@@ -20,7 +20,8 @@ portLayouts = {
                #   LAN        WAN
   'wrt54gl' : ('0 1 2 3 5*', '4 5'),
   'wrt54gs' : ('1 2 3 4 5*', '0 5'),
-  'buffalo' : ('1 2 3 4 5*', '0 5')
+  'buffalo' : ('1 2 3 4 5*', '0 5'),
+  'wl500g'  : ('1 2 3 4 5*', '0 5')
 }
 
 class NodeConfig(object):
