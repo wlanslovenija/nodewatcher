@@ -15,13 +15,14 @@ driverPackages = {
   'broadcom' : ['kmod-brcm-wl', 'kmod-wlcompat', 'wlc']
 }
 
-# A list of port layouts
+# A list of port layouts (do not forget to add new ones to a list of valid layouts to build_image.py if you add them here)
 portLayouts = {
                #   LAN        WAN
   'wrt54gl' : ('0 1 2 3 5*', '4 5'),
   'wrt54gs' : ('1 2 3 4 5*', '0 5'),
-  'buffalo' : ('1 2 3 4 5*', '0 5'),
-  'wl500g'  : ('1 2 3 4 5*', '0 5')
+  'whr-hp-g54' : ('1 2 3 4 5*', '0 5'),
+  'wl-500g'  : ('1 2 3 4 5*', '0 5'),
+  'wl-500gd'  : ('1 2 3 4 5*', '0 5')
 }
 
 class NodeConfig(object):
