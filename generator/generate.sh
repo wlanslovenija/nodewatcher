@@ -6,9 +6,9 @@ python build_image.py \
   --port-layout=wrt54gl \
   --node-type=adhoc \
   --password=abc \
-  --hostname=node-XY \
-  --ip=10.14.0.XY \
-  --add-subnet=wl0,10.16.20Z.ZZZ/27,dhcp,olsr \
+  --hostname=node-17 \
+  --ip=10.14.0.17 \
+  --add-subnet=wl0,10.16.201.160/27,dhcp,olsr \
   --add-iface=wan,eth0.1,dhcp,init \
   --captive-portal \
   --vpn \

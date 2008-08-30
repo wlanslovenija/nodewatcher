@@ -256,9 +256,12 @@ class OpenWrtConfig(NodeConfig):
     """
     self.base = directory
     os.mkdir(os.path.join(directory, 'init.d'))
-
-    # Install our own firewall script
-    self.__overwriteService('firewall')
+    
+    # Generate iproute2 rt_tables (hardcoded for now)
+    os.mkdir(os.path.join(directory, 'iproute2'))
+    f = open(os.path.join(directory, 'iproute2', 'rt_tables'), 'w')
+    f.write('8\twan\n')
+    f.close()
     
     # Configure HTTP server
     self.__copyServiceTemplate('general/httpd.init', 'httpd')
@@ -320,12 +323,6 @@ class OpenWrtConfig(NodeConfig):
     
     # Setup service symlinks
     self.__generateServices(os.path.join(directory, 'rc.d'))
-    
-    # Setup custom routing for subnets
-    meshScriptPath = os.path.join(directory, 'init.d', 'mesh')
-    f = open(meshScriptPath, 'w')
-    self.__generateMeshScript(f)
-    os.chmod(meshScriptPath, 0755)
   
   def build(self, path):
     """
@@ -512,63 +509,6 @@ class OpenWrtConfig(NodeConfig):
     # Copy timezone template
     self.__copyTemplate("general/timezone", os.path.join(self.base, 'TZ'))
   
-  def __generateMeshScript(self, f):
-    f.write('#!/bin/sh /etc/rc.common\n')
-    f.write('START=80\n')
-    f.write('\n')
-    f.write('start() {\n')
-    
-    f.write("\t# Drop OLSR traffic that is not from 10.14.0.0/16\n")
-    f.write("\tiptables -I INPUT -p udp ! -s 10.14.0.0/16 --dport 698 -j DROP\n")
-    f.write("\tiptables -I FORWARD -p udp --dport 698 -j DROP\n")
-    f.write("\t\n")
-    
-    wanIface = self.getInterface('wan')
-    if wanIface:
-      # Add some firewall rules for the wan interface
-      f.write("\t# Prevent direct forwarding between anything and WAN network\n")
-      f.write("\tiptables -N FORWARD_STRICT_WAN\n")
-      f.write("\tiptables -I FORWARD -o %(name)s -j FORWARD_STRICT_WAN\n" % wanIface)
-      
-      if self.subnets:
-        for subnet in self.subnets:
-          if subnet['interface'] == wanIface['name']:
-            # Assigned subnets are an exception
-            f.write("\tiptables -A FORWARD_STRICT_WAN -d %(subnet)s/%(cidr)s -j ACCEPT\n" % subnet)
-      
-      f.write("\tiptables -A FORWARD_STRICT_WAN -j DROP\n" % wanIface)
-      f.write("\t\n")
-    
-    if self.vpn:
-      f.write('\t# Prevent VPN loops via mesh network\n')
-      
-      for vpn in self.vpnServer:
-        f.write('\tiptables -I OUTPUT -p udp -d %s --dport %d -o %s -j DROP\n' % (vpn[0], vpn[1], self.wifiIface))
-      
-      f.write('\n')
-    
-    if self.subnets:
-      f.write('\t# Subnet routing configuration\n')
-      for subnet in self.subnets:
-        # We get the first IP available in the subnet
-        f.write('\tip addr add %(firstIp)s/%(cidr)s dev %(interface)s\n' % subnet)
-      
-      f.write('\n')
-    
-    f.write('}\n\n')
-    f.write('stop() {\n')
-    
-    if self.subnets:
-      f.write('\t# Subnet routing configuration\n')
-      for subnet in self.subnets:
-        # We get the first IP available in the subnet
-        f.write('\tip addr del %(firstIp)s/%(cidr)s dev %(interface)s\n' % subnet)
-      
-      f.write('\n')
-    
-    f.write('}\n')
-    f.close()
-  
   def __generateServices(self, directory):
     os.mkdir(directory)
     
@@ -692,7 +632,6 @@ class OpenWrtConfig(NodeConfig):
           f.write('\toption ipaddr 169.254.189.120\n')
           f.write('\toption netmask 255.255.0.0\n')
           f.write('\n')
-          
     
     # VPN route override
     if self.vpn:
@@ -711,17 +650,52 @@ class OpenWrtConfig(NodeConfig):
           f.write('\toption gateway %s\n' % wanIface['gateway'])
         
         f.write('\toption metric 0\n')
+        f.write('\toption table wan\n')
         f.write('\n')
         idx += 1
     
+    # WAN stuff
+    if self.hasInterface('wan'):
+      f.write('config route wannetwork\n')
+      f.write('\toption interface wan\n')
+      f.write('\toption target network\n')
+      f.write('\toption metric 0\n')
+      f.write('\toption table wan\n')
+      f.write('\n')
+      
+      f.write('config route wandefault\n')
+      f.write('\toption interface wan\n')
+      f.write('\toption target default\n')
+      f.write('\toption gateway auto\n')
+      f.write('\toption metric 0\n')
+      f.write('\toption table wan\n')
+      f.write('\n')
+    
     # WiFi configuration
     f.write('#### WiFi configuration\n')
-    f.write('config interface wlan\n')
+    f.write('config interface mesh\n')
     f.write('\toption ifname "%s"\n' % self.wifiIface)
     f.write('\toption proto static\n')
     f.write('\toption ipaddr %s\n' % self.ip)
     f.write('\toption netmask 255.255.0.0\n')
     f.write('\n')
+    
+    # Subnets
+    if self.subnets:
+      f.write('#### Subnet configuration\n')
+      virtualIfaceIds = {}
+      
+      for subnetId, subnet in enumerate(self.subnets):
+        # Generate subnet configuration
+        ifaceId = virtualIfaceIds.setdefault(subnet['interface'], 0)
+        virtualIfaceIds[subnet['interface']] += 1
+        
+        f.write('config interface subnet%d\n' % subnetId)
+        f.write('\tconfig ifname "%s:%d"\n' % (subnet['interface'], ifaceId))
+        f.write('\tconfig proto static\n')
+        f.write('\tconfig ipaddr %(firstIp)s\n' % subnet)
+        f.write('\tconfig netmask %(mask)s\n' % subnet)
+        f.write('\n')
     
     f.close()
   
