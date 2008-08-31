@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
 #
-from config_generator import OpenWrtConfig
+from config_generator import OpenWrtConfig, portLayouts
 from optparse import OptionParser
 import os
 import sys
@@ -57,10 +57,14 @@ os.mkdir("files/etc")
 
 x = OpenWrtConfig()
 
-for key in ('iface', 'driver', 'password', 'hostname', 'ip'):
+for key in ('iface', 'driver', 'password', 'hostname', 'ip', 'layout'):
   if not options[key]:
     print "Error: You have to specify --interface, --driver, --password, --hostname and --ip!"
     exit()
+
+if options['layout'] not in portLayouts:
+  print "Error: Port layout '%s' is not supported!" % options['layout']
+  exit()
 
 x.setArch(options['arch'])
 x.setWifiIface(options['iface'], options['driver'])
@@ -77,6 +81,7 @@ print "  Node type:  ", options['type']
 print "  Hostname:   ", options['hostname']
 print "  WiFi iface: ", options['iface']
 print "  Driver:     ", options['driver']
+print "  Layout:     ", options['layout']
 print ""
 
 # Add interfaces
