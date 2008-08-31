@@ -619,9 +619,6 @@ class OpenWrtConfig(NodeConfig):
         else:
           f.write('\toption proto dhcp\n')
         
-        if interface['id'] == 'wan':
-          f.write('\toption metric 100\n')
-        
         f.write('\n')
         
         # If interface is WAN and is not static, set a fallback IP
@@ -691,10 +688,10 @@ class OpenWrtConfig(NodeConfig):
         virtualIfaceIds[subnet['interface']] += 1
         
         f.write('config interface subnet%d\n' % subnetId)
-        f.write('\tconfig ifname "%s:%d"\n' % (subnet['interface'], ifaceId))
-        f.write('\tconfig proto static\n')
-        f.write('\tconfig ipaddr %(firstIp)s\n' % subnet)
-        f.write('\tconfig netmask %(mask)s\n' % subnet)
+        f.write('\toption ifname "%s:%d"\n' % (subnet['interface'], ifaceId))
+        f.write('\toption proto static\n')
+        f.write('\toption ipaddr %(firstIp)s\n' % subnet)
+        f.write('\toption netmask %(mask)s\n' % subnet)
         f.write('\n')
     
     f.close()
