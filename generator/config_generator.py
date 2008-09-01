@@ -706,7 +706,7 @@ class OpenWrtConfig(NodeConfig):
     # Wifi interface configuration
     f.write('config wifi-iface\n')
     f.write('\toption device %s\n' % self.wifiIface)
-    f.write('\toption network lan\n')
+    f.write('\toption network mesh\n')
     f.write('\toption mode %s\n' % self.nodeType)
     f.write('\toption ssid %s\n' % self.ssid)
     
