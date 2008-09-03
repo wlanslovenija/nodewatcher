@@ -418,7 +418,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('GatewayName kiberpipa.net\n')
     
     for subnet in self.subnets:
-      if subnet['dhcp']:
+      if subnet['dhcp'] and subnet['interface'] == self.wifiIface:
         f.write('GatewayIPRange %(subnet)s/%(cidr)s\n' % subnet)
         break
     
