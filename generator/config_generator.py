@@ -621,8 +621,8 @@ class OpenWrtConfig(NodeConfig):
         
         f.write('\n')
         
-        # If interface is WAN and is not static, set a fallback IP
-        if interface['id'] == 'wan' and not interface['ip']:
+        # Set a fallback IP on WAN interface
+        if interface['id'] == 'wan':
           f.write('config interface fallback\n')
           f.write('\toption ifname "%(name)s:0"\n' % interface)
           f.write('\toption proto static\n')
