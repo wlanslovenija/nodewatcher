@@ -14,6 +14,8 @@ print "                   Ljubljana WiFi Mesh Image Generator"
 print "============================================================================"
 
 parser = OptionParser()
+parser.add_option('--openwrt-version', dest = 'openwrt_version', default = 'old',
+                  help = 'OpenWRT version to configure for (old or new).')
 parser.add_option('--arch', dest = 'arch', default = 'mipsel',
                   help = 'Hardware architecture (eg. mipsel)')
 parser.add_option('--iface', dest = 'iface',
@@ -46,6 +48,8 @@ parser.add_option('--vpn-password', dest = 'vpn_password',
                   help = 'Specifies the assigned VPN password.')
 parser.add_option('--vpn-keyfile', dest = 'vpn_keyfile',
                   help = 'Specifies the assigned VPN keyfile.')
+parser.add_option('--no-build', action = 'store_true', dest = 'no_build',
+                  help = 'Just generate configuration - do not build an image.')
 
 (options, args) = parser.parse_args()
 options = options.__dict__
@@ -66,6 +70,7 @@ if options['layout'] not in portLayouts:
   print "Error: Port layout '%s' is not supported!" % options['layout']
   exit()
 
+x.setOpenwrtVersion(options['openwrt_version'])
 x.setArch(options['arch'])
 x.setWifiIface(options['iface'], options['driver'])
 x.setPortLayout(options['layout'])
@@ -80,6 +85,7 @@ print "  IP address: ", options['ip']
 print "  Node type:  ", options['type']
 print "  Hostname:   ", options['hostname']
 print "  WiFi iface: ", options['iface']
+print "  OpenWRT:    ", options['openwrt_version']
 print "  Driver:     ", options['driver']
 print "  Layout:     ", options['layout']
 print ""
@@ -136,5 +142,7 @@ if options['vpn']:
 # Generates configuration and builds the image
 print ">>> Generating image, please stand by..."
 x.generate('files/etc')
-x.build('imagebuilder')
-
+if not options['no_build']:
+  x.build('imagebuilder')
+else:
+  print "Warning: Image not build, since --no-build has been specified!"

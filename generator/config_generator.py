@@ -12,7 +12,8 @@ from datetime import datetime
 
 # A list of driver dependent packages
 driverPackages = {
-  'broadcom' : ['kmod-brcm-wl', 'kmod-wlcompat', 'wlc']
+  'broadcom' : ['kmod-brcm-wl', 'kmod-wlcompat', 'wlc'],
+  'mac80211' : ['mac80211', 'b43']
 }
 
 # A list of port layouts (do not forget to add new ones to a list of valid layouts to build_image.py if you add them here)
@@ -32,6 +33,7 @@ class NodeConfig(object):
   ssid = "open.kiberpipa.net"
   bssid = "02:CA:FF:EE:BA:BE"
   arch = "mipsel"
+  openwrtVersion = "old"
   wifiIface = "wl0"
   wifiDriver = "broadcom"
   portLayout = "wrt54gl"
@@ -85,6 +87,12 @@ class NodeConfig(object):
     self.wifiIface = iface
     self.wifiDriver = driver
   
+  def setOpenwrtVersion(self, version):
+    """
+    Sets the OpenWRT version.
+    """
+    self.openwrtVersion = version
+  
   def setArch(self, arch):
     """
     Sets the CPU architecture.
@@ -133,13 +141,13 @@ class NodeConfig(object):
     netmask = None
     
     if ip:
-      if not cidr or not gateway:
-        raise Exception('Static IP configuration requires CIDR and gateway parameters!')
+      if not cidr:
+        raise Exception('Static IP configuration requires CIDR parameter!')
       
       network = ipcalc.Network("%s/%s" % (ip, cidr))
       netmask = str(network.netmask())
       
-      if gateway not in ipcalc.Network("%s/%s" % (str(network.network()), cidr)):
+      if gateway and gateway not in ipcalc.Network("%s/%s" % (str(network.network()), cidr)):
         raise Exception('Gateway must be in the same network as the given interface!')
     
     self.interfaces.append({ 'name'     : name,
@@ -167,6 +175,16 @@ class NodeConfig(object):
     """
     for interface in self.interfaces:
       if interface['id'] == id:
+        return interface
+    
+    return None
+  
+  def getInterfaceByName(self, name):
+    """
+    Returns the interface with the given name.
+    """
+    for interface in self.interfaces:
+      if interface['name'] == name:
         return interface
     
     return None
@@ -559,10 +577,6 @@ class OpenWrtConfig(NodeConfig):
     
     interfaceConfiguration("eth0.0")
     
-    # Ad-hoc mode runs OLSR on the wifi interface
-    if self.nodeType == "adhoc":
-      interfaceConfiguration(self.wifiIface)
-    
     # Additional interface configuration
     for interface in self.interfaces:
       if interface['olsr']:
@@ -604,6 +618,9 @@ class OpenWrtConfig(NodeConfig):
     f.write('\toption netmask 255.255.0.0\n')
     f.write('\n')
     
+    # Add wireless interface configuration
+    self.addInterface('mesh', self.wifiIface, self.ip, 16, olsr = (self.nodeType == "adhoc"), init = True)
+    
     # Other interfaces configuration
     for interface in self.interfaces:
       if interface['init']:
@@ -614,7 +631,9 @@ class OpenWrtConfig(NodeConfig):
           f.write('\toption proto static\n')
           f.write('\toption ipaddr %(ip)s\n' % interface)
           f.write('\toption netmask %(mask)s\n' % interface)
-          f.write('\toption gateway %(gateway)s\n' % interface)
+          
+          if interface['gateway']:
+            f.write('\toption gateway %(gateway)s\n' % interface)
         else:
           f.write('\toption proto dhcp\n')
         
@@ -622,8 +641,13 @@ class OpenWrtConfig(NodeConfig):
         
         # Set a fallback IP on WAN interface
         if interface['id'] == 'wan':
-          f.write('config interface fallback\n')
-          f.write('\toption ifname "%(name)s:0"\n' % interface)
+          if self.openwrtVersion == "old":
+            f.write('config interface fallback\n')
+            f.write('\toption ifname "%(name)s:0"\n' % interface)
+          else:
+            f.write('config alias wanfallback\n')
+            f.write('\toption interface wan\n')
+          
           f.write('\toption proto static\n')
           f.write('\toption ipaddr 169.254.189.120\n')
           f.write('\toption netmask 255.255.0.0\n')
@@ -667,15 +691,6 @@ class OpenWrtConfig(NodeConfig):
       f.write('\toption table wan\n')
       f.write('\n')
     
-    # WiFi configuration
-    f.write('#### WiFi configuration\n')
-    f.write('config interface mesh\n')
-    f.write('\toption ifname "%s"\n' % self.wifiIface)
-    f.write('\toption proto static\n')
-    f.write('\toption ipaddr %s\n' % self.ip)
-    f.write('\toption netmask 255.255.0.0\n')
-    f.write('\n')
-    
     # Subnets
     if self.subnets:
       f.write('#### Subnet configuration\n')
@@ -686,8 +701,13 @@ class OpenWrtConfig(NodeConfig):
         ifaceId = virtualIfaceIds.setdefault(subnet['interface'], 0)
         virtualIfaceIds[subnet['interface']] += 1
         
-        f.write('config interface subnet%d\n' % subnetId)
-        f.write('\toption ifname "%s:%d"\n' % (subnet['interface'], ifaceId))
+        if self.openwrtVersion == "old":
+          f.write('config interface subnet%d\n' % subnetId)
+          f.write('\toption ifname "%s:%d"\n' % (subnet['interface'], ifaceId))
+        else:
+          f.write('config alias subnet%d\n' % subnetId)
+          f.write('\toption interface %(id)s\n' % self.getInterfaceByName(subnet['interface']))
+        
         f.write('\toption proto static\n')
         f.write('\toption ipaddr %(firstIp)s\n' % subnet)
         f.write('\toption netmask %(mask)s\n' % subnet)
