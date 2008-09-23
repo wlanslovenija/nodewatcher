@@ -248,7 +248,6 @@ class OpenWrtConfig(NodeConfig):
     
     # Add some basic services
     self.addService('S35', 'misc')
-    self.addService('S80', 'mesh')
   
   def generate(self, directory):
     """
