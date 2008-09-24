@@ -50,6 +50,8 @@ parser.add_option('--vpn-keyfile', dest = 'vpn_keyfile',
                   help = 'Specifies the assigned VPN keyfile.')
 parser.add_option('--no-build', action = 'store_true', dest = 'no_build',
                   help = 'Just generate configuration - do not build an image.')
+parser.add_option('--imagebuilder-dir', dest = 'imagebuilder_dir', default = './imagebuilder',
+                  help = 'Set OpenWRT imagebuilder directory.')
 
 (options, args) = parser.parse_args()
 options = options.__dict__
@@ -143,6 +145,6 @@ if options['vpn']:
 print ">>> Generating image, please stand by..."
 x.generate('files/etc')
 if not options['no_build']:
-  x.build('imagebuilder')
+  x.build(options['imagebuilder_dir'])
 else:
   print "Warning: Image not build, since --no-build has been specified!"

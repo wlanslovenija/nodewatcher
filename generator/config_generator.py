@@ -13,7 +13,7 @@ from datetime import datetime
 # A list of driver dependent packages
 driverPackages = {
   'broadcom' : ['kmod-brcm-wl', 'kmod-wlcompat', 'wlc'],
-  'mac80211' : ['mac80211', 'b43']
+  'mac80211' : ['kmod-mac80211', 'kmod-b43']
 }
 
 # A list of port layouts (do not forget to add new ones to a list of valid layouts to build_image.py if you add them here)
@@ -339,7 +339,8 @@ class OpenWrtConfig(NodeConfig):
       self.__generateCaptivePortalConfig(os.path.join(directory, 'nodogsplash'))
     
     # Setup service symlinks
-    self.__generateServices(os.path.join(directory, 'rc.d'))
+    if self.openwrtVersion == "old":
+      self.__generateServices(os.path.join(directory, 'rc.d'))
   
   def build(self, path):
     """
@@ -523,8 +524,9 @@ class OpenWrtConfig(NodeConfig):
     
     f.close()
     
-    # Copy timezone template
-    self.__copyTemplate("general/timezone", os.path.join(self.base, 'TZ'))
+    if self.openwrtVersion == "old":
+      # Copy timezone template
+      self.__copyTemplate("general/timezone", os.path.join(self.base, 'TZ'))
   
   def __generateServices(self, directory):
     os.mkdir(directory)
@@ -588,6 +590,8 @@ class OpenWrtConfig(NodeConfig):
     # System configuration
     f.write('config system\n')
     f.write('\toption hostname %s\n' % self.hostname)
+    f.write('\toption timezone "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"\n')
+    f.write('\n')
     f.close()
   
   def __generateNetworkConfig(self, f):
@@ -741,10 +745,23 @@ class OpenWrtConfig(NodeConfig):
   def __generateNtpClientConfig(self, f):
     # Ntpclient configuration
     for ntp in self.ntp:
-      f.write('config ntpclient\n')
+      if self.openwrtVersion == "old":
+        f.write('config ntpclient\n')
+        f.write('\toption count "1"\n')
+      else:
+        f.write('config ntpserver\n')
+      
       f.write('\toption hostname "%s"\n' % ntp)
       f.write('\toption port "123"\n')
-      f.write('\toption count "1"\n')
+      f.write('\n')
+    
+    if self.openwrtVersion == "new":
+      f.write('config ntpdrift\n')
+      f.write('\toption freq 0\n')
+      f.write('\n')
+      
+      f.write('config ntpclient\n')
+      f.write('\toption interval 60\n')
       f.write('\n')
     
     f.close()
