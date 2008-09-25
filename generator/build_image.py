@@ -147,4 +147,4 @@ x.generate('files/etc')
 if not options['no_build']:
   x.build(options['imagebuilder_dir'])
 else:
-  print "Warning: Image not build, since --no-build has been specified!"
+  print "Warning: Image not built, since --no-build has been specified!"
