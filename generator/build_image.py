@@ -46,8 +46,6 @@ parser.add_option('--vpn-username', dest = 'vpn_username',
                   help = 'Specifies the assigned VPN username.')
 parser.add_option('--vpn-password', dest = 'vpn_password',
                   help = 'Specifies the assigned VPN password.')
-parser.add_option('--vpn-keyfile', dest = 'vpn_keyfile',
-                  help = 'Specifies the assigned VPN keyfile.')
 parser.add_option('--no-build', action = 'store_true', dest = 'no_build',
                   help = 'Just generate configuration - do not build an image.')
 parser.add_option('--imagebuilder-dir', dest = 'imagebuilder_dir', default = './imagebuilder',
