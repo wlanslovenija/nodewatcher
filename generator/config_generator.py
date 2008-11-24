@@ -42,7 +42,7 @@ class NodeConfig(object):
   ip = None
   subnets = None
   vpn = None
-  vpnServer = (("193.164.137.78", 9999), ("91.185.199.246", 9999))
+  vpnServer = (("91.185.199.246", 9999), ("193.164.137.78", 9999))
   dns = ("10.14.0.1", "10.14.0.2")
   ntp = ("10.14.0.2", "10.14.0.1")
   interfaces = None
