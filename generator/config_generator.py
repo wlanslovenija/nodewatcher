@@ -587,7 +587,7 @@ class OpenWrtConfig(NodeConfig):
       f.write('}\n')
       f.write('\n')
     
-    interfaceConfiguration("eth0.0")
+    interfaceConfiguration(self.lanIface)
     
     # Additional interface configuration
     for interface in self.interfaces:
