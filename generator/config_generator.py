@@ -13,17 +13,20 @@ from datetime import datetime
 # A list of driver dependent packages
 driverPackages = {
   'broadcom' : ['kmod-brcm-wl', 'kmod-wlcompat', 'wlc'],
-  'mac80211' : ['kmod-mac80211', 'kmod-b43']
+  'mac80211' : ['kmod-mac80211', 'kmod-b43'],
+  'atheros'  : ['kmod-madwifi']
 }
 
-# A list of port layouts (do not forget to add new ones to a list of valid layouts to build_image.py if you add them here)
+# A list of port layouts (do not forget to add new ones to a list of valid
+# layouts to build_image.py if you add them here)
 portLayouts = {
-               #   LAN        WAN
-  'wrt54gl' : ('0 1 2 3 5*', '4 5'),
-  'wrt54gs' : ('1 2 3 4 5*', '0 5'),
+               #  LAN           WAN
+  'wrt54gl'    : ('0 1 2 3 5*', '4 5'),
+  'wrt54gs'    : ('1 2 3 4 5*', '0 5'),
   'whr-hp-g54' : ('1 2 3 4 5*', '0 5'),
-  'wl-500g'  : ('1 2 3 4 5*', '0 5'),
-  'wl-500gd'  : ('1 2 3 4 5*', '0 5')
+  'wl-500g'    : ('1 2 3 4 5*', '0 5'),
+  'wl-500gd'   : ('1 2 3 4 5*', '0 5'),
+  'fonera'     : None
 }
 
 class NodeConfig(object):
@@ -352,7 +355,7 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
 
     # Build the image
-    buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas %s"' % " ".join(self.packages)
+    buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
     print buildString
     os.chdir(path)
     os.system(buildString)
@@ -598,11 +601,12 @@ class OpenWrtConfig(NodeConfig):
     # VLAN configuration
     layout = portLayouts[self.portLayout]
     
-    f.write('#### VLAN configuration\n')
-    f.write('config switch eth0\n')
-    f.write('\toption vlan0 "%s"\n' % layout[0])
-    f.write('\toption vlan1 "%s"\n' % layout[1])
-    f.write('\n')
+    if layout:
+      f.write('#### VLAN configuration\n')
+      f.write('config switch eth0\n')
+      f.write('\toption vlan0 "%s"\n' % layout[0])
+      f.write('\toption vlan1 "%s"\n' % layout[1])
+      f.write('\n')
     
     # Loopback configuration (static)
     f.write('#### Loopback configuration\n')
