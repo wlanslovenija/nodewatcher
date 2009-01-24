@@ -55,6 +55,7 @@ class NodeConfig(object):
   packages = None
   wan = None
   nodeType = "adhoc"
+  lanIface = "eth0.0"
   
   def __init__(self):
     """
@@ -89,6 +90,12 @@ class NodeConfig(object):
     """
     self.wifiIface = iface
     self.wifiDriver = driver
+
+  def setLanIface(self, iface):
+    """
+    Sets the LAN interface name.
+    """
+    self.lanIface = iface
   
   def setOpenwrtVersion(self, version):
     """
@@ -618,13 +625,14 @@ class OpenWrtConfig(NodeConfig):
     f.write('\n')
     
     # LAN configuration
-    f.write('#### LAN configuration\n')
-    f.write('config interface lan\n')
-    f.write('\toption ifname "eth0.0"\n')
-    f.write('\toption proto static\n')
-    f.write('\toption ipaddr %s\n' % self.ip)
-    f.write('\toption netmask 255.255.0.0\n')
-    f.write('\n')
+    if self.lanIface:
+      f.write('#### LAN configuration\n')
+      f.write('config interface lan\n')
+      f.write('\toption ifname "%s"\n' % self.lanIface)
+      f.write('\toption proto static\n')
+      f.write('\toption ipaddr %s\n' % self.ip)
+      f.write('\toption netmask 255.255.0.0\n')
+      f.write('\n')
     
     # Add wireless interface configuration
     self.addInterface('mesh', self.wifiIface, self.ip, 16, olsr = (self.nodeType == "adhoc"), init = True)

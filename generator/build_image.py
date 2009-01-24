@@ -20,6 +20,8 @@ parser.add_option('--arch', dest = 'arch', default = 'mipsel',
                   help = 'Hardware architecture (eg. mipsel)')
 parser.add_option('--iface', dest = 'iface',
                   help = 'Wireless interface name (eg. "wl0")')
+parser.add_option('--iface-lan', dest = 'iface_lan', default = 'eth0.0',
+                  help = 'LAN interface name (eg. "eth0.0")')
 parser.add_option('--driver', dest = 'driver',
                   help = 'Wireless driver name (eg. "broadcom")')
 parser.add_option('--port-layout', dest = 'layout', default = 'wrt54gl',
@@ -73,6 +75,7 @@ if options['layout'] not in portLayouts:
 x.setOpenwrtVersion(options['openwrt_version'])
 x.setArch(options['arch'])
 x.setWifiIface(options['iface'], options['driver'])
+x.setLanIface(options['iface_lan'])
 x.setPortLayout(options['layout'])
 x.setNodeType(options['type'])
 x.setPassword(options['password'])
@@ -85,6 +88,7 @@ print "  IP address: ", options['ip']
 print "  Node type:  ", options['type']
 print "  Hostname:   ", options['hostname']
 print "  WiFi iface: ", options['iface']
+print "  LAN iface:  ", options['iface_lan'] or "(Disabled)"
 print "  OpenWRT:    ", options['openwrt_version']
 print "  Driver:     ", options['driver']
 print "  Layout:     ", options['layout']
