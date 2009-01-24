@@ -22,6 +22,8 @@ parser.add_option('--iface', dest = 'iface',
                   help = 'Wireless interface name (eg. "wl0")')
 parser.add_option('--iface-lan', dest = 'iface_lan', default = 'eth0.0',
                   help = 'LAN interface name (eg. "eth0.0")')
+parser.add_option('--channel', dest = 'channel', default = '8',
+                  help = 'Wifi channel number (eg. 8)')
 parser.add_option('--driver', dest = 'driver',
                   help = 'Wireless driver name (eg. "broadcom")')
 parser.add_option('--port-layout', dest = 'layout', default = 'wrt54gl',
@@ -74,7 +76,7 @@ if options['layout'] not in portLayouts:
 
 x.setOpenwrtVersion(options['openwrt_version'])
 x.setArch(options['arch'])
-x.setWifiIface(options['iface'], options['driver'])
+x.setWifiIface(options['iface'], options['driver'], int(options['channel']))
 x.setLanIface(options['iface_lan'])
 x.setPortLayout(options['layout'])
 x.setNodeType(options['type'])

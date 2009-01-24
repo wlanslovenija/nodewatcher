@@ -38,13 +38,14 @@ class NodeConfig(object):
   """
   A class representing mesh router configuration.
   """
-  ssid = "open.kiberpipa.net"
+  ssid = "open.wlan-lj.net"
   bssid = "02:CA:FF:EE:BA:BE"
   arch = "mipsel"
   openwrtVersion = "old"
   wifiVirtualIface = None
   wifiIface = "wl0"
   wifiDriver = "broadcom"
+  wifiChannel = 8
   portLayout = "wrt54gl"
   password = "ljw"
   hostname = None
@@ -90,12 +91,13 @@ class NodeConfig(object):
     """
     self.password = password
 
-  def setWifiIface(self, iface, driver):
+  def setWifiIface(self, iface, driver, channel = 8):
     """
     Sets the wireless interface name and driver.
     """
     self.wifiIface = iface
     self.wifiDriver = driver
+    self.wifiChannel = channel
     
     if driver in wifiVirtuals:
       self.wifiVirtualIface = wifiVirtuals[driver]
@@ -131,11 +133,6 @@ class NodeConfig(object):
     Sets the node type.
     """
     self.nodeType = nodeType
-    
-    if nodeType == "adhoc":
-      self.ssid = "open.kiberpipa.net"
-    elif nodeType == "ap":
-      self.ssid = "ap.kiberpipa.net"
   
   def addService(self, priority, name):
     """
@@ -752,7 +749,7 @@ class OpenWrtConfig(NodeConfig):
     # Wifi device configuration
     f.write('config wifi-device %s\n' % self.wifiVirtualIface)
     f.write('\toption type %s\n' % self.wifiDriver)
-    f.write('\toption channel 8\n')
+    f.write('\toption channel %s\n' % self.wifiChannel)
     f.write('\n')
     
     # Wifi interface configuration
