@@ -17,6 +17,11 @@ driverPackages = {
   'atheros'  : ['kmod-madwifi']
 }
 
+# A list of virtual interface names for some drivers
+wifiVirtuals = {
+  'atheros'  : 'wifi0'
+}
+
 # A list of port layouts (do not forget to add new ones to a list of valid
 # layouts to build_image.py if you add them here)
 portLayouts = {
@@ -37,6 +42,7 @@ class NodeConfig(object):
   bssid = "02:CA:FF:EE:BA:BE"
   arch = "mipsel"
   openwrtVersion = "old"
+  wifiVirtualIface = None
   wifiIface = "wl0"
   wifiDriver = "broadcom"
   portLayout = "wrt54gl"
@@ -90,6 +96,11 @@ class NodeConfig(object):
     """
     self.wifiIface = iface
     self.wifiDriver = driver
+    
+    if driver in wifiVirtuals:
+      self.wifiVirtualIface = wifiVirtuals[driver]
+    else:
+      self.wifiVirtualIface = iface
 
   def setLanIface(self, iface):
     """
@@ -739,14 +750,14 @@ class OpenWrtConfig(NodeConfig):
   
   def __generateWirelessConfig(self, f):
     # Wifi device configuration
-    f.write('config wifi-device %s\n' % self.wifiIface)
+    f.write('config wifi-device %s\n' % self.wifiVirtualIface)
     f.write('\toption type %s\n' % self.wifiDriver)
     f.write('\toption channel 8\n')
     f.write('\n')
     
     # Wifi interface configuration
     f.write('config wifi-iface\n')
-    f.write('\toption device %s\n' % self.wifiIface)
+    f.write('\toption device %s\n' % self.wifiVirtualIface)
     f.write('\toption network mesh\n')
     f.write('\toption mode %s\n' % self.nodeType)
     f.write('\toption ssid %s\n' % self.ssid)
