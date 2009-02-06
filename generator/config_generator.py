@@ -52,7 +52,7 @@ class NodeConfig(object):
   ip = None
   subnets = None
   vpn = None
-  vpnServer = (("91.185.199.246", 9999), ("193.164.137.78", 9999))
+  vpnServer = (("91.185.199.246", 9999), ("91.185.199.253", 9999), ("193.164.137.78", 9999))
   dns = ("10.14.0.1", "10.14.0.2")
   ntp = ("10.14.0.2", "10.14.0.1")
   interfaces = None
@@ -640,13 +640,7 @@ class OpenWrtConfig(NodeConfig):
     
     # LAN configuration
     if self.lanIface:
-      f.write('#### LAN configuration\n')
-      f.write('config interface lan\n')
-      f.write('\toption ifname "%s"\n' % self.lanIface)
-      f.write('\toption proto static\n')
-      f.write('\toption ipaddr %s\n' % self.ip)
-      f.write('\toption netmask 255.255.0.0\n')
-      f.write('\n')
+      self.addInterface('lan', self.lanIface, self.ip, 16, olsr = True, init = True)
     
     # Add wireless interface configuration
     self.addInterface('mesh', self.wifiIface, self.ip, 16, olsr = (self.nodeType == "adhoc"), init = True)
