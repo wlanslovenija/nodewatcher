@@ -456,7 +456,7 @@ class OpenWrtConfig(NodeConfig):
     # Basic configuration (static)
     f = open(os.path.join(directory, 'nodogsplash.conf'), 'w')
     f.write('GatewayInterface %s\n' % self.wifiIface)
-    f.write('GatewayName kiberpipa.net\n')
+    f.write('GatewayName wlan-lj.net\n')
     
     for subnet in self.subnets:
       if subnet['dhcp'] and subnet['interface'] == self.wifiIface:
