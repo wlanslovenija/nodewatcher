@@ -22,6 +22,7 @@ from config_generator import OpenWrtConfig, portLayouts
 import logging
 import hashlib
 from traceback import format_exc
+import pwd
 
 DESTINATION = "/var/www/nodes.wlan-lj.net/results"
 IMAGEBUILDERS = (
@@ -106,6 +107,14 @@ logging.basicConfig(level = logging.DEBUG,
                     datefmt = '%a, %d %b %Y %H:%M:%S',
                     filename = '/var/log/wlanlj-gennyd.log',
                     filemode = 'a')
+
+# Change ownership for the build directory
+os.system("chown -R generator:generator build")
+
+# Drop user privileges
+info = pwd.getpwnam('generator')
+os.setgid(info.pw_gid)
+os.setuid(info.pw_uid)
 
 logging.info("Wlan-Lj Image Generator Daemon v0.1 starting up...")
 
