@@ -100,8 +100,8 @@
     <td>{{ node.rtt_max|default:"/" }}</td>
   </tr>
   <tr>
-    <td>{% trans "Packet loss" %}</td>
-    <td>{{ node.pkt_loss|default:"/" }}</td>
+    <td>{% trans "Packet loss" %} (%)</td>
+    <td>{{ node.pkt_loss|default_if_none:"/" }}</td>
   </tr>
   <tr>
     <td>{% trans "Peers" %}</td>
