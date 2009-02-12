@@ -4,7 +4,7 @@ def require_lock(*tables):
   def _lock(func):
     def _do_lock(*args,**kws):
       cursor = connection.cursor()
-      cursor.execute("LOCK TABLES %s WRITE" %' '.join(tables))
+      cursor.execute("LOCK TABLES %s" % ', '.join(["%s WRITE" % x for x in tables]))
 
       try:
         return func(*args,**kws)
