@@ -7,7 +7,6 @@ GENERATORS=(
   "config-broadcom-2.6 broadcom"
   "config-fonera atheros"
 )
-MAKEOPTS="-j3"
 
 # -----------------------------------------------------------
 
@@ -29,7 +28,7 @@ for i in $(seq 0 $((${#GENERATORS[@]} - 1))); do
   cp "configs/${config}" .config
 
   echo ">>> Building image..."
-  make ${MAKEOPTS} >/dev/null 2>/dev/null
+  make >/dev/null 2>/dev/null
   if [ "$?" != "0" ]; then
     echo "!!! Failed to build image for ${config}!"
     exit 1
