@@ -65,6 +65,16 @@
       {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information<i> section." %}
     </td>
   </tr>
+  {% if user.is_staff %}
+  <tr>
+    <td>{{ form.network.label }}</td>
+    <td>{{ form.network }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">{% trans "Leave blank for auto-allocation." %}</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>{{ form.description.label }}</td>
     <td>{{ form.description }}</td>

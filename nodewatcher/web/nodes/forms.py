@@ -102,6 +102,7 @@ class RegisterNodeForm(forms.Form):
       
       # Create a new subnet for this node or use an existing one if available
       subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
+      subnet.allocated = True
       subnet.allocated_at = datetime.now()
       subnet.status = SubnetStatus.NotAnnounced
     else:
@@ -116,6 +117,7 @@ class RegisterNodeForm(forms.Form):
         fresh_subnet = pool.allocate_subnet()
         net = ipcalc.Network(fresh_subnet.network, fresh_subnet.cidr)
         subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
+        subnet.allocated = True
         subnet.allocated_at = datetime.now()
         subnet.status = SubnetStatus.NotAnnounced
 
@@ -249,6 +251,7 @@ class AllocateSubnetForm(forms.Form):
   """
   A simple form for subnet allocation.
   """
+  network = forms.CharField(max_length = 50, required = False)
   description = forms.CharField(max_length = 200)
   iface_type = forms.ChoiceField(
     choices = [
@@ -260,18 +263,60 @@ class AllocateSubnetForm(forms.Form):
     label = _("Interface")
   )
   dhcp = forms.BooleanField(required = False, initial = True, label = _("DHCP announce"))
+  
+  def clean(self):
+    """
+    Additional validation handler.
+    """
+    if self.cleaned_data.get('network'):
+      try:
+        network, cidr = self.cleaned_data.get('network').split('/')
+        cidr = int(cidr)
+        if not IPV4_ADDR_RE.match(network) or network.startswith('127.'):
+          raise ValueError
+      except ValueError:
+        raise forms.ValidationError(_("Enter subnet in CIDR notation!"))
+
+      # Check if the given subnet already exists
+      if Subnet.is_allocated(network, cidr):
+        raise forms.ValidationError(_("Specified subnet is already in use!"))
+
+      # Check if the given subnet is part of any allocation pools
+      if Pool.contains_network(network, cidr):
+        raise forms.ValidationError(_("Specified subnet is part of an allocation pool and cannot be manually allocated!"))
+
+      self.cleaned_data['network'] = network
+      self.cleaned_data['cidr'] = cidr
+
+    return self.cleaned_data
 
   def save(self, node):
     """
     Completes subnet allocation.
     """
-    pool = node.project.pool
-    allocation = pool.allocate_subnet()
-    subnet = Subnet(node = node, subnet = allocation.network, cidr = allocation.cidr)
-    subnet.allocated_at = datetime.now()
-    subnet.status = SubnetStatus.NotAnnounced
-    subnet.description = self.cleaned_data.get('description')
-    subnet.gen_iface_type = self.cleaned_data.get('iface_type')
-    subnet.gen_dhcp = self.cleaned_data.get('dhcp')
-    subnet.save()
+    if self.cleaned_data.get('network'):
+      subnet = Subnet(node = node)
+      subnet.subnet = self.cleaned_data.get('network')
+      subnet.cidr = self.cleaned_data.get('cidr')
+      subnet.allocated = True
+      subnet.allocated_at = datetime.now()
+      subnet.status = SubnetStatus.NotAnnounced
+      subnet.description = self.cleaned_data.get('description')
+      subnet.gen_iface_type = self.cleaned_data.get('iface_type')
+      subnet.gen_dhcp = self.cleaned_data.get('dhcp')
+      subnet.save()
+    else:
+      pool = node.project.pool
+      allocation = pool.allocate_subnet()
+      subnet = Subnet(node = node, subnet = allocation.network, cidr = allocation.cidr)
+      subnet.allocated = True
+      subnet.allocated_at = datetime.now()
+      subnet.status = SubnetStatus.NotAnnounced
+      subnet.description = self.cleaned_data.get('description')
+      subnet.gen_iface_type = self.cleaned_data.get('iface_type')
+      subnet.gen_dhcp = self.cleaned_data.get('dhcp')
+      subnet.save()
+
+    # Remove any already announced subnets that are the same subnet
+    Subnet.objects.filter(node = node, subnet = subnet.subnet, cidr = subnet.cidr, allocated = False).delete()
 

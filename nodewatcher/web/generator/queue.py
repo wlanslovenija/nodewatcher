@@ -16,20 +16,19 @@ def queue_generator_job(node):
 
   # Prepare job metadata from profile information
   subnets = []
-  for subnet in node.subnet_set.all():
-    if subnet.is_allocated():
-      # Resolve actual interface name
-      try:
-        iface = IfaceTemplate.objects.get(template = node.profile.template, type = subnet.gen_iface_type)
-      except IfaceTemplate.DoesNotExist:
-        continue
+  for subnet in node.subnet_set.filter(allocated = True):
+    # Resolve actual interface name
+    try:
+      iface = IfaceTemplate.objects.get(template = node.profile.template, type = subnet.gen_iface_type)
+    except IfaceTemplate.DoesNotExist:
+      continue
 
-      subnets.append({
-        'network'     : subnet.subnet,
-        'cidr'        : subnet.cidr,
-        'iface'       : iface.ifname,
-        'dhcp'        : subnet.gen_dhcp
-      })
+    subnets.append({
+      'network'     : subnet.subnet,
+      'cidr'        : subnet.cidr,
+      'iface'       : iface.ifname,
+      'dhcp'        : subnet.gen_dhcp
+    })
   
   # Generate VPN password if needed
   try:

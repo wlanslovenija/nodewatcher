@@ -187,6 +187,7 @@ class Subnet(models.Model):
   subnet = models.CharField(max_length = 200)
   cidr = models.IntegerField()
   description = models.CharField(max_length = 200, null = True)
+  allocated = models.BooleanField(default = False)
   allocated_at = models.DateTimeField(null = True)
 
   # Basic status (set by the monitor daemon)
@@ -196,6 +197,20 @@ class Subnet(models.Model):
   # Generator attributes
   gen_iface_type = models.IntegerField(default = IfaceType.WiFi)
   gen_dhcp = models.BooleanField(default = True)
+  
+  @staticmethod
+  def is_allocated(network, cidr):
+    """
+    Returns true if a node has the specified subnet allocated. This is
+    currently an expensive operation.
+    """
+    net = ipcalc.Network(network, cidr)
+    for x in Subnet.objects.filter(allocated = True):
+      comp_net = ipcalc.Network(x.subnet, x.cidr)
+      if net in comp_net or comp_net in net:
+        return True
+
+    return False
 
   def status_as_string(self):
     """
@@ -210,17 +225,6 @@ class Subnet(models.Model):
     else:
       return "unknown"
   
-  def is_allocated(self):
-    """
-    Returns true if there exists a pool allocation for this
-    subnet.
-    """
-    try:
-      subnet = Pool.objects.get(network = self.subnet, cidr = self.cidr)
-      return True
-    except Pool.DoesNotExist:
-      return False
-
   def __unicode__(self):
     """
     Returns a string representation of this subnet.
@@ -269,13 +273,26 @@ class Pool(models.Model):
   last_alloc_network = models.CharField(max_length = 50, null = True)
   last_alloc_cidr = models.IntegerField(null = True)
 
+  @staticmethod
+  def contains_network(network, cidr):
+    """
+    Returns true if any pools contain this network.
+    """
+    net = ipcalc.Network(network, cidr)
+    for x in Pool.objects.filter(parent = None):
+      comp_net = ipcalc.Network(x.network, x.cidr)
+      if net in comp_net or comp_net in net:
+        return True
+
+    return False
+
   def __unicode__(self):
     """
     Returns a string representation of this pool.
     """
     return u"%s/%d" % (self.network, self.cidr)
   
-  @require_lock('nodes_pool')
+  @require_lock('nodes_pool', 'nodes_subnet')
   def allocate_subnet(self, prefix_len = None):
     """
     Attempts to allocate a subnet from this pool.
@@ -314,6 +331,10 @@ class Pool(models.Model):
 
       allocation = (str(net.network()), prefix_len)
     
+    # Check if this is actually still free
+    if Subnet.is_allocated(*allocation):
+      raise PoolAllocationError('Subnet allocation conflict found! All automatic allocations have been suspended. Contact network operations immediately!')
+
     # Create a new child
     child = Pool(parent = self, family = self.family)
     child.network, child.cidr = allocation
