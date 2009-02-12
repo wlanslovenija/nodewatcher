@@ -14,7 +14,7 @@ import os
 logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(levelname)-8s %(message)s',
                     datefmt = '%a, %d %b %Y %H:%M:%S',
-                    filename = '/var/log/pnet.processor.log',
+                    filename = '/var/log/wlanlj-gennyd.log',
                     filemode = 'a')
 
 c = serverconn.ServerConn("127.0.0.1", 11300)
