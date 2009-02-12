@@ -93,7 +93,7 @@ def generate_image(d):
   })
 
   send_mail(
-    '[Wlan-Lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
+    _("Router images for %s/%s") % (d['hostname'], d['ip']),
     t.render(c),
     'generator@wlan-lj.net',
     [d['email']],
