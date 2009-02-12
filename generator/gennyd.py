@@ -24,6 +24,7 @@ import hashlib
 from traceback import format_exc
 import pwd
 
+WORKDIR = "/home/generator"
 DESTINATION = "/var/www/nodes.wlan-lj.net/results"
 IMAGEBUILDERS = (
   "imagebuilder.atheros",
@@ -45,7 +46,6 @@ def generate_image(d):
   """
   Generates an image accoording to given configuration.
   """
-  print d
   if d['imagebuilder'] not in IMAGEBUILDERS:
     raise Exception("Invalid imagebuilder specified!")
 
@@ -70,6 +70,7 @@ def generate_image(d):
   x.setVpn(d['vpn_username'], d['vpn_password'])
 
   # Cleanup stuff from previous builds
+  os.chdir(WORKDIR)
   os.system("rm -rf build/files/*")
   os.system("rm -rf build/%s/bin/*" % d['imagebuilder'])
   os.mkdir("build/files/etc")
@@ -78,10 +79,10 @@ def generate_image(d):
 
   # Get resulting image
   files = []
-  prefix = hashlib.md5(os.urandom(32)).hexdigest()[0:16]
+  prefix = os.path.join(DESTINATION, hashlib.md5(os.urandom(32)).hexdigest()[0:16])
   for file in d['imagefiles']:
     file = str(file)
-    os.rename("build/%s/bin/%s" % (d['imagebuilder'], file), "%s-%s" % (prefix, file))
+    os.rename("%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file), "%s-%s" % (prefix, file))
     files.append("%s-%s" % (prefix, file))
 
   # Send an e-mail
@@ -94,7 +95,7 @@ def generate_image(d):
   })
 
   send_mail(
-    _("Router images for %s/%s") % (d['hostname'], d['ip']),
+    '[Wlan-Lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
     t.render(c),
     'generator@wlan-lj.net',
     [d['email']],
@@ -131,6 +132,7 @@ try:
     try:
       logging.info("Generating an image for '%s/%s'..." % (j.data['vpn_username'], j.data['ip']))
       generate_image(no_unicodes(j.data))
+      logging.info("Image generation successful!")
     except:
       logging.error(format_exc())
       logging.warning("Image generation has failed!")
