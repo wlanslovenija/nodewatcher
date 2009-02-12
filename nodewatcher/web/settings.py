@@ -12,12 +12,12 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'ljwifi'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'ljwifi'             # Not used with sqlite3.
-DATABASE_PASSWORD = '0174ec955a225abd9f8f46296b4fe1ac603ab990k8fd85afb2761213'         # Not used with sqlite3.
+DATABASE_PASSWORD = 'XXXXXXXXXXXXX'         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 
-EMAIL_HOST = 'mail.transwarp.si'
+EMAIL_HOST = 'XXXXXXXXXXXXXXX'
 EMAIL_SUBJECT_PREFIX = '[Wlan-Lj] '
 
 # Local time zone for this installation. Choices can be found here:
