@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+
+{% block content %}
+<h1>Node Information - {{ node.name|default:"???" }} ({{ node.ip }})</h1>
+
+<table border="0" width="700">
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "General Information" %}
+      {% if current_owner %}&nbsp;[<a href="/nodes/edit/{{ node.ip }}">{% trans "edit" %}</a> | <a href="/nodes/remove/{{ node.ip }}">{% trans "remove" %}</a> | <a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "add subnet" %}</a>]{% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td width="200">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Name" %}</td>
+    <td>{{ node.name|default:"???" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Owner" %}</td>
+    {% if node.owner %}
+    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{% trans "Unknown" %}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Location" %}</td>
+    <td>{{ node.location|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Project" %}</td>
+    <td>{{ node.project.name|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "System node" %}</td>
+    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Border router" %}</td>
+    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  {% if not node.system_node %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Antenna Information" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "External antenna" %}</td>
+    <td>{% if node.ant_external %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Type" %}</td>
+    <td>{{ node.ant_type_as_string }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Polarization" %}</td>
+    <td>{{ node.ant_polarization_as_string }}</td>
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "Image Generator Information" %}
+      {% if current_owner %}&nbsp;[<a href="/generator/image/{{ node.ip }}">{% trans "generate image" %}</a>]{% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>{% trans "Router type" %}</td>
+    <td>{{ node.profile.template.name }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Enable VPN" %}</td>
+    <td>{% if node.profile.use_vpn %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Enable captive portal" %}</td>
+    <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  {% endif %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Status Information" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Node status" %}</td>
+    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "RTT MIN" %}</td>
+    <td>{{ node.rtt_min|default:"/" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "RTT AVG" %}</td>
+    <td>{{ node.rtt_avg|default:"/" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "RTT MAX" %}</td>
+    <td>{{ node.rtt_max|default:"/" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Packet loss" %}</td>
+    <td>{{ node.pkt_loss|default:"/" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Peers" %}</td>
+    <td>{{ node.peers }}</td>
+  </tr>
+  <tr>
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">{% trans "Subnets" %}</td>
+  </tr>
+  {% if not node.subnet_set.all %}
+  <tr>
+    <td colspan="2" class="notice">
+      {% trans "No subnets are currently assigned or visible." %}
+    </td>
+  </tr>
+  {% else %}
+  <tr>
+    <td colspan="2" style="padding: 0px; margin: 0px;">
+      <table border="0" width="100%" cellpadding="0" cellspacing="0">
+        <tr class="inner_header">
+          <td>{% trans "Subnet" %}</td>
+          <td width="120">{% trans "Status" %}</td>
+          <td width="150">{% trans "Last seen" %}</td>
+        </tr>
+        {% for subnet in node.subnet_set.all %}
+        <tr>
+          <td>{{ subnet }}{% if current_owner and subnet.is_allocated %}&nbsp;[<a href="/nodes/deallocate_subnet/{{ subnet.id }}">deallocate</a>]{% endif %}</td>
+          <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
+          <td>{{ subnet.last_seen|default:"never" }}<td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Immediate Neighbours / Peers" %}</td>
+  </tr>
+  {% if not node.peer_list.all %}
+  <tr>
+    <td colspan="2" class="notice">
+      {% trans "Node has no immediate neighbours." %}
+    </td>
+  </tr>
+  {% else %}
+  <tr>
+    <td colspan="2" style="padding: 0px; margin: 0px;">
+      <table border="0" width="100%" cellpadding="0" cellspacing="0">
+        <tr class="inner_header">
+          <td>{% trans "Node" %}</td>
+          <td width="70" align="center">LQ</td>
+          <td width="70" align="center">ILQ</td>
+          <td width="70" align="center">ETX</td>
+        </tr>
+        {% for peer in node.dst.all %}
+        <tr>
+          <td><a href="/nodes/node/{{ peer.src.ip }}">{{ peer.src.name|default:"invalid" }}</a> ({{ peer.src.ip }})</td>
+          <td align="center">{{ peer.lq }}</td>
+          <td align="center">{{ peer.ilq }}</td>
+          <td align="center">{{ peer.etx }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+</table>
+<br /><br/>
+{% endblock %}

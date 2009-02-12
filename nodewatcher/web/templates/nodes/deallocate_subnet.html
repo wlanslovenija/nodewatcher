@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Remove Subnet {{ subnet }}{% endblock %}
+
+{% block content %}
+<h1>Remove Subnet {{ subnet }} ?</h1>
+
+<table border="0" width="700">
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "General Node Information" %}
+    </td>
+  </tr>
+  <tr>
+    <td width="200">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Name" %}</td>
+    <td>{{ node.name|default:"???" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Owner" %}</td>
+    {% if node.owner %}
+    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{% trans "Unknown" %}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Location" %}</td>
+    <td>{{ node.location|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Project" %}</td>
+    <td>{{ node.project.name|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "System node" %}</td>
+    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Border router" %}</td>
+    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "Subnet Information" %}
+    </td>
+  </tr>
+  <tr>
+    <td width="200">{% trans "Subnet" %}</td>
+    <td>{{ subnet }}</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="error">
+      <b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <input type="button" value="{% trans "Remove" %}" onclick="document.location='/nodes/do_deallocate_subnet/{{ subnet.id }}'" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+    </td>
+  </tr>
+</table>
+<br /><br/>
+{% endblock %}

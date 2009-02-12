@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}New Node Registration{% endblock %}
+
+{% block content %}
+<h1>New Node Registration</h1>
+
+<div class="notice">
+  Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="/nodes/node_list" target="_blank">the existing node list</a>). After your node is registred you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.
+</div>
+
+{% if form.errors %}
+<div class="error">
+  <b>Oooops!</b> The following errors have ocurred while attempting to register a new node:<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if user.is_staff %}
+<script src="http://nodes.wlan-lj.net/js/prototype.js"></script>
+<script>
+  function toggleIpInput()
+  {
+    if ($('id_assign_ip').checked) {
+      $('id_ip').value = '';
+      $('id_ip').disabled = true;
+    } else {
+      $('id_ip').disabled = false;
+    }
+  }
+</script>
+{% endif %}
+
+<form action="/nodes/new" method="POST">
+<table border="0" width="700">
+  <tr>
+    <td width="200">{{ form.name.label }}</td>
+    <td>{{ form.name }}</td>
+  </tr>
+  {% if user.is_staff %}
+  <tr>
+    <td>{{ form.ip.label }}</td>
+    <td>{{ form.ip }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><label onclick="toggleIpInput();">{{ form.assign_ip }} {{ form.assign_ip.label }}</label></td>
+  </tr>
+  {% else %}
+  <tr>
+    <td>{{ form.ip.label }}</td>
+    <td><b>{% trans "auto-assigned" %}</b></td>
+  </td>
+  {% endif %}
+  <tr>
+    <td>{{ form.project.label }}</td>
+    <td>{{ form.project }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.location.label }}</td>
+    <td>{{ form.location }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.geo_lat.label }}</td>
+    <td>{{ form.geo_lat }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.geo_long.label }}</td>
+    <td>{{ form.geo_long }}</td>
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">{% trans "Antenna Information" %}</td>
+  </tr>
+  <tr>
+    <td>{{ form.ant_external.label }}</td>
+    <td>{{ form.ant_external }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.ant_type.label }}</td>
+    <td>{{ form.ant_type }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.ant_polarization.label }}</td>
+    <td>{{ form.ant_polarization }}</td>
+  </tr>
+  {% if user.is_staff %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Additional Options" %}</td>
+  </tr>
+  <tr>
+    <td>{{ form.assign_subnet.label }}</td>
+    <td>{{ form.assign_subnet }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.system_node.label }}</td>
+    <td>{{ form.system_node }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.border_router.label }}</td>
+    <td>{{ form.border_router }}</td>
+  </tr>
+  {% endif %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Image Generator Options" %}</td>
+  </tr>
+  <tr>
+    <td>{{ form.template.label }}</td>
+    <td>{{ form.template }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.use_vpn.label }}</td>
+    <td>{{ form.use_vpn }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.use_captive_portal.label }}</td>
+    <td>{{ form.use_captive_portal }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.root_pass.label }}</td>
+    <td>{{ form.root_pass }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">{% trans "Leave blank for auto-generated password." %}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><br/><input type="submit" value="Register new node" /></td>
+  </tr>
+</table>
+<br/>
+</form>
+
+{% if user.is_staff %}
+<script>
+  toggleIpInput();
+  $('id_assign_ip').onchange = toggleIpInput;
+</script>
+{% endif %}
+
+<br /><br/>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Edit Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+
+{% block content %}
+<h1>Edit Node {{ node.name|default:"???" }} ({{ node.ip }})</h1>
+
+{% if form.errors %}
+<div class="error">
+  <b>Oooops!</b> The following errors have ocurred while attempting to change node information:<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form action="/nodes/edit/{{ node.ip }}" method="POST">
+<table border="0" width="700">
+  <tr>
+    <td width="200">{{ form.name.label }}</td>
+    <td>{{ form.name }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.owner.label }}</td>
+    <td>{{ form.owner }}</td>
+  </tr>
+  {% if user.is_staff %}
+  <tr>
+    <td>{{ form.ip.label }}</td>
+    <td>{{ form.ip }}</td>
+  </tr>
+  {% else %}
+  <tr>
+    <td>{{ form.ip.label }}</td>
+    <td><b>{{ node.ip }}</b></td>
+  </td>
+  {% endif %}
+  <tr>
+    <td>{{ form.location.label }}</td>
+    <td>{{ form.location }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.geo_lat.label }}</td>
+    <td>{{ form.geo_lat }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.geo_long.label }}</td>
+    <td>{{ form.geo_long }}</td>
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">{% trans "Antenna Information" %}</td>
+  </tr>
+  <tr>
+    <td>{{ form.ant_external.label }}</td>
+    <td>{{ form.ant_external }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.ant_type.label }}</td>
+    <td>{{ form.ant_type }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.ant_polarization.label }}</td>
+    <td>{{ form.ant_polarization }}</td>
+  </tr>
+  {% if user.is_staff %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Additional Options" %}</td>
+  </tr>
+  <tr>
+    <td>{{ form.system_node.label }}</td>
+    <td>{{ form.system_node }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.border_router.label }}</td>
+    <td>{{ form.border_router }}</td>
+  </tr>
+  {% endif %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Image Generator Options" %}</td>
+  </tr>
+  <tr>
+    <td>{{ form.template.label }}</td>
+    <td>{{ form.template }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.use_vpn.label }}</td>
+    <td>{{ form.use_vpn }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.use_captive_portal.label }}</td>
+    <td>{{ form.use_captive_portal }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.root_pass.label }}</td>
+    <td>{{ form.root_pass }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <br/><input type="submit" value="Update node" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+    </td>
+  </tr>
+</table>
+<br/>
+</form>
+
+<br /><br/>
+{% endblock %}

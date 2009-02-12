@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS generator_subnet;
+DROP TABLE IF EXISTS generator_profile;
+DROP TABLE IF EXISTS generator_ifacetemplate;
+DROP TABLE IF EXISTS generator_template;
+DROP TABLE IF EXISTS nodes_subnet;
+DROP TABLE IF EXISTS nodes_apclient;
+DROP TABLE IF EXISTS nodes_link;
+DROP TABLE IF EXISTS nodes_node_peer_list;
+DROP TABLE IF EXISTS nodes_node;
+DROP TABLE IF EXISTS nodes_project;
+DROP TABLE IF EXISTS nodes_pool;

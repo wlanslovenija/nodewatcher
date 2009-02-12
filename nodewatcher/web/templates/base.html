@@ -1,0 +1,34 @@
+{% load i18n %}
+
+<html>
+<head>
+  <title>Ljubljana WiFi Mesh :: {% block title %}Status{% endblock %}</title>
+  <link rel='stylesheet' type='text/css' href='http://nodes.wlan-lj.net/css/style.css' />
+</head>
+
+<body>
+  <div class="toc">
+    <div class="toc_title">Network Monitor</div>
+    Navigation:<br/>
+    <ul>
+      <li> <a href="/nodes/node_list">Node list</a></li>
+      <li> <a href="/nodes/subnet_list">Subnet list</a></li>
+    </ul>
+    Node operators:<br/>
+    <ul>
+      {% if user.is_authenticated %}
+      <li> <a href="/nodes/my_nodes">My nodes</a></li>
+      <li> <a href="/generator">Image generator</a></li>
+      <li> <a href="/user/settings">Settings</a></li>
+      <li> <a href="/auth/logout">Logout</a></li>
+      {% else %}
+      <li> <a href="/auth/login">Login here</a></li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <div class="content">
+  {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
