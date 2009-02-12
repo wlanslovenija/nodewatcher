@@ -12,6 +12,8 @@ GENERATORS=(
 
 if [ ! -d build ]; then
   mkdir build
+else
+  rm -rf build/*
 fi
 
 GENDIR=`pwd`
