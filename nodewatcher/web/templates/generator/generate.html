@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Generate Image for {{ node.name }}{% endblock %}
+
+{% block content %}
+<h1>Generate Image for {{ node.name }}</h1>
+
+<table border="0" width="700">
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "General Node Information" %}
+    </td>
+  </tr>
+  <tr>
+    <td width="200">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Name" %}</td>
+    <td>{{ node.name|default:"???" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Owner" %}</td>
+    {% if node.owner %}
+    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{% trans "Unknown" %}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Location" %}</td>
+    <td>{{ node.location|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Project" %}</td>
+    <td>{{ node.project.name|default:"Unknown" }}</td>
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "Image Generator Information" %}
+      {% if current_owner %}&nbsp;[<a href="/generator/request/{{ node.ip }}">{% trans "generate image" %}</a>]{% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>{% trans "Router type" %}</td>
+    <td>{{ node.profile.template.name }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Enable VPN" %}</td>
+    <td>{% if node.profile.use_vpn %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Enable captive portal" %}</td>
+    <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="notice">
+      After you press <b>Generate</b> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <input type="button" value="{% trans "Generate" %}" onclick="document.location='/generator/image/{{ node.ip }}'" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+    </td>
+  </tr>
+</table>
+<br /><br/>
+{% endblock %}

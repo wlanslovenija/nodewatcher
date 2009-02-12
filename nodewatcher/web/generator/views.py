@@ -6,6 +6,20 @@ from ljwifi.nodes.models import Node
 from ljwifi.generator.queue import queue_generator_job
 
 @login_required
+def request(request, node_ip):
+  """
+  Displays a confirmation form.
+  """
+  node = get_object_or_404(Node, pk = node_ip)
+  if node.owner != request.user and not request.user.is_staff:
+    raise Http404
+
+  return render_to_response('generator/generate.html',
+    { 'node' : node },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
 def generate(request, node_ip):
   """
   Generates an image for the specified node.

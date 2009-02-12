@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     (r'^nodes/do_deallocate_subnet/(?P<subnet_id>\d+)$', 'ljwifi.nodes.views.node_do_deallocate_subnet'),
 
     # Generator
+    (r'^generator/request/(?P<node_ip>.*?)$', 'ljwifi.generator.views.request'),
     (r'^generator/image/(?P<node_ip>.*?)$', 'ljwifi.generator.views.generate'),
 
     # Authentication
