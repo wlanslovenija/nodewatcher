@@ -13,7 +13,11 @@ The generated files for your node are available here:{% endblocktrans %}
   {% for file in files %}
   http://nodes.wlan-lj.net/results/{{ file }}
   {% endfor %}
-{% blocktrans %}Thank you for your participation in the project!
+{% blocktrans %}Note that these files will only remain available for 5 days.
+After that time, they will be removed from the server and you will have to
+regenerate the image.
+
+Thank you for your participation in the project!
 
 Best regards,
 Wlan-Lj Project <info@wlan-lj.net>
