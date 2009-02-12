@@ -67,7 +67,8 @@ def generate_image(d):
     x.addSubnet(str(subnet['iface']), str(subnet['network']), subnet['cidr'], subnet['dhcp'], True)
 
   x.setCaptivePortal(d['captive_portal'])
-  x.setVpn(d['vpn_username'], d['vpn_password'])
+  if d['vpn']:
+    x.setVpn(d['vpn_username'], d['vpn_password'])
 
   # Cleanup stuff from previous builds
   os.chdir(WORKDIR)
