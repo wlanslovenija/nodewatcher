@@ -16,9 +16,13 @@ from django.db import transaction
 
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
+from lib.nodewatcher import NodeWatcher
+from lib.rra import RRA, RRAIface
 from time import sleep
 from datetime import datetime
 import pwd
+
+WORKDIR = "/home/monitor"
 
 @transaction.commit_manually
 def main():
@@ -34,6 +38,25 @@ def main():
     # Go to sleep for a while
     sleep(60 * 5)
 
+def safe_int_convert(integer):
+  """
+  A helper method for converting a string to an integer.
+  """
+  try:
+    return int(integer)
+  except:
+    return None
+
+def safe_date_convert(timestamp):
+  """
+  A helper method for converting a string timestamp into a datetime
+  object.
+  """
+  try:
+    return datetime.fromtimestamp(int(timestamp))
+  except:
+    return None
+
 def checkMeshStatus():
   """
   Performs a mesh status check.
@@ -41,6 +64,7 @@ def checkMeshStatus():
   # Remove all invalid nodes and subnets
   Node.objects.filter(status = NodeStatus.Invalid).delete()
   Subnet.objects.filter(status = SubnetStatus.NotAllocated).delete()
+  APClient.objects.all().delete()
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.filter(status__lt = NodeStatus.UserSpecifiedMark).update(status = NodeStatus.Down, warnings = False)
@@ -64,6 +88,7 @@ def checkMeshStatus():
     except Node.DoesNotExist:
       # Node does not exist, create an invalid entry for it
       n = Node(ip = nodeIp, status = NodeStatus.Invalid, last_seen = datetime.now())
+      n.warnings = True
       n.peers = len(nodes[nodeIp].links)
       n.save()
       dbNodes[nodeIp] = n
@@ -93,6 +118,35 @@ def checkMeshStatus():
       n.warnings = True
     
     n.last_seen = datetime.now()
+
+    # Since the node appears to be up, let's fetch details
+    info = NodeWatcher.fetch(nodeIp)
+    if info:
+      try:
+        n.firmware_version = info['general']['version']
+        n.local_time = safe_date_convert(info['general']['local_time'])
+        n.bssid = info['wifi']['bssid']
+        n.essid = info['wifi']['essid']
+        n.channel = NodeWatcher.frequency_to_channel(info['wifi']['frequency'])
+        n.clients = 0
+        
+        # Parse nodogsplash client information
+        if 'nds' in info:
+          for cid, client in info['nds'].iteritems():
+            n.clients += 1
+            c = APClient(node = n)
+            c.ip = client['ip']
+            c.uploaded = safe_int_convert(client['up'])
+            c.downloaded = safe_int_convert(client['down'])
+            c.save()
+
+        # Record interface traffic statistics for all interfaces
+        for iid, iface in info['iface'].iteritems():
+          RRA.update(RRAIface, os.path.join(WORKDIR, 'rra', 'traffic_%s_%s.rrd' % (nodeIp, iid)), iface['down'], iface['up'])
+      except:
+        from traceback import print_exc
+        print_exc()
+
     n.save()
 
   # Update valid subnet status in the database
@@ -118,8 +172,12 @@ def checkMeshStatus():
           n.save()
 
 if __name__ == '__main__':
-  # Drop user privileges
   info = pwd.getpwnam('monitor')
+
+  # Change ownership of RRA directory
+  os.chown(os.path.join(WORKDIR, 'rra'), info.pw_uid, info.pw_gid)
+
+  # Drop user privileges
   os.setgid(info.pw_gid)
   os.setuid(info.pw_uid)
 
