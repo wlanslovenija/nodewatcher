@@ -55,14 +55,22 @@
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr>
+    {% if node.has_allocated_subnets %}
     <td colspan="2" class="notice">
-      After you press <b>Generate</b> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.
+      {% blocktrans %}After you press <b>Generate</b> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.{% endblocktrans %}
     </td>
+    {% else %}
+    <td colspan="2" class="error">
+      {% blocktrans %}This node has no allocated subnets or none are assigned to the WiFi interface, image generation is not possible. Please assign some subnets using the <b>add subnet</b> link on node information page.{% endblocktrans %}
+    </td>
+    {% endif %}
   </tr>
   <tr>
     <td></td>
     <td>
+      {% if node.has_allocated_subnets %}
       <input type="button" value="{% trans "Generate" %}" onclick="document.location='/generator/image/{{ node.ip }}'" />&nbsp;
+      {% endif %}
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
     </td>
   </tr>

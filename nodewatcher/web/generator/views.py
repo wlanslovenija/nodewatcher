@@ -27,6 +27,9 @@ def generate(request, node_ip):
   node = get_object_or_404(Node, pk = node_ip)
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
+  
+  if not node.has_allocated_subnets():
+    return HttpResponseRedirect("/generator/request/" + node_ip)
 
   # Actually queue the job
   queue_generator_job(node)

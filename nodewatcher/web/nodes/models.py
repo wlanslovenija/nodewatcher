@@ -124,6 +124,15 @@ class Node(models.Model):
       w.append(_("Node is not announcing its own allocated subnets!"))
 
     return w
+  
+  def has_allocated_subnets(self):
+    """
+    Returns true if node has subnets allocated to the WiFi interface.
+    """
+    if self.subnet_set.filter(allocated = True, gen_iface_type = IfaceType.WiFi):
+      return True
+
+    return False
 
   def ant_type_as_string(self):
     """
