@@ -99,12 +99,32 @@ class Node(models.Model):
   rtt_max = models.FloatField(null = True)
   pkt_loss = models.IntegerField(null = True)
 
-  # For AP nodes - additional status (set by the monitor daemon)
+  # Aditional status (set by the monitor daemon)
   firmware_version = models.CharField(max_length = 50, null = True)
   bssid = models.CharField(max_length = 50, null = True)
   essid = models.CharField(max_length = 50, null = True)
+  local_time = models.DateTimeField(null = True)
   clients = models.IntegerField(null = True)
   
+  def get_warnings(self):
+    """
+    Returns a list of warnings for this node.
+    """
+    w = []
+    if self.status == NodeStatus.Invalid:
+      w.append(_("Node is not registred in the node database!"))
+
+    if self.status == NodeStatus.Duped:
+      w.append(_("Monitor has received duplicate ICMP ECHO packets!"))
+
+    if self.subnet_set.filter(status = SubnetStatus.NotAllocated):
+      w.append(_("Node is announcing subnets, that are not allocated to it!"))
+
+    if self.subnet_set.filter(status = SubnetStatus.NotAnnounced):
+      w.append(_("Node is not announcing its own allocated subnets!"))
+
+    return w
+
   def ant_type_as_string(self):
     """
     Returns this node's antenna type as a string.
@@ -236,13 +256,8 @@ class APClient(models.Model):
   This class represents an end-user client connected to one of the AP nodes
   being tracked via the captive portal.
   """
-  mac = models.CharField(max_length = 50, primary_key = True)
-  last_ip = models.CharField(max_length = 40)
-  last_node = models.ForeignKey(Node)
-
-  # Visibility statistics (set by the monitor daemon)
-  first_seen = models.DateTimeField()
-  last_seen = models.DateTimeField()
+  node = models.ForeignKey(Node)
+  ip = models.CharField(max_length = 40)
 
   # Transfer statistics (set by the monitor daemon)
   uploaded = models.IntegerField()

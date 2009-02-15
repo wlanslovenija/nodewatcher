@@ -11,17 +11,17 @@
     <div class="toc_title">Network Monitor</div>
     Navigation:<br/>
     <ul>
-      <li> <a href="/nodes/node_list">Node list</a></li>
-      <li> <a href="/nodes/subnet_list">Subnet list</a></li>
+      <li> <a href="/nodes/node_list">{% trans "Node List" %}</a></li>
+      <li> <a href="/nodes/gcl">{% trans "Global Client List" %}</a></li>
     </ul>
     Node operators:<br/>
     <ul>
       {% if user.is_authenticated %}
-      <li> <a href="/nodes/my_nodes">My nodes</a></li>
+      <li> <a href="/nodes/my_nodes">{% trans "My Nodes" %}</a></li>
       <!-- <li> <a href="/user/settings">Settings</a></li> -->
-      <li> <a href="/auth/logout">Logout</a></li>
+      <li> <a href="/auth/logout">{% trans "Logout" %}</a></li>
       {% else %}
-      <li> <a href="/auth/login">Login here</a></li>
+      <li> <a href="/auth/login">{% trans "Login Here" %}</a></li>
       {% endif %}
     </ul>
   </div>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}My Nodes{% endblock %}
 
@@ -10,6 +11,7 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
 
 <table border="0" width="750" cellspacing="0">
   <tr class="header">
+    <td width="22"></td>
     <td width="150"><b>Node name</b></td>
     <td width="100"><b>IP</b></td>
     <td width="200"><b>Last seen up</b></td>
@@ -27,7 +29,14 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
   </tr>
   {% else %}
   {% for node in nodes %}
-  <tr><!-- TODO - If node has 'warnings' flag, display an icon -->
+  <tr>
+    <td>
+      {% if node.warnings %}
+      <a href="/nodes/node/{{ node.ip }}">
+        <img src="http://nodes.wlan-lj.net/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" />
+      </a>
+      {% endif %}
+    </td>
     <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:"unknown" }}</a></td>
     <td>{{ node.ip }}</td>
     <td>{{ node.last_seen|default:"?" }}</td>
@@ -40,6 +49,7 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
   {% endfor %}
   {% endif %}
   <tr class="header">
+    <td width="22"></td>
     <td width="150"><b>Node name</b></td>
     <td width="100"><b>IP</b></td>
     <td width="200"><b>Last seen up</b></td>

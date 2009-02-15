@@ -6,6 +6,16 @@
 {% block content %}
 <h1>Node Information - {{ node.name|default:"???" }} ({{ node.ip }})</h1>
 
+{% if node.warnings %}
+<div class="error">
+  {% blocktrans %}<b>WARNING:</b> Some problems were found in this node's configuration! Continued operation of this node might disrupt normal network operations, so these issues must be addressed! The following problems have been detected:{% endblocktrans %}<br />
+  <br>
+  {% for warning in node.get_warnings %}
+  <i>{{ warning }}</i><br/>
+  {% endfor %}
+</div>
+{% endif %}
+
 <table border="0" width="700">
   <tr class="section_title">
     <td colspan="2">
@@ -69,7 +79,7 @@
   </tr>
   <tr>
     <td>{% trans "Router type" %}</td>
-    <td>{{ node.profile.template.name }}</td>
+    <td>{{ node.profile.template.name|default:"Unknown" }}</td>
   </tr>
   <tr>
     <td>{% trans "Enable VPN" %}</td>
@@ -78,6 +88,29 @@
   <tr>
     <td>{% trans "Enable captive portal" %}</td>
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr class="section_title">
+    <td colspan="2">{% trans "Node Configuration" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Firmware version" %}</td>
+    <td>{{ node.firmware_version|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "BSSID" %}</td>
+    <td>{{ node.bssid|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "ESSID" %}</td>
+    <td>{{ node.essid|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Local time" %}</td>
+    <td>{{ node.local_time|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Connected clients" %}</td>
+    <td>{{ node.clients|default:"0" }} [<a href="/nodes/gcl#n{{ node.ip }}">{% trans "global client list" %}</a>]</td>
   </tr>
   {% endif %}
   <tr class="section_title">
