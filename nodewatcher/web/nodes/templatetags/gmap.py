@@ -82,7 +82,6 @@ def do_gmap(parser, token):
     param, value = item.split(":")
     param = param.strip()
     value = value.strip()
-    print param, value
 
     if parameters.has_key(param):
       if value[0] == '"':
