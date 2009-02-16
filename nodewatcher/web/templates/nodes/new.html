@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load gmap %}
 
 {% block title %}New Node Registration{% endblock %}
 
@@ -68,6 +69,9 @@
   <tr>
     <td>{{ form.location.label }}</td>
     <td>{{ form.location }}</td>
+  </tr>
+  <tr>
+    <td colspan="2">{% gmap lat:46.05 long:14.5 %}</td>
   </tr>
   <tr>
     <td>{{ form.geo_lat.label }}</td>

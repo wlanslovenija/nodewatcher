@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load gmap %}
 
 {% block title %}Edit Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
@@ -46,6 +47,9 @@
     <td>{{ form.location.label }}</td>
     <td>{{ form.location }}</td>
   </tr>
+  <tr>
+    <td colspan="2">{% gmap lat:46.05 long:14.5 mlat:node.geo_lat mlong:node.geo_long marker:yes %}</td>
+  </tr>        
   <tr>
     <td>{{ form.geo_lat.label }}</td>
     <td>{{ form.geo_lat }}</td>
