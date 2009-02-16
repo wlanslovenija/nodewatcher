@@ -6,7 +6,10 @@ from django.template import resolve_variable
 register = Library()
 
 GOOGLE_MAPS_API_KEY = "ABQIAAAAmW9WFNNiQwBMneBJZLweHBR3WYOwtT4kU6GVX3AHou_9Z28H_xQgcvQXunWn76h2_FTmY4nu0aylNg"
-INCLUDE_TEMPLATE = '<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s" type="text/javascript"></script>' % GOOGLE_MAPS_API_KEY
+INCLUDE_TEMPLATE = """
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s" type="text/javascript"></script>
+<script src="http://nodes.wlan-lj.net/js/jquery.js"></script>
+"""% GOOGLE_MAPS_API_KEY
 BASIC_TEMPLATE = """
 <div id="gmap" style="width: 500px; height: 300px;"></div>
 <script>
@@ -23,21 +26,23 @@ BASIC_TEMPLATE = """
         map.setCenter(m.getLatLng(), 15);
       }
 
-      GEvent.addListener(map, "click", function(overlay, p) {
-        if (!m) {
-          m = new GMarker(p);
-          map.addOverlay(m);
-        } else {
-          m.setLatLng(p);
-        }
+      if (%(clickable)s) {
+        GEvent.addListener(map, "click", function(overlay, p) {
+          if (!m) {
+            m = new GMarker(p);
+            map.addOverlay(m);
+          } else {
+            m.setLatLng(p);
+          }
 
-        document.getElementById("id_geo_lat").value = p.lat();
-        document.getElementById("id_geo_long").value = p.lng();
-      });
+          document.getElementById("id_geo_lat").value = p.lat();
+          document.getElementById("id_geo_long").value = p.lng();
+        });
+      }
     }
   }
 
-  document.onload = create_map;
+  $(document).ready(function() { create_map(); });
 </script>
 """
 
@@ -52,7 +57,7 @@ class GMapNode(template.Node):
       except:
         pass
 
-      if k == 'marker':
+      if k in ('marker', 'clickable'):
         self.params[k] = "1" if v == 'yes' else "0"
 
       if self.params[k] == None:
@@ -65,11 +70,12 @@ def do_gmap(parser, token):
 
   # Defaults
   parameters = {
-    'lat'     : 0.0,
-    'long'    : 0.0,
-    'mlat'    : 0.0,
-    'mlong'   : 0.0,
-    'marker'  : 'no'
+    'lat'       : 0.0,
+    'long'      : 0.0,
+    'mlat'      : 0.0,
+    'mlong'     : 0.0,
+    'marker'    : 'no',
+    'clickable' : 'yes'
   }
 
   for item in items[1:]:
