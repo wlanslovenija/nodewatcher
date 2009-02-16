@@ -295,6 +295,14 @@ class GraphItem(models.Model):
   graph = models.CharField(max_length = 200)
   title = models.CharField(max_length = 50)
 
+class WhitelistItem(models.Model):
+  """
+  This class represents a whitelisted MAC address.
+  """
+  owner = models.ForeignKey(User)
+  mac = models.CharField(max_length = 50)
+  registred_at = models.DateTimeField()
+
 class PoolAllocationError(Exception):
   pass
 

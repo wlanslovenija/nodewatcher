@@ -2,8 +2,8 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from ljwifi.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool
-from ljwifi.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm
+from ljwifi.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem
+from ljwifi.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm
 from datetime import datetime
 
 def nodes(request):
@@ -22,8 +22,10 @@ def my_nodes(request):
   Display a list of current user's nodes.
   """
   nodes = request.user.node_set.order_by('ip')
+  whitelist = request.user.whitelistitem_set.order_by('mac')
   return render_to_response('nodes/my.html',
-    { 'nodes' : nodes },
+    { 'nodes' : nodes,
+      'whitelist' : whitelist },
     context_instance = RequestContext(request)
   )
 
@@ -193,4 +195,44 @@ def node_do_deallocate_subnet(request, subnet_id = None):
   subnet.delete()
 
   return HttpResponseRedirect("/nodes/node/" + node.ip)
+
+@login_required
+def whitelist_mac(request):
+  """
+  Display a form for whitelisting a MAC address.
+  """
+  if request.method == 'POST':
+    form = WhitelistMacForm(request.POST)
+    if form.is_valid():
+      form.save(request.user)
+      return HttpResponseRedirect("/nodes/my_nodes")
+  else:
+    form = WhitelistMacForm()
+
+  return render_to_response('nodes/whitelist_mac.html',
+    { 'form' : form },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
+def unwhitelist_mac(request, item_id):
+  """
+  Removes a whitelisted MAC address.
+  """
+  item = get_object_or_404(WhitelistItem, pk = item_id)
+  if item.owner != request.user and not request.user.is_staff:
+    raise Http404
+  
+  item.delete()
+  return HttpResponseRedirect("/nodes/my_nodes")
+
+def whitelist(request):
+  """
+  Displays a list of whitelisted addresses.
+  """
+  output = []
+  for item in WhitelistItem.objects.all():
+    output.append(item.mac)
+
+  return HttpResponse("\n".join(output), content_type = "text/plain")
 

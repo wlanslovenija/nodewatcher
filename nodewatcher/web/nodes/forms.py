@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from ljwifi.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType
+from ljwifi.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem
 from ljwifi.nodes import ipcalc
 from ljwifi.generator.models import Template, Profile
 from ljwifi.generator.types import IfaceType
@@ -10,6 +10,7 @@ from datetime import datetime
 import re
 
 IPV4_ADDR_RE = re.compile(r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b')
+MAC_ADDR_RE = re.compile(r'([0-9A-Fa-f]{2}([:]|$)){6}')
 
 class RegisterNodeForm(forms.Form):
   """
@@ -319,4 +320,35 @@ class AllocateSubnetForm(forms.Form):
 
     # Remove any already announced subnets that are the same subnet
     Subnet.objects.filter(node = node, subnet = subnet.subnet, cidr = subnet.cidr, allocated = False).delete()
+
+class WhitelistMacForm(forms.Form):
+  """
+  A simple form for whitelisting a MAC address.
+  """
+  mac = forms.CharField(max_length = 17, label = _("MAC address"))
+  
+  def clean(self):
+    """
+    Additional validation handler.
+    """
+    mac = self.cleaned_data.get('mac')
+    if not MAC_ADDR_RE.match(mac) or len(mac) != 17:
+      raise forms.ValidationError(_("Enter a valid MAC address!"))
+
+    try:
+      item = WhitelistItem.objects.get(mac = mac)
+      raise forms.ValidationError(_("Specified MAC address is already whitelisted!"))
+    except WhitelistItem.DoesNotExist:
+      pass
+
+    return self.cleaned_data
+
+  def save(self, user):
+    """
+    Saves whitelist entry.
+    """
+    item = WhitelistItem(owner = user)
+    item.mac = self.cleaned_data.get('mac').upper()
+    item.registred_at = datetime.now()
+    item.save()
 

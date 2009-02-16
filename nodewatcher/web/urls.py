@@ -14,6 +14,9 @@ urlpatterns = patterns('',
     (r'^nodes/allocate_subnet/(?P<node_ip>.*?)$', 'ljwifi.nodes.views.node_allocate_subnet'),
     (r'^nodes/deallocate_subnet/(?P<subnet_id>\d+)$', 'ljwifi.nodes.views.node_deallocate_subnet'),
     (r'^nodes/do_deallocate_subnet/(?P<subnet_id>\d+)$', 'ljwifi.nodes.views.node_do_deallocate_subnet'),
+    (r'^nodes/whitelist_mac$', 'ljwifi.nodes.views.whitelist_mac'),
+    (r'^nodes/unwhitelist_mac/(?P<item_id>\d+)$', 'ljwifi.nodes.views.unwhitelist_mac'),
+    (r'^feeds/whitelist$', 'ljwifi.nodes.views.whitelist'),
 
     # Generator
     (r'^generator/request/(?P<node_ip>.*?)$', 'ljwifi.generator.views.request'),

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Whitelist a MAC Address{% endblock %}
+
+{% block content %}
+<h1>Whitelist a MAC Address</h1>
+
+{% if form.errors %}
+<div class="error">
+  <b>Oooops!</b> The following errors have ocurred while attempting to whitelist a MAC address:<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form action="/nodes/whitelist_mac" method="POST">
+<table border="0" width="700">
+  <tr>
+    <td colspan="2" class="notice">
+      {% trans "Enter a MAC address to be whitelisted on all routers, so no splash screen confirmation will be needed. Please note that after you enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the mesh, so be patient!" %}
+    </td>
+  </tr>
+  <tr>
+    <td>{{ form.mac.label }}</td>
+    <td>{{ form.mac }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <input type="submit" value="{% trans "Whitelist" %}" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/my_nodes'" />
+    </td>
+  </tr>
+</table>
+</form>
+<br /><br/>
+{% endblock %}
