@@ -20,5 +20,5 @@ regenerate the image.
 Thank you for your participation in the project!
 
 Best regards,
-Wlan-Lj Project <info@wlan-lj.net>
+Wlan-Lj Project <open@wlan-lj.net>
 {% endblocktrans %}
