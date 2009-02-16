@@ -88,11 +88,11 @@
     <td>{{ node.profile.template.name|default:"Unknown" }}</td>
   </tr>
   <tr>
-    <td>{% trans "Enable VPN" %}</td>
+    <td>{% trans "VPN enabled" %}</td>
     <td>{% if node.profile.use_vpn %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr>
-    <td>{% trans "Enable captive portal" %}</td>
+    <td>{% trans "Captive portal enabled" %}</td>
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr class="section_title">
@@ -109,6 +109,10 @@
   <tr>
     <td>{% trans "ESSID" %}</td>
     <td>{{ node.essid|default:"Unknown" }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Channel" %}</td>
+    <td>{{ node.channel|default:"Unknown" }}</td>
   </tr>
   <tr>
     <td>{% trans "Local time" %}</td>
