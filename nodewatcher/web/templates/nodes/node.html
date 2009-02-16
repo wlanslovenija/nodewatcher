@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load gmap %}
 
 {% block title %}Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
@@ -43,6 +44,11 @@
     <td>{% trans "Location" %}</td>
     <td>{{ node.location|default:"Unknown" }}</td>
   </tr>
+  {% if node.geo_lat and node.geo_long %}
+  <tr>
+    <td colspan="2">{% gmap lat:46.05 long:14.5 mlat:node.geo_lat mlong:node.geo_long marker:yes clickable:no %}</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>{% trans "Project" %}</td>
     <td>{{ node.project.name|default:"Unknown" }}</td>
