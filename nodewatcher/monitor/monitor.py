@@ -11,7 +11,7 @@ sys.path.append('/var/www/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'ljwifi.settings'
 
 # Import our models
-from ljwifi.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link
+from ljwifi.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem
 from django.db import transaction
 
 # Import other stuff
@@ -23,6 +23,7 @@ from datetime import datetime
 import pwd
 
 WORKDIR = "/home/monitor"
+GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
 
 @transaction.commit_manually
 def main():
@@ -142,7 +143,21 @@ def checkMeshStatus():
 
         # Record interface traffic statistics for all interfaces
         for iid, iface in info['iface'].iteritems():
-          RRA.update(RRAIface, os.path.join(WORKDIR, 'rra', 'traffic_%s_%s.rrd' % (nodeIp, iid)), iface['down'], iface['up'])
+          title = 'Traffic - %s' % iid
+          rra = os.path.join(WORKDIR, 'rra', 'traffic_%s_%s.rrd' % (nodeIp, iid))
+
+          RRA.update(RRAIface, rra, iface['down'], iface['up'])
+          RRA.graph(RRAIface, title, os.path.join(GRAPHDIR, 'traffic_%s_%s.png' % (nodeIp, iid)), rra, rra)
+
+          # Create a graph item if needed
+          try:
+            graph = GraphItem.objects.get(node = n, name = iid, type = GraphType.Traffic)
+          except GraphItem.DoesNotExist:
+            graph = GraphItem(node = n, name = iid, type = GraphType.Traffic)
+            graph.rra = 'traffic_%s_%s.rrd' % (nodeIp, iid)
+            graph.graph = 'traffic_%s_%s.png' % (nodeIp, iid)
+            graph.title = title
+            graph.save()
       except:
         from traceback import print_exc
         print_exc()

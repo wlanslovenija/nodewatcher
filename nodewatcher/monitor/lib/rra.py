@@ -32,7 +32,13 @@ class RRAIface:
   ]
   graph = [
     "LINE2:upload#DE0056:Upload",
-    "LINE2:download#A150AA:Download"
+    r'GPRINT:upload:LAST:  Current\:%8.2lf %s',
+    r'GPRINT:upload:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:upload:MAX:Maximum\:%8.2lf %s\n',
+    "LINE2:download#A150AA:Download",
+    r'GPRINT:download:LAST:Current\:%8.2lf %s',
+    r'GPRINT:download:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:download:MAX:Maximum\:%8.2lf %s\n'
   ]
 
 class RRA:
@@ -61,4 +67,26 @@ class RRA:
       rrd = rrdtool.RoundRobinDatabase(archive)
 
     rrd.update(rrdtool.Val(*values), template = [x.name for x in conf.sources])
+  
+  @staticmethod
+  def graph(conf, title, graph, *archives):
+    """
+    Renders a graph from data points.
+    """
+    g = rrdtool.RoundRobinGraph(graph)
+    args = []
+    for i, source in enumerate(conf.sources):
+      args.append(rrdtool.Def(source.name, archives[i], data_source = source.name, cf = rrdtool.AverageCF))
+
+    args = args + conf.graph
+    g.graph(
+      alt_y_mrtg = None,
+      width = 500,
+      height = 120,
+      x = "MINUTE:18:MINUTE:72:MINUTE:144:0:%H:%M",
+      title = title,
+      start = int(time.time() - 86400),
+      end = int(time.time() - 180),
+      *args
+    )
 
