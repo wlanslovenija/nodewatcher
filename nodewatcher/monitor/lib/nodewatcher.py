@@ -44,7 +44,7 @@ class NodeWatcher(object):
         frequency *= 1000
 
       channels = [2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484]
-      return channels.index(int(frequency))
+      return channels.index(int(frequency)) + 1
     except:
       return 0
 
