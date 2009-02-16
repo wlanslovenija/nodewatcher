@@ -202,6 +202,16 @@
     </td>
   </tr>
   {% endif %}
+  {% if node.get_traffic_graphs %}
+  <tr class="section_title">
+    <td colspan="2">{% trans "Graphs" %}</td>
+  </tr>
+  {% for graph in node.get_traffic_graphs %}
+  <tr>
+    <td colspan="2" align="center"><img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" /></td>
+  </tr>
+  {% endfor %}
+  {% endif %}
 
 </table>
 <br /><br/>

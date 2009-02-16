@@ -106,6 +106,12 @@ class Node(models.Model):
   local_time = models.DateTimeField(null = True)
   clients = models.IntegerField(null = True)
   
+  def get_traffic_graphs(self):
+    """
+    Returns a list of traffic graph items.
+    """
+    return self.graphitem_set.filter(type = GraphType.Traffic).order_by('name')
+
   def get_warnings(self):
     """
     Returns a list of warnings for this node.
@@ -271,6 +277,23 @@ class APClient(models.Model):
   # Transfer statistics (set by the monitor daemon)
   uploaded = models.IntegerField()
   downloaded = models.IntegerField()
+
+class GraphType:
+  """
+  A list of valid graph types.
+  """
+  Traffic = 0
+
+class GraphItem(models.Model):
+  """
+  This class represents a graph of some node's parameter.
+  """
+  node = models.ForeignKey(Node)
+  type = models.IntegerField()
+  name = models.CharField(max_length = 50)
+  rra = models.CharField(max_length = 200)
+  graph = models.CharField(max_length = 200)
+  title = models.CharField(max_length = 50)
 
 class PoolAllocationError(Exception):
   pass
