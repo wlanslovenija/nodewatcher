@@ -476,7 +476,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('}\n')
     f.write('\n')
     f.write('FirewallRuleSet authenticated-users {\n')
-    f.write('  FirewallRule allow\n')
+    # Should be an empty ruleset so nds will use RETURN instead of ACCEPT
     f.write('}\n')
     f.write('\n')
     f.write('FirewallRuleSet users-to-router {\n')
