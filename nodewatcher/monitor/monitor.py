@@ -18,6 +18,7 @@ from django.db import transaction
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
 from lib.rra import RRA, RRAIface
+from lib.topology import DotTopologyPlotter
 from time import sleep
 from datetime import datetime
 import pwd
@@ -75,6 +76,9 @@ def checkMeshStatus():
   # Fetch routing tables from OLSR
   nodes, hna, aliases = OlsrParser.getTables()
 
+  # Create a topology plotter
+  topology = DotTopologyPlotter()
+
   # Ping nodes present in the database and visible in OLSR
   dbNodes = {}
   nodesToPing = []
@@ -101,6 +105,12 @@ def checkMeshStatus():
     for peerIp, lq, ilq, etx in node.links:
       l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx))
       l.save()
+  
+  # Add nodes to topology map and generate output
+  for node in dbNodes.values():
+    topology.addNode(node)
+
+  topology.save(os.path.join(GRAPHDIR, 'mesh_topology.png'))
 
   # Ping the nodes and update valid node status in the database
   results, dupes = PingParser.pingHosts(10, nodesToPing)
