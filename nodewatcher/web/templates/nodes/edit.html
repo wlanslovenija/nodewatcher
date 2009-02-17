@@ -2,14 +2,14 @@
 {% load i18n %}
 {% load gmap %}
 
-{% block title %}Edit Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+{% block title %}{% trans "Edit Node" %} {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>Edit Node {{ node.name|default:"???" }} ({{ node.ip }})</h1>
+<h1>{% trans "Edit Node" %} {{ node.name|default:"???" }} ({{ node.ip }})</h1>
 
 {% if form.errors %}
 <div class="error">
-  <b>Oooops!</b> The following errors have ocurred while attempting to change node information:<br />
+  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to change node information:{% endblocktrans %}<br />
   <br/>
   {% for error in form.non_field_errors %}
   <i>{{ error|escape }}</i><br/>
@@ -108,7 +108,7 @@
   <tr>
     <td></td>
     <td>
-      <br/><input type="submit" value="Update node" />
+      <br/><input type="submit" value="{% trans "Update Node" %}" />
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
     </td>
   </tr>

@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load gmap %}
 
-{% block title %}Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+{% block title %}{% trans "Node" %} {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>Node Information - {{ node.name|default:"???" }} ({{ node.ip }})</h1>
+<h1>{% trans "Node Information" %} - {{ node.name|default:"???" }} ({{ node.ip }})</h1>
 
 {% if node.warnings %}
 <div class="error">
@@ -42,7 +42,7 @@
   </tr>
   <tr>
     <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:"Unknown" }}</td>
+    <td>{{ node.location|default:_("Unknown") }}</td>
   </tr>
   {% if node.geo_lat and node.geo_long %}
   <tr>
@@ -51,7 +51,7 @@
   {% endif %}
   <tr>
     <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:"Unknown" }}</td>
+    <td>{{ node.project.name|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
@@ -85,7 +85,7 @@
   </tr>
   <tr>
     <td>{% trans "Router type" %}</td>
-    <td>{{ node.profile.template.name|default:"Unknown" }}</td>
+    <td>{{ node.profile.template.name|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "VPN enabled" %}</td>
@@ -100,23 +100,23 @@
   </tr>
   <tr>
     <td>{% trans "Firmware version" %}</td>
-    <td>{{ node.firmware_version|default:"Unknown" }}</td>
+    <td>{{ node.firmware_version|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "BSSID" %}</td>
-    <td>{{ node.bssid|default:"Unknown" }}</td>
+    <td>{{ node.bssid|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "ESSID" %}</td>
-    <td>{{ node.essid|default:"Unknown" }}</td>
+    <td>{{ node.essid|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Channel" %}</td>
-    <td>{{ node.channel|default:"Unknown" }}</td>
+    <td>{{ node.channel|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Local time" %}</td>
-    <td>{{ node.local_time|default:"Unknown" }}</td>
+    <td>{{ node.local_time|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Connected clients" %}</td>
@@ -174,7 +174,7 @@
         <tr>
           <td>{{ subnet }}{% if current_owner and subnet.allocated %}&nbsp;[<a href="/nodes/deallocate_subnet/{{ subnet.id }}">deallocate</a>]{% endif %}</td>
           <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
-          <td>{{ subnet.last_seen|default:"never" }}<td>
+          <td>{{ subnet.last_seen|default:_("never") }}<td>
         </tr>
         {% endfor %}
       </table>

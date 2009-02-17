@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Remove Node {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+{% block title %}{% trans "Remove Node" %} {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>Remove Node - {{ node.name|default:"???" }} ({{ node.ip }}) ?</h1>
+<h1>{% trans "Remove Node" %} - {{ node.name|default:"???" }} ({{ node.ip }}) ?</h1>
 
 <table border="0" width="700">
   <tr class="section_title">
@@ -25,16 +25,16 @@
     {% if node.owner %}
     <td><a href="/users/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
     {% else %}
-    <td>Unknown</td>
+    <td>{% trans "Unknown" %}</td>
     {% endif %}
   </tr>
   <tr>
     <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:"Unknown" }}</td>
+    <td>{{ node.location|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:"Unknown" }}</td>
+    <td>{{ node.project.name|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
@@ -46,7 +46,7 @@
   </tr>
   <tr>
     <td colspan="2" class="error">
-      <b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your node!
+      {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your node!" %}
     </td>
   </tr>
   <tr>

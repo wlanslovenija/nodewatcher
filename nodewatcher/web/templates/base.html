@@ -4,18 +4,19 @@
 <head>
   <title>Ljubljana WiFi Mesh :: {% block title %}Status{% endblock %}</title>
   <link rel='stylesheet' type='text/css' href='http://nodes.wlan-lj.net/css/style.css' />
+  <script src="http://nodes.wlan-lj.net/js/jquery.js"></script>
 </head>
 
 <body>
   <div class="toc">
-    <div class="toc_title">Network Monitor</div>
-    Navigation:<br/>
+    <div class="toc_title">{% trans "Network Monitor" %}</div>
+    {% trans "Navigation" %}:<br/>
     <ul>
       <li> <a href="/nodes/node_list">{% trans "Node List" %}</a></li>
       <li> <a href="/nodes/gcl">{% trans "Global Client List" %}</a></li>
       <li> <a href="/nodes/topology">{% trans "Mesh Topology" %}</a></li>
     </ul>
-    Node operators:<br/>
+    {% trans "Node operators" %}:<br/>
     <ul>
       {% if user.is_authenticated %}
       <li> <a href="/nodes/my_nodes">{% trans "My Nodes" %}</a></li>
@@ -25,9 +26,9 @@
       <li> <a href="/auth/login">{% trans "Login Here" %}</a></li>
       {% endif %}
     </ul>
-    Feeds:<br/>
+    {% trans "Feeds" %}:<br/>
     <ul>
-      <li> <a href="/feeds/whitelist" target="_blank">MAC Whitelist</a></li>
+      <li> <a href="/feeds/whitelist" target="_blank">{% trans "MAC Whitelist" %}</a></li>
     </ul>
   </div>
 

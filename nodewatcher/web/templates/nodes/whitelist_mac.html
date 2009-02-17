@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Whitelist a MAC Address{% endblock %}
+{% block title %}{% trans "Whitelist a MAC Address" %}{% endblock %}
 
 {% block content %}
-<h1>Whitelist a MAC Address</h1>
+<h1>{% trans "Whitelist a MAC Address" %}</h1>
 
 {% if form.errors %}
 <div class="error">
-  <b>Oooops!</b> The following errors have ocurred while attempting to whitelist a MAC address:<br />
+  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to whitelist a MAC address:" %}<br />
   <br/>
   {% for error in form.non_field_errors %}
   <i>{{ error|escape }}</i><br/>

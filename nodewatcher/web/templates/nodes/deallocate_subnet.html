@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Remove Subnet {{ subnet }}{% endblock %}
+{% block title %}{% blocktrans %}Remove Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <h1>Remove Subnet {{ subnet }} ?</h1>
@@ -30,11 +30,11 @@
   </tr>
   <tr>
     <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:"Unknown" }}</td>
+    <td>{{ node.location|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:"Unknown" }}</td>
+    <td>{{ node.project.name|default:_("Unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
@@ -55,7 +55,7 @@
   </tr>
   <tr>
     <td colspan="2" class="error">
-      <b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!
+      {% blocktrans %}<b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!{% endblocktrans %}
     </td>
   </tr>
   <tr>

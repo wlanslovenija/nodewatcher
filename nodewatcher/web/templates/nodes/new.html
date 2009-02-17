@@ -2,18 +2,18 @@
 {% load i18n %}
 {% load gmap %}
 
-{% block title %}New Node Registration{% endblock %}
+{% block title %}{% trans "New Node Registration" %}{% endblock %}
 
 {% block content %}
 <h1>New Node Registration</h1>
 
 <div class="notice">
-  Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="/nodes/node_list" target="_blank">the existing node list</a>). After your node is registred you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.
+  {% blocktrans %}Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="/nodes/node_list" target="_blank">the existing node list</a>). After your node is registred you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.{% endblocktrans %}
 </div>
 
 {% if form.errors %}
 <div class="error">
-  <b>Oooops!</b> The following errors have ocurred while attempting to register a new node:<br />
+  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to register a new node:" %}<br />
   <br/>
   {% for error in form.non_field_errors %}
   <i>{{ error|escape }}</i><br/>
@@ -27,15 +27,14 @@
 {% endif %}
 
 {% if user.is_staff %}
-<script src="http://nodes.wlan-lj.net/js/prototype.js"></script>
 <script>
   function toggleIpInput()
   {
-    if ($('id_assign_ip').checked) {
-      $('id_ip').value = '';
-      $('id_ip').disabled = true;
+    if ($('#id_assign_ip').is(':checked')) {
+      $('#id_ip').value = '';
+      $('#id_ip').attr('disabled', 'disabled');
     } else {
-      $('id_ip').disabled = false;
+      $('#id_ip').removeAttr('disabled');
     }
   }
 </script>
@@ -138,7 +137,7 @@
   </tr>
   <tr>
     <td></td>
-    <td><br/><input type="submit" value="Register new node" /></td>
+    <td><br/><input type="submit" value="{% trans "Register new node" %}" /></td>
   </tr>
 </table>
 <br/>
@@ -147,7 +146,7 @@
 {% if user.is_staff %}
 <script>
   toggleIpInput();
-  $('id_assign_ip').onchange = toggleIpInput;
+  $('#id_assign_ip').onchange = toggleIpInput;
 </script>
 {% endif %}
 

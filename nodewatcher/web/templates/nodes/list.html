@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Node List{% endblock %}
+{% block title %}{% trans "Node List" %}{% endblock %}
 
 {% block content %}
-<h1>Node list</h1>
+<h1>{% trans "Node List" %}</h1>
 <table border="0" width="750">
   <tr>
     <td width="22"></td>
-    <td width="150"><b>Node name</b></td>
+    <td width="150"><b>{% trans "Node name" %}</b></td>
     <td width="100"><b>IP</b></td>
-    <td width="200"><b>Last seen up</b></td>
-    <td width="100"><b>Status</b></td>
-    <td width="50" align="center"><b>Peers</b></td>
+    <td width="200"><b>{% trans "Last seen up" %}</b></td>
+    <td width="100"><b>{% trans "Status" %}</b></td>
+    <td width="50" align="center"><b>{% trans "Peers" %}</b></td>
     <td width="50" align="center"><b>MIN</b></td>
     <td width="50" align="center"><b>AVG</b></td>
     <td width="50" align="center"><b>MAX</b></td>
@@ -20,7 +20,7 @@
   {% for node in nodes %}
   {% ifchanged node.system_node %}
   <tr class="section_title">
-    <td colspan="9"><b>{% if node.system_node %}System nodes{% else %}Other nodes{% endif %}</b></td>
+    <td colspan="9"><b>{% if node.system_node %}{% trans "System nodes" %}{% else %}{% trans "Other nodes" %}{% endif %}</b></td>
   </tr>
   {% endifchanged %}
   <tr>
@@ -31,9 +31,9 @@
       </a>
       {% endif %}
     </td>
-    <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:"unknown" }}</a></td>
+    <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
-    <td>{{ node.last_seen|default:"?" }}</td>
+    <td>{{ node.last_seen|default:_("never") }}</td>
     <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
     <td align="center">{{ node.peers }}</td>
     <td align="center">{{ node.rtt_min|default:"/" }}</td>
@@ -43,20 +43,20 @@
   {% endfor %}
 </table>
 <br/>
-Status legend:<br/>
+{% trans "Status legend" %}:<br/>
 <ul>
-  <li><span class="node_status_up">up</span> - node is reachable</li>
-  <li><span class="node_status_invalid">invalid</span> - IP is not allocated but is seen</li>
-  <li><span class="node_status_visible">visible</span> - node is visible via OLSR but does not reply to ICMP ECHO</li>
-  <li><span class="node_status_down">down</span> - node is not visible via OLSR</li>
-  <li><span class="node_status_duped">duped</span> - duplicate ICMP ECHO packets have been received</li>
-  <li><span class="node_status_new">new</span> - node has just been registred</li>
+  <li><span class="node_status_up">up</span> - {% trans "node is reachable" %}</li>
+  <li><span class="node_status_invalid">invalid</span> - {% trans "IP is not allocated but is seen" %}</li>
+  <li><span class="node_status_visible">visible</span> - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
+  <li><span class="node_status_down">down</span> - {% trans "node is not visible via OLSR" %}</li>
+  <li><span class="node_status_duped">duped</span> - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
+  <li><span class="node_status_new">new</span> - {% trans "node has just been registred" %}</li>
 </ul>
 <br/>
-Notes:<br/>
+{% trans "Notes" %}:<br/>
 <ul>
-  <li><i>not allocated</i> means that the IP is not allocated and should not be seen</li>
-  <li><i>MIN, MAX, AVG</i> represent the current minimum, maximum and average latency</li>
+  <li>{% trans "<i>not allocated</i> means that the IP is not allocated and should not be seen" %}</li>
+  <li>{% trans "<i>MIN, MAX, AVG</i> represent the current minimum, maximum and average latency" %}</li>
 </ul>
 <br/>
 {% endblock %}
