@@ -13,6 +13,7 @@
     <ul>
       <li> <a href="/nodes/node_list">{% trans "Node List" %}</a></li>
       <li> <a href="/nodes/gcl">{% trans "Global Client List" %}</a></li>
+      <li> <a href="/nodes/topology">{% trans "Mesh Topology" %}</a></li>
     </ul>
     Node operators:<br/>
     <ul>
@@ -23,6 +24,10 @@
       {% else %}
       <li> <a href="/auth/login">{% trans "Login Here" %}</a></li>
       {% endif %}
+    </ul>
+    Feeds:<br/>
+    <ul>
+      <li> <a href="/feeds/whitelist" target="_blank">MAC Whitelist</a></li>
     </ul>
   </div>
 

@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     (r'^nodes/do_deallocate_subnet/(?P<subnet_id>\d+)$', 'ljwifi.nodes.views.node_do_deallocate_subnet'),
     (r'^nodes/whitelist_mac$', 'ljwifi.nodes.views.whitelist_mac'),
     (r'^nodes/unwhitelist_mac/(?P<item_id>\d+)$', 'ljwifi.nodes.views.unwhitelist_mac'),
+    (r'^nodes/topology$', 'ljwifi.nodes.views.topology'),
     (r'^feeds/whitelist$', 'ljwifi.nodes.views.whitelist'),
 
     # Generator

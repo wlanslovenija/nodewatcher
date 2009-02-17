@@ -236,3 +236,11 @@ def whitelist(request):
 
   return HttpResponse("\n".join(output), content_type = "text/plain")
 
+def topology(request):
+  """
+  Displays mesh topology.
+  """
+  return render_to_response('nodes/topology.html', {},
+    context_instance = RequestContext(request)
+  )
+
