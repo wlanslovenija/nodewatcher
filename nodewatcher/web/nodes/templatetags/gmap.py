@@ -8,7 +8,6 @@ register = Library()
 GOOGLE_MAPS_API_KEY = "ABQIAAAAmW9WFNNiQwBMneBJZLweHBR3WYOwtT4kU6GVX3AHou_9Z28H_xQgcvQXunWn76h2_FTmY4nu0aylNg"
 INCLUDE_TEMPLATE = """
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s" type="text/javascript"></script>
-<script src="http://nodes.wlan-lj.net/js/jquery.js"></script>
 """% GOOGLE_MAPS_API_KEY
 BASIC_TEMPLATE = """
 <div id="gmap" style="width: 500px; height: 300px;"></div>
