@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     (r'^nodes/do_deallocate_subnet/(?P<subnet_id>\d+)$', 'wlanlj.nodes.views.node_do_deallocate_subnet'),
     (r'^nodes/whitelist_mac$', 'wlanlj.nodes.views.whitelist_mac'),
     (r'^nodes/unwhitelist_mac/(?P<item_id>\d+)$', 'wlanlj.nodes.views.unwhitelist_mac'),
+    (r'^nodes/gcl$', 'wlanlj.nodes.views.gcl'),
     (r'^nodes/topology$', 'wlanlj.nodes.views.topology'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
 

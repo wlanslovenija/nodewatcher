@@ -244,3 +244,13 @@ def topology(request):
     context_instance = RequestContext(request)
   )
 
+def gcl(request):
+  """
+  Displays the global client list.
+  """
+  clients = APClient.objects.all().order_by('node')
+  return render_to_response('nodes/gcl.html',
+    { 'clients' : clients },
+    context_instance = RequestContext(request)
+  )
+
