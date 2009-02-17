@@ -5,7 +5,7 @@ from django.template import resolve_variable
 
 register = Library()
 
-GOOGLE_MAPS_API_KEY = "ABQIAAAAmW9WFNNiQwBMneBJZLweHBR3WYOwtT4kU6GVX3AHou_9Z28H_xQgcvQXunWn76h2_FTmY4nu0aylNg"
+GOOGLE_MAPS_API_KEY = "ABQIAAAAmW9WFNNiQwBMneBJZLweHBQsbKtnqemGOa87hypl-SttWLUzChTDFDo3Fbn2FY6JSqvVkL_gxrQg9g"
 INCLUDE_TEMPLATE = """
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s" type="text/javascript"></script>
 """% GOOGLE_MAPS_API_KEY
