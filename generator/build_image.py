@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Lj-Wifi OpenWRT image builder
+# wlan ljubljana OpenWRT image builder
 #
 # Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
 #

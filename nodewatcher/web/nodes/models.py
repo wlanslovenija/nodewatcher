@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
-from ljwifi.nodes.locker import require_lock
-from ljwifi.nodes import ipcalc
-from ljwifi.generator.types import IfaceType
+from wlanlj.nodes.locker import require_lock
+from wlanlj.nodes import ipcalc
+from wlanlj.generator.types import IfaceType
 
 class Project(models.Model):
   """

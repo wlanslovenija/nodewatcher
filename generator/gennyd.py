@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Wlan-Lj Image Generator Daemon
+# wlan ljubljana Image Generator Daemon
 #
 # Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
 #
@@ -8,7 +8,7 @@
 # Setup import paths, since we are using Django models
 import sys, os
 sys.path.append('/var/www/django')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'ljwifi.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Django stuff
 from django.core.mail import send_mail
@@ -96,7 +96,7 @@ def generate_image(d):
   })
 
   send_mail(
-    '[Wlan-Lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
+    '[wlan-lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
     t.render(c),
     'generator@wlan-lj.net',
     [d['email']],
@@ -118,7 +118,7 @@ info = pwd.getpwnam('generator')
 os.setgid(info.pw_gid)
 os.setuid(info.pw_uid)
 
-logging.info("Wlan-Lj Image Generator Daemon v0.1 starting up...")
+logging.info("wlan ljubljana Image Generator Daemon v0.1 starting up...")
 
 c = serverconn.ServerConn("127.0.0.1", 11300)
 c.job = job.Job

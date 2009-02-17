@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from ljwifi.nodes.models import Node, Subnet as SubnetAllocation
-from ljwifi.generator.types import IfaceType
+from wlanlj.nodes.models import Node, Subnet as SubnetAllocation
+from wlanlj.generator.types import IfaceType
 
 class Template(models.Model):
   """

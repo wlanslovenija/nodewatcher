@@ -2,8 +2,8 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from ljwifi.nodes.models import Node
-from ljwifi.generator.queue import queue_generator_job
+from wlanlj.nodes.models import Node
+from wlanlj.generator.queue import queue_generator_job
 
 @login_required
 def request(request, node_ip):

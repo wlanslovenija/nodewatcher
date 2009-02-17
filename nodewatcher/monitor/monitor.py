@@ -8,10 +8,10 @@
 # Setup import paths, since we are using Django models
 import sys, os
 sys.path.append('/var/www/django')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'ljwifi.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Import our models
-from ljwifi.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem
 from django.db import transaction
 
 # Import other stuff

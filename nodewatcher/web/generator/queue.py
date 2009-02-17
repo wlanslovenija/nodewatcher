@@ -1,6 +1,6 @@
-from ljwifi.nodes.models import Node
-from ljwifi.generator.models import IfaceTemplate
-from ljwifi.account.models import UserAccount
+from wlanlj.nodes.models import Node
+from wlanlj.generator.models import IfaceTemplate
+from wlanlj.account.models import UserAccount
 from beanstalk import serverconn
 from beanstalk import job
 

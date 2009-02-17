@@ -18,7 +18,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 
 EMAIL_HOST = 'XXXXXXXXXXXXXXX'
-EMAIL_SUBJECT_PREFIX = '[Wlan-Lj] '
+EMAIL_SUBJECT_PREFIX = '[wlan-lj] '
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -67,13 +67,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'ljwifi.urls'
+ROOT_URLCONF = 'wlanlj.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/var/www/django/ljwifi/templates'
+    '/var/www/django/wlanlj/templates'
 )
 
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'
@@ -85,7 +85,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'ljwifi.nodes',
-    'ljwifi.generator',
-    'ljwifi.account',
+    'wlanlj.nodes',
+    'wlanlj.generator',
+    'wlanlj.account',
 )

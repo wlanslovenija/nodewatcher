@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from ljwifi.account.util import generate_random_password
+from wlanlj.account.util import generate_random_password
 
 class UserAccount(models.Model):
   """

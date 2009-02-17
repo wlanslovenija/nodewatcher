@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Lj-Wifi configuration generator
+# wlan ljubljana configuration generator
 #
 # Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
 #
@@ -404,7 +404,7 @@ class OpenWrtConfig(NodeConfig):
     os.mkdir(directory)
     
     # Configuration
-    f = open(os.path.join(directory, 'ljwifi.conf'), 'w')
+    f = open(os.path.join(directory, 'wlanlj.conf'), 'w')
     f.write('client\n')
     f.write('proto udp\n')
     f.write('dev tap0\n')
@@ -419,7 +419,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('ns-cert-type server\n')
     f.write('comp-lzo\n')
     f.write('daemon\n')
-    f.write('auth-user-pass /etc/openvpn/ljwifi-password\n')
+    f.write('auth-user-pass /etc/openvpn/wlanlj-password\n')
     f.write('auth-retry nointeract\n')
     f.write('cipher BF-CBC\n')
     f.write('ifconfig %s 255.255.0.0\n' % self.ip)
@@ -427,20 +427,20 @@ class OpenWrtConfig(NodeConfig):
     f.write('mute 20\n')
     f.write('user nobody\n')
     f.write('group nogroup\n')
-    f.write('ca /etc/openvpn/ljwifi-ca.crt\n')
-    f.write('tls-auth /etc/openvpn/ljwifi-ta.key 1\n')
+    f.write('ca /etc/openvpn/wlanlj-ca.crt\n')
+    f.write('tls-auth /etc/openvpn/wlanlj-ta.key 1\n')
     f.write('up /etc/openvpn/up.sh\n')
     f.close()
     
     # Password file
-    f = open(os.path.join(directory, 'ljwifi-password'), 'w')
+    f = open(os.path.join(directory, 'wlanlj-password'), 'w')
     f.write(self.vpn['username'] + "\n")
     f.write(self.vpn['password'] + "\n")
     f.close()
     
     # Copy the key and CA templates
-    self.__copyTemplate("openvpn/ta.key", os.path.join(directory, 'ljwifi-ta.key'))
-    self.__copyTemplate("openvpn/ca.crt", os.path.join(directory, 'ljwifi-ca.crt'))
+    self.__copyTemplate("openvpn/ta.key", os.path.join(directory, 'wlanlj-ta.key'))
+    self.__copyTemplate("openvpn/ca.crt", os.path.join(directory, 'wlanlj-ca.crt'))
     
     # Copy the restart script
     self.__copyTemplate("openvpn/up.sh", os.path.join(directory, 'up.sh'))

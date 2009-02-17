@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Wlan-Lj Image Generator Daemon
+# wlan ljubljana Image Generator Daemon
 #
 # Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
 #

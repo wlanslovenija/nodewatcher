@@ -1,11 +1,11 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from ljwifi.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem
-from ljwifi.nodes import ipcalc
-from ljwifi.generator.models import Template, Profile
-from ljwifi.generator.types import IfaceType
-from ljwifi.account.util import generate_random_password
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem
+from wlanlj.nodes import ipcalc
+from wlanlj.generator.models import Template, Profile
+from wlanlj.generator.types import IfaceType
+from wlanlj.account.util import generate_random_password
 from datetime import datetime
 import re
 

@@ -2,8 +2,8 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from ljwifi.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem
-from ljwifi.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem
+from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm
 from datetime import datetime
 
 def nodes(request):
