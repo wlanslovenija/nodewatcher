@@ -202,7 +202,7 @@
         </tr>
         {% for peer in node.dst.all %}
         <tr>
-          <td><a href="/nodes/node/{{ peer.src.ip }}">{{ peer.src.name|default:"invalid" }}</a> ({{ peer.src.ip }})</td>
+          <td><a href="/nodes/node/{{ peer.src.ip }}">{{ peer.src.name|default:_("unknown") }}</a> ({{ peer.src.ip }})</td>
           <td align="center">{{ peer.lq }}</td>
           <td align="center">{{ peer.ilq }}</td>
           <td align="center">{{ peer.etx }}</td>
