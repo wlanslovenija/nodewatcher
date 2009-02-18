@@ -47,5 +47,14 @@
 <div style="margin-left: 10px;">
 {% gmap lat:46.05 long:14.5 full:yes callback:populate_map %}
 </div>
+<br/>
+<br/>
+{% trans "Edge color key" %}:<br/>
+<ul>
+  <li><font color='#00ff00'>{% trans "green" %}</font> - {% trans "ETX is between 1.0 and 2.0" %}</li>
+  <li><font color='#0000ff'>{% trans "blue" %}</font> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
+  <li><font color='#ff0000'>{% trans "red" %}</font> - {% trans "ETX is greater than 5.0" %}</li>
+</ul>
+<br/>
 <br/><br/><br/><br/>
 {% endblock %}

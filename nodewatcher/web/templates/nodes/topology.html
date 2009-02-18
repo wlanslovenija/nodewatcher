@@ -7,5 +7,13 @@
 <h1>{% trans "Mesh Topology View" %}</h1>
 <br/>
 <img src="http://nodes.wlan-lj.net/graphs/mesh_topology.png" /><br/>
-<br/><br/><br/><br/>
+<br/>
+<br/>
+{% trans "Edge color key" %}:<br/>
+<ul>
+  <li><font color='#00ff00'>{% trans "green" %}</font> - {% trans "ETX is between 1.0 and 2.0" %}</li>
+  <li><font color='#0000ff'>{% trans "blue" %}</font> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
+  <li><font color='#ff0000'>{% trans "red" %}</font> - {% trans "ETX is greater than 5.0" %}</li>
+</ul>
+<br/><br/><br/><br/><br/>
 {% endblock %}
