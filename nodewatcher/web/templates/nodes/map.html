@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load gmap %}
+
+{% block title %}{% trans "Mesh Map View" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Mesh Map View" %}</h1>
+<br/>
+<script>
+  function create_marker(map, lat, lon, ip, name)
+  {
+    var opts = { title : name + " (" + ip + ")" };
+    var m = new GMarker(new GLatLng(lat, lon), opts);
+    GEvent.addListener(m, "click", function() {
+      m.openInfoWindowHtml("<b>" + name + "</b> (" + ip + ")");
+    });
+    map.addOverlay(m);
+  }
+
+  function create_link(map, lat1, lon1, lat2, lon2, color)
+  {
+    var p = new GPolyline([
+      new GLatLng(lat1, lon1),
+      new GLatLng(lat2, lon2)
+    ], color, 10);
+    map.addOverlay(p);
+  }
+
+  function populate_map(map)
+  {
+    /* Nodes */
+    {% for node in nodes %}
+    {% if node.should_draw_on_map %}
+    create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}');
+    {% endif %}
+    {% endfor %}
+
+    /* Links */
+    {% for link in links %}
+    {% if link.should_draw_on_map %}
+    create_link(map, {{ link.src.geo_lat }}, {{ link.src.geo_long }}, {{ link.dst.geo_lat }}, {{ link.dst.geo_long }}, '{{ link.color }}');
+    {% endif %}
+    {% endfor %}
+  }
+</script>
+<div style="margin-left: 10px;">
+{% gmap lat:46.05 long:14.5 full:yes callback:populate_map %}
+</div>
+<br/><br/><br/><br/>
+{% endblock %}

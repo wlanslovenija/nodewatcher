@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     (r'^nodes/unwhitelist_mac/(?P<item_id>\d+)$', 'wlanlj.nodes.views.unwhitelist_mac'),
     (r'^nodes/gcl$', 'wlanlj.nodes.views.gcl'),
     (r'^nodes/topology$', 'wlanlj.nodes.views.topology'),
+    (r'^nodes/map$', 'wlanlj.nodes.views.map'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
 
     # Generator

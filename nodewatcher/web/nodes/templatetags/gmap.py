@@ -45,6 +45,26 @@ BASIC_TEMPLATE = """
 </script>
 """
 
+FULL_TEMPLATE = """
+<div id="gmap" style="width: 700px; height: 700px;"></div>
+<script>
+  function create_map() {
+    if (GBrowserIsCompatible()) {
+      var map = new GMap2(document.getElementById("gmap"));
+      map.setCenter(new GLatLng(%(lat)s, %(long)s), 13);
+      map.enableDoubleClickZoom();
+      map.addControl(new GSmallMapControl());
+
+      if ("%(callback)s" != "undefined") {
+        %(callback)s(map);
+      }
+    }
+  }
+
+  $(document).ready(function() { create_map(); });
+</script>
+"""
+
 class GMapNode(template.Node):
   def __init__(self, params):
     self.params = params
@@ -62,7 +82,10 @@ class GMapNode(template.Node):
       if self.params[k] == None:
         self.params[k] = 0
     
-    return INCLUDE_TEMPLATE + (BASIC_TEMPLATE % self.params)
+    if self.params['full'] == "yes":
+      return INCLUDE_TEMPLATE + (FULL_TEMPLATE % self.params)
+    else:
+      return INCLUDE_TEMPLATE + (BASIC_TEMPLATE % self.params)
 
 def do_gmap(parser, token):
   items = token.split_contents()
@@ -74,7 +97,9 @@ def do_gmap(parser, token):
     'mlat'      : 0.0,
     'mlong'     : 0.0,
     'marker'    : 'no',
-    'clickable' : 'yes'
+    'clickable' : 'yes',
+    'full'      : 'no',
+    'callback'  : 'undefined'
   }
 
   for item in items[1:]:

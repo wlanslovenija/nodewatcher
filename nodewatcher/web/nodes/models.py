@@ -105,6 +105,12 @@ class Node(models.Model):
   essid = models.CharField(max_length = 50, null = True)
   local_time = models.DateTimeField(null = True)
   clients = models.IntegerField(null = True)
+
+  def should_draw_on_map(self):
+    """
+    Returns true if this node should be visible on the map.
+    """
+    return not self.system_node and self.geo_lat and self.geo_long
   
   def get_traffic_graphs(self):
     """
@@ -204,6 +210,23 @@ class Link(models.Model):
   lq = models.FloatField()
   ilq = models.FloatField()
   etx = models.FloatField()
+
+  def should_draw_on_map(self):
+    """
+    Returns true if this link should be visible on the map.
+    """
+    return self.src.should_draw_on_map() and self.dst.should_draw_on_map()
+
+  def color(self):
+    """
+    Returns link's color.
+    """
+    if self.etx >= 1.0 and self.etx <= 2.0:
+      return "#00ff00"
+    elif self.etx > 2.0 and self.etx <= 5.0:
+      return "#0000ff"
+    else:
+      return "#ff0000"
 
 class SubnetStatus:
   """

@@ -2,7 +2,7 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm
 from datetime import datetime
 
@@ -241,6 +241,16 @@ def topology(request):
   Displays mesh topology.
   """
   return render_to_response('nodes/topology.html', {},
+    context_instance = RequestContext(request)
+  )
+
+def map(request):
+  """
+  Displays mesh map.
+  """
+  return render_to_response('nodes/map.html',
+    { 'nodes' : Node.objects.all(),
+      'links' : Link.objects.all() },
     context_instance = RequestContext(request)
   )
 
