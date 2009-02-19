@@ -42,6 +42,11 @@ class RegisterNodeForm(forms.Form):
     Template.objects.all(),
     label = _("Router type")
   )
+  channel = forms.ChoiceField(
+    choices = [(0, _("Default"))] + [(x, x) for x in xrange(1, 11)],
+    initial = 0,
+    label = _("Channel")
+  )
   root_pass = forms.CharField(required = False)
   use_vpn = forms.BooleanField(required = False, initial = True,
     label = _("Enable VPN"),
@@ -81,7 +86,7 @@ class RegisterNodeForm(forms.Form):
 
     if ip and not IPV4_ADDR_RE.match(ip) or ip.startswith('127.'):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
-
+    
     return self.cleaned_data
   
   def save(self, user):
@@ -142,6 +147,10 @@ class RegisterNodeForm(forms.Form):
 
     # Create node profile for image generator
     profile = Profile(node = node, template = self.cleaned_data.get('template'))
+    if not self.cleaned_data.get('channel'):
+      profile.channel = profile.template.channel
+    else:
+      profile.channel = self.cleaned_data.get('channel')
     profile.root_pass = self.cleaned_data.get('root_pass') or generate_random_password(8)
     profile.use_vpn = self.cleaned_data.get('use_vpn')
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
@@ -175,6 +184,10 @@ class UpdateNodeForm(forms.Form):
   template = forms.ModelChoiceField(
     Template.objects.all(),
     label = _("Router type")
+  )
+  channel = forms.ChoiceField(
+    choices = [(x, x) for x in xrange(1, 11)],
+    label = _("Channel")
   )
   root_pass = forms.CharField()
   use_vpn = forms.BooleanField(required = False,
@@ -242,6 +255,7 @@ class UpdateNodeForm(forms.Form):
 
     # Update node profile for image generator
     profile = node.profile
+    profile.channel = self.cleaned_data.get('channel')
     profile.template = self.cleaned_data.get('template')
     profile.root_pass = self.cleaned_data.get('root_pass')
     profile.use_vpn = self.cleaned_data.get('use_vpn')

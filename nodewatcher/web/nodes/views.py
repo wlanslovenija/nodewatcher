@@ -77,7 +77,8 @@ def node_edit(request, node_ip):
       'template'            : node.profile.template.id,
       'use_vpn'             : node.profile.use_vpn,
       'use_captive_portal'  : node.profile.use_captive_portal,
-      'root_pass'           : node.profile.root_pass
+      'root_pass'           : node.profile.root_pass,
+      'channel'             : node.profile.channel
     })
 
   return render_to_response('nodes/edit.html',

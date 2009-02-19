@@ -36,13 +36,14 @@ def queue_generator_job(node):
   except UserAccount.DoesNotExist:
     profile = UserAccount(user = node.owner)
     profile.generate_vpn_password()
-
+  
   data = {
     'ip'              : node.ip,
     'hostname'        : node.name,
     'vpn_username'    : node.owner.username,
     'vpn_password'    : profile.vpn_password,
     'project'         : node.project.name,
+    'channel'         : node.profile.channel,
     'root_pass'       : node.profile.root_pass,
     'vpn'             : node.profile.use_vpn,
     'captive_portal'  : node.profile.use_captive_portal,
@@ -52,7 +53,6 @@ def queue_generator_job(node):
     'iface_lan'       : node.profile.template.iface_lan,
     'iface_wan'       : node.profile.template.iface_wan,
     'driver'          : node.profile.template.driver,
-    'channel'         : node.profile.template.channel,
     'port_layout'     : node.profile.template.port_layout,
     'imagebuilder'    : node.profile.template.imagebuilder,
     'imagefiles'      : node.profile.template.imagefile.split(","),
