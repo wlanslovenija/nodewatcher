@@ -17,12 +17,13 @@
   {% for client in clients %}
   {% ifchanged client.node %}
   <tr class="section_title">
-    <td colspan="5">{% blocktrans %}Node <b>{{ client.node.name }} ({{ client.node.ip }})</b>{% endblocktrans %}</td>
+    <td colspan="5">{% trans "Node" %} <b>{{ client.node.name }} ({{ client.node.ip }})</b></td>
   </tr>
   {% endifchanged %}
   <tr>
     <td></td>
     <td>{{ client.ip }}</td>
+    <td></td>
     <td>{{ client.uploaded }}</td>
     <td>{{ client.downloaded }}</td>
   </tr>
