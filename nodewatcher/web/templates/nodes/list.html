@@ -35,10 +35,17 @@
     <td>{{ node.ip }}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
     <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
+    {% if node.is_down %}
+    <td align="center">0</td>
+    <td align="center">/</td>
+    <td align="center">/</td>
+    <td align="center">/</td>
+    {% else %}
     <td align="center">{{ node.peers }}</td>
     <td align="center">{{ node.rtt_min|default:"/" }}</td>
     <td align="center">{{ node.rtt_avg|default:"/" }}</td>
     <td align="center">{{ node.rtt_max|default:"/" }}</td>
+    {% endif %}
   </tr>
   {% endfor %}
 </table>
