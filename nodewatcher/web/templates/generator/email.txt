@@ -7,7 +7,7 @@ The image for your wireless router ({{ hostname }}/{{ ip }}) has been
 generated! You can flash it directly to your router using the instructions
 which can be found on the following page:
   
-  http://wlan-lj.net/wiki/HowToFlash
+  http://wlan-lj.net/wiki/Navodila/Flashing
 
 The generated files for your node are available here:{% endblocktrans %}
   {% for file in files %}
