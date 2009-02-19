@@ -133,6 +133,12 @@ class NodeConfig(object):
     Sets the node type.
     """
     self.nodeType = nodeType
+
+  def setSSID(self, ssid):
+    """
+    Sets the SSID.
+    """
+    self.ssid = ssid
   
   def addService(self, priority, name):
     """

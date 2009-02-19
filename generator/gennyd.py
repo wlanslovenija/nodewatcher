@@ -59,6 +59,7 @@ def generate_image(d):
   x.setPassword(d['root_pass'])
   x.setHostname(d['hostname'])
   x.setIp(d['ip'])
+  x.setSSID(d['ssid'])
   
   # Add WAN interface and all subnets
   x.addInterface("wan", d['iface_wan'], init = True)
