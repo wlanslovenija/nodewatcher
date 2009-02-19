@@ -120,6 +120,15 @@ class Node(models.Model):
     """
     return self.graphitem_set.filter(type = GraphType.Traffic).order_by('name')
 
+  def is_down(self):
+    """
+    Returns true if the node is currently down.
+    """
+    if self.status != NodeStatus.Up:
+      return True
+
+    return False
+
   def get_warnings(self):
     """
     Returns a list of warnings for this node.

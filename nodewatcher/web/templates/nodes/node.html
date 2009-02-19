@@ -95,6 +95,7 @@
     <td>{% trans "Captive portal enabled" %}</td>
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
+  {% if not node.is_down %}
   <tr class="section_title">
     <td colspan="2">{% trans "Node Configuration" %}</td>
   </tr>
@@ -123,9 +124,15 @@
     <td>{{ node.clients|default:"0" }} [<a href="/nodes/gcl#n{{ node.ip }}">{% trans "global client list" %}</a>]</td>
   </tr>
   {% endif %}
+  {% endif %}
   <tr class="section_title">
     <td colspan="2">{% trans "Status Information" %}</td>
   </tr>
+  {% if node.is_down %}
+  <tr>
+    <td colspan="2" class="notice">{% trans "Node is currently down, so no status information is available." %}</td>
+  </tr>
+  {% else %}
   <tr>
     <td>{% trans "Node status" %}</td>
     <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
@@ -150,8 +157,7 @@
     <td>{% trans "Peers" %}</td>
     <td>{{ node.peers }}</td>
   </tr>
-  <tr>
-  </tr>
+  {% endif %}
   <tr class="section_title">
     <td colspan="2">{% trans "Subnets" %}</td>
   </tr>
@@ -212,7 +218,7 @@
     </td>
   </tr>
   {% endif %}
-  {% if node.get_traffic_graphs %}
+  {% if not node.is_down and node.get_traffic_graphs %}
   <tr class="section_title">
     <td colspan="2">{% trans "Graphs" %}</td>
   </tr>
