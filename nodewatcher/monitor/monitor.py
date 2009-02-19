@@ -156,7 +156,7 @@ def checkMeshStatus():
           title = 'Traffic - %s' % iid
           rra = os.path.join(WORKDIR, 'rra', 'traffic_%s_%s.rrd' % (nodeIp, iid))
 
-          RRA.update(RRAIface, rra, iface['down'], iface['up'])
+          RRA.update(RRAIface, rra, iface['up'], iface['down'])
           RRA.graph(RRAIface, title, os.path.join(GRAPHDIR, 'traffic_%s_%s.png' % (nodeIp, iid)), rra, rra)
 
           # Create a graph item if needed
