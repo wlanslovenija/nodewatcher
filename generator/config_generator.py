@@ -368,6 +368,7 @@ class OpenWrtConfig(NodeConfig):
       self.addPackage(*driverPackages[self.wifiDriver])
 
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
+    self.addPackage('nodewatcher', 'olsrd-mod-actions')
 
     # Build the image
     buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
