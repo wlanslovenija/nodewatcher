@@ -147,8 +147,8 @@ class RegisterNodeForm(forms.Form):
 
     # Create node profile for image generator
     profile = Profile(node = node, template = self.cleaned_data.get('template'))
-    if not self.cleaned_data.get('channel'):
-      profile.channel = profile.template.channel
+    if self.cleaned_data.get('channel') in ("0", None):
+      profile.channel = node.project.channel
     else:
       profile.channel = self.cleaned_data.get('channel')
     profile.root_pass = self.cleaned_data.get('root_pass') or generate_random_password(8)
@@ -255,7 +255,10 @@ class UpdateNodeForm(forms.Form):
 
     # Update node profile for image generator
     profile = node.profile
-    profile.channel = self.cleaned_data.get('channel')
+    if not self.cleaned_data.get('channel'):
+      profile.channel = node.project.channel
+    else:
+      profile.channel = self.cleaned_data.get('channel')
     profile.template = self.cleaned_data.get('template')
     profile.root_pass = self.cleaned_data.get('root_pass')
     profile.use_vpn = self.cleaned_data.get('use_vpn')

@@ -13,6 +13,8 @@ class Project(models.Model):
   name = models.CharField(max_length = 50)
   description = models.CharField(max_length = 200)
   pool = models.ForeignKey('Pool')
+  channel = models.IntegerField()
+  ssid = models.CharField(max_length = 50)
 
   def __unicode__(self):
     """

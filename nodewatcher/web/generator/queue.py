@@ -43,6 +43,7 @@ def queue_generator_job(node):
     'vpn_username'    : node.owner.username,
     'vpn_password'    : profile.vpn_password,
     'project'         : node.project.name,
+    'ssid'            : node.project.ssid,
     'channel'         : node.profile.channel,
     'root_pass'       : node.profile.root_pass,
     'vpn'             : node.profile.use_vpn,
