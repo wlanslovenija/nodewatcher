@@ -17,7 +17,9 @@ BASIC_TEMPLATE = """
       var map = new GMap2(document.getElementById("gmap"));
       map.setCenter(new GLatLng(%(lat)s, %(long)s), 13);
       map.enableDoubleClickZoom();
+      map.removeMapType(map.getMapTypes()[1]);
       map.addControl(new GSmallMapControl());
+      map.addControl(new GMapTypeControl());
       var m = 0;
       if (%(marker)s && %(mlat)s > 0 && %(mlong)s > 0) {
         m = new GMarker(new GLatLng(%(mlat)s, %(mlong)s));
@@ -52,8 +54,10 @@ FULL_TEMPLATE = """
     if (GBrowserIsCompatible()) {
       var map = new GMap2(document.getElementById("gmap"));
       map.setCenter(new GLatLng(%(lat)s, %(long)s), 13);
+      map.removeMapType(map.getMapTypes()[1]);
       map.enableDoubleClickZoom();
       map.addControl(new GSmallMapControl());
+      map.addControl(new GMapTypeControl());
 
       if ("%(callback)s" != "undefined") {
         %(callback)s(map);
