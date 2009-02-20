@@ -218,11 +218,11 @@
     </td>
   </tr>
   {% endif %}
-  {% if not node.is_down and node.get_traffic_graphs %}
+  {% if not node.is_down and node.get_graphs %}
   <tr class="section_title">
     <td colspan="2">{% trans "Graphs" %}</td>
   </tr>
-  {% for graph in node.get_traffic_graphs %}
+  {% for graph in node.get_graphs %}
   <tr>
     <td colspan="2" align="center"><img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" /></td>
   </tr>

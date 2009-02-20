@@ -114,11 +114,11 @@ class Node(models.Model):
     """
     return not self.system_node and self.geo_lat and self.geo_long
   
-  def get_traffic_graphs(self):
+  def get_graphs(self):
     """
     Returns a list of traffic graph items.
     """
-    return self.graphitem_set.filter(type = GraphType.Traffic).order_by('name')
+    return self.graphitem_set.all().order_by('type', 'name')
 
   def is_down(self):
     """
@@ -317,6 +317,8 @@ class GraphType:
   A list of valid graph types.
   """
   Traffic = 0
+  Clients = 1
+  RTT = 2
 
 class GraphItem(models.Model):
   """
