@@ -41,6 +41,66 @@ class RRAIface:
     r'GPRINT:download:MAX:Maximum\:%8.2lf %s\n'
   ]
 
+class RRAClients:
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'clients',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE2:clients#008310:Clients",
+    r'GPRINT:clients:LAST:  Current\:%8.2lf %s',
+    r'GPRINT:clients:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:clients:MAX:Maximum\:%8.2lf %s\n'
+  ]
+
+class RRARTT:
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'rtt',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE2:rtt#0000ff:RTT",
+    r'GPRINT:rtt:LAST:  Current\:%8.2lf %s',
+    r'GPRINT:rtt:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:rtt:MAX:Maximum\:%8.2lf %s\n'
+  ]
+
 class RRA:
   """
   A wrapper class for managing round-robin archives via RRDTool.

@@ -17,7 +17,7 @@ from django.db import transaction
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT
 from lib.topology import DotTopologyPlotter
 from time import sleep
 from datetime import datetime
@@ -58,6 +58,23 @@ def safe_date_convert(timestamp):
     return datetime.fromtimestamp(int(timestamp))
   except:
     return None
+
+def add_graph(node, name, type, conf, title, filename, *values):
+  """
+  A helper function for generating graphs.
+  """
+  rra = os.path.join(WORKDIR, 'rra', '%s.rrd' % filename)
+  RRA.update(conf, rra, *values)
+  RRA.graph(conf, title, os.path.join(GRAPHDIR, '%s.png' % filename), *[rra for i in xrange(2)])
+  
+  try:
+    graph = GraphItem.objects.get(node = node, name = name, type = type)
+  except GraphItem.DoesNotExist:
+    graph = GraphItem(node = node, name = name, type = type)
+    graph.rra = '%s.rrd' % filename
+    graph.graph = '%s.png' % filename
+    graph.title = title
+    graph.save()
 
 def checkMeshStatus():
   """
@@ -121,6 +138,9 @@ def checkMeshStatus():
     if nodeIp in results:
       n.status = NodeStatus.Up
       n.rtt_min, n.rtt_avg, n.rtt_max, n.pkt_loss = results[nodeIp]
+      
+      # Add RTT graph
+      add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency_%s' % nodeIp, n.rtt_avg)
     else:
       n.status = NodeStatus.Visible
 
@@ -150,24 +170,13 @@ def checkMeshStatus():
             c.uploaded = safe_int_convert(client['up'])
             c.downloaded = safe_int_convert(client['down'])
             c.save()
+        
+        # Generate a graph for number of clients
+        add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)
 
         # Record interface traffic statistics for all interfaces
         for iid, iface in info['iface'].iteritems():
-          title = 'Traffic - %s' % iid
-          rra = os.path.join(WORKDIR, 'rra', 'traffic_%s_%s.rrd' % (nodeIp, iid))
-
-          RRA.update(RRAIface, rra, iface['up'], iface['down'])
-          RRA.graph(RRAIface, title, os.path.join(GRAPHDIR, 'traffic_%s_%s.png' % (nodeIp, iid)), rra, rra)
-
-          # Create a graph item if needed
-          try:
-            graph = GraphItem.objects.get(node = n, name = iid, type = GraphType.Traffic)
-          except GraphItem.DoesNotExist:
-            graph = GraphItem(node = n, name = iid, type = GraphType.Traffic)
-            graph.rra = 'traffic_%s_%s.rrd' % (nodeIp, iid)
-            graph.graph = 'traffic_%s_%s.png' % (nodeIp, iid)
-            graph.title = title
-            graph.save()
+          add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (nodeIp, iid), iface['up'], iface['down'])
       except:
         from traceback import print_exc
         print_exc()
