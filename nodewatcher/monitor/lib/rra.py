@@ -95,7 +95,7 @@ class RRARTT:
     )
   ]
   graph = [
-    "LINE2:rtt#0000ff:RTT",
+    "LINE1:rtt#0000ff:RTT",
     r'GPRINT:rtt:LAST:  Current\:%8.2lf %s',
     r'GPRINT:rtt:AVERAGE:Average\:%8.2lf %s',
     r'GPRINT:rtt:MAX:Maximum\:%8.2lf %s\n'
