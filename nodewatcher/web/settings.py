@@ -79,6 +79,9 @@ TEMPLATE_DIRS = (
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'
 LOGIN_URL = '/auth/login'
 AUTH_PROFILE_MODULE = 'account.useraccount'
+AUTHENTICATION_BACKENDS = (
+    'wlanlj.account.auth.CryptBackend',
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
