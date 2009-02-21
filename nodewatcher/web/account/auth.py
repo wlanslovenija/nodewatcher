@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-import bcrypt
+from crypt import crypt
 
 class CryptBackend:
   def authenticate(self, username = None, password = None):
@@ -9,7 +9,7 @@ class CryptBackend:
     """
     try:
       user = User.objects.get(username = username)
-      if bcrypt.hashpw(password, user.password) == user.password:
+      if crypt(password, user.password) == user.password:
         return user
       else:
         return None
