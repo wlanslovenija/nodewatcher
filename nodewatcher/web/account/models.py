@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from wlanlj.account.util import generate_random_password
+from wlanlj.nodes.models import Project
 
 class UserAccount(models.Model):
   """
@@ -11,6 +12,7 @@ class UserAccount(models.Model):
   name = models.CharField(max_length = 50, null = True)
   phone = models.CharField(max_length = 50, null = True)
   info_sticker = models.BooleanField(default = False, null = True)
+  project = models.ForeignKey(Project, null = True)
 
   def generate_vpn_password(self):
     """

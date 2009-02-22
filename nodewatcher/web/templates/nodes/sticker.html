@@ -6,7 +6,7 @@
 {% block content %}
 <h1>{% trans "Generate an Info Sticker" %}</h1>
 
-{% if form.errors %}
+{% if form.errors and show_errors %}
 <div class="error">
   {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to generate a sticker:" %}<br />
   <br/>
@@ -27,6 +27,10 @@
     <td colspan="2" class="notice">
       {% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
     </td>
+  </tr>
+  <tr>
+    <td>{{ form.project.label }}</td>
+    <td>{{ form.project }}</td>
   </tr>
   <tr>
     <td>{{ form.name.label }}</td>

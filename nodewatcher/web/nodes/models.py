@@ -15,6 +15,7 @@ class Project(models.Model):
   pool = models.ForeignKey('Pool')
   channel = models.IntegerField()
   ssid = models.CharField(max_length = 50)
+  sticker = models.CharField(max_length = 50)
 
   def __unicode__(self):
     """

@@ -374,8 +374,13 @@ class InfoStickerForm(forms.Form):
   """
   A simple form for whitelisting a MAC address.
   """
-  name = forms.CharField(max_length = 50, label = _("Your name"), required = False)
-  phone = forms.CharField(max_length = 50, label = _("Phone number"), required = False)
+  name = forms.CharField(max_length = 50, label = _("Your name"))
+  phone = forms.CharField(max_length = 50, label = _("Phone number"))
+  project = forms.ModelChoiceField(
+    Project.objects.all(),
+    initial = Project.objects.all()[0].id,
+    label = _("Project")
+  )
   
   def save(self, user):
     """
@@ -383,12 +388,14 @@ class InfoStickerForm(forms.Form):
     """
     name = self.cleaned_data.get('name')
     phone = self.cleaned_data.get('phone')
+    project = self.cleaned_data.get('project')
 
-    if name == user.name and phone == user.phone:
+    if name == user.name and phone == user.phone and project == user.project:
       regenerate = False
     else:
       user.name = name
       user.phone = phone
+      user.project = project
       regenerate = True
 
     return generate_sticker(user, regenerate)

@@ -12,7 +12,7 @@ def generate_sticker(user, regenerate = False):
     return 'http://nodes.wlan-lj.net/stickers/sticker-%s.pdf' % user.id
 
   # Generate one using pdflatex
-  t = loader.get_template('nodes/sticker.tex')
+  t = loader.get_template('nodes/stickers/%s' % user.project.sticker)
   c = Context({
     'name'  : user.name,
     'phone' : user.phone

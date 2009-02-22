@@ -272,6 +272,7 @@ def sticker(request):
   Display a form for generating an info sticker.
   """
   user = UserAccount.for_user(request.user)
+  show_errors = True
 
   if request.method == 'POST':
     form = InfoStickerForm(request.POST)
@@ -279,12 +280,16 @@ def sticker(request):
       return HttpResponseRedirect(form.save(user))
   else:
     form = InfoStickerForm({
-      'name'  : user.name,
-      'phone' : user.phone
+      'name'    : user.name,
+      'phone'   : user.phone,
+      'project' : user.project.id
     })
 
+    show_errors = False
+
   return render_to_response('nodes/sticker.html',
-    { 'form' : form },
+    { 'form' : form,
+      'show_errors' : show_errors },
     context_instance = RequestContext(request)
   )
 
