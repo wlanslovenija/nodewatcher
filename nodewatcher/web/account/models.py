@@ -8,6 +8,9 @@ class UserAccount(models.Model):
   """
   user = models.ForeignKey(User, unique = True)
   vpn_password = models.CharField(max_length = 50, null = True)
+  name = models.CharField(max_length = 50, null = True)
+  phone = models.CharField(max_length = 50, null = True)
+  info_sticker = models.BooleanField(default = False, null = True)
 
   def generate_vpn_password(self):
     """
@@ -15,4 +18,18 @@ class UserAccount(models.Model):
     """
     self.vpn_password = generate_random_password()
     self.save()
+
+  @staticmethod
+  def for_user(user):
+    """
+    Returns a profile for the selected user, generating it if it
+    doesn't yet exist.
+    """
+    try:
+      profile = user.get_profile()
+    except UserAccount.DoesNotExist:
+      profile = UserAccount(user = user)
+      profile.generate_vpn_password()
+
+    return profile
 

@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     (r'^nodes/gcl$', 'wlanlj.nodes.views.gcl'),
     (r'^nodes/topology$', 'wlanlj.nodes.views.topology'),
     (r'^nodes/map$', 'wlanlj.nodes.views.map'),
+    (r'^nodes/sticker$', 'wlanlj.nodes.views.sticker'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
 
     # Generator

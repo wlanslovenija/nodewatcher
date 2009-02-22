@@ -31,11 +31,7 @@ def queue_generator_job(node):
     })
   
   # Generate VPN password if needed
-  try:
-    profile = node.owner.get_profile()
-  except UserAccount.DoesNotExist:
-    profile = UserAccount(user = node.owner)
-    profile.generate_vpn_password()
+  profile = UserAccount.for_user(node.owner)
   
   data = {
     'ip'              : node.ip,

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Generate an Info Sticker" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Generate an Info Sticker" %}</h1>
+
+{% if form.errors %}
+<div class="error">
+  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to generate a sticker:" %}<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form action="/nodes/sticker" method="POST">
+<table border="0" width="700">
+  <tr>
+    <td colspan="2" class="notice">
+      {% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
+    </td>
+  </tr>
+  <tr>
+    <td>{{ form.name.label }}</td>
+    <td>{{ form.name }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.phone.label }}</td>
+    <td>{{ form.phone }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <input type="submit" value="{% trans "Generate" %}" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/my_nodes'" />
+    </td>
+  </tr>
+</table>
+</form>
+<br /><br/>
+{% endblock %}

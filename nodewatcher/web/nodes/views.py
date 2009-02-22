@@ -3,7 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link
-from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm
+from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm
+from wlanlj.account.models import UserAccount
 from datetime import datetime
 
 def nodes(request):
@@ -262,6 +263,28 @@ def gcl(request):
   clients = APClient.objects.all().order_by('node')
   return render_to_response('nodes/gcl.html',
     { 'clients' : clients },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
+def sticker(request):
+  """
+  Display a form for generating an info sticker.
+  """
+  user = UserAccount.for_user(request.user)
+
+  if request.method == 'POST':
+    form = InfoStickerForm(request.POST)
+    if form.is_valid():
+      return HttpResponseRedirect(form.save(user))
+  else:
+    form = InfoStickerForm({
+      'name'  : user.name,
+      'phone' : user.phone
+    })
+
+  return render_to_response('nodes/sticker.html',
+    { 'form' : form },
     context_instance = RequestContext(request)
   )
 

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem
 from wlanlj.nodes import ipcalc
+from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile
 from wlanlj.generator.types import IfaceType
 from wlanlj.account.util import generate_random_password
@@ -368,4 +369,27 @@ class WhitelistMacForm(forms.Form):
     item.mac = self.cleaned_data.get('mac').upper()
     item.registred_at = datetime.now()
     item.save()
+
+class InfoStickerForm(forms.Form):
+  """
+  A simple form for whitelisting a MAC address.
+  """
+  name = forms.CharField(max_length = 50, label = _("Your name"), required = False)
+  phone = forms.CharField(max_length = 50, label = _("Phone number"), required = False)
+  
+  def save(self, user):
+    """
+    Saves info sticker data and generates the sticker.
+    """
+    name = self.cleaned_data.get('name')
+    phone = self.cleaned_data.get('phone')
+
+    if name == user.name and phone == user.phone:
+      regenerate = False
+    else:
+      user.name = name
+      user.phone = phone
+      regenerate = True
+
+    return generate_sticker(user, regenerate)
 
