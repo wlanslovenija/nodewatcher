@@ -1,4 +1,5 @@
 import urllib2
+import socket
 
 class NodeWatcher(object):
   """
@@ -9,6 +10,7 @@ class NodeWatcher(object):
     """
     Fetches node information via HTTP.
     """
+    socket.setdefaulttimeout(15)
     try:
       info = {}
       data = urllib2.urlopen('http://%s/cgi-bin/nodewatcher' % nodeIp).read()
@@ -28,7 +30,7 @@ class NodeWatcher(object):
           d = d.setdefault(part, {})
         
         d[key[-1]] = value
-    except urllib2.URLError:
+    except:
       return None
 
     return info
