@@ -63,3 +63,9 @@ class Profile(models.Model):
   use_vpn = models.BooleanField()
   use_captive_portal = models.BooleanField()
 
+  # Static WAN configuration
+  wan_dhcp = models.BooleanField(default = True)
+  wan_ip = models.CharField(max_length = 40, null = True)
+  wan_cidr = models.IntegerField(null = True)
+  wan_gw = models.CharField(max_length = 40, null = True)
+
