@@ -55,6 +55,11 @@
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr>
+    {% if not node.owner.email %}
+    <td colspan="2" class="error">
+      {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like image generation) are disabled.{% endblocktrans %}
+    </td>
+    {% else %}
     {% if node.has_allocated_subnets %}
     <td colspan="2" class="notice">
       {% blocktrans %}After you press <b>Generate</b> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.{% endblocktrans %}
@@ -64,11 +69,12 @@
       {% blocktrans %}This node has no allocated subnets or none are assigned to the WiFi interface, image generation is not possible. Please assign some subnets using the <b>add subnet</b> link on node information page.{% endblocktrans %}
     </td>
     {% endif %}
+    {% endif %}
   </tr>
   <tr>
     <td></td>
     <td>
-      {% if node.has_allocated_subnets %}
+      {% if node.has_allocated_subnets and node.owner.email %}
       <input type="button" value="{% trans "Generate" %}" onclick="document.location='/generator/image/{{ node.ip }}'" />&nbsp;
       {% endif %}
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />

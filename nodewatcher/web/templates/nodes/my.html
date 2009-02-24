@@ -8,6 +8,12 @@
 
 Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operators Center (LJW-NOC)!<br/>
 <br/>
+{% if not user.email %}
+<div class="error">
+  {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like image generation) are disabled.{% endblocktrans %}
+</div>
+<br/>
+{% endif %}
 
 <table border="0" width="750" cellspacing="0">
   <tr class="header">
