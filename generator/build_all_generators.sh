@@ -40,7 +40,7 @@ for i in $(seq 0 $((${#GENERATORS[@]} - 1))); do
   fi
 
   echo ">>> Copying packages..."
-  cp -r bin/packages/${pkg} ${GENDIR}/build/packages/${pkg}
+  cp -r bin/packages/* ${GENDIR}/build/packages/${pkg}
 
   echo ">>> Extracting image builder..."
   ID="$$_$RANDOM"
