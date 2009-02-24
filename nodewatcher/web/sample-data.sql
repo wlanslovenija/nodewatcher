@@ -6,6 +6,7 @@ INSERT INTO generator_template(name, openwrt_version, arch, iface_wifi, iface_la
 INSERT INTO generator_template(name, openwrt_version, arch, iface_wifi, iface_lan, iface_wan, driver, channel, port_layout, imagebuilder, imagefile) VALUES('Linksys WRT54GL (2.6)', 'new', 'mipsel', 'wlan0', 'eth0.0', 'eth0.1', 'mac80211', 8, 'wrt54gl', 'imagebuilder.broadcom', 'openwrt-wrt54g-squashfs.bin');
 INSERT INTO generator_template(name, openwrt_version, arch, iface_wifi, iface_lan, iface_wan, driver, channel, port_layout, imagebuilder, imagefile) VALUES('Buffalo WHR-HP-G54', 'new', 'mipsel', 'wl0', 'eth0.0', 'eth0.1', 'broadcom', 8, 'whr-hp-g54', 'imagebuilder.brcm24', 'openwrt-brcm-2.4-squashfs.trx');
 INSERT INTO generator_template(name, openwrt_version, arch, iface_wifi, iface_lan, iface_wan, driver, channel, port_layout, imagebuilder, imagefile) VALUES('Fonera', 'new', 'mips', 'ath0', '', 'eth0','atheros', 8, 'fonera', 'imagebuilder.atheros', 'openwrt-atheros-root.jffs2-64k,openwrt-atheros-vmlinux.lzma');
+INSERT INTO generator_template(name, openwrt_version, arch, iface_wifi, iface_lan, iface_wan, driver, channel, port_layout, imagebuilder, imagefile) VALUES('Linksys WRT54GS (2.4)', 'new', 'mipsel', 'wl0', 'eth0.0', 'eth0.1', 'broadcom', 8, 'wrt54gs', 'imagebuilder.brcm24', 'openwrt-wrt54gs-squashfs.bin');
 INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(1, 0, 'eth0.0');
 INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(1, 1, 'eth0.1');
 INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(1, 2, 'wl0');
@@ -18,4 +19,7 @@ INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(3, 2, 'wl0
 INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(4, 0, 'eth0');
 INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(4, 1, 'eth0');
 INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(4, 2, 'ath0');
+INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(5, 0, 'eth0.0');
+INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(5, 1, 'eth0.1');
+INSERT INTO generator_ifacetemplate(template_id, type, ifname) VALUES(5, 2, 'wl0');
 
