@@ -46,7 +46,8 @@ class RegisterNodeForm(forms.Form):
   channel = forms.ChoiceField(
     choices = [(0, _("Default"))] + [(x, x) for x in xrange(1, 11)],
     initial = 0,
-    label = _("Channel")
+    label = _("Channel"),
+    required = False
   )
   root_pass = forms.CharField(required = False)
   use_vpn = forms.BooleanField(required = False, initial = True,
@@ -188,7 +189,8 @@ class UpdateNodeForm(forms.Form):
   )
   channel = forms.ChoiceField(
     choices = [(x, x) for x in xrange(1, 11)],
-    label = _("Channel")
+    label = _("Channel"),
+    required = False
   )
   root_pass = forms.CharField()
   use_vpn = forms.BooleanField(required = False,
