@@ -86,7 +86,7 @@ class RegisterNodeForm(forms.Form):
     """
     ip = self.cleaned_data.get('ip')
 
-    if ip and not IPV4_ADDR_RE.match(ip) or ip.startswith('127.'):
+    if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
     
     return self.cleaned_data
@@ -149,7 +149,7 @@ class RegisterNodeForm(forms.Form):
 
     # Create node profile for image generator
     profile = Profile(node = node, template = self.cleaned_data.get('template'))
-    if self.cleaned_data.get('channel') in ("0", None):
+    if self.cleaned_data.get('channel') in ('', "0", None):
       profile.channel = node.project.channel
     else:
       profile.channel = self.cleaned_data.get('channel')
@@ -168,7 +168,7 @@ class UpdateNodeForm(forms.Form):
   A simple form for updating node information.
   """
   name = forms.CharField(max_length = 50, label = _("Node name"))
-  ip = forms.CharField(max_length = 40, label = _("IP address"))
+  ip = forms.CharField(max_length = 40, required = False, label = _("IP address"))
   location = forms.CharField(max_length = 200)
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
@@ -229,7 +229,7 @@ class UpdateNodeForm(forms.Form):
     """
     ip = self.cleaned_data.get('ip')
 
-    if ip and not IPV4_ADDR_RE.match(ip) or ip.startswith('127.'):
+    if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
 
     return self.cleaned_data
