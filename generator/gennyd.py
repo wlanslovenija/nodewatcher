@@ -62,7 +62,10 @@ def generate_image(d):
   x.setSSID(d['ssid'])
   
   # Add WAN interface and all subnets
-  x.addInterface("wan", d['iface_wan'], init = True)
+  if d['wan_dhcp']:
+    x.addInterface("wan", d['iface_wan'], init = True)
+  else:
+    x.addInterface("wan", d['iface_wan'], d['wan_ip'], d['wan_cidr'], d['wan_gw'], init = True)
 
   for subnet in d['subnets']:
     x.addSubnet(str(subnet['iface']), str(subnet['network']), subnet['cidr'], subnet['dhcp'], True)
