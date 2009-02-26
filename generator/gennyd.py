@@ -46,9 +46,11 @@ def generate_image(d):
   """
   Generates an image accoording to given configuration.
   """
+  logging.debug(repr(d))
+
   if d['imagebuilder'] not in IMAGEBUILDERS:
     raise Exception("Invalid imagebuilder specified!")
-
+  
   x = OpenWrtConfig()
   x.setOpenwrtVersion(d['openwrt_ver'])
   x.setArch(d['arch'])
@@ -141,6 +143,23 @@ try:
     except:
       logging.error(format_exc())
       logging.warning("Image generation has failed!")
+
+      # Send an e-mail
+      d = no_unicodes(j.data)
+      t = loader.get_template('generator/email-failed.txt')
+      ctx = Context({
+        'hostname'  : d['hostname'],
+        'ip'        : d['ip'],
+        'username'  : d['vpn_username']
+      })
+
+      send_mail(
+        '[wlan-lj] ' + (_("Image generation failed for %s/%s") % (d['hostname'], d['ip'])),
+        t.render(ctx),
+        'generator@wlan-lj.net',
+        [d['email']],
+        fail_silently = False
+      )
 
     j.Finish()
 except KeyboardInterrupt:
