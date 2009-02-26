@@ -282,7 +282,7 @@ def sticker(request):
     form = InfoStickerForm({
       'name'    : user.name,
       'phone'   : user.phone,
-      'project' : user.project.id
+      'project' : user.project.id if user.project else 0
     })
 
     show_errors = False
