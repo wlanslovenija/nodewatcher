@@ -70,6 +70,12 @@
     <td>{% trans "Enable captive portal" %}</td>
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
+  {% if node.ant_external %}
+  <tr>
+    <td>{{ form.antenna.label }}</td>
+    <td>{{ form.antenna }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this ?</a>)</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>{{ form.wan_dhcp.label }}</td>
     <td>{{ form.wan_dhcp }}</td>

@@ -41,6 +41,8 @@ def queue_generator_job(node):
     'project'         : node.project.name,
     'ssid'            : node.project.ssid,
     'channel'         : node.profile.channel,
+    'rx_ant'          : node.profile.antenna,
+    'tx_ant'          : node.profile.antenna,
     'root_pass'       : node.profile.root_pass,
     'vpn'             : node.profile.use_vpn,
     'captive_portal'  : node.profile.use_captive_portal,

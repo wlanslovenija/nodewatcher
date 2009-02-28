@@ -28,7 +28,8 @@ def request(request, node_ip):
   else:
     p = {
       'wan_dhcp'  : node.profile.wan_dhcp,
-      'wan_gw'    : node.profile.wan_gw
+      'wan_gw'    : node.profile.wan_gw,
+      'antenna'   : node.profile.antenna
     }
 
     if node.profile.wan_ip and node.profile.wan_cidr:

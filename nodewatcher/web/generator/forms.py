@@ -14,6 +14,16 @@ class GenerateImageForm(forms.Form):
   wan_dhcp = forms.BooleanField(required = False, label = _("WAN auto-configuration (DHCP)"))
   wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
+  antenna = forms.ChoiceField(
+    choices = [
+      (0, _("Automatic")),
+      (1, _("First")),
+      (2, _("Second"))
+    ],
+    initial = 0,
+    label = _("Antenna connector"),
+    required = False
+  )
 
   def clean(self):
     """
@@ -55,5 +65,6 @@ class GenerateImageForm(forms.Form):
     node.profile.wan_ip = self.cleaned_data.get('wan_ip')
     node.profile.wan_cidr = self.cleaned_data.get('wan_cidr')
     node.profile.wan_gw = self.cleaned_data.get('wan_gw')
+    node.profile.antenna = self.cleaned_data.get('antenna') or 0
     node.profile.save()
 
