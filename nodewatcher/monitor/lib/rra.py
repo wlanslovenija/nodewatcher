@@ -101,6 +101,45 @@ class RRARTT:
     r'GPRINT:rtt:MAX:Maximum\:%8.2lf %s\n'
   ]
 
+class RRALinkQuality:
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'lq',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'ilq',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE1:lq#33ADFF:LQ",
+    r'GPRINT:lq:LAST:  Current\:%8.2lf %s',
+    r'GPRINT:lq:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:lq:MAX:Maximum\:%8.2lf %s\n',
+    "LINE1:ilq#206C9F:ILQ",
+    r'GPRINT:ilq:LAST: Current\:%8.2lf %s',
+    r'GPRINT:ilq:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:ilq:MAX:Maximum\:%8.2lf %s\n'
+  ]
+
 class RRA:
   """
   A wrapper class for managing round-robin archives via RRDTool.

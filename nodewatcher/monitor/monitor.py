@@ -17,7 +17,7 @@ from django.db import transaction
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality
 from lib.topology import DotTopologyPlotter
 from time import sleep
 from datetime import datetime
@@ -148,6 +148,14 @@ def checkMeshStatus():
       n.status = NodeStatus.Duped
       n.warnings = True
     
+    # Add LQ/ILQ graphs
+    lq_avg = ilq_avg = 0.0
+    for peer in nodes[nodeIp].links:
+      lq_avg += float(peer[1])
+      ilq_avg += float(peer[2])
+    
+    add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
+
     n.last_seen = datetime.now()
 
     # Since the node appears to be up, let's fetch details
