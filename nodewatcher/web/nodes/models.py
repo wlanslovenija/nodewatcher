@@ -125,10 +125,13 @@ class Node(models.Model):
     """
     Returns true if the node is currently down.
     """
-    if self.status != NodeStatus.Up:
-      return True
+    return self.status != NodeStatus.Up
 
-    return False
+  def is_invalid(self):
+    """
+    Returns true if the node is invalid.
+    """
+    return self.status == NodeStatus.Invalid
 
   def get_warnings(self):
     """
