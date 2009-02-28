@@ -55,6 +55,7 @@ def generate_image(d):
   x.setOpenwrtVersion(d['openwrt_ver'])
   x.setArch(d['arch'])
   x.setWifiIface(d['iface_wifi'], d['driver'], d['channel'])
+  x.setWifiAnt(d['rx_ant'], d['tx_ant'])
   x.setLanIface(d['iface_lan'])
   x.setPortLayout(d['port_layout'])
   x.setNodeType("adhoc")

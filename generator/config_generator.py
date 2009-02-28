@@ -46,6 +46,8 @@ class NodeConfig(object):
   wifiIface = "wl0"
   wifiDriver = "broadcom"
   wifiChannel = 8
+  wifiTxAnt = 0
+  wifiRxAnt = 0
   portLayout = "wrt54gl"
   password = "ljw"
   hostname = None
@@ -103,7 +105,14 @@ class NodeConfig(object):
       self.wifiVirtualIface = wifiVirtuals[driver]
     else:
       self.wifiVirtualIface = iface
-
+  
+  def setWifiAnt(self, rx, tx):
+    """
+    Sets the wireless receive/transmit antenna.
+    """
+    self.wifiRxAnt = rx
+    self.wifiTxAnt = tx
+  
   def setLanIface(self, iface):
     """
     Sets the LAN interface name.
@@ -751,6 +760,9 @@ class OpenWrtConfig(NodeConfig):
     f.write('config wifi-device %s\n' % self.wifiVirtualIface)
     f.write('\toption type %s\n' % self.wifiDriver)
     f.write('\toption channel %s\n' % self.wifiChannel)
+    f.write('\toption diversity 0\n')
+    f.write('\toption rxantenna %s\n' % self.wifiRxAnt)
+    f.write('\toption txantenna %s\n' % self.wifiTxAnt)
     f.write('\n')
     
     # Wifi interface configuration
