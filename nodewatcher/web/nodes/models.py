@@ -323,6 +323,7 @@ class GraphType:
   Traffic = 0
   Clients = 1
   RTT = 2
+  LQ = 3
 
 class GraphItem(models.Model):
   """
