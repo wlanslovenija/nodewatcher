@@ -550,11 +550,13 @@ class OpenWrtConfig(NodeConfig):
     f.write('\n')
     
     # Set boot_wait to on if it is not set
-    f.write('\tBOOT_WAIT=`nvram get boot_wait`\n')
-    f.write('\t[ "$BOOT_WAIT" != "on" ] && {\n')
-    f.write('\t  nvram set boot_wait=on\n')
-    f.write('\t  nvram commit\n')
-    f.write('\t}\n')
+    f.write('\tif [ -x /usr/sbin/nvram ]; then\n')
+    f.write('\t\tBOOT_WAIT=`nvram get boot_wait`\n')
+    f.write('\t\t[ "$BOOT_WAIT" != "on" ] && {\n')
+    f.write('\t\t  nvram set boot_wait=on\n')
+    f.write('\t\t  nvram commit\n')
+    f.write('\t\t}\n')
+    f.write('\tfi\n')
     
     f.write('}\n')
     
