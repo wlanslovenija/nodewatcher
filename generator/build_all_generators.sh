@@ -10,22 +10,15 @@ GENERATORS=(
 
 # -----------------------------------------------------------
 
-if [ ! -d build ]; then
-  mkdir build
-  mkdir build/packages
-else
-  rm -rf build/*
-  mkdir build/packages
-fi
-
-GENDIR=`pwd`
-cd ${OPENWRT}
-
-for i in $(seq 0 $((${#GENERATORS[@]} - 1))); do
-  config=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 1`
-  dest=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 2`
-  pkg=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 3`
+function build_generator()
+{
+  config=$1
+  dest=$2
+  pkg=$3
   
+  GENDIR=`pwd`
+  cd build/tmp/${dest}
+
   echo ">>> Preparing to build ${config}..."
   make distclean > /dev/null 2> /dev/null
   
@@ -52,7 +45,51 @@ for i in $(seq 0 $((${#GENERATORS[@]} - 1))); do
   rmdir /tmp/ib$ID
 
   echo ">>> Build completed."
+}
+
+if [ ! -d build ]; then
+  mkdir build
+else
+  rm -rf build/*
+fi
+
+mkdir build/packages
+mkdir build/tmp
+
+GENDIR=`pwd`
+cd ${OPENWRT}
+make distclean
+cd $GENDIR
+
+echo ">>> Preparing build directories for all generators..."
+for i in $(seq 0 $((${#GENERATORS[@]} - 1))); do
+  config=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 1`
+  dest=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 2`
+  pkg=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 3`
+  
+  cp -lr ${OPENWRT} build/tmp/${dest}
 done
+
+echo ">>> Directories ready. Starting parallel build!"
+
+PIDS=""
+
+for i in $(seq 0 $((${#GENERATORS[@]} - 1))); do
+  config=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 1`
+  dest=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 2`
+  pkg=`echo -n ${GENERATORS[$i]} | cut -d ' ' -f 3`
+  
+  build_generator $config $dest $pkg &
+  PIDS="${PIDS} $!"
+done
+
+echo ">>> Spawned builders: ${PIDS}"
+
+# Trap interruptions
+trap 'kill ${PIDS}; exit' INT QUIT TERM EXIT
+
+# Wait for processes to complete
+wait $PIDS
 
 echo ">>> All image generators built!"
 
