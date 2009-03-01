@@ -79,6 +79,16 @@ class RegisterNodeForm(forms.Form):
     required = False,
     label = _("Type")
   )
+  ant_conn = forms.ChoiceField(
+    choices = [
+      (0, _("Automatic")),
+      (1, _("First")),
+      (2, _("Second"))
+    ],
+    initial = 0,
+    label = _("Antenna connector"),
+    required = False
+  )
 
   def clean(self):
     """
@@ -156,6 +166,7 @@ class RegisterNodeForm(forms.Form):
     profile.root_pass = self.cleaned_data.get('root_pass') or generate_random_password(8)
     profile.use_vpn = self.cleaned_data.get('use_vpn')
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
+    profile.antenna = self.cleaned_data.get('ant_conn') or 0
     profile.save()
 
     if subnet:
@@ -222,6 +233,16 @@ class UpdateNodeForm(forms.Form):
     required = False,
     label = _("Type")
   )
+  ant_conn = forms.ChoiceField(
+    choices = [
+      (0, _("Automatic")),
+      (1, _("First")),
+      (2, _("Second"))
+    ],
+    initial = 0,
+    label = _("Antenna connector"),
+    required = False
+  )
 
   def clean(self):
     """
@@ -266,6 +287,7 @@ class UpdateNodeForm(forms.Form):
     profile.root_pass = self.cleaned_data.get('root_pass')
     profile.use_vpn = self.cleaned_data.get('use_vpn')
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
+    profile.antenna = self.cleaned_data.get('ant_conn') or 0
     profile.save()
 
 class AllocateSubnetForm(forms.Form):

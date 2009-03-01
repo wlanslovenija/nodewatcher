@@ -73,6 +73,10 @@
     <td>{{ form.ant_polarization.label }}</td>
     <td>{{ form.ant_polarization }}</td>
   </tr>
+  <tr>
+    <td>{{ form.ant_conn.label }}</td>
+    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this ?</a>)</td>
+  </tr>
   {% if user.is_staff %}
   <tr class="section_title">
     <td colspan="2">{% trans "Additional Options" %}</td>

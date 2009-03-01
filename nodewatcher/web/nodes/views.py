@@ -72,6 +72,7 @@ def node_edit(request, node_ip):
       'ant_external'        : node.ant_external,
       'ant_polarization'    : node.ant_polarization,
       'ant_type'            : node.ant_type,
+      'ant_conn'            : node.profile.antenna,
       'owner'               : node.owner.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
