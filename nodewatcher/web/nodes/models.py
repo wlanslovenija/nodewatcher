@@ -119,7 +119,7 @@ class Node(models.Model):
     """
     Returns a list of traffic graph items.
     """
-    return self.graphitem_set.all().order_by('type', 'name')
+    return self.graphitem_set.all().order_by('-type', 'name')
 
   def is_down(self):
     """
