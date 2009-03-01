@@ -217,7 +217,7 @@ class RRASolar:
     r'GPRINT:charge:LAST:     Current\:%8.2lf',
     r'GPRINT:charge:AVERAGE:Average\:%8.2lf',
     r'GPRINT:charge:MAX:Maximum\:%8.2lf\n',
-    "LINE2:load#BAE366:Load [V]",
+    "LINE2:load#BAE366:Load [A]",
     r'GPRINT:load:LAST:       Current\:%8.2lf',
     r'GPRINT:load:AVERAGE:Average\:%8.2lf',
     r'GPRINT:load:MAX:Maximum\:%8.2lf\n',
