@@ -17,7 +17,7 @@ from django.db import transaction
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar
 from lib.topology import DotTopologyPlotter
 from time import sleep
 from datetime import datetime
@@ -65,7 +65,7 @@ def add_graph(node, name, type, conf, title, filename, *values):
   """
   rra = os.path.join(WORKDIR, 'rra', '%s.rrd' % filename)
   RRA.update(conf, rra, *values)
-  RRA.graph(conf, title, os.path.join(GRAPHDIR, '%s.png' % filename), *[rra for i in xrange(2)])
+  RRA.graph(conf, title, os.path.join(GRAPHDIR, '%s.png' % filename), *[rra for i in xrange(len(values))])
   
   try:
     graph = GraphItem.objects.get(node = node, name = name, type = type)
@@ -185,6 +185,23 @@ def checkMeshStatus():
         # Record interface traffic statistics for all interfaces
         for iid, iface in info['iface'].iteritems():
           add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (nodeIp, iid), iface['up'], iface['down'])
+
+        # Generate solar statistics when available
+        if 'solar' in info:
+          states = {
+            'boost'       : 1,
+            'equalize'    : 2,
+            'absorption'  : 3,
+            'float'       : 4
+          }
+ 
+          add_graph(n, '', GraphType.Solar, RRASolar, 'Solar Monitor', 'solar_%s' % nodeIp,
+            info['solar']['batvoltage'],
+            info['solar']['solvoltage'],
+            info['solar']['charge'],
+            states.get(info['solar']['state'], 1),
+            info['solar']['load']
+          )
       except:
         from traceback import print_exc
         print_exc()

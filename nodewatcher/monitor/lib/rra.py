@@ -142,6 +142,86 @@ class RRALinkQuality:
     '--units-exponent', '0'
   ]
 
+class RRASolar:
+  interval = 1800
+  sources = [
+    rrdtool.DataSource(
+      'batvoltage',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'solvoltage',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'charge',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'state',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'load',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    # State definitions for background areas
+    "CDEF:boost=state,1,EQ,INF,0,IF",
+    "CDEF:equalize=state,2,EQ,INF,0,IF",
+    "CDEF:absorption=state,3,EQ,INF,0,IF",
+    "CDEF:float=state,4,EQ,INF,0,IF",
+    "CDEF:inval=state,UN,INF,0,IF",
+    
+    # Graphical elements
+    r"COMMENT:States (background color)\:",
+    "AREA:boost#FEF6F6:Boost",
+    "AREA:equalize#FEFCE7:Equalize",
+    "AREA:absorption#E7EBFE:Absorption",
+    r"AREA:float#EDFEED:Float\n",
+    "AREA:inval#FFFFFF",
+
+    "LINE2:batvoltage#6B7FD3:Battery voltage",
+    r'GPRINT:batvoltage:LAST:Current\:%8.2lf %s',
+    r'GPRINT:batvoltage:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:batvoltage:MAX:Maximum\:%8.2lf %s\n',
+    "LINE2:solvoltage#FF00A3:Solar voltage",
+    r'GPRINT:solvoltage:LAST:  Current\:%8.2lf %s',
+    r'GPRINT:solvoltage:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:solvoltage:MAX:Maximum\:%8.2lf %s\n',
+    "LINE2:charge#CBFE66:Charge",
+    r'GPRINT:charge:LAST:         Current\:%8.2lf %s',
+    r'GPRINT:charge:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:charge:MAX:Maximum\:%8.2lf %s\n',
+    "LINE2:load#BAE366:Load",
+    r'GPRINT:load:LAST:           Current\:%8.2lf %s',
+    r'GPRINT:load:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:load:MAX:Maximum\:%8.2lf %s\n',
+
+    '--alt-y-grid',
+    '--units-exponent', '0'
+  ]
+
 class RRA:
   """
   A wrapper class for managing round-robin archives via RRDTool.
