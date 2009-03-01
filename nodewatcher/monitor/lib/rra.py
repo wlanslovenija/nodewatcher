@@ -137,7 +137,9 @@ class RRALinkQuality:
     "LINE1:ilq#206C9F:ILQ",
     r'GPRINT:ilq:LAST: Current\:%8.2lf %s',
     r'GPRINT:ilq:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:ilq:MAX:Maximum\:%8.2lf %s\n'
+    r'GPRINT:ilq:MAX:Maximum\:%8.2lf %s\n',
+    '--alt-y-grid',
+    '--units-exponent', '0'
   ]
 
 class RRA:
