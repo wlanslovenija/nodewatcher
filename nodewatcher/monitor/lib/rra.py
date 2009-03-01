@@ -31,11 +31,11 @@ class RRAIface:
     )
   ]
   graph = [
-    "LINE2:upload#DE0056:Upload",
+    "LINE2:upload#DE0056:Upload [B/s]",
     r'GPRINT:upload:LAST:  Current\:%8.2lf %s',
     r'GPRINT:upload:AVERAGE:Average\:%8.2lf %s',
     r'GPRINT:upload:MAX:Maximum\:%8.2lf %s\n',
-    "LINE2:download#A150AA:Download",
+    "LINE2:download#A150AA:Download [B/s]",
     r'GPRINT:download:LAST:Current\:%8.2lf %s',
     r'GPRINT:download:AVERAGE:Average\:%8.2lf %s',
     r'GPRINT:download:MAX:Maximum\:%8.2lf %s\n'
@@ -66,9 +66,11 @@ class RRAClients:
   ]
   graph = [
     "LINE2:clients#008310:Clients",
-    r'GPRINT:clients:LAST:  Current\:%8.2lf %s',
-    r'GPRINT:clients:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:clients:MAX:Maximum\:%8.2lf %s\n'
+    r'GPRINT:clients:LAST:  Current\:%8.2lf',
+    r'GPRINT:clients:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:clients:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0'
   ]
 
 class RRARTT:
@@ -95,10 +97,12 @@ class RRARTT:
     )
   ]
   graph = [
-    "LINE1:rtt#0000ff:RTT",
-    r'GPRINT:rtt:LAST:  Current\:%8.2lf %s',
-    r'GPRINT:rtt:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:rtt:MAX:Maximum\:%8.2lf %s\n'
+    "LINE1:rtt#0000ff:RTT [ms]",
+    r'GPRINT:rtt:LAST:  Current\:%8.2lf',
+    r'GPRINT:rtt:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:rtt:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0'
   ]
 
 class RRALinkQuality:
@@ -131,13 +135,13 @@ class RRALinkQuality:
   ]
   graph = [
     "LINE1:lq#33ADFF:LQ",
-    r'GPRINT:lq:LAST:  Current\:%8.2lf %s',
-    r'GPRINT:lq:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:lq:MAX:Maximum\:%8.2lf %s\n',
+    r'GPRINT:lq:LAST:  Current\:%8.2lf',
+    r'GPRINT:lq:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:lq:MAX:Maximum\:%8.2lf\n',
     "LINE1:ilq#206C9F:ILQ",
-    r'GPRINT:ilq:LAST: Current\:%8.2lf %s',
-    r'GPRINT:ilq:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:ilq:MAX:Maximum\:%8.2lf %s\n',
+    r'GPRINT:ilq:LAST: Current\:%8.2lf',
+    r'GPRINT:ilq:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:ilq:MAX:Maximum\:%8.2lf\n',
     '--alt-y-grid',
     '--units-exponent', '0'
   ]
@@ -202,21 +206,21 @@ class RRASolar:
     "AREA:inval#FFFFFF",
 
     "LINE2:batvoltage#6B7FD3:Battery voltage",
-    r'GPRINT:batvoltage:LAST:Current\:%8.2lf %s',
-    r'GPRINT:batvoltage:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:batvoltage:MAX:Maximum\:%8.2lf %s\n',
+    r'GPRINT:batvoltage:LAST:Current\:%8.2lf',
+    r'GPRINT:batvoltage:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:batvoltage:MAX:Maximum\:%8.2lf\n',
     "LINE2:solvoltage#FF00A3:Solar voltage",
-    r'GPRINT:solvoltage:LAST:  Current\:%8.2lf %s',
-    r'GPRINT:solvoltage:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:solvoltage:MAX:Maximum\:%8.2lf %s\n',
-    "LINE2:charge#CBFE66:Charge",
-    r'GPRINT:charge:LAST:         Current\:%8.2lf %s',
-    r'GPRINT:charge:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:charge:MAX:Maximum\:%8.2lf %s\n',
-    "LINE2:load#BAE366:Load",
-    r'GPRINT:load:LAST:           Current\:%8.2lf %s',
-    r'GPRINT:load:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:load:MAX:Maximum\:%8.2lf %s\n',
+    r'GPRINT:solvoltage:LAST:  Current\:%8.2lf',
+    r'GPRINT:solvoltage:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:solvoltage:MAX:Maximum\:%8.2lf\n',
+    "LINE2:charge#CBFE66:Charge [A]",
+    r'GPRINT:charge:LAST:     Current\:%8.2lf',
+    r'GPRINT:charge:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:charge:MAX:Maximum\:%8.2lf\n',
+    "LINE2:load#BAE366:Load [V]",
+    r'GPRINT:load:LAST:       Current\:%8.2lf',
+    r'GPRINT:load:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:load:MAX:Maximum\:%8.2lf\n',
 
     '--alt-y-grid',
     '--units-exponent', '0'
