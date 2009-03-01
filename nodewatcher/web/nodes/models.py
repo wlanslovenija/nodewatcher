@@ -320,11 +320,11 @@ class GraphType:
   """
   A list of valid graph types.
   """
-  Traffic = 0
-  Clients = 1
+  Traffic = 10
+  Clients = 20
   RTT = 2
   LQ = 3
-  Solar = 4
+  Solar = 30
 
 class GraphItem(models.Model):
   """
