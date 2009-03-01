@@ -383,6 +383,7 @@ class OpenWrtConfig(NodeConfig):
       self.addPackage(*driverPackages[self.wifiDriver])
 
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
+    self.addPackage('kmod-ipt-conntrack', 'iptables-mod-conntrack')
     self.addPackage('nodewatcher', 'olsrd-mod-actions')
 
     # Build the image
