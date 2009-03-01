@@ -86,10 +86,11 @@ done
 echo ">>> Spawned builders: ${PIDS}"
 
 # Trap interruptions
-trap 'kill ${PIDS}; exit' INT QUIT TERM EXIT
+trap 'kill ${PIDS} 2>/dev/null; exit' INT QUIT TERM EXIT
 
 # Wait for processes to complete
 wait $PIDS
 
+trap '' INT QUIT TERM EXIT
 echo ">>> All image generators built!"
 
