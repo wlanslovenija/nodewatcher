@@ -85,7 +85,7 @@ class RegisterNodeForm(forms.Form):
       (1, _("First")),
       (2, _("Second"))
     ],
-    initial = 0,
+    initial = 1,
     label = _("Antenna connector"),
     required = False
   )
@@ -239,7 +239,7 @@ class UpdateNodeForm(forms.Form):
       (1, _("First")),
       (2, _("Second"))
     ],
-    initial = 0,
+    initial = 1,
     label = _("Antenna connector"),
     required = False
   )
