@@ -442,6 +442,18 @@ class Pool(models.Model):
     self.save()
     return child
 
+class StatsSolar(models.Model):
+  """
+  Solar dataset storage.
+  """
+  node = models.ForeignKey(Node)
+  timestamp = models.DateTimeField()
+  batvoltage = models.FloatField()
+  solvoltage = models.FloatField()
+  charge = models.FloatField()
+  load = models.FloatField()
+  state = models.IntegerField()
+
 def subnet_on_delete_callback(sender, **kwargs):
   """
   On delete callback for Subnets.
