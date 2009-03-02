@@ -64,7 +64,7 @@ def add_graph(node, name, type, conf, title, filename, *values):
   A helper function for generating graphs.
   """
   rra = os.path.join(WORKDIR, 'rra', '%s.rrd' % filename)
-  RRA.update(conf, rra, *values)
+  RRA.update(node, conf, rra, *values)
   RRA.graph(conf, title, os.path.join(GRAPHDIR, '%s.png' % filename), *[rra for i in xrange(len(values))])
   
   try:

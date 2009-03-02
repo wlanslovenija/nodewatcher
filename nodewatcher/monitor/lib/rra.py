@@ -2,7 +2,14 @@ import rrdtool
 import time
 import os
 
-class RRAIface:
+# Models
+from wlanlj.nodes.models import StatsSolar
+from datetime import datetime
+
+class RRAConfiguration:
+  last_update = 0
+
+class RRAIface(RRAConfiguration):
   interval = 300
   sources = [
     rrdtool.DataSource(
@@ -41,7 +48,7 @@ class RRAIface:
     r'GPRINT:download:MAX:Maximum\:%8.2lf %s\n'
   ]
 
-class RRAClients:
+class RRAClients(RRAConfiguration):
   interval = 300
   sources = [
     rrdtool.DataSource(
@@ -73,7 +80,7 @@ class RRAClients:
     '--units-exponent', '0'
   ]
 
-class RRARTT:
+class RRARTT(RRAConfiguration):
   interval = 300
   sources = [
     rrdtool.DataSource(
@@ -105,7 +112,7 @@ class RRARTT:
     '--units-exponent', '0'
   ]
 
-class RRALinkQuality:
+class RRALinkQuality(RRAConfiguration):
   interval = 300
   sources = [
     rrdtool.DataSource(
@@ -146,7 +153,8 @@ class RRALinkQuality:
     '--units-exponent', '0'
   ]
 
-class RRASolar:
+class RRASolar(RRAConfiguration):
+  db_model = StatsSolar
   interval = 1800
   sources = [
     rrdtool.DataSource(
@@ -205,12 +213,12 @@ class RRASolar:
     r"AREA:float#EDFEED:Float\n",
     "AREA:inval#FFFFFF",
 
-    "LINE2:batvoltage#6B7FD3:Battery voltage",
-    r'GPRINT:batvoltage:LAST:Current\:%8.2lf',
+    "LINE2:batvoltage#6B7FD3:Battery [V]",
+    r'GPRINT:batvoltage:LAST:    Current\:%8.2lf',
     r'GPRINT:batvoltage:AVERAGE:Average\:%8.2lf',
     r'GPRINT:batvoltage:MAX:Maximum\:%8.2lf\n',
-    "LINE2:solvoltage#FF00A3:Solar voltage",
-    r'GPRINT:solvoltage:LAST:  Current\:%8.2lf',
+    "LINE2:solvoltage#FF00A3:Solar panel [V]",
+    r'GPRINT:solvoltage:LAST:Current\:%8.2lf',
     r'GPRINT:solvoltage:AVERAGE:Average\:%8.2lf',
     r'GPRINT:solvoltage:MAX:Maximum\:%8.2lf\n',
     "LINE2:charge#CBFE66:Charge [A]",
@@ -242,7 +250,7 @@ class RRA:
     return rrd
 
   @staticmethod
-  def update(conf, archive, *values):
+  def update(node, conf, archive, *values):
     """
     Updates an existing RRD archive or creates a new one if needed.
     """
@@ -252,6 +260,19 @@ class RRA:
       rrd = rrdtool.RoundRobinDatabase(archive)
 
     rrd.update(rrdtool.Val(*values), template = [x.name for x in conf.sources])
+
+    # Record data in database store if set
+    now = time.time()
+    if 'db_model' in conf.__dict__ and now - conf.last_update >= conf.interval:
+      data = {}
+      for i, x in enumerate(conf.sources):
+        data[x.name] = values[i]
+      
+      m = conf.db_model(**data)
+      m.node = node
+      m.timestamp = datetime.now()
+      m.save()
+      conf.last_update = now
   
   @staticmethod
   def graph(conf, title, graph, *archives):
