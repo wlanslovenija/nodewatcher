@@ -40,7 +40,7 @@ class RegisterNodeForm(forms.Form):
 
   # Image generator stuff
   template = forms.ModelChoiceField(
-    Template.objects.all(),
+    Template.objects.all().order_by('name'),
     label = _("Router type")
   )
   channel = forms.ChoiceField(
@@ -195,7 +195,7 @@ class UpdateNodeForm(forms.Form):
 
   # Image generator stuff
   template = forms.ModelChoiceField(
-    Template.objects.all(),
+    Template.objects.all().order_by('name'),
     label = _("Router type")
   )
   channel = forms.ChoiceField(
