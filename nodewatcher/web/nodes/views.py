@@ -80,7 +80,8 @@ def node_edit(request, node_ip):
       'use_vpn'             : node.profile.use_vpn,
       'use_captive_portal'  : node.profile.use_captive_portal,
       'root_pass'           : node.profile.root_pass,
-      'channel'             : node.profile.channel
+      'channel'             : node.profile.channel,
+      'lan_bridge'          : node.profile.lan_bridge
     })
 
   return render_to_response('nodes/edit.html',

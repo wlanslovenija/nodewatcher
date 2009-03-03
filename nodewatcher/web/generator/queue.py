@@ -50,6 +50,7 @@ def queue_generator_job(node):
     'wan_ip'          : node.profile.wan_ip,
     'wan_cidr'        : node.profile.wan_cidr,
     'wan_gw'          : node.profile.wan_gw,
+    'lan_wifi_bridge' : node.profile.lan_bridge,
     'openwrt_ver'     : node.profile.template.openwrt_version,
     'arch'            : node.profile.template.arch,
     'iface_wifi'      : node.profile.template.iface_wifi,

@@ -56,6 +56,9 @@ class RegisterNodeForm(forms.Form):
   use_captive_portal = forms.BooleanField(required = False, initial = True,
     label = _("Enable captive portal")
   )
+  lan_bridge = forms.BooleanField(required = False, initial = False,
+    label = _("Enable LAN/WiFi bridge")
+  )
 
   # Antenna type
   ant_external = forms.BooleanField(required = False, label = _("External antenna"))
@@ -167,6 +170,7 @@ class RegisterNodeForm(forms.Form):
     profile.use_vpn = self.cleaned_data.get('use_vpn')
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
     profile.antenna = self.cleaned_data.get('ant_conn') or 0
+    profile.lan_bridge = self.cleaned_data.get('lan_bridge') or False
     profile.save()
 
     if subnet:
@@ -209,6 +213,9 @@ class UpdateNodeForm(forms.Form):
   )
   use_captive_portal = forms.BooleanField(required = False,
     label = _("Enable captive portal")
+  )
+  lan_bridge = forms.BooleanField(required = False, initial = False,
+    label = _("Enable LAN/WiFi bridge")
   )
 
   # Antenna type
@@ -288,6 +295,7 @@ class UpdateNodeForm(forms.Form):
     profile.use_vpn = self.cleaned_data.get('use_vpn')
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
     profile.antenna = self.cleaned_data.get('ant_conn') or 0
+    profile.lan_bridge = self.cleaned_data.get('lan_bridge') or False
     profile.save()
 
 class AllocateSubnetForm(forms.Form):

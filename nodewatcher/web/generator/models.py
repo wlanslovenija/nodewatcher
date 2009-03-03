@@ -64,6 +64,9 @@ class Profile(models.Model):
   use_captive_portal = models.BooleanField()
   antenna = models.IntegerField(default = 1)
 
+  # LAN bridge option
+  lan_bridge = models.BooleanField(default = False)
+
   # Static WAN configuration
   wan_dhcp = models.BooleanField(default = True)
   wan_ip = models.CharField(max_length = 40, null = True)
