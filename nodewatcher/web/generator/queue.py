@@ -8,7 +8,7 @@ from beanstalk import job
 queue = serverconn.ServerConn("127.0.0.1", 11300)
 queue.use("generator")
 
-def queue_generator_job(node):
+def queue_generator_job(node, email_user):
   """
   Queues a generator job via the beanstalk daemon.
   """
@@ -61,7 +61,7 @@ def queue_generator_job(node):
     'imagebuilder'    : node.profile.template.imagebuilder,
     'imagefiles'      : node.profile.template.imagefile.split(","),
     'subnets'         : subnets,
-    'email'           : node.owner.email
+    'email'           : email_user.email
   }
 
   # Queue the actual job

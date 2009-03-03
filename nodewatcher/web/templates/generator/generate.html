@@ -58,6 +58,12 @@
       {% if current_owner %}&nbsp;[<a href="/generator/request/{{ node.ip }}">{% trans "generate image" %}</a>]{% endif %}
     </td>
   </tr>
+  {% if user.is_staff %}
+  <tr>
+    <td>{{ form.email_user.label }}</td>
+    <td>{{ form.email_user }}</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>{% trans "Router type" %}</td>
     <td>{{ node.profile.template.name }}</td>

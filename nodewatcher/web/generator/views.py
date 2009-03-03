@@ -18,8 +18,8 @@ def request(request, node_ip):
   if request.method == 'POST':
     form = GenerateImageForm(request.POST)
     if form.is_valid():
-      form.save(node)
-      queue_generator_job(node)
+      email_user = form.save(node)
+      queue_generator_job(node, email_user)
 
       return render_to_response('generator/please_wait.html',
         { 'node' : node },
@@ -27,9 +27,9 @@ def request(request, node_ip):
       )
   else:
     p = {
-      'wan_dhcp'  : node.profile.wan_dhcp,
-      'wan_gw'    : node.profile.wan_gw,
-      'antenna'   : node.profile.antenna
+      'wan_dhcp'    : node.profile.wan_dhcp,
+      'wan_gw'      : node.profile.wan_gw,
+      'email_user'  : node.owner.id
     }
 
     if node.profile.wan_ip and node.profile.wan_cidr:

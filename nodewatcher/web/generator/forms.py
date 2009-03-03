@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 from wlanlj.generator.models import Template, Profile
 from wlanlj.nodes import ipcalc
 from datetime import datetime
@@ -14,6 +15,12 @@ class GenerateImageForm(forms.Form):
   wan_dhcp = forms.BooleanField(required = False, label = _("WAN auto-configuration (DHCP)"))
   wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
+  email_user = forms.ModelChoiceField(
+    User.objects.all(),
+    initial = User.objects.all()[0].id,
+    required = False,
+    label = _("Send image to")
+  )
 
   def clean(self):
     """
@@ -22,6 +29,10 @@ class GenerateImageForm(forms.Form):
     wan_dhcp = self.cleaned_data.get('wan_dhcp')
     wan_ip = self.cleaned_data.get('wan_ip')
     wan_gw = self.cleaned_data.get('wan_gw')
+    email_user = self.cleaned_data.get('email_user')
+
+    if email_user and not email_user.email:
+      raise forms.ValidationError(_("Specified user does not have an e-mail configured!"))
 
     if not wan_dhcp and (not wan_ip or not wan_gw):
       raise forms.ValidationError(_("IP and gateway are required for static WAN configuration!"))
@@ -56,4 +67,6 @@ class GenerateImageForm(forms.Form):
     node.profile.wan_cidr = self.cleaned_data.get('wan_cidr')
     node.profile.wan_gw = self.cleaned_data.get('wan_gw')
     node.profile.save()
+
+    return node.owner if not self.cleaned_data.get('email_user') else self.cleaned_data.get('email_user')
 
