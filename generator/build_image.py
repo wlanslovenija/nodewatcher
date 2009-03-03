@@ -28,6 +28,8 @@ parser.add_option('--driver', dest = 'driver',
                   help = 'Wireless driver name (eg. "broadcom")')
 parser.add_option('--port-layout', dest = 'layout', default = 'wrt54gl',
                   help = 'Port layout (valid layouts: "wrt54gl", "wrt54gs", "whr-hp-g54", "wl-500g", "wl-500gd", "fonera")')
+parser.add_option('--lan-wifi-bridge', dest = 'lan_wifi_bridge', action = 'store_true',
+                  help = 'Enables LAN<->WiFi bridge.')
 parser.add_option('--node-type', dest = 'type', default = 'adhoc',
                   help = 'Node type (valid types: "adhoc", "ap")')
 parser.add_option('--password', dest = 'password',
@@ -83,6 +85,9 @@ x.setNodeType(options['type'])
 x.setPassword(options['password'])
 x.setHostname(options['hostname'])
 x.setIp(options['ip'])
+
+if options['lan_wifi_bridge']:
+  x.enableLanWifiBridge()
 
 print ">>> Configuring image with the following settings:"
 print ""

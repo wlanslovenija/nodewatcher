@@ -65,6 +65,8 @@ class NodeConfig(object):
   wan = None
   nodeType = "adhoc"
   lanIface = "eth0.0"
+  lanWifiBridge = False
+  lanWifiBridgeIface = "br-mesh"
   
   def __init__(self):
     """
@@ -159,7 +161,46 @@ class NodeConfig(object):
     self.services.append({ 'priority' : priority,
                            'name'     : name })
   
-  def addInterface(self, id, name, ip = None, cidr = None, gateway = None, init = False, olsr = False, strict = False):
+  def switchWanToLan(self):
+    """
+    Changes interface configurations so WAN interfaces takes the role
+    of the LAN interface. This will only happen when no VLAN tagging
+    is possible (there is no port layout configured for that specified
+    configuration).
+    
+    Also VPN must not be configured, otherwise this method will do
+    nothing at all.
+    """
+    if portLayouts[self.portLayout] or self.vpn or not self.hasInterface('wan'):
+      return
+    
+    wan = self.getInterface('wan')
+    self.lanIface = wan['name']
+    self.removeInterface('wan')
+  
+  def enableLanWifiBridge(self):
+    """
+    Enables LAN<->WiFi bridge.
+    """
+    # Ignore if  there are any subnets configured for LAN interface
+    for subnet in self.subnets:
+      if subnet['interface'] == self.lanIface:
+        return
+    
+    self.lanWifiBridge = True
+  
+  def removeInterface(self, id):
+    """
+    Removes an interface.
+    
+    @param id: Interface configuration identifier
+    """
+    for interface in self.interfaces[:]:
+      if interface['id'] == id:
+        self.interfaces.remove(interface)
+        return
+  
+  def addInterface(self, id, name, ip = None, cidr = None, gateway = None, init = False, olsr = False, type = None):
     """
     Adds a non-standard interface to this node.
     
@@ -170,6 +211,7 @@ class NodeConfig(object):
     @param gateway: Gateway or None in case of DHCP
     @param init: True if the iface should be initialized upon boot
     @param olsr: Should OLSR run on this interface
+    @param type: Optional interface type
     """
     netmask = None
     
@@ -190,7 +232,8 @@ class NodeConfig(object):
                              'gateway'  : gateway,
                              'id'       : id,
                              'init'     : init,
-                             'olsr'     : olsr })
+                             'olsr'     : olsr,
+                             'type'     : type })
   
   def hasInterface(self, id):
     """
@@ -306,6 +349,9 @@ class OpenWrtConfig(NodeConfig):
     """
     self.base = directory
     os.mkdir(os.path.join(directory, 'init.d'))
+    
+    # Perform WAN<->LAN switch when certain conditions are met
+    self.switchWanToLan()
     
     # Generate iproute2 rt_tables (hardcoded for now)
     os.mkdir(os.path.join(directory, 'iproute2'))
@@ -473,11 +519,11 @@ class OpenWrtConfig(NodeConfig):
     
     # Basic configuration (static)
     f = open(os.path.join(directory, 'nodogsplash.conf'), 'w')
-    f.write('GatewayInterface %s\n' % self.wifiIface)
+    f.write('GatewayInterface %s\n' % (self.wifiIface if not self.lanWifiBridge else self.lanWifiBridgeIface))
     f.write('GatewayName wlan-lj.net\n')
     
     for subnet in self.subnets:
-      if subnet['dhcp'] and subnet['interface'] == self.wifiIface:
+      if subnet['dhcp'] and subnet['interface'] == (self.wifiIface if not self.lanWifiBridge else self.lanWifiBridgeIface):
         f.write('GatewayIPRange %(subnet)s/%(cidr)s\n' % subnet)
         break
     
@@ -620,9 +666,6 @@ class OpenWrtConfig(NodeConfig):
       f.write('}\n')
       f.write('\n')
     
-    if self.lanIface:
-      interfaceConfiguration(self.lanIface)
-    
     # Additional interface configuration
     for interface in self.interfaces:
       if interface['olsr']:
@@ -660,16 +703,37 @@ class OpenWrtConfig(NodeConfig):
     
     # LAN configuration
     if self.lanIface:
-      self.addInterface('lan', self.lanIface, self.ip, 16, olsr = True, init = True)
+      # When LAN<->WiFi bridge is enabled, this interface is called 'mesh' as firewall
+      # rules for 'mesh' interface should be applied.
+      self.addInterface(
+        "lan" if not self.lanWifiBridge else "mesh",
+        self.lanIface,
+        self.ip,
+        16,
+        olsr = True if not self.lanWifiBridge else False,
+        init = True,
+        type = None if not self.lanWifiBridge else "bridge"
+      )
     
-    # Add wireless interface configuration
-    self.addInterface('mesh', self.wifiIface, self.ip, 16, olsr = (self.nodeType == "adhoc"), init = True)
+    # Add wireless interface configuration (when no LAN<->WiFi bridge is enabled)
+    if not self.lanWifiBridge:
+      self.addInterface('mesh', self.wifiIface, self.ip, 16, olsr = (self.nodeType == "adhoc"), init = True)
+    else:
+      # Transfer all WiFi subnets to bridge interface
+      for subnet in self.subnets:
+        if subnet['interface'] == self.wifiIface:
+          subnet['interface'] = self.lanWifiBridgeIface
+      
+      # Create a virtual bridge interface (for OLSR configuration)
+      self.addInterface("mesh", self.lanWifiBridgeIface, self.ip, 16, olsr = True, init = False)
     
     # Other interfaces configuration
     for interface in self.interfaces:
       if interface['init']:
         f.write('config interface %(id)s\n' % interface)
         f.write('\toption ifname "%(name)s"\n' % interface)
+        if interface['type']:
+          f.write('\toption type %(type)s\n' % interface)
         
         if interface['ip']:
           f.write('\toption proto static\n')

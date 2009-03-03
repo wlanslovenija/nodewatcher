@@ -76,7 +76,10 @@ def generate_image(d):
   x.setCaptivePortal(d['captive_portal'])
   if d['vpn']:
     x.setVpn(d['vpn_username'], d['vpn_password'])
-
+  
+  if d['lan_wifi_bridge']:
+    x.enableLanWifiBridge()
+  
   # Cleanup stuff from previous builds
   os.chdir(WORKDIR)
   os.system("rm -rf build/files/*")
