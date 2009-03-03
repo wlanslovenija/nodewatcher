@@ -125,7 +125,7 @@ class Node(models.Model):
     """
     Returns true if the node is currently down.
     """
-    return self.status != NodeStatus.Up
+    return self.status not in (NodeStatus.Up, NodeStatus.Duped)
 
   def is_invalid(self):
     """
