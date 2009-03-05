@@ -20,7 +20,7 @@ from lib.nodewatcher import NodeWatcher
 from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar
 from lib.topology import DotTopologyPlotter
 from time import sleep
-from datetime import datetime
+from datetime import datetime, timedelta
 import pwd
 
 WORKDIR = "/home/monitor"
@@ -83,7 +83,7 @@ def checkMeshStatus():
   # Remove all invalid nodes and subnets
   Node.objects.filter(status = NodeStatus.Invalid).delete()
   Subnet.objects.filter(status = SubnetStatus.NotAllocated).delete()
-  APClient.objects.all().delete()
+  APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.filter(status__lt = NodeStatus.UserSpecifiedMark).update(status = NodeStatus.Down, warnings = False)
@@ -172,11 +172,17 @@ def checkMeshStatus():
         # Parse nodogsplash client information
         if 'nds' in info:
           for cid, client in info['nds'].iteritems():
+            try:
+              c = APClient.objects.get(node = n, ip = client['ip'])
+            except APClient.DoesNotExist:
+              c = APClient(node = n)
+              n.clients_so_far += 1
+            
             n.clients += 1
-            c = APClient(node = n)
             c.ip = client['ip']
             c.uploaded = safe_int_convert(client['up'])
             c.downloaded = safe_int_convert(client['down'])
+            c.last_update = datetime.now()
             c.save()
         
         # Generate a graph for number of clients
