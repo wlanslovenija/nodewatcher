@@ -123,6 +123,10 @@
     <td>{% trans "Connected clients" %}</td>
     <td>{{ node.clients|default:"0" }} [<a href="/nodes/gcl#n{{ node.ip }}">{% trans "global client list" %}</a>]</td>
   </tr>
+  <tr>
+    <td>{% trans "Clients so far" %}</td>
+    <td>{{ node.clients_so_far|default:"0" }}</td>
+  </tr>
   {% endif %}
   {% endif %}
   <tr class="section_title">
