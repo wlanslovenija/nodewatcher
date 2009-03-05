@@ -469,7 +469,7 @@ class OpenWrtConfig(NodeConfig):
     
     # Configuration
     f = open(os.path.join(directory, 'wlanlj.conf'), 'w')
-    f.write('tls-client\n')
+    f.write('client\n')
     f.write('proto udp\n')
     f.write('dev tap0\n')
     
