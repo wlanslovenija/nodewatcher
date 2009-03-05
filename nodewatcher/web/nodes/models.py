@@ -108,6 +108,7 @@ class Node(models.Model):
   essid = models.CharField(max_length = 50, null = True)
   local_time = models.DateTimeField(null = True)
   clients = models.IntegerField(null = True)
+  clients_so_far = models.IntegerField(default = 0)
 
   def should_draw_on_map(self):
     """
@@ -311,6 +312,7 @@ class APClient(models.Model):
   """
   node = models.ForeignKey(Node)
   ip = models.CharField(max_length = 40)
+  last_update = models.DateTimeField(null = True)
 
   # Transfer statistics (set by the monitor daemon)
   uploaded = models.IntegerField()
