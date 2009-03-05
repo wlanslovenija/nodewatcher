@@ -21,7 +21,9 @@ from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar
 from lib.topology import DotTopologyPlotter
 from time import sleep
 from datetime import datetime, timedelta
+from traceback import format_exc
 import pwd
+import logging
 
 WORKDIR = "/home/monitor"
 GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
@@ -33,8 +35,7 @@ def main():
       checkMeshStatus()
       transaction.commit()
     except:
-      from traceback import print_exc
-      print_exc()
+      logging.warning(format_exc())
       transaction.rollback()
 
     # Go to sleep for a while
@@ -74,7 +75,9 @@ def add_graph(node, name, type, conf, title, filename, *values):
     graph.rra = '%s.rrd' % filename
     graph.graph = '%s.png' % filename
     graph.title = title
-    graph.save()
+
+  graph.last_update = datetime.now()
+  graph.save()
 
 def checkMeshStatus():
   """
@@ -84,6 +87,7 @@ def checkMeshStatus():
   Node.objects.filter(status = NodeStatus.Invalid).delete()
   Subnet.objects.filter(status = SubnetStatus.NotAllocated).delete()
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
+  GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 1)).delete()
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.filter(status__lt = NodeStatus.UserSpecifiedMark).update(status = NodeStatus.Down, warnings = False)
@@ -210,13 +214,15 @@ def checkMeshStatus():
             info['solar']['load']
           )
       except:
-        from traceback import print_exc
-        print_exc()
+        logging.warning(format_exc())
 
     n.save()
 
   # Update valid subnet status in the database
   for nodeIp, subnets in hna.iteritems():
+    if nodeIp not in dbNodes:
+      continue
+
     for subnet in subnets:
       subnet, cidr = subnet.split("/")
 
@@ -239,6 +245,13 @@ def checkMeshStatus():
 
 if __name__ == '__main__':
   info = pwd.getpwnam('monitor')
+
+  # Configure logger
+  logging.basicConfig(level = logging.DEBUG,
+                      format = '%(asctime)s %(levelname)-8s %(message)s',
+                      datefmt = '%a, %d %b %Y %H:%M:%S',
+                      filename = '/var/log/wlanlj-monitor.log',
+                      filemode = 'a')
 
   # Change ownership of RRA directory
   os.chown(os.path.join(WORKDIR, 'rra'), info.pw_uid, info.pw_gid)
