@@ -190,7 +190,8 @@ def checkMeshStatus():
 
         # Record interface traffic statistics for all interfaces
         for iid, iface in info['iface'].iteritems():
-          add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (nodeIp, iid), iface['up'], iface['down'])
+          if iid not in ('wifi0', 'wmaster0'):
+            add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (nodeIp, iid), iface['up'], iface['down'])
 
         # Generate solar statistics when available
         if 'solar' in info:
