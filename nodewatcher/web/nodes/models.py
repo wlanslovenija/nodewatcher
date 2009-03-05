@@ -338,6 +338,7 @@ class GraphItem(models.Model):
   rra = models.CharField(max_length = 200)
   graph = models.CharField(max_length = 200)
   title = models.CharField(max_length = 50)
+  last_update = models.DateTimeField(null = True)
 
 class WhitelistItem(models.Model):
   """
