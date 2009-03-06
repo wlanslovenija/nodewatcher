@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile
@@ -431,4 +431,33 @@ class InfoStickerForm(forms.Form):
       regenerate = True
 
     return generate_sticker(user, regenerate)
+
+class EventSubscribeForm(forms.Form):
+  """
+  A simple form for subscribing to an event.
+  """
+  node = forms.ModelChoiceField(
+    Node.objects.exclude(status = NodeStatus.Invalid),
+    label = _("Node"),
+    required = False
+  )
+  code = forms.ChoiceField(
+    choices = [
+      (0, _('Any event')),
+      (EventCode.NodeDown, _('Node has gone down')),
+      (EventCode.NodeUp, _('Node has come up')),
+      (EventCode.UptimeReset, _('Node has been rebooted')),
+      (EventCode.PacketDuplication, _('Packet duplication detected'))
+    ],
+    required = False
+  )
+
+  def save(self, user):
+    """
+    Saves whitelist entry.
+    """
+    s = EventSubscription(user = user)
+    s.node = self.cleaned_data.get('node') or None
+    s.code = self.cleaned_data.get('code') or None
+    s.save()
 

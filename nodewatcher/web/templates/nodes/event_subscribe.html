@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Subscribe to Events" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Subscribe to Events" %}</h1>
+
+{% if form.errors %}
+<div class="error">
+  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to add an event subscription:" %}<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form action="/nodes/event_subscribe" method="POST">
+<table border="0" width="700">
+  <tr>
+    <td>{{ form.node.label }}</td>
+    <td>{{ form.node }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.code.label }}</td>
+    <td>{{ form.code }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <input type="submit" value="{% trans "Add Subscription" %}" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/events'" />
+    </td>
+  </tr>
+</table>
+</form>
+<br /><br/>
+{% endblock %}

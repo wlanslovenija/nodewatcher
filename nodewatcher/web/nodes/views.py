@@ -2,8 +2,8 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link
-from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
+from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.account.models import UserAccount
 from datetime import datetime
 
@@ -294,4 +294,46 @@ def sticker(request):
       'show_errors' : show_errors },
     context_instance = RequestContext(request)
   )
+
+@login_required
+def event_list(request):
+  """
+  Display a list of current user's events.
+  """
+  return render_to_response('nodes/event_list.html',
+    { 'events' : Event.objects.filter(node__owner = request.user).order_by('-id')[0:30],
+      'subscriptions' : EventSubscription.objects.filter(user = request.user) },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
+def event_subscribe(request):
+  """
+  Display a form for subscribing to an event.
+  """
+  if request.method == 'POST':
+    form = EventSubscribeForm(request.POST)
+    if form.is_valid():
+      form.save(request.user)
+      return HttpResponseRedirect("/nodes/events")
+  else:
+    form = EventSubscribeForm()
+
+  return render_to_response('nodes/event_subscribe.html',
+    { 'form' : form },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
+def event_unsubscribe(request, subscription_id):
+  """
+  Removes event subscription.
+  """
+  s = get_object_or_404(EventSubscription, pk = subscription_id)
+  if s.user != request.user and not request.user.is_staff:
+    raise Http404
+  
+  s.delete()
+
+  return HttpResponseRedirect("/nodes/events")
 

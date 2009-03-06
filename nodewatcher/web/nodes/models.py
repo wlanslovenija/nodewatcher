@@ -1,9 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.core.mail import send_mail
+from django.template import loader, Context
 from wlanlj.nodes.locker import require_lock
 from wlanlj.nodes import ipcalc
 from wlanlj.generator.types import IfaceType
+from datetime import datetime, timedelta
 
 class Project(models.Model):
   """
@@ -109,6 +112,7 @@ class Node(models.Model):
   local_time = models.DateTimeField(null = True)
   clients = models.IntegerField(null = True)
   clients_so_far = models.IntegerField(default = 0)
+  uptime = models.IntegerField(null = True)
 
   def should_draw_on_map(self):
     """
@@ -216,6 +220,12 @@ class Node(models.Model):
       return "new"
     else:
       return "unknown"
+
+  def __unicode__(self):
+    """
+    Returns a string representation of this node.
+    """
+    return "%s (%s)" % (self.name, self.ip)
 
 class Link(models.Model):
   """
@@ -456,6 +466,160 @@ class StatsSolar(models.Model):
   charge = models.FloatField()
   load = models.FloatField()
   state = models.IntegerField()
+
+class EventSource:
+  """
+  Valid event source identifiers.
+  """
+  Monitor = 1
+  UserReport = 2
+
+class EventCode:
+  """
+  Valid event code identifiers.
+  """
+  NodeDown = 1
+  NodeUp = 2
+  UptimeReset = 3
+  InvalidSubnetAnnounce = 4
+  PacketDuplication = 5
+
+class Event(models.Model):
+  """
+  Event model.
+  """
+  timestamp = models.DateTimeField()
+  node = models.ForeignKey(Node)
+  code = models.IntegerField()
+  summary = models.CharField(max_length = 100)
+  data = models.CharField(max_length = 1000)
+  source = models.IntegerField()
+  counter = models.IntegerField(default = 1)
+  need_resend = models.BooleanField(default = False)
+
+  def code_to_string(self):
+    """
+    Converts an event code to a human readable string.
+    """
+    if self.code == EventCode.NodeDown:
+      return _("Node has gone down")
+    elif self.code == EventCode.NodeUp:
+      return _("Node has come up")
+    elif self.code == EventCode.UptimeReset:
+      return _("Node has been rebooted")
+    elif self.code == EventCode.InvalidSubnetAnnounce:
+      return _("Node is announcing invalid subnets")
+    elif self.code == EventCode.PacketDuplication:
+      return _("Duplicate ICMP ECHO replies received")
+    else:
+      return _("Unknown event")
+
+  def source_to_string(self):
+    """
+    Converts a source identifier to a string.
+    """
+    if self.source == EventSource.Monitor:
+      return _("Monitor")
+    elif self.source == EventSource.UserReport:
+      return _("User report")
+    else:
+      return _("Unknown source")
+
+  @staticmethod
+  def create_event(node, code, summary, source, data = ""):
+    """
+    Creates a new event.
+    """
+    # Check if this event should be supressed because it has already
+    # occurred a short while ago
+    events = Event.objects.filter(node = node, code = code, timestamp__gt = datetime.now() - timedelta(minutes = 30))
+    if len(events):
+      event = events[0]
+      event.counter += 1
+      event.need_resend = True
+      event.save()
+      return
+
+    # Create an event instance
+    event = Event(node = node)
+    event.code = code
+    event.summary = summary
+    event.source = source
+    event.data = data
+    event.timestamp = datetime.now()
+    event.save()
+    event.post_event()
+
+    # Check if there are any repeated events that need sending
+    for event in Event.objects.filter(need_resend = True, timestamp__lt = datetime.now() + timedelta(minutes = 30)):
+      event.need_resend = False
+      event.save()
+      event.post_event()
+
+  def has_repeated(self):
+    """
+    Returns true if this event has repeated in 30 minutes from its creation.
+    """
+    return self.counter > 1
+  
+  def post_event(self):
+    """
+    Posts an event to all subscribers.
+    """
+    # Check subscriptions and post notifications
+    subscriptions = EventSubscription.objects.filter(
+      models.Q(node = self.node) | models.Q(node__isnull = True),
+      models.Q(code = self.code) | models.Q(code__isnull = True)
+    )
+
+    for subscription in subscriptions:
+      subscription.notify(self)
+
+class EventSubscription(models.Model):
+  """
+  Event subscription model.
+  """
+  user = models.ForeignKey(User)
+  node = models.ForeignKey(Node, null = True)
+  active = models.BooleanField(default = True)
+  code = models.IntegerField(null = True)
+
+  def code_to_string(self):
+    """
+    Converts an event code to a human readable string.
+    """
+    if self.code == EventCode.NodeDown:
+      return _("Node has gone down")
+    elif self.code == EventCode.NodeUp:
+      return _("Node has come up")
+    elif self.code == EventCode.UptimeReset:
+      return _("Node has been rebooted")
+    elif self.code == EventCode.InvalidSubnetAnnounce:
+      return _("Node is announcing invalid subnets")
+    elif self.code == EventCode.PacketDuplication:
+      return _("Duplicate ICMP ECHO replies received")
+    else:
+      return _("Unknown event")
+
+  def notify(self, event):
+    """
+    Notify a user about an event.
+
+    @param event: A valid Event instance
+    """
+    t = loader.get_template('nodes/event_mail.txt')
+    c = Context({
+      'user'  : self.user,
+      'event' : event
+    })
+
+    send_mail(
+      '[wlan-lj] ' + event.node.ip + '/' +  _("Event notification") + ' - ' + event.code_to_string(),
+      t.render(c),
+      'events@wlan-lj.net',
+      [self.user.email],
+      fail_silently = False
+    )
 
 def subnet_on_delete_callback(sender, **kwargs):
   """

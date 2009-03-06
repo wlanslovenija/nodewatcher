@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<h1>Events</h1>
+
+<br/>
+{% if not user.email %}
+<div class="error">
+  {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like event subscriptions) are disabled.{% endblocktrans %}
+</div>
+<br/>
+{% endif %}
+
+<table border="0" width="750" cellspacing="0">
+  <tr class="header">
+    <td width="200"><b>{% trans "Timestamp" %}</b></td>
+    <td width="150"><b>{% trans "Node name" %}</b></td>
+    <td><b>{% trans "Event" %}</b></td>
+  </tr>
+  {% if not events %}
+  <tr>
+    <td colspan="8" class="notice">
+      {% trans "No events have been recorded for your nodes." %}
+    </td>
+  </tr>
+  {% else %}
+  {% for event in events %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td>{{ event.timestamp }}</td>
+    <td><a href="/nodes/node/{{ event.node.ip }}">{{ event.node.name }}</a></td>
+    <td>{{ event.code_to_string }}</td>
+  </tr>
+  {% endfor %}
+  {% endif %}
+  <tr class="header">
+    <td width="200"><b>{% trans "Timestamp" %}</b></td>
+    <td width="150"><b>{% trans "Node name" %}</b></td>
+    <td><b>{% trans "Event" %}</b></td>
+  </tr>
+</table>
+<br/>
+Event subscriptions:
+<table border="0" width="750" cellspacing="0">
+  <tr class="header">
+    <td width="22"></td>
+    <td width="150"><b>{% trans "Node" %}</b></td>
+    <td><b>{% trans "Event type" %}</b></td>
+  </tr>
+  {% if not subscriptions %}
+  <tr>
+    <td colspan="8" class="notice">
+      {% trans "No event subscriptions have been configured." %}
+    </td>
+  </tr>
+  {% else %}
+  {% for subscription in subscriptions %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}">X</a></td>
+    <td>
+      {% if subscription.node %}
+      <a href="/nodes/node/{{ subscription.node.ip }}">{{ subscription.node.name }}</a>
+      {% else %}
+      <i>{% trans "any node" %}</i>
+      {% endif %}
+    </td>
+    <td>
+      {% if subscription.code %}
+      {{ subscription.code_to_string }}
+      {% else %}
+      <i>{% trans "any event" %}</i>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  {% endif %}
+  <tr class="header">
+    <td width="22"></td>
+    <td width="150"><b>{% trans "Node" %}</b></td>
+    <td><b>{% trans "Event type" %}</b></td>
+  </tr>
+</table>
+
+<br/>
+{% trans "Options" %}:
+<ul>
+  <li><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a></li>
+</ul>
+<br /><br/>
+{% endblock %}
