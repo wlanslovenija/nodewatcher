@@ -37,7 +37,7 @@
     <td>{{ node.name|default:"???" }}</td>
   </tr>
   <tr>
-    <td>{% trans "Owner" %}</td>
+    <td>{% trans "Maintainer" %}</td>
     {% if node.owner %}
     <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
     {% else %}

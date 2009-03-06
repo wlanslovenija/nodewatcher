@@ -190,7 +190,7 @@ class UpdateNodeForm(forms.Form):
   owner = forms.ModelChoiceField(
     User.objects.all(),
     initial = User.objects.all()[0].id,
-    label = _("Owner")
+    label = _("Maintainer")
   )
 
   # Special node properties (can only be set by staff)
