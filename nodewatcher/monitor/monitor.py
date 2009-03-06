@@ -198,7 +198,7 @@ def checkMeshStatus():
             add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (nodeIp, iid), iface['up'], iface['down'])
 
         # Generate solar statistics when available
-        if 'solar' in info:
+        if 'solar' in info and all([x in info['solar'] for x in ('batvoltage', 'solvoltage', 'charge', 'state', 'load')]):
           states = {
             'boost'       : 1,
             'equalize'    : 2,
