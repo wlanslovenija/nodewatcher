@@ -11,7 +11,7 @@ sys.path.append('/var/www/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode
 from django.db import transaction
 
 # Import other stuff
@@ -47,6 +47,15 @@ def safe_int_convert(integer):
   """
   try:
     return int(integer)
+  except:
+    return None
+
+def safe_uptime_convert(uptime):
+  """
+  A helper method for converting a string to an uptime integer.
+  """
+  try:
+    return int(float(uptime.split(' ')[0]))
   except:
     return None
 
@@ -90,7 +99,7 @@ def checkMeshStatus():
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 1)).delete()
 
   # Mark all nodes as down and all subnets as not announced
-  Node.objects.filter(status__lt = NodeStatus.UserSpecifiedMark).update(status = NodeStatus.Down, warnings = False)
+  Node.objects.all().update(warnings = False)
   Subnet.objects.update(status = SubnetStatus.NotAnnounced)
   Link.objects.all().delete()
 
@@ -119,6 +128,17 @@ def checkMeshStatus():
       n.save()
       dbNodes[nodeIp] = n
   
+  # Mark invisible nodes as down
+  for node in Node.objects.exclude(status = NodeStatus.Invalid):
+    oldStatus = node.status
+
+    if node.ip not in dbNodes:
+      node.status = NodeStatus.Down
+      node.save()
+
+    if oldStatus in (NodeStatus.Up, NodeStatus.Visible, NodeStatus.Duped) and node.status == NodeStatus.Down:
+      Event.create_event(node, EventCode.NodeDown, '', EventSource.Monitor)
+
   # Setup all node peerings
   for nodeIp, node in nodes.iteritems():
     n = dbNodes[nodeIp]
@@ -137,6 +157,7 @@ def checkMeshStatus():
   results, dupes = PingParser.pingHosts(10, nodesToPing)
   for nodeIp in nodesToPing:
     n = dbNodes[nodeIp]
+    oldStatus = n.status
 
     # Determine node status
     if nodeIp in results:
@@ -151,6 +172,12 @@ def checkMeshStatus():
     if nodeIp in dupes:
       n.status = NodeStatus.Duped
       n.warnings = True
+
+    # Generate status change events
+    if oldStatus == NodeStatus.Down and n.status == NodeStatus.Up:
+      Event.create_event(n, EventCode.NodeUp, '', EventSource.Monitor)
+    elif oldStatus != NodeStatus.Duped and n.status == NodeStatus.Duped:
+      Event.create_event(n, EventCode.PacketDuplication, '', EventSource.Monitor)
     
     # Add LQ/ILQ graphs
     lq_avg = ilq_avg = 0.0
@@ -166,13 +193,18 @@ def checkMeshStatus():
     info = NodeWatcher.fetch(nodeIp)
     if info:
       try:
+        oldUptime = n.uptime or 0
         n.firmware_version = info['general']['version']
         n.local_time = safe_date_convert(info['general']['local_time'])
         n.bssid = info['wifi']['bssid']
         n.essid = info['wifi']['essid']
         n.channel = NodeWatcher.frequency_to_channel(info['wifi']['frequency'])
         n.clients = 0
-        
+        n.uptime = safe_uptime_convert(info['general']['uptime'])
+
+        if oldUptime > n.uptime:
+          Event.create_event(n, EventCode.UptimeReset, '', EventSource.Monitor, data = 'Old uptime: %s\n  New uptime: %s' % (oldUptime, n.uptime))
+
         # Parse nodogsplash client information
         if 'nds' in info:
           for cid, client in info['nds'].iteritems():
