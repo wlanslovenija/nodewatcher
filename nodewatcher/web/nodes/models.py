@@ -484,6 +484,7 @@ class EventCode:
   InvalidSubnetAnnounce = 4
   PacketDuplication = 5
   IPShortage = 6
+  ChannelChanged = 7
 
   @staticmethod
   def to_string(code):
@@ -505,6 +506,8 @@ class EventCode:
       return _("Duplicate ICMP ECHO replies received")
     elif code == EventCode.IPShortage:
       return _("IP shortage for wireless clients")
+    elif code == EventCode.ChannelChanged:
+      return _("WiFi channel has changed")
     else:
       return _("Unknown event")
 
