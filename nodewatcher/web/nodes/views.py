@@ -337,3 +337,18 @@ def event_unsubscribe(request, subscription_id):
 
   return HttpResponseRedirect("/nodes/events")
 
+@login_required
+def package_list(request, node_ip):
+  """
+  Display a list of node's installed packages.
+  """
+  node = get_object_or_404(Node, pk = node_ip)
+  if node.owner != request.user and not request.user.is_staff:
+    raise Http404
+
+  return render_to_response('nodes/installed_packages.html',
+    { 'packages' : node.installedpackage_set.all().order_by('name'),
+      'node'  : node },
+    context_instance = RequestContext(request)
+  )
+

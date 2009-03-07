@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     (r'^nodes/events$', 'wlanlj.nodes.views.event_list'),
     (r'^nodes/event_subscribe', 'wlanlj.nodes.views.event_subscribe'),
     (r'^nodes/event_unsubscribe/(?P<subscription_id>\d+)$', 'wlanlj.nodes.views.event_unsubscribe'),
+    (r'^nodes/installed_packages/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.package_list'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
 
     # Generator

@@ -127,6 +127,12 @@
     <td>{% trans "Clients so far" %}</td>
     <td>{{ node.clients_so_far|default:"0" }}</td>
   </tr>
+  {% if current_owner and node.installedpackage_set.all %}
+  <tr>
+    <td>{% trans "Installed packages" %}</td>
+    <td><a href="/nodes/installed_packages/{{ node.ip }}">{% trans "show list" %}</a></td>
+  </tr>
+  {% endif %}
   {% endif %}
   {% endif %}
   <tr class="section_title">

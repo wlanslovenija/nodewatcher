@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Installed Packages for {{ node.name }} ({{ node.ip }}){% endblock %}
+
+{% block content %}
+<h1>Installed Packages for {{ node.name }} ({{ node.ip }})</h1>
+
+<table border="0" width="650" cellspacing="0">
+  <tr class="header">
+    <td width="200"><b>{% trans "Package name" %}</b></td>
+    <td width="250"><b>{% trans "Version" %}</b></td>
+    <td width="200"><b>{% trans "Last check" %}</b></td>
+  </tr>
+  {% if not packages %}
+  <tr>
+    <td colspan="8" class="notice">
+      {% trans "No package information is available for this node." %}
+    </td>
+  </tr>
+  {% else %}
+  {% for package in packages %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td>{{ package.name }}</td>
+    <td>{{ package.version }}</td>
+    <td>{{ package.last_update }}</td>
+  </tr>
+  {% endfor %}
+  {% endif %}
+  <tr class="header">
+    <td width="200"><b>{% trans "Package name" %}</b></td>
+    <td width="250"><b>{% trans "Version" %}</b></td>
+    <td width="200"><b>{% trans "Last check" %}</b></td>
+  </tr>
+</table>
+<br/>
+<br /><br/>
+{% endblock %}
