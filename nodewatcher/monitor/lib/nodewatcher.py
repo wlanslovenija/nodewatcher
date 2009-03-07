@@ -13,7 +13,7 @@ class NodeWatcher(object):
     socket.setdefaulttimeout(15)
     try:
       info = {}
-      data = urllib2.urlopen('http://%s/cgi-bin/nodewatcher' % nodeIp).read()
+      data = urllib2.urlopen('http://%s/cgi-bin/nodewatcher' % nodeIp).read(512 * 1024)
       for line in data.split('\n'):
         if not line:
           break
@@ -49,4 +49,24 @@ class NodeWatcher(object):
       return channels.index(int(frequency)) + 1
     except:
       return 0
+
+  @staticmethod
+  def fetchInstalledPackages(nodeIp):
+    """
+    Fetches installed node packages.
+    """
+    socket.setdefaulttimeout(15)
+    try:
+      info = {}
+      data = urllib2.urlopen('http://%s/cgi-bin/opkgwatcher' % nodeIp).read(512 * 1024)
+      for line in data.split('\n'):
+        if not line:
+          break
+        
+        package, x, version, y = line.strip().split(' ')
+        info[package] = version
+    except:
+      return None
+
+    return info
 

@@ -11,7 +11,7 @@ sys.path.append('/var/www/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage
 from django.db import transaction
 
 # Import other stuff
@@ -28,6 +28,15 @@ import logging
 
 WORKDIR = "/home/monitor"
 GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
+
+class LastUpdateTimes:
+  """
+  Stores last update times for stuff that needs to be updated less frequently
+  than each 5 minutes.
+  """
+  packages = None
+
+lut = {}
 
 @transaction.commit_manually
 def main():
@@ -93,6 +102,8 @@ def checkMeshStatus():
   """
   Performs a mesh status check.
   """
+  global lut
+
   # Remove all invalid nodes and subnets
   Node.objects.filter(status = NodeStatus.Invalid).delete()
   Subnet.objects.filter(status = SubnetStatus.NotAllocated).delete()
@@ -251,6 +262,30 @@ def checkMeshStatus():
             states.get(info['solar']['state'], 1),
             info['solar']['load']
           )
+
+        # Check for installed package versions (every hour)
+        nlut = lut.setdefault(n.ip, LastUpdateTimes())
+        if not nlut.packages or nlut.packages < datetime.now() - timedelta(hour = 1):
+          nlut.packages = datetime.now()
+          packages = NodeWatcher.fetchInstalledPackages(n.ip)
+
+          # Remove removed packages and update existing package versions
+          for package in n.installedpackage_set.all():
+            if package.name not in packages:
+              package.delete()
+            else:
+              package.version = packages[package.name]
+              package.last_update = datetime.now()
+              package.save()
+              del packages[package.name]
+
+          # Add added packages
+          for packageName, version in packages.iteritems():
+            package = InstalledPackage(node = n)
+            package.name = packageName
+            package.version = version
+            package.last_update = datetime.now()
+            package.save()
       except:
         logging.warning(format_exc())
 
