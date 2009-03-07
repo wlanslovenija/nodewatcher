@@ -342,6 +342,7 @@ class OpenWrtConfig(NodeConfig):
     
     # Add some basic services
     self.addService('S35', 'misc')
+    self.addService('K35', 'misc')
   
   def generate(self, directory):
     """
@@ -583,6 +584,7 @@ class OpenWrtConfig(NodeConfig):
   def __generateMiscScript(self, f):
     f.write('#!/bin/sh /etc/rc.common\n')
     f.write('START=35')
+    f.write('STOP=35')
     f.write('\n')
     f.write('start() {\n')
     
