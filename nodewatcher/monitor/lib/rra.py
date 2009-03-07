@@ -264,15 +264,18 @@ class RRA:
     # Record data in database store if set
     now = time.time()
     if 'db_model' in conf.__dict__ and now - conf.last_update >= conf.interval:
-      data = {}
-      for i, x in enumerate(conf.sources):
-        data[x.name] = values[i]
-      
-      m = conf.db_model(**data)
-      m.node = node
-      m.timestamp = datetime.now()
-      m.save()
-      conf.last_update = now
+      try:
+        data = {}
+        for i, x in enumerate(conf.sources):
+          data[x.name] = values[i]
+        
+        m = conf.db_model(**data)
+        m.node = node
+        m.timestamp = datetime.now()
+        m.save()
+        conf.last_update = now
+      except ValueError:
+        pass
   
   @staticmethod
   def graph(conf, title, graph, *archives):
