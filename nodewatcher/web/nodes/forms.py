@@ -447,7 +447,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.NodeDown, _('Node has gone down')),
       (EventCode.NodeUp, _('Node has come up')),
       (EventCode.UptimeReset, _('Node has been rebooted')),
-      (EventCode.PacketDuplication, _('Packet duplication detected'))
+      (EventCode.PacketDuplication, _('Packet duplication detected')),
+      (EventCode.IPShortage, _('IP shortage on WiFi subnet'))
     ],
     required = False
   )

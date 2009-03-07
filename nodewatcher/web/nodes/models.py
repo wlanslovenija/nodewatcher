@@ -483,6 +483,31 @@ class EventCode:
   UptimeReset = 3
   InvalidSubnetAnnounce = 4
   PacketDuplication = 5
+  IPShortage = 6
+
+  @staticmethod
+  def to_string(code):
+    """
+    A helper method for transforming an event code to a human
+    readable string.
+
+    @param code: A valid event code
+    """
+    if code == EventCode.NodeDown:
+      return _("Node has gone down")
+    elif code == EventCode.NodeUp:
+      return _("Node has come up")
+    elif code == EventCode.UptimeReset:
+      return _("Node has been rebooted")
+    elif code == EventCode.InvalidSubnetAnnounce:
+      return _("Node is announcing invalid subnets")
+    elif code == EventCode.PacketDuplication:
+      return _("Duplicate ICMP ECHO replies received")
+    elif code == EventCode.IPShortage:
+      return _("IP shortage for wireless clients")
+    else:
+      return _("Unknown event")
+
 
 class Event(models.Model):
   """
@@ -501,18 +526,7 @@ class Event(models.Model):
     """
     Converts an event code to a human readable string.
     """
-    if self.code == EventCode.NodeDown:
-      return _("Node has gone down")
-    elif self.code == EventCode.NodeUp:
-      return _("Node has come up")
-    elif self.code == EventCode.UptimeReset:
-      return _("Node has been rebooted")
-    elif self.code == EventCode.InvalidSubnetAnnounce:
-      return _("Node is announcing invalid subnets")
-    elif self.code == EventCode.PacketDuplication:
-      return _("Duplicate ICMP ECHO replies received")
-    else:
-      return _("Unknown event")
+    return EventCode.to_string(self.code)
 
   def source_to_string(self):
     """
@@ -588,18 +602,7 @@ class EventSubscription(models.Model):
     """
     Converts an event code to a human readable string.
     """
-    if self.code == EventCode.NodeDown:
-      return _("Node has gone down")
-    elif self.code == EventCode.NodeUp:
-      return _("Node has come up")
-    elif self.code == EventCode.UptimeReset:
-      return _("Node has been rebooted")
-    elif self.code == EventCode.InvalidSubnetAnnounce:
-      return _("Node is announcing invalid subnets")
-    elif self.code == EventCode.PacketDuplication:
-      return _("Duplicate ICMP ECHO replies received")
-    else:
-      return _("Unknown event")
+    return EventCode.to_string(self.code)
 
   def notify(self, event):
     """
