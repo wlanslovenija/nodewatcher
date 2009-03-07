@@ -265,7 +265,7 @@ def checkMeshStatus():
 
         # Check for installed package versions (every hour)
         nlut = lut.setdefault(n.ip, LastUpdateTimes())
-        if not nlut.packages or nlut.packages < datetime.now() - timedelta(hour = 1):
+        if not nlut.packages or nlut.packages < datetime.now() - timedelta(hours = 1):
           nlut.packages = datetime.now()
           packages = NodeWatcher.fetchInstalledPackages(n.ip)
 
