@@ -206,6 +206,7 @@ def checkMeshStatus():
     if info:
       try:
         oldUptime = n.uptime or 0
+        oldChannel = n.channel or 0
         n.firmware_version = info['general']['version']
         n.local_time = safe_date_convert(info['general']['local_time'])
         n.bssid = info['wifi']['bssid']
@@ -216,6 +217,9 @@ def checkMeshStatus():
 
         if oldUptime > n.uptime:
           Event.create_event(n, EventCode.UptimeReset, '', EventSource.Monitor, data = 'Old uptime: %s\n  New uptime: %s' % (oldUptime, n.uptime))
+
+        if oldChannel != n.channel:
+          Event.create_event(n, EventCode.ChannelChanged, '', EventSource.Monitor, data = 'Old channel: %s\n  New channel %s' % (oldChannel, n.channel))
 
         # Parse nodogsplash client information
         if 'nds' in info:
