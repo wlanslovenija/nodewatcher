@@ -11,7 +11,7 @@ sys.path.append('/var/www/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType
 from django.db import transaction
 
 # Import other stuff
@@ -19,6 +19,7 @@ from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
 from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar
 from lib.topology import DotTopologyPlotter
+from lib import ipcalc
 from time import sleep
 from datetime import datetime, timedelta
 from traceback import format_exc
@@ -223,6 +224,11 @@ def checkMeshStatus():
         
         # Generate a graph for number of clients
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)
+
+        # Check for IP shortage
+        wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi)
+        if len(wifiSubnet) and n.clients >= ipcalc.Network(wifiSubnet[0].subnet, wifiSubnet[0].cidr).size() - 4:
+          Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifiSubnet[0], n.clients))
 
         # Record interface traffic statistics for all interfaces
         for iid, iface in info['iface'].iteritems():
