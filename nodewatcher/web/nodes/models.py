@@ -624,6 +624,15 @@ class EventSubscription(models.Model):
       fail_silently = False
     )
 
+class InstalledPackage(models.Model):
+  """
+  This model represents an installed package reported via nodewatcher.
+  """
+  node = models.ForeignKey(Node)
+  name = models.CharField(max_length = 100)
+  version = models.CharField(max_length = 50)
+  last_update = models.DateTimeField()
+
 def subnet_on_delete_callback(sender, **kwargs):
   """
   On delete callback for Subnets.
