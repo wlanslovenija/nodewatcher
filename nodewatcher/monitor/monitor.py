@@ -43,6 +43,11 @@ def main():
   while True:
     try:
       checkMeshStatus()
+
+      # Repost any events that need reposting
+      Event.post_events_that_need_resend()
+      
+      # Commit transaction if everything went ok
       transaction.commit()
     except:
       logging.warning(format_exc())
