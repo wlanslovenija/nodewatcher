@@ -77,18 +77,6 @@
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr>
-    <td>{{ form.wan_dhcp.label }}</td>
-    <td>{{ form.wan_dhcp }}</td>
-  </tr>
-  <tr class="static_opts" style="display: none;">
-    <td>{{ form.wan_ip.label }}</td>
-    <td>{{ form.wan_ip }}</td>
-  </tr>
-  <tr class="static_opts" style="display: none;">
-    <td>{{ form.wan_gw.label }}</td>
-    <td>{{ form.wan_gw }}</td>
-  </tr>
-  <tr>
     {% if not node.owner.email %}
     <td colspan="2" class="error">
       {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like image generation) are disabled.{% endblocktrans %}
@@ -116,19 +104,5 @@
   </tr>
 </table>
 </form>
-<script>
-  function toggleAutoConfiguration()
-  {
-    if ($('#id_wan_dhcp').is(':checked')) {
-      $('.static_opts').css('display', 'none');
-    } else {
-      $('.static_opts').css('display', '');
-    }
-  }
-
-
-  $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
-  $(function() { toggleAutoConfiguration(); });
-</script>
 <br /><br/>
 {% endblock %}

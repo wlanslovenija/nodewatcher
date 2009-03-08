@@ -26,16 +26,9 @@ def request(request, node_ip):
         context_instance = RequestContext(request)
       )
   else:
-    p = {
-      'wan_dhcp'    : node.profile.wan_dhcp,
-      'wan_gw'      : node.profile.wan_gw,
+    form = GenerateImageForm({
       'email_user'  : node.owner.id
-    }
-
-    if node.profile.wan_ip and node.profile.wan_cidr:
-      p['wan_ip'] = "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr)
-
-    form = GenerateImageForm(p)
+    })
 
   return render_to_response('generator/generate.html',
     { 'node'  : node,

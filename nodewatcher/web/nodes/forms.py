@@ -93,15 +93,45 @@ class RegisterNodeForm(forms.Form):
     required = False
   )
 
+  # WAN options
+  wan_dhcp = forms.BooleanField(required = False, label = _("WAN auto-configuration (DHCP)"), initial = True)
+  wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
+  wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
+
   def clean(self):
     """
     Additional validation handler.
     """
     ip = self.cleaned_data.get('ip')
+    wan_dhcp = self.cleaned_data.get('wan_dhcp')
+    wan_ip = self.cleaned_data.get('wan_ip')
+    wan_gw = self.cleaned_data.get('wan_gw')
 
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
-    
+
+    if not wan_dhcp and (not wan_ip or not wan_gw):
+      raise forms.ValidationError(_("IP and gateway are required for static WAN configuration!"))
+
+    if wan_ip:
+      try:
+        network, cidr = wan_ip.split('/')
+        cidr = int(cidr)
+        if not IPV4_ADDR_RE.match(network) or network.startswith('127.'):
+          raise ValueError
+      except ValueError:
+        raise forms.ValidationError(_("Enter subnet in CIDR notation!"))
+
+      if not IPV4_ADDR_RE.match(wan_gw) or wan_gw.startswith('127.'):
+        raise forms.ValidationError(_("Enter a valid gateway IP address!"))
+
+      self.cleaned_data['wan_ip'] = network
+      self.cleaned_data['wan_cidr'] = cidr
+
+      net = ipcalc.Network(str(ipcalc.Network(network, cidr).network()), cidr)
+      if ipcalc.IP(wan_gw) not in net:
+        raise forms.ValidationError(_("Gateway must be part of specified WAN subnet!"))
+
     return self.cleaned_data
   
   def save(self, user):
@@ -171,6 +201,10 @@ class RegisterNodeForm(forms.Form):
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
     profile.antenna = self.cleaned_data.get('ant_conn') or 0
     profile.lan_bridge = self.cleaned_data.get('lan_bridge') or False
+    profile.wan_dhcp = self.cleaned_data.get('wan_dhcp')
+    profile.wan_ip = self.cleaned_data.get('wan_ip')
+    profile.wan_cidr = self.cleaned_data.get('wan_cidr')
+    profile.wan_gw = self.cleaned_data.get('wan_gw')
     profile.save()
 
     if subnet:
@@ -256,14 +290,44 @@ class UpdateNodeForm(forms.Form):
     required = False
   )
 
+  # WAN options
+  wan_dhcp = forms.BooleanField(required = False, label = _("WAN auto-configuration (DHCP)"))
+  wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
+  wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
+
   def clean(self):
     """
     Additional validation handler.
     """
     ip = self.cleaned_data.get('ip')
+    wan_dhcp = self.cleaned_data.get('wan_dhcp')
+    wan_ip = self.cleaned_data.get('wan_ip')
+    wan_gw = self.cleaned_data.get('wan_gw')
 
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
+
+    if not wan_dhcp and (not wan_ip or not wan_gw):
+      raise forms.ValidationError(_("IP and gateway are required for static WAN configuration!"))
+
+    if wan_ip:
+      try:
+        network, cidr = wan_ip.split('/')
+        cidr = int(cidr)
+        if not IPV4_ADDR_RE.match(network) or network.startswith('127.'):
+          raise ValueError
+      except ValueError:
+        raise forms.ValidationError(_("Enter subnet in CIDR notation!"))
+
+      if not IPV4_ADDR_RE.match(wan_gw) or wan_gw.startswith('127.'):
+        raise forms.ValidationError(_("Enter a valid gateway IP address!"))
+
+      self.cleaned_data['wan_ip'] = network
+      self.cleaned_data['wan_cidr'] = cidr
+
+      net = ipcalc.Network(str(ipcalc.Network(network, cidr).network()), cidr)
+      if ipcalc.IP(wan_gw) not in net:
+        raise forms.ValidationError(_("Gateway must be part of specified WAN subnet!"))
 
     return self.cleaned_data
   
@@ -302,6 +366,10 @@ class UpdateNodeForm(forms.Form):
     profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
     profile.antenna = self.cleaned_data.get('ant_conn') or 0
     profile.lan_bridge = self.cleaned_data.get('lan_bridge') or False
+    profile.wan_dhcp = self.cleaned_data.get('wan_dhcp')
+    profile.wan_ip = self.cleaned_data.get('wan_ip')
+    profile.wan_cidr = self.cleaned_data.get('wan_cidr')
+    profile.wan_gw = self.cleaned_data.get('wan_gw')
     profile.save()
 
 class AllocateSubnetForm(forms.Form):

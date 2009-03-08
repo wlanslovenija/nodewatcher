@@ -116,6 +116,18 @@
     <td>{{ form.use_captive_portal }}</td>
   </tr>
   <tr>
+    <td>{{ form.wan_dhcp.label }}</td>
+    <td>{{ form.wan_dhcp }}</td>
+  </tr>
+  <tr class="static_opts" style="display: none;">
+    <td>{{ form.wan_ip.label }}</td>
+    <td>{{ form.wan_ip }}</td>
+  </tr>
+  <tr class="static_opts" style="display: none;">
+    <td>{{ form.wan_gw.label }}</td>
+    <td>{{ form.wan_gw }}</td>
+  </tr>
+  <tr>
     <td>{{ form.root_pass.label }}</td>
     <td>{{ form.root_pass }}</td>
   </tr>
@@ -130,5 +142,18 @@
 <br/>
 </form>
 
+<script>
+  function toggleAutoConfiguration()
+  {
+    if ($('#id_wan_dhcp').is(':checked')) {
+      $('.static_opts').css('display', 'none');
+    } else {
+      $('.static_opts').css('display', '');
+    }
+  }
+
+  $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
+  $(function() { toggleAutoConfiguration(); });
+</script>
 <br /><br/>
 {% endblock %}

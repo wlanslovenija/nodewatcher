@@ -80,6 +80,9 @@ def node_edit(request, node_ip):
       'template'            : node.profile.template.id,
       'use_vpn'             : node.profile.use_vpn,
       'use_captive_portal'  : node.profile.use_captive_portal,
+      'wan_dhcp'            : node.profile.wan_dhcp,
+      'wan_ip'              : "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr) if node.profile.wan_ip and node.profile.wan_cidr else None,
+      'wan_gw'              : node.profile.wan_gw,
       'root_pass'           : node.profile.root_pass,
       'channel'             : node.profile.channel,
       'lan_bridge'          : node.profile.lan_bridge
