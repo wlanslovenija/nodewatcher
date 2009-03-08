@@ -688,7 +688,7 @@ class OpenWrtConfig(NodeConfig):
     # VLAN configuration
     layout = portLayouts[self.portLayout]
     
-    if isinstance(layout, list):
+    if isinstance(layout, tuple):
       f.write('#### VLAN configuration\n')
       f.write('config switch eth0\n')
       f.write('\toption vlan0 "%s"\n' % layout[0])
