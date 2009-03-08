@@ -42,12 +42,12 @@ class DotTopologyPlotter:
         continue
       elif link.etx >= 1 and link.etx <= 2:
         color = "green"
-        weight = 1.0
+        weight = 20.0
       elif link.etx > 2 and link.etx <= 5:
         color = "blue"
         weight = 5.0
       else:
-        weight = 20.0
+        weight = 0.7
         color = "red"
 
       links[link.src.ip] = '"%s" -- "%s" [label="%s",color="%s",weight="%s"];\n' % (node.ip, link.src.ip, link.etx, color, weight)
@@ -63,7 +63,7 @@ class DotTopologyPlotter:
     @param filename: The filename
     """
     s = "graph topology {\n%s}\n" % self.__output
-    rd, wr = popen("/usr/bin/dot -Tpng -Gsize=8.5,1000.0 -Gfontpath=/usr/share/fonts/corefonts -Nfontname=verdana -Nfontsize=12 -Efontname=verdana -Efontsize=10 -Elen=4 -Earrowsize=1 -o %s" % filename)
+    rd, wr = popen("/usr/bin/neato -Tpng -Gsize=10.0,1000.0 -Gfontpath=/usr/share/fonts/corefonts -Nfontname=verdana -Nfontsize=12 -Efontname=verdana -Efontsize=10 -Elen=3 -Earrowsize=1 -o %s" % filename)
     wr.write(s)
     wr.close()
 
