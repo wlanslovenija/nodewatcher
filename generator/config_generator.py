@@ -31,7 +31,8 @@ portLayouts = {
   'whr-hp-g54' : ('1 2 3 4 5*', '0 5'),
   'wl-500g'    : ('1 2 3 4 5*', '0 5'),
   'wl-500gd'   : ('1 2 3 4 5*', '0 5'),
-  'fonera'     : None
+  'fonera'     : None,
+  'fonera+'    : True
 }
 
 class NodeConfig(object):
@@ -687,7 +688,7 @@ class OpenWrtConfig(NodeConfig):
     # VLAN configuration
     layout = portLayouts[self.portLayout]
     
-    if layout:
+    if isinstance(layout, list):
       f.write('#### VLAN configuration\n')
       f.write('config switch eth0\n')
       f.write('\toption vlan0 "%s"\n' % layout[0])
