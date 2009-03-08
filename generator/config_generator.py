@@ -538,6 +538,7 @@ class OpenWrtConfig(NodeConfig):
     for dns in self.dns:
       f.write('  FirewallRule allow tcp port 53 to %s\n' % dns)
       f.write('  FirewallRule allow udp port 53 to %s\n' % dns)
+      f.write('  FirewallRule allow icmp to %s\n' % dns)
     
     f.write('}\n')
     f.write('\n')
