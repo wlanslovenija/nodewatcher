@@ -541,7 +541,7 @@ class Event(models.Model):
       return _("User report")
     else:
       return _("Unknown source")
-
+  
   @staticmethod
   def create_event(node, code, summary, source, data = ""):
     """
@@ -568,7 +568,14 @@ class Event(models.Model):
     event.post_event()
 
     # Check if there are any repeated events that need sending
-    for event in Event.objects.filter(need_resend = True, timestamp__lt = datetime.now() + timedelta(minutes = 30)):
+    Event.post_events_that_need_resend()
+  
+  @staticmethod
+  def post_events_that_need_resend():
+    """
+    Posts all events that need to be resent.
+    """
+    for event in Event.objects.filter(need_resend = True, timestamp__lt = datetime.now() - timedelta(minutes = 30)):
       event.need_resend = False
       event.save()
       event.post_event()
