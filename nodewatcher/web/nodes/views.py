@@ -74,6 +74,7 @@ def node_edit(request, node_ip):
       'ant_type'            : node.ant_type,
       'ant_conn'            : node.profile.antenna,
       'owner'               : node.owner.id,
+      'project'             : node.project.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
       'template'            : node.profile.template.id,

@@ -192,6 +192,11 @@ class UpdateNodeForm(forms.Form):
     initial = User.objects.all()[0].id,
     label = _("Maintainer")
   )
+  project = forms.ModelChoiceField(
+    Project.objects.all(),
+    initial = Project.objects.all()[0].id,
+    label = _("Project")
+  )
 
   # Special node properties (can only be set by staff)
   system_node = forms.BooleanField(required = False)
@@ -277,6 +282,7 @@ class UpdateNodeForm(forms.Form):
     node.ant_external = self.cleaned_data.get('ant_external')
     node.ant_polarization = self.cleaned_data.get('ant_polarization')
     node.ant_type = self.cleaned_data.get('ant_type')
+    node.project = self.cleaned_data.get('project')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
