@@ -223,7 +223,7 @@ def checkMeshStatus():
         if oldUptime > n.uptime:
           Event.create_event(n, EventCode.UptimeReset, '', EventSource.Monitor, data = 'Old uptime: %s\n  New uptime: %s' % (oldUptime, n.uptime))
 
-        if oldChannel != n.channel:
+        if oldChannel != n.channel and oldChannel != 0:
           Event.create_event(n, EventCode.ChannelChanged, '', EventSource.Monitor, data = 'Old channel: %s\n  New channel %s' % (oldChannel, n.channel))
 
         # Parse nodogsplash client information
