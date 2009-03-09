@@ -94,7 +94,10 @@ def generate_image(d):
   for file in d['imagefiles']:
     file = str(file)
     os.rename("%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file), "%s-%s" % (os.path.join(DESTINATION, prefix), file))
-    files.append("%s-%s" % (prefix, file))
+    f = open("%s-%s" % (os.path.join(DESTINATION, prefix), file), 'r')
+    checksum = hashlib.md5(f.read()).hexdigest()
+    f.close()
+    files.append({ 'name' : "%s-%s" % (prefix, file), 'checksum' : checksum })
 
   # Send an e-mail
   t = loader.get_template('generator/email.txt')
