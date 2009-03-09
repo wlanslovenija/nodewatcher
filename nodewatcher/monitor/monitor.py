@@ -11,7 +11,7 @@ sys.path.append('/var/www/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType
 from django.db import transaction
 
 # Import other stuff
@@ -140,6 +140,7 @@ def checkMeshStatus():
     except Node.DoesNotExist:
       # Node does not exist, create an invalid entry for it
       n = Node(ip = nodeIp, status = NodeStatus.Invalid, last_seen = datetime.now())
+      n.node_type = NodeType.Unknown
       n.warnings = True
       n.peers = len(nodes[nodeIp].links)
       n.save()
@@ -276,7 +277,7 @@ def checkMeshStatus():
         nlut = lut.setdefault(n.ip, LastUpdateTimes())
         if not nlut.packages or nlut.packages < datetime.now() - timedelta(hours = 1):
           nlut.packages = datetime.now()
-          packages = NodeWatcher.fetchInstalledPackages(n.ip)
+          packages = NodeWatcher.fetchInstalledPackages(n.ip) or []
 
           # Remove removed packages and update existing package versions
           for package in n.installedpackage_set.all():
