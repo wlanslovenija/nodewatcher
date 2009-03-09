@@ -1,4 +1,5 @@
 from popen2 import popen2 as popen
+from wlanlj.nodes.models import NodeType
 
 class DotTopologyPlotter:
   """
@@ -21,7 +22,14 @@ class DotTopologyPlotter:
     if node.system_node:
       color = "#FFCB05"
     else:
-      color = "#BFCB05"
+      if node.node_type == NodeType.Server:
+        color = "#E2F206"
+      elif node.node_type == NodeType.Test:
+        color = "#A7F206"
+      elif node.node_type == NodeType.Unknown:
+        color = "#F26006"
+      else:
+        color = "#BFCB05"
     
     if node.name:
       name = "%s\\n(%s)" % (node.name, node.ip)
