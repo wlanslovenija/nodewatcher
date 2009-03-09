@@ -11,7 +11,7 @@ def nodes(request):
   """
   Display a list of all current nodes and their status.
   """
-  nodes = Node.objects.all().order_by('-system_node', 'ip')
+  nodes = Node.objects.all().order_by('node_type', 'ip')
   return render_to_response('nodes/list.html',
     { 'nodes' : nodes },
     context_instance = RequestContext(request)
@@ -77,6 +77,7 @@ def node_edit(request, node_ip):
       'project'             : node.project.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
+      'node_type'           : node.node_type,
       'template'            : node.profile.template.id,
       'use_vpn'             : node.profile.use_vpn,
       'use_captive_portal'  : node.profile.use_captive_portal,
@@ -85,7 +86,7 @@ def node_edit(request, node_ip):
       'wan_gw'              : node.profile.wan_gw,
       'root_pass'           : node.profile.root_pass,
       'channel'             : node.profile.channel,
-      'lan_bridge'          : node.profile.lan_bridge
+      'lan_bridge'          : node.profile.lan_bridge,
     })
 
   return render_to_response('nodes/edit.html',

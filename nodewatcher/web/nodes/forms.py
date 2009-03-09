@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile
@@ -32,6 +32,15 @@ class RegisterNodeForm(forms.Form):
     Project.objects.all(),
     initial = Project.objects.all()[0].id,
     label = _("Project")
+  )
+  node_type = forms.ChoiceField(
+    choices = [
+      (NodeType.Mesh, _("Mesh node")),
+      (NodeType.Server, _("Server node")),
+      (NodeType.Test, _("Test node"))
+    ],
+    initial = NodeType.Mesh,
+    label = _("Node type")
   )
   
   # Special node properties (can only be set by staff)
@@ -182,6 +191,7 @@ class RegisterNodeForm(forms.Form):
     node.ant_external = self.cleaned_data.get('ant_external')
     node.ant_polarization = self.cleaned_data.get('ant_polarization')
     node.ant_type = self.cleaned_data.get('ant_type')
+    node.node_type = self.cleaned_data.get('node_type')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
@@ -230,6 +240,15 @@ class UpdateNodeForm(forms.Form):
     Project.objects.all(),
     initial = Project.objects.all()[0].id,
     label = _("Project")
+  )
+  node_type = forms.ChoiceField(
+    choices = [
+      (NodeType.Mesh, _("Mesh node")),
+      (NodeType.Server, _("Server node")),
+      (NodeType.Test, _("Test node"))
+    ],
+    initial = NodeType.Mesh,
+    label = _("Node type")
   )
 
   # Special node properties (can only be set by staff)
@@ -347,6 +366,7 @@ class UpdateNodeForm(forms.Form):
     node.ant_polarization = self.cleaned_data.get('ant_polarization')
     node.ant_type = self.cleaned_data.get('ant_type')
     node.project = self.cleaned_data.get('project')
+    node.node_type = self.cleaned_data.get('node_type')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')

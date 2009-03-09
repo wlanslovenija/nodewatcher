@@ -18,9 +18,9 @@
     <td width="50" align="center"><b>MAX</b></td>
   </tr>
   {% for node in nodes %}
-  {% ifchanged node.system_node %}
+  {% ifchanged node.node_type %}
   <tr class="section_title">
-    <td colspan="9"><b>{% if node.system_node %}{% trans "System nodes" %}{% else %}{% trans "Other nodes" %}{% endif %}</b></td>
+    <td colspan="9"><b>{{ node.node_type_as_string_plural }}</b></td>
   </tr>
   {% endifchanged %}
   <tr>

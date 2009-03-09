@@ -67,6 +67,15 @@ class NodeStatus:
   NeedHelp = 103
   TakenDown = 104
 
+class NodeType:
+  """
+  Valid node types.
+  """
+  Server = 1
+  Mesh = 2
+  Test = 3
+  Unknown = 4
+
 class Node(models.Model):
   """
   This class represents a single node in the mesh.
@@ -81,6 +90,7 @@ class Node(models.Model):
   # services such as VPN
   system_node = models.BooleanField(default = False)
   border_router = models.BooleanField(default = False)
+  node_type = models.IntegerField(default = NodeType.Mesh)
 
   # Geographical location
   geo_lat = models.FloatField(null = True)
@@ -137,6 +147,38 @@ class Node(models.Model):
     Returns true if the node is invalid.
     """
     return self.status == NodeStatus.Invalid
+
+  def is_mesh_node(self):
+    """
+    Returns true if the node is a mesh node.
+    """
+    return self.node_type in (NodeType.Mesh, NodeType.Test)
+
+  def node_type_as_string(self):
+    """
+    Returns node type as string.
+    """
+    if self.node_type == NodeType.Mesh:
+      return _("Mesh node")
+    elif self.node_type == NodeType.Server:
+      return _("Server node")
+    elif self.node_type == NodeType.Test:
+      return _("Test node")
+    else:
+      return _("Unknown")
+
+  def node_type_as_string_plural(self):
+    """
+    Returns node type as string.
+    """
+    if self.node_type == NodeType.Mesh:
+      return _("Mesh nodes")
+    elif self.node_type == NodeType.Server:
+      return _("Server nodes")
+    elif self.node_type == NodeType.Test:
+      return _("Test nodes")
+    else:
+      return _("Unknown nodes")
 
   def get_warnings(self):
     """

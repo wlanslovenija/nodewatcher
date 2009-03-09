@@ -99,10 +99,14 @@
     <td>{{ form.ant_conn.label }}</td>
     <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this ?</a>)</td>
   </tr>
-  {% if user.is_staff %}
   <tr class="section_title">
     <td colspan="2">{% trans "Additional Options" %}</td>
   </tr>
+  <tr>
+    <td>{{ form.node_type.label }}</td>
+    <td>{{ form.node_type }}</td>
+  </tr>
+  {% if user.is_staff %}
   <tr>
     <td>{{ form.assign_subnet.label }}</td>
     <td>{{ form.assign_subnet }}</td>

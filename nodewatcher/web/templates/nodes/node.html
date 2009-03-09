@@ -61,7 +61,11 @@
     <td>{% trans "Border router" %}</td>
     <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
-  {% if not node.system_node %}
+  <tr>
+    <td>{% trans "Node type" %}</td>
+    <td>{{ node.node_type_as_string }}</td>
+  </tr>
+  {% if node.is_mesh_node %}
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
   </tr>
