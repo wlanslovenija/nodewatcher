@@ -1,0 +1,12 @@
+{% if obj.has_repeated %}WARNING: This event has repeated {{ obj.counter }} times within 30 minutes from its original creation time!<br/>{% endif %}
+
+Timestamp: {{ obj.timestamp }}<br/>
+Node: {{ obj.node.name }} ({{ obj.node.ip }})<br/>
+Event: {{ obj.code_to_string }}<br/>
+Code: {{ obj.code }}<br/>
+Source: {{ obj.source_to_string }}<br/>
+Summary: {{ obj.summary|default:"/" }}<br/>
+Additional data:<br/>
+<pre>
+  {{ obj.data|default:_("none") }}
+</pre>

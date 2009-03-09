@@ -1,4 +1,9 @@
 from django.conf.urls.defaults import *
+from wlanlj.nodes.feeds import LatestEvents
+
+feeds = {
+  'events'  : LatestEvents
+}
 
 urlpatterns = patterns('',
     # Nodes
@@ -25,6 +30,7 @@ urlpatterns = patterns('',
     (r'^nodes/event_unsubscribe/(?P<subscription_id>\d+)$', 'wlanlj.nodes.views.event_unsubscribe'),
     (r'^nodes/installed_packages/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.package_list'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
+    (r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }),
 
     # Generator
     (r'^generator/request/(?P<node_ip>.*?)$', 'wlanlj.generator.views.request'),
