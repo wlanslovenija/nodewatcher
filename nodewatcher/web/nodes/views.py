@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
+from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
 from datetime import datetime
 
@@ -63,7 +64,7 @@ def node_edit(request, node_ip):
       form.save(node, request.user)
       return HttpResponseRedirect("/nodes/node/" + node.ip)
   else:
-    form = UpdateNodeForm({
+    p = {
       'name'                : node.name,
       'ip'                  : node.ip,
       'location'            : node.location,
@@ -72,22 +73,41 @@ def node_edit(request, node_ip):
       'ant_external'        : node.ant_external,
       'ant_polarization'    : node.ant_polarization,
       'ant_type'            : node.ant_type,
-      'ant_conn'            : node.profile.antenna,
       'owner'               : node.owner.id,
       'project'             : node.project.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
-      'node_type'           : node.node_type,
-      'template'            : node.profile.template.id,
-      'use_vpn'             : node.profile.use_vpn,
-      'use_captive_portal'  : node.profile.use_captive_portal,
-      'wan_dhcp'            : node.profile.wan_dhcp,
-      'wan_ip'              : "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr) if node.profile.wan_ip and node.profile.wan_cidr else None,
-      'wan_gw'              : node.profile.wan_gw,
-      'root_pass'           : node.profile.root_pass,
-      'channel'             : node.profile.channel,
-      'lan_bridge'          : node.profile.lan_bridge,
-    })
+      'node_type'           : node.node_type
+    }
+
+    try:
+      p.update({
+        'template'            : node.profile.template.id,
+        'use_vpn'             : node.profile.use_vpn,
+        'use_captive_portal'  : node.profile.use_captive_portal,
+        'wan_dhcp'            : node.profile.wan_dhcp,
+        'wan_ip'              : "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr) if node.profile.wan_ip and node.profile.wan_cidr else None,
+        'wan_gw'              : node.profile.wan_gw,
+        'root_pass'           : node.profile.root_pass,
+        'channel'             : node.profile.channel,
+        'lan_bridge'          : node.profile.lan_bridge,
+        'ant_conn'            : node.profile.antenna
+      })
+    except Profile.DoesNotExist:
+      p.update({
+        'template'            : None,
+        'use_vpn'             : True,
+        'use_captive_portal'  : True,
+        'wan_dhcp'            : True,
+        'wan_ip'              : '',
+        'wan_gw'              : '',
+        'root_pass'           : '',
+        'channel'             : node.project.channel,
+        'lan_bridge'          : False,
+        'ant_conn'            : 3
+      })
+
+    form = UpdateNodeForm(p)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,

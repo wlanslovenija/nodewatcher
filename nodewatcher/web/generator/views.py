@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from wlanlj.nodes.models import Node
+from wlanlj.generator.models import Profile
 from wlanlj.generator.queue import queue_generator_job
 from wlanlj.generator.forms import GenerateImageForm
 
@@ -13,6 +14,11 @@ def request(request, node_ip):
   """
   node = get_object_or_404(Node, pk = node_ip)
   if node.owner != request.user and not request.user.is_staff:
+    raise Http404
+
+  try:
+    profile = node.profile
+  except Profile.DoesNotExist:
     raise Http404
 
   if request.method == 'POST':

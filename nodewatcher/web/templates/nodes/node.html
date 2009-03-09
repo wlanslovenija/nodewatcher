@@ -81,6 +81,7 @@
     <td>{% trans "Polarization" %}</td>
     <td>{{ node.ant_polarization_as_string }}</td>
   </tr>
+  {% if node.profile %}
   <tr class="section_title">
     <td colspan="2">
       {% trans "Image Generator Information" %}
@@ -99,6 +100,7 @@
     <td>{% trans "Captive portal enabled" %}</td>
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
+  {% endif %}
   {% if not node.is_down %}
   <tr class="section_title">
     <td colspan="2">{% trans "Node Configuration" %}</td>

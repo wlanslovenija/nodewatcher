@@ -128,36 +128,36 @@
     <td>{{ form.template }}</td>
   </tr>
   {% if user.is_staff %}
-  <tr>
+  <tr class="imagegen_opts">
     <td>{{ form.channel.label }}</td>
     <td>{{ form.channel }}</td>
   </tr>
   {% endif %}
-  <tr>
+  <tr class="imagegen_opts">
     <td>{{ form.use_vpn.label }}</td>
     <td>{{ form.use_vpn }}</td>
   </tr>
-  <tr>
+  <tr class="imagegen_opts">
     <td>{{ form.use_captive_portal.label }}</td>
     <td>{{ form.use_captive_portal }}</td>
   </tr>
-  <tr>
+  <tr class="imagegen_opts">
     <td>{{ form.wan_dhcp.label }}</td>
     <td>{{ form.wan_dhcp }}</td>
   </tr>
-  <tr class="static_opts" style="display: none;">
+  <tr class="static_opts imagegen_opts" style="display: none;">
     <td>{{ form.wan_ip.label }}</td>
     <td>{{ form.wan_ip }}</td>
   </tr>
-  <tr class="static_opts" style="display: none;">
+  <tr class="static_opts imagegen_opts" style="display: none;">
     <td>{{ form.wan_gw.label }}</td>
     <td>{{ form.wan_gw }}</td>
   </tr>
-  <tr>
+  <tr class="imagegen_opts">
     <td>{{ form.root_pass.label }}</td>
     <td>{{ form.root_pass }}</td>
   </tr>
-  <tr>
+  <tr class="imagegen_opts">
     <td></td>
     <td class="small_text">{% trans "Leave blank for auto-generated password." %}</td>
   </tr>
@@ -179,8 +179,22 @@
     }
   }
 
+  function toggleImageGeneratorOptions()
+  {
+    if ($('#id_template').attr('value') == '') {
+      $('.imagegen_opts').css('display', 'none');
+    } else {
+      $('.imagegen_opts').css('display', '');
+      toggleAutoConfiguration();
+    }
+  }
+
   $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
-  $(function() { toggleAutoConfiguration(); });
+  $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
+  $(function() {
+    toggleAutoConfiguration();
+    toggleImageGeneratorOptions();
+  });
 
 {% if user.is_staff %}
   toggleIpInput();
