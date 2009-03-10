@@ -6,6 +6,7 @@ from django.template import loader, Context
 from wlanlj.nodes.locker import require_lock
 from wlanlj.nodes import ipcalc
 from wlanlj.generator.types import IfaceType
+from wlanlj.dns.models import Zone, Record
 from datetime import datetime, timedelta
 
 class Project(models.Model):
@@ -19,6 +20,7 @@ class Project(models.Model):
   channel = models.IntegerField()
   ssid = models.CharField(max_length = 50)
   sticker = models.CharField(max_length = 50)
+  zone = models.ForeignKey(Zone, null = True)
 
   def __unicode__(self):
     """
@@ -697,5 +699,12 @@ def subnet_on_delete_callback(sender, **kwargs):
   except Pool.DoesNotExist:
     pass
 
+def node_on_delete_callback(sender, **kwargs):
+  """
+  On delete callback for Nodes.
+  """
+  Record.remove_for_node(kwargs['instance'])
+
 models.signals.pre_delete.connect(subnet_on_delete_callback, sender = Subnet)
+models.signals.pre_delete.connect(node_on_delete_callback, sender = Node)
 

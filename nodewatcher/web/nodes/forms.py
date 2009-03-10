@@ -7,6 +7,7 @@ from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile
 from wlanlj.generator.types import IfaceType
 from wlanlj.account.util import generate_random_password
+from wlanlj.dns.models import Record
 from datetime import datetime
 import re
 
@@ -223,6 +224,9 @@ class RegisterNodeForm(forms.Form):
     if subnet:
       subnet.save()
 
+    # Update DNS entries
+    Record.update_for_node(node)
+
     return node
 
 class UpdateNodeForm(forms.Form):
@@ -363,6 +367,8 @@ class UpdateNodeForm(forms.Form):
     Completes node data update.
     """
     ip = self.cleaned_data.get('ip')
+    oldName = node.name
+    oldProject = node.project
 
     # Update node metadata
     node.name = self.cleaned_data.get('name')
@@ -381,6 +387,10 @@ class UpdateNodeForm(forms.Form):
       node.border_router = self.cleaned_data.get('border_router')
     
     node.save()
+
+    # Update DNS records on name changes
+    if oldName != node.name or oldProject != node.project:
+      Record.update_for_node(node, old_name = oldName, old_project = oldProject)
 
     # Update node profile for image generator
     try:
