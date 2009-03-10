@@ -59,7 +59,7 @@ def node_edit(request, node_ip):
     raise Http404
   
   if request.method == 'POST':
-    form = UpdateNodeForm(request.POST)
+    form = UpdateNodeForm(node, request.POST)
     if form.is_valid():
       form.save(node, request.user)
       return HttpResponseRedirect("/nodes/node/" + node.ip)
@@ -107,7 +107,7 @@ def node_edit(request, node_ip):
         'ant_conn'            : 3
       })
 
-    form = UpdateNodeForm(p)
+    form = UpdateNodeForm(node, p)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,

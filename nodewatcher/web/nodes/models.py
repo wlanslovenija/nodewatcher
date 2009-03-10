@@ -83,7 +83,7 @@ class Node(models.Model):
   This class represents a single node in the mesh.
   """
   ip = models.CharField(max_length = 40, primary_key = True)
-  name = models.CharField(max_length = 50, null = True)
+  name = models.CharField(max_length = 50, null = True, unique = True)
   owner = models.ForeignKey(User, null = True)
   location = models.CharField(max_length = 200, null = True)
   project = models.ForeignKey(Project, null = True)

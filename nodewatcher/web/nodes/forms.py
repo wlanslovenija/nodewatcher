@@ -113,10 +113,17 @@ class RegisterNodeForm(forms.Form):
     """
     Additional validation handler.
     """
+    name = self.cleaned_data.get('name')
     ip = self.cleaned_data.get('ip')
     wan_dhcp = self.cleaned_data.get('wan_dhcp')
     wan_ip = self.cleaned_data.get('wan_ip')
     wan_gw = self.cleaned_data.get('wan_gw')
+
+    try:
+      node = Node.objects.get(name = name)
+      raise forms.ValidationError(_("The specified node name already exists!"))
+    except Node.DoesNotExist:
+      pass
 
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
@@ -325,14 +332,29 @@ class UpdateNodeForm(forms.Form):
   wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
 
+  def __init__(self, node, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    super(UpdateNodeForm, self).__init__(*args, **kwargs)
+    self.__current_node = node
+
   def clean(self):
     """
     Additional validation handler.
     """
+    name = self.cleaned_data.get('name')
     ip = self.cleaned_data.get('ip')
     wan_dhcp = self.cleaned_data.get('wan_dhcp')
     wan_ip = self.cleaned_data.get('wan_ip')
     wan_gw = self.cleaned_data.get('wan_gw')
+
+    try:
+      node = Node.objects.get(name = name)
+      if node != self.__current_node:
+        raise forms.ValidationError(_("The specified node name already exists!"))
+    except Node.DoesNotExist:
+      pass
 
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
