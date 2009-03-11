@@ -65,6 +65,10 @@
     <td>{% trans "Node type" %}</td>
     <td>{{ node.node_type_as_string }}</td>
   </tr>
+  <tr>
+    <td>{% trans "Last seen" %}</td>
+    <td>{{ node.last_seen|default:_("never") }}</td>
+  </tr>
   {% if node.is_mesh_node %}
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
