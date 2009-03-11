@@ -13,6 +13,7 @@ import re
 
 IPV4_ADDR_RE = re.compile(r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b')
 MAC_ADDR_RE = re.compile(r'([0-9A-Fa-f]{2}([:]|$)){6}')
+NODE_NAME_RE = re.compile('(?:[a-zA-Z0-9]*-?[a-zA-Z0-9])*[a-zA-Z0-9]$')
 
 class RegisterNodeForm(forms.Form):
   """
@@ -121,6 +122,9 @@ class RegisterNodeForm(forms.Form):
     geo_lat = self.cleaned_data.get('geo_lat')
     geo_long = self.cleaned_data.get('geo_long')
 
+    if not NODE_NAME_RE.match(name):
+      raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
+
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
@@ -197,7 +201,7 @@ class RegisterNodeForm(forms.Form):
         subnet.status = SubnetStatus.NotAnnounced
 
     # Update node metadata
-    node.name = self.cleaned_data.get('name')
+    node.name = self.cleaned_data.get('name').lower()
     node.project = project
     node.owner = user
     node.location = self.cleaned_data.get('location')
@@ -356,6 +360,9 @@ class UpdateNodeForm(forms.Form):
     geo_lat = self.cleaned_data.get('geo_lat')
     geo_long = self.cleaned_data.get('geo_long')
 
+    if not NODE_NAME_RE.match(name):
+      raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
+
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
@@ -403,7 +410,7 @@ class UpdateNodeForm(forms.Form):
     oldProject = node.project
 
     # Update node metadata
-    node.name = self.cleaned_data.get('name')
+    node.name = self.cleaned_data.get('name').lower()
     node.owner = self.cleaned_data.get('owner')
     node.location = self.cleaned_data.get('location')
     node.geo_lat = self.cleaned_data.get('geo_lat')
