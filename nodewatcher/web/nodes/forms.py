@@ -13,7 +13,7 @@ import re
 
 IPV4_ADDR_RE = re.compile(r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b')
 MAC_ADDR_RE = re.compile(r'([0-9A-Fa-f]{2}([:]|$)){6}')
-NODE_NAME_RE = re.compile('(?:[a-zA-Z0-9]*-?[a-zA-Z0-9])*[a-zA-Z0-9]$')
+NODE_NAME_RE = re.compile('(?:[a-zA-Z0-9]+-?[a-zA-Z0-9]*)*[a-zA-Z0-9]$')
 
 class RegisterNodeForm(forms.Form):
   """
