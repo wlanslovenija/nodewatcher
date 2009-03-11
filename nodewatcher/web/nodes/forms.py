@@ -118,6 +118,11 @@ class RegisterNodeForm(forms.Form):
     wan_dhcp = self.cleaned_data.get('wan_dhcp')
     wan_ip = self.cleaned_data.get('wan_ip')
     wan_gw = self.cleaned_data.get('wan_gw')
+    geo_lat = self.cleaned_data.get('geo_lat')
+    geo_long = self.cleaned_data.get('geo_long')
+
+    if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
+      raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
     try:
       node = Node.objects.get(name = name)
@@ -348,6 +353,11 @@ class UpdateNodeForm(forms.Form):
     wan_dhcp = self.cleaned_data.get('wan_dhcp')
     wan_ip = self.cleaned_data.get('wan_ip')
     wan_gw = self.cleaned_data.get('wan_gw')
+    geo_lat = self.cleaned_data.get('geo_lat')
+    geo_long = self.cleaned_data.get('geo_long')
+
+    if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
+      raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
     try:
       node = Node.objects.get(name = name)
