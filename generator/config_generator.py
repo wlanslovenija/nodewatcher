@@ -22,6 +22,11 @@ wifiVirtuals = {
   'atheros'  : 'wifi0'
 }
 
+# A list of antenna mappings when auto is selected
+wifiAntennas = {
+  'atheros'  : 1
+}
+
 # A list of port layouts (do not forget to add new ones to a list of valid
 # layouts to build_image.py if you add them here)
 portLayouts = {
@@ -47,8 +52,8 @@ class NodeConfig(object):
   wifiIface = "wl0"
   wifiDriver = "broadcom"
   wifiChannel = 8
-  wifiTxAnt = 0
-  wifiRxAnt = 0
+  wifiTxAnt = 1
+  wifiRxAnt = 1
   portLayout = "wrt54gl"
   password = "ljw"
   hostname = None
@@ -115,6 +120,9 @@ class NodeConfig(object):
     """
     self.wifiRxAnt = rx
     self.wifiTxAnt = tx
+    
+    if self.wifiRxAnt == self.wifiTxAnt == 3 and self.wifiDriver in wifiAntennas:
+      self.wifiRxAnt = self.wifiTxAnt = wifiAntennas[self.wifiDriver]
   
   def setLanIface(self, iface):
     """
