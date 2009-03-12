@@ -96,11 +96,12 @@ class RegisterNodeForm(forms.Form):
   )
   ant_conn = forms.ChoiceField(
     choices = [
+      (4, _("Default")),
       (3, _("Automatic")),
       (0, _("First")),
       (1, _("Second"))
     ],
-    initial = 3,
+    initial = 4,
     label = _("Antenna connector"),
     required = False
   )
@@ -327,11 +328,12 @@ class UpdateNodeForm(forms.Form):
   )
   ant_conn = forms.ChoiceField(
     choices = [
+      (4, _("Default")),
       (3, _("Automatic")),
       (0, _("First")),
       (1, _("Second"))
     ],
-    initial = 3,
+    initial = 4,
     label = _("Antenna connector"),
     required = False
   )
