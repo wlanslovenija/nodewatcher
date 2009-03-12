@@ -22,7 +22,7 @@ wifiVirtuals = {
   'atheros'  : 'wifi0'
 }
 
-# A list of antenna mappings when auto is selected
+# A list of forced antenna mappings for some configurations
 wifiAntennas = {
   'atheros'  : 1
 }
@@ -121,7 +121,7 @@ class NodeConfig(object):
     self.wifiRxAnt = rx
     self.wifiTxAnt = tx
     
-    if self.wifiRxAnt == self.wifiTxAnt == 3 and self.wifiDriver in wifiAntennas:
+    if self.wifiDriver in wifiAntennas:
       self.wifiRxAnt = self.wifiTxAnt = wifiAntennas[self.wifiDriver]
   
   def setLanIface(self, iface):
