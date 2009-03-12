@@ -848,6 +848,7 @@ class OpenWrtConfig(NodeConfig):
       f.write('\toption bssid %s\n' % self.bssid)
     
     f.write('\toption hidden 0\n')
+    f.write('\toption bgscan 0\n')
     f.write('\toption encryption none\n')
     f.write('\n')
     
