@@ -22,9 +22,14 @@ wifiVirtuals = {
   'atheros'  : 'wifi0'
 }
 
-# A list of forced antenna mappings for some configurations
+# A list of default antenna mappings for some configurations
 wifiAntennas = {
-  'atheros'  : 1
+                  # Antenna   Force always or only on default
+  'fonera'      : (1,         True),
+  'fonera+'     : (1,         True),
+  'whr-hp-g54'  : (1,         False),
+  'wrt54gl'     : (0,         False),
+  'wrt54gs'     : (0,         False)
 }
 
 # A list of port layouts (do not forget to add new ones to a list of valid
@@ -54,6 +59,7 @@ class NodeConfig(object):
   wifiChannel = 8
   wifiTxAnt = 1
   wifiRxAnt = 1
+  wifiAntDiv = 0
   portLayout = "wrt54gl"
   password = "ljw"
   hostname = None
@@ -121,8 +127,14 @@ class NodeConfig(object):
     self.wifiRxAnt = rx
     self.wifiTxAnt = tx
     
-    if self.wifiDriver in wifiAntennas:
-      self.wifiRxAnt = self.wifiTxAnt = wifiAntennas[self.wifiDriver]
+    if self.wifiRxAnt == self.wifiTxAnt == 3:
+      self.wifiAntDiv = 1
+    
+    if self.portLayout in wifiAntennas:
+      ant, force = wifiAntennas[self.portLayout]
+      
+      if force or rx == tx == 4:
+        self.wifiRxAnt = self.wifiTxAnt = ant
   
   def setLanIface(self, iface):
     """
@@ -840,7 +852,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('config wifi-device %s\n' % self.wifiVirtualIface)
     f.write('\toption type %s\n' % self.wifiDriver)
     f.write('\toption channel %s\n' % self.wifiChannel)
-    f.write('\toption diversity 0\n')
+    f.write('\toption diversity %s\n' % self.wifiAntDiv)
     f.write('\toption rxantenna %s\n' % self.wifiRxAnt)
     f.write('\toption txantenna %s\n' % self.wifiTxAnt)
     f.write('\n')

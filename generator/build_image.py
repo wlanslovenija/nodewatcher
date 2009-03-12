@@ -78,9 +78,10 @@ if options['layout'] not in portLayouts:
 
 x.setOpenwrtVersion(options['openwrt_version'])
 x.setArch(options['arch'])
-x.setWifiIface(options['iface'], options['driver'], int(options['channel']))
-x.setLanIface(options['iface_lan'])
 x.setPortLayout(options['layout'])
+x.setWifiIface(options['iface'], options['driver'], int(options['channel']))
+x.setWifiAnt(4, 4)
+x.setLanIface(options['iface_lan'])
 x.setNodeType(options['type'])
 x.setPassword(options['password'])
 x.setHostname(options['hostname'])
