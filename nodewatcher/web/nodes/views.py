@@ -277,9 +277,18 @@ def map(request):
   """
   Displays mesh map.
   """
+  # Remove duplicate links
+  links = []
+  existing = {}
+
+  for link in Link.objects.all():
+    if (link.dst, link.src) not in existing or link.etx > existing[(link.dst, link.src)]:
+      existing[(link.src, link.dst)] = link.etx
+      links.append(link)
+
   return render_to_response('nodes/map.html',
     { 'nodes' : Node.objects.all(),
-      'links' : Link.objects.all() },
+      'links' : links },
     context_instance = RequestContext(request)
   )
 
