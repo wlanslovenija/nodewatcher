@@ -53,7 +53,8 @@ class Record(models.Model):
       return
     
     record = Record.for_node(node)
-    record.delete()
+    if record.id:
+      record.delete()
 
   @staticmethod
   def update_for_node(node, old_name = None, old_project = None):
@@ -73,7 +74,8 @@ class Record(models.Model):
     record = Record.for_node(node, name = old_name, zone = old_zone)
     
     if not node.project.zone:
-      record.delete()
+      if record.id:
+        record.delete()
     else:
       record.zone = node.project.zone
       record.name = "%s.nodes" % node.name
@@ -87,6 +89,9 @@ class Record(models.Model):
       old_zone.serial += 1
       old_zone.save()
     
-    record.zone.serial += 1
-    record.zone.save()
+    try:
+      record.zone.serial += 1
+      record.zone.save()
+    except Zone.DoesNotExist:
+      pass
 
