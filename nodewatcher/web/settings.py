@@ -91,4 +91,5 @@ INSTALLED_APPS = (
     'wlanlj.nodes',
     'wlanlj.generator',
     'wlanlj.account',
+    'wlanlj.dns',
 )
