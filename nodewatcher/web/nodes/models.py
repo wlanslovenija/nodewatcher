@@ -523,6 +523,7 @@ class EventSource:
   """
   Monitor = 1
   UserReport = 2
+  NodeDatabase = 3
 
 class EventCode:
   """
@@ -535,6 +536,8 @@ class EventCode:
   PacketDuplication = 5
   IPShortage = 6
   ChannelChanged = 7
+
+  NodeAdded = 100
 
   @staticmethod
   def to_string(code):
@@ -558,6 +561,8 @@ class EventCode:
       return _("IP shortage for wireless clients")
     elif code == EventCode.ChannelChanged:
       return _("WiFi channel has changed")
+    elif code == EventCode.NodeAdded:
+      return _("A new node has been registred")
     else:
       return _("Unknown event")
 
@@ -589,6 +594,8 @@ class Event(models.Model):
       return _("Monitor")
     elif self.source == EventSource.UserReport:
       return _("User report")
+    elif self.source == EventSource.NodeDatabase:
+      return _("Node database")
     else:
       return _("Unknown source")
   

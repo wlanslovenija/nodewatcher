@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile
@@ -243,6 +243,9 @@ class RegisterNodeForm(forms.Form):
 
     # Update DNS entries
     Record.update_for_node(node)
+
+    # Generate node added event
+    Event.create_event(node, EventCode.NodeAdded, '', EventSource.NodeDatabase)
 
     return node
 
