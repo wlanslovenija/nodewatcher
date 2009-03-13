@@ -62,7 +62,7 @@ class Profile(models.Model):
   root_pass = models.CharField(max_length = 20)
   use_vpn = models.BooleanField()
   use_captive_portal = models.BooleanField()
-  antenna = models.IntegerField(default = 1)
+  antenna = models.IntegerField(default = 4)
 
   # LAN bridge option
   lan_bridge = models.BooleanField(default = False)
