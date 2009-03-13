@@ -326,6 +326,12 @@ class Subnet(models.Model):
   gen_iface_type = models.IntegerField(default = IfaceType.WiFi)
   gen_dhcp = models.BooleanField(default = True)
   
+  def is_wifi(self):
+    """
+    Returns true if this subnet is a wireless one.
+    """
+    return self.gen_iface_type == IfaceType.WiFi
+
   @staticmethod
   def is_allocated(network, cidr):
     """

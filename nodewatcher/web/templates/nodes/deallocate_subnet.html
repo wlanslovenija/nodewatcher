@@ -55,13 +55,19 @@
   </tr>
   <tr>
     <td colspan="2" class="error">
+      {% if subnet.is_wifi and not user.is_staff %}
+      {% blocktrans %}<b>ERROR:</b> This is a primary wifi subnet that should not be removed.{% endblocktrans %}
+      {% else %}
       {% blocktrans %}<b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!{% endblocktrans %}
+      {% endif %}
     </td>
   </tr>
   <tr>
     <td></td>
     <td>
+      {% if not subnet.is_wifi or user.is_staff %}
       <input type="button" value="{% trans "Remove" %}" onclick="document.location='/nodes/do_deallocate_subnet/{{ subnet.id }}'" />&nbsp;
+      {% endif %}
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
     </td>
   </tr>

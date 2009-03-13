@@ -176,12 +176,12 @@ def node_allocate_subnet(request, node_ip = None):
     raise Http404
  
   if request.method == 'POST':
-    form = AllocateSubnetForm(request.POST)
+    form = AllocateSubnetForm(node, request.POST)
     if form.is_valid():
       form.save(node)
       return HttpResponseRedirect("/nodes/node/" + node.ip)
   else:
-    form = AllocateSubnetForm()
+    form = AllocateSubnetForm(node)
 
   return render_to_response('nodes/allocate_subnet.html',
     { 'form' : form,
@@ -221,6 +221,9 @@ def node_do_deallocate_subnet(request, subnet_id = None):
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
   
+  if subnet.is_wifi and not request.user.is_staff:
+    raise Http404
+
   subnet.delete()
 
   return HttpResponseRedirect("/nodes/node/" + node.ip)
