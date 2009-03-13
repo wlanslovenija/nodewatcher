@@ -29,7 +29,8 @@ wifiAntennas = {
   'fonera+'     : (1,         True),
   'whr-hp-g54'  : (1,         False),
   'wrt54gl'     : (0,         False),
-  'wrt54gs'     : (0,         False)
+  'wrt54gs'     : (0,         False),
+  'rb433'       : (1,         False)
 }
 
 # A list of port layouts (do not forget to add new ones to a list of valid
@@ -42,7 +43,8 @@ portLayouts = {
   'wl-500g'    : ('1 2 3 4 5*', '0 5'),
   'wl-500gd'   : ('1 2 3 4 5*', '0 5'),
   'fonera'     : None,
-  'fonera+'    : True
+  'fonera+'    : True,
+  'rb433'      : True
 }
 
 class NodeConfig(object):
