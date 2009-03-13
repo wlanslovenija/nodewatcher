@@ -30,6 +30,8 @@ wifiAntennas = {
   'whr-hp-g54'  : (1,         False),
   'wrt54gl'     : (0,         False),
   'wrt54gs'     : (0,         False),
+  'wl-500g'     : (0,         False),
+  'wl-500gd'    : (0,         False),
   'rb433'       : (1,         False)
 }
 
