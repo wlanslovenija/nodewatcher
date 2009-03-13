@@ -111,13 +111,13 @@ def checkMeshStatus():
 
   # Remove all invalid nodes and subnets
   Node.objects.filter(status = NodeStatus.Invalid).delete()
-  Subnet.objects.filter(status = SubnetStatus.NotAllocated).delete()
+  Subnet.objects.filter(status = SubnetStatus.NotAllocated, last_seen__lt = datetime.now() - timedelta(minutes = 11)).delete()
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 1)).delete()
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.all().update(warnings = False)
-  Subnet.objects.update(status = SubnetStatus.NotAnnounced)
+  Subnet.objects.exclude(status = SubnetStatus.NotAllocated).update(status = SubnetStatus.NotAnnounced)
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
@@ -277,7 +277,7 @@ def checkMeshStatus():
         nlut = lut.setdefault(n.ip, LastUpdateTimes())
         if not nlut.packages or nlut.packages < datetime.now() - timedelta(hours = 1):
           nlut.packages = datetime.now()
-          packages = NodeWatcher.fetchInstalledPackages(n.ip) or []
+          packages = NodeWatcher.fetchInstalledPackages(n.ip) or {}
 
           # Remove removed packages and update existing package versions
           for package in n.installedpackage_set.all():
@@ -312,7 +312,13 @@ def checkMeshStatus():
       try:
         s = Subnet.objects.get(node__ip = nodeIp, subnet = subnet, cidr = int(cidr))
         s.last_seen = datetime.now()
-        s.status = SubnetStatus.AnnouncedOk
+
+        if s.status != SubnetStatus.NotAllocated:
+          s.status = SubnetStatus.AnnouncedOk
+        elif not s.node.border_router:
+          s.node.warnings = True
+          s.node.save()
+
         s.save()
       except Subnet.DoesNotExist:
         # Subnet does not exist, create an invalid entry for it
