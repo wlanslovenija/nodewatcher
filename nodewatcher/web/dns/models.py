@@ -49,6 +49,9 @@ class Record(models.Model):
 
     @param node: A valid Node instance
     """
+    if node.is_invalid():
+      return
+    
     record = Record.for_node(node)
     record.delete()
 
