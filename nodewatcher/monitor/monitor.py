@@ -208,7 +208,7 @@ def checkMeshStatus():
     n.last_seen = datetime.now()
 
     # Since the node appears to be up, let's fetch details
-    info = NodeWatcher.fetch(nodeIp)
+    info = NodeWatcher.fetch(nodeIp) if n.node_type != NodeType.Server else None
     if info:
       try:
         oldUptime = n.uptime or 0
