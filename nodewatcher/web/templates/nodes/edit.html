@@ -32,17 +32,10 @@
     <td>{{ form.owner.label }}</td>
     <td>{{ form.owner }}</td>
   </tr>
-  {% if user.is_staff %}
-  <tr>
-    <td>{{ form.ip.label }}</td>
-    <td>{{ form.ip }}</td>
-  </tr>
-  {% else %}
   <tr>
     <td>{{ form.ip.label }}</td>
     <td><b>{{ node.ip }}</b></td>
   </td>
-  {% endif %}
   <tr>
     <td>{{ form.project.label }}</td>
     <td>{{ form.project }}</td>
