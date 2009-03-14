@@ -80,6 +80,9 @@ def generate_image(d):
   if d['lan_wifi_bridge']:
     x.enableLanWifiBridge()
   
+  if d['lan_wan_switch']:
+    x.switchWanToLan()
+  
   # Cleanup stuff from previous builds
   os.chdir(WORKDIR)
   os.system("rm -rf build/files/*")
