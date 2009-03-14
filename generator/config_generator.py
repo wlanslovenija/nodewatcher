@@ -910,7 +910,7 @@ class OpenWrtConfig(NodeConfig):
       f.write('\n')
       
       f.write('config ntpclient\n')
-      f.write('\toption interval 60\n')
+      f.write('\toption interval 3600\n')
       f.write('\n')
     
     f.close()
