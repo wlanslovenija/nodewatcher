@@ -1,38 +1,31 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Node Operator Authentication" %}{% endblock %}
+{% block title %}{% trans "Login" %}{% endblock %}
 
 {% block content %}
-<h1>Node Operator Authentication</h1>
+<h1>Login</h1>
+
+<form action="/auth/login" method="POST" id="acctmgr_loginform" >
 
 {% if form.non_field_errors %}
 <p class="error">
   <strong>{% trans "Error" %}:</strong>
-  {% for error in form.non_field_errors %}
+  {% for error in form.noxn_field_errors %}
   {{ error }}
   {% endfor %}
 </p>
 {% endif %}
-
-<form action="/auth/login" method="POST">
-  <table width="500" border="0">
-    <tr>
-      <td width="150"><b>{{ form.username.label_tag }}</b></td>
-      <td>{{ form.username }}</td>
-    </tr>
-    <tr>
-      <td><b>{{ form.password.label_tag }}</b></td>
-      <td>{{ form.password }}</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <input type="submit" value="{% trans "Login" %}" />
-        <input type="hidden" name="next" value="{{ next }}" />
-      </td>
-    </tr>
-  </table>
+<input type="hidden" name="next" value="{{ next }}" />
+<div>
+{{ form.username.label_tag }}
+{{ form.username }}
+</div>
+<div>
+{{ form.password.label_tag }}
+{{ form.password }}
+</div>
+<input type="submit" value="{% trans "Login" %}" />
+<p><a href="/auth/lost_pass">{% trans "Forgot your password?" %}</a></p>
 </form>
-<br/><br/><br/><br/>
 {% endblock %}

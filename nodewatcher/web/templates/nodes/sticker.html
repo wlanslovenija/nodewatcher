@@ -2,10 +2,17 @@
 {% load i18n %}
 
 {% block title %}{% trans "Generate an Info Sticker" %}{% endblock %}
-
+{% block contenttype %}prefs{% endblock %}
 {% block content %}
 <h1>{% trans "Generate an Info Sticker" %}</h1>
-
+<ul id="tabs">
+  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
+  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
+  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
+  <li class="active">{% trans "Info sticker" %}</li>
+</ul>
+<div id="tabcontent">
 {% if form.errors and show_errors %}
 <div class="error">
   {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to generate a sticker:" %}<br />
@@ -20,14 +27,12 @@
   {% endfor %}
 </div>
 {% endif %}
-
+<p>
+{% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
+</p>
 <form action="/nodes/sticker" method="POST">
 <table border="0" width="700">
-  <tr>
-    <td colspan="2" class="notice">
-      {% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
-    </td>
-  </tr>
+
   <tr>
     <td>{{ form.project.label }}</td>
     <td>{{ form.project }}</td>
@@ -40,14 +45,11 @@
     <td>{{ form.phone.label }}</td>
     <td>{{ form.phone }}</td>
   </tr>
-  <tr>
-    <td></td>
-    <td>
+</table>
+  <div class="buttons">
       <input type="submit" value="{% trans "Generate" %}" />&nbsp;
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/my_nodes'" />
-    </td>
-  </tr>
-</table>
+    </div>
 </form>
-<br /><br/>
+</div>
 {% endblock %}

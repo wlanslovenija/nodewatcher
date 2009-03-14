@@ -1,47 +1,3 @@
-body {
-  font-size: 12px;
-  font-family: verdana, sans-serif;
-  background-color: #F0F3EA;
-  margin: 0 0 0 0;
-}
-
-a {
-  text-decoration: none;
-  color: #669900;
-}
-
-a:hover {
-  text-decoration: none;
-  color: #336600;
-}
-
-div.toc {
-  width: 200px;
-  float: left;
-  margin: 2px 0 0 2px;
-}
-
-div.toc_title {
-  width: 100%;
-  color: #FFFFFF;
-  font-size: 14px;
-  background-color: #669900;
-  margin: -2px 0 0 -2px;
-}
-
-div.content {
-  margin: 0 0 0 200px;
-  background-color: #FFFFFF;
-/*  height: 100%; */
-}
-
-h1 {
-  font-size: 1.7em;
-}
-
-table {
-  font-size: 12px;
-}
 
 abbr {
   cursor: help;
@@ -50,16 +6,20 @@ abbr {
   text-transform: uppercase;
 }
 
+table.listing {
+  margin-top: 0px;
+}
+
 .small_text {
   font-size: 10px;
 }
 
 .node_status_up {
-  color: #00ff00;
+  color: #00bb00;
 }
 
 .node_status_invalid {
-  color: #298800;
+  color: #cccc22;
 }
 
 .node_status_new {
@@ -90,9 +50,12 @@ abbr {
   color: #FFA82F;
 }
 
-tr.section_title {
-  background-color: #E2EAD5;
+table.listing tbody tr.section_title:hover,
+table.listing tbody tr.section_title:focus,
+table.listing tbody tr.section_title {
+  background-color: #FFFFFF !important;
 }
+
 
 tr.inner_header {
   background-color: #F2FBE4;
@@ -100,28 +63,49 @@ tr.inner_header {
 }
 
 .error {
-  width: 700px;
-  margin-top: 5px;
-  margin-left: 5px;
-  border-top: 1px solid #DA453A;
-  border-bottom: 1px solid #DA453A;
-  background-color: #FFBDB8;
-  color: #67403D;
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -moz-border-radius-topleft:3px;
+  -moz-border-radius-topright:3px;
+  width: 680px;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #CD2D1D;
+  background-color: #FFEBE9;
+  color: #930E00;
   text-align: center;
 }
 
 .notice {
-  width: 700px;
-  margin-left: 5px;
-  border-top: 1px solid #95DA3A;
-  border-bottom: 1px solid #95DA3A;
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -moz-border-radius-topleft:3px;
+  -moz-border-radius-topright:3px;
+  width: 680px;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #95DA3A;
   background-color: #E1FFB8;
   color: #3D6744;
   text-align: center;
 }
 
-tr.header {
-  background-color: #F2FBE4;
+.embedded #gmap {
+  width: 400px !important;
+  float: right;
+}
+
+.graphs {
+  text-align: center;
+}
+
+#details_title {
+  clear: both;
+}
+
+#details_list .section_title td {
+  padding-top: 10px;
   font-weight: bold;
 }
+
 

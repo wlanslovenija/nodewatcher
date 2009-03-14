@@ -10,7 +10,7 @@ INCLUDE_TEMPLATE = """
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s" type="text/javascript"></script>
 """% GOOGLE_MAPS_API_KEY
 BASIC_TEMPLATE = """
-<div id="gmap" style="width: 500px; height: 300px;"></div>
+<div id="gmap" style="width:400px; height: 300px;"></div>
 <script>
   function create_map() {
     if (GBrowserIsCompatible()) {

@@ -2,11 +2,17 @@
 {% load i18n %}
 
 {% block title %}My Nodes{% endblock %}
-
+{% block contenttype %}prefs{% endblock %}
 {% block content %}
 <h1>My Nodes</h1>
-
-Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operators Center (LJW-NOC)!<br/>
+<ul id="tabs">
+  <li class="active">{% trans "My nodes" %}</li>
+  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
+  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
+  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+</ul>
+<div id="tabcontent">
 <br/>
 {% if not user.email %}
 <div class="error">
@@ -14,8 +20,12 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
 </div>
 <br/>
 {% endif %}
-
-<table border="0" width="750" cellspacing="0">
+  {% if not nodes %}
+<div class="notice">
+{% trans "You currently have no nodes defined. You can use <b>New node</b> option to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly." %}
+</div>
+  {% else %}
+<table border="0" width="700" cellspacing="0">
   <tr class="header">
     <td width="22"></td>
     <td width="150"><b>{% trans "Node name" %}</b></td>
@@ -27,13 +37,7 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
     <td width="50" align="center"><b>AVG</b></td>
     <td width="50" align="center"><b>MAX</b></td>
   </tr>
-  {% if not nodes %}
-  <tr>
-    <td colspan="8" class="notice">
-      {% trans "You currently have no nodes defined. You can use <b>Register a new node</b> option below the node list to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly." %}
-    </td>
-  </tr>
-  {% else %}
+
   {% for node in nodes %}
   <tr>
     <td align="center">
@@ -60,19 +64,8 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
     {% endif %}
   </tr>
   {% endfor %}
-  {% endif %}
-  <tr class="header">
-    <td width="22"></td>
-    <td width="150"><b>{% trans "Node name" %}</b></td>
-    <td width="100"><b>IP</b></td>
-    <td width="200"><b>{% trans "Last seen up" %}</b></td>
-    <td width="100"><b>{% trans "Status" %}</b></td>
-    <td width="50" align="center"><b>{% trans "Peers" %}</b></td>
-    <td width="50" align="center"><b>MIN</b></td>
-    <td width="50" align="center"><b>AVG</b></td>
-    <td width="50" align="center"><b>MAX</b></td>
-  </tr>
 </table>
+{% endif %}
 {% if whitelist %}
 <br/>
 {% trans "Whitelisted MAC addresses" %}:<br/>
@@ -96,12 +89,5 @@ Hello <b>{{ user.username }}</b> and welcome to Ljubljana Wifi Mesh Node Operato
   </tr>
 </table>
 {% endif %}
-<br/>
-{% trans "Options" %}:
-<ul>
-  <li><a href="/nodes/new">{% trans "Register a new node" %}</a></li>
-  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
-  <li><a href="/nodes/sticker">{% trans "Generate info sticker" %}</a></li>
-</ul>
-<br /><br/>
+</div>
 {% endblock %}

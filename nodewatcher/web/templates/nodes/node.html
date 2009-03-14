@@ -16,16 +16,16 @@
   {% endfor %}
 </div>
 {% endif %}
-
-<table border="0" width="700">
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "General Information" %}
-      {% if current_owner %}&nbsp;[<a href="/nodes/edit/{{ node.ip }}">{% trans "edit" %}</a> | <a href="/nodes/remove/{{ node.ip }}">{% trans "remove" %}</a> | <a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "add subnet" %}</a>]{% endif %}
-    </td>
-  </tr>
+<div class="embedded">
+{% if node.geo_lat and node.geo_long %}
+{% gmap lat:46.05 long:14.5 mlat:node.geo_lat mlong:node.geo_long marker:yes clickable:no %}
+{% endif %}
+</div>
+<h3 class="section_title">{% trans "General Information" %}</h3>
+{% if current_owner %}<p>[<a href="/nodes/edit/{{ node.ip }}">{% trans "edit" %}</a> | <a href="/nodes/remove/{{ node.ip }}">{% trans "remove" %}</a> | <a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "add subnet" %}</a>]</p>{% endif %}
+<table border="0" width="300">
   <tr>
-    <td width="200">{% trans "IP address" %}</td>
+    <td width="120">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
   </tr>
   <tr>
@@ -44,11 +44,10 @@
     <td>{% trans "Location" %}</td>
     <td>{{ node.location|default:_("Unknown") }}</td>
   </tr>
-  {% if node.geo_lat and node.geo_long %}
   <tr>
-    <td colspan="2">{% gmap lat:46.05 long:14.5 mlat:node.geo_lat mlong:node.geo_long marker:yes clickable:no %}</td>
+    <td>{% trans "Node status" %}</td>
+    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
   </tr>
-  {% endif %}
   <tr>
     <td>{% trans "Project" %}</td>
     <td>{{ node.project.name|default:_("Unknown") }}</td>
@@ -69,6 +68,9 @@
     <td>{% trans "Last seen" %}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
   </tr>
+</table>
+<h3 id="details_title">{% trans "Details" %}</h3>
+<table border="0" width="700" id="details_list">
   {% if node.is_mesh_node %}
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
@@ -160,10 +162,6 @@
   </tr>
   {% else %}
   <tr>
-    <td>{% trans "Node status" %}</td>
-    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
-  </tr>
-  <tr>
     <td>{% trans "RTT MIN" %}</td>
     <td>{{ node.rtt_min|default:"/" }}</td>
   </tr>
@@ -184,77 +182,64 @@
     <td>{{ node.peers }}</td>
   </tr>
   {% endif %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Subnets" %}</td>
-  </tr>
-  {% if not node.subnet_set.all %}
-  <tr>
-    <td colspan="2" class="notice">
-      {% trans "No subnets are currently assigned or visible." %}
-    </td>
-  </tr>
+</table>
+<h3>{% trans "Subnets" %}</h3>
+{% if not node.subnet_set.all %}
+<p class="notice">{% trans "No subnets are currently assigned or visible." %}</p>
   {% else %}
-  <tr>
-    <td colspan="2" style="padding: 0px; margin: 0px;">
-      <table border="0" width="100%" cellpadding="0" cellspacing="0">
-        <tr class="inner_header">
-          <td>{% trans "Subnet" %}</td>
-          <td width="120">{% trans "Status" %}</td>
-          <td width="150">{% trans "Last seen" %}</td>
-        </tr>
-        {% for subnet in node.subnet_set.all %}
+<table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
+<thead>
         <tr>
+          <th>{% trans "Subnet" %}</th>
+          <th width="120">{% trans "Status" %}</th>
+          <th width="150">{% trans "Last seen" %}</th>
+        </tr>
+</thead>
+<tbody>
+        {% for subnet in node.subnet_set.all %}
+        <tr class="{% cycle 'odd' 'even' %}">
           <td>{{ subnet }}{% if current_owner and subnet.allocated %}&nbsp;[<a href="/nodes/deallocate_subnet/{{ subnet.id }}">deallocate</a>]{% endif %}</td>
           <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
-          <td>{{ subnet.last_seen|default:_("never") }}<td>
+          <td>{{ subnet.last_seen|default:_("never") }}</td>
         </tr>
         {% endfor %}
+</tbody>
       </table>
-    </td>
-  </tr>
   {% endif %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Immediate Neighbours / Peers" %}</td>
-  </tr>
+<h3>{% trans "Immediate Neighbours / Peers" %}</h3>
   {% if not node.peer_list.all %}
-  <tr>
-    <td colspan="2" class="notice">
-      {% trans "Node has no immediate neighbours." %}
-    </td>
-  </tr>
+<p class="notice">{% trans "Node has no immediate neighbours." %}</p>
   {% else %}
-  <tr>
-    <td colspan="2" style="padding: 0px; margin: 0px;">
-      <table border="0" width="100%" cellpadding="0" cellspacing="0">
-        <tr class="inner_header">
-          <td>{% trans "Node" %}</td>
-          <td width="70" align="center">LQ</td>
-          <td width="70" align="center">ILQ</td>
-          <td width="70" align="center">ETX</td>
-        </tr>
-        {% for peer in node.src.all %}
+      <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
+<thead>
         <tr>
+          <th>{% trans "Node" %}</th>
+          <th width="70" align="center">LQ</th>
+          <th width="70" align="center">ILQ</th>
+          <th width="70" align="center">ETX</th>
+        </tr>
+</thead>
+<tbody>
+        {% for peer in node.src.all %}
+        <tr class="{% cycle 'odd' 'even' %}">
           <td><a href="/nodes/node/{{ peer.dst.ip }}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
           <td align="center">{{ peer.lq }}</td>
           <td align="center">{{ peer.ilq }}</td>
           <td align="center">{{ peer.etx }}</td>
         </tr>
         {% endfor %}
+</tbody>
       </table>
-    </td>
-  </tr>
-  {% endif %}
-  {% if not node.is_down and node.get_graphs %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Graphs" %}</td>
-  </tr>
-  {% for graph in node.get_graphs %}
-  <tr>
-    <td colspan="2" align="center"><img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" /></td>
-  </tr>
-  {% endfor %}
   {% endif %}
 
-</table>
-<br /><br/>
+  {% if not node.is_down and node.get_graphs %}
+  <h3>{% trans "Graphs" %}</h3>
+<div class="graphs">
+  {% for graph in node.get_graphs %}
+<img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" />
+<br/><br/>
+  {% endfor %}
+</div>
+  {% endif %}
+
 {% endblock %}

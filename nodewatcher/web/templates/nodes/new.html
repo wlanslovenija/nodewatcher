@@ -3,13 +3,20 @@
 {% load gmap %}
 
 {% block title %}{% trans "New Node Registration" %}{% endblock %}
-
+{% block contenttype %}prefs{% endblock %}
 {% block content %}
 <h1>New Node Registration</h1>
-
-<div class="notice">
+<ul id="tabs">
+  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
+  <li class="active">{% trans "New node" %}</li>
+  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
+  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+</ul>
+<div id="tabcontent">
+<p>
   {% blocktrans %}Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="/nodes/node_list" target="_blank">the existing node list</a>). After your node is registred you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.{% endblocktrans %}
-</div>
+</p>
 
 {% if form.errors %}
 <div class="error">
@@ -165,12 +172,9 @@
     <td></td>
     <td class="small_text">{% trans "Leave blank for auto-generated password." %}</td>
   </tr>
-  <tr>
-    <td></td>
-    <td><br/><input type="submit" value="{% trans "Register new node" %}" /></td>
-  </tr>
 </table>
-<br/>
+
+<div class="buttons"><input type="submit" value="{% trans "Register new node" %}" /></div>
 </form>
 
 <script>
@@ -205,6 +209,5 @@
   $('#id_assign_ip').onchange = toggleIpInput;
 {% endif %}
 </script>
-
-<br /><br/>
+</div>
 {% endblock %}

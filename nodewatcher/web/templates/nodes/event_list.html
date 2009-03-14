@@ -2,31 +2,35 @@
 {% load i18n %}
 
 {% block title %}Events{% endblock %}
-
+{% block contenttype %}prefs{% endblock %}
 {% block content %}
 <h1>Events</h1>
-
-<br/>
+<ul id="tabs">
+  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
+  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
+  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li class="active">{% trans "Event log" %}</li>
+  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+</ul>
+<div id="tabcontent">
 {% if not user.email %}
 <div class="error">
   {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like event subscriptions) are disabled.{% endblocktrans %}
 </div>
 <br/>
 {% endif %}
-
+  {% if not events %}
+<div class="notice">
+      {% trans "No events have been recorded for your nodes." %}
+</div>
+  {% else %}
 <table border="0" width="750" cellspacing="0">
   <tr class="header">
     <td width="200"><b>{% trans "Timestamp" %}</b></td>
     <td width="150"><b>{% trans "Node name" %}</b></td>
     <td><b>{% trans "Event" %}</b></td>
   </tr>
-  {% if not events %}
-  <tr>
-    <td colspan="8" class="notice">
-      {% trans "No events have been recorded for your nodes." %}
-    </td>
-  </tr>
-  {% else %}
+
   {% for event in events %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ event.timestamp }}</td>
@@ -34,28 +38,23 @@
     <td>{{ event.code_to_string }}</td>
   </tr>
   {% endfor %}
-  {% endif %}
-  <tr class="header">
-    <td width="200"><b>{% trans "Timestamp" %}</b></td>
-    <td width="150"><b>{% trans "Node name" %}</b></td>
-    <td><b>{% trans "Event" %}</b></td>
-  </tr>
 </table>
+{% endif %}
 <br/>
-Event subscriptions:
+<h3>Event subscriptions</h3>
+  {% if not subscriptions %}
+  <div class="notice">
+      {% trans "No event subscriptions have been configured." %}<br />
+   <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
+    </div>
+  {% else %}
 <table border="0" width="750" cellspacing="0">
   <tr class="header">
     <td width="22"></td>
     <td width="150"><b>{% trans "Node" %}</b></td>
     <td><b>{% trans "Event type" %}</b></td>
   </tr>
-  {% if not subscriptions %}
-  <tr>
-    <td colspan="8" class="notice">
-      {% trans "No event subscriptions have been configured." %}
-    </td>
-  </tr>
-  {% else %}
+
   {% for subscription in subscriptions %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}">X</a></td>
@@ -75,18 +74,8 @@ Event subscriptions:
     </td>
   </tr>
   {% endfor %}
-  {% endif %}
-  <tr class="header">
-    <td width="22"></td>
-    <td width="150"><b>{% trans "Node" %}</b></td>
-    <td><b>{% trans "Event type" %}</b></td>
-  </tr>
+  <tr><td colspan="3" class="section_title"><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a><td></tr>
 </table>
-
-<br/>
-{% trans "Options" %}:
-<ul>
-  <li><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a></li>
-</ul>
-<br /><br/>
+  {% endif %}
+</div>
 {% endblock %}
