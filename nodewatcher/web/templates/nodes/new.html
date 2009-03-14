@@ -108,7 +108,7 @@
   </tr>
   <tr>
     <td>{{ form.ant_conn.label }}</td>
-    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this ?</a>)</td>
+    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this?</a>)</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Additional Options" %}</td>
@@ -155,6 +155,10 @@
   <tr class="imagegen_opts">
     <td>{{ form.wan_dhcp.label }}</td>
     <td>{{ form.wan_dhcp }}</td>
+  </tr>
+  <tr class="imagegen_opts">
+    <td></td>
+    <td class="small_text">f you will not use WAN port leave it auto-configured.</td>
   </tr>
   <tr class="static_opts imagegen_opts" style="display: none;">
     <td>{{ form.wan_ip.label }}</td>
