@@ -17,6 +17,16 @@ driverPackages = {
   'atheros'  : ['kmod-madwifi']
 }
 
+# A list of platform dependent packages
+platformPackages = {
+  'rb433'    : ['kmod-switch']
+}
+
+# A list of per-platform switch identifiers (when not set, eth0 is used)
+switchIds = {
+  'rb433'    : '0'
+}
+
 # A list of virtual interface names for some drivers
 wifiVirtuals = {
   'atheros'  : 'wifi0'
@@ -46,7 +56,7 @@ portLayouts = {
   'wl-500gd'   : ('1 2 3 4 5*', '0 5'),
   'fonera'     : None,
   'fonera+'    : True,
-  'rb433'      : True
+  'rb433'      : True # ('1 5*',       '2 5')
 }
 
 class NodeConfig(object):
@@ -453,6 +463,9 @@ class OpenWrtConfig(NodeConfig):
     """
     if self.wifiDriver in driverPackages:
       self.addPackage(*driverPackages[self.wifiDriver])
+    
+    if self.portLayout in platformPackages:
+      self.addPackage(*platformPackages[self.portLayout])
 
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
     self.addPackage('kmod-ipt-conntrack', 'iptables-mod-conntrack')
@@ -715,7 +728,7 @@ class OpenWrtConfig(NodeConfig):
     
     if isinstance(layout, tuple):
       f.write('#### VLAN configuration\n')
-      f.write('config switch eth0\n')
+      f.write('config switch %s\n' % ("eth0" if not self.portLayout in switchIds else switchIds[self.portLayout]))
       f.write('\toption vlan0 "%s"\n' % layout[0])
       f.write('\toption vlan1 "%s"\n' % layout[1])
       f.write('\n')
