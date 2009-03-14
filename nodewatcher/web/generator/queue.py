@@ -1,5 +1,6 @@
 from wlanlj.nodes.models import Node
 from wlanlj.generator.models import IfaceTemplate
+from wlanlj.generator.types import IfaceType
 from wlanlj.account.models import UserAccount
 from beanstalk import serverconn
 from beanstalk import job
@@ -32,7 +33,7 @@ def queue_generator_job(node, email_user):
   
   # Generate VPN password if needed
   profile = UserAccount.for_user(node.owner)
-  
+
   data = {
     'ip'              : node.ip,
     'hostname'        : node.name,
@@ -61,6 +62,7 @@ def queue_generator_job(node, email_user):
     'imagebuilder'    : node.profile.template.imagebuilder,
     'imagefiles'      : node.profile.template.imagefile.split(","),
     'subnets'         : subnets,
+    'lan_wan_switch'  : not node.profile.template.iface_lan and node.has_allocated_subnets(IfaceType.LAN),
     'email'           : email_user.email
   }
 

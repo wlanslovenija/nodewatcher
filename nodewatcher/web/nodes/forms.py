@@ -364,6 +364,15 @@ class UpdateNodeForm(forms.Form):
     wan_gw = self.cleaned_data.get('wan_gw')
     geo_lat = self.cleaned_data.get('geo_lat')
     geo_long = self.cleaned_data.get('geo_long')
+    use_vpn = self.cleaned_data.get('use_vpn')
+    node = self.__current_node
+    template = self.cleaned_data.get('template')
+
+    try:
+      if use_vpn and not template.iface_lan and node.has_allocated_subnets(IfaceType.LAN):
+        raise forms.ValidationError(_("The specified router only has one ethernet port! You have already added some LAN subnets to it, so you cannot enable VPN!"))
+    except Profile.DoesNotExist:
+      pass
 
     if not NODE_NAME_RE.match(name):
       raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
@@ -499,6 +508,12 @@ class AllocateSubnetForm(forms.Form):
         raise forms.ValidationError(_("Only one WiFi subnet may be allocated to a node!"))
       except Subnet.DoesNotExist:
         pass
+    
+    try:
+      if type == IfaceType.LAN and not self.__node.profile.template.iface_lan and self.__node.profile.use_vpn:
+        raise forms.ValidationError(_("The specified router only has one ethernet port! You have already enabled VPN, so you cannot add subnets to LAN port!"))
+    except Profile.DoesNotExist:
+      pass
 
     if self.cleaned_data.get('network'):
       try:

@@ -209,12 +209,12 @@ class Node(models.Model):
       w.append(_("Node's local clock is more than 30 minutes out of sync!"))
 
     return w
-  
-  def has_allocated_subnets(self):
+
+  def has_allocated_subnets(self, type = IfaceType.WiFi):
     """
-    Returns true if node has subnets allocated to the WiFi interface.
+    Returns true if node has subnets allocated to the specified interface.
     """
-    if self.subnet_set.filter(allocated = True, gen_iface_type = IfaceType.WiFi):
+    if self.subnet_set.filter(allocated = True, gen_iface_type = type):
       return True
 
     return False
