@@ -482,8 +482,7 @@ class AllocateSubnetForm(forms.Form):
   iface_type = forms.ChoiceField(
     choices = [
       (IfaceType.WiFi, 'WiFi'),
-      (IfaceType.LAN, 'LAN'),
-      (IfaceType.WAN, 'WAN')
+      (IfaceType.LAN, 'LAN')
     ],
     initial = IfaceType.LAN,
     label = _("Interface")
