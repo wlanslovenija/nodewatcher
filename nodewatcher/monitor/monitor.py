@@ -227,6 +227,9 @@ def checkMeshStatus():
         if oldChannel != n.channel and oldChannel != 0:
           Event.create_event(n, EventCode.ChannelChanged, '', EventSource.Monitor, data = 'Old channel: %s\n  New channel %s' % (oldChannel, n.channel))
 
+        if n.has_time_sync_problems():
+          n.warnings = True
+
         # Parse nodogsplash client information
         if 'nds' in info:
           for cid, client in info['nds'].iteritems():
