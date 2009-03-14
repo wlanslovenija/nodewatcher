@@ -209,6 +209,16 @@ class NodeConfig(object):
     if portLayouts[self.portLayout] or self.vpn or not self.hasInterface('wan'):
       return
     
+    hasLanSubnet = False
+    for subnet in self.subnets:
+      if subnet['interface'] == self.lanIface:
+        hasLanSubnet = True
+        break
+    
+    # Only switch if there is a LAN subnet present
+    if not hasLanSubnet:
+      return
+    
     wan = self.getInterface('wan')
     self.lanIface = wan['name']
     self.removeInterface('wan')
