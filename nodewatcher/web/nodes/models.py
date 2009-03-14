@@ -125,6 +125,12 @@ class Node(models.Model):
   clients = models.IntegerField(null = True)
   clients_so_far = models.IntegerField(default = 0)
   uptime = models.IntegerField(null = True)
+  
+  def has_time_sync_problems(self):
+    """
+    Returns true if local and server clocks are too far apart.
+    """
+    return abs(datetime.now() - self.local_time).seconds > 1800
 
   def should_draw_on_map(self):
     """
@@ -198,6 +204,9 @@ class Node(models.Model):
 
     if self.subnet_set.filter(status = SubnetStatus.NotAnnounced):
       w.append(_("Node is not announcing its own allocated subnets!"))
+
+    if self.has_time_sync_problems():
+      w.append(_("Node's local clock is more than 30 minutes out of sync!"))
 
     return w
   
