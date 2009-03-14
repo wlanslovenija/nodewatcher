@@ -29,7 +29,8 @@ DESTINATION = "/var/www/nodes.wlan-lj.net/results"
 IMAGEBUILDERS = (
   "imagebuilder.atheros",
   "imagebuilder.brcm24",
-  "imagebuilder.broadcom"
+  "imagebuilder.broadcom",
+  "imagebuilder.ar71xx"
 )
 
 def no_unicodes(x):
