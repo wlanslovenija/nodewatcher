@@ -130,7 +130,7 @@ class Node(models.Model):
     """
     Returns true if local and server clocks are too far apart.
     """
-    return abs(datetime.now() - self.local_time).seconds > 1800
+    return self.local_time and abs(datetime.now() - self.local_time).seconds > 1800
 
   def should_draw_on_map(self):
     """
