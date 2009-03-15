@@ -3,6 +3,18 @@
 
 {% block title %}Events{% endblock %}
 {% block contenttype %}prefs{% endblock %}
+
+{% block rss %}
+  <link rel="alternate" href="/feeds/rss/events/{{ user.id }}" title="wlan ljubljana - Latest mesh events for {{ user.username }}" type="application/rss+xml" />
+{% endblock %}
+
+{% block altlinks %}
+  <h3>{% trans "Download in other formats" %}:</h3>
+  <ul>
+    <li class="first last"><a href="/feeds/rss/events/{{ user.id }}">{% trans "RSS Feed" %}</a></li>
+  </ul>
+{% endblock %}
+
 {% block content %}
 <h1>Events</h1>
 <ul id="tabs">

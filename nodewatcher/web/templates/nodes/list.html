@@ -3,6 +3,17 @@
 
 {% block title %}{% trans "Node List" %}{% endblock %}
 
+{% block rss %}
+  <link rel="alternate" href="/feeds/rss/events" title="wlan ljubljana - Latest mesh events" type="application/rss+xml" />
+{% endblock %}
+
+{% block altlinks %}
+  <h3>{% trans "Download in other formats" %}:</h3>
+  <ul>
+    <li class="first last"><a href="/feeds/rss/events">{% trans "RSS Feed" %}</a></li>
+  </ul>
+{% endblock %}
+
 {% block content %}
 <h1>{% trans "Node List" %}</h1>
 <table border="0" width="100%" class="listing">
