@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load conversion %}
 
 {% block title %}{% trans "Global Client List" %}{% endblock %}
 
@@ -27,8 +28,8 @@
     <td></td>
     <td>{{ client.ip }}</td>
     <td></td>
-    <td>{{ client.uploaded }}</td>
-    <td>{{ client.downloaded }}</td>
+    <td>{{ client.uploaded|human_readable_kbytes }}</td>
+    <td>{{ client.downloaded|human_readable_kbytes }}</td>
   </tr>
   {% endfor %}
   {% else %}
