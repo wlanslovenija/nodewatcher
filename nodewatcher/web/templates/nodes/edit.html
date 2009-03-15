@@ -4,9 +4,17 @@
 
 {% block title %}{% trans "Edit Node" %} {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
+{% block contenttype %}prefs{% endblock %}
 {% block content %}
 <h1>{% trans "Edit Node" %} {{ node.name|default:"???" }} ({{ node.ip }})</h1>
-
+<ul id="tabs">
+  <li class="active">{% trans "My nodes" %}</li>
+  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
+  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
+  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+</ul>
+<div id="tabcontent">
 {% if form.errors %}
 <div class="error">
   {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to change node information:{% endblocktrans %}<br />
@@ -136,15 +144,10 @@
     <td>{{ form.root_pass.label }}</td>
     <td>{{ form.root_pass }}</td>
   </tr>
-  <tr>
-    <td></td>
-    <td>
-      <br/><input type="submit" value="{% trans "Update Node" %}" />
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </td>
-  </tr>
 </table>
-<br/>
+  <div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+    </div>
 </form>
 
 <script>
@@ -174,5 +177,5 @@
     toggleImageGeneratorOptions();
   });
 </script>
-<br /><br/>
+</div>
 {% endblock %}

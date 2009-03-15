@@ -21,8 +21,10 @@
 {% gmap lat:46.05 long:14.5 mlat:node.geo_lat mlong:node.geo_long marker:yes clickable:no %}
 {% endif %}
 </div>
-<h3 class="section_title">{% trans "General Information" %}</h3>
-{% if current_owner %}<p>[<a href="/nodes/edit/{{ node.ip }}">{% trans "edit" %}</a> | <a href="/nodes/remove/{{ node.ip }}">{% trans "remove" %}</a> | <a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "add subnet" %}</a>]</p>{% endif %}
+<h3 class="section_title">{% trans "General Information" %}
+{% if current_owner %}&nbsp;<a href="/nodes/edit/{{ node.ip }}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" border="0" /></a>&nbsp;<a href="/nodes/remove/{{ node.ip }}"><img src="/images/delete.png" title="{% trans "Delete node" %}" border="0" /></a>{% endif %}
+</h3>
+
 <table border="0" width="300">
   <tr>
     <td width="120">{% trans "IP address" %}</td>
@@ -70,7 +72,7 @@
   </tr>
 </table>
 <h3 id="details_title">{% trans "Details" %}</h3>
-<table border="0" width="700" id="details_list">
+<table border="0" id="details_list" class="layout">
   {% if node.is_mesh_node %}
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
@@ -106,6 +108,12 @@
     <td>{% trans "Captive portal enabled" %}</td>
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
+  {% if current_owner and node.installedpackage_set.all %}
+  <tr>
+    <td>{% trans "Installed packages" %}</td>
+    <td><a href="/nodes/installed_packages/{{ node.ip }}">{% trans "show list" %}</a></td>
+  </tr>
+  {% endif %}
   {% endif %}
   {% if not node.is_down %}
   <tr class="section_title">
@@ -127,24 +135,6 @@
     <td>{% trans "Channel" %}</td>
     <td>{{ node.channel|default:_("Unknown") }}</td>
   </tr>
-  <tr>
-    <td>{% trans "Local time" %}</td>
-    <td>{{ node.local_time|default:_("Unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Connected clients" %}</td>
-    <td>{{ node.clients|default:"0" }} [<a href="/nodes/gcl#n{{ node.ip }}">{% trans "global client list" %}</a>]</td>
-  </tr>
-  <tr>
-    <td>{% trans "Clients so far" %}</td>
-    <td>{{ node.clients_so_far|default:"0" }}</td>
-  </tr>
-  {% if current_owner and node.installedpackage_set.all %}
-  <tr>
-    <td>{% trans "Installed packages" %}</td>
-    <td><a href="/nodes/installed_packages/{{ node.ip }}">{% trans "show list" %}</a></td>
-  </tr>
-  {% endif %}
   {% endif %}
   {% endif %}
   <tr class="section_title">
@@ -181,15 +171,28 @@
     <td>{% trans "Peers" %}</td>
     <td>{{ node.peers }}</td>
   </tr>
+  <tr>
+    <td>{% trans "Local time" %}</td>
+    <td>{{ node.local_time|default:_("Unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Connected clients" %}</td>
+    <td>{{ node.clients|default:"0" }} <a href="/nodes/gcl#n{{ node.ip }}"><img src="/images/users.png" title="{% trans "Global client list" %}" border="0" /></a></td>
+  </tr>
+  <tr>
+    <td>{% trans "Clients so far" %}</td>
+    <td>{{ node.clients_so_far|default:"0" }}</td>
+  </tr>
   {% endif %}
 </table>
 <h3>{% trans "Subnets" %}</h3>
 {% if not node.subnet_set.all %}
-<p class="notice">{% trans "No subnets are currently assigned or visible." %}</p>
+<p class="notice">{% trans "No subnets are currently assigned or visible." %}{% if current_owner %}<br /><a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "Add subnet" %}</a>{% endif %}</p>
   {% else %}
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
         <tr>
+          {% if current_owner %}<th width="20">&nbsp;</th>{% endif %}
           <th>{% trans "Subnet" %}</th>
           <th width="120">{% trans "Status" %}</th>
           <th width="150">{% trans "Last seen" %}</th>
@@ -198,11 +201,17 @@
 <tbody>
         {% for subnet in node.subnet_set.all %}
         <tr class="{% cycle 'odd' 'even' %}">
-          <td>{{ subnet }}{% if current_owner and subnet.allocated %}&nbsp;[<a href="/nodes/deallocate_subnet/{{ subnet.id }}">deallocate</a>]{% endif %}</td>
+          {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" border="0" /></a>{% endif %}</td>{% endif %}
+          <td>{{ subnet }}</td>
           <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
           <td>{{ subnet.last_seen|default:_("never") }}</td>
         </tr>
         {% endfor %}
+{% if current_owner %}
+<tr class="table_links"><td colspan="4">
+<a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "Add subnet" %}</a>
+</td></tr>
+{% endif %}
 </tbody>
       </table>
   {% endif %}

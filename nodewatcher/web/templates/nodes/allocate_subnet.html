@@ -20,16 +20,14 @@
   {% endfor %}
 </div>
 {% endif %}
-
-<form action="/nodes/allocate_subnet/{{ node.ip }}" method="POST">
-<table border="0" width="700">
+<table border="0" class="nodeinfo layout">
   <tr class="section_title">
     <td colspan="2">
       {% trans "General Node Information" %}
     </td>
   </tr>
   <tr>
-    <td width="200">{% trans "IP address" %}</td>
+    <td width="100">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
   </tr>
   <tr>
@@ -52,19 +50,14 @@
     <td>{% trans "Project" %}</td>
     <td>{{ node.project.name|default:_("Unknown") }}</td>
   </tr>
-  <tr>
-    <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
-  </tr>
-  <tr>
-    <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
-  </tr>
-  <tr>
-    <td colspan="2" class="notice">
+</table>
+
+<p>
       {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information<i> section." %}
-    </td>
-  </tr>
+</p>
+
+<form action="/nodes/allocate_subnet/{{ node.ip }}" method="POST">
+<table border="0" class="layout">
   {% if user.is_staff %}
   <tr>
     <td>{{ form.network.label }}</td>
@@ -87,14 +80,10 @@
     <td>{{ form.dhcp.label }}</td>
     <td>{{ form.dhcp }}</td>
   </tr>
-  <tr>
-    <td></td>
-    <td>
+</table>
+  <div class="buttons">
       <input type="submit" value="{% trans "Allocate" %}" />&nbsp;
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </td>
-  </tr>
-</table>
+    </div>
 </form>
-<br /><br/>
 {% endblock %}

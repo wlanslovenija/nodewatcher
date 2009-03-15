@@ -5,13 +5,11 @@
 
 {% block content %}
 <h1>{% trans "Remove Node" %} - {{ node.name|default:"???" }} ({{ node.ip }}) ?</h1>
-
+  <div class="error">
+      {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your node!" %}
+    </div>
+<h3>{% trans "General Information" %}</h3>
 <table border="0" width="700">
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "General Information" %}
-    </td>
-  </tr>
   <tr>
     <td width="200">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
@@ -44,18 +42,10 @@
     <td>{% trans "Border router" %}</td>
     <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
   </tr>
-  <tr>
-    <td colspan="2" class="error">
-      {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your node!" %}
-    </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
+</table>
+
+  <div class="buttons">
       <input type="button" value="{% trans "Remove" %}" onclick="document.location='/nodes/do_remove/{{ node.ip }}'" />&nbsp;
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </td>
-  </tr>
-</table>
-<br /><br/>
+    </div>
 {% endblock %}

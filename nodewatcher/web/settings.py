@@ -1,6 +1,6 @@
 # Django settings for generator project.
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -10,10 +10,10 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'ljwifi'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'ljwifi'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'XXXXXXXXXXXXX'         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_NAME = 'wlanlj'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'wlanlj'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'wlanlj'         # Not used with sqlite3.
+DATABASE_HOST = 'void.local'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 
@@ -73,7 +73,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/var/www/django/wlanlj/templates'
+    '/home/lukacu/Documents/Graphics/Work/wlan-lj/nodewatcher/wlanlj/templates'
 )
 
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'

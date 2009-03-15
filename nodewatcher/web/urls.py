@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from wlanlj.nodes.feeds import LatestEvents
+from django.conf import settings
 
 feeds = {
   'events'  : LatestEvents
@@ -45,3 +46,12 @@ urlpatterns = patterns('',
     (r'^auth/lost_pass$', 'django.contrib.auth.views.password_reset', 
      {'template_name' : 'auth/lost_pass.html', 'email_template_name' : 'auth/lost_pass_email.html'}),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^js/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/lukacu/Documents/Graphics/Work/wlan-lj/nodewatcher/static/js'}),
+        (r'^css/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/lukacu/Documents/Graphics/Work/wlan-lj/nodewatcher/static/css'}),
+        (r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/lukacu/Documents/Graphics/Work/wlan-lj/nodewatcher/static/images'}),
+    )
+
+

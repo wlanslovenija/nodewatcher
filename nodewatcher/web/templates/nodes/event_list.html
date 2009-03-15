@@ -36,13 +36,15 @@
       {% trans "No events have been recorded for your nodes." %}
 </div>
   {% else %}
-<table border="0" width="750" cellspacing="0">
-  <tr class="header">
-    <td width="200"><b>{% trans "Timestamp" %}</b></td>
-    <td width="150"><b>{% trans "Node name" %}</b></td>
-    <td><b>{% trans "Event" %}</b></td>
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th width="200"><b>{% trans "Timestamp" %}</b></th>
+    <th width="150"><b>{% trans "Node name" %}</b></th>
+    <th><b>{% trans "Event" %}</b></th>
   </tr>
-
+</thead>
+<tbody>
   {% for event in events %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ event.timestamp }}</td>
@@ -50,6 +52,7 @@
     <td>{{ event.code_to_string }}</td>
   </tr>
   {% endfor %}
+</tbody>
 </table>
 {% endif %}
 <br/>
@@ -60,16 +63,18 @@
    <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
     </div>
   {% else %}
-<table border="0" width="750" cellspacing="0">
-  <tr class="header">
-    <td width="22"></td>
-    <td width="150"><b>{% trans "Node" %}</b></td>
-    <td><b>{% trans "Event type" %}</b></td>
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th width="22"></th>
+    <th width="150"><b>{% trans "Node" %}</b></th>
+    <th><b>{% trans "Event type" %}</b></th>
   </tr>
-
+</thead>
+<tbody>
   {% for subscription in subscriptions %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}">X</a></td>
+    <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}"><img src="/images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
     <td>
       {% if subscription.node %}
       <a href="/nodes/node/{{ subscription.node.ip }}">{{ subscription.node.name }}</a>
@@ -86,7 +91,8 @@
     </td>
   </tr>
   {% endfor %}
-  <tr><td colspan="3" class="section_title"><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a><td></tr>
+  <tr class="table_links"><td colspan="3"><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a></td></tr>
+</tbody>
 </table>
   {% endif %}
 </div>

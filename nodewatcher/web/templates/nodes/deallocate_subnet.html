@@ -5,13 +5,15 @@
 
 {% block content %}
 <h1>Remove Subnet {{ subnet }} ?</h1>
-
-<table border="0" width="700">
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "General Node Information" %}
-    </td>
-  </tr>
+  <div class="error">
+      {% if subnet.is_wifi and not user.is_staff %}
+      {% blocktrans %}<b>ERROR:</b> This is a primary wifi subnet that should not be removed.{% endblocktrans %}
+      {% else %}
+      {% blocktrans %}<b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!{% endblocktrans %}
+      {% endif %}
+    </div>
+<h3>{% trans "General Node Information" %}</h3>
+<table border="0" width="100%">
   <tr>
     <td width="200">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
@@ -44,33 +46,18 @@
     <td>{% trans "Border router" %}</td>
     <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
   </tr>
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "Subnet Information" %}
-    </td>
-  </tr>
+</table>
+<h3>{% trans "Subnet Information" %}</h3>
+<table border="0" width="100%">
   <tr>
     <td width="200">{% trans "Subnet" %}</td>
     <td>{{ subnet }}</td>
   </tr>
-  <tr>
-    <td colspan="2" class="error">
-      {% if subnet.is_wifi and not user.is_staff %}
-      {% blocktrans %}<b>ERROR:</b> This is a primary wifi subnet that should not be removed.{% endblocktrans %}
-      {% else %}
-      {% blocktrans %}<b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!{% endblocktrans %}
-      {% endif %}
-    </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
+</table>
+  <div class="buttons">
       {% if not subnet.is_wifi or user.is_staff %}
       <input type="button" value="{% trans "Remove" %}" onclick="document.location='/nodes/do_deallocate_subnet/{{ subnet.id }}'" />&nbsp;
       {% endif %}
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </td>
-  </tr>
-</table>
-<br /><br/>
+    </div>
 {% endblock %}

@@ -1,10 +1,19 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Subscribe to Events" %}{% endblock %}
-
+{% block title %}Events{% endblock %}
+{% block contenttype %}prefs{% endblock %}
 {% block content %}
-<h1>{% trans "Subscribe to Events" %}</h1>
+<h1>{% trans "Events" %}</h1>
+<ul id="tabs">
+  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
+  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
+  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li class="active">{% trans "Event log" %}</li>
+  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+</ul>
+<div id="tabcontent">
+<h3>{% trans "Subscribe to Event" %}</h3>
 
 {% if form.errors %}
 <div class="error">
@@ -31,14 +40,11 @@
     <td>{{ form.code.label }}</td>
     <td>{{ form.code }}</td>
   </tr>
-  <tr>
-    <td></td>
-    <td>
+</table>
+  <div class="buttons">
       <input type="submit" value="{% trans "Add Subscription" %}" />&nbsp;
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/events'" />
-    </td>
-  </tr>
-</table>
+    </div>
 </form>
-<br /><br/>
+</div>
 {% endblock %}

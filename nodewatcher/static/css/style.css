@@ -43,7 +43,7 @@ table.listing {
 }
 
 .subnet_status_ok {
-  color: #00ff00;
+  color: #00bb00;
 }
 
 .subnet_status_notallocated {
@@ -56,6 +56,15 @@ table.listing tbody tr.section_title {
   background-color: #FFFFFF !important;
 }
 
+table.listing tbody tr.table_links:hover,
+table.listing tbody tr.table_links:focus,
+table.listing tbody tr.table_links {
+  background-color: #FFFFFF !important;
+}
+
+table.listing tbody tr.table_links td {
+  text-align: center;
+}
 
 tr.inner_header {
   background-color: #F2FBE4;
@@ -103,9 +112,29 @@ tr.inner_header {
   clear: both;
 }
 
-#details_list .section_title td {
-  padding-top: 10px;
+table.layout {
+  width: 100%;
+}
+
+table.layout .section_title td {
   font-weight: bold;
 }
 
+table.nodeinfo {
+  float: right;
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -moz-border-radius-topleft:3px;
+  -moz-border-radius-topright:3px;
+  background-color:#F5F7F5;
+  border:medium none;
+  padding: 5px;
+  margin-right: 5px;
+  width: auto;
+}
+
+
+.nodeinfo td {
+  font-size: 60%;
+}
 

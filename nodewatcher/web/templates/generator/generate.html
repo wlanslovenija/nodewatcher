@@ -93,16 +93,12 @@
     {% endif %}
     {% endif %}
   </tr>
-  <tr>
-    <td></td>
-    <td>
+</table>
+  <div class="buttons">
       {% if node.has_allocated_subnets and node.owner.email %}
       <input type="submit" value="{% trans "Generate" %}" />&nbsp;
       {% endif %}
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </td>
-  </tr>
-</table>
+    </div>
 </form>
-<br /><br/>
 {% endblock %}
