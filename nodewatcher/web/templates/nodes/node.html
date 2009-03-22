@@ -245,7 +245,7 @@
   <h3>{% trans "Graphs" %}</h3>
 <div class="graphs">
   {% for graph in node.get_graphs %}
-<img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" />
+  {{ graph.render }}
 <br/><br/>
   {% endfor %}
 </div>

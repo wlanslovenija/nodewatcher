@@ -397,6 +397,26 @@ class GraphType:
   LQ = 3
   Solar = 30
 
+  @staticmethod
+  def as_string(type):
+    """
+    Returns the graph type as a human readable string.
+    
+    @param type: A valid graph type number
+    """
+    if type == GraphType.Traffic:
+      return "traffic"
+    elif type == GraphType.Clients:
+      return "clients"
+    elif type == GraphType.RTT:
+      return "rtt"
+    elif type == GraphType.LQ:
+      return "lq"
+    elif type == GraphType.Solar:
+      return "solar"
+    else:
+      return "unknown"
+
 class GraphItem(models.Model):
   """
   This class represents a graph of some node's parameter.
@@ -408,6 +428,18 @@ class GraphItem(models.Model):
   graph = models.CharField(max_length = 200)
   title = models.CharField(max_length = 50)
   last_update = models.DateTimeField(null = True)
+
+  def render(self):
+    """
+    Renders the surrounding HTML (uses a custom template if one is
+    available).
+    """
+    t = loader.get_template('nodes/graphs/%s.html' % GraphType.as_string(self.type))
+    c = Context({
+      'graph'  : self
+    })
+
+    return t.render(c)
 
 class WhitelistItem(models.Model):
   """
