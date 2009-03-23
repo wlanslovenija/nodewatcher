@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Events{% endblock %}
+{% block contenttype %}prefs{% endblock %}
+
+{% block rss %}
+  <link rel="alternate" href="/feeds/rss/events" title="wlan ljubljana - Latest mesh events" type="application/rss+xml" />
+{% endblock %}
+
+{% block altlinks %}
+  <h3>{% trans "Download in other formats" %}:</h3>
+  <ul>
+    <li class="first last"><a href="/feeds/rss/events">{% trans "RSS Feed" %}</a></li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+<h1>Events</h1>
+  {% if not events %}
+<div class="notice">
+  {% trans "No events have been recorded." %}
+</div>
+  {% else %}
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th width="200"><b>{% trans "Timestamp" %}</b></th>
+    <th width="150"><b>{% trans "Node name" %}</b></th>
+    <th><b>{% trans "Event" %}</b></th>
+  </tr>
+</thead>
+<tbody>
+  {% for event in events %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td>{{ event.timestamp }}</td>
+    <td><a href="/nodes/node/{{ event.node.ip }}">{{ event.node.name }}</a></td>
+    <td>{{ event.code_to_string }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+{% endif %}
+<br/>
+{% endblock %}

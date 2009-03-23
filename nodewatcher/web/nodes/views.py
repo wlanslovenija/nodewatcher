@@ -332,6 +332,15 @@ def sticker(request):
     context_instance = RequestContext(request)
   )
 
+def global_events(request):
+  """
+  Display a list of global mesh events.
+  """
+  return render_to_response('nodes/global_events.html',
+    { 'events' : Event.objects.all().order_by('-id')[0:30] },
+    context_instance = RequestContext(request)
+  )
+
 @login_required
 def event_list(request):
   """
