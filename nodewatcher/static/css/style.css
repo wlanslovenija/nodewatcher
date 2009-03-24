@@ -66,6 +66,10 @@ table.listing tbody tr.table_links td {
   text-align: center;
 }
 
+.nodelist table.listing td{
+  font-size: 12px;
+}
+
 tr.inner_header {
   background-color: #F2FBE4;
   font-weight: bold;
