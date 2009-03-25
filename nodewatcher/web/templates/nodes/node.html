@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load gmap %}
+{% load conversion %}
 
 {% block title %}{% trans "Node" %} {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
 
@@ -70,6 +71,12 @@
     <td>{% trans "Last seen" %}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
   </tr>
+  {% if node.uptime %}
+  <tr>
+    <td>{% trans "Uptime" %}</td>
+    <td>{{ node.uptime|time_delta }}</td>
+  </tr>
+  {% endif %}
 </table>
 <h3 id="details_title">{% trans "Details" %}</h3>
 <table border="0" id="details_list" class="layout">
