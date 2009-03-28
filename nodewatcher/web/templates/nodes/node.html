@@ -71,7 +71,7 @@
     <td>{% trans "Last seen" %}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
   </tr>
-  {% if node.uptime %}
+  {% if node.uptime and not node.is_down %}
   <tr>
     <td>{% trans "Uptime" %}</td>
     <td>{{ node.uptime|time_delta }}</td>
