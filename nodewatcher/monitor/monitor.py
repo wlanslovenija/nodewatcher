@@ -17,7 +17,7 @@ from django.db import transaction
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage
 from lib.topology import DotTopologyPlotter
 from lib import ipcalc
 from time import sleep
@@ -64,6 +64,18 @@ def safe_int_convert(integer):
     return int(integer)
   except:
     return None
+
+def safe_loadavg_convert(loadavg):
+  """
+  A helper method for converting a string to a loadavg tuple.
+  """
+  try:
+    loadavg = loadavg.split(' ')
+    la1min, la5min, la15min = (float(x) for x in loadavg[0:3])
+    nproc = int(loadavg[3].split('/')[1])
+    return la1min, la5min, la15min, nproc
+  except:
+    return None, None, None, None
 
 def safe_uptime_convert(uptime):
   """
@@ -258,6 +270,17 @@ def checkMeshStatus():
         for iid, iface in info['iface'].iteritems():
           if iid not in ('wifi0', 'wmaster0'):
             add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (nodeIp, iid), iface['up'], iface['down'])
+        
+        # Generate load average statistics
+        if 'loadavg' in info['general']:
+          n.loadavg_1min, n.loadavg_5min, n.loadavg_15min, n.numproc = safe_loadavg_convert(info['general']['loadavg'])
+          add_graph(n, '', GraphType.LoadAverage, RRALoadAverage, 'Load Average', 'loadavg_%s' % nodeIp, n.loadavg_1min, n.loadavg_5min, n.loadavg_15min)
+          add_graph(n, '', GraphType.NumProc, RRANumProc, 'Number of Processes', 'numproc_%s' % nodeIp, n.numproc)
+
+        # Generate free memory statistics
+        if 'memfree' in info['general']:
+          n.memfree = safe_int_convert(info['general']['memfree'])
+          add_graph(n, '', GraphType.MemUsage, RRAMemUsage, 'Free Memory', 'memfree_%s' % nodeIp, n.memfree)
 
         # Generate solar statistics when available
         if 'solar' in info and all([x in info['solar'] for x in ('batvoltage', 'solvoltage', 'charge', 'state', 'load')]):

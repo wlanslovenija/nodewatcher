@@ -153,6 +153,120 @@ class RRALinkQuality(RRAConfiguration):
     '--units-exponent', '0'
   ]
 
+class RRALoadAverage(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'la1min',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'la5min',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'la15min',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE1:la1min#EACC00:1 Minute",
+    r'GPRINT:la1min:LAST:  Current\:%8.2lf',
+    r'GPRINT:la1min:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:la1min:MAX:Maximum\:%8.2lf\n',
+    "LINE1:la5min#EA8F00:5 Minutes",
+    r'GPRINT:la5min:LAST:  Current\:%8.2lf',
+    r'GPRINT:la5min:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:la5min:MAX:Maximum\:%8.2lf\n',
+    "LINE1:la15min#FF0000:15 Minutes",
+    r'GPRINT:la15min:LAST:  Current\:%8.2lf',
+    r'GPRINT:la15min:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:la15min:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0'
+  ]
+
+class RRANumProc(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'nproc',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE2:nproc#00CB33:Number of Processes",
+    r'GPRINT:nproc:LAST:  Current\:%8.2lf',
+    r'GPRINT:nproc:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:nproc:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0'
+  ]
+
+class RRAMemUsage(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'memfree',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE2:memfree#BAE366:Free Memory [KB]",
+    r'GPRINT:memfree:LAST:  Current\:%8.2lf',
+    r'GPRINT:memfree:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:memfree:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0'
+  ]
+
 class RRASolar(RRAConfiguration):
   db_model = StatsSolar
   interval = 1800
