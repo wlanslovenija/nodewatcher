@@ -125,6 +125,11 @@ class Node(models.Model):
   clients = models.IntegerField(null = True)
   clients_so_far = models.IntegerField(default = 0)
   uptime = models.IntegerField(null = True)
+  loadavg_1min = models.FloatField(null = True)
+  loadavg_5min = models.FloatField(null = True)
+  loadavg_15min = models.FloatField(null = True)
+  memfree = models.IntegerField(null = True)
+  numproc = models.IntegerField(null = True)
   
   def has_time_sync_problems(self):
     """
@@ -396,6 +401,9 @@ class GraphType:
   RTT = 2
   LQ = 3
   Solar = 30
+  LoadAverage = 1
+  MemUsage = 0
+  NumProc = -1
 
   @staticmethod
   def as_string(type):
@@ -414,6 +422,12 @@ class GraphType:
       return "lq"
     elif type == GraphType.Solar:
       return "solar"
+    elif type == GraphType.LoadAverage:
+      return "loadavg"
+    elif type == GraphType.MemUsage:
+      return "memusage"
+    elif type == GraphType.NumProc:
+      return "numproc"
     else:
       return "unknown"
 
