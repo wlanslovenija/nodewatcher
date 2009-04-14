@@ -558,14 +558,16 @@ class OpenWrtConfig(NodeConfig):
     f.write('GatewayInterface %s\n' % (self.wifiIface if not self.lanWifiBridge else self.lanWifiBridgeIface))
     f.write('GatewayName wlan-lj.net\n')
     
+    subnetSize = 30
     for subnet in self.subnets:
       if subnet['dhcp'] and subnet['interface'] == (self.wifiIface if not self.lanWifiBridge else self.lanWifiBridgeIface):
         f.write('GatewayIPRange %(subnet)s/%(cidr)s\n' % subnet)
+        subnetSize = ipcalc.Network("%(subnet)s/%(cidr)s" % subnet).size() - 2
         break
     
     f.write('ClientIdleTimeout 30\n')
     f.write('ClientForceTimeout 360\n')
-    f.write('MaxClients 60\n')
+    f.write('MaxClients %d\n' % subnetSize)
     f.write('\n')
     f.write('FirewallRuleSet preauthenticated-users {\n')
     
