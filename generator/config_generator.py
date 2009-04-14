@@ -576,13 +576,10 @@ class OpenWrtConfig(NodeConfig):
     
     f.write('}\n')
     f.write('\n')
-    f.write('FirewallRuleSet authenticated-users {\n')
-    # Should be an empty ruleset so nds will use RETURN instead of ACCEPT
-    f.write('}\n')
-    f.write('\n')
-    f.write('FirewallRuleSet users-to-router {\n')
-    f.write('  FirewallRule allow\n')
-    f.write('}\n')
+    f.write('EmptyRuleSetPolicy authenticated-users passthrough\n')
+    f.write('EmptyRuleSetPolicy users-to-router passthrough\n')
+    f.write('EmptyRuleSetPolicy trusted-users passthrough\n')
+    f.write('EmptyRuleSetPolicy trusted-users-to-router passthrough\n')
     f.close()
     
     # Add the nodogsplash service and package dependencies
