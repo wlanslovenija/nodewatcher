@@ -258,7 +258,7 @@ class UpdateNodeForm(forms.Form):
   """
   name = forms.CharField(max_length = 50, label = _("Node name"))
   ip = forms.CharField(max_length = 40, required = False, label = _("IP address"))
-  location = forms.CharField(max_length = 200)
+  location = forms.CharField(max_length = 200, widget = widgets.TextInput(attrs = {'size': '40'}))
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
   owner = forms.ModelChoiceField(
