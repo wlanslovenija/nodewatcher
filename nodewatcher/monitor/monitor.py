@@ -280,7 +280,9 @@ def checkMeshStatus():
         # Generate free memory statistics
         if 'memfree' in info['general']:
           n.memfree = safe_int_convert(info['general']['memfree'])
-          add_graph(n, '', GraphType.MemUsage, RRAMemUsage, 'Free Memory', 'memfree_%s' % nodeIp, n.memfree)
+          buffers = safe_int_convert(info['general'].get('buffers', 0))
+          cached = safe_int_convert(info['general'].get('cached', 0))
+          add_graph(n, '', GraphType.MemUsage, RRAMemUsage, 'Memory Usage', 'memusage_%s' % nodeIp, n.memfree, buffers, cached)
 
         # Generate solar statistics when available
         if 'solar' in info and all([x in info['solar'] for x in ('batvoltage', 'solvoltage', 'charge', 'state', 'load')]):

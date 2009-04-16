@@ -192,11 +192,11 @@ class RRALoadAverage(RRAConfiguration):
     r'GPRINT:la1min:AVERAGE:Average\:%8.2lf',
     r'GPRINT:la1min:MAX:Maximum\:%8.2lf\n',
     "LINE1:la5min#EA8F00:5 Minutes",
-    r'GPRINT:la5min:LAST:  Current\:%8.2lf',
+    r'GPRINT:la5min:LAST: Current\:%8.2lf',
     r'GPRINT:la5min:AVERAGE:Average\:%8.2lf',
     r'GPRINT:la5min:MAX:Maximum\:%8.2lf\n',
     "LINE1:la15min#FF0000:15 Minutes",
-    r'GPRINT:la15min:LAST:  Current\:%8.2lf',
+    r'GPRINT:la15min:LAST:Current\:%8.2lf',
     r'GPRINT:la15min:AVERAGE:Average\:%8.2lf',
     r'GPRINT:la15min:MAX:Maximum\:%8.2lf\n',
     '--alt-y-grid',
@@ -242,6 +242,16 @@ class RRAMemUsage(RRAConfiguration):
       'memfree',
       type = rrdtool.GaugeDST,
       heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'buffers',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'cached',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
     )
   ]
   archives = [
@@ -259,12 +269,18 @@ class RRAMemUsage(RRAConfiguration):
     )
   ]
   graph = [
-    "LINE2:memfree#BAE366:Free Memory [KB]",
+    "AREA:memfree#8F005C:Free Memory [B]",
     r'GPRINT:memfree:LAST:  Current\:%8.2lf',
     r'GPRINT:memfree:AVERAGE:Average\:%8.2lf',
     r'GPRINT:memfree:MAX:Maximum\:%8.2lf\n',
-    '--alt-y-grid',
-    '--units-exponent', '0'
+    "AREA:buffers#FF5700:Buffers [B]:STACK",
+    r'GPRINT:buffers:LAST:      Current\:%8.2lf',
+    r'GPRINT:buffers:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:buffers:MAX:Maximum\:%8.2lf\n',
+    "AREA:cached#FFC73B:Cached [B]:STACK",
+    r'GPRINT:cached:LAST:       Current\:%8.2lf',
+    r'GPRINT:cached:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:cached:MAX:Maximum\:%8.2lf\n'
   ]
 
 class RRASolar(RRAConfiguration):
