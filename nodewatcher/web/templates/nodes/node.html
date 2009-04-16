@@ -84,6 +84,12 @@
     <td width="300"></td>
     <td></td>
   </tr>
+  {% if current_owner and node.notes %}
+  <tr>
+    <td valign="top">{% trans "Notes" %}</td>
+    <td>{{ node.notes|linebreaksbr }}</td>
+  </tr>
+  {% endif %}
   {% if node.is_mesh_node %}
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>

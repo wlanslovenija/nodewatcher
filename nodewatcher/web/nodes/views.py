@@ -77,7 +77,8 @@ def node_edit(request, node_ip):
       'project'             : node.project.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
-      'node_type'           : node.node_type
+      'node_type'           : node.node_type,
+      'notes'               : node.notes
     }
 
     try:

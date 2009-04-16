@@ -87,6 +87,7 @@ class Node(models.Model):
   owner = models.ForeignKey(User, null = True)
   location = models.CharField(max_length = 200, null = True)
   project = models.ForeignKey(Project, null = True)
+  notes = models.CharField(max_length = 1000, null = True)
 
   # System nodes are special purpuse nodes that provide external
   # services such as VPN

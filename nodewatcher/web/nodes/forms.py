@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import widgets
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource
@@ -24,6 +25,7 @@ class RegisterNodeForm(forms.Form):
   location = forms.CharField(max_length = 200)
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
+  notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
 
   # Additional flags
   assign_ip = forms.BooleanField(required = False, label = _("No IP yet? Assign me one!"), initial = True)
@@ -212,6 +214,7 @@ class RegisterNodeForm(forms.Form):
     node.ant_polarization = self.cleaned_data.get('ant_polarization')
     node.ant_type = self.cleaned_data.get('ant_type')
     node.node_type = self.cleaned_data.get('node_type')
+    node.notes = self.cleaned_data.get('notes')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
@@ -277,6 +280,7 @@ class UpdateNodeForm(forms.Form):
     initial = NodeType.Mesh,
     label = _("Node type")
   )
+  notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
 
   # Special node properties (can only be set by staff)
   system_node = forms.BooleanField(required = False)
@@ -434,6 +438,7 @@ class UpdateNodeForm(forms.Form):
     node.ant_type = self.cleaned_data.get('ant_type')
     node.project = self.cleaned_data.get('project')
     node.node_type = self.cleaned_data.get('node_type')
+    node.notes = self.cleaned_data.get('notes')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
