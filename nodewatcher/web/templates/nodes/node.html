@@ -35,6 +35,12 @@
     <td>{% trans "Name" %}</td>
     <td>{{ node.name|default:"???" }}</td>
   </tr>
+  {% if node.url %}
+  <tr>
+    <td></td>
+    <td class="small_text"><a href="{{ node.url }}" target="_blank" class="ext-link"><span class="icon"> </span>&nbsp;{% trans "visit info page" %}</a></td>
+  </tr>
+  {% endif %}
   <tr>
     <td>{% trans "Maintainer" %}</td>
     {% if node.owner %}

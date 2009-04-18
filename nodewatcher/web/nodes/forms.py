@@ -26,6 +26,7 @@ class RegisterNodeForm(forms.Form):
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
   notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
+  url = forms.CharField(max_length = 200, required = False, label = _("Info URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Additional flags
   assign_ip = forms.BooleanField(required = False, label = _("No IP yet? Assign me one!"), initial = True)
@@ -215,6 +216,7 @@ class RegisterNodeForm(forms.Form):
     node.ant_type = self.cleaned_data.get('ant_type')
     node.node_type = self.cleaned_data.get('node_type')
     node.notes = self.cleaned_data.get('notes')
+    node.url = self.cleaned_data.get('url')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
@@ -281,6 +283,7 @@ class UpdateNodeForm(forms.Form):
     label = _("Node type")
   )
   notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
+  url = forms.CharField(max_length = 200, required = False, label = _("Info URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Special node properties (can only be set by staff)
   system_node = forms.BooleanField(required = False)
@@ -439,6 +442,7 @@ class UpdateNodeForm(forms.Form):
     node.project = self.cleaned_data.get('project')
     node.node_type = self.cleaned_data.get('node_type')
     node.notes = self.cleaned_data.get('notes')
+    node.url = self.cleaned_data.get('url')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')

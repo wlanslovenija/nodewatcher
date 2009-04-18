@@ -149,6 +149,13 @@
       <span class="small_text">These notes are only visible to node's maintainer (that's you).</span>
     </td>
   </tr>
+  <tr>
+    <td valign="top">{{ form.url.label }}</td>
+    <td>
+      {{ form.url }}<br/>
+      <span class="small_text">You may enter any URL that will be displayed on node's info page.</span>
+    </td>
+  </tr>
 </table>
   <div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
