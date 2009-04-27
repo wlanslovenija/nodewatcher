@@ -269,15 +269,15 @@ class RRAMemUsage(RRAConfiguration):
     )
   ]
   graph = [
-    "AREA:memfree#8F005C:Free Memory [B]",
+    "AREA:memfree#8F005C:Free Memory [KB]",
     r'GPRINT:memfree:LAST:  Current\:%8.2lf',
     r'GPRINT:memfree:AVERAGE:Average\:%8.2lf',
     r'GPRINT:memfree:MAX:Maximum\:%8.2lf\n',
-    "AREA:buffers#FF5700:Buffers [B]:STACK",
+    "AREA:buffers#FF5700:Buffers [KB]:STACK",
     r'GPRINT:buffers:LAST:      Current\:%8.2lf',
     r'GPRINT:buffers:AVERAGE:Average\:%8.2lf',
     r'GPRINT:buffers:MAX:Maximum\:%8.2lf\n',
-    "AREA:cached#FFC73B:Cached [B]:STACK",
+    "AREA:cached#FFC73B:Cached [KB]:STACK",
     r'GPRINT:cached:LAST:       Current\:%8.2lf',
     r'GPRINT:cached:AVERAGE:Average\:%8.2lf',
     r'GPRINT:cached:MAX:Maximum\:%8.2lf\n'
