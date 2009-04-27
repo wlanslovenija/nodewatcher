@@ -172,10 +172,21 @@ def checkMeshStatus():
   # Setup all node peerings
   for nodeIp, node in nodes.iteritems():
     n = dbNodes[nodeIp]
+    oldRedundancyLink = n.redundancy_link
+    n.redundancy_link = False
 
     for peerIp, lq, ilq, etx in node.links:
       l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx))
       l.save()
+
+      # Check if we have a peering with any border routers
+      if l.dst.border_router:
+        n.redundancy_link = True
+
+    if oldRedundancyLink and not n.redundancy_link:
+      Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor)
+
+    n.save()
   
   # Add nodes to topology map and generate output
   for node in dbNodes.values():
