@@ -653,7 +653,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.UptimeReset, _('Node has been rebooted')),
       (EventCode.PacketDuplication, _('Packet duplication detected')),
       (EventCode.IPShortage, _('IP shortage on WiFi subnet')),
-      (EventCode.ChannelChanged, _('WiFi channel has changed'))
+      (EventCode.ChannelChanged, _('WiFi channel has changed')),
+      (EventCode.RedundancyLoss, _('Redundant link to border gateway has gone down'))
     ],
     required = False
   )

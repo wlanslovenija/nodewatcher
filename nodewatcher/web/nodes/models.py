@@ -95,6 +95,7 @@ class Node(models.Model):
   system_node = models.BooleanField(default = False)
   border_router = models.BooleanField(default = False)
   node_type = models.IntegerField(default = NodeType.Mesh)
+  redundancy_link = models.BooleanField(default = False)
 
   # Geographical location
   geo_lat = models.FloatField(null = True)
@@ -593,6 +594,7 @@ class EventCode:
   PacketDuplication = 5
   IPShortage = 6
   ChannelChanged = 7
+  RedundancyLoss = 8
 
   NodeAdded = 100
 
@@ -618,6 +620,8 @@ class EventCode:
       return _("IP shortage for wireless clients")
     elif code == EventCode.ChannelChanged:
       return _("WiFi channel has changed")
+    elif code == EventCode.RedundancyLoss:
+      return _("Redundant link to border gateway has gone down")
     elif code == EventCode.NodeAdded:
       return _("A new node has been registred")
     else:
