@@ -745,7 +745,7 @@ class EventSubscription(models.Model):
     })
 
     send_mail(
-      '[wlan-lj] ' + event.node.ip + '/' +  _("Event notification") + ' - ' + event.code_to_string(),
+      '[wlan-lj] ' + event.node.ip + '/' + event.node.name + ' - ' + event.code_to_string(),
       t.render(c),
       'events@wlan-lj.net',
       [self.user.email],
