@@ -665,6 +665,6 @@ class EventSubscribeForm(forms.Form):
     """
     s = EventSubscription(user = user)
     s.node = self.cleaned_data.get('node') or None
-    s.code = self.cleaned_data.get('code') or None
+    s.code = int(self.cleaned_data.get('code')) or None
     s.save()
 
