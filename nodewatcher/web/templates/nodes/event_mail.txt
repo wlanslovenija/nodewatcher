@@ -3,8 +3,10 @@ Hello {{ user.username }}!
 You have requested to be notified when certain events regarding nodes
 participating in the mesh occur within the network. This is an automated
 notification of an event.
-
-{% if event.has_repeated %}WARNING: This event has repeated {{ event.counter }} times within 30 minutes from its original creation time!{% endif %}
+{% if event.has_repeated %}
+WARNING: This event has repeated {{ event.counter }} times within 30 minutes from
+its original creation time!
+{% endif %}
 Timestamp: {{ event.timestamp }}
 Node: {{ event.node.name }} ({{ event.node.ip }})
 Event: {{ event.code_to_string }}
@@ -14,8 +16,8 @@ Summary: {{ event.summary|default:"/" }}
 Additional data:
   {{ event.data|default:_("none") }}
 
-You may configure event subscriptions via settings available by going to the
-following URL:
+You may configure event subscriptions via settings available by going to
+the following URL:
   http://nodes.wlan-lj.net/nodes/events
 
 Best regards,
