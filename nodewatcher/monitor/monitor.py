@@ -186,6 +186,9 @@ def checkMeshStatus():
     if oldRedundancyLink and not n.redundancy_link:
       Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor)
 
+    if n.redundancy_req and not n.redundancy_link:
+      n.warnings = True
+
     n.save()
   
   # Add nodes to topology map and generate output
