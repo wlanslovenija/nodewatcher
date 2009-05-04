@@ -79,7 +79,8 @@ def node_edit(request, node_ip):
       'border_router'       : node.border_router,
       'node_type'           : node.node_type,
       'notes'               : node.notes,
-      'url'                 : node.url
+      'url'                 : node.url,
+      'redundancy_req'      : node.redundancy_req
     }
 
     try:

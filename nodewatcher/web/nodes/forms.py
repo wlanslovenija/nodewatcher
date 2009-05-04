@@ -114,6 +114,9 @@ class RegisterNodeForm(forms.Form):
   wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
 
+  # Other options
+  redundancy_req = forms.BooleanField(required = False, label = _("Warn if node has no direct peering with a border gateway"))
+
   def clean(self):
     """
     Additional validation handler.
@@ -217,6 +220,7 @@ class RegisterNodeForm(forms.Form):
     node.node_type = self.cleaned_data.get('node_type')
     node.notes = self.cleaned_data.get('notes')
     node.url = self.cleaned_data.get('url')
+    node.redundancy_req = self.cleaned_data.get('redundancy_req')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
@@ -353,6 +357,9 @@ class UpdateNodeForm(forms.Form):
   wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
 
+  # Other options
+  redundancy_req = forms.BooleanField(required = False, label = _("Warn if node has no direct peering with a border gateway"))
+
   def __init__(self, node, *args, **kwargs):
     """
     Class constructor.
@@ -443,6 +450,7 @@ class UpdateNodeForm(forms.Form):
     node.node_type = self.cleaned_data.get('node_type')
     node.notes = self.cleaned_data.get('notes')
     node.url = self.cleaned_data.get('url')
+    node.redundancy_req = self.cleaned_data.get('redundancy_req')
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
