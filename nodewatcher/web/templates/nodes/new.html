@@ -131,6 +131,12 @@
     <td>{{ form.border_router }}</td>
   </tr>
   {% endif %}
+  <tr>
+    <td>{{ form.redundancy_req.label }}</td>
+    <td>{{ form.redundancy_req }}<br/>
+      <span class="small_text">Warn if node has no direct peering with a border gateway (what includes VPN servers).</span>
+    </td>
+  </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Image Generator Options" %}</td>
   </tr>
@@ -187,10 +193,6 @@
       {{ form.url }}<br/>
       <span class="small_text">You may enter any URL that will be displayed on node's info page.</span>
     </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td><label>{{ form.redundancy_req }} {{ form.redundancy_req.label }}</label></td>
   </tr>
 </table>
 

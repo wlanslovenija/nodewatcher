@@ -115,7 +115,7 @@ class RegisterNodeForm(forms.Form):
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
 
   # Other options
-  redundancy_req = forms.BooleanField(required = False, label = _("Warn if node has no direct peering with a border gateway"))
+  redundancy_req = forms.BooleanField(required = False, label = _("Enable no direct peering to a border gateway warning"))
 
   def clean(self):
     """
@@ -358,7 +358,7 @@ class UpdateNodeForm(forms.Form):
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
 
   # Other options
-  redundancy_req = forms.BooleanField(required = False, label = _("Warn if node has no direct peering with a border gateway"))
+  redundancy_req = forms.BooleanField(required = False, label = _("Enable no direct peering to a border gateway warning"))
 
   def __init__(self, node, *args, **kwargs):
     """
