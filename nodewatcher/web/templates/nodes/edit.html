@@ -104,8 +104,11 @@
   </tr>
   {% endif %}
   <tr>
-    <td></td>
-    <td><label>{{ form.redundancy_req }} {{ form.redundancy_req.label }}</label></td>
+    <td>{{ form.redundancy_req.label }}</td>
+    <td>
+      {{ form.redundancy_req }}<br/>
+      <span class="small_text">Warn if node has no direct peering with a border gateway (includes VPN servers).</span> 
+    </td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Image Generator Options" %}</td>
