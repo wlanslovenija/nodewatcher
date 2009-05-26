@@ -9,7 +9,7 @@ class CryptBackend:
     """
     try:
       user = User.objects.get(username = username)
-      if crypt(password, user.password) == user.password:
+      if crypt(password, user.password) == user.password and user.is_active:
         return user
       else:
         return None
