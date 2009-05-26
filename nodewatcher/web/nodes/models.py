@@ -77,6 +77,7 @@ class NodeType:
   Mesh = 2
   Test = 3
   Unknown = 4
+  Mobile = 5
 
 class Node(models.Model):
   """
@@ -181,6 +182,8 @@ class Node(models.Model):
       return _("Server node")
     elif self.node_type == NodeType.Test:
       return _("Test node")
+    elif self.node_type == NodeType.Mobile:
+      return _("Mobile node")
     else:
       return _("Unknown")
 
@@ -194,6 +197,8 @@ class Node(models.Model):
       return _("Server nodes")
     elif self.node_type == NodeType.Test:
       return _("Test nodes")
+    elif self.node_type == NodeType.Mobile:
+      return _("Mobile nodes")
     else:
       return _("Unknown nodes")
 

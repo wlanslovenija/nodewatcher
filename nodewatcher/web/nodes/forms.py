@@ -42,7 +42,8 @@ class RegisterNodeForm(forms.Form):
     choices = [
       (NodeType.Mesh, _("Mesh node")),
       (NodeType.Server, _("Server node")),
-      (NodeType.Test, _("Test node"))
+      (NodeType.Test, _("Test node")),
+      (NodeType.Mobile, _("Mobile node"))
     ],
     initial = NodeType.Mesh,
     label = _("Node type")
@@ -282,7 +283,8 @@ class UpdateNodeForm(forms.Form):
     choices = [
       (NodeType.Mesh, _("Mesh node")),
       (NodeType.Server, _("Server node")),
-      (NodeType.Test, _("Test node"))
+      (NodeType.Test, _("Test node")),
+      (NodeType.Mobile, _("Mobile node"))
     ],
     initial = NodeType.Mesh,
     label = _("Node type")
