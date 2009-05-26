@@ -268,8 +268,8 @@ class UpdateNodeForm(forms.Form):
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
   owner = forms.ModelChoiceField(
-    User.objects.all(),
-    initial = User.objects.all()[0].id,
+    User.objects.filter(is_active = True),
+    initial = User.objects.filter(is_active = True)[0].id,
     label = _("Maintainer")
   )
   project = forms.ModelChoiceField(

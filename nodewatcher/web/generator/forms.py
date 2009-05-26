@@ -13,8 +13,8 @@ class GenerateImageForm(forms.Form):
   A simple form for image generation.
   """
   email_user = forms.ModelChoiceField(
-    User.objects.all(),
-    initial = User.objects.all()[0].id,
+    User.objects.filter(is_active = True),
+    initial = User.objects.filter(is_active = True)[0].id,
     required = False,
     label = _("Send image to")
   )
