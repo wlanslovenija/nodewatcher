@@ -187,10 +187,11 @@ class RegisterNodeForm(forms.Form):
       node.ip = str(net.host_first())
       
       # Create a new subnet for this node or use an existing one if available
-      subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
-      subnet.allocated = True
-      subnet.allocated_at = datetime.now()
-      subnet.status = SubnetStatus.NotAnnounced
+      if fresh_subnet.family == 4 and fresh_subnet.cidr != 32:
+        subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
+        subnet.allocated = True
+        subnet.allocated_at = datetime.now()
+        subnet.status = SubnetStatus.NotAnnounced
     else:
       # An IP has been entered, check if this node already exists
       try:

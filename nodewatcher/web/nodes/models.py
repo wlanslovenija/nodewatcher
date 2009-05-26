@@ -543,9 +543,16 @@ class Pool(models.Model):
       net = ipcalc.Network(self.network, prefix_len)
       if net not in parent_net:
         raise PoolAllocationError('Given prefix exceeds pool size!')
-
-      allocation = (self.network, prefix_len)
+      
+      if prefix_len == 32:
+        # We are allocating a single host, don't let it be .0/32
+        net = ipcalc.Network(self.network, self.cidr)
+        allocation = (str(net.host_first()), 32)
+      else:
+        # Standard subnet allocation
+        allocation = (self.network, prefix_len)
     else:
+      print "already allocated?!"
       net = ipcalc.Network(self.last_alloc_network, self.last_alloc_cidr)
       net = ipcalc.Network(long(net) + net.size(), prefix_len)
       if net not in parent_net:
@@ -782,6 +789,14 @@ def node_on_delete_callback(sender, **kwargs):
   On delete callback for Nodes.
   """
   Record.remove_for_node(kwargs['instance'])
+
+  # Check if node has a /32 subnet assigned and free it if needed
+  try:
+    subnet = Pool.objects.get(network = kwargs['instance'].ip, cidr = 32)
+    subnet.allocated = False
+    subnet.save()
+  except Pool.DoesNotExist:
+    pass
 
 models.signals.pre_delete.connect(subnet_on_delete_callback, sender = Subnet)
 models.signals.pre_delete.connect(node_on_delete_callback, sender = Node)
