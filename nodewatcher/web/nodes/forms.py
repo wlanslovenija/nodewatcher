@@ -138,8 +138,8 @@ class RegisterNodeForm(forms.Form):
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
     
-    if not location and node_type != NodeType.Mobile:
-      raise forms.ValidationError(_("Location is required for non-mobile nodes!"))
+    if not location and node_type == NodeType.Mesh:
+      raise forms.ValidationError(_("Location is required for mesh nodes!"))
 
     try:
       node = Node.objects.get(name = name)
@@ -393,7 +393,7 @@ class UpdateNodeForm(forms.Form):
     node_type = int(self.cleaned_data.get('node_type'))
 
     try:
-      if use_vpn and not template.iface_lan and node.has_allocated_subnets(IfaceType.LAN):
+      if use_vpn and template and not template.iface_lan and node.has_allocated_subnets(IfaceType.LAN):
         raise forms.ValidationError(_("The specified router only has one ethernet port! You have already added some LAN subnets to it, so you cannot enable VPN!"))
     except Profile.DoesNotExist:
       pass
@@ -404,8 +404,8 @@ class UpdateNodeForm(forms.Form):
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
-    if not location and node_type != NodeType.Mobile:
-      raise forms.ValidationError(_("Location is required for non-mobile nodes!"))
+    if not location and node_type == NodeType.Mesh:
+      raise forms.ValidationError(_("Location is required for mesh nodes!"))
 
     try:
       node = Node.objects.get(name = name)
