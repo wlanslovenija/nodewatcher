@@ -129,12 +129,17 @@ class RegisterNodeForm(forms.Form):
     wan_gw = self.cleaned_data.get('wan_gw')
     geo_lat = self.cleaned_data.get('geo_lat')
     geo_long = self.cleaned_data.get('geo_long')
+    location = self.cleaned_data.get('location')
+    node_type = int(self.cleaned_data.get('node_type'))
 
     if not NODE_NAME_RE.match(name):
       raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
 
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
+    
+    if not location and node_type != NodeType.Mobile:
+      raise forms.ValidationError(_("Location is required for non-mobile nodes!"))
 
     try:
       node = Node.objects.get(name = name)
@@ -384,6 +389,8 @@ class UpdateNodeForm(forms.Form):
     use_vpn = self.cleaned_data.get('use_vpn')
     node = self.__current_node
     template = self.cleaned_data.get('template')
+    location = self.cleaned_data.get('location')
+    node_type = int(self.cleaned_data.get('node_type'))
 
     try:
       if use_vpn and not template.iface_lan and node.has_allocated_subnets(IfaceType.LAN):
@@ -396,6 +403,9 @@ class UpdateNodeForm(forms.Form):
 
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
+
+    if not location and node_type != NodeType.Mobile:
+      raise forms.ValidationError(_("Location is required for non-mobile nodes!"))
 
     try:
       node = Node.objects.get(name = name)
