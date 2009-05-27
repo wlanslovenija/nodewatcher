@@ -50,6 +50,10 @@
     {% endif %}
   </tr>
   <tr>
+    <td>{% trans "Node type" %}</td>
+    <td>{{ node.node_type_as_string }}</td>
+  </tr>
+  <tr>
     <td>{% trans "Location" %}</td>
     <td>{{ node.location|default:_("Unknown") }}</td>
   </tr>
@@ -68,10 +72,6 @@
   <tr>
     <td>{% trans "Border router" %}</td>
     <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Node type" %}</td>
-    <td>{{ node.node_type_as_string }}</td>
   </tr>
   <tr>
     <td>{% trans "Last seen" %}</td>

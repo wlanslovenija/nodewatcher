@@ -49,21 +49,25 @@
     <td>{{ form.project }}</td>
   </tr>
   <tr>
+    <td>{{ form.node_type.label }}</td>
+    <td>{{ form.node_type }}</td>
+  </tr>
+  <tr class="location_opts">
     <td>{{ form.location.label }}</td>
     <td>{{ form.location }}</td>
   </tr>
-  <tr>
+  <tr class="location_opts">
     <td colspan="2">{% gmap lat:46.05 long:14.5 mlat:node.geo_lat mlong:node.geo_long marker:yes %}</td>
   </tr>        
-  <tr>
+  <tr class="location_opts">
     <td>{{ form.geo_lat.label }}</td>
     <td>{{ form.geo_lat }}</td>
   </tr>
-  <tr>
+  <tr class="location_opts">
     <td>{{ form.geo_long.label }}</td>
     <td>{{ form.geo_long }}</td>
   </tr>
-  <tr>
+  <tr class="location_opts">
     <td></td>
     <td class="small_text">Click on the map or enter coordinates in <a href="http://en.wikipedia.org/wiki/Decimal_degrees" target="_blank">decimal degrees</a> format.</td>
   </tr>
@@ -88,10 +92,6 @@
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Additional Options" %}</td>
-  </tr>
-  <tr>
-    <td>{{ form.node_type.label }}</td>
-    <td>{{ form.node_type }}</td>
   </tr>
   {% if user.is_staff %}
   <tr>
@@ -189,11 +189,22 @@
     }
   }
 
+  function toggleLocation()
+  {
+    if ($('#id_node_type').attr('value') == {{ mobile_node_type }}) {
+      $('.location_opts').css('display', 'none');
+    } else {
+      $('.location_opts').css('display', '');
+    }
+  }
+
   $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
   $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
+  $('#id_node_type').change(function(event) { toggleLocation(); });
   $(function() {
     toggleAutoConfiguration();
     toggleImageGeneratorOptions();
+    toggleLocation();
   });
 </script>
 </div>
