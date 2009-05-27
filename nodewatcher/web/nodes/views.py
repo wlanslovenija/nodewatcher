@@ -2,7 +2,7 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
+from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
@@ -45,7 +45,8 @@ def node_new(request):
     form = RegisterNodeForm()
 
   return render_to_response('nodes/new.html',
-    { 'form' : form },
+    { 'form' : form,
+      'mobile_node_type' : NodeType.Mobile },
     context_instance = RequestContext(request)
   )
 
@@ -114,7 +115,8 @@ def node_edit(request, node_ip):
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,
-      'node' : node },
+      'node' : node,
+      'mobile_node_type' : NodeType.Mobile },
     context_instance = RequestContext(request)
   )
 
