@@ -557,7 +557,6 @@ class Pool(models.Model):
         # Standard subnet allocation
         allocation = (self.network, prefix_len)
     else:
-      print "already allocated?!"
       net = ipcalc.Network(self.last_alloc_network, self.last_alloc_cidr)
       net = ipcalc.Network(long(net) + net.size(), prefix_len)
       if net not in parent_net:
