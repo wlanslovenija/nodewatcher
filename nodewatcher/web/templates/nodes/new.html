@@ -143,7 +143,12 @@
   </tr>
   <tr>
     <td>{{ form.template.label }}</td>
-    <td>{{ form.template }}</td>
+    <td>
+      {{ form.template }}<br/>
+      <span class="small_text">You can leave it unconfigured if you are using custom firmware or hardware and you are not
+      interested in automatic image building. Maybe use notes field bellow to describe node software, hardware and
+      configuration.</span>
+    </td>
   </tr>
   <tr class="imagegen_opts">
     <td>{{ form.channel.label }}</td>
