@@ -53,9 +53,9 @@
     <td align="center">0</td>
     {% else %}
     <td align="center">{{ node.peers }}</td>
-	<td align="center">{{ node.clients }}</td>
+    <td align="center">{{ node.clients|default:"0" }}</td>
     {% endif %}
-    <td align="center">{{ node.project }}</td>
+    <td align="center">{{ node.project|default:_("unknown") }}</td>
   </tr>
   {% endfor %}
 </tbody>
