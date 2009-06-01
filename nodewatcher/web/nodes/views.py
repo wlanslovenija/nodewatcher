@@ -13,10 +13,13 @@ def nodes(request):
   """
   Display a list of all current nodes and their status.
   """
-  def ip_order(x, y):
+  def type_ip_order(x, y):
+    c = cmp(x.node_type, y.node_type)
+    if c != 0:
+      return c
     return cmp(long(ipcalc.IP(x.ip)), long(ipcalc.IP(y.ip)))
-  nodes = list(Node.objects.all().order_by('node_type'))
-  nodes.sort(ip_order)
+  nodes = list(Node.objects.all())
+  nodes.sort(type_ip_order)
   return render_to_response('nodes/list.html',
     { 'nodes' : nodes },
     context_instance = RequestContext(request)
