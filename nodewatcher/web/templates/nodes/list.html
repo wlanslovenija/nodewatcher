@@ -23,11 +23,10 @@
     <th width="150"><b>{% trans "Node name" %}</b></th>
     <th width="100"><b>IP</b></th>
     <th width="280"><b>{% trans "Last seen up" %}</b></th>
-    <th width="100"><b>{% trans "Status" %}</b></th>
-    <th width="50" align="center"><b>{% trans "Peers" %}</b></th>
-    <th width="50" align="center"><b>MIN</b></th>
-    <th width="50" align="center"><b>AVG</b></th>
-    <th width="50" align="center"><b>MAX</b></th>
+    <th width="70"><b>{% trans "Status" %}</b></th>
+    <th width="70" align="center"><b>{% trans "Peers" %}</b></th>
+    <th width="70" align="center"><b>{% trans "Clients" %}</b></th>
+    <th width="90" align="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 <tbody>
@@ -51,15 +50,12 @@
     <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
     {% if node.is_down %}
     <td align="center">0</td>
-    <td align="center">/</td>
-    <td align="center">/</td>
-    <td align="center">/</td>
+    <td align="center">0</td>
     {% else %}
     <td align="center">{{ node.peers }}</td>
-    <td align="center">{{ node.rtt_min|default:"/" }}</td>
-    <td align="center">{{ node.rtt_avg|default:"/" }}</td>
-    <td align="center">{{ node.rtt_max|default:"/" }}</td>
+	<td align="center">{{ node.clients }}</td>
     {% endif %}
+    <td align="center">{{ node.project }}</td>
   </tr>
   {% endfor %}
 </tbody>
@@ -78,7 +74,6 @@
 {% trans "Notes" %}:<br/>
 <ul>
   <li>{% trans "<i>not allocated</i> means that the IP is not allocated and should not be seen" %}</li>
-  <li>{% trans "<i>MIN, MAX, AVG</i> represent the current minimum, maximum and average latency" %}</li>
 </ul>
 <br/>
 {% endblock %}

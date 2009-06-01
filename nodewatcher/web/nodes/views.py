@@ -7,12 +7,16 @@ from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetF
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
 from datetime import datetime
+from wlanlj.nodes import ipcalc
 
 def nodes(request):
   """
   Display a list of all current nodes and their status.
   """
-  nodes = Node.objects.all().order_by('node_type', 'ip')
+  def ip_order(x, y):
+    return cmp(ipcalc.IP(x.ip).long(), ipcalc.IP(y.ip).long())
+  nodes = Node.objects.all().order_by('node_type').list()
+  nodes.sort(ip_order)
   return render_to_response('nodes/list.html',
     { 'nodes' : nodes },
     context_instance = RequestContext(request)
