@@ -252,7 +252,7 @@ def checkMeshStatus():
         n.uptime = safe_uptime_convert(info['general']['uptime'])
 
         if oldVersion != n.firmware_version:
-          Event.create_event(n, EventCode.VersionChanged, '', EventSource.Monitor, data = 'Old version: %s\n  New version: %s' % (oldVersion, n.firmware_version))
+          Event.create_event(n, EventCode.VersionChange, '', EventSource.Monitor, data = 'Old version: %s\n  New version: %s' % (oldVersion, n.firmware_version))
 
         if oldUptime > n.uptime:
           Event.create_event(n, EventCode.UptimeReset, '', EventSource.Monitor, data = 'Old uptime: %s\n  New uptime: %s' % (oldUptime, n.uptime))
