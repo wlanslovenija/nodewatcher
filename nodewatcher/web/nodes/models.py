@@ -610,6 +610,7 @@ class EventCode:
   IPShortage = 6
   ChannelChanged = 7
   RedundancyLoss = 8
+  VersionChange = 9
 
   NodeAdded = 100
 
@@ -637,6 +638,8 @@ class EventCode:
       return _("WiFi channel has changed")
     elif code == EventCode.RedundancyLoss:
       return _("Redundant link to border gateway has gone down")
+    elif code == EventCode.VersionChange:
+      return _("Firmware version has changed")
     elif code == EventCode.NodeAdded:
       return _("A new node has been registred")
     else:

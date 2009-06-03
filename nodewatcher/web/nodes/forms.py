@@ -675,7 +675,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.PacketDuplication, _('Packet duplication detected')),
       (EventCode.IPShortage, _('IP shortage on WiFi subnet')),
       (EventCode.ChannelChanged, _('WiFi channel has changed')),
-      (EventCode.RedundancyLoss, _('Redundant link to border gateway has gone down'))
+      (EventCode.RedundancyLoss, _('Redundant link to border gateway has gone down')),
+      (EventCode.VersionChange, _("Firmware version has changed"))
     ],
     required = False
   )
