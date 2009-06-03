@@ -101,7 +101,10 @@ def add_graph(node, name, type, conf, title, filename, *values):
   A helper function for generating graphs.
   """
   rra = os.path.join(WORKDIR, 'rra', '%s.rrd' % filename)
-  RRA.update(node, conf, rra, *values)
+  try:
+    RRA.update(node, conf, rra, *values)
+  except:
+    pass
   RRA.graph(conf, title, os.path.join(GRAPHDIR, '%s.png' % filename), *[rra for i in xrange(len(values))])
   
   try:
@@ -239,6 +242,7 @@ def checkMeshStatus():
       try:
         oldUptime = n.uptime or 0
         oldChannel = n.channel or 0
+        oldVersion = n.firmware_version
         n.firmware_version = info['general']['version']
         n.local_time = safe_date_convert(info['general']['local_time'])
         n.bssid = info['wifi']['bssid']
@@ -246,6 +250,9 @@ def checkMeshStatus():
         n.channel = NodeWatcher.frequency_to_channel(info['wifi']['frequency'])
         n.clients = 0
         n.uptime = safe_uptime_convert(info['general']['uptime'])
+
+        if oldVersion != n.firmware_version:
+          Event.create_event(n, EventCode.VersionChanged, '', EventSource.Monitor, data = 'Old version: %s\n  New version: %s' % (oldVersion, n.firmware_version))
 
         if oldUptime > n.uptime:
           Event.create_event(n, EventCode.UptimeReset, '', EventSource.Monitor, data = 'Old uptime: %s\n  New uptime: %s' % (oldUptime, n.uptime))
