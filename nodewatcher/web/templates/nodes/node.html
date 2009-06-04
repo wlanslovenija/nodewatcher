@@ -268,8 +268,9 @@
       </table>
   {% endif %}
 
-  {% if not node.is_down and node.get_graphs %}
+  {% if node.get_graphs %}
   <h3>{% trans "Graphs" %}</h3>
+  <p class="error">{% trans "Node is currently down, so these graphs are out of date!" %}</p>
 <div class="graphs">
   {% for graph in node.get_graphs %}
   {{ graph.render }}
