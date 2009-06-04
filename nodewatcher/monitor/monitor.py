@@ -128,7 +128,7 @@ def checkMeshStatus():
   Node.objects.filter(status = NodeStatus.Invalid).delete()
   Subnet.objects.filter(status = SubnetStatus.NotAllocated, last_seen__lt = datetime.now() - timedelta(minutes = 11)).delete()
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
-  GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 1)).delete()
+  GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.all().update(warnings = False)
