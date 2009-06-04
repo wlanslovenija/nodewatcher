@@ -270,7 +270,9 @@
 
   {% if node.get_graphs %}
   <h3>{% trans "Graphs" %}</h3>
+  {% if node.is_down %}
   <p class="error">{% trans "Node is currently down, so these graphs are out of date!" %}</p>
+  {% endif %}
 <div class="graphs">
   {% for graph in node.get_graphs %}
   {{ graph.render }}
