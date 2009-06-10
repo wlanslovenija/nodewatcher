@@ -152,7 +152,7 @@ class Node(models.Model):
     """
     Returns a list of traffic graph items.
     """
-    return self.graphitem_set.all().order_by('-type', 'name')
+    return self.graphitem_set.filter(parent = None).order_by('-type', 'name')
 
   def is_down(self):
     """
@@ -295,6 +295,9 @@ class Node(models.Model):
     """
     Returns a string representation of this node.
     """
+    if not self.name:
+      return "unknown (%s)" % self.ip
+
     return "%s (%s)" % (self.name, self.ip)
 
 class Link(models.Model):
@@ -448,12 +451,19 @@ class GraphItem(models.Model):
   This class represents a graph of some node's parameter.
   """
   node = models.ForeignKey(Node)
+  parent = models.ForeignKey('self', null = True, related_name = 'children')
   type = models.IntegerField()
   name = models.CharField(max_length = 50)
   rra = models.CharField(max_length = 200)
   graph = models.CharField(max_length = 200)
   title = models.CharField(max_length = 50)
   last_update = models.DateTimeField(null = True)
+
+  def get_children(self):
+    """
+    Returns properly sorted graph item children.
+    """
+    return self.children.order_by('-type', 'name')
 
   def render(self):
     """
