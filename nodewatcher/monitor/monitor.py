@@ -96,27 +96,31 @@ def safe_date_convert(timestamp):
   except:
     return None
 
-def add_graph(node, name, type, conf, title, filename, *values):
+def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   """
   A helper function for generating graphs.
   """
-  rra = os.path.join(WORKDIR, 'rra', '%s.rrd' % filename)
+  rra = str(os.path.join(WORKDIR, 'rra', '%s.rrd' % filename))
   try:
     RRA.update(node, conf, rra, *values)
   except:
     pass
-  RRA.graph(conf, title, os.path.join(GRAPHDIR, '%s.png' % filename), *[rra for i in xrange(len(values))])
+  RRA.graph(conf, title, str(os.path.join(GRAPHDIR, '%s.png' % filename)), *[rra for i in xrange(len(values))])
   
+  # Get parent instance (toplevel by default)
+  parent = attrs.get('parent', None)
+
   try:
-    graph = GraphItem.objects.get(node = node, name = name, type = type)
+    graph = GraphItem.objects.get(node = node, name = name, type = type, parent = parent)
   except GraphItem.DoesNotExist:
-    graph = GraphItem(node = node, name = name, type = type)
+    graph = GraphItem(node = node, name = name, type = type, parent = parent)
     graph.rra = '%s.rrd' % filename
     graph.graph = '%s.png' % filename
     graph.title = title
 
   graph.last_update = datetime.now()
   graph.save()
+  return graph
 
 def checkMeshStatus():
   """
@@ -232,7 +236,10 @@ def checkMeshStatus():
       lq_avg += float(peer[1])
       ilq_avg += float(peer[2])
     
-    add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
+    lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
+
+    for peer in n.src.all():
+      add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s_%s' % (nodeIp, peer.dst.ip), peer.lq, peer.ilq, parent = lq_graph)
 
     n.last_seen = datetime.now()
 
