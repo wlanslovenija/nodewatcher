@@ -458,6 +458,7 @@ class GraphItem(models.Model):
   graph = models.CharField(max_length = 200)
   title = models.CharField(max_length = 50)
   last_update = models.DateTimeField(null = True)
+  dead = models.BooleanField(default = False)
 
   def get_children(self):
     """
