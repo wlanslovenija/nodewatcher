@@ -12,6 +12,7 @@ class GenerateImageForm(forms.Form):
   """
   A simple form for image generation.
   """
+  config_only = forms.BooleanField(initial = False, required = False, label = _("Configuration only"))
   email_user = forms.ModelChoiceField(
     User.objects.filter(is_active = True),
     initial = User.objects.filter(is_active = True)[0].id,

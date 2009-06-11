@@ -25,7 +25,7 @@ def request(request, node_ip):
     form = GenerateImageForm(request.POST)
     if form.is_valid():
       email_user = form.save(node)
-      queue_generator_job(node, email_user)
+      queue_generator_job(node, email_user, form.cleaned_data['config_only'])
 
       return render_to_response('generator/please_wait.html',
         { 'node' : node },

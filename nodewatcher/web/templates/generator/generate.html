@@ -77,6 +77,13 @@
     <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr>
+    <td valign="top">{{ form.config_only.label }}</td>
+    <td>
+      {{ form.config_only }}<br/>
+      <span class="small_text">{% trans "Check this option to <b>ONLY</b> generate configuration files. If you don't know what this is, leave this option unchecked!" %}</span>
+    </td>
+  </tr>
+  <tr>
     {% if not node.owner.email %}
     <td colspan="2" class="error">
       {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like image generation) are disabled.{% endblocktrans %}

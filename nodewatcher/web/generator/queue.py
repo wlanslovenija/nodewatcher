@@ -9,7 +9,7 @@ from beanstalk import job
 queue = serverconn.ServerConn("127.0.0.1", 11300)
 queue.use("generator")
 
-def queue_generator_job(node, email_user):
+def queue_generator_job(node, email_user, config_only = False):
   """
   Queues a generator job via the beanstalk daemon.
   """
@@ -63,6 +63,7 @@ def queue_generator_job(node, email_user):
     'imagefiles'      : node.profile.template.imagefile.split(","),
     'subnets'         : subnets,
     'lan_wan_switch'  : not node.profile.template.iface_lan and node.has_allocated_subnets(IfaceType.LAN),
+    'only_config'     : config_only,
     'email'           : email_user.email
   }
 

@@ -1,0 +1,25 @@
+{% load i18n %}{% blocktrans %}Hello {{ username }}!
+
+Router configuration for ({{ hostname }}/{{ ip }}) has been generated! You can
+use it as a starting point for your custom router configuration so that its
+settings are compatible with the network.
+
+Configuration archive listed below contains files suitable for use with the
+wlan ljubljana firmware. Because of this, some settings may require patches
+and/or are version related. For further information consult the mailing list
+and the code repository found on the website.
+
+The generated configuration archive is available here:{% endblocktrans %}
+
+  http://nodes.wlan-lj.net/results/{{ config }}
+  MD5: {{ checksum }}
+
+{% blocktrans %}Note that these files will only remain available for 5 days. After that
+time, they will be removed from the server and you will have to request them
+again.
+
+Thank you for your participation in the project!
+
+Best regards,
+wlan ljubljana network <open@wlan-lj.net>
+{% endblocktrans %}
