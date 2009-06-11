@@ -25,9 +25,20 @@ from datetime import datetime, timedelta
 from traceback import format_exc
 import pwd
 import logging
+import time
 
 WORKDIR = "/home/monitor"
 GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
+RRA_CONF_MAP = {
+  GraphType.RTT         : RRARTT,
+  GraphType.LQ          : RRALinkQuality,
+  GraphType.Clients     : RRAClients,
+  GraphType.Traffic     : RRAIface,
+  GraphType.LoadAverage : RRALoadAverage,
+  GraphType.NumProc     : RRANumProc,
+  GraphType.MemUsage    : RRAMemUsage,
+  GraphType.Solar       : RRASolar
+}
 
 class LastUpdateTimes:
   """
@@ -43,6 +54,7 @@ def main():
   while True:
     try:
       checkMeshStatus()
+      checkDeadGraphs()
 
       # Repost any events that need reposting
       Event.post_events_that_need_resend()
@@ -119,8 +131,27 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
     graph.title = title
 
   graph.last_update = datetime.now()
+  graph.dead = False
   graph.save()
   return graph
+
+def checkDeadGraphs():
+  """
+  Checks for dead graphs.
+  """
+  for graph in GraphItem.objects.filter(dead = False, last_update__lt = datetime.now() - timedelta(minutes = 10)):
+    # Mark graph as dead
+    graph.dead = True
+    graph.save()
+
+    # Redraw the graph with dead status attached
+    pathArchive = str(os.path.join(WORKDIR, 'rra', graph.rra))
+    pathImage = str(os.path.join(GRAPHDIR, graph.graph))
+    conf = RRA_CONF_MAP[graph.type]
+
+    RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())), dead = True,
+              *[pathArchive for i in xrange(len(conf.sources))])
+
 
 def checkMeshStatus():
   """

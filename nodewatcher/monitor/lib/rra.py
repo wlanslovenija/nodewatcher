@@ -408,7 +408,7 @@ class RRA:
         pass
   
   @staticmethod
-  def graph(conf, title, graph, *archives):
+  def graph(conf, title, graph, *archives, **kwargs):
     """
     Renders a graph from data points.
     """
@@ -416,16 +416,27 @@ class RRA:
     args = []
     for i, source in enumerate(conf.sources):
       args.append(rrdtool.Def(source.name, archives[i], data_source = source.name, cf = rrdtool.AverageCF))
+    
+    if kwargs.get('end_time') is None:
+      end_time = int(time.time())
+    else:
+      end_time = int(kwargs.get('end_time'))
+
+    if kwargs.get('dead') == True:
+      args.append('--pango-markup')
+      title = '%s <span foreground="red">[OUT OF DATE]</span>' % title
 
     args = args + conf.graph
+    args.append('--font')
+    args.append('DEFAULT:0:DejaVu Sans Mono')
     g.graph(
       alt_y_mrtg = None,
       width = 500,
       height = 120,
       x = "MINUTE:18:MINUTE:72:MINUTE:144:0:%H:%M",
       title = title,
-      start = int(time.time() - 86400),
-      end = int(time.time() - 180),
+      start = end_time - 86400,
+      end = end_time - 180,
       *args
     )
 
