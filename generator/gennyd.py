@@ -23,6 +23,7 @@ import logging
 import hashlib
 from traceback import format_exc
 import pwd
+from zipfile import ZipFile, ZIP_DEFLATED
 
 WORKDIR = "/home/generator"
 DESTINATION = "/var/www/nodes.wlan-lj.net/results"
@@ -90,35 +91,70 @@ def generate_image(d):
   os.system("rm -rf build/%s/bin/*" % d['imagebuilder'])
   os.mkdir("build/files/etc")
   x.generate("build/files/etc")
-  x.build("build/%s" % d['imagebuilder'])
 
-  # Get resulting image
-  files = []
-  prefix = hashlib.md5(os.urandom(32)).hexdigest()[0:16]
-  for file in d['imagefiles']:
-    file = str(file)
-    os.rename("%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file), "%s-%s" % (os.path.join(DESTINATION, prefix), file))
-    f = open("%s-%s" % (os.path.join(DESTINATION, prefix), file), 'r')
+  if d['only_config']:
+    # Just pack configuration and send it
+    prefix = hashlib.md5(os.urandom(32)).hexdigest()[0:16]
+    zip = ZipFile(os.path.join(DESTINATION, prefix + "-config.zip"), 'w', ZIP_DEFLATED)
+    os.chdir('build/files')
+    for root, dirs, files in os.walk("etc"):
+      for file in files:
+        zip.write(os.path.join(root, file))
+    zip.close()
+
+    # Generate checksum
+    f = open(os.path.join(DESTINATION, prefix + "-config.zip"), 'r')
     checksum = hashlib.md5(f.read()).hexdigest()
     f.close()
-    files.append({ 'name' : "%s-%s" % (prefix, file), 'checksum' : checksum })
 
-  # Send an e-mail
-  t = loader.get_template('generator/email.txt')
-  c = Context({
-    'hostname'  : d['hostname'],
-    'ip'        : d['ip'],
-    'username'  : d['vpn_username'],
-    'files'     : files
-  })
+    # Send an e-mail
+    t = loader.get_template('generator/email_config.txt')
+    c = Context({
+      'hostname'  : d['hostname'],
+      'ip'        : d['ip'],
+      'username'  : d['vpn_username'],
+      'config'    : prefix + "-config.zip",
+      'checksum'  : checksum
+    })
 
-  send_mail(
-    '[wlan-lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
-    t.render(c),
-    'generator@wlan-lj.net',
-    [d['email']],
-    fail_silently = False
-  )
+    send_mail(
+      '[wlan-lj] ' + (_("Configuration for %s/%s") % (d['hostname'], d['ip'])),
+      t.render(c),
+      'generator@wlan-lj.net',
+      [d['email']],
+      fail_silently = False
+    )
+  else:
+    # Generate full image
+    x.build("build/%s" % d['imagebuilder'])
+
+    # Get resulting image
+    files = []
+    prefix = hashlib.md5(os.urandom(32)).hexdigest()[0:16]
+    for file in d['imagefiles']:
+      file = str(file)
+      os.rename("%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file), "%s-%s" % (os.path.join(DESTINATION, prefix), file))
+      f = open("%s-%s" % (os.path.join(DESTINATION, prefix), file), 'r')
+      checksum = hashlib.md5(f.read()).hexdigest()
+      f.close()
+      files.append({ 'name' : "%s-%s" % (prefix, file), 'checksum' : checksum })
+
+    # Send an e-mail
+    t = loader.get_template('generator/email.txt')
+    c = Context({
+      'hostname'  : d['hostname'],
+      'ip'        : d['ip'],
+      'username'  : d['vpn_username'],
+      'files'     : files
+    })
+
+    send_mail(
+      '[wlan-lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
+      t.render(c),
+      'generator@wlan-lj.net',
+      [d['email']],
+      fail_silently = False
+    )
 
 # Configure logger
 logging.basicConfig(level = logging.DEBUG,
