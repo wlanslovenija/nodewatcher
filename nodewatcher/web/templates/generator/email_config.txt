@@ -6,8 +6,9 @@ settings are compatible with the network.
 
 Configuration archive listed below contains files suitable for use with the
 wlan ljubljana firmware. Because of this, some settings may require patches
-and/or are version related. For further information consult the mailing list
-and the code repository found on the website.
+and/or are version related. For further information consult:
+
+  http://wlan-lj.net/wiki/Navodila/PoMeri
 
 The generated configuration archive is available here:{% endblocktrans %}
 
