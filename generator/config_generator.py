@@ -394,14 +394,6 @@ class OpenWrtConfig(NodeConfig):
     
     # Configure HTTP server
     self.__copyServiceTemplate('general/httpd.init', 'httpd')
-    os.mkdir(os.path.join(directory, '..', 'www'))
-    os.mkdir(os.path.join(directory, '..', 'www', 'cgi-bin'))
-    path = os.path.join(directory, '..', 'www', 'cgi-bin', 'urandom')
-    self.__copyTemplate("general/httpd.urandom", path)
-    os.chmod(path, 0755)
-    path = os.path.join(directory, '..', 'www', 'cgi-bin', 'zero')
-    self.__copyTemplate("general/httpd.zero", path)
-    os.chmod(path, 0755)
     
     # Prevent the date from going to far into the past on reboot
     miscScriptPath = os.path.join(directory, 'init.d', 'misc')
@@ -468,6 +460,7 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('kmod-ipt-conntrack', 'iptables-mod-conntrack')
     self.addPackage('kmod-ipt-nat', 'iptables-mod-nat')
     self.addPackage('nodewatcher', 'olsrd-mod-actions')
+    self.addPackage('pv', 'netprofscripts')
 
     # Build the image
     buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
