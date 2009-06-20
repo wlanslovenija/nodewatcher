@@ -612,6 +612,7 @@ class OpenWrtConfig(NodeConfig):
   def __generateMiscScript(self, f):
     f.write('#!/bin/sh /etc/rc.common\n')
     f.write('START=35')
+    f.write('\n')
     f.write('STOP=35')
     f.write('\n')
     f.write('start() {\n')
