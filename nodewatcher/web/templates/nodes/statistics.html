@@ -17,4 +17,16 @@ Nodes with warnings: {{ nodes_warned }}<br/>
 Subnet count: {{ subnet_count }}<br/>
 Clients currently online: {{ clients_online }}</br>
 Average peers per node: {{ peers_avg }}<br/>
+<br/>
+Traffic on VPN gateways:<br/>
+<div align="center">
+  <img src="http://nodes.wlan-lj.net/graphs/global_replicator_traffic.png"/><br/>
+  <div style="width: 581px;">
+    <span class="small_text">
+      <span style="color: #DE0056">outgoing</span> traffic originates in the mesh and is forwarded towards the Internet;
+      <span style="color: #A150AA">incoming</span> traffic originates in the Internet and is forwarded towards the mesh;
+      <span style="color: #5083AA">internal</span> traffic is traffic between mesh nodes via VPN
+    </span>
+  </div>
+</div>
 {% endblock %}
