@@ -57,6 +57,7 @@ class NodeStatus:
   Duped = 3
   Invalid = 4
   New = 5
+  Pending = 6
   
   # Magic marker
   UserSpecifiedMark = 100
@@ -288,6 +289,8 @@ class Node(models.Model):
       return "takendown"
     elif self.status == NodeStatus.New:
       return "new"
+    elif self.status == NodeStatus.Pending:
+      return "pending"
     else:
       return "unknown"
 
