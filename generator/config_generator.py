@@ -9,6 +9,7 @@ import os
 import ipcalc
 import crypt
 from datetime import datetime
+from random import shuffle
 
 # A list of driver dependent packages
 driverPackages = {
@@ -502,7 +503,9 @@ class OpenWrtConfig(NodeConfig):
     f.write('proto udp\n')
     f.write('dev tap0\n')
     
-    for vpn in self.vpnServer:
+    vpnServers = list(self.vpnServer)
+    shuffle(vpnServers)
+    for vpn in vpnServers:
       f.write('remote %s %s\n' % vpn)
     
     f.write('resolv-retry infinite\n')
