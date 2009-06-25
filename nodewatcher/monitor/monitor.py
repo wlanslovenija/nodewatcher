@@ -201,7 +201,10 @@ def checkMeshStatus():
     oldStatus = node.status
 
     if node.ip not in dbNodes:
-      node.status = NodeStatus.Down
+      if node.status == NodeStatus.New:
+        node.status = NodeStatus.Pending
+      elif node.status != NodeStatus.Pending:
+        node.status = NodeStatus.Down
       node.save()
 
     if oldStatus in (NodeStatus.Up, NodeStatus.Visible, NodeStatus.Duped) and node.status == NodeStatus.Down:
