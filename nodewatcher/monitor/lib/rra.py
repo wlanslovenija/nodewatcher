@@ -43,15 +43,18 @@ class RRALocalTraffic(RRAConfiguration):
     )
   ]
   graph = [
-    "LINE2:toinet#DE0056:Out     ",
+    "AREA:toinet#FFD5CC",
+    "AREA:frominet#CCFFCC::STACK",
+    "AREA:internal#CCE5FF::STACK",
+    "LINE1:toinet#CF7E6C:Out     ",
     r'GPRINT:toinet:LAST:Current\:%8.2lf %s',
     r'GPRINT:toinet:AVERAGE:Average\:%8.2lf %s',
     r'GPRINT:toinet:MAX:Maximum\:%8.2lf %s\n',
-    "LINE2:frominet#A150AA:In      ",
+    "LINE1:frominet#6CCF6C:In      :STACK",
     r'GPRINT:frominet:LAST:Current\:%8.2lf %s',
     r'GPRINT:frominet:AVERAGE:Average\:%8.2lf %s',
     r'GPRINT:frominet:MAX:Maximum\:%8.2lf %s\n',
-    "LINE2:internal#5083AA:Internal",
+    "LINE1:internal#6C9CCF:Internal:STACK",
     r'GPRINT:internal:LAST:Current\:%8.2lf %s',
     r'GPRINT:internal:AVERAGE:Average\:%8.2lf %s',
     r'GPRINT:internal:MAX:Maximum\:%8.2lf %s\n'
