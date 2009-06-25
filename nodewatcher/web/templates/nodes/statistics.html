@@ -5,20 +5,22 @@
 
 {% block content %}
 <h1>{% trans "Network Statistics" %}</h1>
-FIXME needs nicer design table with bg or sth:)<br/>
+<div class="summary">
+  {% trans "Registred nodes" %}: {{ node_count }}<br/>
+  {% trans "Node count by status" %}:
+  <div style="padding-left: 20px;">
+  {% for s in nodes_by_status %}
+  <span class="node_status_{{ s.status }}">{{ s.status }}</span>: {{ s.count }}<br/>
+  {% endfor %}
+  </div>
+  <br/>
+  {% trans "Nodes with warnings" %}: {{ nodes_warned }}<br/>
+  {% trans "Subnet count" %}: {{ subnet_count }}<br/>
+  {% trans "Clients currently online" %}: <a href="/nodes/gcl">{{ clients_online }}</a><br/>
+  {% trans "Average peers per node" %}: {{ peers_avg }}<br/>
+</div>
 <br/>
-Registred nodes: {{ node_count }}<br/>
-Node count by status:<br/>
-{% for s in nodes_by_status %}
-<span class="node_status_{{ s.status }}">{{ s.status }}</span>: {{ s.count }}<br/>
-{% endfor %}
-<br/>
-Nodes with warnings: {{ nodes_warned }}<br/>
-Subnet count: {{ subnet_count }}<br/>
-Clients currently online: {{ clients_online }}</br>
-Average peers per node: {{ peers_avg }}<br/>
-<br/>
-Traffic on VPN gateways (bytes per second):<br/>
+<h2>{% trans "VPN gateway traffic" %} <span class="small_text">(in bytes per second)</span></h2>
 <div align="center">
   <img src="http://nodes.wlan-lj.net/graphs/global_replicator_traffic.png"/><br/>
   <div style="width: 581px;">
