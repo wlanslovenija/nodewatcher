@@ -2,6 +2,7 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
+from django.db import models
 from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
@@ -22,6 +23,24 @@ def nodes(request):
   nodes.sort(type_ip_order)
   return render_to_response('nodes/list.html',
     { 'nodes' : nodes },
+    context_instance = RequestContext(request)
+  )
+
+def statistics(request):
+  """
+  Displays some global statistics.
+  """
+  nodes_by_status = []
+  for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
+    nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
+
+  return render_to_response('nodes/statistics.html',
+    { 'node_count' : len(Node.objects.all()),
+      'nodes_by_status' : nodes_by_status,
+      'nodes_warned' : len(Node.objects.filter(warnings = True)),
+      'subnet_count' : len(Subnet.objects.all()),
+      'clients_online' : len(APClient.objects.all()),
+      'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'] },
     context_instance = RequestContext(request)
   )
 

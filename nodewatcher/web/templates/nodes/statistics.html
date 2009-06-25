@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Network Statistics" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Network Statistics" %}</h1>
+FIXME needs nicer design table with bg or sth:)<br/>
+<br/>
+Registred nodes: {{ node_count }}<br/>
+Node count by status:<br/>
+{% for s in nodes_by_status %}
+<span class="node_status_{{ s.status }}">{{ s.status }}</span>: {{ s.count }}<br/>
+{% endfor %}
+<br/>
+Nodes with warnings: {{ nodes_warned }}<br/>
+Subnet count: {{ subnet_count }}<br/>
+Clients currently online: {{ clients_online }}</br>
+Average peers per node: {{ peers_avg }}<br/>
+{% endblock %}

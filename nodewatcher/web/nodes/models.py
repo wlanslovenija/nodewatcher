@@ -69,6 +69,38 @@ class NodeStatus:
   NeedEquipment = 102
   NeedHelp = 103
   TakenDown = 104
+  
+  @staticmethod
+  def as_string(status):
+    """
+    Returns a node's status as a human readable string.
+    """
+    if status == NodeStatus.Up:
+      return "up"
+    elif status == NodeStatus.Visible:
+      return "visible"
+    elif status == NodeStatus.Down:
+      return "down"
+    elif status == NodeStatus.Duped:
+      return "duped"
+    elif status == NodeStatus.Invalid:
+      return "invalid"
+    elif status == NodeStatus.UnknownProblems:
+      return "problems"
+    elif status == NodeStatus.Building:
+      return "building"
+    elif status == NodeStatus.NeedEquipment:
+      return "needequip"
+    elif status == NodeStatus.NeedHelp:
+      return "needhelp"
+    elif status == NodeStatus.TakenDown:
+      return "takendown"
+    elif status == NodeStatus.New:
+      return "new"
+    elif status == NodeStatus.Pending:
+      return "pending"
+    else:
+      return "unknown"
 
 class NodeType:
   """
@@ -268,32 +300,7 @@ class Node(models.Model):
     """
     Returns this node's status as a human readable string.
     """
-    if self.status == NodeStatus.Up:
-      return "up"
-    elif self.status == NodeStatus.Visible:
-      return "visible"
-    elif self.status == NodeStatus.Down:
-      return "down"
-    elif self.status == NodeStatus.Duped:
-      return "duped"
-    elif self.status == NodeStatus.Invalid:
-      return "invalid"
-    elif self.status == NodeStatus.UnknownProblems:
-      return "problems"
-    elif self.status == NodeStatus.Building:
-      return "building"
-    elif self.status == NodeStatus.NeedEquipment:
-      return "needequip"
-    elif self.status == NodeStatus.NeedHelp:
-      return "needhelp"
-    elif self.status == NodeStatus.TakenDown:
-      return "takendown"
-    elif self.status == NodeStatus.New:
-      return "new"
-    elif self.status == NodeStatus.Pending:
-      return "pending"
-    else:
-      return "unknown"
+    return NodeStatus.as_string(self.status)
 
   def __unicode__(self):
     """

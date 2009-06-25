@@ -31,6 +31,7 @@ urlpatterns = patterns('',
     (r'^nodes/event_subscribe', 'wlanlj.nodes.views.event_subscribe'),
     (r'^nodes/event_unsubscribe/(?P<subscription_id>\d+)$', 'wlanlj.nodes.views.event_unsubscribe'),
     (r'^nodes/installed_packages/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.package_list'),
+    (r'^nodes/statistics$', 'wlanlj.nodes.views.statistics'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
     (r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }),
 
