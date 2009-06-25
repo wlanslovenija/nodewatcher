@@ -259,7 +259,10 @@ def checkMeshStatus():
       n.warnings = True
 
     # Generate status change events
-    if oldStatus == NodeStatus.Down and n.status in (NodeStatus.Up, NodeStatus.Visible):
+    if oldStatus in (NodeStatus.Down, NodeStatus.Pending) and n.status in (NodeStatus.Up, NodeStatus.Visible):
+      if oldStatus == NodeStatus.Pending:
+        n.first_seen = datetime.now()
+
       Event.create_event(n, EventCode.NodeUp, '', EventSource.Monitor)
     elif oldStatus != NodeStatus.Duped and n.status == NodeStatus.Duped:
       Event.create_event(n, EventCode.PacketDuplication, '', EventSource.Monitor)
