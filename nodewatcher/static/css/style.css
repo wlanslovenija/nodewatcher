@@ -38,6 +38,10 @@ table.listing {
   color: #7F43FF;
 }
 
+.node_status_pending {
+  color: #648863;
+}
+
 .subnet_status_notannounced {
   color: #ff0000;
 }
