@@ -9,6 +9,54 @@ from datetime import datetime
 class RRAConfiguration:
   last_update = 0
 
+class RRALocalTraffic(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'toinet',
+      type = rrdtool.CounterDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'frominet',
+      type = rrdtool.CounterDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'internal',
+      type = rrdtool.CounterDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE2:toinet#DE0056:Out     ",
+    r'GPRINT:toinet:LAST:Current\:%8.2lf %s',
+    r'GPRINT:toinet:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:toinet:MAX:Maximum\:%8.2lf %s\n',
+    "LINE2:frominet#A150AA:In      ",
+    r'GPRINT:frominet:LAST:Current\:%8.2lf %s',
+    r'GPRINT:frominet:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:frominet:MAX:Maximum\:%8.2lf %s\n',
+    "LINE2:internal#5083AA:Internal",
+    r'GPRINT:internal:LAST:Current\:%8.2lf %s',
+    r'GPRINT:internal:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:internal:MAX:Maximum\:%8.2lf %s\n'
+  ]
+
 class RRAIface(RRAConfiguration):
   interval = 300
   sources = [

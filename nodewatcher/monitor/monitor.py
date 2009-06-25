@@ -17,8 +17,9 @@ from django.db import transaction
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic
 from lib.topology import DotTopologyPlotter
+from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
 from time import sleep
 from datetime import datetime, timedelta
@@ -55,6 +56,7 @@ def main():
     try:
       checkMeshStatus()
       checkDeadGraphs()
+      checkGlobalStatistics()
 
       # Repost any events that need reposting
       Event.post_events_that_need_resend()
@@ -134,6 +136,19 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   graph.dead = False
   graph.save()
   return graph
+
+def checkGlobalStatistics():
+  """
+  Graph some global statistics.
+  """
+  stats = fetch_traffic_statistics()
+  rra = os.path.join(WORKDIR, 'rra', 'global_replicator_traffic.rrd')
+  RRA.update(None, RRALocalTraffic, rra,
+    stats['statistics:to-inet'],
+    stats['statistics:from-inet'],
+    stats['statistics:internal']
+  )
+  RRA.graph(RRALocalTraffic, 'replicator - Traffic', os.path.join(GRAPHDIR, 'global_replicator_traffic.png'), rra, rra, rra)
 
 def checkDeadGraphs():
   """
@@ -439,8 +454,8 @@ if __name__ == '__main__':
   os.chown(os.path.join(WORKDIR, 'rra'), info.pw_uid, info.pw_gid)
 
   # Drop user privileges
-  os.setgid(info.pw_gid)
-  os.setuid(info.pw_uid)
+  #os.setgid(info.pw_gid)
+  #os.setuid(info.pw_uid)
 
   # Enter main
   main()
