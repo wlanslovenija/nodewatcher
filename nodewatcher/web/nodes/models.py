@@ -115,6 +115,7 @@ class Node(models.Model):
   peers = models.IntegerField(null = True, default = 0)
   peer_list = models.ManyToManyField('self', through = 'Link', symmetrical = False)
   last_seen = models.DateTimeField(null = True)
+  first_seen = models.DateTimeField(null = True)
   channel = models.IntegerField(null = True)
 
   # RTT measurements (set by the monitor daemon)
