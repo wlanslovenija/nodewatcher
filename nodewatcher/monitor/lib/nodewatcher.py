@@ -1,5 +1,8 @@
+from __future__ import with_statement
 import urllib2
 import socket
+import threading
+from Queue import Queue, Empty
 
 class NodeWatcher(object):
   """
@@ -69,4 +72,71 @@ class NodeWatcher(object):
       return None
 
     return info
+
+  @staticmethod
+  def spawnWorkers(ips, num_workers = 20):
+    """
+    Spawns workers to process stuff.
+
+    @param ips: Node IPs
+    @return: A dictionary with node information
+    """
+    work = Queue()
+    for ip in ips:
+      work.put(ip)
+
+    done = {}
+    doneLock = threading.Lock()
+    workers = []
+
+    for i in xrange(num_workers):
+      workers.append(NodeWatcherWorker(work, done, doneLock))
+    
+    for worker in workers:
+      worker.start()
+
+    work.join()
+    for worker in workers:
+      worker.join()
+    return done
+
+class NodeWatcherWorker(threading.Thread):
+  """
+  A nodewatcher worker thread for parallel data fetch.
+  """
+  __workQueue = None
+  __doneQueue = None
+  __doneQueueLock = None
+  
+  def __init__(self, work, done, lock):
+    """
+    Class constructor.
+
+    @param work: Work queue instance
+    @param done: Done queue instance
+    @param lock: Done queue lock
+    """
+    self.__workQueue = work
+    self.__doneQueue = done
+    self.__doneQueueLock = lock
+    super(NodeWatcherWorker, self).__init__()
+  
+  def run(self):
+    """
+    Process items from the work queue.
+    """
+    if self.__workQueue is None or self.__doneQueue is None:
+      return
+    
+    while True:
+      try:
+        ip = self.__workQueue.get(False)
+        data = NodeWatcher.fetch(ip)
+
+        with self.__doneQueueLock:
+          self.__doneQueue[ip] = data
+
+        self.__workQueue.task_done()
+      except Empty:
+        break
 

@@ -271,6 +271,7 @@ def checkMeshStatus():
 
   # Ping the nodes and update valid node status in the database
   results, dupes = PingParser.pingHosts(10, nodesToPing)
+  nodewatcherInfos = NodeWatcher.spawnWorkers(results.keys())
   for nodeIp in nodesToPing:
     n = dbNodes[nodeIp]
     oldStatus = n.status
@@ -311,9 +312,10 @@ def checkMeshStatus():
 
     n.last_seen = datetime.now()
 
-    # Since the node appears to be up, let's fetch details
-    info = NodeWatcher.fetch(nodeIp) if n.node_type != NodeType.Server else None
-    if info:
+    # Check if we have fetched nodewatcher data
+    if nodeIp in nodewatcherInfos and nodewatcherInfos[nodeIp] is not None:
+      info = nodewatcherInfos[nodeIp]
+
       try:
         oldUptime = n.uptime or 0
         oldChannel = n.channel or 0
