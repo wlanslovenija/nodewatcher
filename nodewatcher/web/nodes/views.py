@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models
+from django.utils.translation import ugettext as _
 from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
@@ -30,6 +31,8 @@ def statistics(request):
   """
   Displays some global statistics.
   """
+  node_count = len(Node.objects.all())
+  others = node_count
   nodes_by_status = []
   for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
@@ -37,9 +40,12 @@ def statistics(request):
   templates_by_usage = []
   for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
+    others -= t['count']
+
+  templates_by_usage.append({ 'template' : _("unknown"), 'count' : others, 'special' : True })
 
   return render_to_response('nodes/statistics.html',
-    { 'node_count' : len(Node.objects.all()),
+    { 'node_count' : node_count,
       'nodes_by_status' : nodes_by_status,
       'nodes_warned' : len(Node.objects.filter(warnings = True)),
       'subnet_count' : len(Subnet.objects.all()),
