@@ -34,6 +34,10 @@ def statistics(request):
   for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
+  templates_by_usage = []
+  for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')):
+    templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
+
   return render_to_response('nodes/statistics.html',
     { 'node_count' : len(Node.objects.all()),
       'nodes_by_status' : nodes_by_status,
@@ -41,6 +45,8 @@ def statistics(request):
       'subnet_count' : len(Subnet.objects.all()),
       'clients_online' : len(APClient.objects.all()),
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
+      'external_ant' : len(Node.objects.filter(ant_external = True)),
+      'template_usage' : templates_by_usage,
       'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'] },
     context_instance = RequestContext(request)
   )
