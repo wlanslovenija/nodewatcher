@@ -164,6 +164,7 @@ class Node(models.Model):
   clients = models.IntegerField(null = True)
   clients_so_far = models.IntegerField(default = 0)
   uptime = models.IntegerField(null = True)
+  uptime_so_far = models.IntegerField(null = True)
   loadavg_1min = models.FloatField(null = True)
   loadavg_5min = models.FloatField(null = True)
   loadavg_15min = models.FloatField(null = True)
