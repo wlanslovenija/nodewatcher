@@ -60,6 +60,81 @@ class RRALocalTraffic(RRAConfiguration):
     r'GPRINT:internal:MAX:Maximum\:%8.2lf %s\n'
   ]
 
+class RRANodesByStatus(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'up',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'down',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'visible',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'invalid',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'pending',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    ),
+    rrdtool.DataSource(
+      'duped',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE1:up#00bb00:up     ",
+    r'GPRINT:up:LAST:Current\:%8.2lf %s',
+    r'GPRINT:up:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:up:MAX:Maximum\:%8.2lf %s\n',
+    "LINE1:down#ff0000:down   ",
+    r'GPRINT:down:LAST:Current\:%8.2lf %s',
+    r'GPRINT:down:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:down:MAX:Maximum\:%8.2lf %s\n',
+    "LINE1:visible#FFA82F:visible",
+    r'GPRINT:visible:LAST:Current\:%8.2lf %s',
+    r'GPRINT:visible:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:visible:MAX:Maximum\:%8.2lf %s\n',
+    "LINE1:invalid#cccc22:invalid",
+    r'GPRINT:invalid:LAST:Current\:%8.2lf %s',
+    r'GPRINT:invalid:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:invalid:MAX:Maximum\:%8.2lf %s\n',
+    "LINE1:pending#648863:pending",
+    r'GPRINT:pending:LAST:Current\:%8.2lf %s',
+    r'GPRINT:pending:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:pending:MAX:Maximum\:%8.2lf %s\n',
+    "LINE1:duped#7F43FF:duped  ",
+    r'GPRINT:duped:LAST:Current\:%8.2lf %s',
+    r'GPRINT:duped:AVERAGE:Average\:%8.2lf %s',
+    r'GPRINT:duped:MAX:Maximum\:%8.2lf %s\n',
+  ]
+
 class RRAIface(RRAConfiguration):
   interval = 300
   sources = [

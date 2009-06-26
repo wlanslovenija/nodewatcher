@@ -12,12 +12,12 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 
 # Import our models
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType
-from django.db import transaction
+from django.db import transaction, models
 
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
@@ -149,6 +149,22 @@ def checkGlobalStatistics():
     stats['statistics:internal']
   )
   RRA.graph(RRALocalTraffic, 'replicator - Traffic', os.path.join(GRAPHDIR, 'global_replicator_traffic.png'), rra, rra, rra)
+
+  # Nodes by status
+  nbs = {}
+  for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
+    nbs[s['status']] = s['count']
+
+  rra = os.path.join(WORKDIR, 'rra', 'global_nodes_by_status.rrd')
+  RRA.update(None, RRANodesByStatus, rra,
+    nbs.get(NodeStatus.Up, 0),
+    nbs.get(NodeStatus.Down, 0),
+    nbs.get(NodeStatus.Visible, 0),
+    nbs.get(NodeStatus.Invalid, 0),
+    nbs.get(NodeStatus.Pending, 0),
+    nbs.get(NodeStatus.Duped, 0)
+  )
+  RRA.graph(RRANodesByStatus, 'Nodes By Status', os.path.join(GRAPHDIR, 'global_nodes_by_status.png'), *([rra] * 6))
 
 def checkDeadGraphs():
   """
