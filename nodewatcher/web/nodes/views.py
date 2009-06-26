@@ -35,7 +35,7 @@ def statistics(request):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
   templates_by_usage = []
-  for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')):
+  for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
 
   return render_to_response('nodes/statistics.html',
