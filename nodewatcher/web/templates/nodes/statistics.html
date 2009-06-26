@@ -6,6 +6,7 @@
 {% block content %}
 <h1>{% trans "Network Statistics" %}</h1>
 <div class="summary">
+  <h2>Nodes</h2>
   {% trans "Registred nodes" %}: {{ node_count }}<br/>
   {% trans "Nodes with warnings" %}: {{ nodes_warned }}<br/>
   {% trans "Node count by status" %}:
@@ -15,22 +16,23 @@
   {% endfor %}
   </div>
   <br/>
-  {% trans "Subnet count" %}: {{ subnet_count }}<br/>
-  {% trans "Clients currently online" %}: <a href="/nodes/gcl">{{ clients_online }}</a><br/>
-  {% trans "Clients online so far" %}: {{ clients_ever }}<br/>
-  {% trans "Routers with external antenna" %}: {{ external_ant }}<br/>
-  {% trans "Routers by type" %}:
+  {% trans "Nodes with an external antenna" %}: {{ external_ant }}<br/>
+  {% trans "Nodes by router type" %}:
   <div style="padding-left: 20px;">
     <table width="300" border="0">
     {% for t in template_usage %}
     <tr>
-      <td>{{ t.template }}</td>
+      <td>{% if t.special %}<i>{% endif %}{{ t.template }}{% if t.special %}</i>{% endif %}</td>
       <td>{{ t.count }}</td>
     </tr>
     {% endfor %}
     </table>
   </div>
-  <br/>
+  <h2>Clients</h2>
+  {% trans "Clients currently online" %}: <a href="/nodes/gcl">{{ clients_online }}</a><br/>
+  {% trans "Clients online so far" %}: {{ clients_ever }}<br/>
+  <h2>Network</h2>  
+  {% trans "Subnet count" %}: {{ subnet_count }}<br/>
   {% trans "Average peers per node" %}: {{ peers_avg }}<br/>
 </div>
 <br/>
