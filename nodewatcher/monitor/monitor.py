@@ -46,6 +46,7 @@ class LastUpdateTimes:
   Stores last update times for stuff that needs to be updated less frequently
   than each 5 minutes.
   """
+  uptime_credit = None
   packages = None
 
 lut = {}
@@ -240,6 +241,10 @@ def checkMeshStatus():
 
     if oldStatus in (NodeStatus.Up, NodeStatus.Visible, NodeStatus.Duped) and node.status == NodeStatus.Down:
       Event.create_event(node, EventCode.NodeDown, '', EventSource.Monitor)
+      
+      # Invalidate uptime credit for this node
+      nlut = lut.get(node.ip, LastUpdateTimes())
+      nlut.uptime_credit = None
 
   # Setup all node peerings
   for nodeIp, node in nodes.iteritems():
@@ -283,6 +288,13 @@ def checkMeshStatus():
       
       # Add RTT graph
       add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency_%s' % nodeIp, n.rtt_avg)
+
+      # Add uptime credit
+      nlut = lut.get(n.ip, LastUpdateTimes())
+      if nlut.uptime_credit is not None:
+        n.uptime_so_far = (n.uptime_so_far or 0) + int(time.time() - nlut.uptime_credit)
+
+      nlut.uptime_credit = time.time()
     else:
       n.status = NodeStatus.Visible
 
