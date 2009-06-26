@@ -40,6 +40,7 @@ def statistics(request):
       'nodes_warned' : len(Node.objects.filter(warnings = True)),
       'subnet_count' : len(Subnet.objects.all()),
       'clients_online' : len(APClient.objects.all()),
+      'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
       'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'] },
     context_instance = RequestContext(request)
   )
