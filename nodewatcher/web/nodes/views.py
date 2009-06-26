@@ -48,11 +48,14 @@ def statistics(request):
 
   # Nodes by project
   nodes_by_project = []
+  others = 0
   for p in Node.objects.all().values('project__name').annotate(count = models.Count('ip')).order_by('project__id'):
     if not p['project__name']:
-      nodes_by_project.append({ 'name' : _("unknown"), 'count' : p['count'], 'special' : True})
+      others = p['count']
     else:
       nodes_by_project.append({ 'name' : p['project__name'], 'count' : p['count']})
+  
+  nodes_by_project.append({ 'name' : _("unknown"), 'count' : others, 'special' : True})
 
   return render_to_response('nodes/statistics.html',
     { 'node_count' : node_count,
