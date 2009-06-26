@@ -31,12 +31,14 @@ def statistics(request):
   """
   Displays some global statistics.
   """
+  # Nodes by status
   node_count = len(Node.objects.all())
   others = node_count
   nodes_by_status = []
   for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
+  # Nodes by template usage
   templates_by_usage = []
   for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
@@ -44,9 +46,18 @@ def statistics(request):
 
   templates_by_usage.append({ 'template' : _("unknown"), 'count' : others, 'special' : True })
 
+  # Nodes by project
+  nodes_by_project = []
+  for p in Node.objects.all().values('project__name').annotate(count = models.Count('ip')).order_by('project__id'):
+    if not p['project__name']:
+      nodes_by_project.append({ 'name' : _("unknown"), 'count' : p['count'], 'special' : True})
+    else:
+      nodes_by_project.append({ 'name' : p['project__name'], 'count' : p['count']})
+
   return render_to_response('nodes/statistics.html',
     { 'node_count' : node_count,
       'nodes_by_status' : nodes_by_status,
+      'nodes_by_project' : nodes_by_project,
       'nodes_warned' : len(Node.objects.filter(warnings = True)),
       'subnet_count' : len(Subnet.objects.all()),
       'clients_online' : len(APClient.objects.all()),
