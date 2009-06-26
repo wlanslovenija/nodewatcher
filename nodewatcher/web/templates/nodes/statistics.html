@@ -9,13 +9,12 @@
   <h2>Nodes</h2>
   {% trans "Registred nodes" %}: {{ node_count }}<br/>
   {% trans "Nodes with warnings" %}: {{ nodes_warned }}<br/>
-  {% trans "Node count by status" %}:
+  {% trans "Nodes by status" %}:
   <div style="padding-left: 20px;">
   {% for s in nodes_by_status %}
   <span class="node_status_{{ s.status }}">{{ s.status }}</span>: {{ s.count }}<br/>
   {% endfor %}
   </div>
-  <br/>
   {% trans "Nodes with an external antenna" %}: {{ external_ant }}<br/>
   {% trans "Nodes by router type" %}:
   <div style="padding-left: 20px;">
@@ -28,12 +27,28 @@
     {% endfor %}
     </table>
   </div>
+  {% trans "Nodes by project" %}:
+  <div style="padding-left: 20px;">
+    <table width="300" border="0">
+    {% for p in nodes_by_project %}
+    <tr>
+      <td>{% if p.special %}<i>{% endif %}{{ p.name }}{% if p.special %}</i>{% endif %}</td>
+      <td>{{ p.count }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+  </div>
   <h2>Clients</h2>
   {% trans "Clients currently online" %}: <a href="/nodes/gcl">{{ clients_online }}</a><br/>
   {% trans "Clients online so far" %}: {{ clients_ever }}<br/>
   <h2>Network</h2>  
   {% trans "Subnet count" %}: {{ subnet_count }}<br/>
   {% trans "Average peers per node" %}: {{ peers_avg }}<br/>
+</div>
+<br/>
+<h2>{% trans "Nodes by status" %}</h2>
+<div align="center">
+  <img src="http://nodes.wlan-lj.net/graphs/global_nodes_by_status.png"/>
 </div>
 <br/>
 <h2>{% trans "VPN gateway traffic" %} <span class="small_text">(in bytes per second)</span></h2>
