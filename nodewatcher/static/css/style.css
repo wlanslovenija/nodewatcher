@@ -166,7 +166,7 @@ table.nodeinfo {
 	margin-top: 20px;
 }
 
-.networksummary table.summary td.nodes {
+.networksummary table.layout td.nodes {
 	text-align: center;
 	vertical-align: baseline;
 	font-size: 2em;

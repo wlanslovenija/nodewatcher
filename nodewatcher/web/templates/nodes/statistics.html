@@ -7,7 +7,7 @@
 <h1>{% trans "Network Statistics" %}</h1>
 <div class="networksummary">
   <h2>Nodes</h2>
-<table class="layout summary">
+<table class="layout">
 <tr>
 {% for s in nodes_by_status %}
 <td class="node_status_{{ s.status }} nodes" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }}" alt="{{ s.status }}"/> {{ s.count }}<td/>
