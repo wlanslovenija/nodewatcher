@@ -10,6 +10,10 @@ table.listing {
   margin-top: 0px;
 }
 
+h1 {
+  vertical-align: bottom;
+}
+
 .small_text {
   font-size: 10px;
 }
@@ -146,8 +150,18 @@ table.nodeinfo {
   width: auto;
 }
 
-
 .nodeinfo td {
   font-size: 60%;
 }
 
+.networksummary h2 {
+	margin-top: 20px;
+}
+
+.networksummary table.summary td.nodes {
+	text-align: center;
+	vertical-align: baseline;
+	font-size: 2em;
+	font-weight: bold;
+	width: 25%;
+}

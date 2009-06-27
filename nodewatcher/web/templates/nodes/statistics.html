@@ -5,39 +5,47 @@
 
 {% block content %}
 <h1>{% trans "Network Statistics" %}</h1>
-<div class="summary">
+<div class="networksummary">
   <h2>Nodes</h2>
-  {% trans "Registred nodes" %}: {{ node_count }}<br/>
-  {% trans "Nodes with warnings" %}: {{ nodes_warned }}<br/>
-  {% trans "Nodes by status" %}:
-  <div style="padding-left: 20px;">
-  {% for s in nodes_by_status %}
-  <span class="node_status_{{ s.status }}">{{ s.status }}</span>: {{ s.count }}<br/>
-  {% endfor %}
-  </div>
-  {% trans "Nodes with an external antenna" %}: {{ external_ant }}<br/>
-  {% trans "Nodes by router type" %}:
-  <div style="padding-left: 20px;">
-    <table width="300" border="0">
+<table class="layout summary">
+<tr>
+{% for s in nodes_by_status %}
+<td class="node_status_{{ s.status }} nodes" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }}" alt="{{ s.status }}"/> {{ s.count }}<td/>
+{% endfor %}
+</tr>
+</table>
+
+<div>
+{% trans "All registred nodes" %}: {{ node_count }}<br/>
+{% trans "Nodes with warnings" %}: {{ nodes_warned }}<br/>
+{% trans "Nodes with an external antenna" %}: {{ external_ant }}<br/>
+</div>
+
+<h3 id="routers_folder" class="folding closed">{% trans "Nodes by router type" %}</h3>
+  <div style="padding-left: 20px;" id="routers_foldee">
+    <table border="0" style="width: 90%; !important;" class="listing">
     {% for t in template_usage %}
-    <tr>
+    <tr class="{% cycle 'odd' 'even' %}">
       <td>{% if t.special %}<i>{% endif %}{{ t.template }}{% if t.special %}</i>{% endif %}</td>
       <td>{{ t.count }}</td>
     </tr>
     {% endfor %}
     </table>
   </div>
-  {% trans "Nodes by project" %}:
-  <div style="padding-left: 20px;">
-    <table width="300" border="0">
+
+<h3 id="projects_folder" class="folding closed">{% trans "Nodes by project" %}</h3>
+  <div style="padding-left: 20px;" id="projects_foldee">
+    <table border="0" style="width: 90%; !important;" class="listing">
     {% for p in nodes_by_project %}
-    <tr>
+    <tr class="{% cycle 'odd' 'even' %}">
       <td>{% if p.special %}<i>{% endif %}{{ p.name }}{% if p.special %}</i>{% endif %}</td>
       <td>{{ p.count }}</td>
     </tr>
     {% endfor %}
     </table>
   </div>
+
+
   <h2>Clients</h2>
   {% trans "Clients currently online" %}: <a href="/nodes/gcl">{{ clients_online }}</a><br/>
   {% trans "Clients online so far" %}: {{ clients_ever }}<br/>
