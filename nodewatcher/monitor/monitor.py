@@ -243,7 +243,7 @@ def checkMeshStatus():
       Event.create_event(node, EventCode.NodeDown, '', EventSource.Monitor)
       
       # Invalidate uptime credit for this node
-      nlut = lut.get(node.ip, LastUpdateTimes())
+      nlut = lut.setdefault(node.ip, LastUpdateTimes())
       nlut.uptime_credit = None
 
   # Setup all node peerings
@@ -290,7 +290,7 @@ def checkMeshStatus():
       add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency_%s' % nodeIp, n.rtt_avg)
 
       # Add uptime credit
-      nlut = lut.get(n.ip, LastUpdateTimes())
+      nlut = lut.setdefault(n.ip, LastUpdateTimes())
       if nlut.uptime_credit is not None:
         n.uptime_so_far = (n.uptime_so_far or 0) + int(time.time() - nlut.uptime_credit)
 
