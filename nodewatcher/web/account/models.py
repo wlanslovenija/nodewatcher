@@ -11,7 +11,7 @@ class UserAccount(models.Model):
   vpn_password = models.CharField(max_length = 50, null = True)
   name = models.CharField(max_length = 50, null = True)
   phone = models.CharField(max_length = 50, null = True)
-  info_sticker = models.BooleanField(default = False, null = True)
+  info_sticker = models.BooleanField(default = False)
   project = models.ForeignKey(Project, null = True)
 
   def generate_vpn_password(self):
