@@ -154,6 +154,14 @@ table.nodeinfo {
   font-size: 60%;
 }
 
+.summary {
+  background: #ffd;
+  border: 1px outset #996;
+  margin-top: 1em;
+  padding: .5em 1em;
+  position: relative;
+}
+
 .networksummary h2 {
 	margin-top: 20px;
 }
