@@ -77,10 +77,10 @@
     <td>{% trans "Last seen" %}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
   </tr>
-  {% if node.uptime and not node.is_down %}
+  {% if node.is_mesh_node %}
   <tr>
-    <td>{% trans "Uptime" %}</td>
-    <td>{{ node.uptime|time_delta }}</td>
+    <td>{% trans "Clients so far" %}</td>
+    <td>{{ node.clients_so_far|default:"0" }}</td>
   </tr>
   {% endif %}
 </table>
@@ -196,6 +196,12 @@
     <td>{% trans "Peers" %}</td>
     <td>{{ node.peers }}</td>
   </tr>
+  {% if node.uptime %}
+  <tr>
+    <td>{% trans "Uptime" %}</td>
+    <td>{{ node.uptime|time_delta }}</td>
+  </tr>
+  {% endif %}
   {% if node.is_mesh_node %}
   <tr>
     <td>{% trans "Local time" %}</td>
@@ -204,10 +210,6 @@
   <tr>
     <td>{% trans "Connected clients" %}</td>
     <td>{{ node.clients|default:"0" }} <a href="/nodes/gcl#n{{ node.ip }}"><img src="/images/users.png" title="{% trans "Global client list" %}" border="0" /></a></td>
-  </tr>
-  <tr>
-    <td>{% trans "Clients so far" %}</td>
-    <td>{{ node.clients_so_far|default:"0" }}</td>
   </tr>
   {% endif %}
   {% endif %}
