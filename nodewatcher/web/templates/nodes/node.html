@@ -83,6 +83,10 @@
     <td>{{ node.clients_so_far|default:"0" }}</td>
   </tr>
   {% endif %}
+  <tr>
+    <td>{% trans "Stability" %}</td>
+    <td>{{ node.get_stability|default:_("unknown") }} %</td>
+  </tr>
 </table>
 <h3 id="details_title">{% trans "Details" %}</h3>
 <table border="0" id="details_list" class="layout">

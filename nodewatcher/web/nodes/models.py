@@ -261,6 +261,16 @@ class Node(models.Model):
       w.append(_("Node requires direct border gateway peering but has none!"))
 
     return w
+  
+  def get_stability(self):
+    """
+    Returns this node's stability factor.
+    """
+    if not self.first_seen or not self.uptime_so_far:
+      return None
+
+    dt = abs(self.first_seen - datetime.now())
+    return "%.02f" % (float(self.uptime_so_far) / (dt.days*3600*24 + dt.seconds) * 100)
 
   def has_allocated_subnets(self, type = IfaceType.WiFi):
     """
