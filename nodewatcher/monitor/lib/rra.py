@@ -202,8 +202,7 @@ class RRAClients(RRAConfiguration):
     r'GPRINT:clients:LAST:  Current\:%8.2lf',
     r'GPRINT:clients:AVERAGE:Average\:%8.2lf',
     r'GPRINT:clients:MAX:Maximum\:%8.2lf\n',
-    '--alt-y-grid',
-    '--units-exponent', '0'
+    '--lower-limit', '0'
   ]
 
 class RRARTT(RRAConfiguration):
