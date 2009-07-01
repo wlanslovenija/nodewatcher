@@ -168,7 +168,7 @@ def checkGlobalStatistics():
   RRA.graph(RRANodesByStatus, 'Nodes By Status', os.path.join(GRAPHDIR, 'global_nodes_by_status.png'), *([rra] * 6))
 
   # Global client count
-  client_count = Node.objects.all().aggregate(num = models.Sum('clients'))['num']
+  client_count = len(APClient.objects.all())
   rra = os.path.join(WORKDIR, 'rra', 'global_client_count.rrd')
   RRA.update(None, RRAClients, rra, client_count)
   RRA.graph(RRAClients, 'Global Client Count', os.path.join(GRAPHDIR, 'global_client_count.png'), rra)
