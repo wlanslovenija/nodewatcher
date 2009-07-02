@@ -19,11 +19,11 @@ h1 {
 }
 
 .node_status_up {
-  color: #00810F;
+  color: #00bb00;
 }
 
 .node_status_invalid {
-  color: #FFE13E;
+  color: #cccc22;
 }
 
 .node_status_new {
@@ -31,19 +31,19 @@ h1 {
 }
 
 .node_status_visible {
-  color: #00C2D9;
+  color: #ffa82f;
 }
 
 .node_status_down {
-  color: #DE0000;
+  color: #ff0000;
 }
 
 .node_status_duped {
-  color: #9F00BE;
+  color: #7f43ff;
 }
 
 .node_status_pending {
-  color: #FFF46D;
+  color: 648863;
 }
 
 .subnet_status_notannounced {
