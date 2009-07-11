@@ -8,12 +8,34 @@
 <h1>{% trans "Mesh Map View" %}</h1>
 <br/>
 <script>
-  function create_marker(map, lat, lon, ip, name)
+  var icons = {};
+
+  function create_icon(status)
   {
-    var opts = { title : name + " (" + ip + ")" };
+    if (icons[status])
+      return icons[status];
+
+    icon = new GIcon();
+    icon.image = "/images/gmap_node_"+status+".png";
+    icon.shadow = "/images/gmap_node_shadow.png";
+    icon.iconSize = new GSize(20, 32);
+    icon.shadowSize = new GSize(32, 32);
+    icon.iconAnchor = new GPoint(9, 30);
+    icon.infoWindowAnchor = new GPoint(10, 2);
+    icons[status] = icon;
+    return icon;
+  }
+
+  function create_marker(map, lat, lon, ip, name, status, urlinfo)
+  {
+    var opts = { title : name + " (" + ip + ")", "icon" : create_icon(status) };
     var m = new GMarker(new GLatLng(lat, lon), opts);
     GEvent.addListener(m, "click", function() {
-      m.openInfoWindowHtml("<b>" + name + "</b> (" + ip + ")");
+      html = "<b>" + name + "</b> (" + ip + ")<div class=\"gmap_details\">Status: <span class=\"node_status_" +
+           status + "\">" + status + "</span><br><a href=\"/nodes/node/" + ip +"\" target=\"_blank\">more information</a>";
+      if (urlinfo) 
+       html = html + " | <a href=\"" + urlinfo + "\" target=\"_blank\">{% trans "visit info page" %}</a>";
+      m.openInfoWindowHtml(html + "</div>");
     });
     map.addOverlay(m);
   }
@@ -23,16 +45,17 @@
     var p = new GPolyline([
       new GLatLng(lat1, lon1),
       new GLatLng(lat2, lon2)
-    ], color, 10);
+    ], color, 5);
     map.addOverlay(p);
   }
 
   function populate_map(map)
   {
+
     /* Nodes */
     {% for node in nodes %}
     {% if node.should_draw_on_map %}
-    create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}');
+    create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}', '{{ node.status_as_string }}', '{{ node.url }}');
     {% endif %}
     {% endfor %}
 

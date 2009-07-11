@@ -124,10 +124,6 @@ tr.inner_header {
   clear: both;
 }
 
-a.ext-link .icon {
-  background: url(../images/extlink.gif) center center no-repeat;
-  padding-left: 12px;
-}
 
 table.layout {
   width: 100%;
@@ -190,4 +186,8 @@ table.nodeinfo {
 
 .legend ul li img {
 	vertical-align: middle;
+}
+
+.gmap_details {
+	font-size: 80%;
 }

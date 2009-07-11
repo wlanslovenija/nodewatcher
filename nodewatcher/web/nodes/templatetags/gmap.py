@@ -12,6 +12,24 @@ INCLUDE_TEMPLATE = """
 BASIC_TEMPLATE = """
 <div id="gmap" style="width:400px; height: 300px;"></div>
 <script>
+  var icons = {};
+
+  function create_icon(status)
+  {
+    if (icons[status])
+      return icons[status];
+
+    icon = new GIcon();
+    icon.image = "/images/gmap_node_"+status+".png";
+    icon.shadow = "/images/gmap_node_shadow.png";
+    icon.iconSize = new GSize(20, 32);
+    icon.shadowSize = new GSize(32, 32);
+    icon.iconAnchor = new GPoint(9, 30);
+    icon.infoWindowAnchor = new GPoint(10, 2);
+    icons[status] = icon;
+    return icon;
+  }
+
   function create_map() {
     if (GBrowserIsCompatible()) {
       var map = new GMap2(document.getElementById("gmap"));
@@ -22,7 +40,7 @@ BASIC_TEMPLATE = """
       map.addControl(new GMapTypeControl());
       var m = 0;
       if (%(marker)s && %(mlat)s > 0 && %(mlong)s > 0) {
-        m = new GMarker(new GLatLng(%(mlat)s, %(mlong)s));
+        m = new GMarker(new GLatLng(%(mlat)s, %(mlong)s), {'icon' : create_icon("%(status)s")});
         map.addOverlay(m);
         map.setCenter(m.getLatLng(), 15);
       }
@@ -103,7 +121,8 @@ def do_gmap(parser, token):
     'marker'    : 'no',
     'clickable' : 'yes',
     'full'      : 'no',
-    'callback'  : 'undefined'
+    'callback'  : 'undefined',
+    'status'  : 'up'
   }
 
   for item in items[1:]:
