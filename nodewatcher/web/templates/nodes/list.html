@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load nodestatus %}
 
 {% block title %}{% trans "Node List" %}{% endblock %}
 {% block contenttype %}nodelist{% endblock %}
@@ -23,7 +24,7 @@
     <th width="150"><b>{% trans "Node name" %}</b></th>
     <th width="100"><b>IP</b></th>
     <th width="280"><b>{% trans "Last seen up" %}</b></th>
-    <th width="70"><b>{% trans "Status" %}</b></th>
+    <th width="50" align="center"><b>{% trans "Status" %}</b></th>
     <th width="70" align="center"><b>{% trans "Peers" %}</b></th>
     <th width="70" align="center"><b>{% trans "Clients" %}</b></th>
     <th width="90" align="center"><b>{% trans "Project" %}</b></th>
@@ -47,7 +48,7 @@
     <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
-    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
+    <td align="center">{{ node.status_as_string|statusimage:"small" }}</td>
     {% if node.is_down %}
     <td align="center">0</td>
     <td align="center">0</td>
@@ -61,14 +62,16 @@
 </tbody>
 </table>
 <br/>
-{% trans "Status legend" %}:<br/>
+<div class="legend">
+<h3>{% trans "Status legend" %}:</h3>
 <ul>
-  <li><span class="node_status_up">up</span> - {% trans "node is reachable" %}</li>
-  <li><span class="node_status_invalid">invalid</span> - {% trans "IP is not allocated but is seen" %}</li>
-  <li><span class="node_status_visible">visible</span> - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
-  <li><span class="node_status_down">down</span> - {% trans "node is not visible via OLSR" %}</li>
-  <li><span class="node_status_duped">duped</span> - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
-  <li><span class="node_status_new">new</span> - {% trans "node has just been registred" %}</li>
-  <li><span class="node_status_pending">pending</span> - {% trans "node has not yet been seen since registration" %}</li>
+  <li>{{ "up"|status:"small" }} - {% trans "node is reachable" %}</li>
+  <li>{{ "invalid"|status:"small" }} - {% trans "IP is not allocated but is seen" %}</li>
+  <li>{{ "visible"|status:"small" }} - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
+  <li>{{ "down"|status:"small" }}- {% trans "node is not visible via OLSR" %}</li>
+  <li>{{ "duped"|status:"small" }} - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
+  <li>{{ "new"|status:"small" }} - {% trans "node has just been registred" %}</li>
+  <li>{{ "pending"|status:"small" }} - {% trans "node has not yet been seen since registration" %}</li>
 </ul>
+</div>
 {% endblock %}
