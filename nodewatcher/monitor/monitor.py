@@ -131,8 +131,8 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
     graph = GraphItem(node = node, name = name, type = type, parent = parent)
     graph.rra = '%s.rrd' % filename
     graph.graph = '%s.png' % filename
-    graph.title = title
-
+  
+  graph.title = title
   graph.last_update = datetime.now()
   graph.dead = False
   graph.save()
