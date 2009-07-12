@@ -66,10 +66,10 @@
 <h3>{% trans "Status legend" %}:</h3>
 <ul>
   <li>{{ "up"|status:"small" }} - {% trans "node is reachable" %}</li>
-  <li>{{ "invalid"|status:"small" }} - {% trans "IP is not allocated but is seen" %}</li>
   <li>{{ "visible"|status:"small" }} - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
   <li>{{ "down"|status:"small" }}- {% trans "node is not visible via OLSR" %}</li>
   <li>{{ "duped"|status:"small" }} - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
+  <li>{{ "invalid"|status:"small" }} - {% trans "IP is not allocated but is seen" %}</li>
   <li>{{ "new"|status:"small" }} - {% trans "node has just been registred" %}</li>
   <li>{{ "pending"|status:"small" }} - {% trans "node has not yet been seen since registration" %}</li>
 </ul>
