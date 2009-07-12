@@ -35,7 +35,7 @@ def statistics(request):
   node_count = len(Node.objects.all())
   others = node_count
   nodes_by_status = []
-  for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
+  for s in Node.objects.all().order_by('status').values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
   # Nodes by template usage
