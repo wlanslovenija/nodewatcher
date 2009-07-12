@@ -45,15 +45,16 @@
 
   function create_link(map, zoomLevel, lat1, lon1, lat2, lon2, color)
   {
-    var startPoint = map.getProjection().fromLatLngToPixel(new GLatLng(lat1, lon1), zoomLevel);
-    var endPoint = map.getProjection().fromLatLngToPixel(new GLatLng(lat2, lon2), zoomLevel);
+    var projection = map.getCurrentMapType().getProjection();
+    var startPoint = projection.fromLatLngToPixel(new GLatLng(lat1, lon1), zoomLevel);
+    var endPoint = projection.fromLatLngToPixel(new GLatLng(lat2, lon2), zoomLevel);
     
     startPoint.y -= antennaOffset;
     endPoint.y -= antennaOffset;
     
     var p = new GPolyline([
-      map.getProjection().fromPixelToLatLng(startPoint, zoomLevel),
-      map.getProjection().fromPixelToLatLng(endPoint, zoomLevel)
+      projection.fromPixelToLatLng(startPoint, zoomLevel),
+      projection.fromPixelToLatLng(endPoint, zoomLevel)
     ], color, 5);
     map.addOverlay(p);
   }
