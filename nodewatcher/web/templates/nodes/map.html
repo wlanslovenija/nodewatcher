@@ -55,7 +55,7 @@
     /* Nodes */
     {% for node in nodes %}
     {% if node.should_draw_on_map %}
-    create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}', '{{ node.status_as_string }}', '{{ node.url }}');
+    create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}', '{{ node.status_as_string }}', '{{ node.url|default:"" }}');
     {% endif %}
     {% endfor %}
 
