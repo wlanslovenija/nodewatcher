@@ -18,7 +18,7 @@ def statusimage(value, arg, autoescape=None):
     if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new')):
       return ""
 
-    if not (arg in ('big', 'small')):
+    if not (arg in ('big', 'small', 'gmap')):
       arg = "small"
 
     params = {"status":value, "size":arg}
@@ -32,7 +32,7 @@ def status(value, arg, autoescape=None):
     if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new')):
       return ""
 
-    if not (arg in ('big', 'small')):
+    if not (arg in ('big', 'small', 'gmap')):
       arg = "small"
 
     params = {"status":value, "size":arg}

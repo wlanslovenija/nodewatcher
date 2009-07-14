@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load gmap %}
+{% load nodestatus %}
 
 {% block title %}{% trans "Mesh Map View" %}{% endblock %}
 
@@ -17,7 +18,7 @@
       return icons[status];
 
     icon = new GIcon();
-    icon.image = "/images/gmap_node_"+status+".png";
+    icon.image = "/images/status_"+status+"_gmap.png";
     icon.shadow = "/images/gmap_node_shadow.png";
     icon.transparent = "gmap_node_transparent.png";
     icon.imageMap = [12,0,14,1,15,2,16,3,16,4,16,5,17,6,17,7,17,8,16,9,16,10,16,11,15,12,14,13,13,14,14,15,14,16,15,17,15,18,16,19,16,20,16,21,17,22,17,23,18,24,18,25,19,26,19,27,15,28,16,29,14,30,5,30,3,29,4,28,0,27,1,26,1,25,1,24,2,23,2,22,3,21,3,20,4,19,4,18,4,17,5,16,5,15,6,14,5,13,4,12,3,11,3,10,3,9,2,8,2,7,2,6,3,5,3,4,3,3,4,2,5,1,7,0];
@@ -87,14 +88,23 @@
 <div style="margin-left: 10px;">
 {% gmap lat:46.05 long:14.5 full:yes callback:map_init %}
 </div>
+<div class="legend">
+<h3>{% trans "Node status key" %}:</h3>
+<ul>
+  <li>{{ "up"|status:"gmap" }} - {% trans "node is reachable" %}</li>
+  <li>{{ "invalid"|status:"gmap" }} - {% trans "IP is not allocated but is seen" %}</li>
+  <li>{{ "visible"|status:"gmap" }} - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
+  <li>{{ "down"|status:"gmap" }}- {% trans "node is not visible via OLSR" %}</li>
+  <li>{{ "duped"|status:"gmap" }} - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
+  <li>{{ "new"|status:"gmap" }} - {% trans "node has just been registred" %}</li>
+  <li>{{ "pending"|status:"gmap" }} - {% trans "node has not yet been seen since registration" %}</li>
+</ul>
 <br/>
-<br/>
-{% trans "Edge color key" %}:<br/>
+<h3>{% trans "Edge color key" %}:</h3>
 <ul>
   <li><font color='#00ff00'>{% trans "green" %}</font> - {% trans "ETX is between 1.0 and 2.0" %}</li>
   <li><font color='#0000ff'>{% trans "blue" %}</font> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
   <li><font color='#ff0000'>{% trans "red" %}</font> - {% trans "ETX is greater than 5.0" %}</li>
 </ul>
-<br/>
-<br/><br/><br/><br/>
+</div>
 {% endblock %}

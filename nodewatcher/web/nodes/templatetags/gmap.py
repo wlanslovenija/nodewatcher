@@ -20,7 +20,7 @@ BASIC_TEMPLATE = """
       return icons[status];
 
     icon = new GIcon();
-    icon.image = "/images/gmap_node_"+status+".png";
+    icon.image = "/images/status_"+status+"_gmap.png";
     icon.shadow = "/images/gmap_node_shadow.png";
     icon.iconSize = new GSize(20, 32);
     icon.shadowSize = new GSize(32, 32);
