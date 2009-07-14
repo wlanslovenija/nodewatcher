@@ -309,8 +309,8 @@ def checkMeshStatus():
       n.warnings = True
 
     # Generate status change events
-    if oldStatus in (NodeStatus.Down, NodeStatus.Pending) and n.status in (NodeStatus.Up, NodeStatus.Visible):
-      if oldStatus == NodeStatus.Pending:
+    if oldStatus in (NodeStatus.Down, NodeStatus.Pending, NodeStatus.New) and n.status in (NodeStatus.Up, NodeStatus.Visible):
+      if oldStatus in (NodeStatus.New, NodeStatus.Pending):
         n.first_seen = datetime.now()
 
       Event.create_event(n, EventCode.NodeUp, '', EventSource.Monitor)
