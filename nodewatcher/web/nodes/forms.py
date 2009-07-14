@@ -228,6 +228,7 @@ class RegisterNodeForm(forms.Form):
     node.notes = self.cleaned_data.get('notes')
     node.url = self.cleaned_data.get('url')
     node.redundancy_req = self.cleaned_data.get('redundancy_req')
+    node.warnings = False
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
