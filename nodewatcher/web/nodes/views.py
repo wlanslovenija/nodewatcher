@@ -43,8 +43,9 @@ def statistics(request):
   for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
     others -= t['count']
-
-  templates_by_usage.append({ 'template' : _("unknown"), 'count' : others, 'special' : True })
+  
+  if others > 0:
+    templates_by_usage.append({ 'template' : _("unknown"), 'count' : others, 'special' : True })
 
   # Nodes by project
   nodes_by_project = []
@@ -55,7 +56,8 @@ def statistics(request):
     else:
       nodes_by_project.append({ 'name' : p['project__name'], 'count' : p['count']})
   
-  nodes_by_project.append({ 'name' : _("unknown"), 'count' : others, 'special' : True})
+  if others > 0:
+    nodes_by_project.append({ 'name' : _("unknown"), 'count' : others, 'special' : True})
 
   return render_to_response('nodes/statistics.html',
     { 'node_count' : node_count,
