@@ -102,15 +102,15 @@
     <td>{{ form.ant_external.label }}</td>
     <td>{{ form.ant_external }}</td>
   </tr>
-  <tr>
+  <tr class="extantenna_opts">
     <td>{{ form.ant_type.label }}</td>
     <td>{{ form.ant_type }}</td>
   </tr>
-  <tr>
+  <tr class="extantenna_opts">
     <td>{{ form.ant_polarization.label }}</td>
     <td>{{ form.ant_polarization }}</td>
   </tr>
-  <tr>
+  <tr class="extantenna_opts">
     <td>{{ form.ant_conn.label }}</td>
     <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this?</a>)</td>
   </tr>
@@ -233,14 +233,25 @@
       $('.location_opts').css('display', '');
     }
   }
+  
+  function toggleExtAntenna()
+  {
+    if ($('#id_ant_external').is(':checked')) {
+      $('.extantenna_opts').css('display', '');
+    } else {
+      $('.extantenna_opts').css('display', 'none');
+    }
+  }
 
   $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
   $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
   $('#id_node_type').change(function(event) { toggleLocation(); });
+  $('#id_ant_external').change(function(event) { toggleExtAntenna(); });
   $(function() {
     toggleAutoConfiguration();
     toggleImageGeneratorOptions();
     toggleLocation();
+    toggleExtAntenna();
   });
 
 {% if user.is_staff %}
