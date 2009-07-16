@@ -359,21 +359,33 @@ def checkMeshStatus():
           n.warnings = True
 
         # Parse nodogsplash client information
+        oldNdsStatus = n.captive_portal_status
         if 'nds' in info:
-          for cid, client in info['nds'].iteritems():
-            try:
-              c = APClient.objects.get(node = n, ip = client['ip'])
-            except APClient.DoesNotExist:
-              c = APClient(node = n)
-              n.clients_so_far += 1
-            
-            n.clients += 1
-            c.ip = client['ip']
-            c.uploaded = safe_int_convert(client['up'])
-            c.downloaded = safe_int_convert(client['down'])
-            c.last_update = datetime.now()
-            c.save()
+          if 'down' in info['nds']:
+            n.captive_portal_status = False
+          else:
+            for cid, client in info['nds'].iteritems():
+              try:
+                c = APClient.objects.get(node = n, ip = client['ip'])
+              except APClient.DoesNotExist:
+                c = APClient(node = n)
+                n.clients_so_far += 1
+              
+              n.clients += 1
+              c.ip = client['ip']
+              c.uploaded = safe_int_convert(client['up'])
+              c.downloaded = safe_int_convert(client['down'])
+              c.last_update = datetime.now()
+              c.save()
+        else:
+          n.captive_portal_status = True
         
+        # Check for captive portal status change
+        if oldNdsStatus and not n.captive_portal_status:
+          Event.create_event(n, EventCode.CaptivePortalDown, '', EventSource.Monitor)
+        elif not oldNdsStatus and n.captive_portal_status:
+          Event.create_event(n, EventCode.CaptivePortalUp, '', EventSource.Monitor)
+
         # Generate a graph for number of clients
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)
 
