@@ -525,7 +525,6 @@ class OpenWrtConfig(NodeConfig):
     f.write('group nogroup\n')
     f.write('ca /etc/openvpn/wlanlj-ca.crt\n')
     f.write('tls-auth /etc/openvpn/wlanlj-ta.key 1\n')
-    f.write('up /etc/openvpn/up.sh\n')
     f.close()
     
     # Password file
@@ -538,10 +537,6 @@ class OpenWrtConfig(NodeConfig):
     self.__copyTemplate("openvpn/ta.key", os.path.join(directory, 'wlanlj-ta.key'))
     self.__copyTemplate("openvpn/ca.crt", os.path.join(directory, 'wlanlj-ca.crt'))
     
-    # Copy the restart script
-    self.__copyTemplate("openvpn/up.sh", os.path.join(directory, 'up.sh'))
-    os.chmod(os.path.join(directory, 'up.sh'), 0755)
-
     # Add package dependencies
     self.addPackage('kmod-tun', 'zlib', 'libopenssl', 'liblzo', 'openvpn')
   
