@@ -170,6 +170,7 @@ class Node(models.Model):
   loadavg_15min = models.FloatField(null = True)
   memfree = models.IntegerField(null = True)
   numproc = models.IntegerField(null = True)
+  captive_portal_status = models.BooleanField(default = True)
   
   def has_time_sync_problems(self):
     """
@@ -644,6 +645,8 @@ class EventCode:
   ChannelChanged = 7
   RedundancyLoss = 8
   VersionChange = 9
+  CaptivePortalDown = 10
+  CaptivePortalUp = 11
 
   NodeAdded = 100
 
@@ -673,6 +676,10 @@ class EventCode:
       return _("Redundant link to border gateway has gone down")
     elif code == EventCode.VersionChange:
       return _("Firmware version has changed")
+    elif code == EventCode.CaptivePortalDown:
+      return _("Captive portal has failed")
+    elif code == EventCode.CaptivePortalUp:
+      return _("Captive portal has been restored")
     elif code == EventCode.NodeAdded:
       return _("A new node has been registred")
     else:
