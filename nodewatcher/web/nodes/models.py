@@ -442,6 +442,7 @@ class GraphType:
   LoadAverage = 1
   MemUsage = 0
   NumProc = -1
+  WifiCells = 7
 
   @staticmethod
   def as_string(type):
@@ -466,6 +467,8 @@ class GraphType:
       return "memusage"
     elif type == GraphType.NumProc:
       return "numproc"
+    elif type == GraphType.WifiCells:
+      return "wificells"
     else:
       return "unknown"
 
