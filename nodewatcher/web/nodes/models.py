@@ -443,6 +443,7 @@ class GraphType:
   MemUsage = 0
   NumProc = -1
   WifiCells = 7
+  OlsrPeers = 5
 
   @staticmethod
   def as_string(type):
@@ -469,6 +470,8 @@ class GraphType:
       return "numproc"
     elif type == GraphType.WifiCells:
       return "wificells"
+    elif type == GraphType.OlsrPeers:
+      return "olsrpeers"
     else:
       return "unknown"
 
