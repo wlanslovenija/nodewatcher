@@ -439,6 +439,37 @@ class RRAWifiCells(RRAConfiguration):
     '--lower-limit', '0'
   ]
 
+class RRAOlsrPeers(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'peers',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE1:peers#EEBA00:Peers",
+    r'GPRINT:peers:LAST:  Current\:%8.2lf',
+    r'GPRINT:peers:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:peers:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0'
+  ]
+
 class RRASolar(RRAConfiguration):
   db_model = StatsSolar
   interval = 1800

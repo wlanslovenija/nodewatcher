@@ -17,7 +17,7 @@ from django.db import transaction, models
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
@@ -38,7 +38,9 @@ RRA_CONF_MAP = {
   GraphType.LoadAverage : RRALoadAverage,
   GraphType.NumProc     : RRANumProc,
   GraphType.MemUsage    : RRAMemUsage,
-  GraphType.Solar       : RRASolar
+  GraphType.Solar       : RRASolar,
+  GraphType.WifiCells   : RRAWifiCells,
+  GraphType.OlsrPeers   : RRAOlsrPeers
 }
 
 class LastUpdateTimes:
@@ -317,6 +319,9 @@ def checkMeshStatus():
     elif oldStatus != NodeStatus.Duped and n.status == NodeStatus.Duped:
       Event.create_event(n, EventCode.PacketDuplication, '', EventSource.Monitor)
     
+    # Add olsr peer count graph
+    add_graph(n, '', GraphType.OlsrPeers, RRAOlsrPeers, 'Routing Peers', 'olsrpeers_%s' % nodeIp, n.peers)
+
     # Add LQ/ILQ graphs
     lq_avg = ilq_avg = 0.0
     for peer in nodes[nodeIp].links:
