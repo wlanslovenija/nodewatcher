@@ -17,7 +17,7 @@ from django.db import transaction, models
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
 from lib.nodewatcher import NodeWatcher
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
@@ -385,6 +385,10 @@ def checkMeshStatus():
           Event.create_event(n, EventCode.CaptivePortalDown, '', EventSource.Monitor)
         elif not oldNdsStatus and n.captive_portal_status:
           Event.create_event(n, EventCode.CaptivePortalUp, '', EventSource.Monitor)
+
+        # Generate a graph for number of wifi cells
+        if 'cells' in info['wifi']:
+          add_graph(n, '', GraphType.WifiCells, RRAWifiCells, 'Nearby Wifi Cells', 'wificells_%s' % nodeIp, safe_int_convert(info['wifi']['cells']) or 0)
 
         # Generate a graph for number of clients
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)

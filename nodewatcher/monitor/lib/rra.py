@@ -408,6 +408,37 @@ class RRAMemUsage(RRAConfiguration):
     r'GPRINT:cached:MAX:Maximum\:%8.2lf\n'
   ]
 
+class RRAWifiCells(RRAConfiguration):
+  interval = 300
+  sources = [
+    rrdtool.DataSource(
+      'cells',
+      type = rrdtool.GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 180000 / interval
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1800 / interval,
+      rows = 700
+    )
+  ]
+  graph = [
+    "LINE1:cells#00EE00:Cells",
+    r'GPRINT:cells:LAST:  Current\:%8.2lf',
+    r'GPRINT:cells:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:cells:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0'
+  ]
+
 class RRASolar(RRAConfiguration):
   db_model = StatsSolar
   interval = 1800
