@@ -670,6 +670,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('LinkQualityFishEye 0\n')
     f.write('LinkQualityLevel 2\n')
     f.write('LinkQualityWinSize 100\n')
+    f.write('LinkQualityAlgorithm "etx_ff"\n')
     f.write('Pollrate 0.1\n')
     f.write('TcRedundancy 2\n')
     f.write('MprCoverage 1\n')
