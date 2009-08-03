@@ -41,8 +41,8 @@ wifiAntennas = {
   'whr-hp-g54'  : (1,         False),
   'wrt54gl'     : (0,         False),
   'wrt54gs'     : (0,         False),
-  'wl-500g'     : (0,         False),
-  'wl-500gd'    : (0,         False),
+  'wl-500gp'    : (0,         True),
+  'wl-500gd'    : (0,         True),
   'rb433'       : (1,         False)
 }
 
@@ -53,8 +53,8 @@ portLayouts = {
   'wrt54gl'    : ('0 1 2 3 5*', '4 5'),
   'wrt54gs'    : ('1 2 3 4 5*', '0 5'),
   'whr-hp-g54' : ('1 2 3 4 5*', '0 5'),
-  'wl-500g'    : ('0 1 2 3 5*', '4 5'),
-  'wl-500gd'   : ('1 2 3 4 5*', '0 5'),
+  'wl-500gp'   : ('0 1 2 3 5*', '4 5'),
+  'wl-500gd'   : ('0 1 2 3 5*', '4 5'),
   'fonera'     : None,
   'fonera+'    : True,
   'rb433'      : True # ('1 5*',       '2 5')
