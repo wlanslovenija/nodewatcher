@@ -191,3 +191,12 @@ table.nodeinfo {
 .gmap_details {
 	font-size: 80%;
 }
+
+.optional_packages ul {
+  padding: 0 0 0 0;
+}
+
+.optional_packages ul li {
+  list-style-type: none;
+}
+
