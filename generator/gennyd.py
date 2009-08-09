@@ -85,6 +85,10 @@ def generate_image(d):
   if d['lan_wan_switch']:
     x.switchWanToLan()
   
+  # Add optional packages
+  for package in d['opt_pkg']:
+    x.addPackage(package)
+  
   # Cleanup stuff from previous builds
   os.chdir(WORKDIR)
   os.system("rm -rf build/files/*")
