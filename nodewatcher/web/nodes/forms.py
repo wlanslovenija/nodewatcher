@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
-from wlanlj.generator.models import Template, Profile
+from wlanlj.generator.models import Template, Profile, OptionalPackage
 from wlanlj.generator.types import IfaceType
 from wlanlj.account.util import generate_random_password
 from wlanlj.dns.models import Record
@@ -74,6 +74,12 @@ class RegisterNodeForm(forms.Form):
   )
   lan_bridge = forms.BooleanField(required = False, initial = False,
     label = _("Enable LAN/WiFi bridge")
+  )
+  optional_packages = forms.ModelMultipleChoiceField(
+    queryset = OptionalPackage.objects.all().order_by("fancy_name"),
+    label = _("Optional packages"),
+    required = False,
+    widget = widgets.CheckboxSelectMultiple
   )
 
   # Antenna type
@@ -253,6 +259,7 @@ class RegisterNodeForm(forms.Form):
       profile.wan_ip = self.cleaned_data.get('wan_ip')
       profile.wan_cidr = self.cleaned_data.get('wan_cidr')
       profile.wan_gw = self.cleaned_data.get('wan_gw')
+      profile.optional_packages = self.cleaned_data.get('optional_packages')
       profile.save()
 
     if subnet:
@@ -325,6 +332,12 @@ class UpdateNodeForm(forms.Form):
   )
   lan_bridge = forms.BooleanField(required = False, initial = False,
     label = _("Enable LAN/WiFi bridge")
+  )
+  optional_packages = forms.ModelMultipleChoiceField(
+    queryset = OptionalPackage.objects.all().order_by("fancy_name"),
+    label = _("Optional packages"),
+    required = False,
+    widget = widgets.CheckboxSelectMultiple
   )
 
   # Antenna type
@@ -450,7 +463,7 @@ class UpdateNodeForm(forms.Form):
     ip = self.cleaned_data.get('ip')
     oldName = node.name
     oldProject = node.project
-
+    
     # Update node metadata
     node.name = self.cleaned_data.get('name').lower()
     node.owner = self.cleaned_data.get('owner')
@@ -500,6 +513,7 @@ class UpdateNodeForm(forms.Form):
       profile.wan_ip = self.cleaned_data.get('wan_ip')
       profile.wan_cidr = self.cleaned_data.get('wan_cidr')
       profile.wan_gw = self.cleaned_data.get('wan_gw')
+      profile.optional_packages = self.cleaned_data.get('optional_packages')
       profile.save()
     elif profile:
       profile.delete()

@@ -152,7 +152,8 @@ def node_edit(request, node_ip):
         'root_pass'           : node.profile.root_pass,
         'channel'             : node.profile.channel,
         'lan_bridge'          : node.profile.lan_bridge,
-        'ant_conn'            : node.profile.antenna
+        'ant_conn'            : node.profile.antenna,
+        'optional_packages'   : [x.id for x in node.profile.optional_packages.all()]
       })
     except Profile.DoesNotExist:
       p.update({
@@ -165,7 +166,8 @@ def node_edit(request, node_ip):
         'root_pass'           : '',
         'channel'             : node.project.channel,
         'lan_bridge'          : False,
-        'ant_conn'            : 3
+        'ant_conn'            : 3,
+        'optional_packages'   : []
       })
 
     form = UpdateNodeForm(node, p)

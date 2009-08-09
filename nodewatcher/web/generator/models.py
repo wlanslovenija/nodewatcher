@@ -50,6 +50,21 @@ class IfaceTemplate(models.Model):
     else:
       return "Unknown"
 
+class OptionalPackage(models.Model):
+  """
+  This class represents an optional package that can be enabled by the
+  user in their profile.
+  """
+  fancy_name = models.CharField(max_length = 200)
+  description = models.CharField(max_length = 200)
+  name = models.CharField(max_length = 100)
+
+  def __unicode__(self):
+    """
+    Returns a string representation of this model.
+    """
+    return "%s (%s)" % (self.fancy_name, self.description)
+
 class Profile(models.Model):
   """
   This class represents an actual user's configuration profile.
@@ -72,4 +87,7 @@ class Profile(models.Model):
   wan_ip = models.CharField(max_length = 40, null = True)
   wan_cidr = models.IntegerField(null = True)
   wan_gw = models.CharField(max_length = 40, null = True)
+
+  # Optional packages
+  optional_packages = models.ManyToManyField(OptionalPackage)
 

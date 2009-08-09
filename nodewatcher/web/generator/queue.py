@@ -61,6 +61,7 @@ def queue_generator_job(node, email_user, config_only = False):
     'port_layout'     : node.profile.template.port_layout,
     'imagebuilder'    : node.profile.template.imagebuilder,
     'imagefiles'      : node.profile.template.imagefile.split(","),
+    'opt_pkg'         : [x.name for x in node.profile.optional_packages.all()],
     'subnets'         : subnets,
     'lan_wan_switch'  : not node.profile.template.iface_lan and node.has_allocated_subnets(IfaceType.LAN),
     'only_config'     : config_only,
