@@ -691,7 +691,7 @@ class OpenWrtConfig(NodeConfig):
       
       # Penalize traffic via VPN
       if name == "tap0":
-        f.write('  LinkQualityMult default 0.44\n')
+        f.write('  LinkQualityMult default 0.80\n')
       
       f.write('}\n')
       f.write('\n')
