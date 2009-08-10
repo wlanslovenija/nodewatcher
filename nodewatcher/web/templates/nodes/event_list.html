@@ -31,6 +31,51 @@
 </div>
 <br/>
 {% endif %}
+<h3>Event subscriptions</h3>
+  {% if not subscriptions %}
+  <div class="notice">
+      {% trans "No event subscriptions have been configured." %}<br />
+   <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
+    </div>
+  {% else %}
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th width="22"></th>
+    <th width="150"><b>{% trans "Type" %}</b></th>
+    <th width="150"><b>{% trans "Node" %}</b></th>
+    <th><b>{% trans "Event code" %}</b></th>
+  </tr>
+</thead>
+<tbody>
+  {% for subscription in subscriptions %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}"><img src="/images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
+    <td>
+      {{ subscription.type_to_string }}
+    </td>
+    <td>
+      {% if subscription.is_single_node %}
+      <a href="/nodes/node/{{ subscription.node.ip }}">{{ subscription.node.name }}</a>
+      {% else %}
+      -
+      {% endif %}
+    </td>
+    <td>
+      {% if subscription.code %}
+      {{ subscription.code_to_string }}
+      {% else %}
+      <i>{% trans "any event" %}</i>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  <tr class="table_links"><td colspan="4"><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a></td></tr>
+</tbody>
+</table>
+  {% endif %}
+<br/>
+<h3>{% trans "Latest events for your nodes" %}</h3>
   {% if not events %}
 <div class="notice">
       {% trans "No events have been recorded for your nodes." %}
@@ -56,44 +101,5 @@
 </table>
 {% endif %}
 <br/>
-<h3>Event subscriptions</h3>
-  {% if not subscriptions %}
-  <div class="notice">
-      {% trans "No event subscriptions have been configured." %}<br />
-   <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
-    </div>
-  {% else %}
-<table border="0" class="listing">
-<thead>
-  <tr>
-    <th width="22"></th>
-    <th width="150"><b>{% trans "Node" %}</b></th>
-    <th><b>{% trans "Event type" %}</b></th>
-  </tr>
-</thead>
-<tbody>
-  {% for subscription in subscriptions %}
-  <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}"><img src="/images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
-    <td>
-      {% if subscription.node %}
-      <a href="/nodes/node/{{ subscription.node.ip }}">{{ subscription.node.name }}</a>
-      {% else %}
-      <i>{% trans "any node" %}</i>
-      {% endif %}
-    </td>
-    <td>
-      {% if subscription.code %}
-      {{ subscription.code_to_string }}
-      {% else %}
-      <i>{% trans "any event" %}</i>
-      {% endif %}
-    </td>
-  </tr>
-  {% endfor %}
-  <tr class="table_links"><td colspan="3"><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a></td></tr>
-</tbody>
-</table>
-  {% endif %}
 </div>
 {% endblock %}

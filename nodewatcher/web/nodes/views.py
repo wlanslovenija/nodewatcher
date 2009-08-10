@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models
 from django.utils.translation import ugettext as _
-from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription
+from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
@@ -430,7 +430,8 @@ def event_subscribe(request):
     form = EventSubscribeForm()
 
   return render_to_response('nodes/event_subscribe.html',
-    { 'form' : form },
+    { 'form' : form,
+      'single_node_type' : SubscriptionType.SingleNode },
     context_instance = RequestContext(request)
   )
 

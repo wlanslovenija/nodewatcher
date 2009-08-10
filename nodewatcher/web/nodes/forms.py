@@ -2,7 +2,7 @@ from django import forms
 from django.forms import widgets
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile, OptionalPackage
@@ -676,10 +676,19 @@ class EventSubscribeForm(forms.Form):
   """
   A simple form for subscribing to an event.
   """
+  type = forms.ChoiceField(
+    choices = [
+      (SubscriptionType.SingleNode, _("Match a single node")),
+      (SubscriptionType.AllNodes, _("Match all nodes")),
+      (SubscriptionType.MyNodes, _("Match only own nodes"))
+    ],
+    label = _("Type")
+  )
   node = forms.ModelChoiceField(
     Node.objects.exclude(status = NodeStatus.Invalid),
     label = _("Node"),
-    required = False
+    required = False,
+    empty_label = None
   )
   code = forms.ChoiceField(
     choices = [
@@ -703,7 +712,13 @@ class EventSubscribeForm(forms.Form):
     Saves whitelist entry.
     """
     s = EventSubscription(user = user)
-    s.node = self.cleaned_data.get('node') or None
+    s.type = int(self.cleaned_data.get('type'))
+    
+    if s.type == SubscriptionType.SingleNode:
+      s.node = self.cleaned_data.get('node') or None
+    else:
+      s.node = None
+
     s.code = int(self.cleaned_data.get('code')) or None
     s.save()
 

@@ -774,12 +774,41 @@ class Event(models.Model):
     """
     # Check subscriptions and post notifications
     subscriptions = EventSubscription.objects.filter(
-      models.Q(node = self.node) | models.Q(node__isnull = True),
+      # Filter by nodes
+      models.Q(type = SubscriptionType.SingleNode, node = self.node) | \
+      models.Q(type = SubscriptionType.AllNodes) | \
+      models.Q(type = SubscriptionType.MyNodes, user = self.node.owner),
+      
+      # Filter by event code
       models.Q(code = self.code) | models.Q(code__isnull = True)
     )
 
     for subscription in subscriptions:
       subscription.notify(self)
+
+class SubscriptionType:
+  """
+  Valid subscription types.
+  """
+  SingleNode = 1
+  AllNodes = 2
+  MyNodes = 3
+
+  @staticmethod
+  def to_string(type):
+    """
+    Converts a subscription type to a human readable string.
+
+    @param type: A valid subscription type
+    """
+    if type == SubscriptionType.SingleNode:
+      return _("single node")
+    elif type == SubscriptionType.AllNodes:
+      return _("any node")
+    elif type == SubscriptionType.MyNodes:
+      return _("my nodes")
+    else:
+      return _("unknown")
 
 class EventSubscription(models.Model):
   """
@@ -789,12 +818,25 @@ class EventSubscription(models.Model):
   node = models.ForeignKey(Node, null = True)
   active = models.BooleanField(default = True)
   code = models.IntegerField(null = True)
+  type = models.IntegerField(default = SubscriptionType.SingleNode)
 
   def code_to_string(self):
     """
     Converts an event code to a human readable string.
     """
     return EventCode.to_string(self.code)
+
+  def type_to_string(self):
+    """
+    Converts a subscription type to a human readable string.
+    """
+    return SubscriptionType.to_string(self.type)
+  
+  def is_single_node(self):
+    """
+    Returns true if this subscription is for a single node.
+    """
+    return self.type == SubscriptionType.SingleNode
 
   def notify(self, event):
     """

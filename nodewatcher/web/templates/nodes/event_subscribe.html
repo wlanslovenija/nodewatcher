@@ -33,6 +33,10 @@
 <form action="/nodes/event_subscribe" method="POST">
 <table border="0" width="700">
   <tr>
+    <td>{{ form.type.label }}</td>
+    <td>{{ form.type }}</td>
+  </tr>
+  <tr class="single_node_subscribe">
     <td>{{ form.node.label }}</td>
     <td>{{ form.node }}</td>
   </tr>
@@ -47,4 +51,20 @@
     </div>
 </form>
 </div>
+
+<script>
+  function toggleSingleNode()
+  {
+    if ($('#id_type').attr('value') == {{ single_node_type }}) {
+      $('.single_node_subscribe').css('display', '');
+    } else {
+      $('.single_node_subscribe').css('display', 'none');
+    }
+  }
+
+  $('#id_type').change(function(event) { toggleSingleNode(); });
+  $(function() {
+    toggleSingleNode();
+  });
+</script>
 {% endblock %}
