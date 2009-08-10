@@ -1,6 +1,6 @@
 # Django settings for generator project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -12,8 +12,8 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'wlanlj'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'wlanlj'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'wlanlj'         # Not used with sqlite3.
-DATABASE_HOST = 'void.local'             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PASSWORD = 'XXX'         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 
@@ -65,6 +65,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
 )
 
 ROOT_URLCONF = 'wlanlj.urls'
