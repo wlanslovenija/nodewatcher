@@ -368,6 +368,7 @@ def checkMeshStatus():
         if 'nds' in info:
           if 'down' in info['nds']:
             n.captive_portal_status = False
+            n.warnings = True
           else:
             for cid, client in info['nds'].iteritems():
               try:
