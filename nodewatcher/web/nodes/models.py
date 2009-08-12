@@ -261,6 +261,9 @@ class Node(models.Model):
     if self.redundancy_req and not self.redundancy_link:
       w.append(_("Node requires direct border gateway peering but has none!"))
 
+    if not self.captive_portal_status:
+      w.append(_("Captive portal daemon is down!"))
+
     return w
   
   def get_stability(self):
