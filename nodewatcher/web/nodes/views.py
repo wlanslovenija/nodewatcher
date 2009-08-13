@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models
 from django.utils.translation import ugettext as _
-from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType
+from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
@@ -103,7 +103,8 @@ def node_new(request):
 
   return render_to_response('nodes/new.html',
     { 'form' : form,
-      'mobile_node_type' : NodeType.Mobile },
+      'mobile_node_type' : NodeType.Mobile,
+      'map_projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
     context_instance = RequestContext(request)
   )
 
@@ -175,7 +176,8 @@ def node_edit(request, node_ip):
   return render_to_response('nodes/edit.html',
     { 'form' : form,
       'node' : node,
-      'mobile_node_type' : NodeType.Mobile },
+      'mobile_node_type' : NodeType.Mobile,
+      'map_projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
     context_instance = RequestContext(request)
   )
 
@@ -355,7 +357,8 @@ def map(request):
 
   return render_to_response('nodes/map.html',
     { 'nodes' : Node.objects.all(),
-      'links' : links },
+      'links' : links,
+      'projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
     context_instance = RequestContext(request)
   )
 

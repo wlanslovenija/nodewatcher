@@ -21,6 +21,10 @@ class Project(models.Model):
   ssid = models.CharField(max_length = 50)
   sticker = models.CharField(max_length = 50)
   zone = models.ForeignKey(Zone, null = True)
+  
+  # Geographical location
+  geo_lat = models.FloatField(null = True)
+  geo_long = models.FloatField(null = True)
 
   def __unicode__(self):
     """

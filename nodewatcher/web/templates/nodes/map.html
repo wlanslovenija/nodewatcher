@@ -11,6 +11,7 @@
 <script>
   var icons = {};
   var antennaOffset = 23; // antenna top is at (9, 7), icon anchor at (9, 30)
+  var gmap;
 
   function create_icon(status)
   {
@@ -62,8 +63,9 @@
 
   function map_init(map)
   {
-	google.maps.Event.addListener(map, "zoomend", function (oldLevel, newLevel) { if (oldLevel != newLevel) { populate_map(map, newLevel); } } );
-	populate_map(map, map.getZoom());
+    gmap = map;
+	  google.maps.Event.addListener(map, "zoomend", function (oldLevel, newLevel) { if (oldLevel != newLevel) { populate_map(map, newLevel); } } );
+  	populate_map(map, map.getZoom());
   }
   
   function populate_map(map, zoomLevel)
@@ -86,8 +88,29 @@
   }
 </script>
 <div style="margin-left: 10px;">
+{% trans "Project" %}:
+<select id="gmap_project">
+  {% for project in projects %}
+  <option value="{{ project.id }}">{{ project.name }}</option>
+  {% endfor %}
+</select>
+
 {% gmap lat:46.05 long:14.5 full:yes callback:map_init %}
 </div>
+<script>
+  function updateMapForProject()
+  {
+    var projectId = $('#gmap_project').attr('value');
+    {% for project in projects %}
+    if (projectId == {{ project.id }}) {
+      gmap.panTo(new GLatLng({{ project.geo_lat }}, {{ project.geo_long }}));
+      return;
+    }
+    {% endfor %}
+  }
+
+  $('#gmap_project').change(function(event) { updateMapForProject(); });
+</script>
 <div class="legend">
 <h3>{% trans "Node status key" %}:</h3>
 <ul>

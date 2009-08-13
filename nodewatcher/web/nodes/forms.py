@@ -36,6 +36,7 @@ class RegisterNodeForm(forms.Form):
   project = forms.ModelChoiceField(
     Project.objects.all(),
     initial = Project.objects.all()[0].id,
+    empty_label = None,
     label = _("Project")
   )
   node_type = forms.ChoiceField(
@@ -285,11 +286,13 @@ class UpdateNodeForm(forms.Form):
   owner = forms.ModelChoiceField(
     User.objects.filter(is_active = True),
     initial = User.objects.filter(is_active = True)[0].id,
+    empty_label = None,
     label = _("Maintainer")
   )
   project = forms.ModelChoiceField(
     Project.objects.all(),
     initial = Project.objects.all()[0].id,
+    empty_label = None,
     label = _("Project")
   )
   node_type = forms.ChoiceField(

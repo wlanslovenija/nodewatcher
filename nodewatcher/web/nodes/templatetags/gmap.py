@@ -60,6 +60,10 @@ BASIC_TEMPLATE = """
           document.getElementById("id_geo_long").value = p.lng();
         });
       }
+
+      if ("%(callback)s" != "undefined") {
+        %(callback)s(map);
+      }
     }
   }
 
