@@ -8,6 +8,7 @@
 {% block content %}
 <h1>{% trans "Mesh Map View" %}</h1>
 <br/>
+<script src="/js/jquery.history.js"></script>
 <script>
   var icons = {};
   var antennaOffset = 23; // antenna top is at (9, 7), icon anchor at (9, 30)
@@ -98,18 +99,25 @@
 {% gmap lat:46.05 long:14.5 full:yes callback:map_init %}
 </div>
 <script>
-  function updateMapForProject()
-  {
+  $('#gmap_project').change(function(event) {
     var projectId = $('#gmap_project').attr('value');
-    {% for project in projects %}
-    if (projectId == {{ project.id }}) {
-      gmap.panTo(new GLatLng({{ project.geo_lat }}, {{ project.geo_long }}));
-      return;
-    }
-    {% endfor %}
-  }
+    $.history.load(projectId);
+  });
 
-  $('#gmap_project').change(function(event) { updateMapForProject(); });
+  $(function() {
+     $.history.init(function(hash) {
+      if (hash && hash.match(/^\d+$/)) {
+        $('#gmap_project').attr('value', hash);
+        var projectId = hash;
+        {% for project in projects %}
+        if (projectId == {{ project.id }}) {
+          gmap.panTo(new GLatLng({{ project.geo_lat }}, {{ project.geo_long }}));
+          return;
+        }
+        {% endfor %}
+      }
+    });  
+  });
 </script>
 <div class="legend">
 <h3>{% trans "Node status key" %}:</h3>
