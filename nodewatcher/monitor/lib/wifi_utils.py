@@ -64,7 +64,12 @@ class OlsrParser(object):
 
         srcNode.links.append((dstIp, LQ, ILQ, ETX))
       elif currentTable == 'HNA':
-        network, cidr, gwIp = line.split('\t')
+        try:
+          network, cidr, gwIp = line.split('\t')
+        except ValueError:
+          # Newer OLSR versions have changed the format
+          network, gwIp = line.split('\t')
+          network, cidr = network.split('/')
 
         node = hna.setdefault(gwIp, [])
         node.append('%s/%s' % (network, cidr))
