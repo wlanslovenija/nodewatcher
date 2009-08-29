@@ -56,7 +56,11 @@ class OlsrParser(object):
       
       if currentTable == 'Topology':
         srcIp, dstIp, LQ, ILQ, ETX = line.split('\t')
-        if not float(ETX):
+        try:
+          if not float(ETX):
+            continue
+        except ValueError:
+          # Newer OLSR versions can use INFINITE as ETX
           continue
 
         srcNode = OlsrParser.createNode(srcIp, nodes)
