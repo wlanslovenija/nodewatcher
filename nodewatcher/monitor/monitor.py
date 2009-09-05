@@ -207,7 +207,7 @@ def checkMeshStatus():
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.all().update(warnings = False)
-  Subnet.objects.exclude(status = SubnetStatus.NotAllocated).update(status = SubnetStatus.NotAnnounced)
+  Subnet.objects.exclude(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Hijacked)).update(status = SubnetStatus.NotAnnounced)
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
@@ -479,9 +479,9 @@ def checkMeshStatus():
         s = Subnet.objects.get(node__ip = nodeIp, subnet = subnet, cidr = int(cidr))
         s.last_seen = datetime.now()
 
-        if s.status != SubnetStatus.NotAllocated:
+        if s.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced):
           s.status = SubnetStatus.AnnouncedOk
-        elif not s.node.border_router:
+        elif not s.node.border_router or s.status == SubnetStatus.Hijacked:
           s.node.warnings = True
           s.node.save()
 
@@ -492,11 +492,28 @@ def checkMeshStatus():
         s.status = SubnetStatus.NotAllocated
         s.save()
 
-        # Flag node entry with warnings flag (if not a border router)
+        # Check if this is a hijack
         n = dbNodes[nodeIp]
-        if not n.border_router:
+        try:
+          origin = Subnet.objects.get(subnet = subnet, cidr = int(cidr), status__in = (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced))
+          s.status = SubnetStatus.Hijacked
+          s.save()
+
+          # Generate an event
+          Event.create_event(n, EventCode.SubnetHijacked, '', EventSource.Monitor,
+                             data = 'Subnet: %s/%s\n  Allocated to: %s' % (s.subnet, s.cidr, origin.node))
+        except Subnet.DoesNotExist:
+          pass
+
+        # Flag node entry with warnings flag (if not a border router)
+        if not n.border_router or s.status == SubnetStatus.Hijacked:
           n.warnings = True
           n.save()
+  
+  # Remove subnets that were hijacked but are not visible anymore
+  for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, last_seen__lt = datetime.now() - timedelta(minutes = 5)):
+    Event.create_event(s.node, EventCode.SubnetRestored, '', EventSource.Monitor, data = 'Subnet: %s/%s' % (s.subnet, s.cidr))
+    s.delete()
 
 if __name__ == '__main__':
   info = pwd.getpwnam('monitor')
