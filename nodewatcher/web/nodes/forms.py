@@ -705,7 +705,9 @@ class EventSubscribeForm(forms.Form):
       (EventCode.RedundancyLoss, _('Redundant link to border gateway has gone down')),
       (EventCode.VersionChange, _("Firmware version has changed")),
       (EventCode.CaptivePortalDown, _("Captive portal has failed")),
-      (EventCode.CaptivePortalUp, _("Captive portal has been restored"))
+      (EventCode.CaptivePortalUp, _("Captive portal has been restored")),
+      (EventCode.SubnetHijacked, _("Node is causing a subnet collision")),
+      (EventCode.SubnetRestored, _("Subnet collision is no longer present"))
     ],
     required = False
   )

@@ -364,6 +364,7 @@ class SubnetStatus:
   AnnouncedOk = 0
   NotAllocated = 1
   NotAnnounced = 2
+  Hijacked = 3
 
 class Subnet(models.Model):
   """
@@ -415,6 +416,8 @@ class Subnet(models.Model):
       return "not allocated"
     elif self.status == SubnetStatus.NotAnnounced:
       return "not announced"
+    elif self.status == SubnetStatus.Hijacked:
+      return "hijacked"
     else:
       return "unknown"
   
@@ -660,6 +663,8 @@ class EventCode:
   VersionChange = 9
   CaptivePortalDown = 10
   CaptivePortalUp = 11
+  SubnetHijacked = 12
+  SubnetRestored = 13
 
   NodeAdded = 100
 
@@ -695,6 +700,10 @@ class EventCode:
       return _("Captive portal has been restored")
     elif code == EventCode.NodeAdded:
       return _("A new node has been registred")
+    elif code == EventCode.SubnetHijacked:
+      return _("Node is causing a subnet collision")
+    elif code == EventCode.SubnetRestored:
+      return _("Subnet collision is no longer present")
     else:
       return _("Unknown event")
 
