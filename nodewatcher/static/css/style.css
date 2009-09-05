@@ -58,6 +58,10 @@ h1 {
   color: #FFA82F;
 }
 
+.subnet_status_hijacked {
+  color: #ff0000;
+}
+
 table.listing tbody tr.section_title:hover,
 table.listing tbody tr.section_title:focus,
 table.listing tbody tr.section_title {
