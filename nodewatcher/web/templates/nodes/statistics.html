@@ -10,7 +10,7 @@
 <table class="layout">
 <tr>
 {% for s in nodes_by_status %}
-<td class="node_status_{{ s.status }} nodes" width="{{ nodes_by_status_element_width }}%" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }}" alt="{{ s.status }}"/> {{ s.count }}<td/>
+<td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status_element_width }}%;" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }}" alt="{{ s.status }}"/> {{ s.count }}</td>
 {% endfor %}
 </tr>
 </table>
@@ -54,15 +54,15 @@
   {% trans "Average peers per node" %}: {{ peers_avg }}<br/>
 </div>
 <h2>Graphs</h2>
-<div align="center">
-  <img src="http://nodes.wlan-lj.net/graphs/global_nodes_by_status.png"/><br/>
+<div class="graphs">
+  <img src="http://nodes.wlan-lj.net/graphs/global_nodes_by_status.png" alt="{% trans "Global nodes by status" %}"/><br/>
   <br/>
-  <img src="http://nodes.wlan-lj.net/graphs/global_client_count.png"/>
+  <img src="http://nodes.wlan-lj.net/graphs/global_client_count.png" alt="{% trans "Global client count" %}"/>
 </div>
 <br/>
 <h2>{% trans "VPN gateway traffic" %} <span class="small_text">(in bytes per second)</span></h2>
-<div align="center">
-  <img src="http://nodes.wlan-lj.net/graphs/global_replicator_traffic.png"/><br/>
+<div class="graphs">
+  <img src="http://nodes.wlan-lj.net/graphs/global_replicator_traffic.png" alt="{% trans "Global replicator traffic" %}"/><br/>
   <div style="width: 581px;">
     <span class="small_text">
       <span style="color: #CF7E6C">outgoing</span> traffic originates in the mesh and is forwarded towards the Internet;

@@ -20,14 +20,14 @@
 <table border="0" width="100%" class="listing">
 <thead>
   <tr>
-    <th width="22"></th>
-    <th width="150"><b>{% trans "Node name" %}</b></th>
-    <th width="100"><b>IP</b></th>
-    <th width="280"><b>{% trans "Last seen up" %}</b></th>
-    <th width="50" align="center"><b>{% trans "Status" %}</b></th>
-    <th width="70" align="center"><b>{% trans "Peers" %}</b></th>
-    <th width="70" align="center"><b>{% trans "Clients" %}</b></th>
-    <th width="90" align="center"><b>{% trans "Project" %}</b></th>
+    <th style="width: 22px;"></th>
+    <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
+    <th style="width: 100px;"><b>IP</b></th>
+    <th style="width: 280px;"><b>{% trans "Last seen up" %}</b></th>
+    <th style="width: 50px;" align="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 70px;" align="center"><b>{% trans "Peers" %}</b></th>
+    <th style="width: 70px;" align="center"><b>{% trans "Clients" %}</b></th>
+    <th style="width: 90px;" align="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 <tbody>
@@ -41,7 +41,7 @@
     <td align="center">
       {% if node.warnings %}
       <a href="/nodes/node/{{ node.ip }}">
-        <img src="/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" border="0" />
+        <img src="/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>

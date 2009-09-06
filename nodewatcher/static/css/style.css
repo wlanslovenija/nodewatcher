@@ -204,3 +204,6 @@ table.nodeinfo {
   list-style-type: none;
 }
 
+.graphs {
+  text-align: center;
+}

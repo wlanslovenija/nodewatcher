@@ -73,7 +73,7 @@ BASIC_TEMPLATE = """
 
 FULL_TEMPLATE = """
 <div id="gmap" style="width: 700px; height: 700px;"></div>
-<script>
+<script type="text/javascript">
   function create_map() {
     if (GBrowserIsCompatible()) {
       var map = new GMap2(document.getElementById("gmap"));

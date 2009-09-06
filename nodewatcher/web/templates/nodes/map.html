@@ -8,8 +8,9 @@
 {% block content %}
 <h1>{% trans "Mesh Map View" %}</h1>
 <br/>
-<script src="/js/jquery.history.js"></script>
-<script>
+<script src="/js/jquery.history.js" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
   var icons = {};
   var antennaOffset = 23; // antenna top is at (9, 7), icon anchor at (9, 30)
   var gmap;
@@ -87,6 +88,7 @@
     {% endif %}
     {% endfor %}
   }
+-->
 </script>
 <div style="margin-left: 10px;">
 {% trans "Project" %}:
@@ -98,7 +100,7 @@
 
 {% gmap lat:46.05 long:14.5 full:yes callback:map_init %}
 </div>
-<script>
+<script type="text/javascript">
   $('#gmap_project').change(function(event) {
     var projectId = $('#gmap_project').attr('value');
     $.history.load(projectId);
@@ -133,9 +135,9 @@
 <br/>
 <h3>{% trans "Edge color key" %}:</h3>
 <ul>
-  <li><font color='#00ff00'>{% trans "green" %}</font> - {% trans "ETX is between 1.0 and 2.0" %}</li>
-  <li><font color='#0000ff'>{% trans "blue" %}</font> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
-  <li><font color='#ff0000'>{% trans "red" %}</font> - {% trans "ETX is greater than 5.0" %}</li>
+  <li><span style="color: #00ff00;">{% trans "green" %}</span> - {% trans "ETX is between 1.0 and 2.0" %}</li>
+  <li><span style="color: #0000ff;">{% trans "blue" %}</span> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
+  <li><span style="color: #ff0000;">{% trans "red" %}</span> - {% trans "ETX is greater than 5.0" %}</li>
 </ul>
 </div>
 {% endblock %}
