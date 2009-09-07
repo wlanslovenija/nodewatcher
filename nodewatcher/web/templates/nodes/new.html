@@ -81,6 +81,10 @@
     <td>{{ form.location }}</td>
   </tr>
   <tr class="location_opts">
+    <td></td>
+    <td class="small_text">{% trans "Should be an address where the node is located." %}</td>
+  </tr>
+  <tr class="location_opts">
     <td colspan="2">{% gmap lat:46.05 long:14.5 callback:map_init %}</td>
   </tr>
   <tr class="location_opts">
