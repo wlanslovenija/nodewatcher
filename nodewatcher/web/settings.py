@@ -29,7 +29,7 @@ TIME_ZONE = 'Europe/Ljubljana'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'sl-si'
+LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
@@ -74,7 +74,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/lukacu/Documents/Graphics/Work/wlan-lj/nodewatcher/wlanlj/templates'
+    '/var/www/django/wlanlj/templates'
 )
 
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'
@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.sitemaps',
     'wlanlj.nodes',
     'wlanlj.generator',
     'wlanlj.account',

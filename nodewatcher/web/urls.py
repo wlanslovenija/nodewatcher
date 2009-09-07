@@ -1,9 +1,15 @@
 from django.conf.urls.defaults import *
 from wlanlj.nodes.feeds import LatestEvents
+from wlanlj.nodes.sitemaps import NodeSitemap, StaticSitemap
 from django.conf import settings
 
 feeds = {
   'events'  : LatestEvents
+}
+
+sitemaps = {
+  'nodes'   : NodeSitemap,
+  'static'  : StaticSitemap
 }
 
 urlpatterns = patterns('',
@@ -34,6 +40,9 @@ urlpatterns = patterns('',
     (r'^nodes/statistics$', 'wlanlj.nodes.views.statistics'),
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
     (r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }),
+
+    # Sitemap
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', { 'sitemaps' : sitemaps }),
 
     # Generator
     (r'^generator/request/(?P<node_ip>.*?)$', 'wlanlj.generator.views.request'),
