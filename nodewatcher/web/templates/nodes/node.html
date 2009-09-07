@@ -152,6 +152,12 @@
     <td>{% trans "ESSID" %}</td>
     <td>{{ node.essid|default:_("Unknown") }}</td>
   </tr>
+  {% if current_owner %}
+  <tr>
+    <td>{% trans "MAC" %}</td>
+    <td>{{ node.wifi_mac|default:_("Unknown") }}</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>{% trans "Channel" %}</td>
     <td>{{ node.channel|default:_("Unknown") }}</td>
