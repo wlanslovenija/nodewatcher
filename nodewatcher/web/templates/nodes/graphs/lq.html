@@ -1,5 +1,5 @@
 {% load i18n %}
-<img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" id="lq_graph_{{ graph.id }}" />
+<img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" id="lq_graph_{{ graph.id }}" alt="LQ" />
 {% if graph.get_children %}
 <br/>
 <b>{% trans "Display" %}:</b>
@@ -9,7 +9,7 @@
   <option value="{{ child.graph }}">{{ child.title }}</option>
   {% endfor %}
 </select>
-<script>
+<script type="text/javascript">
   function lq_peer_select_changed_{{ graph.id }}()
   {
     var subgraph = $('#lq_peer_select_{{ graph.id }}').attr('value');

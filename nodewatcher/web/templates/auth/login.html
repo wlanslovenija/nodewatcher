@@ -6,7 +6,7 @@
 {% block content %}
 <h1>Login</h1>
 
-<form action="/auth/login" method="POST" id="acctmgr_loginform" >
+<form action="/auth/login" method="post" id="acctmgr_loginform" >
 
 {% if form.non_field_errors %}
 <p class="error">
@@ -16,8 +16,8 @@
   {% endfor %}
 </p>
 {% endif %}
-<input type="hidden" name="next" value="{{ next }}" />
 <div>
+<input type="hidden" name="next" value="{{ next }}" />
 {{ form.username.label_tag }}
 {{ form.username }}
 </div>
@@ -25,7 +25,7 @@
 {{ form.password.label_tag }}
 {{ form.password }}
 </div>
-<input type="submit" value="{% trans "Login" %}" />
+<div><input type="submit" value="{% trans "Login" %}" /></div>
 <p><a href="/auth/lost_pass">{% trans "Forgot your password?" %}</a></p>
 </form>
 {% endblock %}

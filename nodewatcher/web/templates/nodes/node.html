@@ -23,12 +23,12 @@
 {% endif %}
 </div>
 <h3 class="section_title">{% trans "General Information" %}
-{% if current_owner %}&nbsp;<a href="/nodes/edit/{{ node.ip }}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" border="0" /></a>&nbsp;<a href="/nodes/remove/{{ node.ip }}"><img src="/images/delete.png" title="{% trans "Delete node" %}" border="0" /></a>{% endif %}
+{% if current_owner %}&nbsp;<a href="/nodes/edit/{{ node.ip }}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>&nbsp;<a href="/nodes/remove/{{ node.ip }}"><img src="/images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>{% endif %}
 </h3>
 
 <table border="0" width="300">
   <tr>
-    <td width="120">{% trans "IP address" %}</td>
+    <td style="width: 120px;">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
   </tr>
   <tr>
@@ -91,7 +91,7 @@
 <h3 id="details_title">{% trans "Details" %}</h3>
 <table border="0" id="details_list" class="layout">
   <tr>
-    <td width="300"></td>
+    <td style="width: 300px;"></td>
     <td></td>
   </tr>
   {% if node.is_mesh_node %}
@@ -219,7 +219,7 @@
   </tr>
   <tr>
     <td>{% trans "Connected clients" %}</td>
-    <td>{{ node.clients|default:"0" }} <a href="/nodes/gcl#n{{ node.ip }}"><img src="/images/users.png" title="{% trans "Global client list" %}" border="0" /></a></td>
+    <td>{{ node.clients|default:"0" }} <a href="/nodes/gcl#n{{ node.ip }}"><img src="/images/users.png" title="{% trans "Global client list" %}" alt="{% trans "Global client list" %}" /></a></td>
   </tr>
   {% endif %}
   {% endif %}
@@ -231,16 +231,16 @@
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
         <tr>
-          {% if current_owner %}<th width="20">&nbsp;</th>{% endif %}
+          {% if current_owner %}<th style="width: 20px;">&nbsp;</th>{% endif %}
           <th>{% trans "Subnet" %}</th>
-          <th width="120">{% trans "Status" %}</th>
-          <th width="150">{% trans "Last seen" %}</th>
+          <th style="width: 120px;">{% trans "Status" %}</th>
+          <th style="width: 150px;">{% trans "Last seen" %}</th>
         </tr>
 </thead>
 <tbody>
         {% for subnet in node.subnet_set.all %}
         <tr class="{% cycle 'odd' 'even' %}">
-          {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" border="0" /></a>{% endif %}</td>{% endif %}
+          {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" /></a>{% endif %}</td>{% endif %}
           <td>{{ subnet }}</td>
           <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
           <td>{{ subnet.last_seen|default:_("never") }}</td>
@@ -262,9 +262,9 @@
 <thead>
         <tr>
           <th>{% trans "Node" %}</th>
-          <th width="70" align="center">LQ</th>
-          <th width="70" align="center">ILQ</th>
-          <th width="70" align="center">ETX</th>
+          <th style="width: 70px;" align="center">LQ</th>
+          <th style="width: 70px;" align="center">ILQ</th>
+          <th style="width: 70px;" align="center">ETX</th>
         </tr>
 </thead>
 <tbody>

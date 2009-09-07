@@ -11,7 +11,7 @@ INCLUDE_TEMPLATE = """
 """% GOOGLE_MAPS_API_KEY
 BASIC_TEMPLATE = """
 <div id="gmap" style="width:400px; height: 300px;"></div>
-<script>
+<script type="text/javascript">
   var icons = {};
 
   function create_icon(status)

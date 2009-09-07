@@ -27,7 +27,7 @@
     </td>
   </tr>
   <tr>
-    <td width="100">{% trans "IP address" %}</td>
+    <td style="width: 100px;">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
   </tr>
   <tr>
@@ -53,10 +53,10 @@
 </table>
 
 <p>
-      {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information<i> section." %}
+      {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information</i> section." %}
 </p>
 
-<form action="/nodes/allocate_subnet/{{ node.ip }}" method="POST">
+<form action="/nodes/allocate_subnet/{{ node.ip }}" method="post">
 <table border="0" class="layout">
   {% if user.is_staff %}
   <tr>

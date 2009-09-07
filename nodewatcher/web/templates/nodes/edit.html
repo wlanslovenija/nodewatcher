@@ -30,10 +30,10 @@
 </div>
 {% endif %}
 
-<form action="/nodes/edit/{{ node.ip }}" method="POST">
-<table border="0" width="700">
+<form action="/nodes/edit/{{ node.ip }}" method="post">
+<table border="0" width="700px">
   <tr>
-    <td width="200">{{ form.name.label }}</td>
+    <td style="width: 200px;">{{ form.name.label }}</td>
     <td>{{ form.name }}</td>
   </tr>
   <tr>
@@ -43,7 +43,7 @@
   <tr>
     <td>{{ form.ip.label }}</td>
     <td><b>{{ node.ip }}</b></td>
-  </td>
+  </tr>
   <tr>
     <td>{{ form.project.label }}</td>
     <td>{{ form.project }}</td>
@@ -69,7 +69,7 @@
   </tr>
   <tr class="location_opts">
     <td></td>
-    <td class="small_text">Click on the map or enter coordinates in <a href="http://en.wikipedia.org/wiki/Decimal_degrees" target="_blank">decimal degrees</a> format.</td>
+    <td class="small_text">Click on the map or enter coordinates in <a href="http://en.wikipedia.org/wiki/Decimal_degrees" rel="external">decimal degrees</a> format.</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
@@ -88,7 +88,7 @@
   </tr>
   <tr class="extantenna_opts">
     <td>{{ form.ant_conn.label }}</td>
-    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this?</a>)</td>
+    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" rel="external">what is this?</a>)</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Additional Options" %}</td>
@@ -178,7 +178,7 @@
     </div>
 </form>
 
-<script>
+<script type="text/javascript">
   var gmap;
 
   function map_init(map)

@@ -11,7 +11,7 @@
 <h3>{% trans "General Information" %}</h3>
 <table border="0" width="700">
   <tr>
-    <td width="200">{% trans "IP address" %}</td>
+    <td style="width: 200px;">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
   </tr>
   <tr>
@@ -36,11 +36,11 @@
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
+    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
   <tr>
     <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}
+    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
 </table>
 

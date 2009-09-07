@@ -15,7 +15,7 @@
 </ul>
 <div id="tabcontent">
 <p>
-  {% blocktrans %}Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="/nodes/node_list" target="_blank">the existing node list</a>). After your node is registred you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.{% endblocktrans %}
+  {% blocktrans %}Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="/nodes/node_list" rel="external">the existing node list</a>). After your node is registred you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.{% endblocktrans %}
 </p>
 
 {% if form.errors %}
@@ -34,7 +34,7 @@
 {% endif %}
 
 {% if user.is_staff %}
-<script>
+<script type="text/javascript">
   function toggleIpInput()
   {
     if ($('#id_assign_ip').is(':checked')) {
@@ -47,10 +47,10 @@
 </script>
 {% endif %}
 
-<form action="/nodes/new" method="POST">
-<table border="0" width="700">
+<form action="/nodes/new" method="post">
+<table border="0" width="700px">
   <tr>
-    <td width="200">{{ form.name.label }}</td>
+    <td style="width: 200px;">{{ form.name.label }}</td>
     <td>{{ form.name }}</td>
   </tr>
   {% if user.is_staff %}
@@ -93,7 +93,7 @@
   </tr>
   <tr class="location_opts">
     <td></td>
-    <td class="small_text">Click on the map or enter coordinates in <a href="http://en.wikipedia.org/wiki/Decimal_degrees" target="_blank">decimal degrees</a> format.</td>
+    <td class="small_text">Click on the map or enter coordinates in <a href="http://en.wikipedia.org/wiki/Decimal_degrees" rel="external">decimal degrees</a> format.</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
@@ -112,7 +112,7 @@
   </tr>
   <tr class="extantenna_opts">
     <td>{{ form.ant_conn.label }}</td>
-    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" target="_blank">what is this?</a>)</td>
+    <td>{{ form.ant_conn }} (<a href="http://wlan-lj.net/wiki/Diversity" rel="external">what is this?</a>)</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Additional Options" %}</td>
@@ -209,7 +209,7 @@
 <div class="buttons"><input type="submit" value="{% trans "Register new node" %}" /></div>
 </form>
 
-<script>
+<script type="text/javascript">
   var gmap;
 
   function map_init(map)

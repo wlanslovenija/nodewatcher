@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load nodestatus %}
 
 {% block title %}My Nodes{% endblock %}
 {% block contenttype %}prefs{% endblock %}
@@ -28,15 +29,14 @@
 <table border="0" class="listing">
 <thead>
   <tr>
-    <th width="22"></th>
-    <th width="150"><b>{% trans "Node name" %}</b></th>
-    <th width="100"><b>IP</b></th>
-    <th width="200"><b>{% trans "Last seen up" %}</b></th>
-    <th width="100"><b>{% trans "Status" %}</b></th>
-    <th width="50" align="center"><b>{% trans "Peers" %}</b></th>
-    <th width="50" align="center"><b>MIN</b></th>
-    <th width="50" align="center"><b>AVG</b></th>
-    <th width="50" align="center"><b>MAX</b></th>
+    <th style="width: 22px;"></th>
+    <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
+    <th style="width: 100px;"><b>IP</b></th>
+    <th style="width: 280px;"><b>{% trans "Last seen up" %}</b></th>
+    <th style="width: 50px;" align="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 70px;" align="center"><b>{% trans "Peers" %}</b></th>
+    <th style="width: 70px;" align="center"><b>{% trans "Clients" %}</b></th>
+    <th style="width: 90px;" align="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 <tbody>
@@ -45,25 +45,22 @@
     <td align="center">
       {% if node.warnings %}
       <a href="/nodes/node/{{ node.ip }}">
-        <img src="http://nodes.wlan-lj.net/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" border="0" />
+        <img src="http://nodes.wlan-lj.net/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>
     <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     <td>{{ node.last_seen|default:_("never") }}</td>
-    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
+    <td align="center">{{ node.status_as_string|statusimage:"small" }}</td>
     {% if node.is_down %}
     <td align="center">0</td>
-    <td align="center">/</td>
-    <td align="center">/</td>
-    <td align="center">/</td>
+    <td align="center">0</td>
     {% else %}
     <td align="center">{{ node.peers }}</td>
-    <td align="center">{{ node.rtt_min|default:"/" }}</td>
-    <td align="center">{{ node.rtt_avg|default:"/" }}</td>
-    <td align="center">{{ node.rtt_max|default:"/" }}</td>
+    <td align="center">{{ node.clients|default:"0" }}</td>
     {% endif %}
+    <td align="center">{{ node.project|default:_("unknown") }}</td>
   </tr>
   {% endfor %}
 </tbody>
