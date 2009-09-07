@@ -260,6 +260,7 @@ class RegisterNodeForm(forms.Form):
       profile.wan_ip = self.cleaned_data.get('wan_ip')
       profile.wan_cidr = self.cleaned_data.get('wan_cidr')
       profile.wan_gw = self.cleaned_data.get('wan_gw')
+      profile.save()
       profile.optional_packages = self.cleaned_data.get('optional_packages')
       profile.save()
 
@@ -516,6 +517,7 @@ class UpdateNodeForm(forms.Form):
       profile.wan_ip = self.cleaned_data.get('wan_ip')
       profile.wan_cidr = self.cleaned_data.get('wan_cidr')
       profile.wan_gw = self.cleaned_data.get('wan_gw')
+      profile.save()
       profile.optional_packages = self.cleaned_data.get('optional_packages')
       profile.save()
     elif profile:
