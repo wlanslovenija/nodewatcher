@@ -396,6 +396,10 @@ def checkMeshStatus():
         if 'cells' in info['wifi']:
           add_graph(n, '', GraphType.WifiCells, RRAWifiCells, 'Nearby Wifi Cells', 'wificells_%s' % nodeIp, safe_int_convert(info['wifi']['cells']) or 0)
 
+        # Update node's MAC address on wifi iface
+        if 'mac' in info['wifi']:
+          n.wifi_mac = info['wifi']['mac']
+
         # Generate a graph for number of clients
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)
 
