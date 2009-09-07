@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models
 from django.utils.translation import ugettext as _
-from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project
+from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
@@ -225,6 +225,9 @@ def node_do_remove(request, node_ip = None):
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
   
+  # Generate node removed event
+  Event.create_event(node, EventCode.NodeRemoved, '', EventSource.NodeDatabase)
+
   node.delete()
 
   return HttpResponseRedirect("/nodes/my_nodes")

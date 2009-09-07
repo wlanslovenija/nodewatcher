@@ -493,6 +493,9 @@ class UpdateNodeForm(forms.Form):
     if oldName != node.name or oldProject != node.project:
       Record.update_for_node(node, old_name = oldName, old_project = oldProject)
 
+      # Generate node renamed event
+      Event.create_event(node, EventCode.NodeRenamed, '', EventSource.NodeDatabase, data = 'Old name: %s\n  New name: %s' % (oldName, node.name))
+
     # Update node profile for image generator
     try:
       profile = node.profile
@@ -709,7 +712,10 @@ class EventSubscribeForm(forms.Form):
       (EventCode.CaptivePortalDown, _("Captive portal has failed")),
       (EventCode.CaptivePortalUp, _("Captive portal has been restored")),
       (EventCode.SubnetHijacked, _("Node is causing a subnet collision")),
-      (EventCode.SubnetRestored, _("Subnet collision is no longer present"))
+      (EventCode.SubnetRestored, _("Subnet collision is no longer present")),
+      (EventCode.NodeAdded, _("A new node has been registered")),
+      (EventCode.NodeRenamed, _("Node has been renamed")),
+      (EventCode.NodeRemoved, _("Node has been removed"))
     ],
     required = False
   )

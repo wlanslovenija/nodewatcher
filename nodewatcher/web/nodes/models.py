@@ -668,6 +668,8 @@ class EventCode:
   SubnetRestored = 13
 
   NodeAdded = 100
+  NodeRenamed = 101
+  NodeRemoved = 102
 
   @staticmethod
   def to_string(code):
@@ -700,11 +702,15 @@ class EventCode:
     elif code == EventCode.CaptivePortalUp:
       return _("Captive portal has been restored")
     elif code == EventCode.NodeAdded:
-      return _("A new node has been registred")
+      return _("A new node has been registered")
     elif code == EventCode.SubnetHijacked:
       return _("Node is causing a subnet collision")
     elif code == EventCode.SubnetRestored:
       return _("Subnet collision is no longer present")
+    elif code == EventCode.NodeRenamed:
+      return _("Node has been renamed")
+    elif code == EventCode.NodeRemoved:
+      return _("Node has been removed")
     else:
       return _("Unknown event")
 
