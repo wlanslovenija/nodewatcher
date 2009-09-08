@@ -53,9 +53,6 @@ urlpatterns = patterns('',
      {'template_name' : 'auth/login.html'}),
 
     (r'^auth/logout$', 'django.contrib.auth.views.logout_then_login'),
-
-    (r'^auth/lost_pass$', 'django.contrib.auth.views.password_reset', 
-     {'template_name' : 'auth/lost_pass.html', 'email_template_name' : 'auth/lost_pass_email.html'}),
 )
 
 if settings.DEBUG:
