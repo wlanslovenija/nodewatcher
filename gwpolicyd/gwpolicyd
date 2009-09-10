@@ -10,13 +10,24 @@ HASH_TABLE_START = 0x100
 IPV4_SUBNET_PREFIX = '10.14'
 DEBUG = False
 
+class AddressFamily:
+  """
+  Possible address families.
+  """
+  Ethernet = 1
+  IPv4 = 4
+  IPv6 = 6
+
 class PolicyControl(object):
+  """
+  Policy control (an interface to tc).
+  """
   interface = None
 
   # Level 2 hash tables
   tables = None
   next_table_id = HASH_TABLE_START
-  l1_table = None
+  l1_tables = None
 
   # Filter rules
   filters = None
@@ -29,7 +40,12 @@ class PolicyControl(object):
     """
     self.interface = interface
     self.tables = {}
+    self.l1_tables = {}
     self.filters = {}
+
+    for x, family in AddressFamily.__dict__.iteritems():
+      if not x.startswith('__'):
+        self.tables[family] = {}
 
     # Create initial rules
     self.create_initial()
@@ -65,17 +81,29 @@ class PolicyControl(object):
     # Initialize qdisc
     self.tc('qdisc add dev %s root handle 1: htb default 0' % self.interface)
 
+    # -- Ethernet
+    # Initialize L1 hash table
+    l1_id = self.get_hash_table_id()
+    self.tc('filter add dev %s parent 1: prio 1 handle %x: protocol ip u32 divisor 256' % (self.interface, l1_id))
+
+    # L1 hash table lookup (MAC) - destination MAC lives at offset -14
+    self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht 800:: ' \
+            'match u8 0x00 0x00 ' \
+            'hashkey mask 0x0000ff00 at -12 ' \
+            'link %x:' % (self.interface, l1_id))
+    self.l1_tables[AddressFamily.Ethernet] = l1_id
+
+    # -- IPv4
     # Initialize L1 hash table
     l1_id = self.get_hash_table_id()
     self.tc('filter add dev %s parent 1: prio 1 handle %x: protocol ip u32 divisor 256' % (self.interface, l1_id))
 
     # L1 hash table lookup (IPv4) - destination address lives at offset 16
-    l1_ht = 'filter add dev %s parent 1: prio 1 protocol ip u32 ht 800:: ' \
+    self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht 800:: ' \
             'match ip dst %s.0.0/16 ' \
             'hashkey mask 0x0000ff00 at 16 ' \
-            'link %x:' % (self.interface, IPV4_SUBNET_PREFIX, l1_id)
-    self.tc(l1_ht)
-    self.l1_table = l1_id
+            'link %x:' % (self.interface, IPV4_SUBNET_PREFIX, l1_id))
+    self.l1_tables[AddressFamily.IPv4] = l1_id
 
   def get_hash_keys(self, family, ip):
     """
@@ -85,32 +113,48 @@ class PolicyControl(object):
     @param ip: IP address
     @return: A tuple of L1 and L2 hash keys
     """
-    if family == 4:
+    if family == AddressFamily.Ethernet:
+      mac = ip.split(':')
+      return int(mac[4], 16), int(mac[5], 16)
+    elif family == AddressFamily.IPv4:
       raw = socket.inet_pton(socket.AF_INET, ip)
       return ord(raw[2]), ord(raw[3])
-    elif family == 6:
+    elif family == AddressFamily.IPv6:
       raise NotImplementedError
   
-  def create_hash_table(self, l1, l2):
+  def create_hash_table(self, family, l1, l2):
     """
     Creates a new level 2 hash table for filter lookups.
-
+    
+    @param family: Address family
     @param l1: L1 hash key
     @param l2: L2 hash key
     """
-    # Initialize L2 hash table
-    l2_id = self.get_hash_table_id()
-    self.tc('filter add dev %s parent 1: prio 1 handle %x: protocol ip u32 divisor 256' % (self.interface, l2_id))
-    
-    # L2 hash table lookup (IPv4)
-    l2_ht = 'filter add dev %s parent 1: prio 1 protocol ip u32 ht %x:%x: ' \
-            'match ip dst %s.%d.0/24 ' \
-            'hashkey mask 0x000000ff at 16 ' \
-            'link %x:' % (self.interface, self.l1_table, l1, IPV4_SUBNET_PREFIX, l1, l2_id)
-    self.tc(l2_ht)
+    if family == AddressFamily.Ethernet:
+      # Initialize L2 hash table
+      l2_id = self.get_hash_table_id()
+      self.tc('filter add dev %s parent 1: prio 1 handle %x: protocol ip u32 divisor 256' % (self.interface, l2_id))
+
+      # L2 hash table lookup (MAC)
+      self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht %x:%x: ' \
+              'match u8 0x%x 0xFF at -10 ' \
+              'hashkey mask 0x000000ff at -12 ' \
+              'link %x:' % (self.interface, self.l1_tables[family], l1, l1, l2_id))
+    elif family == AddressFamily.IPv4:
+      # Initialize L2 hash table
+      l2_id = self.get_hash_table_id()
+      self.tc('filter add dev %s parent 1: prio 1 handle %x: protocol ip u32 divisor 256' % (self.interface, l2_id))
+      
+      # L2 hash table lookup (IPv4)
+      self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht %x:%x: ' \
+              'match ip dst %s.%d.0/24 ' \
+              'hashkey mask 0x000000ff at 16 ' \
+              'link %x:' % (self.interface, self.l1_tables[family], l1, IPV4_SUBNET_PREFIX, l1, l2_id))
+    else:
+      return
 
     # Register hash table
-    self.tables[l1] = l2_id
+    self.tables[family][l1] = l2_id
 
   def insert_filter(self, family, ip, class_id):
     """
@@ -122,17 +166,32 @@ class PolicyControl(object):
     """
     # Generate hash keys and create L2 table if one does not exist
     l1, l2 = self.get_hash_keys(family, ip)
-    if l1 not in self.tables:
-      self.create_hash_table(l1, l2)
+    if l1 not in self.tables[family]:
+      self.create_hash_table(family, l1, l2)
     
     # Fetch L2 hash table identifier and priority
-    l2_id = self.tables[l1]
+    l2_id = self.tables[family][l1]
 
     # Create filter
-    self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht %x:%x: ' \
-            'match ip dst %s/32 ' \
-            'flowid 1:%x' % (self.interface, l2_id, l2, ip, class_id))
-    
+    if family == AddressFamily.Ethernet:
+      mac = [int(x, 16) for x in ip.split(':')]
+      self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht %x:%x: ' \
+              'match u16 0x%02x%02x 0xffff at -14 ' \
+              'match u32 0x%02x%02x%02x%02x 0xffffffff at -12 ' \
+              'flowid 1:%x' \
+              % (
+                  self.interface, l2_id, l2,
+                  mac[0], mac[1], mac[2], mac[3],
+                  mac[4], mac[5],
+                  class_id
+                ))
+    elif family == AddressFamily.IPv4:
+      self.tc('filter add dev %s parent 1: prio 1 protocol ip u32 ht %x:%x: ' \
+              'match ip dst %s/32 ' \
+              'flowid 1:%x' % (self.interface, l2_id, l2, ip, class_id))
+    elif family == AddressFamily.IPv6:
+      pass
+
     self.filters[family, ip] = class_id
   
   def update_filter(self, family, ip, class_id):
@@ -152,7 +211,7 @@ class PolicyControl(object):
 
     # Get hash keys so we know which filter to update
     l1, l2 = self.get_hash_keys(family, ip)
-    l2_id = self.tables[l1]
+    l2_id = self.tables[family][l1]
 
     # Change filter
     self.tc('filter change dev %s parent 1: protocol ip prio 1 ' \
@@ -173,7 +232,7 @@ class PolicyControl(object):
 
     # Get hash keys so we know which filter to remove
     l1, l2 = self.get_hash_keys(family, ip)
-    l2_id = self.tables[l1]
+    l2_id = self.tables[family][l1]
 
     # Remove filter
     self.tc('filter del dev %s parent 1: protocol ip prio 1 ' \
