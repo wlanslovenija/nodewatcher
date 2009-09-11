@@ -326,12 +326,17 @@ def watch_loop():
   last_interface_check = time.time()
  
   while True:
-    time.sleep(REFRESH_INTERVAL)
-    check_jobs()
-
-    if time.time() - last_interface_check > 600:
-      check_interface()
-      last_interface_check = time.time()
+    try:
+      time.sleep(REFRESH_INTERVAL)
+      check_jobs()
+      
+      if time.time() - last_interface_check > 600:
+        check_interface()
+        last_interface_check = time.time()
+    except KeyboardInterrupt:
+      raise
+    except:
+      pass
 
 if __name__ == '__main__':
   print "============================================================================"
