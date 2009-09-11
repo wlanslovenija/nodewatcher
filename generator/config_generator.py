@@ -527,8 +527,6 @@ class OpenWrtConfig(NodeConfig):
     f.write('group nogroup\n')
     f.write('ca /etc/openvpn/wlanlj-ca.crt\n')
     f.write('tls-auth /etc/openvpn/wlanlj-ta.key 1\n')
-    if self.vpn['mac'] is not None:
-      f.write('up /etc/openvpn/up.sh\n')
     f.close()
     
     # Password file
@@ -539,15 +537,23 @@ class OpenWrtConfig(NodeConfig):
 
     # MAC setup file
     if self.vpn['mac'] is not None:
-      up_path = os.path.join(directory, 'up.sh')
+      up_path = os.path.join(directory, '../init.d/openvpn-mac')
       f = open(up_path, 'w')
-      f.write('#!/bin/sh\n')
-      f.write('# This MAC configuration is used to identify this VPN link for\n')
-      f.write('# traffic policy purpuses. If you change this any policy settings\n')
-      f.write('# set on wlan Ljubljana gateways will cease to work!\n')
-      f.write('ifconfig $1 hw ether %s\n' % self.vpn['mac'])
+      f.write('#!/bin/sh /etc/rc.common\n')
+      f.write('# Must run before OpenVPN\n')
+      f.write('START=60\n')
+      f.write('STOP=60\n')
+      f.write('\n')
+      f.write('start() {\n')
+      f.write('  # This MAC configuration is used to identify this VPN link for\n')
+      f.write('  # traffic policy purpuses. If you change this any policy settings\n')
+      f.write('  # set on wlan Ljubljana gateways will cease to work!\n')
+      f.write('  openvpn --mktun --dev tap0\n')
+      f.write('  ifconfig tap0 hw ether %s\n' % self.vpn['mac'])
+      f.write('}\n')
       f.close()
       os.chmod(up_path, 0755)
+      self.addService('S60', 'openvpn-mac')
     
     # Copy the key and CA templates
     self.__copyTemplate("openvpn/ta.key", os.path.join(directory, 'wlanlj-ta.key'))
