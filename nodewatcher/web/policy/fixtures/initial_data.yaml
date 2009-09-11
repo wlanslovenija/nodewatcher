@@ -1,0 +1,21 @@
+# Traffic control classes
+- model: policy.TrafficControlClass
+  pk: 1
+  fields:
+    bandwidth: 512
+
+- model: policy.TrafficControlClass
+  pk: 2
+  fields:
+    bandwidth: 1024
+
+- model: policy.TrafficControlClass
+  pk: 3
+  fields:
+    bandwidth: 2048
+
+- model: policy.TrafficControlClass
+  pk: 4
+  fields:
+    bandwidth: 4096
+

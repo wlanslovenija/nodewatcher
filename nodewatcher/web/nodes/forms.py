@@ -5,10 +5,11 @@ from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
-from wlanlj.generator.models import Template, Profile, OptionalPackage
+from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from wlanlj.generator.types import IfaceType
 from wlanlj.account.util import generate_random_password
 from wlanlj.dns.models import Record
+from wlanlj.policy.models import TrafficControlClass, Policy, PolicyFamily, PolicyAction
 from datetime import datetime
 import re
 
@@ -81,6 +82,14 @@ class RegisterNodeForm(forms.Form):
     label = _("Optional packages"),
     required = False,
     widget = widgets.CheckboxSelectMultiple
+  )
+  
+  # Traffic policy settings
+  tc_ingress = forms.ModelChoiceField(
+    TrafficControlClass.objects.all().order_by("id"),
+    label = _("Download limit"),
+    required = False,
+    empty_label = _("Unlimited")
   )
 
   # Antenna type
@@ -237,12 +246,27 @@ class RegisterNodeForm(forms.Form):
     node.redundancy_req = self.cleaned_data.get('redundancy_req')
     node.warnings = False
 
+    for i in xrange(10):
+      try:
+        mac = gen_mac_address()
+        Node.objects.get(vpn_mac_conf = mac)
+      except Node.DoesNotExist: 
+        node.vpn_mac_conf = mac
+        break
+    else:
+      raise Exception, "unable to generate unique MAC"
+
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
       node.border_router = self.cleaned_data.get('border_router')
     
     node.status = NodeStatus.New
     node.save()
+
+    # Create node traffic control policy
+    tc_ingress = self.cleaned_data.get('tc_ingress')
+    if tc_ingress:
+      Policy.set_policy(node, node.vpn_mac_conf, PolicyAction.Shape, tc_ingress, PolicyFamily.Ethernet)
 
     # Create node profile for image generator
     if self.cleaned_data.get('template'):
@@ -342,6 +366,14 @@ class UpdateNodeForm(forms.Form):
     label = _("Optional packages"),
     required = False,
     widget = widgets.CheckboxSelectMultiple
+  )
+
+  # Traffic policy settings
+  tc_ingress = forms.ModelChoiceField(
+    TrafficControlClass.objects.all().order_by("id"),
+    label = _("Download limit"),
+    required = False,
+    empty_label = _("Unlimited")
   )
 
   # Antenna type
@@ -488,6 +520,16 @@ class UpdateNodeForm(forms.Form):
       node.border_router = self.cleaned_data.get('border_router')
     
     node.save()
+
+    # Update node traffic control policy
+    tc_ingress = self.cleaned_data.get('tc_ingress')
+    if tc_ingress:
+      Policy.set_policy(node, node.vpn_mac_conf, PolicyAction.Shape, tc_ingress, PolicyFamily.Ethernet)
+    else:
+      try:
+        node.gw_policy.get(addr = node.vpn_mac_conf, family = PolicyFamily.Ethernet).delete()
+      except Policy.DoesNotExist:
+        pass
 
     # Update DNS records on name changes
     if oldName != node.name or oldProject != node.project:

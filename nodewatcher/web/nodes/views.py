@@ -8,6 +8,7 @@ from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
+from wlanlj.policy.models import Policy, PolicyFamily
 from datetime import datetime
 from wlanlj.nodes import ipcalc
 
@@ -141,6 +142,13 @@ def node_edit(request, node_ip):
       'url'                 : node.url,
       'redundancy_req'      : node.redundancy_req
     }
+
+    try:
+      p.update({
+        'tc_ingress'          : node.gw_policy.get(addr = node.vpn_mac_conf, family = PolicyFamily.Ethernet).tc_class.id
+      })
+    except Policy.DoesNotExist:
+      pass
 
     try:
       p.update({

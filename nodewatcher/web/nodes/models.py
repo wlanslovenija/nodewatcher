@@ -154,6 +154,8 @@ class Node(models.Model):
   first_seen = models.DateTimeField(null = True)
   channel = models.IntegerField(null = True)
   wifi_mac = models.CharField(max_length = 20, null = True)
+  vpn_mac = models.CharField(max_length = 20, null = True)
+  vpn_mac_conf = models.CharField(max_length = 20, null = True, unique = True)
 
   # RTT measurements (set by the monitor daemon)
   rtt_min = models.FloatField(null = True)

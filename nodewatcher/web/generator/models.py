@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from wlanlj.nodes.models import Node, Subnet as SubnetAllocation
 from wlanlj.generator.types import IfaceType
+import os
 
 class Template(models.Model):
   """
@@ -90,4 +91,11 @@ class Profile(models.Model):
 
   # Optional packages
   optional_packages = models.ManyToManyField(OptionalPackage)
+
+def gen_mac_address():
+  """
+  Generates a random MAC address.
+  """
+  mac = [ord(x) for x in os.urandom(4)]
+  return "00:ff:%02x:%02x:%02x:%02x" % tuple(mac)
 
