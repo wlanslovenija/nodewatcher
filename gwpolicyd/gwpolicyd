@@ -1,14 +1,26 @@
 #!/usr/bin/python
 import os
+import sys
 import socket
 import struct
 import signal
 from optparse import OptionParser
+from datetime import datetime
+import time
 
-TC = '/usr/sbin/tc'
+# Setup import paths, since we are using Django models
+sys.path.append('/var/www/django')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
+
+# Django models
+from wlanlj.policy.models import Policy, PolicyJob, TrafficControlClass
+from django.db import transaction
+
+TC = '/sbin/tc'
 HASH_TABLE_START = 0x100
 IPV4_SUBNET_PREFIX = '10.14'
 DEBUG = False
+REFRESH_INTERVAL = 5
 
 class AddressFamily:
   """
@@ -57,7 +69,7 @@ class PolicyControl(object):
     if DEBUG:
       print "tc %s" % command
 
-    #os.system('%s %s' % (TC, command))
+    os.system('%s %s' % (TC, command))
   
   def remove_all_rules(self):
     """
@@ -250,7 +262,77 @@ class PolicyControl(object):
     """
     self.tc('class add dev %s parent 1: classid 1:%x htb rate %dkbit ceil %dkbit' \
             % (self.interface, class_id, bandwidth, bandwidth))
+
+@transaction.commit_manually
+def check_jobs():
+  """
+  Checks if any jobs need to be executed.
+  """
+  global p
+
+  # Check for any explicit jobs
+  for job in PolicyJob.objects.all():
+    try:
+      policy = Policy.objects.get(node = job.node, addr = job.addr)
+      p.update_filter(policy.family, policy.addr, policy.tc_class.id)
+    except Policy.DoesNotExist:
+      p.remove_filter(job.family, job.addr)
+
+    job.delete()
+
+  transaction.commit()
+
+def init_policy():
+  """
+  Initializes policy.
+  """
+  global p
+
+  # Register traffic control classes
+  for c in TrafficControlClass.objects.all():
+    p.insert_class(c.id, c.bandwidth)
   
+  # Load all existing rules
+  for policy in Policy.objects.all():
+    p.insert_filter(policy.family, policy.addr, policy.tc_class.id)
+
+def check_interface():
+  """
+  Checks if interface is still available and resets the whole thing
+  if it disappears.
+  """
+  global p
+
+  if os.system('/sbin/ip link sh dev %s 2>/dev/null >/dev/null' % p.interface) != 0:
+    # Interface has disappeared
+    print "WARNING: Interface %s has disappeared. Waiting for it to come back..."
+
+    # Check interface every 30 seconds
+    while True:
+      time.sleep(30)
+      if os.system('/sbin/ip link sh dev %s 2>/dev/null >/dev/null' % p.interface) == 0:
+        break
+
+    # Interface is back we need to reset everything
+    print "WARNING: Interface %s has reappeared. Restarting..."
+    p = PolicyControl(p.interface)
+    init_policy()
+
+def watch_loop():
+  """
+  A loop that monitors for changes and updates the traffic policy.
+  """
+  init_policy()
+  last_interface_check = time.time()
+ 
+  while True:
+    time.sleep(REFRESH_INTERVAL)
+    check_jobs()
+
+    if time.time() - last_interface_check > 600:
+      check_interface()
+      last_interface_check = time.time()
+
 if __name__ == '__main__':
   print "============================================================================"
   print "                    wlan Ljubljana gateway policy daemon                    "
@@ -264,6 +346,8 @@ if __name__ == '__main__':
   parser = OptionParser()
   parser.add_option('-i', '--interface', dest = 'interface', help = 'Shaped interface')
   parser.add_option('-p', '--prefix', dest = 'prefix', help = 'Subnet prefix')
+  parser.add_option('-r', '--refresh-interval', dest = 'refresh', type = 'int',
+                    default = REFRESH_INTERVAL, help = 'Refresh interval (in seconds)')
   parser.add_option('-d', '--debug', dest = 'debug', action = 'store_true', help = 'Output debug messages')
   options, args = parser.parse_args()
   options = options.__dict__
@@ -275,6 +359,7 @@ if __name__ == '__main__':
 
   DEBUG = options['debug']
   IPV4_SUBNET_PREFIX = options['prefix']
+  REFRESH_INTERVAL = options['refresh']
   p = PolicyControl(options['interface'])
 
   # Install signal handler for SIGTERM
@@ -284,16 +369,7 @@ if __name__ == '__main__':
   signal.signal(signal.SIGTERM, handle_sigterm)
   
   try:
-    p.insert_class(1, 512)
-    p.insert_class(2, 1024)
-    p.insert_class(3, 2048)
-    p.insert_class(4, 4096)
-    p.insert_filter(4, '10.14.128.1', 2)
-    p.insert_filter(4, '10.14.128.33', 3)
-    p.insert_filter(4, '10.14.129.129', 2)
-    p.insert_filter(4, '10.14.130.33', 2)
-    p.update_filter(4, '10.14.130.33', 3)
-    p.remove_filter(4, '10.14.129.129')
+    watch_loop()
   finally:
     p.remove_all_rules()
 
