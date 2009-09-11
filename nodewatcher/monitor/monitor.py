@@ -323,15 +323,16 @@ def checkMeshStatus():
     add_graph(n, '', GraphType.OlsrPeers, RRAOlsrPeers, 'Routing Peers', 'olsrpeers_%s' % nodeIp, n.peers)
 
     # Add LQ/ILQ graphs
-    lq_avg = ilq_avg = 0.0
-    for peer in nodes[nodeIp].links:
-      lq_avg += float(peer[1])
-      ilq_avg += float(peer[2])
-    
-    lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
+    if n.peers > 0:
+      lq_avg = ilq_avg = 0.0
+      for peer in nodes[nodeIp].links:
+        lq_avg += float(peer[1])
+        ilq_avg += float(peer[2])
+      
+      lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
 
-    for peer in n.src.all():
-      add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s_%s' % (nodeIp, peer.dst.ip), peer.lq, peer.ilq, parent = lq_graph)
+      for peer in n.src.all():
+        add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s_%s' % (nodeIp, peer.dst.ip), peer.lq, peer.ilq, parent = lq_graph)
 
     n.last_seen = datetime.now()
 
@@ -399,6 +400,10 @@ def checkMeshStatus():
         # Update node's MAC address on wifi iface
         if 'mac' in info['wifi']:
           n.wifi_mac = info['wifi']['mac']
+
+        # Check for VPN statistics
+        if 'vpn' in info:
+          n.vpn_mac = info['vpn']['mac']
 
         # Generate a graph for number of clients
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)
