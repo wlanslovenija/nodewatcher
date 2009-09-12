@@ -8,7 +8,7 @@ from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
-from wlanlj.policy.models import Policy, PolicyFamily
+from wlanlj.policy.models import Policy, PolicyFamily, TrafficControlClass
 from datetime import datetime
 from wlanlj.nodes import ipcalc
 
@@ -154,6 +154,7 @@ def node_edit(request, node_ip):
       p.update({
         'template'            : node.profile.template.id,
         'use_vpn'             : node.profile.use_vpn,
+        'tc_egress'           : TrafficControlClass.objects.get(bandwidth = node.profile.vpn_egress_limit).id if node.profile.vpn_egress_limit else None,
         'use_captive_portal'  : node.profile.use_captive_portal,
         'wan_dhcp'            : node.profile.wan_dhcp,
         'wan_ip'              : "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr) if node.profile.wan_ip and node.profile.wan_cidr else None,

@@ -91,6 +91,12 @@ class RegisterNodeForm(forms.Form):
     required = False,
     empty_label = _("Unlimited")
   )
+  tc_egress = forms.ModelChoiceField(
+    TrafficControlClass.objects.all().order_by("id"),
+    label = _("Upload limit"),
+    required = False,
+    empty_label = _("Unlimited")
+  )
 
   # Antenna type
   ant_external = forms.BooleanField(required = False, label = _("External antenna"))
@@ -284,7 +290,12 @@ class RegisterNodeForm(forms.Form):
       profile.wan_ip = self.cleaned_data.get('wan_ip')
       profile.wan_cidr = self.cleaned_data.get('wan_cidr')
       profile.wan_gw = self.cleaned_data.get('wan_gw')
+
+      if self.cleaned_data.get('tc_egress'):
+        profile.vpn_egress_limit = self.cleaned_data.get('tc_egress').bandwidth
+
       profile.save()
+
       profile.optional_packages = self.cleaned_data.get('optional_packages')
       profile.save()
 
@@ -372,6 +383,12 @@ class UpdateNodeForm(forms.Form):
   tc_ingress = forms.ModelChoiceField(
     TrafficControlClass.objects.all().order_by("id"),
     label = _("Download limit"),
+    required = False,
+    empty_label = _("Unlimited")
+  )
+  tc_egress = forms.ModelChoiceField(
+    TrafficControlClass.objects.all().order_by("id"),
+    label = _("Upload limit"),
     required = False,
     empty_label = _("Unlimited")
   )
@@ -562,7 +579,14 @@ class UpdateNodeForm(forms.Form):
       profile.wan_ip = self.cleaned_data.get('wan_ip')
       profile.wan_cidr = self.cleaned_data.get('wan_cidr')
       profile.wan_gw = self.cleaned_data.get('wan_gw')
+
+      if self.cleaned_data.get('tc_egress'):
+        profile.vpn_egress_limit = self.cleaned_data.get('tc_egress').bandwidth
+      else:
+        profile.vpn_egress_limit = None
+ 
       profile.save()
+
       profile.optional_packages = self.cleaned_data.get('optional_packages')
       profile.save()
     elif profile:

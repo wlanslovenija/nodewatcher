@@ -92,6 +92,9 @@ class Profile(models.Model):
   # Optional packages
   optional_packages = models.ManyToManyField(OptionalPackage)
 
+  # VPN upload shaping
+  vpn_egress_limit = models.IntegerField(null = True)
+
 def gen_mac_address():
   """
   Generates a random MAC address.
