@@ -325,13 +325,14 @@ class NodeConfig(object):
                           'dhcp'        : dhcp,
                           'olsr'        : olsr })
   
-  def setVpn(self, username, password, mac = None):
+  def setVpn(self, username, password, mac = None, limit = None):
     """
     Sets VPN parameters.
     
     @param username: Assigned username
     @param password: Assigned password
     @param mac: Assigned MAC address
+    @param limit: Egress traffic limit (in kbit/s)
     """
     if not self.hasInterface('wan'):
       raise Exception('VPN requires WAN access configuration!')
@@ -339,7 +340,8 @@ class NodeConfig(object):
     self.addInterface('vpn', 'tap0', olsr = True)
     self.vpn = { 'username' : username,
                  'password' : password,
-                 'mac'      : mac }
+                 'mac'      : mac,
+                 'limit'    : limit }
   
   def setCaptivePortal(self, value):
     """
@@ -464,6 +466,7 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('kmod-ipt-nat', 'iptables-mod-nat')
     self.addPackage('nodewatcher', 'olsrd-mod-actions')
     self.addPackage('pv', 'netprofscripts')
+    self.addPackage('tc', 'kmod-sched')
 
     # Build the image
     buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
@@ -550,6 +553,13 @@ class OpenWrtConfig(NodeConfig):
       f.write('  # set on wlan Ljubljana gateways will cease to work!\n')
       f.write('  openvpn --mktun --dev tap0\n')
       f.write('  ifconfig tap0 hw ether %s\n' % self.vpn['mac'])
+      
+      if self.vpn['limit']:
+        f.write('\n')
+        f.write('  # Setup egress limiting on VPN interface\n')
+        f.write('  insmod sch_tbf\n')
+        f.write('  tc qdisc add dev tap0 root tbf rate %skbit latency 50ms burst 5120\n' % self.vpn['limit'])
+
       f.write('}\n')
       f.close()
       os.chmod(up_path, 0755)
