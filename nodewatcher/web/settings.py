@@ -63,6 +63,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.csrf.middleware.CsrfMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
@@ -77,6 +78,7 @@ TEMPLATE_DIRS = (
     '/var/www/django/wlanlj/templates'
 )
 
+FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'
 LOGIN_URL = '/auth/login'
 AUTH_PROFILE_MODULE = 'account.useraccount'
@@ -94,4 +96,5 @@ INSTALLED_APPS = (
     'wlanlj.generator',
     'wlanlj.account',
     'wlanlj.dns',
+    'wlanlj.policy',
 )
