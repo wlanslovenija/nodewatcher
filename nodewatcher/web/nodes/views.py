@@ -206,6 +206,34 @@ def node(request, node_ip = None):
   )
 
 @login_required
+def node_reset(request, node_ip):
+  """
+  Displays a form where the user can confirm node data reset. If
+  confirmed, node data is reset and node is moved into pending
+  state.
+  """
+  node = get_object_or_404(Node, pk = node_ip)
+  if node.owner != request.user and not request.user.is_staff:
+    raise Http404
+
+  if request.method == 'POST':
+    # Reset confirmed
+    if node.status == NodeStatus.Down:
+      node.status = NodeStatus.Pending
+      node.last_seen = None
+      node.first_seen = None
+      node.uptime_so_far = None
+      node.clients_so_far = 0
+      node.save()
+
+      return HttpResponseRedirect("/nodes/node/%s" % node.ip)
+
+  return render_to_response('nodes/reset.html',
+    { 'node' : node },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
 def node_remove(request, node_ip = None):
   """
   Displays node info.

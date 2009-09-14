@@ -16,12 +16,12 @@ urlpatterns = patterns('',
     # Nodes
     (r'^$', 'wlanlj.nodes.views.nodes'),
     (r'^nodes/node_list$', 'wlanlj.nodes.views.nodes'),
-    (r'^nodes/subnet_list$', 'wlanlj.nodes.views.subnets'),
     (r'^nodes/my_nodes$', 'wlanlj.nodes.views.my_nodes'),
     (r'^nodes/new$', 'wlanlj.nodes.views.node_new'),
     (r'^nodes/node/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.node'),
     (r'^nodes/remove/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.node_remove'),
     (r'^nodes/do_remove/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.node_do_remove'),
+    (r'^nodes/reset/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.node_reset'),
     (r'^nodes/edit/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.node_edit'),
     (r'^nodes/allocate_subnet/(?P<node_ip>.*?)$', 'wlanlj.nodes.views.node_allocate_subnet'),
     (r'^nodes/deallocate_subnet/(?P<subnet_id>\d+)$', 'wlanlj.nodes.views.node_deallocate_subnet'),
@@ -46,7 +46,6 @@ urlpatterns = patterns('',
 
     # Generator
     (r'^generator/request/(?P<node_ip>.*?)$', 'wlanlj.generator.views.request'),
-    (r'^generator/image/(?P<node_ip>.*?)$', 'wlanlj.generator.views.generate'),
 
     # Authentication
     (r'^auth/(?:login)?$', 'django.contrib.auth.views.login',
