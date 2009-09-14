@@ -234,49 +234,31 @@ def node_reset(request, node_ip):
   )
 
 @login_required
-def node_remove(request, node_ip = None):
+def node_remove(request, node_ip):
   """
   Displays node info.
   """
-  if not node_ip:
-    raise Http404
-  
   node = get_object_or_404(Node, pk = node_ip)
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
+  
+  if request.method == 'POST':
+    # Generate node removed event and remove node
+    Event.create_event(node, EventCode.NodeRemoved, '', EventSource.NodeDatabase)
+    node.delete()
+    return HttpResponseRedirect("/nodes/my_nodes")
   
   return render_to_response('nodes/remove.html',
     { 'node' : node },
     context_instance = RequestContext(request)
   )
 
+
 @login_required
-def node_do_remove(request, node_ip = None):
+def node_allocate_subnet(request, node_ip):
   """
   Displays node info.
   """
-  if not node_ip:
-    raise Http404
-  
-  node = get_object_or_404(Node, pk = node_ip)
-  if node.owner != request.user and not request.user.is_staff:
-    raise Http404
-  
-  # Generate node removed event
-  Event.create_event(node, EventCode.NodeRemoved, '', EventSource.NodeDatabase)
-
-  node.delete()
-
-  return HttpResponseRedirect("/nodes/my_nodes")
-
-@login_required
-def node_allocate_subnet(request, node_ip = None):
-  """
-  Displays node info.
-  """
-  if not node_ip:
-    raise Http404
-  
   node = get_object_or_404(Node, pk = node_ip)
   if node.status == NodeStatus.Invalid or (node.owner != request.user and not request.user.is_staff):
     raise Http404
@@ -296,43 +278,27 @@ def node_allocate_subnet(request, node_ip = None):
   )
 
 @login_required
-def node_deallocate_subnet(request, subnet_id = None):
+def node_deallocate_subnet(request, subnet_id):
   """
   Displays node info.
   """
-  if not subnet_id:
-    raise Http404
-  
   subnet = get_object_or_404(Subnet, pk = subnet_id)
   node = subnet.node
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
   
+  if request.method == 'POST':
+    if subnet.is_wifi and not request.user.is_staff:
+      raise Http404
+
+    subnet.delete()
+    return HttpResponseRedirect("/nodes/node/%s" % node.ip)
+
   return render_to_response('nodes/deallocate_subnet.html',
     { 'node' : node,
       'subnet' : subnet },
     context_instance = RequestContext(request)
   )
-
-@login_required
-def node_do_deallocate_subnet(request, subnet_id = None):
-  """
-  Displays node info.
-  """
-  if not subnet_id:
-    raise Http404
-  
-  subnet = get_object_or_404(Subnet, pk = subnet_id)
-  node = subnet.node
-  if node.owner != request.user and not request.user.is_staff:
-    raise Http404
-  
-  if subnet.is_wifi and not request.user.is_staff:
-    raise Http404
-
-  subnet.delete()
-
-  return HttpResponseRedirect("/nodes/node/" + node.ip)
 
 @login_required
 def whitelist_mac(request):

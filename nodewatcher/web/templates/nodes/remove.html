@@ -43,9 +43,11 @@
     <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
 </table>
-
+  
+  <form method="POST" action="{% url wlanlj.nodes.views.node_remove node.ip %}">
   <div class="buttons">
-      <input type="button" value="{% trans "Remove" %}" onclick="document.location='/nodes/do_remove/{{ node.ip }}'" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </div>
+    <input type="submit" value="{% trans "Remove" %}" />&nbsp;
+    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+  </div>
+  </form>
 {% endblock %}

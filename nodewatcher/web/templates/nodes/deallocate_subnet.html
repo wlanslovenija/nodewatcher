@@ -54,10 +54,13 @@
     <td>{{ subnet }}</td>
   </tr>
 </table>
+
+  <form method="POST" action="{% url wlanlj.nodes.views.node_deallocate_subnet subnet.id %}">
   <div class="buttons">
-      {% if not subnet.is_wifi or user.is_staff %}
-      <input type="button" value="{% trans "Remove" %}" onclick="document.location='/nodes/do_deallocate_subnet/{{ subnet.id }}'" />&nbsp;
-      {% endif %}
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </div>
+    {% if not subnet.is_wifi or user.is_staff %}
+    <input type="submit" value="{% trans "Remove" %}" />&nbsp;
+    {% endif %}
+    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+  </div>
+  </form>
 {% endblock %}
