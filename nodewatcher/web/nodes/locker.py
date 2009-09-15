@@ -1,15 +1,14 @@
-from django.db import connection
+from django.db import connection, transaction
 
 def require_lock(*tables):
   def _lock(func):
     def _do_lock(*args,**kws):
       cursor = connection.cursor()
-      cursor.execute("LOCK TABLES %s" % ', '.join(["%s WRITE" % x for x in tables]))
+      cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
 
       try:
         return func(*args,**kws)
       finally:
-        cursor.execute("UNLOCK TABLES")
         if cursor:
           cursor.close()
     return _do_lock
