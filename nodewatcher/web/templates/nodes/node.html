@@ -50,7 +50,11 @@
   <tr>
     <td>{% trans "Maintainer" %}</td>
     {% if node.owner %}
+    {% if user.is_authenticated and node.owner.email %}
+    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
+    {% else %}
     <td>{{ node.owner.username }}</td>
+    {% endif %}
     {% else %}
     <td>{% trans "Unknown" %}</td>
     {% endif %}
