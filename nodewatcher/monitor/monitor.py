@@ -8,7 +8,7 @@
 # Setup import paths, since we are using Django models
 import sys, os
 sys.path.append('/var/www/django')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings_production'
 
 # Import our models
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType
