@@ -9,13 +9,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'wlanlj'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'wlanlj'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'XXX'         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
-DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 
 EMAIL_HOST = 'XXXXXXXXXXXXXXX'
 EMAIL_SUBJECT_PREFIX = '[wlan-lj] '
@@ -78,6 +77,7 @@ TEMPLATE_DIRS = (
     '/var/www/django/wlanlj/templates'
 )
 
+DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'
 LOGIN_URL = '/auth/login'
