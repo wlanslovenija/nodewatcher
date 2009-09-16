@@ -47,7 +47,11 @@
     </td>
     <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
-    <td>{{ node.last_seen|default:_("never") }}</td>
+    {% if node.last_seen %}
+    <td>{{ node.last_seen|date }}</td>
+    {% else %}
+    <td>{% trans "never" %}</td>
+    {% endif %}
     <td align="center">{{ node.status_as_string|statusimage:"small" }}</td>
     {% if node.is_down %}
     <td align="center">0</td>

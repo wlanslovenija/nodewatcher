@@ -85,7 +85,11 @@
   </tr>
   <tr>
     <td>{% trans "Last seen" %}</td>
-    <td>{{ node.last_seen|default:_("never") }}</td>
+    {% if node.last_seen %}
+    <td>{{ node.last_seen|date }}</td>
+    {% else %}
+    <td>{% trans "never" %}</td>
+    {% endif %}
   </tr>
   {% if node.is_mesh_node %}
   <tr>
@@ -248,12 +252,16 @@
         </tr>
 </thead>
 <tbody>
-        {% for subnet in node.subnet_set.all %}
+        {% for subnet in node.get_subnets %}
         <tr class="{% cycle 'odd' 'even' %}">
           {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" /></a>{% endif %}</td>{% endif %}
           <td>{{ subnet }}</td>
           <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
-          <td>{{ subnet.last_seen|default:_("never") }}</td>
+          {% if subnet.last_seen %}
+          <td>{{ subnet.last_seen|date }}</td>
+          {% else %}
+          <td>{% trans "never" %}</td>
+          {% endif %}
         </tr>
         {% endfor %}
 {% if current_owner %}

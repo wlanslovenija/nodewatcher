@@ -291,6 +291,12 @@ class Node(models.Model):
       return True
 
     return False
+  
+  def get_subnets(self):
+    """
+    Returns properly ordered subnets.
+    """
+    return self.subnet_set.all().order_by("id")
 
   def ant_type_as_string(self):
     """
