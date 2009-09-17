@@ -170,7 +170,7 @@
     <td>{{ form.tc_ingress.label }}</td>
     <td>{{ form.tc_ingress }}</td>
   </tr>
-  <tr>
+  <tr class="imagegen_opts vpn_opts">
     <td></td>
     <td class="small_text">This will setup traffic limiting on VPN gateways. Set limits only if and when you notice problems with Internet connection sharing because of the node. In general this is not needed as traffic is already limited by other factors (like wireless connections quality).</td>
   </tr>
@@ -252,6 +252,15 @@
     }
   }
 
+  function toggleVpnOptions()
+  {
+    if ($('#id_use_vpn').is(':checked')) {
+      $('.vpn_opts').css('display', '');
+    } else {
+      $('.vpn_opts').css('display', 'none');
+    }
+  }
+
   function toggleLocation()
   {
     if ($('#id_node_type').attr('value') == {{ mobile_node_type }}) {
@@ -286,8 +295,10 @@
   $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
   $('#id_node_type').change(function(event) { toggleLocation(); });
   $('#id_ant_external').change(function(event) { toggleExtAntenna(); });
+  $('#id_use_vpn').change(function(event) { toggleVpnOptions(); });
   $(function() {
     toggleAutoConfiguration();
+    toggleVpnOptions();
     toggleImageGeneratorOptions();
     toggleLocation();
     toggleExtAntenna();
