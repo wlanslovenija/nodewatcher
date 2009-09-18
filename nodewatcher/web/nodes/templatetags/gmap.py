@@ -40,6 +40,7 @@ BASIC_TEMPLATE = """
       map.removeMapType(map.getMapTypes()[1]);
       map.addControl(new GSmallMapControl());
       map.addControl(new GMapTypeControl());
+      map.addControl(new GScaleControl());
       var m = 0;
       if (%(marker)s && %(mlat)s > 0 && %(mlong)s > 0) {
         m = new GMarker(new GLatLng(%(mlat)s, %(mlong)s), {'icon' : create_icon("%(status)s")});
@@ -82,6 +83,7 @@ FULL_TEMPLATE = """
       map.enableDoubleClickZoom();
       map.addControl(new GSmallMapControl());
       map.addControl(new GMapTypeControl());
+      map.addControl(new GScaleControl());
 
       if ("%(callback)s" != "undefined") {
         %(callback)s(map);
