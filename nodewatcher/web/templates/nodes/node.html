@@ -108,7 +108,7 @@
     <td style="width: 300px;"></td>
     <td></td>
   </tr>
-  {% if node.is_mesh_node %}
+  {% if node.is_mesh_node or node.is_mobile_node %}
   <tr class="section_title">
     <td colspan="2">{% trans "Antenna Information" %}</td>
   </tr>

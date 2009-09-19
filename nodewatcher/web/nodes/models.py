@@ -215,6 +215,12 @@ class Node(models.Model):
     """
     return self.node_type in (NodeType.Mesh, NodeType.Test)
 
+  def is_mobile_node(self):
+    """
+    Returns true if the node is a mobile node.
+    """
+    return self.node_type == NodeType.Mobile
+
   def node_type_as_string(self):
     """
     Returns node type as string.
