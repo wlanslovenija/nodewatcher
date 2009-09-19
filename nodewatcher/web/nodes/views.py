@@ -218,7 +218,7 @@ def node_reset(request, node_ip):
 
   if request.method == 'POST':
     # Reset confirmed
-    if node.status == NodeStatus.Down:
+    if node.status in (NodeStatus.Down, NodeStatus.Pending):
       node.status = NodeStatus.Pending
       node.last_seen = None
       node.first_seen = None
