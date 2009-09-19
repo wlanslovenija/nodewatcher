@@ -224,6 +224,7 @@ def node_reset(request, node_ip):
       node.first_seen = None
       node.uptime_so_far = None
       node.clients_so_far = 0
+      node.graphitem_set.all().delete()
       node.save()
 
       return HttpResponseRedirect("/nodes/node/%s" % node.ip)
