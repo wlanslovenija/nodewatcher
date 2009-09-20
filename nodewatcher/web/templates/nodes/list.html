@@ -54,7 +54,11 @@
     {% endif %}
     <td align="center">{{ node.status_as_string|statusimage:"small" }}</td>
     {% if node.is_down %}
+    {% if node.is_invalid %}
+    <td align="center">{{ node.peers }}</td>
+    {% else %}
     <td align="center">0</td>
+    {% endif %}
     <td align="center">0</td>
     {% else %}
     <td align="center">{{ node.peers }}</td>
