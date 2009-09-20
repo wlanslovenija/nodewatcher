@@ -3,10 +3,10 @@
 {% load gmap %}
 {% load conversion %}
 
-{% block title %}{% trans "Node" %} {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+{% block title %}{% trans "Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1><img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:"???" }} ({{ node.ip }})</h1>
+<h1><img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 
 {% if node.warnings %}
 <div class="error">
@@ -39,7 +39,7 @@
   </tr>
   <tr>
     <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:"???" }}</td>
+    <td>{{ node.name|default:_("unknown") }}</td>
   </tr>
   {% if node.url %}
   <tr>

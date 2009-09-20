@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Subnet Allocation" %} - {{ node.name|default:"???" }} ({{ node.ip }}){% endblock %}
+{% block title %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>{% trans "Subnet Allocation" %} - {{ node.name|default:"???" }} ({{ node.ip }})</h1>
+<h1>{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 
 {% if form.errors %}
 <div class="error">
@@ -32,7 +32,7 @@
   </tr>
   <tr>
     <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:"???" }}</td>
+    <td>{{ node.name|default:_("unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Maintainer" %}</td>
