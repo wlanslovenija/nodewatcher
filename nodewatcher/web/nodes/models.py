@@ -257,7 +257,7 @@ class Node(models.Model):
     """
     w = []
     if self.status == NodeStatus.Invalid:
-      w.append(_("Node is not registred in the node database!"))
+      w.append(_("Node is not registered in the node database!"))
 
     if self.status == NodeStatus.Duped:
       w.append(_("Monitor has received duplicate ICMP ECHO packets!"))
