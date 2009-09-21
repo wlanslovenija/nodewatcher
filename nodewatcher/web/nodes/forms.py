@@ -154,6 +154,9 @@ class RegisterNodeForm(forms.Form):
     location = self.cleaned_data.get('location')
     node_type = int(self.cleaned_data.get('node_type'))
 
+    if not name:
+      return
+
     if not NODE_NAME_RE.match(name):
       raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
 
@@ -458,6 +461,9 @@ class UpdateNodeForm(forms.Form):
     template = self.cleaned_data.get('template')
     location = self.cleaned_data.get('location')
     node_type = int(self.cleaned_data.get('node_type'))
+
+    if not name:
+      return
 
     try:
       if use_vpn and template and not template.iface_lan and node.has_allocated_subnets(IfaceType.LAN):
