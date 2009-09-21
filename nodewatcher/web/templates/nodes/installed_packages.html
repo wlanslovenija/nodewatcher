@@ -26,7 +26,7 @@
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ package.name }}</td>
     <td>{{ package.version }}</td>
-    <td>{{ package.last_update }}</td>
+    <td>{{ package.last_update|date }}</td>
   </tr>
   {% endfor %}
   {% endif %}
