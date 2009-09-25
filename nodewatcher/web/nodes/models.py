@@ -564,6 +564,7 @@ class Pool(models.Model):
   default_prefix_len = models.IntegerField(default = 27)
   last_alloc_network = models.CharField(max_length = 50, null = True)
   last_alloc_cidr = models.IntegerField(null = True)
+  description = models.CharField(max_length = 200, null = True)
 
   @staticmethod
   def contains_network(network, cidr):
@@ -577,6 +578,17 @@ class Pool(models.Model):
         return True
 
     return False
+  
+  def family_as_string(self):
+    """
+    Returns this pool's address family as a string.
+    """
+    if self.family == PoolFamily.Ipv4:
+      return "IPv4"
+    elif self.family == PoolFamily.Ipv6:
+      return "IPv6"
+    else:
+      return _("Unknown")
 
   def __unicode__(self):
     """

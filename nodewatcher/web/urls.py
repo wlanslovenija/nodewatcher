@@ -39,6 +39,10 @@ urlpatterns = patterns('',
     (r'^feeds/whitelist$', 'wlanlj.nodes.views.whitelist'),
     (r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }),
 
+    # Pools
+    (r'^ip_pools$', 'wlanlj.nodes.views.pools'),
+    (r'^ip_pools/txt$', 'wlanlj.nodes.views.pools_text'),
+
     # Sitemap
     (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', { 'sitemaps' : sitemaps }),
 

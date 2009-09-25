@@ -28,6 +28,25 @@ def nodes(request):
     context_instance = RequestContext(request)
   )
 
+def pools(request):
+  """
+  Displays IP allocation pools.
+  """
+  return render_to_response('nodes/pools.html',
+    { 'pools' : Pool.objects.filter(parent = None).order_by('id') },
+    context_instance = RequestContext(request)
+  )
+
+def pools_text(request):
+  """
+  Displays IP allocation pools as tab separated text values.
+  """
+  output = []
+  for pool in Pool.objects.filter(parent = None).order_by('id'):
+    output.append("%s\t%s\t%s" % (pool, pool.family_as_string(), pool.description))
+
+  return HttpResponse("\n".join(output), content_type = "text/plain")
+
 def statistics(request):
   """
   Displays some global statistics.

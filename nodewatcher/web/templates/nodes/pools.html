@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}IP Allocation Pools{% endblock %}
+{% block contenttype %}prefs{% endblock %}
+
+{% block rss %}
+  <link rel="alternate" href="/feeds/rss/events" title="wlan ljubljana - Latest mesh events" type="application/rss+xml" />
+{% endblock %}
+
+{% block altlinks %}
+  <h3>{% trans "Download in other formats" %}:</h3>
+  <ul>
+    <li class="first last"><a href="{% url wlanlj.nodes.views.pools_text %}">{% trans "Tab separated" %}</a></li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+<h1>IP Allocation Pools</h1>
+  {% if not pools %}
+<div class="notice">
+  {% trans "No IP allocation pools found in the database." %}
+</div>
+  {% else %}
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th style="width: 50px;"><b>{% trans "Family" %}</b></th>
+    <th style="width: 200px;"><b>{% trans "Subnet" %}</b></th>
+    <th><b>{% trans "Description" %}</b></th>
+  </tr>
+</thead>
+<tbody>
+  {% for pool in pools %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td>{{ pool.family_as_string }}</td>
+    <td>{{ pool }}</td>
+    <td>{{ pool.description }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+{% endif %}
+<br/>
+{% endblock %}
