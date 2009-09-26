@@ -5,15 +5,15 @@ from wlanlj.account.models import UserAccount
 from beanstalk import serverconn
 from beanstalk import job
 
-# Global connection instance
-queue = serverconn.ServerConn("127.0.0.1", 11300)
-queue.use("generator")
-
 def queue_generator_job(node, email_user, config_only = False):
   """
   Queues a generator job via the beanstalk daemon.
   """
   assert(isinstance(node, Node))
+  
+  # Open up a connection with beanstalkd
+  queue = serverconn.ServerConn("127.0.0.1", 11300)
+  queue.use("generator")
 
   # Prepare job metadata from profile information
   subnets = []
