@@ -206,7 +206,7 @@ def checkMeshStatus():
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
 
   # Mark all nodes as down and all subnets as not announced
-  Node.objects.all().update(warnings = False)
+  Node.objects.all().update(warnings = False, conflicting_subnets = False)
   Subnet.objects.exclude(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Hijacked)).update(status = SubnetStatus.NotAnnounced)
   Link.objects.all().delete()
 
@@ -513,11 +513,23 @@ def checkMeshStatus():
                              data = 'Subnet: %s/%s\n  Allocated to: %s' % (s.subnet, s.cidr, origin.node))
         except Subnet.DoesNotExist:
           pass
-
+        
         # Flag node entry with warnings flag (if not a border router)
         if not n.border_router or s.status == SubnetStatus.Hijacked:
           n.warnings = True
           n.save()
+      
+      # Detect subnets that cause conflicts and raise warning flags for all involved
+      # nodes
+      if s.is_conflicting():
+        s.node.warnings = True
+        s.node.conflicting_subnets = True
+        s.node.save()
+        
+        for cs in s.get_conflicting_subnets():
+          cs.node.warnings = True
+          cs.node.conflicting_subnets = True
+          cs.node.save()
   
   # Remove subnets that were hijacked but are not visible anymore
   for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, last_seen__lt = datetime.now() - timedelta(minutes = 5)):
