@@ -3,11 +3,19 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.template import loader, Context
+from django.conf import settings
 from wlanlj.nodes.locker import require_lock
 from wlanlj.nodes import ipcalc
 from wlanlj.generator.types import IfaceType
 from wlanlj.dns.models import Zone, Record
 from datetime import datetime, timedelta
+
+# This will select the proper IP lookup mechanism, so it will also work on
+# non-PostgreSQL databases (but it will be much slower for larger sets).
+if settings.DATABASE_ENGINE.startswith('postgresql'):
+  from wlanlj.nodes.util import IPField, IPManager
+else:
+  from wlanlj.nodes.util_dummy import IPField, IPManager
 
 class Project(models.Model):
   """
@@ -63,17 +71,6 @@ class NodeStatus:
   New = 5
   Pending = 6
   
-  # Magic marker
-  UserSpecifiedMark = 100
-
-  # Additional status codes that can only be set explicitly
-  # by the node's owner or an administrator.
-  UnknownProblems = 100
-  Building = 101
-  NeedEquipment = 102
-  NeedHelp = 103
-  TakenDown = 104
-  
   @staticmethod
   def as_string(status):
     """
@@ -89,16 +86,6 @@ class NodeStatus:
       return "duped"
     elif status == NodeStatus.Invalid:
       return "invalid"
-    elif status == NodeStatus.UnknownProblems:
-      return "problems"
-    elif status == NodeStatus.Building:
-      return "building"
-    elif status == NodeStatus.NeedEquipment:
-      return "needequip"
-    elif status == NodeStatus.NeedHelp:
-      return "needhelp"
-    elif status == NodeStatus.TakenDown:
-      return "takendown"
     elif status == NodeStatus.New:
       return "new"
     elif status == NodeStatus.Pending:
@@ -135,6 +122,7 @@ class Node(models.Model):
   node_type = models.IntegerField(default = NodeType.Mesh)
   redundancy_link = models.BooleanField(default = False)
   redundancy_req = models.BooleanField(default = False)
+  conflicting_subnets = models.BooleanField(default = False)
 
   # Geographical location
   geo_lat = models.FloatField(null = True)
@@ -262,7 +250,7 @@ class Node(models.Model):
     if self.status == NodeStatus.Duped:
       w.append(_("Monitor has received duplicate ICMP ECHO packets!"))
 
-    if self.subnet_set.filter(status = SubnetStatus.NotAllocated):
+    if self.subnet_set.filter(status = SubnetStatus.NotAllocated) and not self.border_router:
       w.append(_("Node is announcing subnets, that are not allocated to it!"))
 
     if self.subnet_set.filter(status = SubnetStatus.NotAnnounced):
@@ -276,6 +264,9 @@ class Node(models.Model):
 
     if not self.captive_portal_status:
       w.append(_("Captive portal daemon is down!"))
+    
+    if self.conflicting_subnets:
+      w.append(_("Node is announcing one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!"))
 
     return w
   
@@ -387,7 +378,7 @@ class Subnet(models.Model):
   wifi mesh.
   """
   node = models.ForeignKey(Node)
-  subnet = models.CharField(max_length = 200)
+  subnet = models.CharField(max_length = 40)
   cidr = models.IntegerField()
   description = models.CharField(max_length = 200, null = True)
   allocated = models.BooleanField(default = False)
@@ -401,11 +392,43 @@ class Subnet(models.Model):
   gen_iface_type = models.IntegerField(default = IfaceType.WiFi)
   gen_dhcp = models.BooleanField(default = True)
   
+  # Field for indexed lookups
+  ip_subnet = IPField(null = True)
+  
+  # Custom manager
+  objects = IPManager()
+  
+  def save(self, **kwargs):
+    """
+    Saves the model.
+    """
+    self.ip_subnet = '%s/%s' % (self.subnet, self.cidr)
+    super(Subnet, self).save(**kwargs)
+  
   def is_wifi(self):
     """
     Returns true if this subnet is a wireless one.
     """
     return self.gen_iface_type == IfaceType.WiFi
+  
+  def is_conflicting(self):
+    """
+    Returns true if this subnet is conflicting with anouther announced
+    subnet.
+    """
+    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk).count() > 0
+  
+  def is_announced(self):
+    """
+    Returns true if this subnet is being currently announced.
+    """
+    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.Hijacked)
+  
+  def get_conflicting_subnets(self):
+    """
+    Returns conflicting subnets (if any).
+    """
+    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk)
 
   @staticmethod
   def is_allocated(network, cidr):
