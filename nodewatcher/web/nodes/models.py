@@ -266,7 +266,7 @@ class Node(models.Model):
       w.append(_("Captive portal daemon is down!"))
     
     if self.conflicting_subnets:
-      w.append(_("Node is announcing one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!"))
+      w.append(_("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!"))
 
     return w
   
