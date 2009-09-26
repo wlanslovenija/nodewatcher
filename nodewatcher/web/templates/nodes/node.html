@@ -265,7 +265,7 @@
         </tr>
         {% if subnet.is_conflicting %}
         <tr class="{% cycle subnet_rows %}">
-          <td colspan="3" class="small_text">
+          <td colspan="{% if current_owner %}4{% else %}3{% endif %}" class="small_text">
             <span style="color: red;">
               Subnet <b>{{ subnet }}</b> conflicts with:<br/>
               <div style="padding-left: 10px;">
