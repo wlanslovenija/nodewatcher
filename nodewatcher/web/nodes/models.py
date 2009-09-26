@@ -253,16 +253,16 @@ class Node(models.Model):
     if self.subnet_set.filter(status = SubnetStatus.NotAllocated) and not self.border_router:
       w.append(_("Node is announcing subnets, that are not allocated to it!"))
 
-    if self.subnet_set.filter(status = SubnetStatus.NotAnnounced):
+    if self.subnet_set.filter(status = SubnetStatus.NotAnnounced) and not self.is_down():
       w.append(_("Node is not announcing its own allocated subnets!"))
 
-    if self.has_time_sync_problems():
+    if self.has_time_sync_problems() and not self.is_down():
       w.append(_("Node's local clock is more than 30 minutes out of sync!"))
 
-    if self.redundancy_req and not self.redundancy_link:
+    if self.redundancy_req and not self.redundancy_link and not self.is_down():
       w.append(_("Node requires direct border gateway peering but has none!"))
 
-    if not self.captive_portal_status:
+    if not self.captive_portal_status and not self.is_down():
       w.append(_("Captive portal daemon is down!"))
     
     if self.conflicting_subnets:
@@ -416,6 +416,9 @@ class Subnet(models.Model):
     Returns true if this subnet is conflicting with anouther announced
     subnet.
     """
+    if self.cidr == 0:
+      return False
+
     return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk).count() > 0
   
   def is_announced(self):
@@ -428,7 +431,10 @@ class Subnet(models.Model):
     """
     Returns conflicting subnets (if any).
     """
-    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk)
+    if self.cidr == 0:
+      return Subnet.objects.none()
+
+    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk).order_by("ip_subnet")
 
   @staticmethod
   def is_allocated(network, cidr):
