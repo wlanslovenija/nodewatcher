@@ -38,7 +38,7 @@ wifiAntennas = {
                   # Antenna   Force always or only on default
   'fonera'      : (1,         True),
   'fonera+'     : (1,         True),
-  'whr-hp-g54'  : (1,         True),
+  'whr-hp-g54'  : (0,         True),
   'wrt54gl'     : (0,         False),
   'wrt54gs'     : (0,         False),
   'wl-500gp'    : (0,         True),
