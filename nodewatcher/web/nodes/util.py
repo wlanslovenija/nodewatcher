@@ -97,7 +97,7 @@ class IPField(models.Field):
   
   def post_create_sql(self, style, db_table):
     """
-    Returns SQL taht will be executed after the model has been created.
+    Returns SQL that will be executed after the model has been created.
     """
     post_sql = (
       style.SQL_KEYWORD('CREATE ') +
