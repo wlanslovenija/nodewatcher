@@ -461,7 +461,7 @@ class Subnet(models.Model):
     elif self.status == SubnetStatus.NotAnnounced:
       return "not announced"
     elif self.status == SubnetStatus.Hijacked:
-      return "hijacked"
+      return "collision"
     else:
       return "unknown"
   
