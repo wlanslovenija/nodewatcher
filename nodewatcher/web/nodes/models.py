@@ -425,7 +425,13 @@ class Subnet(models.Model):
     """
     Returns true if this subnet is being currently announced.
     """
-    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.Hijacked)
+    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAllocated, SubnetStatus.Hijacked)
+  
+  def is_properly_announced(self):
+    """
+    Returns true if this subnet is properly announced.
+    """
+    return self.status == SubnetStatus.AnnouncedOk
   
   def get_conflicting_subnets(self):
     """

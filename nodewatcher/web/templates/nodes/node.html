@@ -271,13 +271,13 @@
               <div style="padding-left: 10px;">
               {% for conflict in subnet.get_conflicting_subnets %}
               {% if conflict.is_announced %}
-              <b>{{ conflict }}</b> allocated to and announced by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
-              {% else %}
-                {% if conflict.allocated %}
-                <b>{{ conflict }}</b> allocated to <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+                {% if conflict.is_properly_announced %}
+                <b>{{ conflict }}</b> allocated to and announced by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
                 {% else %}
                 <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
                 {% endif %}
+              {% else %}
+                <b>{{ conflict }}</b> allocated to <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
               {% endif %}
               {% endfor %}
               </div>
