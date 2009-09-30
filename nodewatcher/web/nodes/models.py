@@ -939,7 +939,7 @@ class EventSubscription(models.Model):
       t.render(c),
       'events@wlan-lj.net',
       [self.user.email],
-      fail_silently = False
+      fail_silently = True
     )
 
 class InstalledPackage(models.Model):
