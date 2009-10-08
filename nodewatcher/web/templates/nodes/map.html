@@ -14,6 +14,7 @@
   var icons = {};
   var antennaOffset = 23; // antenna top is at (9, 7), icon anchor at (9, 30)
   var gmap;
+  var gprojectId = -1;
 
   function create_icon(status)
   {
@@ -66,25 +67,31 @@
   function map_init(map)
   {
     gmap = map;
-	  google.maps.Event.addListener(map, "zoomend", function (oldLevel, newLevel) { if (oldLevel != newLevel) { populate_map(map, newLevel); } } );
-  	populate_map(map, map.getZoom());
+	  google.maps.Event.addListener(map, "zoomend", function (oldLevel, newLevel) { if (oldLevel != newLevel) { populate_map(map, newLevel, gprojectId); } } );
+  	populate_map(map, map.getZoom(), -1);
   }
   
-  function populate_map(map, zoomLevel)
+  function populate_map(map, zoomLevel, projectId)
   {
     map.clearOverlays();
+    projectId = '' + projectId;
+    gprojectId = projectId;
   
     /* Nodes */
     {% for node in nodes %}
     {% if node.should_draw_on_map %}
-    create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}', '{{ node.status_as_string }}', '{{ node.url|default:"" }}');
+    if (projectId == -1 || '{{ node.project.pk }}' == projectId) {
+      create_marker(map, {{ node.geo_lat }}, {{ node.geo_long }}, '{{ node.ip }}', '{{ node.name }}', '{{ node.status_as_string }}', '{{ node.url|default:"" }}');
+    }
     {% endif %}
     {% endfor %}
 
     /* Links */
     {% for link in links %}
     {% if link.should_draw_on_map %}
-    create_link(map, zoomLevel, {{ link.src.geo_lat }}, {{ link.src.geo_long }}, {{ link.dst.geo_lat }}, {{ link.dst.geo_long }}, '{{ link.color }}');
+    if (projectId == -1 || ('{{ link.src.project.pk }}' == projectId && '{{ link.dst.project.pk }}' == projectId)) {
+      create_link(map, zoomLevel, {{ link.src.geo_lat }}, {{ link.src.geo_long }}, {{ link.dst.geo_lat }}, {{ link.dst.geo_long }}, '{{ link.color }}');
+    }
     {% endif %}
     {% endfor %}
   }
@@ -93,6 +100,7 @@
 <div style="margin-left: 10px;">
 {% trans "Project" %}:
 <select id="gmap_project">
+  <option value="-1">{% trans "Show all nodes" %}</option>
   {% for project in projects %}
   <option value="{{ project.id }}">{{ project.name }}</option>
   {% endfor %}
@@ -108,17 +116,21 @@
 
   $(function() {
      $.history.init(function(hash) {
-      if (hash && hash.match(/^\d+$/)) {
+      if (hash && hash.match(/^-?\d+$/)) {
         $('#gmap_project').attr('value', hash);
         var projectId = hash;
         {% for project in projects %}
         if (projectId == {{ project.id }}) {
+          populate_map(gmap, gmap.getZoom(), projectId);
           gmap.panTo(new GLatLng({{ project.geo_lat }}, {{ project.geo_long }}));
           return;
         }
         {% endfor %}
+
+        // No project id selected
+        populate_map(gmap, gmap.getZoom(), -1);
       }
-    });  
+    });
   });
 </script>
 <div class="legend">
