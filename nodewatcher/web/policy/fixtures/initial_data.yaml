@@ -19,3 +19,13 @@
   fields:
     bandwidth: 4096
 
+- model: policy.TrafficControlClass
+  pk: 5
+  fields:
+    bandwidth: 256
+
+- model: policy.TrafficControlClass
+  pk: 6
+  fields:
+    bandwidth: 128
+
