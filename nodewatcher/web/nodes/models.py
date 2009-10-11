@@ -650,6 +650,10 @@ class Pool(models.Model):
 
     # First check if there are any children that are marked as free
     for c in self.children.filter(allocated = False, cidr = prefix_len):
+      # Check for conflicts
+      if Subnet.is_allocated(c.network, c.cidr):
+        raise PoolAllocationError('Subnet allocation conflict found!')
+
       c.allocated = True
       c.save()
       return c
