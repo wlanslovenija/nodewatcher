@@ -86,13 +86,13 @@ class RegisterNodeForm(forms.Form):
   
   # Traffic policy settings
   tc_ingress = forms.ModelChoiceField(
-    TrafficControlClass.objects.all().order_by("id"),
+    TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Download limit"),
     required = False,
     empty_label = _("Unlimited")
   )
   tc_egress = forms.ModelChoiceField(
-    TrafficControlClass.objects.all().order_by("id"),
+    TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Upload limit"),
     required = False,
     empty_label = _("Unlimited")
@@ -384,13 +384,13 @@ class UpdateNodeForm(forms.Form):
 
   # Traffic policy settings
   tc_ingress = forms.ModelChoiceField(
-    TrafficControlClass.objects.all().order_by("id"),
+    TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Download limit"),
     required = False,
     empty_label = _("Unlimited")
   )
   tc_egress = forms.ModelChoiceField(
-    TrafficControlClass.objects.all().order_by("id"),
+    TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Upload limit"),
     required = False,
     empty_label = _("Unlimited")
