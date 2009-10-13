@@ -221,6 +221,12 @@ class Node(models.Model):
     """
     return self.status not in (NodeStatus.Up, NodeStatus.Duped)
 
+  def is_resettable(self):
+    """
+    Returns true if the node can be reset.
+    """
+    return self.status in (NodeStatus.Down, NodeStatus.Pending)
+
   def is_invalid(self):
     """
     Returns true if the node is invalid.

@@ -237,7 +237,7 @@ def node_reset(request, node_ip):
 
   if request.method == 'POST':
     # Reset confirmed
-    if node.status in (NodeStatus.Down, NodeStatus.Pending):
+    if node.is_resettable():
       node.status = NodeStatus.Pending
       node.reset()
       node.save()

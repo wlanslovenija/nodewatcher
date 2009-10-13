@@ -25,7 +25,7 @@
 <h3 class="section_title">{% trans "General Information" %}
 {% if current_owner %}
 <a href="/nodes/edit/{{ node.ip }}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
-{% if node.is_down %}
+{% if node.is_resettable %}
 <a href="/nodes/reset/{{ node.ip }}"><img src="/images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
 {% endif %}
 <a href="/nodes/remove/{{ node.ip }}"><img src="/images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
