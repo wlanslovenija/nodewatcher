@@ -239,11 +239,7 @@ def node_reset(request, node_ip):
     # Reset confirmed
     if node.status in (NodeStatus.Down, NodeStatus.Pending):
       node.status = NodeStatus.Pending
-      node.last_seen = None
-      node.first_seen = None
-      node.uptime_so_far = None
-      node.clients_so_far = 0
-      node.graphitem_set.all().delete()
+      node.reset()
       node.save()
 
       return HttpResponseRedirect("/nodes/node/%s" % node.ip)

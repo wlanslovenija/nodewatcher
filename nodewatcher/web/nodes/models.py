@@ -166,6 +166,36 @@ class Node(models.Model):
   memfree = models.IntegerField(null = True)
   numproc = models.IntegerField(null = True)
   captive_portal_status = models.BooleanField(default = True)
+
+  def reset(self):
+    """
+    Resets node data.
+    """
+    self.status = NodeStatus.Pending
+    self.last_seen = None
+    self.first_seen = None
+    self.graphitem_set.all().delete()
+    self.channel = None
+    self.wifi_mac = None
+    self.vpn_mac = None
+    self.rtt_min = None
+    self.rtt_avg = None
+    self.rtt_max = None
+    self.pkt_loss = None
+    self.firmware_version = None
+    self.bssid = None
+    self.essid = None
+    self.local_time = None
+    self.clients = 0
+    self.clients_so_far = 0
+    self.uptime = None
+    self.uptime_so_far = None
+    self.loadavg_1min = None
+    self.loadavg_5min = None
+    self.loadavg_15min = None
+    self.memfree = None
+    self.numproc = None
+    self.captive_portal_status = True
   
   def has_time_sync_problems(self):
     """
