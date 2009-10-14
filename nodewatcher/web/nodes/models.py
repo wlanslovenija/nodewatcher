@@ -287,7 +287,7 @@ class Node(models.Model):
       w.append(_("Monitor has received duplicate ICMP ECHO packets!"))
 
     if self.subnet_set.filter(status = SubnetStatus.NotAllocated) and not self.border_router:
-      w.append(_("Node is announcing subnets, that are not allocated to it!"))
+      w.append(_("Node is announcing subnets that are not allocated to it!"))
 
     if self.subnet_set.filter(status = SubnetStatus.NotAnnounced) and not self.is_down():
       w.append(_("Node is not announcing its own allocated subnets!"))
@@ -407,6 +407,7 @@ class SubnetStatus:
   NotAllocated = 1
   NotAnnounced = 2
   Hijacked = 3
+  Subset = 4
 
 class Subnet(models.Model):
   """
@@ -455,19 +456,19 @@ class Subnet(models.Model):
     if self.cidr == 0:
       return False
 
-    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk).count() > 0
+    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node).count() > 0
   
   def is_announced(self):
     """
     Returns true if this subnet is being currently announced.
     """
-    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAllocated, SubnetStatus.Hijacked)
+    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAllocated, SubnetStatus.Hijacked, SubnetStatus.Subset)
   
   def is_properly_announced(self):
     """
     Returns true if this subnet is properly announced.
     """
-    return self.status == SubnetStatus.AnnouncedOk
+    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.Subset)
   
   def get_conflicting_subnets(self):
     """
@@ -476,7 +477,7 @@ class Subnet(models.Model):
     if self.cidr == 0:
       return Subnet.objects.none()
 
-    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(pk = self.pk).order_by("ip_subnet")
+    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node).order_by("ip_subnet")
 
   @staticmethod
   def is_allocated(network, cidr):
@@ -504,6 +505,8 @@ class Subnet(models.Model):
       return "not announced"
     elif self.status == SubnetStatus.Hijacked:
       return "collision"
+    elif self.status == SubnetStatus.Subset:
+      return "ok"
     else:
       return "unknown"
   
