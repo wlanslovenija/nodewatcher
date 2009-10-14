@@ -848,6 +848,13 @@ class Event(models.Model):
     else:
       return _("Unknown source")
   
+  def should_show_link(self):
+    """
+    Returns true if a link to event-generating node should be added
+    to the notification message.
+    """
+    return self.code != EventCode.NodeRemoved
+
   @staticmethod
   def create_event(node, code, summary, source, data = ""):
     """
@@ -974,8 +981,14 @@ class EventSubscription(models.Model):
       'event' : event
     })
 
+    # Format node name and IP
+    if event.node.name:
+      name_ip = '%s/%s' % (event.node.ip, event.node.name)
+    else:
+      name_ip = event.node.ip
+
     send_mail(
-      '[wlan-lj] ' + event.node.ip + '/' + event.node.name + ' - ' + event.code_to_string(),
+      '[wlan-lj] %s - %s' % (name_ip, event.code_to_string()),
       t.render(c),
       'events@wlan-lj.net',
       [self.user.email],

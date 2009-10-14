@@ -8,7 +8,8 @@ WARNING: This event has repeated {{ event.counter }} times within 30 minutes fro
 its original creation time!
 {% endif %}
 Timestamp: {{ event.timestamp }}
-Node: {{ event.node.name }} ({{ event.node.ip }})
+Node: {{ event.node.name|default:_("unknown") }} ({{ event.node.ip }})
+{% if event.should_show_link %}      http://nodes.wlan-lj.net/nodes/node/{{ event.node.ip }}{% endif %}
 Event: {{ event.code_to_string }}
 Code: {{ event.code }}
 Source: {{ event.source_to_string }}
