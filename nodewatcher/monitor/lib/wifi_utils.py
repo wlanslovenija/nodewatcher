@@ -11,11 +11,15 @@ class OlsrNode(object):
 
 class OlsrParser(object):
   @staticmethod
-  def createNode(ip, list):
+  def createNode(ip, list, hna):
     if not list.has_key(ip):
       node = OlsrNode()
       node.ip = ip
       list[ip] = node
+
+      # Treat node entry as /32 HNA
+      l = hna.setdefault(ip, [])
+      l.append('%s/32' % ip)
     else:
       node = list[ip]
 
@@ -35,7 +39,6 @@ class OlsrParser(object):
 
     nodes = {}
     hna = {}
-    aliases = {}
 
     for line in data.splitlines():
       line = line.strip()
@@ -63,8 +66,8 @@ class OlsrParser(object):
           # Newer OLSR versions can use INFINITE as ETX
           continue
 
-        srcNode = OlsrParser.createNode(srcIp, nodes)
-        dstNode = OlsrParser.createNode(dstIp, nodes)
+        srcNode = OlsrParser.createNode(srcIp, nodes, hna)
+        dstNode = OlsrParser.createNode(dstIp, nodes, hna)
 
         srcNode.links.append((dstIp, LQ, ILQ, ETX))
       elif currentTable == 'HNA':
@@ -80,10 +83,11 @@ class OlsrParser(object):
       elif currentTable == 'MID':
         ip, alias = line.split('\t')
 
-        l = aliases.setdefault(ip, [])
-        l.append(alias)
+        # Treat MIDs as /32 HNAs
+        l = hna.setdefault(ip, [])
+        l.append('%s/32' % alias)
     
-    return nodes, hna, aliases
+    return nodes, hna
 
 class PingParser(object):
   @staticmethod

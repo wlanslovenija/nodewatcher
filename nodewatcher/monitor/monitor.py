@@ -201,7 +201,7 @@ def checkMeshStatus():
 
   # Remove all invalid nodes and subnets
   Node.objects.filter(status = NodeStatus.Invalid).delete()
-  Subnet.objects.filter(status = SubnetStatus.NotAllocated, last_seen__lt = datetime.now() - timedelta(minutes = 11)).delete()
+  Subnet.objects.filter(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Subset), last_seen__lt = datetime.now() - timedelta(minutes = 11)).delete()
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
 
@@ -211,7 +211,7 @@ def checkMeshStatus():
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
-  nodes, hna, aliases = OlsrParser.getTables()
+  nodes, hna = OlsrParser.getTables()
 
   # Create a topology plotter
   topology = DotTopologyPlotter()
@@ -409,7 +409,7 @@ def checkMeshStatus():
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % nodeIp, n.clients)
 
         # Check for IP shortage
-        wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi)
+        wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
         if len(wifiSubnet) and n.clients >= ipcalc.Network(wifiSubnet[0].subnet, wifiSubnet[0].cidr).size() - 4:
           Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifiSubnet[0], n.clients))
 
@@ -487,8 +487,10 @@ def checkMeshStatus():
       try:
         s = Subnet.objects.get(node__ip = nodeIp, subnet = subnet, cidr = int(cidr))
         s.last_seen = datetime.now()
-
-        if s.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced):
+        
+        if s.status == SubnetStatus.Subset:
+          pass
+        elif s.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced):
           s.status = SubnetStatus.AnnouncedOk
         elif not s.node.border_router or s.status == SubnetStatus.Hijacked:
           s.node.warnings = True
@@ -496,9 +498,14 @@ def checkMeshStatus():
 
         s.save()
       except Subnet.DoesNotExist:
-        # Subnet does not exist, create an invalid entry for it
+        # Subnet does not exist, prepare one
         s = Subnet(node = dbNodes[nodeIp], subnet = subnet, cidr = int(cidr), last_seen = datetime.now())
-        s.status = SubnetStatus.NotAllocated
+
+        # Check if this is a more specific prefix announce for an allocated prefix
+        if Subnet.objects.ip_filter(ip_subnet__contains = '%s/%s' % (subnet, cidr)).filter(node = s.node, allocated = True).count() > 0:
+          s.status = SubnetStatus.Subset
+        else:
+          s.status = SubnetStatus.NotAllocated
         s.save()
 
         # Check if this is a hijack
@@ -515,7 +522,7 @@ def checkMeshStatus():
           pass
         
         # Flag node entry with warnings flag (if not a border router)
-        if not n.border_router or s.status == SubnetStatus.Hijacked:
+        if s.status != SubnetStatus.Subset and (not n.border_router or s.status == SubnetStatus.Hijacked):
           n.warnings = True
           n.save()
       
