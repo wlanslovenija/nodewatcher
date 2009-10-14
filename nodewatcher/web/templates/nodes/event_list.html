@@ -93,7 +93,12 @@
   {% for event in events %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ event.timestamp|date }}</td>
-    <td><a href="/nodes/node/{{ event.node.ip }}">{{ event.node.name }}</a></td>
+    <td>
+      {% if not event.node.name %}
+      {{ event.node.ip }}
+      {% else %}
+      <a href="/nodes/node/{{ event.node.ip }}">{{ event.node.name }}</a></td>
+      {% endif %}
     <td>{{ event.code_to_string }}</td>
   </tr>
   {% endfor %}
