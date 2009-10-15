@@ -467,6 +467,7 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('nodewatcher', 'olsrd-mod-actions')
     self.addPackage('pv', 'netprofscripts')
     self.addPackage('tc', 'kmod-sched')
+    self.addPackage('kmod-ipv6')
 
     # Build the image
     buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
