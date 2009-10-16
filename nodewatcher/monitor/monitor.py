@@ -270,11 +270,12 @@ def checkMeshStatus():
       # Check if we have a peering with any border routers
       if l.dst.border_router:
         n.redundancy_link = True
-
-    if oldRedundancyLink and not n.redundancy_link:
-      Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor)
-    elif not oldRedundancyLink and n.redundancy_link:
-      Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor)
+    
+    if not n.is_invalid():
+      if oldRedundancyLink and not n.redundancy_link:
+        Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor)
+      elif not oldRedundancyLink and n.redundancy_link:
+        Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor)
 
     if n.redundancy_req and not n.redundancy_link:
       n.warnings = True
