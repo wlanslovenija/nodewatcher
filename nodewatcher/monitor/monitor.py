@@ -27,6 +27,8 @@ from traceback import format_exc
 import pwd
 import logging
 import time
+import DNS
+from random import random
 
 WORKDIR = "/home/monitor"
 GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
@@ -50,6 +52,7 @@ class LastUpdateTimes:
   """
   uptime_credit = None
   packages = None
+  dns_check = None
 
 lut = {}
 
@@ -471,6 +474,29 @@ def checkMeshStatus():
             package.version = version
             package.last_update = datetime.now()
             package.save()
+
+        # Check is DNS works (every hour)
+        if not nlut.dns_check or nlut.dns_check < datetime.now() - timedelta(hours = 1):
+          nlut.dns_check = datetime.now() + timedelta(minutes = int(random() * 20))
+          DNS.defaults['server'] = [n.ip]
+          DNS.defaults['timeout'] = 15
+          old_dns_works = n.dns_works
+
+          # Perform the request
+          req = DNS.DnsRequest(name = 'www.google.com', qtype = 'A')
+          try:
+            req.req()
+            n.dns_works = True
+          except DNS.Base.DNSError:
+            n.dns_works = False
+            n.warnings = True
+
+          if old_dns_works != n.dns_works:
+            # Generate a proper event when the state changes
+            if n.dns_works:
+              Event.create_event(n, EventCode.DnsResolverRestored, '', EventSource.Monitor)
+            else:
+              Event.create_event(n, EventCode.DnsResolverFailed, '', EventSource.Monitor)
       except:
         logging.warning(format_exc())
 
