@@ -866,7 +866,7 @@ class Event(models.Model):
     # Check if this event should be supressed because it has already
     # occurred a short while ago
     events = Event.objects.filter(node = node, code = code, timestamp__gt = datetime.now() - timedelta(minutes = 30))
-    if len(events):
+    if len(events) and code not in (EventCode.NodeRenamed,):
       event = events[0]
       event.counter += 1
       event.need_resend = True
