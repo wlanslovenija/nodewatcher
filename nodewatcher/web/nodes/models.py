@@ -1012,6 +1012,9 @@ def subnet_on_delete_callback(sender, **kwargs):
   On delete callback for Subnets.
   """
   instance = kwargs['instance']
+  if not instance.allocated:
+    return
+
   try:
     subnet = Pool.objects.get(network = instance.subnet, cidr = instance.cidr)
     subnet.allocated = False
