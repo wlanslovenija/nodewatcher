@@ -273,6 +273,8 @@ def checkMeshStatus():
 
     if oldRedundancyLink and not n.redundancy_link:
       Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor)
+    elif not oldRedundancyLink and n.redundancy_link:
+      Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor)
 
     if n.redundancy_req and not n.redundancy_link:
       n.warnings = True
