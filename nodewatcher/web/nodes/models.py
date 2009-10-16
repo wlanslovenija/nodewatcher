@@ -166,6 +166,7 @@ class Node(models.Model):
   memfree = models.IntegerField(null = True)
   numproc = models.IntegerField(null = True)
   captive_portal_status = models.BooleanField(default = True)
+  dns_works = models.BooleanField(default = True)
 
   def reset(self):
     """
@@ -300,6 +301,9 @@ class Node(models.Model):
 
     if not self.captive_portal_status and not self.is_down():
       w.append(_("Captive portal daemon is down!"))
+
+    if not self.dns_works and not self.is_down():
+      w.append(_("Node's DNS resolver does not respond!"))
     
     if self.conflicting_subnets:
       w.append(_("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!"))
@@ -770,6 +774,8 @@ class EventCode:
   CaptivePortalUp = 11
   SubnetHijacked = 12
   SubnetRestored = 13
+  DnsResolverFailed = 14
+  DnsResolverRestored = 15
 
   NodeAdded = 100
   NodeRenamed = 101
@@ -811,6 +817,10 @@ class EventCode:
       return _("Node is causing a subnet collision")
     elif code == EventCode.SubnetRestored:
       return _("Subnet collision is no longer present")
+    elif code == EventCode.DnsResolverFailed:
+      return _("DNS resolver has failed")
+    elif code == EventCode.DnsResolverRestored:
+      return _("DNS resolver restored")
     elif code == EventCode.NodeRenamed:
       return _("Node has been renamed")
     elif code == EventCode.NodeRemoved:

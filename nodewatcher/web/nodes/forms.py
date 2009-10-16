@@ -785,6 +785,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.CaptivePortalUp, _("Captive portal has been restored")),
       (EventCode.SubnetHijacked, _("Node is causing a subnet collision")),
       (EventCode.SubnetRestored, _("Subnet collision is no longer present")),
+      (EventCode.DnsResolverFailed, _("DNS resolver has failed")),
+      (EventCode.DnsResolverRestored, _("DNS resolver restored")),
       (EventCode.NodeAdded, _("A new node has been registered")),
       (EventCode.NodeRenamed, _("Node has been renamed")),
       (EventCode.NodeRemoved, _("Node has been removed"))
