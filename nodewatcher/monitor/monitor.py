@@ -27,8 +27,6 @@ from traceback import format_exc
 import pwd
 import logging
 import time
-import DNS
-from random import random
 
 WORKDIR = "/home/monitor"
 GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
@@ -373,11 +371,14 @@ def checkMeshStatus():
         # Parse nodogsplash client information
         oldNdsStatus = n.captive_portal_status
         if 'nds' in info:
-          if 'down' in info['nds']:
+          if 'down' in info['nds'] and info['nds']['down'] == '1':
             n.captive_portal_status = False
             n.warnings = True
           else:
             for cid, client in info['nds'].iteritems():
+              if not cid.startswith('client'):
+                continue
+
               try:
                 c = APClient.objects.get(node = n, ip = client['ip'])
               except APClient.DoesNotExist:
@@ -478,20 +479,11 @@ def checkMeshStatus():
             package.last_update = datetime.now()
             package.save()
 
-        # Check is DNS works (every hour)
-        if not nlut.dns_check or nlut.dns_check < datetime.now() - timedelta(hours = 1):
-          nlut.dns_check = datetime.now() + timedelta(minutes = int(random() * 20))
-          DNS.defaults['server'] = [n.ip]
-          DNS.defaults['timeout'] = 15
+        # Check if DNS works
+        if 'dns' in info:
           old_dns_works = n.dns_works
-
-          # Perform the request
-          req = DNS.DnsRequest(name = 'www.google.com', qtype = 'A')
-          try:
-            req.req()
-            n.dns_works = True
-          except DNS.Base.DNSError:
-            n.dns_works = False
+          n.dns_works = info['dns']['local'] == '0' and info['dns']['remote'] == '0'
+          if not n.dns_works:
             n.warnings = True
 
           if old_dns_works != n.dns_works:
