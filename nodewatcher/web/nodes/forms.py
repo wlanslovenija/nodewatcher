@@ -780,6 +780,7 @@ class EventSubscribeForm(forms.Form):
       (EventCode.IPShortage, _('IP shortage on WiFi subnet')),
       (EventCode.ChannelChanged, _('WiFi channel has changed')),
       (EventCode.RedundancyLoss, _('Redundant link to border gateway has gone down')),
+      (EventCode.RedundancyRestored, _("Redundant link to border gateway has been restored")),
       (EventCode.VersionChange, _("Firmware version has changed")),
       (EventCode.CaptivePortalDown, _("Captive portal has failed")),
       (EventCode.CaptivePortalUp, _("Captive portal has been restored")),

@@ -776,6 +776,7 @@ class EventCode:
   SubnetRestored = 13
   DnsResolverFailed = 14
   DnsResolverRestored = 15
+  RedundancyRestored = 16
 
   NodeAdded = 100
   NodeRenamed = 101
@@ -805,6 +806,8 @@ class EventCode:
       return _("WiFi channel has changed")
     elif code == EventCode.RedundancyLoss:
       return _("Redundant link to border gateway has gone down")
+    elif code == EventCode.RedundancyRestored:
+      return _("Redundant link to border gateway has been restored")
     elif code == EventCode.VersionChange:
       return _("Firmware version has changed")
     elif code == EventCode.CaptivePortalDown:
