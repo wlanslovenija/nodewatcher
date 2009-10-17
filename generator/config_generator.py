@@ -619,6 +619,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('filterwin2k\n')
     f.write('localise-queries\n')
     f.write('no-negcache\n')
+    f.write('no-resolv\n')
 
     for dns in self.dns:
       f.write('server=%s\n' % dns)
