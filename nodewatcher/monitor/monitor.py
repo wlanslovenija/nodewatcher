@@ -208,7 +208,7 @@ def checkMeshStatus():
 
   # Mark all nodes as down and all subnets as not announced
   Node.objects.all().update(warnings = False, conflicting_subnets = False)
-  Subnet.objects.exclude(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Hijacked)).update(status = SubnetStatus.NotAnnounced)
+  Subnet.objects.exclude(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Hijacked, SubnetStatus.Subset)).update(status = SubnetStatus.NotAnnounced)
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
