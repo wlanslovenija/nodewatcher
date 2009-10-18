@@ -200,15 +200,14 @@ def checkMeshStatus():
   """
   global lut
 
-  # Remove all invalid nodes and subnets
+  # Remove all invalid nodes and mark subnets as not visible
   Node.objects.filter(status = NodeStatus.Invalid).delete()
-  Subnet.objects.filter(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Subset), last_seen__lt = datetime.now() - timedelta(minutes = 11)).delete()
+  Subnet.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
 
-  # Mark all nodes as down and all subnets as not announced
+  # Mark all nodes as down
   Node.objects.all().update(warnings = False, conflicting_subnets = False)
-  Subnet.objects.exclude(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Hijacked, SubnetStatus.Subset)).update(status = SubnetStatus.NotAnnounced)
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
@@ -508,6 +507,7 @@ def checkMeshStatus():
       try:
         s = Subnet.objects.get(node__ip = nodeIp, subnet = subnet, cidr = int(cidr))
         s.last_seen = datetime.now()
+        s.visible = True
         
         if s.status == SubnetStatus.Subset:
           pass
@@ -521,6 +521,7 @@ def checkMeshStatus():
       except Subnet.DoesNotExist:
         # Subnet does not exist, prepare one
         s = Subnet(node = dbNodes[nodeIp], subnet = subnet, cidr = int(cidr), last_seen = datetime.now())
+        s.visible = True
 
         # Check if this is a more specific prefix announce for an allocated prefix
         if Subnet.objects.ip_filter(ip_subnet__contains = '%s/%s' % (subnet, cidr)).filter(node = s.node, allocated = True).count() > 0:
@@ -559,8 +560,12 @@ def checkMeshStatus():
           cs.node.conflicting_subnets = True
           cs.node.save()
   
+  # Remove (or change their status) subnets that are not visible
+  Subnet.objects.filter(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Subset), visible = False).delete()
+  Subnet.objects.filter(status = SubnetStatus.AnnouncedOk, visible = False).update(status = SubnetStatus.NotAnnounced)
+
   # Remove subnets that were hijacked but are not visible anymore
-  for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, last_seen__lt = datetime.now() - timedelta(minutes = 5)):
+  for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, visible = False):
     Event.create_event(s.node, EventCode.SubnetRestored, '', EventSource.Monitor, data = 'Subnet: %s/%s' % (s.subnet, s.cidr))
     s.delete()
 
