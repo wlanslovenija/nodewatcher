@@ -426,6 +426,7 @@ class Subnet(models.Model):
   allocated_at = models.DateTimeField(null = True)
 
   # Basic status (set by the monitor daemon)
+  visible = models.BooleanField()
   status = models.IntegerField()
   last_seen = models.DateTimeField(null = True)
 
