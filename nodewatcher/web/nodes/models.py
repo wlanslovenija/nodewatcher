@@ -333,7 +333,7 @@ class Node(models.Model):
     """
     Returns properly ordered subnets.
     """
-    return self.subnet_set.all().order_by("id")
+    return self.subnet_set.all().order_by("ip_subnet")
 
   def ant_type_as_string(self):
     """
