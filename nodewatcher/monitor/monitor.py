@@ -156,7 +156,7 @@ def checkGlobalStatistics():
 
   # Nodes by status
   nbs = {}
-  for s in Node.objects.all().values('status').annotate(count = models.Count('ip')):
+  for s in Node.objects.exclude(node_type = NodeType.Test).values('status').annotate(count = models.Count('ip')):
     nbs[s['status']] = s['count']
 
   rra = os.path.join(WORKDIR, 'rra', 'global_nodes_by_status.rrd')
