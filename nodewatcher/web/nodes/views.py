@@ -55,12 +55,12 @@ def statistics(request):
   node_count = len(Node.objects.all())
   others = node_count
   nodes_by_status = []
-  for s in Node.objects.all().order_by('status').values('status').annotate(count = models.Count('ip')):
+  for s in Node.objects.exclude(node_type = NodeType.Test).order_by('status').values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
   # Nodes by template usage
   templates_by_usage = []
-  for t in Profile.objects.all().values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
+  for t in Profile.objects.exclude(node__node_type = NodeType.Test).values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
     others -= t['count']
   
@@ -70,7 +70,7 @@ def statistics(request):
   # Nodes by project
   nodes_by_project = []
   others = 0
-  for p in Node.objects.all().values('project__name').annotate(count = models.Count('ip')).order_by('project__id'):
+  for p in Node.objects.exclude(node_type = NodeType.Test).values('project__name').annotate(count = models.Count('ip')).order_by('project__id'):
     if not p['project__name']:
       others = p['count']
     else:
@@ -85,11 +85,11 @@ def statistics(request):
       'nodes_by_status_length' : len(nodes_by_status),
       'nodes_by_status_element_width' : 100 / len(nodes_by_status),
       'nodes_by_project' : nodes_by_project,
-      'nodes_warned' : len(Node.objects.filter(warnings = True)),
-      'subnet_count' : len(Subnet.objects.all()),
-      'clients_online' : len(APClient.objects.all()),
+      'nodes_warned' : Node.objects.filter(warnings = True).exclude(node_type = NodeType.Test).count(),
+      'subnet_count' : Subnet.objects.all().count(),
+      'clients_online' : APClient.objects.all().count(),
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
-      'external_ant' : len(Node.objects.filter(ant_external = True)),
+      'external_ant' : Node.objects.filter(ant_external = True).count(),
       'template_usage' : templates_by_usage,
       'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'] },
     context_instance = RequestContext(request)
