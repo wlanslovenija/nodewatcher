@@ -27,7 +27,7 @@ class RegisterNodeForm(forms.Form):
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
   notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
-  url = forms.CharField(max_length = 200, required = False, label = _("Info URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
+  url = forms.CharField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Additional flags
   assign_ip = forms.BooleanField(required = False, label = _("No IP yet? Assign me one!"), initial = True)
@@ -345,7 +345,7 @@ class UpdateNodeForm(forms.Form):
     label = _("Node type")
   )
   notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
-  url = forms.CharField(max_length = 200, required = False, label = _("Info URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
+  url = forms.CharField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Special node properties (can only be set by staff)
   system_node = forms.BooleanField(required = False)

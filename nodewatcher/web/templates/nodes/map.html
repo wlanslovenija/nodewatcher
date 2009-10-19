@@ -42,7 +42,7 @@
       html = "<b>" + name + "</b> (" + ip + ")<div class=\"gmap_details\">Status: <span class=\"node_status_" +
            status + "\">" + status + "</span><br><a href=\"/nodes/node/" + ip +"\" target=\"_blank\">more information</a>";
       if (urlinfo) 
-       html = html + " | <a href=\"" + urlinfo + "\" target=\"_blank\">{% trans "visit info page" %}</a>";
+       html = html + " | <a href=\"" + urlinfo + "\" target=\"_blank\">{% trans "visit home page" %}</a>";
       m.openInfoWindowHtml(html + "</div>");
     });
     map.addOverlay(m);
