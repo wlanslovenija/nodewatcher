@@ -1,12 +1,12 @@
 {% load i18n %}
-<img src="http://nodes.wlan-lj.net/graphs/{{ graph.graph }}" id="lq_graph_{{ graph.id }}" alt="LQ" />
+<img src="http://nodes.wlan-lj.net/graphs/day_{{ graph.graph }}" id="lq_graph_{{ graph.id }}" alt="LQ" />
 {% if graph.get_children %}
 <br/>
 <b>{% trans "Display" %}:</b>
 <select id="lq_peer_select_{{ graph.id }}" onchange="lq_peer_select_changed_{{ graph.id }}()">
-  <option value="{{ graph.graph }}" selected="selected">{% trans "Average link quality" %}</option>
+  <option value="day_{{ graph.graph }}" selected="selected">{% trans "Average link quality" %}</option>
   {% for child in graph.get_children %}
-  <option value="{{ child.graph }}">{{ child.title }}</option>
+  <option value="day_{{ child.graph }}">{{ child.title }}</option>
   {% endfor %}
 </select>
 <script type="text/javascript">

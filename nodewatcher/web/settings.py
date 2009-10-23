@@ -98,3 +98,13 @@ INSTALLED_APPS = (
     'wlanlj.dns',
     'wlanlj.policy',
 )
+
+# Graph configuration
+GRAPH_DIR = "/var/www/nodes.wlan-lj.net/graphs"
+GRAPH_TIMESPANS = (
+  ('day',   86400),
+  ('week',  604800),
+  ('month', 2678400),
+  ('year',  33053184)
+)
+

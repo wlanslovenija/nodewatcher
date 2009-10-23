@@ -592,6 +592,17 @@ class GraphItem(models.Model):
   title = models.CharField(max_length = 50)
   last_update = models.DateTimeField(null = True)
   dead = models.BooleanField(default = False)
+  
+  def get_timespans(self):
+    """
+    Returns a list of graph image filenames for different time
+    periods.
+    """
+    for prefix, timespan in settings.GRAPH_TIMESPANS:
+      yield {
+        'image'     : "%s_%s" % (prefix, self.graph),
+        'timespan'  : timespan
+      }
 
   def get_children(self):
     """
