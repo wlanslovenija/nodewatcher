@@ -13,6 +13,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings_production'
 # Import our models
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType
 from django.db import transaction, models
+from django.conf import settings
 
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
@@ -29,7 +30,6 @@ import logging
 import time
 
 WORKDIR = "/home/monitor"
-GRAPHDIR = "/var/www/nodes.wlan-lj.net/graphs"
 RRA_CONF_MAP = {
   GraphType.RTT         : RRARTT,
   GraphType.LQ          : RRALinkQuality,
@@ -123,7 +123,7 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
     RRA.update(node, conf, rra, *values)
   except:
     pass
-  RRA.graph(conf, title, str(os.path.join(GRAPHDIR, '%s.png' % filename)), *[rra for i in xrange(len(values))])
+  RRA.graph(conf, title, '%s.png' % filename, *[rra for i in xrange(len(values))])
   
   # Get parent instance (toplevel by default)
   parent = attrs.get('parent', None)
@@ -152,7 +152,7 @@ def checkGlobalStatistics():
     stats['statistics:from-inet'],
     stats['statistics:internal']
   )
-  RRA.graph(RRALocalTraffic, 'replicator - Traffic', os.path.join(GRAPHDIR, 'global_replicator_traffic.png'), rra, rra, rra)
+  RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra, rra, rra)
 
   # Nodes by status
   nbs = {}
@@ -168,13 +168,13 @@ def checkGlobalStatistics():
     nbs.get(NodeStatus.Pending, 0),
     nbs.get(NodeStatus.Duped, 0)
   )
-  RRA.graph(RRANodesByStatus, 'Nodes By Status', os.path.join(GRAPHDIR, 'global_nodes_by_status.png'), *([rra] * 6))
+  RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', *([rra] * 6))
 
   # Global client count
   client_count = len(APClient.objects.all())
   rra = os.path.join(WORKDIR, 'rra', 'global_client_count.rrd')
   RRA.update(None, RRAClients, rra, client_count)
-  RRA.graph(RRAClients, 'Global Client Count', os.path.join(GRAPHDIR, 'global_client_count.png'), rra)
+  RRA.graph(RRAClients, 'Global Client Count', 'global_client_count.png', rra)
 
 def checkDeadGraphs():
   """
@@ -187,7 +187,7 @@ def checkDeadGraphs():
 
     # Redraw the graph with dead status attached
     pathArchive = str(os.path.join(WORKDIR, 'rra', graph.rra))
-    pathImage = str(os.path.join(GRAPHDIR, graph.graph))
+    pathImage = graph.graph
     conf = RRA_CONF_MAP[graph.type]
 
     RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())), dead = True,
@@ -283,7 +283,7 @@ def checkMeshStatus():
   for node in dbNodes.values():
     topology.addNode(node)
 
-  topology.save(os.path.join(GRAPHDIR, 'mesh_topology.png'))
+  topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'))
 
   # Ping the nodes and update valid node status in the database
   results, dupes = PingParser.pingHosts(10, nodesToPing)

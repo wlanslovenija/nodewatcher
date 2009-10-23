@@ -4,10 +4,39 @@ import os
 
 # Models
 from wlanlj.nodes.models import StatsSolar
+from django.conf import settings
 from datetime import datetime
 
 class RRAConfiguration:
   last_update = 0
+
+  # Standard archives
+  archives = [
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 600
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 6,
+      rows = 700
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 24,
+      rows = 775
+    ),
+    rrdtool.RoundRobinArchive(
+      cf = rrdtool.AverageCF,
+      xff = 0.5,
+      steps = 288,
+      rows = 797
+    )
+  ]
 
 class RRALocalTraffic(RRAConfiguration):
   interval = 300
@@ -26,20 +55,6 @@ class RRALocalTraffic(RRAConfiguration):
       'internal',
       type = rrdtool.CounterDST,
       heartbeat = interval * 2
-    )
-  ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
     )
   ]
   graph = [
@@ -94,20 +109,6 @@ class RRANodesByStatus(RRAConfiguration):
       heartbeat = interval * 2
     )
   ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
-    )
-  ]
   graph = [
     "LINE1:up#007B0F:up     ",
     r'GPRINT:up:LAST:Current\:%8.2lf',
@@ -149,20 +150,6 @@ class RRAIface(RRAConfiguration):
       heartbeat = interval * 2
     )
   ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
-    )
-  ]
   graph = [
     "LINE2:upload#DE0056:Upload [B/s]",
     r'GPRINT:upload:LAST:  Current\:%8.2lf %s',
@@ -183,20 +170,6 @@ class RRAClients(RRAConfiguration):
       heartbeat = interval * 2
     )
   ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
-    )
-  ]
   graph = [
     "LINE2:clients#008310:Clients",
     r'GPRINT:clients:LAST:  Current\:%8.2lf',
@@ -212,20 +185,6 @@ class RRARTT(RRAConfiguration):
       'rtt',
       type = rrdtool.GaugeDST,
       heartbeat = interval * 2
-    )
-  ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
     )
   ]
   graph = [
@@ -249,20 +208,6 @@ class RRALinkQuality(RRAConfiguration):
       'ilq',
       type = rrdtool.GaugeDST,
       heartbeat = interval * 2
-    )
-  ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
     )
   ]
   graph = [
@@ -297,20 +242,6 @@ class RRALoadAverage(RRAConfiguration):
       heartbeat = interval * 2
     )
   ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
-    )
-  ]
   graph = [
     "LINE1:la1min#EACC00:1 Minute",
     r'GPRINT:la1min:LAST:  Current\:%8.2lf',
@@ -335,20 +266,6 @@ class RRANumProc(RRAConfiguration):
       'nproc',
       type = rrdtool.GaugeDST,
       heartbeat = interval * 2
-    )
-  ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
     )
   ]
   graph = [
@@ -379,20 +296,6 @@ class RRAMemUsage(RRAConfiguration):
       heartbeat = interval * 2
     )
   ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
-    )
-  ]
   graph = [
     "AREA:memfree#8F005C:Free Memory [KB]",
     r'GPRINT:memfree:LAST:  Current\:%8.2lf',
@@ -417,20 +320,6 @@ class RRAWifiCells(RRAConfiguration):
       heartbeat = interval * 2
     )
   ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
-    )
-  ]
   graph = [
     "LINE1:cells#00EE00:Cells",
     r'GPRINT:cells:LAST:  Current\:%8.2lf',
@@ -446,20 +335,6 @@ class RRAOlsrPeers(RRAConfiguration):
       'peers',
       type = rrdtool.GaugeDST,
       heartbeat = interval * 2
-    )
-  ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
     )
   ]
   graph = [
@@ -498,20 +373,6 @@ class RRASolar(RRAConfiguration):
       'load',
       type = rrdtool.GaugeDST,
       heartbeat = interval * 2
-    )
-  ]
-  archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1,
-      rows = 180000 / interval
-    ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
-      xff = 0.5,
-      steps = 1800 / interval,
-      rows = 700
     )
   ]
   graph = [
@@ -599,7 +460,6 @@ class RRA:
     """
     Renders a graph from data points.
     """
-    g = rrdtool.RoundRobinGraph(graph)
     args = []
     for i, source in enumerate(conf.sources):
       args.append(rrdtool.Def(source.name, archives[i], data_source = source.name, cf = rrdtool.AverageCF))
@@ -616,14 +476,16 @@ class RRA:
     args = args + conf.graph
     args.append('--font')
     args.append('DEFAULT:0:DejaVu Sans Mono')
-    g.graph(
-      alt_y_mrtg = None,
-      width = 500,
-      height = 120,
-      x = "MINUTE:18:MINUTE:72:MINUTE:144:0:%H:%M",
-      title = title,
-      start = end_time - 86400,
-      end = end_time - 180,
-      *args
-    )
+
+    for prefix, timespan in settings.GRAPH_TIMESPANS:
+      g = rrdtool.RoundRobinGraph(str(os.path.join(settings.GRAPH_DIR, "%s_%s" % (prefix, graph))))
+      g.graph(
+        alt_y_mrtg = None,
+        width = 500,
+        height = 120,
+        title = title,
+        start = end_time - timespan,
+        end = end_time - 180,
+        *args
+      )
 
