@@ -72,7 +72,8 @@ class RRALocalTraffic(RRAConfiguration):
     "LINE1:internal#6C9CCF:Internal:STACK",
     r'GPRINT:internal:LAST:Current\:%8.2lf %s',
     r'GPRINT:internal:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:internal:MAX:Maximum\:%8.2lf %s\n'
+    r'GPRINT:internal:MAX:Maximum\:%8.2lf %s\n',
+    '--lower-limit', '0'
   ]
 
 class RRANodesByStatus(RRAConfiguration):
@@ -134,6 +135,7 @@ class RRANodesByStatus(RRAConfiguration):
     r'GPRINT:pending:LAST:Current\:%8.2lf',
     r'GPRINT:pending:AVERAGE:Average\:%8.2lf',
     r'GPRINT:pending:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0'
   ]
 
 class RRAIface(RRAConfiguration):
@@ -158,7 +160,8 @@ class RRAIface(RRAConfiguration):
     "LINE2:download#A150AA:Download [B/s]",
     r'GPRINT:download:LAST:Current\:%8.2lf %s',
     r'GPRINT:download:AVERAGE:Average\:%8.2lf %s',
-    r'GPRINT:download:MAX:Maximum\:%8.2lf %s\n'
+    r'GPRINT:download:MAX:Maximum\:%8.2lf %s\n',
+    '--lower-limit', '0'
   ]
 
 class RRAClients(RRAConfiguration):
@@ -193,7 +196,8 @@ class RRARTT(RRAConfiguration):
     r'GPRINT:rtt:AVERAGE:Average\:%8.2lf',
     r'GPRINT:rtt:MAX:Maximum\:%8.2lf\n',
     '--alt-y-grid',
-    '--units-exponent', '0'
+    '--units-exponent', '0',
+    '--lower-limit', '0'
   ]
 
 class RRALinkQuality(RRAConfiguration):
@@ -219,8 +223,8 @@ class RRALinkQuality(RRAConfiguration):
     r'GPRINT:ilq:LAST: Current\:%8.2lf',
     r'GPRINT:ilq:AVERAGE:Average\:%8.2lf',
     r'GPRINT:ilq:MAX:Maximum\:%8.2lf\n',
-    '--alt-y-grid',
-    '--units-exponent', '0'
+    '--lower-limit', '0',
+    '--upper-limit', '1'
   ]
 
 class RRALoadAverage(RRAConfiguration):
@@ -255,8 +259,8 @@ class RRALoadAverage(RRAConfiguration):
     r'GPRINT:la15min:LAST:Current\:%8.2lf',
     r'GPRINT:la15min:AVERAGE:Average\:%8.2lf',
     r'GPRINT:la15min:MAX:Maximum\:%8.2lf\n',
-    '--alt-y-grid',
-    '--units-exponent', '0'
+    '--lower-limit', '0',
+    '--upper-limit', '1'
   ]
 
 class RRANumProc(RRAConfiguration):
@@ -274,7 +278,8 @@ class RRANumProc(RRAConfiguration):
     r'GPRINT:nproc:AVERAGE:Average\:%8.2lf',
     r'GPRINT:nproc:MAX:Maximum\:%8.2lf\n',
     '--alt-y-grid',
-    '--units-exponent', '0'
+    '--units-exponent', '0',
+    '--lower-limit', '0'
   ]
 
 class RRAMemUsage(RRAConfiguration):
@@ -308,7 +313,8 @@ class RRAMemUsage(RRAConfiguration):
     "AREA:cached#FFC73B:Cached [KB]:STACK",
     r'GPRINT:cached:LAST:       Current\:%8.2lf',
     r'GPRINT:cached:AVERAGE:Average\:%8.2lf',
-    r'GPRINT:cached:MAX:Maximum\:%8.2lf\n'
+    r'GPRINT:cached:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0'
   ]
 
 class RRAWifiCells(RRAConfiguration):
@@ -407,9 +413,9 @@ class RRASolar(RRAConfiguration):
     r'GPRINT:load:LAST:       Current\:%8.2lf',
     r'GPRINT:load:AVERAGE:Average\:%8.2lf',
     r'GPRINT:load:MAX:Maximum\:%8.2lf\n',
-
     '--alt-y-grid',
-    '--units-exponent', '0'
+    '--units-exponent', '0',
+    '--lower-limit', '0'
   ]
 
 class RRA:
