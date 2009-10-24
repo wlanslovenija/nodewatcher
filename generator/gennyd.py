@@ -134,14 +134,17 @@ def generate_image(d):
 
     # Get resulting image
     files = []
-    prefix = hashlib.md5(os.urandom(32)).hexdigest()[0:16]
     for file in d['imagefiles']:
       file = str(file)
-      os.rename("%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file), "%s-%s" % (os.path.join(DESTINATION, prefix), file))
-      f = open("%s-%s" % (os.path.join(DESTINATION, prefix), file), 'r')
+      source = "%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file)
+
+      f = open(source, 'r')
       checksum = hashlib.md5(f.read()).hexdigest()
       f.close()
-      files.append({ 'name' : "%s-%s" % (prefix, file), 'checksum' : checksum })
+      
+      destination = "%s-%s" % (os.path.join(DESTINATION, checksum), file)
+      os.rename(source, destination)
+      files.append({ 'name' : "%s-%s" % (checksum, file), 'checksum' : checksum })
 
     # Send an e-mail
     t = loader.get_template('generator/email.txt')
