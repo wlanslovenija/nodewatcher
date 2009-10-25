@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="graph">
-<img src="/graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{% for child in graph.get_children %}{% if not forloop.first %}, {% endif %}{{ child.title }}{% empty %}{{ graph.title }}{% endfor %}" />
+<img src="/graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{{ graph.title }}{% for child in graph.get_children %}, {{ child.title }}{% endfor %}" />
 <br/>
 {% if graph.get_children %}
 <b>{% trans "Display:" %}</b>
