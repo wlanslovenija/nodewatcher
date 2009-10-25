@@ -548,6 +548,10 @@ class GraphType:
   NumProc = -1
   WifiCells = 7
   OlsrPeers = 5
+  GatewayTraffic = 40
+
+  # Global graphs
+  NodesByStatus = 1000
 
   @staticmethod
   def as_string(type):
@@ -576,23 +580,39 @@ class GraphType:
       return "wificells"
     elif type == GraphType.OlsrPeers:
       return "olsrpeers"
+    elif type == GraphType.GatewayTraffic:
+      return "gwtraffic"
+    elif type == GraphType.NodesByStatus:
+      return "nodesbystatus"
     else:
       return "unknown"
 
-class GraphItem(models.Model):
+class GraphItemNP(object):
   """
-  This class represents a graph of some node's parameter.
+  A non-persistent graph item with methods for its rendering.
   """
-  node = models.ForeignKey(Node)
-  parent = models.ForeignKey('self', null = True, related_name = 'children')
-  type = models.IntegerField()
-  name = models.CharField(max_length = 50)
-  rra = models.CharField(max_length = 200)
-  graph = models.CharField(max_length = 200)
-  title = models.CharField(max_length = 50)
-  last_update = models.DateTimeField(null = True)
-  dead = models.BooleanField(default = False)
-  
+  node = None
+  parent = None
+  type = None
+  name = None
+  rra = None
+  graph = None
+  title = None
+  last_update = None
+  dead = False
+
+  def __init__(self, type, graph, title):
+    """
+    Class constructor.
+
+    @param type: Graph type
+    @param graph: Graph image filename
+    @param title: Graph title
+    """
+    self.type = type
+    self.graph = graph
+    self.title = title
+
   def get_timespans(self):
     """
     Returns a list of graph image filenames for different time
@@ -608,6 +628,9 @@ class GraphItem(models.Model):
     """
     Returns properly sorted graph item children.
     """
+    if not self.children:
+      return []
+
     return self.children.order_by('-type', 'name')
 
   def render(self):
@@ -621,6 +644,20 @@ class GraphItem(models.Model):
     })
 
     return t.render(c)
+
+class GraphItem(models.Model, GraphItemNP):
+  """
+  This class represents a graph of some node's parameter.
+  """
+  node = models.ForeignKey(Node)
+  parent = models.ForeignKey('self', null = True, related_name = 'children')
+  type = models.IntegerField()
+  name = models.CharField(max_length = 50)
+  rra = models.CharField(max_length = 200)
+  graph = models.CharField(max_length = 200)
+  title = models.CharField(max_length = 50)
+  last_update = models.DateTimeField(null = True)
+  dead = models.BooleanField(default = False)
 
 class WhitelistItem(models.Model):
   """

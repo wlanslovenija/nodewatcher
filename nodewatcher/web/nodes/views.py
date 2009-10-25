@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models
 from django.utils.translation import ugettext as _
-from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource
+from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
@@ -91,7 +91,13 @@ def statistics(request):
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
       'external_ant' : Node.objects.filter(ant_external = True).count(),
       'template_usage' : templates_by_usage,
-      'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'] },
+      'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'],
+      'graphs' : [
+        GraphItemNP(GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
+        GraphItemNP(GraphType.Clients, "global_client_count.png", "Global Client Count"),
+        GraphItemNP(GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
+      ]
+    },
     context_instance = RequestContext(request)
   )
 

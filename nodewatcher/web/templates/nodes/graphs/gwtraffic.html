@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load graphimg %}
+<h2>{% trans "VPN gateway traffic" %} <span class="small_text">({% trans "in bytes per second" %})</span></h2>
+{% show_graph %}
+<div style="width: 581px; margin-left: 66px;">
+  <span class="small_text">
+    <span style="color: #CF7E6C">outgoing</span> traffic originates in the mesh and is forwarded towards the Internet;
+    <span style="color: #6CCF6C">incoming</span> traffic originates in the Internet and is forwarded towards the mesh;
+    <span style="color: #6C9CCF">internal</span> traffic is traffic between mesh nodes via VPN
+  </span>
+</div>

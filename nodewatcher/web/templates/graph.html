@@ -1,4 +1,5 @@
 {% load i18n %}
+<div class="graph">
 <img src="/graphs/day_{{ graph.graph }}" id="{{ graph.name }}_graph_{{ graph.id }}" alt="{{ graph.title }}" />
 {% if graph.get_children %}
 <br/>
@@ -17,3 +18,4 @@
   }
 </script>
 {% endif %}
+</div>
