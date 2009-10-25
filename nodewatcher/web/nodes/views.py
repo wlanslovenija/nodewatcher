@@ -93,9 +93,9 @@ def statistics(request):
       'template_usage' : templates_by_usage,
       'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'],
       'graphs' : [
-        GraphItemNP(GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
-        GraphItemNP(GraphType.Clients, "global_client_count.png", "Global Client Count"),
-        GraphItemNP(GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
+        GraphItemNP(1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
+        GraphItemNP(2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
+        GraphItemNP(3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
       ]
     },
     context_instance = RequestContext(request)

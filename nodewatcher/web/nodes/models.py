@@ -601,14 +601,16 @@ class GraphItemNP(object):
   last_update = None
   dead = False
 
-  def __init__(self, type, graph, title):
+  def __init__(self, id, type, graph, title):
     """
     Class constructor.
-
+    
+    @param id: Unique identifier
     @param type: Graph type
     @param graph: Graph image filename
     @param title: Graph title
     """
+    self.id = id
     self.type = type
     self.graph = graph
     self.title = title
@@ -644,6 +646,12 @@ class GraphItemNP(object):
     })
 
     return t.render(c)
+
+  def type_as_string(self):
+    """
+    Return this graph's type as a string.
+    """
+    return GraphType.as_string(self.type)
 
 class GraphItem(models.Model, GraphItemNP):
   """
