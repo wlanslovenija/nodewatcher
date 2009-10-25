@@ -638,7 +638,7 @@ class GraphItemNP(object):
     Renders the surrounding HTML (uses a custom template if one is
     available).
     """
-    t = loader.get_template('nodes/graphs/%s.html' % GraphType.as_string(self.type))
+    t = loader.get_template('graphs/%s.html' % GraphType.as_string(self.type))
     c = Context({
       'graph'  : self
     })
