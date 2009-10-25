@@ -1,21 +1,29 @@
 {% load i18n %}
+{% regroup graph.get_timespans by timespan as timespan_list %}
 <div class="graph">
-<img src="/graphs/day_{{ graph.graph }}" id="{{ graph.name }}_graph_{{ graph.id }}" alt="{{ graph.title }}" />
-{% if graph.get_children %}
+<img src="/graphs/{{ timespan_list|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{% if graph.get_children %}{% regroup graph.get_children by title as title_list %}{{ title_list|join:", " }}{% else %}{{ graph.title }}{% endif %}" />
 <br/>
-<b>{% trans "Display" %}:</b>
-<select id="{{ graph.name }}_select_{{ graph.id }}" onchange="{{ graph.name }}_select_changed_{{ graph.id }}()">
+{% if graph.get_children %}
+<b>{% trans "Display:" %}</b>
+<select id="graph_child_select_{{ graph.id }}" onchange="graph_display_changed_{{ graph.id }}()">
   <option value="{{ graph.graph }}" selected="selected">{{ graph.title }}</option>
   {% for child in graph.get_children %}
   <option value="{{ child.graph }}">{{ child.title }}</option>
   {% endfor %}
 </select>
+{% endif %}
+<b>{% trans "Timespan:" %}</b>
+<select id="graph_timespan_select_{{ graph.id }}" onchange="graph_display_changed_{{ graph.id }}()">
+  {% for timespan in graph.get_timespans %}
+  <option value="{{ timespan.prefix }}">{{ timespan.timespan }}</option>
+  {% endfor %}
+</select>
 <script type="text/javascript">
-  function {{ graph.name }}_select_changed_{{ graph.id }}()
+  function graph_display_changed_{{ graph.id }}()
   {
-    var subgraph = $('#{{ graph.name }}_select_{{ graph.id }}').attr('value');
-    $('#{{ graph.name }}_graph_{{ graph.id }}').attr('src', '/graphs/day_' + subgraph);
+    var subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
+    var prefix = $('#graph_timespan_select_{{ graph.id }}').attr('value');
+    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + prefix + '_' + subgraph);
   }
 </script>
-{% endif %}
 </div>

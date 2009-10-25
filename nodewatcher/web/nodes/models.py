@@ -622,7 +622,7 @@ class GraphItemNP(object):
     """
     for prefix, timespan in settings.GRAPH_TIMESPANS:
       yield {
-        'image'     : "%s_%s" % (prefix, self.graph),
+        'prefix'    : prefix,
         'timespan'  : timespan
       }
 
