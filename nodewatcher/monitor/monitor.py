@@ -332,7 +332,7 @@ def checkMeshStatus():
         lq_avg += float(peer[1])
         ilq_avg += float(peer[2])
       
-      lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
+      lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Average Link Quality', 'lq_%s' % nodeIp, lq_avg / n.peers, ilq_avg / n.peers)
 
       for peer in n.src.all():
         add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s_%s' % (nodeIp, peer.dst.ip), peer.lq, peer.ilq, parent = lq_graph)
