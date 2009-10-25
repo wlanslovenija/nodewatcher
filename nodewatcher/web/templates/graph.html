@@ -1,0 +1,18 @@
+<img src="/graphs/day_{{ graph.graph }}" id="{{ graph.name }}_graph_{{ graph.id }}" alt="{{ graph.title }}" />
+{% if graph.get_children %}
+<br/>
+<b>{% trans "Display" %}:</b>
+<select id="{{ graph.name }}_select_{{ graph.id }}" onchange="{{ graph.name }}_select_changed_{{ graph.id }}()">
+  <option value="{{ graph.graph }}" selected="selected">{{ graph.title }}</option>
+  {% for child in graph.get_children %}
+  <option value="{{ child.graph }}">{{ child.title }}</option>
+  {% endfor %}
+</select>
+<script type="text/javascript">
+  function {{ graph.name }}_select_changed_{{ graph.id }}()
+  {
+    var subgraph = $('#{{ graph.name }}_select_{{ graph.id }}').attr('value');
+    $('#{{ graph.name }}_graph_{{ graph.id }}').attr('src', '/graphs/day_' + subgraph);
+  }
+</script>
+{% endif %}
