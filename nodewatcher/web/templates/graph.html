@@ -1,7 +1,6 @@
 {% load i18n %}
-{% regroup graph.get_timespans by timespan as timespan_list %}
 <div class="graph">
-<img src="/graphs/{{ timespan_list.list|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{% if graph.get_children %}{% regroup graph.get_children by title as title_list %}{{ title_list.list|join:", " }}{% else %}{{ graph.title }}{% endif %}" />
+<img src="/graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{% for child in graph.get_children %}{% if not forloop.first %}, {% endif %}{{ child.title }}{% empty %}{{ graph.title }}{% endfor %}" />
 <br/>
 {% if graph.get_children %}
 <b>{% trans "Display:" %}</b>
@@ -15,7 +14,7 @@
 <b>{% trans "Timespan:" %}</b>
 <select id="graph_timespan_select_{{ graph.id }}" onchange="graph_display_changed_{{ graph.id }}()">
   {% for timespan in graph.get_timespans %}
-  <option value="{{ timespan.prefix }}">{% trans timespan.prefix %}</option>
+  <option value="{{ timespan }}">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</option>
   {% endfor %}
 </select>
 <script type="text/javascript">

@@ -617,14 +617,11 @@ class GraphItemNP(object):
 
   def get_timespans(self):
     """
-    Returns a list of graph image filenames for different time
+    Returns a list of graph image prefixes for different time
     periods.
     """
-    for prefix, timespan in settings.GRAPH_TIMESPANS:
-      yield {
-        'prefix'    : prefix,
-        'timespan'  : timespan
-      }
+    for prefix, _ in settings.GRAPH_TIMESPANS:
+      yield prefix
 
   def get_children(self):
     """
