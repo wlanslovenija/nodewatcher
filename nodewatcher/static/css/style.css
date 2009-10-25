@@ -120,7 +120,7 @@ tr.inner_header {
   float: right;
 }
 
-.graphs {
+.graphs div.graph {
   text-align: center;
 }
 
@@ -204,6 +204,3 @@ table.nodeinfo {
   list-style-type: none;
 }
 
-.graphs {
-  text-align: center;
-}
