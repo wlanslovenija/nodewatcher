@@ -536,7 +536,9 @@ class APClient(models.Model):
 
 class GraphType:
   """
-  A list of valid graph types.
+  A list of valid graph types. When adding a graph type that will
+  be used by a persistent model here, you MUST update RRA_CONF_MAP
+  in monitoring daemon! Otherwise the monitoring daemon will break.
   """
   Traffic = 10
   Clients = 20
