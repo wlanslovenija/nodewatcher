@@ -29,7 +29,7 @@ def object_transformator():
       object.vpn_password = 'XXX'
       object.phone = '5551234'
     elif name == 'User':
-      object.password = 'XXX'
+      object.password = '$1$1qL5F...$ZPQdHpHMsvNQGI4rIbAG70'
     elif name == 'Profile':
       object.root_pass = 'XXX'
     elif name == 'StatsSolar':
