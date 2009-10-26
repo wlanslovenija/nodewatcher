@@ -32,7 +32,9 @@ def object_transformator():
       object.password = 'XXX'
     elif name == 'Profile':
       object.root_pass = 'XXX'
-    
+    elif name == 'StatsSolar':
+      continue
+
     yield holder.object
 
 # Write transformed objects out
