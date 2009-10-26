@@ -14,23 +14,41 @@ if len(sys.argv) != 2:
   print "Usage: %s dump" % sys.argv[0]
   exit(1)
 
-print "!!! NOTE: This script assumes that you have created and configured"
-print "!!! a proper database via settings.py! The database MUST be completely"
-print "!!! empty (no tables or sequences should be present). If this is not"
-print "!!! the case, this operation WILL FAIL! Press CTRL+C to abort now."
-
+db_backend = settings.DATABASE_ENGINE
 if settings.DATABASE_ENGINE.startswith('postgresql'):
-  print "!!!"
-  print "!!! You are using a PostgreSQL database. Be sure that you have"
-  print "!!! installed the IP4R extension or schema sync WILL FAIL!"
-  print "!!! "
-  print "!!! More information: http://ip4r.projects.postgresql.org"
-  print "!!!"
+  db_backend = 'postgresql'
 
-try:
-  time.sleep(5)
-except KeyboardInterrupt:
-  exit(1)
+if os.path.isfile('scripts/%s_init.sh' % db_backend):
+  print "!!! NOTE: A setup script exists for your database. Be sure that it"
+  print "!!! does what you want before continuing! You may have to edit the"
+  print "!!! script and YOU MUST REVIEW IT! Otherwise the script may bork"
+  print "!!! your installation. Press CTRL + C to abort now."
+
+  try:
+    time.sleep(5)
+  except KeyboardInterrupt:
+    exit(1)
+
+  print ">>> Executing database setup script 'scripts/%s_init.sh'..." % db_backend
+  os.system("scripts/%s_init.sh" % db_backend)
+else:
+  print "!!! NOTE: This script assumes that you have created and configured"
+  print "!!! a proper database via settings.py! The database MUST be completely"
+  print "!!! empty (no tables or sequences should be present). If this is not"
+  print "!!! the case, this operation WILL FAIL! Press CTRL+C to abort now."
+  
+  if settings.DATABASE_ENGINE.startswith('postgresql'):
+    print "!!!"
+    print "!!! You are using a PostgreSQL database. Be sure that you have"
+    print "!!! installed the IP4R extension or schema sync WILL FAIL!"
+    print "!!! "
+    print "!!! More information: http://ip4r.projects.postgresql.org"
+    print "!!!"
+  
+  try:
+    time.sleep(5)
+  except KeyboardInterrupt:
+    exit(1)
 
 print ">>> Performing initial database sync..."
 os.system("python manage.py syncdb --noinput")
