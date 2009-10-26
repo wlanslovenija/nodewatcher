@@ -482,6 +482,8 @@ class RRA:
     args = args + conf.graph
     args.append('--font')
     args.append('DEFAULT:0:DejaVu Sans Mono')
+    
+    args.append('--disable-rrdtool-tag')
 
     for prefix, timespan in settings.GRAPH_TIMESPANS:
       g = rrdtool.RoundRobinGraph(str(os.path.join(settings.GRAPH_DIR, "%s_%s" % (prefix, graph))))
