@@ -8,7 +8,10 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings'
 # Imports
 from django.db import connection, transaction
 from django.conf import settings
+from django.core import serializers
+from django.core.management.color import no_style
 import time
+from traceback import print_exc
 
 if len(sys.argv) != 2:
   print "Usage: %s dump" % sys.argv[0]
@@ -74,5 +77,35 @@ except:
   exit(1)
 
 print ">>> Importing data from '%s'..." % sys.argv[1]
-ensure_success(os.system("python manage.py loaddata %s" % sys.argv[1]))
+
+if settings.DATABASE_ENGINE == 'mysql':
+  cursor.execute("SET foregin_key_check = 0")
+
+transaction.commit_unless_managed()
+transaction.enter_transaction_management()
+transaction.managed(True)
+
+models = set()
+
+try:
+  for holder in serializers.deserialize('json', open(sys.argv[1], 'r')):
+    models.add(holder.object.__class__)
+    holder.save()
+except:
+  transaction.rollback()
+  transaction.leave_transaction_management()
+
+  print_exc()
+  print "ERROR: Data import operation failed, aborting!"
+  exit(1)
+
+# Reset sequences
+for line in connection.ops.sequence_reset_sql(no_style(), models):
+  cursor.execute(line)
+
+transaction.commit()
+transaction.leave_transaction_management()
+connection.close()
+
+print ">>> Import completed."
 
