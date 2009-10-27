@@ -20,7 +20,7 @@
   {% for client in clients %}
   {% ifchanged client.node %}
   <tr class="section_title">
-    <td colspan="5">{% trans "Node" %} <b>{{ client.node.name }} ({{ client.node.ip }})</b></td>
+    <td colspan="5"><b>{% trans "Node" %} <a href="/nodes/node/{{ client.node.ip }}">{{ client.node.name }}</a> ({{ client.node.ip }})</b></td>
   </tr>
   {% endifchanged %}
   <tr class="{% cycle 'odd' 'even' %}">
