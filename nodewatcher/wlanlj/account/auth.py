@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.models import check_password
 from crypt import crypt
 
 if crypt('', '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/') != '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/':
@@ -14,6 +15,15 @@ class CryptBackend:
     """
     try:
       user = User.objects.get(username = username)
+      if check_password(password, user.password):
+        # Successfully checked password in Django password format, so we can change it to crypt format
+        salt = '$1$' + User.objects.make_random_password(8)
+        user.password = crypt(password, salt)
+        user.save()
+    except ValueError:
+      pass
+    
+    try:
       if crypt(password, user.password) == user.password and user.is_active:
         return user
       else:
