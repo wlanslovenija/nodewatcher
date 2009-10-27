@@ -25,6 +25,8 @@ def ensure_success(errcode):
 db_backend = settings.DATABASE_ENGINE
 if settings.DATABASE_ENGINE.startswith('postgresql'):
   db_backend = 'postgresql'
+elif settings.DATABASE_ENGINE.startswith('sqlite'):
+  db_backend = 'sqlite'
 
 if os.path.isfile('scripts/%s_init.sh' % db_backend):
   print "!!! NOTE: A setup script exists for your database. Be sure that it"
@@ -38,7 +40,7 @@ if os.path.isfile('scripts/%s_init.sh' % db_backend):
     exit(1)
 
   print ">>> Executing database setup script 'scripts/%s_init.sh'..." % db_backend
-  ensure_success(os.system("scripts/%s_init.sh" % db_backend))
+  ensure_success(os.system("scripts/%s_init.sh %s" % (db_backend, settings.DATABASE_NAME)))
 else:
   print "!!! NOTE: This script assumes that you have created and configured"
   print "!!! a proper database via settings.py! The database MUST be completely"
@@ -59,7 +61,7 @@ else:
     exit(1)
 
 print ">>> Performing initial database sync..."
-ensure_success(os.system("python manage.py syncdb --noinput"))
+ensure_success(os.system("%s manage.py syncdb --noinput" % sys.executable))
 
 print ">>> Performing data cleanup..."
 try:
@@ -88,9 +90,12 @@ transaction.managed(True)
 models = set()
 
 try:
+  count = 0
   for holder in serializers.deserialize('json', open(sys.argv[1], 'r')):
     models.add(holder.object.__class__)
     holder.save()
+    count += 1
+  print "Installed %d object(s)" % count
 except:
   transaction.rollback()
   transaction.leave_transaction_management()

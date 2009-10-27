@@ -1,6 +1,11 @@
 from django.contrib.auth.models import User
 from crypt import crypt
 
+if crypt('', '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/') != '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/':
+  # crypt does not support MD5 hashed passwords, we will use Python implementation
+  from md5crypt import unix_md5_crypt
+  crypt = unix_md5_crypt
+
 class CryptBackend:
   def authenticate(self, username = None, password = None):
     """
@@ -26,4 +31,3 @@ class CryptBackend:
       return User.objects.get(pk = user_id)
     except User.DoesNotExist:
       return None
-

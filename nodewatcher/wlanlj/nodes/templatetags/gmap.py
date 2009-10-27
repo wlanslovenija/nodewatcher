@@ -1,14 +1,14 @@
 from django import template
+from django.conf import settings
 from django.template import Library
 from django.template import RequestContext
 from django.template import resolve_variable
 
 register = Library()
 
-GOOGLE_MAPS_API_KEY = "ABQIAAAAmW9WFNNiQwBMneBJZLweHBQsbKtnqemGOa87hypl-SttWLUzChTDFDo3Fbn2FY6JSqvVkL_gxrQg9g"
 INCLUDE_TEMPLATE = """
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=%s" type="text/javascript"></script>
-"""% GOOGLE_MAPS_API_KEY
+"""% settings.GOOGLE_MAPS_API_KEY
 BASIC_TEMPLATE = """
 <div id="gmap" style="width:400px; height: 300px;"></div>
 <script type="text/javascript">
