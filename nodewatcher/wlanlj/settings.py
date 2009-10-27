@@ -9,9 +9,11 @@ STATIC_DOC_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..',
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-  ('Jernej Kos', 'kostko@unimatrix-one.org'),
-)
+# A tuple that lists people who get code error notifications. When
+# DEBUG=False and a view raises an exception, Django will e-mail these
+# people with the full exception information. Each member of the tuple
+# should be a tuple of (Full name, e-mail address).
+ADMINS = ()
 
 MANAGERS = ADMINS
 

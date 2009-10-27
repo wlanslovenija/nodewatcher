@@ -82,8 +82,6 @@ def statistics(request):
   return render_to_response('nodes/statistics.html',
     { 'node_count' : node_count,
       'nodes_by_status' : nodes_by_status,
-      'nodes_by_status_length' : len(nodes_by_status),
-      'nodes_by_status_element_width' : 100 / len(nodes_by_status),
       'nodes_by_project' : nodes_by_project,
       'nodes_warned' : Node.objects.filter(warnings = True).exclude(node_type = NodeType.Test).count(),
       'subnet_count' : Subnet.objects.all().count(),

@@ -17,7 +17,6 @@
   </tr>
 </thead>
 <tbody>
-  {% if clients %}
   {% for client in clients %}
   {% ifchanged client.node %}
   <tr class="section_title">
@@ -31,14 +30,13 @@
     <td>{{ client.uploaded|human_readable_kbytes }}</td>
     <td>{{ client.downloaded|human_readable_kbytes }}</td>
   </tr>
-  {% endfor %}
-  {% else %}
+  {% empty %}
   <tr>
-    <td colspan="5" class="notice" style="height: 60px;">
+    <td colspan="5" class="notice">
       {% trans "There are currently no reported connected clients." %}
     </td>
-  </tr>
-  {% endif %}
+  </tr>  
+  {% endfor %}
 </tbody>
 </table>
 <br/>

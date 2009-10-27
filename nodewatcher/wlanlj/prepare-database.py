@@ -13,8 +13,8 @@ from django.core.management.color import no_style
 import time
 from traceback import print_exc
 
-if len(sys.argv) != 2:
-  print "Usage: %s dump" % sys.argv[0]
+if len(sys.argv) > 2:
+  print "Usage: %s [<dump file>]" % sys.argv[0]
   exit(1)
 
 def ensure_success(errcode):
@@ -27,6 +27,8 @@ if settings.DATABASE_ENGINE.startswith('postgresql'):
   db_backend = 'postgresql'
 elif settings.DATABASE_ENGINE.startswith('sqlite'):
   db_backend = 'sqlite'
+elif settings.DATABASE_ENGINE.startswith('mysql'):
+  db_backend = 'mysql'
 
 if os.path.isfile('scripts/%s_init.sh' % db_backend):
   print "!!! NOTE: A setup script exists for your database. Be sure that it"
@@ -47,7 +49,7 @@ else:
   print "!!! empty (no tables or sequences should be present). If this is not"
   print "!!! the case, this operation WILL FAIL! Press CTRL+C to abort now."
   
-  if settings.DATABASE_ENGINE.startswith('postgresql'):
+  if db_backend == 'postgresql':
     print "!!!"
     print "!!! You are using a PostgreSQL database. Be sure that you have"
     print "!!! installed the IP4R extension or schema sync WILL FAIL!"
@@ -61,56 +63,61 @@ else:
     exit(1)
 
 print ">>> Performing initial database sync..."
-ensure_success(os.system("%s manage.py syncdb --noinput" % sys.executable))
+if len(sys.argv) < 2:
+  ensure_success(os.system("%s manage.py syncdb" % sys.executable))
+else:
+  ensure_success(os.system("%s manage.py syncdb --noinput" % sys.executable))
 
-print ">>> Performing data cleanup..."
-try:
-  cursor = connection.cursor()
-  cursor.execute("DELETE FROM auth_group_permissions")
-  cursor.execute("DELETE FROM auth_group")
-  cursor.execute("DELETE FROM auth_permission")
-  cursor.execute("DELETE FROM auth_user")
-  cursor.execute("DELETE FROM django_content_type")
-  cursor.execute("DELETE FROM django_site")
-  cursor.execute("DELETE FROM policy_trafficcontrolclass")
+if len(sys.argv) < 2:
+  print ">>> Initialization completed."
+else:
+  print ">>> Performing data cleanup..."
+  try:
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM auth_group_permissions")
+    cursor.execute("DELETE FROM auth_group")
+    cursor.execute("DELETE FROM auth_permission")
+    cursor.execute("DELETE FROM auth_user")
+    cursor.execute("DELETE FROM django_content_type")
+    cursor.execute("DELETE FROM django_site")
+    cursor.execute("DELETE FROM policy_trafficcontrolclass")
+    transaction.commit_unless_managed()
+  except:
+    print "ERROR: Data cleanup operation failed, aborting!"
+    exit(1)
+  
+  print ">>> Importing data from '%s'..." % sys.argv[1]
+  
+  if db_backend == 'mysql':
+    cursor.execute("SET foregin_key_check = 0")
+  
   transaction.commit_unless_managed()
-except:
-  print "ERROR: Data cleanup operation failed, aborting!"
-  exit(1)
-
-print ">>> Importing data from '%s'..." % sys.argv[1]
-
-if settings.DATABASE_ENGINE == 'mysql':
-  cursor.execute("SET foregin_key_check = 0")
-
-transaction.commit_unless_managed()
-transaction.enter_transaction_management()
-transaction.managed(True)
-
-models = set()
-
-try:
-  count = 0
-  for holder in serializers.deserialize('json', open(sys.argv[1], 'r')):
-    models.add(holder.object.__class__)
-    holder.save()
-    count += 1
-  print "Installed %d object(s)" % count
-except:
-  transaction.rollback()
+  transaction.enter_transaction_management()
+  transaction.managed(True)
+  
+  models = set()
+  
+  try:
+    count = 0
+    for holder in serializers.deserialize('json', open(sys.argv[1], 'r')):
+      models.add(holder.object.__class__)
+      holder.save()
+      count += 1
+    print "Installed %d object(s)" % count
+  except:
+    transaction.rollback()
+    transaction.leave_transaction_management()
+  
+    print_exc()
+    print "ERROR: Data import operation failed, aborting!"
+    exit(1)
+  
+  # Reset sequences
+  for line in connection.ops.sequence_reset_sql(no_style(), models):
+    cursor.execute(line)
+  
+  transaction.commit()
   transaction.leave_transaction_management()
-
-  print_exc()
-  print "ERROR: Data import operation failed, aborting!"
-  exit(1)
-
-# Reset sequences
-for line in connection.ops.sequence_reset_sql(no_style(), models):
-  cursor.execute(line)
-
-transaction.commit()
-transaction.leave_transaction_management()
-connection.close()
-
-print ">>> Import completed."
-
+  connection.close()
+  
+  print ">>> Import completed."

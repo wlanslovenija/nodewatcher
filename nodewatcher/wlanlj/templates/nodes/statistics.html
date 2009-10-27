@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% trans "Network Statistics" %}{% endblock %}
 
@@ -10,7 +11,11 @@
 <table class="layout">
 <tr>
 {% for s in nodes_by_status %}
-<td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status_element_width }}%;" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }}" alt="{{ s.status }}"/> {{ s.count }}</td>
+<td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status|widthlist }}%;" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }}" alt="{{ s.status }}"/> {{ s.count }}</td>
+{% empty %}
+<td class="notice">
+  {% trans "There are currently no nodes registered/connected." %}
+</td>
 {% endfor %}
 </tr>
 </table>
@@ -29,6 +34,12 @@
       <td>{% if t.special %}<i>{% endif %}{{ t.template }}{% if t.special %}</i>{% endif %}</td>
       <td>{{ t.count }}</td>
     </tr>
+    {% empty %}
+    <tr>
+      <td class="notice">
+        {% trans "There are currently no nodes registered/connected." %}
+      </td>
+    </tr>
     {% endfor %}
     </table>
   </div>
@@ -40,6 +51,12 @@
     <tr class="{% cycle 'odd' 'even' %}">
       <td>{% if p.special %}<i>{% endif %}{{ p.name }}{% if p.special %}</i>{% endif %}</td>
       <td>{{ p.count }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td class="notice">
+        {% trans "There are currently no nodes registered/connected." %}
+      </td>
     </tr>
     {% endfor %}
     </table>

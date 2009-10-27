@@ -36,7 +36,7 @@ class RegisterNodeForm(forms.Form):
   )
   project = forms.ModelChoiceField(
     Project.objects.all(),
-    initial = Project.objects.all()[0].id,
+    initial = getattr((Project.objects.all() or [1])[0], "id", None),
     empty_label = None,
     label = _("Project")
   )
@@ -324,13 +324,13 @@ class UpdateNodeForm(forms.Form):
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
   owner = forms.ModelChoiceField(
     User.objects.filter(is_active = True),
-    initial = User.objects.filter(is_active = True)[0].id,
+    initial = getattr((User.objects.filter(is_active = True) or [1])[0], "id", None),
     empty_label = None,
     label = _("Maintainer")
   )
   project = forms.ModelChoiceField(
     Project.objects.all(),
-    initial = Project.objects.all()[0].id,
+    initial = getattr((User.objects.all() or [1])[0], "id", None),
     empty_label = None,
     label = _("Project")
   )
@@ -730,7 +730,7 @@ class InfoStickerForm(forms.Form):
   phone = forms.CharField(max_length = 50, label = _("Phone number"))
   project = forms.ModelChoiceField(
     Project.objects.all(),
-    initial = Project.objects.all()[0].id,
+    initial = getattr((User.objects.all() or [1])[0], "id", None),
     label = _("Project")
   )
   
