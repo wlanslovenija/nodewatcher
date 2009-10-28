@@ -122,8 +122,7 @@
   
   function centerMap() {
     var id = $('#gmap_center').val();
-    gmap.panTo(new GLatLng(projects[id].lat, projects[id].long));
-    gmap.setZoom(projects[id].zoom);
+    gmap.setCenter(new GLatLng(projects[id].lat, projects[id].long), projects[id].zoom);
   }
   
   function updateMap(changeData) {
@@ -237,7 +236,7 @@
 {% trans "Center map on project" %}
 <select id="gmap_center">
   {% for project in projects %}
-  <option value="{{ project.id }}">{{ project.name }}{% if project.geo_name %}{% ifnotequal project.geo_name project.name %}({{ project.geo_name }}){% endifnotequal %}{% endif %}</option>
+  <option value="{{ project.id }}">{{ project.name }}{% if project.geo_name %}{% ifnotequal project.geo_name project.name %} ({{ project.geo_name }}){% endifnotequal %}{% endif %}</option>
   {% endfor %}
 </select>
 <br />
