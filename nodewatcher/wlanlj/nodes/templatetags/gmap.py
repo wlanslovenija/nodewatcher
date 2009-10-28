@@ -12,6 +12,7 @@ INCLUDE_TEMPLATE = """
 BASIC_TEMPLATE = """
 <div id="gmap" style="width:400px; height: 300px;"></div>
 <script type="text/javascript">
+/* <![CDATA[ */
   var icons = {};
 
   function create_icon(status)
@@ -35,7 +36,7 @@ BASIC_TEMPLATE = """
   function create_map() {
     if (GBrowserIsCompatible()) {
       var map = new GMap2(document.getElementById("gmap"));
-      map.setCenter(new GLatLng(%(lat)s, %(long)s), 13);
+      map.setCenter(new GLatLng(%(lat)s, %(long)s), %(zoom)s);
       map.enableDoubleClickZoom();
       map.removeMapType(map.getMapTypes()[1]);
       map.addControl(new GSmallMapControl());
@@ -69,16 +70,18 @@ BASIC_TEMPLATE = """
   }
 
   $(document).ready(function() { create_map(); });
+/* ]]> */
 </script>
 """
 
 FULL_TEMPLATE = """
 <div id="gmap" style="width: 700px; height: 700px;"></div>
 <script type="text/javascript">
+/* <![CDATA[ */
   function create_map() {
     if (GBrowserIsCompatible()) {
       var map = new GMap2(document.getElementById("gmap"));
-      map.setCenter(new GLatLng(%(lat)s, %(long)s), 13);
+      map.setCenter(new GLatLng(%(lat)s, %(long)s), %(zoom)s);
       map.removeMapType(map.getMapTypes()[1]);
       map.enableDoubleClickZoom();
       map.addControl(new GSmallMapControl());
@@ -92,6 +95,7 @@ FULL_TEMPLATE = """
   }
 
   $(document).ready(function() { create_map(); });
+/* ]]> */
 </script>
 """
 
@@ -122,8 +126,9 @@ def do_gmap(parser, token):
 
   # Defaults
   parameters = {
-    'lat'       : 0.0,
-    'long'      : 0.0,
+    'lat'       : settings.GOOGLE_MAPS_DEFAULT_LAT,
+    'long'      : settings.GOOGLE_MAPS_DEFAULT_LONG,
+    'zoom'      : settings.GOOGLE_MAPS_DEFAULT_ZOOM,
     'mlat'      : 0.0,
     'mlong'     : 0.0,
     'marker'    : 'no',

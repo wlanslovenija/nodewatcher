@@ -33,6 +33,8 @@ class Project(models.Model):
   # Geographical location
   geo_lat = models.FloatField(null = True)
   geo_long = models.FloatField(null = True)
+  geo_zoom = models.IntegerField(null = True)
+  geo_name = models.IntegerField(null = True)
 
   def __unicode__(self):
     """

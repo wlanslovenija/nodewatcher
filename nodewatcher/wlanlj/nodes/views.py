@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
@@ -384,6 +385,9 @@ def map(request):
   return render_to_response('nodes/map.html',
     { 'nodes' : Node.objects.all(),
       'links' : links,
+      'default_lat' : settings.GOOGLE_MAPS_DEFAULT_LAT,
+      'default_long' : settings.GOOGLE_MAPS_DEFAULT_LONG,
+      'default_zoom' : settings.GOOGLE_MAPS_DEFAULT_ZOOM,
       'projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
     context_instance = RequestContext(request)
   )

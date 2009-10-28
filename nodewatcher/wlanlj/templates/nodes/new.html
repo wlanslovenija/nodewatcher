@@ -35,6 +35,7 @@
 
 {% if user.is_staff %}
 <script type="text/javascript">
+/* <![CDATA[ */
   function toggleIpInput()
   {
     if ($('#id_assign_ip').is(':checked')) {
@@ -44,6 +45,7 @@
       $('#id_ip').removeAttr('disabled');
     }
   }
+/* ]]> */
 </script>
 {% endif %}
 
@@ -85,7 +87,7 @@
     <td class="small_text">{% trans "Should be an address where the node is located." %}</td>
   </tr>
   <tr class="location_opts">
-    <td colspan="2">{% gmap lat:46.05 long:14.5 callback:map_init %}</td>
+    <td colspan="2">{% gmap callback:map_init %}</td>
   </tr>
   <tr class="location_opts">
     <td>{{ form.geo_lat.label }}</td>
@@ -226,6 +228,7 @@
 </form>
 
 <script type="text/javascript">
+/* <![CDATA[ */
   var gmap;
 
   function map_init(map)
@@ -308,6 +311,7 @@
   toggleIpInput();
   $('#id_assign_ip').onchange = toggleIpInput;
 {% endif %}
+/* ]]> */
 </script>
 </div>
 {% endblock %}

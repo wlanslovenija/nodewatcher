@@ -64,6 +64,10 @@ SECRET_KEY = '1p)^zvjul0^c)v5*l!8^48g=ili!cn54^l)wl1avvu-x$==k7p'
 # Google Maps API key for 127.0.0.1
 GOOGLE_MAPS_API_KEY = 'ABQIAAAAsSAo-sxy6T5T7_DN1d9N4xRi_j0U6kJrkFvY4-OX2XYmEAa76BRH5tgaUAj1SaWR_RbmjkZ4zO7dDA'
 
+GOOGLE_MAPS_DEFAULT_LAT = 46.05
+GOOGLE_MAPS_DEFAULT_LONG = 14.5
+GOOGLE_MAPS_DEFAULT_ZOOM = 13
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
   'django.template.loaders.filesystem.load_template_source',
