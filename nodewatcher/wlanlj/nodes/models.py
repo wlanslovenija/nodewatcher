@@ -31,10 +31,10 @@ class Project(models.Model):
   zone = models.ForeignKey(Zone, null = True)
   
   # Geographical location
-  geo_lat = models.FloatField(null = True)
-  geo_long = models.FloatField(null = True)
-  geo_zoom = models.IntegerField(null = True)
-  geo_name = models.IntegerField(null = True)
+  geo_lat = models.FloatField()
+  geo_long = models.FloatField()
+  geo_zoom = models.IntegerField()
+  geo_name = models.CharField(max_length = 50)
 
   def __unicode__(self):
     """
