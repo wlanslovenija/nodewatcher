@@ -249,8 +249,6 @@
 {% trans "Show nodes based on status:" %}
 <input type="checkbox" name="gmap_status" id="gmap_status_up" value="up" checked="checked" />
 <label for="gmap_status_up">up</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_invalid" value="invalid" checked="checked" />
-<label for="gmap_status_invalid">invalid</label>
 <input type="checkbox" name="gmap_status" id="gmap_status_visible" value="visible" checked="checked" />
 <label for="gmap_status_visible">visible</label>
 <input type="checkbox" name="gmap_status" id="gmap_status_down" value="down" checked="checked" />
@@ -268,7 +266,6 @@
 <h3>{% trans "Node status key" %}:</h3>
 <ul>
   <li>{{ "up"|status:"gmap" }} - {% trans "node is reachable" %}</li>
-  <li>{{ "invalid"|status:"gmap" }} - {% trans "IP is not allocated but is seen" %}</li>
   <li>{{ "visible"|status:"gmap" }} - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
   <li>{{ "down"|status:"gmap" }}- {% trans "node is not visible via OLSR" %}</li>
   <li>{{ "duped"|status:"gmap" }} - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
