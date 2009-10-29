@@ -24,6 +24,7 @@ import hashlib
 from traceback import format_exc
 import pwd
 from zipfile import ZipFile, ZIP_DEFLATED
+from base64 import urlsafe_b64encode
 
 WORKDIR = "/home/generator"
 DESTINATION = "/var/www/nodes.wlan-lj.net/results"
@@ -139,12 +140,16 @@ def generate_image(d):
       source = "%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file)
 
       f = open(source, 'r')
-      checksum = hashlib.md5(f.read()).hexdigest()
+      checksum = hashlib.md5(f.read())
       f.close()
       
-      destination = "%s-%s" % (os.path.join(DESTINATION, checksum), file)
+      # We can take just first 22 characters as checksums have fixed size and we can reconstruct it
+      prefix = urlsafe_b64encode(checksum.digest())[:22]
+      checksum = checksum.hexdigest()
+      
+      destination = "%s-%s" % (os.path.join(DESTINATION, prefix), file)
       os.rename(source, destination)
-      files.append({ 'name' : "%s-%s" % (checksum, file), 'checksum' : checksum })
+      files.append({ 'name' : "%s-%s" % (prefix, file), 'checksum' : checksum })
 
     # Send an e-mail
     t = loader.get_template('generator/email.txt')
