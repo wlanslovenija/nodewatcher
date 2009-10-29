@@ -386,6 +386,7 @@ def checkMeshStatus():
               
               n.clients += 1
               c.ip = client['ip']
+              c.connected_at = safe_date_convert(client['added_at'])
               c.uploaded = safe_int_convert(client['up'])
               c.downloaded = safe_int_convert(client['down'])
               c.last_update = datetime.now()

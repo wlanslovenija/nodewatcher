@@ -26,7 +26,7 @@
   <tr class="{% cycle 'odd' 'even' %}">
     <td></td>
     <td>{{ client.ip }}</td>
-    <td></td>
+    <td>{{ client.connected_at|date|default:_("unknown") }}</td>
     <td>{{ client.uploaded|human_readable_kbytes }}</td>
     <td>{{ client.downloaded|human_readable_kbytes }}</td>
   </tr>

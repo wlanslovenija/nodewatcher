@@ -541,6 +541,7 @@ class APClient(models.Model):
   """
   node = models.ForeignKey(Node)
   ip = models.CharField(max_length = 40)
+  connected_at = models.DateTimeField(null = True)
   last_update = models.DateTimeField(null = True)
 
   # Transfer statistics (set by the monitor daemon)
