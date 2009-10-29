@@ -61,7 +61,7 @@
     <td class="small_text">{% trans "Should be an address where the node is located." %}</td>
   </tr>
   <tr class="location_opts">
-    <td colspan="2">{% gmap mlat:node.geo_lat mlong:node.geo_long marker:yes callback:map_init %}</td>
+    <td colspan="2"><div id="gmap" style="width:400px; height: 300px;"></div></td>
   </tr>        
   <tr class="location_opts">
     <td>{{ form.geo_lat.label }}</td>
@@ -189,91 +189,24 @@
     </td>
   </tr>
 </table>
-  <div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
-    </div>
+<div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />
+<input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+</div>
 </form>
+</div>
+{% endblock %}
 
+{% block js %}
 <script type="text/javascript">
 /* <![CDATA[ */
-  var gmap;
-
-  function map_init(map)
-  {
-    gmap = map;
-  }
-
-  function toggleAutoConfiguration()
-  {
-    if ($('#id_wan_dhcp').is(':checked')) {
-      $('.static_opts').css('display', 'none');
-    } else {
-      $('.static_opts').css('display', '');
-    }
-  }
-
-  function toggleImageGeneratorOptions()
-  {
-    if ($('#id_template').attr('value') == '') {
-      $('.imagegen_opts').css('display', 'none');
-    } else {
-      $('.imagegen_opts').css('display', '');
-      toggleAutoConfiguration();
-    }
-  }
-
-  function toggleVpnOptions()
-  {
-    if ($('#id_use_vpn').is(':checked')) {
-      $('.vpn_opts').css('display', '');
-    } else {
-      $('.vpn_opts').css('display', 'none');
-    }
-  }
-
-  function toggleLocation()
-  {
-    if ($('#id_node_type').attr('value') == {{ mobile_node_type }}) {
-      $('.location_opts').css('display', 'none');
-    } else {
-      $('.location_opts').css('display', '');
-    }
-  }
-
-  function toggleExtAntenna()
-  {
-    if ($('#id_ant_external').is(':checked')) {
-      $('.extantenna_opts').css('display', '');
-    } else {
-      $('.extantenna_opts').css('display', 'none');
-    }
-  }
-
-  function updateMapForProject()
-  {
-    var projectId = $('#id_project').attr('value');
-    {% for project in map_projects %}
-    if (projectId == {{ project.id }}) {
-      gmap.setCenter(new GLatLng({{ project.geo_lat }}, {{ project.geo_long }}), 13);
-      return;
-    }
-    {% endfor %}
-  }
-  
-  $('#id_project').change(function(event) { updateMapForProject(); });
-  $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
-  $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
-  $('#id_node_type').change(function(event) { toggleLocation(); });
-  $('#id_ant_external').change(function(event) { toggleExtAntenna(); });
-  $('#id_use_vpn').change(function(event) { toggleVpnOptions(); });
-  $(function() {
-    toggleAutoConfiguration();
-    toggleVpnOptions();
-    toggleImageGeneratorOptions();
-    toggleLocation();
-    toggleExtAntenna();
-  });
+  var mobileNodeType = {{ mobile_node_type }};
+  var projects = [
+  {% for project in map_projects %}{% if project.has_geoloc %}
+    { "id": {{ project.id }}, "lat": {{ project.geo_lat }}, "long": {{ project.geo_long }}, "zoom": {{ project.geo_zoom }} }{% if not forloop.last %},{% endif %}
+  {% endif %}{% endfor %}
+  ];
 /* ]]> */
 </script>
-</div>
+<script src="/js/node.js" type="text/javascript"></script>
+{% do_gmap "mapInit" "" node.geo_lat node.geo_long %}
 {% endblock %}

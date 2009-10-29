@@ -31,10 +31,21 @@ class Project(models.Model):
   zone = models.ForeignKey(Zone, null = True)
   
   # Geographical location
-  geo_lat = models.FloatField()
-  geo_long = models.FloatField()
-  geo_zoom = models.IntegerField()
-  geo_name = models.CharField(max_length = 50)
+  geo_lat = models.FloatField(null = True)
+  geo_long = models.FloatField(null = True)
+  geo_zoom = models.IntegerField(null = True)
+  
+  def has_geoloc(self):
+    """
+    Returns true if this project has geographical location defined.
+    """
+    return self.geo_lat and self.geo_long and self.geo_zoom
+  
+  def has_nodes(self):
+    """
+    Returns true if this project has nodes.
+    """
+    return self.nodes.all().count() > 0
 
   def __unicode__(self):
     """
@@ -113,7 +124,7 @@ class Node(models.Model):
   name = models.CharField(max_length = 50, null = True, unique = True)
   owner = models.ForeignKey(User, null = True)
   location = models.CharField(max_length = 200, null = True)
-  project = models.ForeignKey(Project, null = True)
+  project = models.ForeignKey(Project, null = True, related_name = 'nodes')
   notes = models.CharField(max_length = 1000, null = True)
   url = models.CharField(max_length = 200, null = True)
 

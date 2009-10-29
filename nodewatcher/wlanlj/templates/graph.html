@@ -22,8 +22,7 @@
 </div>
 <script type="text/javascript">
 /* <![CDATA[ */
-  function graph_display_changed_{{ graph.id }}()
-  {
+  function graph_display_changed_{{ graph.id }}() {
     var subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
     var prefix = $('#graph_timespan_select_{{ graph.id }}').attr('value');
     $('#graph_{{ graph.id }}').attr('src', '/graphs/' + prefix + '_' + subgraph);

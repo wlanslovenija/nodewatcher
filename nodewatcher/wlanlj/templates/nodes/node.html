@@ -19,7 +19,7 @@
 {% endif %}
 <div class="embedded">
 {% if node.geo_lat and node.geo_long %}
-{% gmap mlat:node.geo_lat mlong:node.geo_long marker:yes clickable:no status:node.status_as_string %}
+<div id="gmap" style="width:400px; height: 300px;"></div>
 {% endif %}
 </div>
 <h3 class="section_title">{% trans "General Information" %}
@@ -331,4 +331,8 @@
 </div>
   {% endif %}
 
+{% endblock %}
+
+{% block js %}
+{% do_gmap "mapInit" "" node.geo_lat node.geo_long "" node.status_as_string %}
 {% endblock %}

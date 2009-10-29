@@ -129,7 +129,7 @@ def node_new(request):
   return render_to_response('nodes/new.html',
     { 'form' : form,
       'mobile_node_type' : NodeType.Mobile,
-      'map_projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
+      'map_projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
 
@@ -210,7 +210,7 @@ def node_edit(request, node_ip):
     { 'form' : form,
       'node' : node,
       'mobile_node_type' : NodeType.Mobile,
-      'map_projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
+      'map_projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
 
@@ -388,7 +388,7 @@ def map(request):
       'default_lat' : settings.GOOGLE_MAPS_DEFAULT_LAT,
       'default_long' : settings.GOOGLE_MAPS_DEFAULT_LONG,
       'default_zoom' : settings.GOOGLE_MAPS_DEFAULT_ZOOM,
-      'projects' : Project.objects.exclude(geo_lat = None).order_by("id") },
+      'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
 

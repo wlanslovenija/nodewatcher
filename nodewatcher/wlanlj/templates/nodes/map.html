@@ -8,242 +8,19 @@
 {% block content %}
 <h1>{% trans "Mesh Map View" %}</h1>
 <br/>
-<script src="/js/jquery.history.js" type="text/javascript"></script>
-<script type="text/javascript">
-/* <![CDATA[ */
-  var icons = {};
-  var antennaOffset = 23; // antenna top is at (9, 7), icon anchor at (9, 30)
-  var projects = {
-    {% for project in projects %}
-    {{ project.id }}: { "lat": {{ project.geo_lat|default:default_lat }}, "long": {{ project.geo_long|default:default_long }}, "zoom": {{ project.geo_zoom|default:default_zoom }} }{% if not forloop.last %},{% endif %}
-    {% endfor %}  
-  };
-  var nodes = [
-    {% for node in nodes %}{% if node.should_draw_on_map %}
-    { "project": {{ node.project.pk }}, "lat": {{ node.geo_lat }}, "long": {{ node.geo_long }}, "ip": '{{ node.ip|escapejs }}', "name": '{{ node.name|escapejs }}', "status": '{{ node.status_as_string|escapejs }}', "url": '{{ node.url|default:""|escapejs }}' }{% if not forloop.last %},{% endif %}
-    {% endif %}{% endfor %}    
-  ];
-  var links = [
-    {% for link in links %}{% if link.should_draw_on_map %}
-    { "src": '{{ link.src.ip|escapejs }}', "dst": '{{ link.dst.ip|escapejs }}', "color": '{{ link.color|escapejs }}' }{% if not forloop.last %},{% endif %}
-    {% endif %}{% endfor %}  
-  ];
-  var gmap;
-  var updating = false;
-
-  function createIcon(status) {
-    if (icons[status])
-      return icons[status];
-
-    icon = new GIcon();
-    icon.image = "/images/status_"+status+"_gmap.png";
-    icon.shadow = "/images/gmap_node_shadow.png";
-    icon.transparent = "gmap_node_transparent.png";
-    icon.imageMap = [12,0,14,1,15,2,16,3,16,4,16,5,17,6,17,7,17,8,16,9,16,10,16,11,15,12,14,13,13,14,14,15,14,16,15,17,15,18,16,19,16,20,16,21,17,22,17,23,18,24,18,25,19,26,19,27,15,28,16,29,14,30,5,30,3,29,4,28,0,27,1,26,1,25,1,24,2,23,2,22,3,21,3,20,4,19,4,18,4,17,5,16,5,15,6,14,5,13,4,12,3,11,3,10,3,9,2,8,2,7,2,6,3,5,3,4,3,3,4,2,5,1,7,0];
-    icon.iconSize = new GSize(20, 32);
-    icon.shadowSize = new GSize(32, 32);
-    icon.iconAnchor = new GPoint(9, 30);
-    icon.infoWindowAnchor = new GPoint(10, 2);
-    icons[status] = icon;
-    return icon;
-  }
-
-  function createMarker(node) {
-    var opts = { "title" : node.name + " (" + node.ip + ")", "icon" : createIcon(node.status) };
-    var m = new GMarker(new GLatLng(node.lat, node.long), opts);
-    GEvent.addListener(m, "click", function() {
-      html = "<b>" + node.name + "</b> (" + node.ip + ")<div class=\"gmap_details\">Status: <span class=\"node_status_" +
-             node.status + "\">" + node.status + "</span><br><a href=\"/nodes/node/" + node.ip +"\">more information</a>";
-      if (node.url) html = html + " | <a href=\"" + node.url + "\">{% trans "visit home page" %}</a>";
-      m.openInfoWindowHtml(html + "</div>");
-    });
-    gmap.addOverlay(m);
-  }
-
-  function createLink(src, dst, link) {
-    var projection = gmap.getCurrentMapType().getProjection();
-    var startPoint = projection.fromLatLngToPixel(new GLatLng(src.lat, src.long), gmap.getZoom());
-    var endPoint = projection.fromLatLngToPixel(new GLatLng(dst.lat, dst.long), gmap.getZoom());
-    
-    startPoint.y -= antennaOffset;
-    endPoint.y -= antennaOffset;
-    
-    var p = new GPolyline([
-      projection.fromPixelToLatLng(startPoint, gmap.getZoom()),
-      projection.fromPixelToLatLng(endPoint, gmap.getZoom())
-    ], link.color, 5);
-    gmap.addOverlay(p);
-    return { "overlay": p, "src": src, "dst": dst, "link": link };
-  }
-  
-  var visibleNodes = 0;
-  var shownNodes = {};
-  var shownNodesNumber = 0;
-  var shownLinks = [];
-  function updateNodes(filtersNotChanged, zoomNotChanged) {
-    if (!filtersNotChanged) {
-      gmap.clearOverlays();
-      
-      shownNodes = {};
-      shownNodesNumber = 0;
-      shownLinks = [];
-      for (var i = 0; i < nodes.length; i++) {
-        if ($('#gmap_project_' + nodes[i].project + ':checked').length == 0) continue;
-        if ($('#gmap_status_' + nodes[i].status + ':checked').length == 0) continue;
-        
-        shownNodes[nodes[i].ip] = nodes[i];
-        shownNodesNumber++;
-        createMarker(nodes[i]);
-      }
-      
-      for (var i = 0; i < links.length; i++) {
-        if (shownNodes[links[i].src] && shownNodes[links[i].dst]) {
-          shownLinks.push(createLink(shownNodes[links[i].src], shownNodes[links[i].dst], links[i]));
-        }
-      }
-    }
-    else if (!zoomNotChanged) {
-      var newShownLinks = [];
-      for (var i = 0; i < shownLinks.length; i++) {
-        gmap.removeOverlay(shownLinks[i].overlay);
-        newShownLinks.push(createLink(shownLinks[i].src, shownLinks[i].dst, shownLinks[i].link));
-      }
-      shownLinks = newShownLinks;
-    }
-    
-    var bounds = gmap.getBounds();
-    visibleNodes = 0;
-    for (var node in shownNodes) {
-       if (bounds.containsLatLng(new google.maps.LatLng(shownNodes[node].lat, shownNodes[node].long))) visibleNodes++;
-    }
-    
-    $('#gmap_statusbar').html("Visible " + visibleNodes + " of " + shownNodesNumber + " shown nodes" + (shownNodesNumber != nodes.length ? " (from " + nodes.length + " all nodes)" : ""));
-  }
-  
-  function centerMap() {
-    var id = $('#gmap_center').val();
-    gmap.setCenter(new GLatLng(projects[id].lat, projects[id].long), projects[id].zoom);
-  }
-  
-  function updateMap(changeData) {
-    if (updating) return;
-    
-    var hash = "lat=" + gmap.getCenter().lat() + "&long=" + gmap.getCenter().lng() + "&zoom=" + gmap.getZoom() + "&type=" + gmap.getCurrentMapType().getUrlArg();
-    $('input[name="gmap_project"]:checked').each(function (i) {
-      hash += "&project=" + $(this).val();
-    });
-    $('input[name="gmap_status"]:checked').each(function (i) {
-      hash += "&status=" + $(this).val();
-    });
-    $.history.load(hash, changeData);
-  }
-
-  function mapInit(map) {
-    gmap = map;
-    
-    google.maps.Event.addListener(map, "zoomend", function () { updateMap( { "filtersNotChanged": true, "zoomNotChanged": false } ); } );
-    google.maps.Event.addListener(map, "moveend", function () { updateMap( { "filtersNotChanged": true, "zoomNotChanged": true } ); } );
-    google.maps.Event.addListener(map, "maptypechanged", function () { updateMap( { "filtersNotChanged": true, "zoomNotChanged": true } ); } );
-    
-    var lock = false;
-    google.maps.Event.addListener(map, "move", function () {
-      // JS events hopefully execute in one thread so there is no race condition
-      // but it also does not really matter if it is
-      if (!lock) {
-        lock = true;
-        // We allow updates to occur at least 100 ms apart
-        setTimeout(function () { lock = false; }, 100);
-        updateMap( { "filtersNotChanged": true, "zoomNotChanged": true } );
-      }
-    });
-
-    $(function() {
-      $('#gmap_center').change(function () { centerMap(); });
-      $('input[name="gmap_project"]').change(function () { updateMap( { "filtersNotChanged": false, "zoomNotChanged": true } ); });
-      $('input[name="gmap_status"]').change(function () { updateMap( { "filtersNotChanged": false, "zoomNotChanged": true } ); });
-      
-      var oldhash = "";
-      $.history.init(function (hash, changeData) {
-        if (!changeData) changeData = {};
-        
-        if (hash) {
-          if (hash == oldhash) {
-            return;
-          }
-          else {
-            oldhash = hash;
-          }
-          
-          var splits = hash.split(/&/);
-          if (splits.length == 0) {
-            udpate_map();
-            return;
-          }
-          
-          var params = {
-            "lat": gmap.getCenter().lat(),
-            "long": gmap.getCenter().lng(),
-            "zoom": gmap.getZoom(),
-            "type": gmap.getCurrentMapType().getUrlArg(),
-            "project": [],
-            "status": []
-          };
-          
-          for (var i = 0; i < splits.length; i++) {
-            var sp = splits[i].split(/=/);
-            if (sp.length == 2) {
-              if (sp[0] == "project") {
-                params.project.push(sp[1]);
-              }
-              else if (sp[0] == "status") {
-                params.status.push(sp[1]);
-              }
-              else {
-                params[sp[0]] = sp[1];
-              }
-            }
-          }
-          
-          var mapType = gmap.getCurrentMapType();
-          var mapTypes = gmap.getMapTypes();
-          for (var m = 0; m < mapTypes.length; m++) {
-            if (mapTypes[m].getUrlArg() == params.type) {
-              mapType = mapTypes[m];
-              break;
-            }
-          }
-          
-          updating = true;
-          
-          gmap.setCenter(new GLatLng(params.lat, params.long), parseInt(params.zoom), mapType);
-          
-          $('input[name="gmap_project"]').val(params.project);
-          $('input[name="gmap_status"]').val(params.status);
-          
-          updating = false;
-          
-          updateNodes(changeData.filtersNotChanged, changeData.zoomNotChanged);
-        }
-        else {
-          updateMap( { "filtersNotChanged": false, "zoomNotChanged": false } );
-        }
-      });
-    });
-  }
-/* ]]> */
-</script>
 <div style="margin-left: 10px;">
-{% trans "Center map on project" %}
+{% trans "Position map to encompass all nodes of " %}
 <select id="gmap_center">
+  <option value="" id="gmap_center_default">---------</option>
   {% for project in projects %}
-  <option value="{{ project.id }}">{{ project.name }}{% if project.geo_name %}{% ifnotequal project.geo_name project.name %} ({{ project.geo_name }}){% endifnotequal %}{% endif %}</option>
+  <option value="{{ project.id }}"{% if not project.has_nodes %} disabled="disabled" title="{% trans "Project has no nodes" %}"{% endif %}>{{ project.name }}</option>
   {% endfor %}
-</select>
+</select>{% trans " project" %}
 <br />
 {% trans "Show nodes based on project:" %}
 {% for project in projects %}
-<input type="checkbox" name="gmap_project" id="gmap_project_{{ project.id }}" value="{{ project.id }}" checked="checked" />
-<label for="gmap_project_{{ project.id }}">{{ project.name }}</label>
+<input type="checkbox" name="gmap_project" id="gmap_project_{{ project.id }}" value="{{ project.id }}" {% if project.has_nodes %}checked="checked"{% else %}disabled="disabled" title="{% trans "Project has no nodes" %}"{% endif %} />
+<label for="gmap_project_{{ project.id }}"{% if not project.has_nodes %} title="{% trans "Project has no nodes" %}"{% endif %}>{{ project.name }}</label>
 {% endfor %}
 <br />
 {% trans "Show nodes based on status:" %}
@@ -259,7 +36,7 @@
 <label for="gmap_status_new">new</label>
 <input type="checkbox" name="gmap_status" id="gmap_status_pending" value="pending" checked="checked" />
 <label for="gmap_status_pending">pending</label>
-{% gmap full:yes callback:mapInit %}
+<div id="gmap" style="width: 700px; height: 700px;"></div>
 <span id="gmap_statusbar">&nbsp;</span>
 </div>
 <div class="legend">
@@ -280,4 +57,24 @@
   <li><span style="color: #ff0000;">{% trans "red" %}</span> - {% trans "ETX is greater than 5.0" %}</li>
 </ul>
 </div>
+{% endblock %}
+
+{% block js %}
+<script src="/js/jquery.history.js" type="text/javascript"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+  var nodes = [
+    {% for node in nodes %}{% if node.should_draw_on_map %}
+    { "project": {{ node.project.pk }}, "lat": {{ node.geo_lat }}, "long": {{ node.geo_long }}, "ip": '{{ node.ip|escapejs }}', "name": '{{ node.name|escapejs }}', "status": '{{ node.status_as_string|escapejs }}', "url": '{{ node.url|default:""|escapejs }}' }{% if not forloop.last %},{% endif %}
+    {% endif %}{% endfor %}    
+  ];
+  var links = [
+    {% for link in links %}{% if link.should_draw_on_map %}
+    { "src": '{{ link.src.ip|escapejs }}', "dst": '{{ link.dst.ip|escapejs }}', "color": '{{ link.color|escapejs }}' }{% if not forloop.last %},{% endif %}
+    {% endif %}{% endfor %}  
+  ];
+/* ]]> */
+</script>
+{% do_gmap "mapInit" "true" %}
+<script src="/js/map.js" type="text/javascript"></script>
 {% endblock %}
