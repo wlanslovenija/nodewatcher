@@ -89,7 +89,7 @@ else:
   print ">>> Importing data from '%s'..." % sys.argv[1]
   
   if db_backend == 'mysql':
-    cursor.execute("SET foregin_key_check = 0")
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
   
   transaction.commit_unless_managed()
   transaction.enter_transaction_management()
