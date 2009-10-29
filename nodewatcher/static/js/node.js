@@ -54,9 +54,11 @@ function toggleIpInput() {
   if ($('#id_assign_ip').is(':checked')) {
     $('#id_ip').value = '';
     $('#id_ip').attr('disabled', 'disabled');
+    $('.assign_subnet').css('display', 'none');
   }
   else {
     $('#id_ip').removeAttr('disabled');
+    $('.assign_subnet').css('display', '');
   }
 }
 
