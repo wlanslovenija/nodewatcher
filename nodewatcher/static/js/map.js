@@ -7,6 +7,16 @@ var shownLinks = [];
 
 var gmap;
 
+function updateStatusbar() {
+  var bounds = gmap.getBounds();
+  visibleNodes = 0;
+  for (var node in shownNodes) {
+     if (bounds.containsLatLng(new google.maps.LatLng(shownNodes[node].lat, shownNodes[node].long))) visibleNodes++;
+  }
+  
+  $('#gmap_statusbar').html("Visible " + visibleNodes + " of " + shownNodesNumber + " shown nodes" + (shownNodesNumber != nodes.length ? " (from " + nodes.length + " all nodes)" : ""));
+}
+
 function updateNodes(filtersNotChanged, zoomNotChanged, notMoved) {
   if (!filtersNotChanged) {
     gmap.clearOverlays();
@@ -38,13 +48,7 @@ function updateNodes(filtersNotChanged, zoomNotChanged, notMoved) {
     shownLinks = newShownLinks;
   }
   
-  var bounds = gmap.getBounds();
-  visibleNodes = 0;
-  for (var node in shownNodes) {
-     if (bounds.containsLatLng(new google.maps.LatLng(shownNodes[node].lat, shownNodes[node].long))) visibleNodes++;
-  }
-  
-  $('#gmap_statusbar').html("Visible " + visibleNodes + " of " + shownNodesNumber + " shown nodes" + (shownNodesNumber != nodes.length ? " (from " + nodes.length + " all nodes)" : ""));
+  updateStatusbar();
 }
 
 function buildHash(lat, long, zoom) {
@@ -107,7 +111,7 @@ function mapInit(map) {
       lock = true;
       // We allow updates to occur at least 100 ms apart
       setTimeout(function () { lock = false; }, 100);
-      updateMap( { "filtersNotChanged": true, "zoomNotChanged": true, "notMoved": false } );
+      updateStatusbar();
     }
   });
 
@@ -120,19 +124,19 @@ function mapInit(map) {
     $.history.init(function (hash, changeData) {
       if (!changeData) changeData = {};
       
-      if (!changeData.notMoved || !changeData.zoomNotChanged) {
-        if (!centering) {
-          $('#gmap_center_default').removeAttr('disabled');
-          $('#gmap_center').val("");
-        }
-      }
-      
       if (hash) {
         if (hash == oldhash) {
           return;
         }
         else {
           oldhash = hash;
+        }
+      
+        if (!changeData.notMoved || !changeData.zoomNotChanged) {
+          if (!centering) {
+            $('#gmap_center_default').removeAttr('disabled');
+            $('#gmap_center').val("");
+          }
         }
         
         var splits = hash.split(/&/);
