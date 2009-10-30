@@ -90,6 +90,8 @@ else:
   
   if db_backend == 'mysql':
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+  elif db_backend == 'sqlite':
+    cursor.execute("PRAGMA foreign_keys = 0")
   
   transaction.commit_unless_managed()
   transaction.enter_transaction_management()

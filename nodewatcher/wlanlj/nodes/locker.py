@@ -4,24 +4,36 @@ from django.conf import settings
 #
 # NOTE ABOUT LOCKING
 #
-# This function is needed to prevent concurrent access to
-# data in sections that need to be serializable.  There is
-# another option, namely to set transaction isolation level
-# via SET TRANSACTION ISOLATION LEVEL SERIALIZABLE, but this
-# has the drawback that it must be executed as the first
-# query in a transaction (and we have no control over this,
-# especially in Django).
+# This decorator is needed to prevent concurrent access to
+# data in code sections that have to be serialized. One option
+# is to set default isolation level of your database management
+# system to SERIALIZABLE which has a performance drawback. There
+# is another option, namely to set transaction isolation level
+# at beginning of transaction via SET TRANSACTION ISOLATION
+# LEVEL SERIALIZABLE or similar statement, but this is not
+# possible in Django with TransactionMiddleware where transaction
+# is opened at the start of a HTTP request.
 #
-# Therefore this method implements EXCLUSIVE table locks,
-# currently only on PostgreSQL.
+# Therefore this method implements EXCLUSIVE table locks to
+# acquire exclusive access for code sections where needed.
 #
 
 # Check for database drivers, this is not done in the decorator
 # so this check is executed only once upon module load
 if settings.DATABASE_ENGINE.startswith('postgresql'):
+  # READ COMMITTED is the default isolation level in PostgreSQL so
+  # we add explicit locking to support default isolation level.
   LOCK_TYPE = "postgresql"
-elif settings.DATABASE_ENGINE == 'mysql':
+elif settings.DATABASE_ENGINE.startswith('mysql'):
+  # MySQL InnoDB default isolation level is REPEATABLE READ so we
+  # add explicit locking to support default isolation level.
   LOCK_TYPE = "mysql"
+elif settings.DATABASE_ENGINE.startswith('sqlite'):
+  # Locking is not necessary for SQLite as default isolation
+  # level for SQLite is SERIALIZABLE. (This means concurrent
+  # transactions can fail and users have to retry their requests.)
+  # You should probably add locking if you change isolation level.
+  LOCK_TYPE = None
 else:
   LOCK_TYPE = None
 
@@ -31,20 +43,18 @@ def require_lock(*tables):
       cursor = connection.cursor()
 
       if LOCK_TYPE == "postgresql":
-        cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
+        cursor.execute("LOCK TABLES %s" % ', '.join(["%s WRITE" % x for x in tables]))
       elif LOCK_TYPE == "mysql":
-        # Not yet implemented
+        cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
         pass
 
       try:
         return func(*args,**kws)
       finally:
         if LOCK_TYPE == "mysql":
-          # Not yet implemented
-          pass
+          cursor.execute("UNLOCK TABLES")
         
         if cursor:
           cursor.close()
     return _do_lock
   return _lock
-
