@@ -46,7 +46,6 @@ def require_lock(*tables):
         cursor.execute("LOCK TABLES %s" % ', '.join(["%s WRITE" % x for x in tables]))
       elif LOCK_TYPE == "mysql":
         cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
-        pass
 
       try:
         return func(*args,**kws)
