@@ -1,4 +1,5 @@
 from django.db import connection, transaction
+from django.conf import settings
 
 #
 # NOTE ABOUT LOCKING
@@ -15,15 +16,33 @@ from django.db import connection, transaction
 # currently only on PostgreSQL.
 #
 
+# Check for database drivers, this is not done in the decorator
+# so this check is executed only once upon module load
+if settings.DATABASE_ENGINE.startswith('postgresql'):
+  LOCK_TYPE = "postgresql"
+elif settings.DATABASE_ENGINE == 'mysql':
+  LOCK_TYPE = "mysql"
+else:
+  LOCK_TYPE = None
+
 def require_lock(*tables):
   def _lock(func):
     def _do_lock(*args,**kws):
       cursor = connection.cursor()
-      cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
+
+      if LOCK_TYPE == "postgresql":
+        cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
+      elif LOCK_TYPE == "mysql":
+        # Not yet implemented
+        pass
 
       try:
         return func(*args,**kws)
       finally:
+        if LOCK_TYPE == "mysql":
+          # Not yet implemented
+          pass
+        
         if cursor:
           cursor.close()
     return _do_lock
