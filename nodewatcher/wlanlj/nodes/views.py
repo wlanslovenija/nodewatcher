@@ -53,13 +53,13 @@ def statistics(request):
   Displays some global statistics.
   """
   # Nodes by status
-  node_count = len(Node.objects.all())
-  others = node_count
+  node_count = Node.objects.all().count()
   nodes_by_status = []
   for s in Node.objects.exclude(node_type = NodeType.Test).order_by('status').values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
   # Nodes by template usage
+  others = Node.objects.exclude(node_type = NodeType.Test).count()
   templates_by_usage = []
   for t in Profile.objects.exclude(node__node_type = NodeType.Test).values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
@@ -85,10 +85,11 @@ def statistics(request):
       'nodes_by_status' : nodes_by_status,
       'nodes_by_project' : nodes_by_project,
       'nodes_warned' : Node.objects.filter(warnings = True).exclude(node_type = NodeType.Test).count(),
+      'nodes_test' : Node.objects.filter(node_type = NodeType.Test).count(),
       'subnet_count' : Subnet.objects.all().count(),
       'clients_online' : APClient.objects.all().count(),
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
-      'external_ant' : Node.objects.filter(ant_external = True).count(),
+      'external_ant' : Node.objects.filter(ant_external = True).exclude(node_type = NodeType.Test).count(),
       'template_usage' : templates_by_usage,
       'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'],
       'graphs' : [
