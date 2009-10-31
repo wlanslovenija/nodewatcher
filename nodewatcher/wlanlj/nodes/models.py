@@ -686,6 +686,7 @@ class WhitelistItem(models.Model):
   owner = models.ForeignKey(User)
   mac = models.CharField(max_length = 50)
   registred_at = models.DateTimeField()
+  description = models.CharField(max_length = 200, default = '')
 
 class PoolAllocationError(Exception):
   pass

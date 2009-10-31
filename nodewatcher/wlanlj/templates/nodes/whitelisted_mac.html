@@ -44,7 +44,13 @@
   {% for item in whitelist %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td align="center"><a href="/nodes/unwhitelist_mac/{{ item.id }}"><img src="/images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
-    <td>{{ item.mac }}</td>
+    <td>
+      {{ item.mac }}
+      {% if item.description %}
+      <br/>
+      <span class="small_text">{{ item.description }}</span>
+      {% endif %}
+    </td>
     <td>{{ item.registred_at|date }}</td>
   </tr>
   {% endfor %}
@@ -62,6 +68,10 @@
   <tr>
     <td></td>
     <td class="small_text">MAC address should be in the format <tt>XX:XX:XX:XX:XX</tt> or <tt>XX-XX-XX-XX-XX-XX</tt>.</td>
+  </tr>
+  <tr>
+    <td>{{ form.description.label }}</td>
+    <td>{{ form.description }}</td>
   </tr>
 </table>
 <div class="buttons">

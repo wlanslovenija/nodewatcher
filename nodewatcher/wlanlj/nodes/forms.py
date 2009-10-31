@@ -604,7 +604,7 @@ class AllocateSubnetForm(forms.Form):
   A simple form for subnet allocation.
   """
   network = forms.CharField(max_length = 50, required = False)
-  description = forms.CharField(max_length = 200)
+  description = forms.CharField(max_length = 200, widget = widgets.TextInput(attrs = {'size': '40'}))
   iface_type = forms.ChoiceField(
     choices = [
       (IfaceType.WiFi, 'WiFi'),
@@ -697,6 +697,7 @@ class WhitelistMacForm(forms.Form):
   A simple form for whitelisting a MAC address.
   """
   mac = forms.CharField(max_length = 17, label = _("MAC address"))
+  description = forms.CharField(max_length = 200, label = _("Description"), widget = widgets.TextInput(attrs = {'size': '40'}))
   
   def clean(self):
     """
@@ -722,6 +723,7 @@ class WhitelistMacForm(forms.Form):
     """
     item = WhitelistItem(owner = user)
     item.mac = self.cleaned_data.get('mac').upper()
+    item.description = self.cleaned_data.get('description')
     item.registred_at = datetime.now()
     item.save()
 
