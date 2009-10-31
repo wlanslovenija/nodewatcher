@@ -14,7 +14,8 @@ from datetime import datetime
 import re
 
 IPV4_ADDR_RE = re.compile(r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b')
-MAC_ADDR_RE = re.compile(r'([0-9A-Fa-f]{2}([:]|$)){6}')
+MAC_ADDR_RE = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
+MAC_ADDR_RE_ALT = re.compile(r'^([0-9A-Fa-f]{2}-){5}[0-9A-Fa-f]{2}$') # Windows displays MAC address as physical address with dashes
 NODE_NAME_RE = re.compile('(?:[a-zA-Z0-9]+-?[a-zA-Z0-9]*)*[a-zA-Z0-9]$')
 
 class RegisterNodeForm(forms.Form):
@@ -702,7 +703,9 @@ class WhitelistMacForm(forms.Form):
     Additional validation handler.
     """
     mac = self.cleaned_data.get('mac')
-    if not MAC_ADDR_RE.match(mac) or len(mac) != 17:
+    if MAC_ADDR_RE_ALT.match(mac):
+      self.cleaned_data['mac'] = mac.replace('-', ':')
+    elif not MAC_ADDR_RE.match(mac):
       raise forms.ValidationError(_("Enter a valid MAC address!"))
 
     try:

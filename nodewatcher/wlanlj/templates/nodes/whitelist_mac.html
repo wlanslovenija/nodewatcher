@@ -27,7 +27,7 @@
   {% endfor %}
 </div>
 {% endif %}
-<p>{% trans "Enter a MAC address to be whitelisted on all routers, so no splash screen confirmation will be needed. Please note that after you enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the mesh, so be patient!" %}
+<p>{% trans "Enter a MAC address (physical address of your WiFi network card) to be whitelisted on all routers, so no splash screen confirmation will be needed. Please note that after you enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the mesh, so be patient!" %}
 </p>
 <form action="/nodes/whitelist_mac" method="post">
 
