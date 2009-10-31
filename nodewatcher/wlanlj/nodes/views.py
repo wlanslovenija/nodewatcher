@@ -107,10 +107,9 @@ def my_nodes(request):
   Display a list of current user's nodes.
   """
   nodes = request.user.node_set.order_by('ip')
-  whitelist = request.user.whitelistitem_set.order_by('mac')
+  
   return render_to_response('nodes/my.html',
-    { 'nodes' : nodes,
-      'whitelist' : whitelist },
+    { 'nodes' : nodes },
     context_instance = RequestContext(request)
   )
 
@@ -323,7 +322,7 @@ def node_deallocate_subnet(request, subnet_id):
   )
 
 @login_required
-def whitelist_mac(request):
+def whitelisted_mac(request):
   """
   Display a form for whitelisting a MAC address.
   """
@@ -331,12 +330,14 @@ def whitelist_mac(request):
     form = WhitelistMacForm(request.POST)
     if form.is_valid():
       form.save(request.user)
-      return HttpResponseRedirect("/nodes/my_nodes")
+      return HttpResponseRedirect("/nodes/whitelisted_mac")
   else:
     form = WhitelistMacForm()
 
-  return render_to_response('nodes/whitelist_mac.html',
-    { 'form' : form },
+  whitelist = request.user.whitelistitem_set.order_by('mac')
+  return render_to_response('nodes/whitelisted_mac.html',
+    { 'form' : form,
+      'whitelist' : whitelist },
     context_instance = RequestContext(request)
   )
 
@@ -350,7 +351,7 @@ def unwhitelist_mac(request, item_id):
     raise Http404
   
   item.delete()
-  return HttpResponseRedirect("/nodes/my_nodes")
+  return HttpResponseRedirect("/nodes/whitelisted_mac")
 
 def whitelist(request):
   """

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Whitelisted MAC addresses" %}{% endblock %}
+{% block contenttype %}prefs{% endblock %}
+{% block content %}
+<h1>{% trans "Whitelisted MAC addresses" %}</h1>
+<ul id="tabs">
+  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
+  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
+  <li class="active"><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
+  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
+  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+</ul>
+<div id="tabcontent">
+{% if form.errors %}
+<div class="error">
+  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to whitelist a MAC address:" %}<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+{% if not whitelist %}
+<div class="notice">
+{% trans "You currently have no MAC addresses whitelisted." %}
+</div>
+{% else %}
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th width="22"></th>
+    <th><b>{% trans "MAC address" %}</b></th>
+    <th width="200"><b>{% trans "Registered at" %}</b></th>
+  </tr>
+</thead>
+<tbody>
+  {% for item in whitelist %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td align="center"><a href="/nodes/unwhitelist_mac/{{ item.id }}"><img src="/images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
+    <td>{{ item.mac }}</td>
+    <td>{{ item.registred_at|date }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+{% endif %}
+<p>{% trans "Enter a MAC address (physical address of your WiFi network card) to be whitelisted on all nodes, so no splash screen confirmation will be needed. Please note that after you enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the mesh, so be patient!" %}
+</p>
+<form action="/nodes/whitelisted_mac" method="post">
+<table border="0" width="700">
+  <tr>
+    <td>{{ form.mac.label }}</td>
+    <td>{{ form.mac }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">MAC address should be in the format <tt>XX:XX:XX:XX:XX</tt> or <tt>XX-XX-XX-XX-XX-XX</tt>.</td>
+  </tr>
+</table>
+<div class="buttons">
+      <input type="submit" value="{% trans "Whitelist" %}" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/my_nodes'" />
+</div>
+</form>
+</div>
+{% endblock %}

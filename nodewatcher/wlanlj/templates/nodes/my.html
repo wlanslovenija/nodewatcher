@@ -9,7 +9,7 @@
 <ul id="tabs">
   <li class="active">{% trans "My nodes" %}</li>
   <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li><a href="/nodes/whitelist_mac">{% trans "Whitelist a MAC address" %}</a></li>
+  <li><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
   <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
   <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
 </ul>
@@ -65,28 +65,6 @@
     <td align="center">{{ node.clients|default:"0" }}</td>
     {% endif %}
     <td align="center">{{ node.project|default:_("unknown") }}</td>
-  </tr>
-  {% endfor %}
-</tbody>
-</table>
-{% endif %}
-{% if whitelist %}
-<br/>
-{% trans "Whitelisted MAC addresses" %}:<br/>
-<table border="0" class="listing">
-<thead>
-  <tr>
-    <th width="22"></th>
-    <th><b>{% trans "MAC address" %}</b></th>
-    <th width="200"><b>{% trans "Registered at" %}</b></th>
-  </tr>
-</thead>
-<tbody>
-  {% for item in whitelist %}
-  <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="/nodes/unwhitelist_mac/{{ item.id }}"><img src="/images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
-    <td>{{ item.mac }}</td>
-    <td>{{ item.registred_at|date }}</td>
   </tr>
   {% endfor %}
 </tbody>
