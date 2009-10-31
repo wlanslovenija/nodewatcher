@@ -15,7 +15,7 @@ if len(sys.argv) != 2:
 TMP_DIR = "/tmp/__wlanlj_dump_package"
 
 os.mkdir(TMP_DIR)
-os.system("python manage.py dumpdata > /tmp/__wlanlj_dump.json")
+os.system("python manage.py dumpdata --settings=wlanlj.settings_production > /tmp/__wlanlj_dump.json")
 os.system("./sanitize-dump.py json /tmp/__wlanlj_dump.json %s/data.json" % TMP_DIR)
 os.system("cp -R %s %s" % (settings.GRAPH_DIR, TMP_DIR))
 os.system(r"find %s -name .svn -type d -exec rm -rf '{}' \; 2>/dev/null" % TMP_DIR)
