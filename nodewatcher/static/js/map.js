@@ -17,8 +17,8 @@ function updateStatusbar() {
   $('#gmap_statusbar').html("Visible " + visibleNodes + " of " + shownNodesNumber + " shown nodes" + (shownNodesNumber != nodes.length ? " (from " + nodes.length + " all nodes)" : ""));
 }
 
-function updateNodes(filtersNotChanged, zoomNotChanged, notMoved) {
-  if (!filtersNotChanged) {
+function updateNodes(filtersChanged, zoomChanged, moved) {
+  if (filtersChanged) {
     gmap.clearOverlays();
     
     shownNodes = {};
@@ -39,7 +39,7 @@ function updateNodes(filtersNotChanged, zoomNotChanged, notMoved) {
       }
     }
   }
-  else if (!zoomNotChanged) {
+  else if (zoomChanged) {
     var newShownLinks = [];
     for (var i = 0; i < shownLinks.length; i++) {
       gmap.removeOverlay(shownLinks[i].overlay);
@@ -58,6 +58,50 @@ function buildHash(lat, long, zoom) {
   return hash;
 }
 
+function readHash(hash) {
+  var params = {
+    "project": [],
+    "status": []
+  };
+  
+  if (hash) {
+    var splits = hash.split(/&/);
+    if (splits.length == 0) {
+      udpate_map();
+      return;
+    }
+    
+    for (var i = 0; i < splits.length; i++) {
+      var sp = splits[i].split(/=/);
+      if (sp.length == 2) {
+        if (sp[0] == "project") {
+          // Values have to be sorted so that they have unique representation (so arraysEqual works properly)
+          params.project = $.grep(sp[1].split(/,/), function (el, i) { return $('#gmap_project_' + el).attr('disabled'); }, true).sort();
+        }
+        else if (sp[0] == "status") {
+          // Values have to be sorted so that they have unique representation (so arraysEqual works properly)
+          params.status = sp[1].split(/,/).sort();
+        }
+        else {
+          params[sp[0]] = sp[1];
+        }
+      }
+    }
+    
+    if (params.type) {
+      var mapTypes = gmap.getMapTypes();
+      for (var m = 0; m < mapTypes.length; m++) {
+        if (mapTypes[m].getUrlArg() == params.type) {
+          params.type = mapTypes[m];
+          break;
+        }
+      }
+    }
+  }
+  
+  return params;
+}
+
 function centerMap() {
   var id = $('#gmap_center').val();
   
@@ -68,40 +112,72 @@ function centerMap() {
     if (nodes[i].project == id) bounds.extend(new google.maps.LatLng(nodes[i].lat, nodes[i].long));
   }
   
-  var zoom = gmap.getBoundsZoomLevel(bounds);
-  var filtersNotChanged = true;
-  
   if ($('#gmap_project_' + id + ':checked').length == 0) {
     updating = true;
   
     $('#gmap_project_' + id).attr('checked', 'checked');
   
     updating = false;
-    
-    filtersNotChanged = false;
   }
   
   $('#gmap_center_default').attr('disabled', 'disabled');
   
   centering = true;
   
-  $.history.load(buildHash(bounds.getCenter().lat(), bounds.getCenter().lng(), zoom), { "filtersNotChanged": filtersNotChanged, "zoomNotChanged": gmap.getZoom() == zoom ? true : false, "notMoved": false });
+  $(window).updatehash(buildHash(bounds.getCenter().lat(), bounds.getCenter().lng(), gmap.getBoundsZoomLevel(bounds)));
   
   centering = false;
 }
 
-function updateMap(changeData) {
+function updateMap() {
   if (updating) return;
   
-  $.history.load(buildHash(gmap.getCenter().lat(), gmap.getCenter().lng(), gmap.getZoom()), changeData);
+  $(window).updatehash(buildHash(gmap.getCenter().lat(), gmap.getCenter().lng(), gmap.getZoom()));
+}
+
+function arraysEqual(first, second) {
+  if (first.length != second.length) {
+    return false;
+  }
+  for (var i = 0; i < first.length; i++) {
+    if (first[i] != second[i]) return false;
+  }
+  return true;
+}
+
+function checkFiltersChanged(currentParams, oldParams) {
+  if (arraysEqual(currentParams.project, oldParams.project) && arraysEqual(currentParams.status, oldParams.status)) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+function checkZoomChanged(currentParams, oldParams) {
+  if (oldParams.zoom && (currentParams.zoom == oldParams.zoom)) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+function checkMoved(currentParams, oldParams) {
+  if (oldParams.lat && oldParams.long && (currentParams.lat == oldParams.lat) && (currentParams.long == oldParams.long)) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 function mapInit(map) {
   gmap = map;
   
-  google.maps.Event.addListener(map, "zoomend", function () { updateMap( { "filtersNotChanged": true, "zoomNotChanged": false, "notMoved": true } ); });
-  google.maps.Event.addListener(map, "moveend", function () { updateMap( { "filtersNotChanged": true, "zoomNotChanged": true, "notMoved": false } ); });
-  google.maps.Event.addListener(map, "maptypechanged", function () { updateMap( { "filtersNotChanged": true, "zoomNotChanged": true, "notMoved": true } ); });
+  google.maps.Event.addListener(map, "zoomend", function () { updateMap(); });
+  google.maps.Event.addListener(map, "moveend", function () { updateMap(); });
+  google.maps.Event.addListener(map, "maptypechanged", function () { updateMap(); });
   
   var lock = false;
   google.maps.Event.addListener(map, "move", function () {
@@ -117,80 +193,49 @@ function mapInit(map) {
 
   $(document).ready(function () {
     $('#gmap_center').change(function () { centerMap(); });
-    $('input[name="gmap_project"]').change(function () { updateMap( { "filtersNotChanged": false, "zoomNotChanged": true, "notMoved": true } ); });
-    $('input[name="gmap_status"]').change(function () { updateMap( { "filtersNotChanged": false, "zoomNotChanged": true, "notMoved": true } ); });
+    $('input[name="gmap_project"]').change(function () { updateMap(); });
+    $('input[name="gmap_status"]').change(function () { updateMap(); });
     
-    var oldhash = "";
-    $.history.init(function (hash, changeData) {
-      if (!changeData) changeData = {};
+    $(window).hashchange(function (event, data) {
+      var currentHash = data.currentHash;
+      var oldHash = data.oldHash;
       
-      if (hash) {
-        if (hash == oldhash) {
-          return;
-        }
-        else {
-          oldhash = hash;
-        }
-      
-        if (!changeData.notMoved || !changeData.zoomNotChanged) {
+      if (currentHash) {
+        var currentParams = readHash(currentHash);
+        var oldParams = readHash(oldHash);
+        
+        if (!currentParams.lat) currentParams.lat = gmap.getCenter().lat();
+        if (!currentParams.long) currentParams.long = gmap.getCenter().lng();
+        if (!currentParams.zoom) currentParams.zoom = gmap.getZoom();
+        if (!currentParams.type) currentParams.type = gmap.getCurrentMapType();
+        
+        var filtersChanged = checkFiltersChanged(currentParams, oldParams);
+        var zoomChanged = checkZoomChanged(currentParams, oldParams);
+        var moved = checkMoved(currentParams, oldParams);
+        
+        if (moved || zoomChanged) {
           if (!centering) {
             $('#gmap_center_default').removeAttr('disabled');
             $('#gmap_center').val("");
           }
         }
         
-        var splits = hash.split(/&/);
-        if (splits.length == 0) {
-          udpate_map();
-          return;
-        }
-        
-        var params = {
-          "lat": gmap.getCenter().lat(),
-          "long": gmap.getCenter().lng(),
-          "zoom": gmap.getZoom(),
-          "type": gmap.getCurrentMapType().getUrlArg(),
-          "project": [],
-          "status": []
-        };
-        
-        for (var i = 0; i < splits.length; i++) {
-          var sp = splits[i].split(/=/);
-          if (sp.length == 2) {
-            if (sp[0] == "project") {
-              params.project = $.grep(sp[1].split(/,/), function (el, i) { return $('#gmap_project_' + el).attr('disabled'); }, true);
-            }
-            else if (sp[0] == "status") {
-              params.status = sp[1].split(/,/);
-            }
-            else {
-              params[sp[0]] = sp[1];
-            }
-          }
-        }
-        
-        var mapType = gmap.getCurrentMapType();
-        var mapTypes = gmap.getMapTypes();
-        for (var m = 0; m < mapTypes.length; m++) {
-          if (mapTypes[m].getUrlArg() == params.type) {
-            mapType = mapTypes[m];
-            break;
-          }
-        }
-        
         updating = true;
         
-        gmap.setCenter(new google.maps.LatLng(params.lat, params.long), parseInt(params.zoom), mapType);
+        gmap.setCenter(new google.maps.LatLng(currentParams.lat, currentParams.long), parseInt(currentParams.zoom), currentParams.type);
         
-        $('input[name="gmap_project"]').val(params.project);
-        $('input[name="gmap_status"]').val(params.status);
+        $('input[name="gmap_project"]').val(currentParams.project);
+        $('input[name="gmap_status"]').val(currentParams.status);
         
         updating = false;
         
-        updateNodes(changeData.filtersNotChanged, changeData.zoomNotChanged, changeData.notMoved);
+        updateNodes(filtersChanged, zoomChanged, moved);
       }
-      else {
-        updateMap( { "filtersNotChanged": false, "zoomNotChanged": false, "notMoved": false } );
+      // We set hash from map state only the first time, if later user deletes/clears hash we do nothing
+      // (user could just be going back through history where also an entry with a map URL without hash is
+      // and if we set hash again user would be blocked from navigating further back)
+      else if (!oldHash) {
+        updateMap();
       }
     });
   });
