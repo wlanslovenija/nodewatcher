@@ -108,9 +108,16 @@ function centerMap() {
   if (!id) return;
   
   var bounds = new google.maps.LatLngBounds();
+  var count = 0;
   for (var i = 0; i < nodes.length; i++) {
-    if (nodes[i].project == id) bounds.extend(new google.maps.LatLng(nodes[i].lat, nodes[i].long));
+    if (nodes[i].project == id) {
+      bounds.extend(new google.maps.LatLng(nodes[i].lat, nodes[i].long));
+      count++;
+    }
   }
+  
+  // To be robust if user manages to select disabled center map entry
+  if (!count) return;
   
   if ($('#gmap_project_' + id + ':checked').length == 0) {
     updating = true;
