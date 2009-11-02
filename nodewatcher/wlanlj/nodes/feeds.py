@@ -25,6 +25,9 @@ class LatestEvents(Feed):
 
     return Event.objects.filter(node__owner = obj).order_by('-timestamp')[:30]
 
+  def item_pubdate(self, item):
+    return item.timestamp
+
   def item_link(self, item):
     return "http://nodes.wlan-lj.net/nodes/node/%s#evt%s" % (item.node.ip, item.id)
 
