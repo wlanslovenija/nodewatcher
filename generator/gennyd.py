@@ -110,7 +110,7 @@ def generate_image(d):
     
     # Read image version
     f = open("etc/version", 'r')
-    version = f.read()
+    version = f.read().replace('.', '_')
     f.close()
 
     # Generate checksum
@@ -149,7 +149,7 @@ def generate_image(d):
     
     # Read image version
     f = open("build/files/etc/version", 'r')
-    version = f.read()
+    version = f.read().replace('.', '_')
     f.close()
 
     # Get resulting image
