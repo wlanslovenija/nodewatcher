@@ -182,9 +182,9 @@ function checkMoved(currentParams, oldParams) {
 function mapInit(map) {
   gmap = map;
   
-  google.maps.Event.addListener(map, "zoomend", function () { updateMap(); });
-  google.maps.Event.addListener(map, "moveend", function () { updateMap(); });
-  google.maps.Event.addListener(map, "maptypechanged", function () { updateMap(); });
+  google.maps.Event.addListener(map, "zoomend", updateMap);
+  google.maps.Event.addListener(map, "moveend", updateMap);
+  google.maps.Event.addListener(map, "maptypechanged", updateMap);
   
   var lock = false;
   google.maps.Event.addListener(map, "move", function () {
@@ -199,9 +199,17 @@ function mapInit(map) {
   });
 
   $(document).ready(function () {
-    $('#gmap_center').change(function () { centerMap(); });
-    $('input[name="gmap_project"]').change(function () { updateMap(); });
-    $('input[name="gmap_status"]').change(function () { updateMap(); });
+    $('#gmap_center').change(centerMap);
+    $('input[name="gmap_project"]').change(updateMap);
+    $('input[name="gmap_status"]').change(updateMap);
+    
+    // Workaround for IE handling of change event which is not triggered until input element loses its focus
+    if ($.browser.msie) {
+      $('input:radio,input:checkbox').click(function () {
+        this.blur();
+        this.focus();
+      });
+    }
     
     $(window).hashchange(function (event, data) {
       var currentHash = data.currentHash;
