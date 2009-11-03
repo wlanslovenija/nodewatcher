@@ -149,7 +149,6 @@ def generate_image(d):
       version = f.read().strip().replace('.', '_')
       f.close()
     except:
-      raise
       version = 'unknown'
 
     # Get resulting image
