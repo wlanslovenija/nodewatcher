@@ -4,12 +4,26 @@ from wlanlj.nodes.models import Node, Subnet as SubnetAllocation
 from wlanlj.generator.types import IfaceType
 import os
 
+class ImageFile(models.Model):
+  """
+  This class represents an image filename for template.
+  """
+  name = models.CharField(max_length = 200)
+  type = models.CharField(max_length = 20, null = True) # type should be null if template has only one image file type
+  
+  def __unicode__(self):
+    """
+    Return human readable image filename.
+    """
+    return self.name
+
 class Template(models.Model):
   """
   This class represents a preconfigured profile for image generation. This
   corresponds to options passed on to the image generator.
   """
   name = models.CharField(max_length = 50)
+  short_name = models.CharField(max_length = 50)
   description = models.CharField(max_length = 200)
 
   # Profile metadata for the generator
@@ -22,7 +36,7 @@ class Template(models.Model):
   channel = models.IntegerField()
   port_layout = models.CharField(max_length = 20)
   imagebuilder = models.CharField(max_length = 100)
-  imagefile = models.CharField(max_length = 200)
+  imagefiles = models.ManyToManyField(ImageFile)
 
   def __unicode__(self):
     """

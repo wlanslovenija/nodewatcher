@@ -100,17 +100,31 @@ def generate_image(d):
   if d['only_config']:
     # Just pack configuration and send it
     prefix = hashlib.md5(os.urandom(32)).hexdigest()[0:16]
-    zip = ZipFile(os.path.join(DESTINATION, prefix + "-config.zip"), 'w', ZIP_DEFLATED)
+    tempfile = os.path.join(DESTINATION, prefix + "-config.zip")
+    zip = ZipFile(tempfile, 'w', ZIP_DEFLATED)
     os.chdir('build/files')
     for root, dirs, files in os.walk("etc"):
       for file in files:
         zip.write(os.path.join(root, file))
     zip.close()
+    
+    # Read image version
+    f = open("etc/version", 'r')
+    version = f.read()
+    f.close()
 
     # Generate checksum
-    f = open(os.path.join(DESTINATION, prefix + "-config.zip"), 'r')
-    checksum = hashlib.md5(f.read()).hexdigest()
+    f = open(tempfile, 'r')
+    checksum = hashlib.md5(f.read())
     f.close()
+    
+    # We can take just first 22 characters as checksums are fixed size and we can reconstruct it
+    filechecksum = urlsafe_b64encode(checksum.digest())[:22]
+    checksum = checksum.hexdigest()
+    
+    result = "%s-%s-%s-config-%s.zip" % (d['hostname'], d['router_name'], version, filechecksum)
+    destination = os.path.join(DESTINATION, result)
+    os.rename(tempfile, destination)
 
     # Send an e-mail
     t = loader.get_template('generator/email_config.txt')
@@ -118,7 +132,7 @@ def generate_image(d):
       'hostname'  : d['hostname'],
       'ip'        : d['ip'],
       'username'  : d['vpn_username'],
-      'config'    : prefix + "-config.zip",
+      'config'    : result,
       'checksum'  : checksum
     })
 
@@ -132,10 +146,15 @@ def generate_image(d):
   else:
     # Generate full image
     x.build("build/%s" % d['imagebuilder'])
+    
+    # Read image version
+    f = open("build/files/etc/version", 'r')
+    version = f.read()
+    f.close()
 
     # Get resulting image
     files = []
-    for file in d['imagefiles']:
+    for file, type in d['imagefiles']:
       file = str(file)
       source = "%s/build/%s/bin/%s" % (WORKDIR, d['imagebuilder'], file)
 
@@ -143,13 +162,14 @@ def generate_image(d):
       checksum = hashlib.md5(f.read())
       f.close()
       
-      # We can take just first 22 characters as checksums have fixed size and we can reconstruct it
-      prefix = urlsafe_b64encode(checksum.digest())[:22]
+      # We can take just first 22 characters as checksums are fixed size and we can reconstruct it
+      filechecksum = urlsafe_b64encode(checksum.digest())[:22]
       checksum = checksum.hexdigest()
       
-      destination = "%s-%s" % (os.path.join(DESTINATION, prefix), file)
+      result = "%s-%s-%s%s-%s.zip" % (d['hostname'], d['router_name'], version, ("-%s" % type if type else ""), filechecksum)      
+      destination = os.path.join(DESTINATION, result)
       os.rename(source, destination)
-      files.append({ 'name' : "%s-%s" % (prefix, file), 'checksum' : checksum })
+      files.append({ 'name' : result, 'checksum' : checksum })
 
     # Send an e-mail
     t = loader.get_template('generator/email.txt')
