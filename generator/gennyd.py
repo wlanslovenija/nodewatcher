@@ -166,7 +166,9 @@ def generate_image(d):
       filechecksum = urlsafe_b64encode(checksum.digest())[:22]
       checksum = checksum.hexdigest()
       
-      result = "%s-%s-%s%s-%s.zip" % (d['hostname'], d['router_name'], version, ("-%s" % type if type else ""), filechecksum)      
+      (_, ext) = os.path.splitext(file)
+      
+      result = "%s-%s-%s%s-%s%s" % (d['hostname'], d['router_name'], version, ("-%s" % type if type else ""), filechecksum, ext)      
       destination = os.path.join(DESTINATION, result)
       os.rename(source, destination)
       files.append({ 'name' : result, 'checksum' : checksum })
