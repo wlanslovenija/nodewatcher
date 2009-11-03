@@ -25,6 +25,7 @@ from traceback import format_exc
 import pwd
 from zipfile import ZipFile, ZIP_DEFLATED
 from base64 import urlsafe_b64encode
+from glob import glob
 
 WORKDIR = "/home/generator"
 DESTINATION = "/var/www/nodes.wlan-lj.net/results"
@@ -108,11 +109,6 @@ def generate_image(d):
         zip.write(os.path.join(root, file))
     zip.close()
     
-    # Read image version
-    f = open("etc/version", 'r')
-    version = f.read().replace('.', '_')
-    f.close()
-
     # Generate checksum
     f = open(tempfile, 'r')
     checksum = hashlib.md5(f.read())
@@ -122,7 +118,7 @@ def generate_image(d):
     filechecksum = urlsafe_b64encode(checksum.digest())[:22]
     checksum = checksum.hexdigest()
     
-    result = "%s-%s-%s-config-%s.zip" % (d['hostname'], d['router_name'], version, filechecksum)
+    result = "%s-%s-config-%s.zip" % (d['hostname'], d['router_name'], filechecksum)
     destination = os.path.join(DESTINATION, result)
     os.rename(tempfile, destination)
 
@@ -148,9 +144,13 @@ def generate_image(d):
     x.build("build/%s" % d['imagebuilder'])
     
     # Read image version
-    f = open("build/files/etc/version", 'r')
-    version = f.read().replace('.', '_')
-    f.close()
+    try:
+      f = open(glob('%s/build/%s/build_dir/target-*/root-*/etc/version' % (WORKDIR, d['imagebuilder']))[0], 'r')
+      version = f.read().strip().replace('.', '_')
+      f.close()
+    except:
+      raise
+      version = 'unknown'
 
     # Get resulting image
     files = []
@@ -166,8 +166,8 @@ def generate_image(d):
       filechecksum = urlsafe_b64encode(checksum.digest())[:22]
       checksum = checksum.hexdigest()
       
-      (_, ext) = os.path.splitext(file)
-      
+      ext = os.path.splitext(file)[1]
+
       result = "%s-%s-%s%s-%s%s" % (d['hostname'], d['router_name'], version, ("-%s" % type if type else ""), filechecksum, ext)      
       destination = os.path.join(DESTINATION, result)
       os.rename(source, destination)
@@ -181,7 +181,7 @@ def generate_image(d):
       'username'  : d['vpn_username'],
       'files'     : files
     })
-
+    
     send_mail(
       '[wlan-lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
       t.render(c),
