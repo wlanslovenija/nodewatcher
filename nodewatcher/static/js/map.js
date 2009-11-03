@@ -203,14 +203,6 @@ function mapInit(map) {
     $('input[name="gmap_project"]').change(updateMap);
     $('input[name="gmap_status"]').change(updateMap);
     
-    // Workaround for IE handling of change event which is not triggered until input element loses its focus
-    if ($.browser.msie) {
-      $('input:radio,input:checkbox').click(function () {
-        this.blur();
-        this.focus();
-      });
-    }
-    
     $(window).hashchange(function (event, data) {
       var currentHash = data.currentHash;
       var oldHash = data.oldHash;
