@@ -3,9 +3,9 @@
  * http://mitar.tnode.com/
  * In kind public domain.
  *
- * $Id$
- * $Revision$
- * $HeadURL$
+ * $Id: jquery.hashchange.js 110 2009-11-06 20:23:46Z mitar $
+ * $Revision: 110 $
+ * $HeadURL: https://common.tnode.com/svn/mitar/hashchange/trunk/src/jquery.hashchange.js $
 */
 
 (function ($) {		
