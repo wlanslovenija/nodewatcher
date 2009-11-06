@@ -272,7 +272,7 @@ class Node(models.Model):
     elif self.node_type == NodeType.Mobile:
       return _("Mobile node")
     else:
-      return _("Unknown")
+      return _("Unknown node")
 
   def node_type_as_string_plural(self):
     """
