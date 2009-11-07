@@ -40,16 +40,18 @@
       </form>
       <div id="metanav" class="nav">
     <ul>
-      {% if user.is_authenticated %}
       {% spaceless %}
+      {% if user.is_authenticated %}
       <li class="first">{% trans "logged in as" %} {{ user.username }}</li>
-      <li> <a href="/auth/logout">{% trans "Logout" %}</a></li>
-      <!-- <li class="last"> <a href="/user/settings">Preferences</a></li> -->
-      <li class="last"> <a href="/nodes/my_nodes">{% trans "My Nodes" %}</a></li>
-      {% endspaceless %}
+      <li><a href="/auth/logout">{% trans "Logout" %}</a></li>
+      <li><a href="http://wlan-lj.net/prefs">Preferences</a></li>
+      <li class="last"><a href="/nodes/my_nodes">{% trans "My Nodes" %}</a></li>
       {% else %}
       <li class="first"><a href="/auth/login">{% trans "Login" %}</a></li>
+      <li><a href="http://wlan-lj.net/prefs">{% trans "Preferences" %}</a></li>
+      <li><a href="http://wlan-lj.net/register">{% trans "Register" %}</a></li>
       {% endif %}
+      {% endspaceless %}
     </ul>
 
   </div>
