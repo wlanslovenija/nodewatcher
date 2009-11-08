@@ -128,4 +128,6 @@ GRAPH_TIMESPANS = (
 MONITOR_WORKDIR = '/home/monitor'
 MONITOR_WORKERS = 20
 MONITOR_OLSR_HOST = '127.0.0.1'
+MONITOR_USER = 'monitor'
+MONITOR_LOGFILE = '/var/log/wlanlj-monitor.log'
 
