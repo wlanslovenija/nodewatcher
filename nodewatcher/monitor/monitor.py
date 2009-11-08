@@ -434,7 +434,7 @@ def check_mesh_status():
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
-  nodes, hna = OlsrParser.getTables()
+  nodes, hna = OlsrParser.getTables(settings.MONITOR_OLSR_HOST)
 
   # Create a topology plotter
   topology = DotTopologyPlotter()

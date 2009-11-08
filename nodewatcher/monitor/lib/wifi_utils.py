@@ -26,9 +26,14 @@ class OlsrParser(object):
     return node
 
   @staticmethod
-  def getTables():
+  def getTables(olsr_ip = "127.0.0.1"):
+    """
+    Parses OLSR tables to extract topology and announce infos.
+
+    @param olsr_ip: IP address of the router instance
+    """
     try:
-      response = urllib2.urlopen('http://127.0.0.1:2006')
+      response = urllib2.urlopen('http://%s:2006' % olsr_ip)
     except:
       return None
 
