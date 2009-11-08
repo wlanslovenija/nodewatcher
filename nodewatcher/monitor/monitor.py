@@ -507,31 +507,6 @@ def check_mesh_status():
     topology.addNode(node)
 
   topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'))
-  
-  # Ping the nodes to prepare information for later node processing
-  results, dupes = PingParser.pingHosts(10, nodesToPing)
-
-  # We MUST commit the current transaction here, because we will be processing
-  # some transactions in parallel and must ensure that this transaction that has
-  # modified the nodes is commited. Otherwise this will deadlock!
-  transaction.commit()
-  
-  worker_results = []
-  for node_ip in nodesToPing:
-    worker_results.append(
-      WORKER_POOL.apply_async(process_node, (node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links))
-    )
-  
-  # Wait for all workers to finish processing
-  ex = None
-  for result in worker_results:
-    try:
-      result.get()
-    except Exception, e:
-      ex = e
-  
-  if ex is not None:
-    raise ex
 
   # Update valid subnet status in the database
   for nodeIp, subnets in hna.iteritems():
@@ -605,9 +580,31 @@ def check_mesh_status():
   for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, visible = False):
     Event.create_event(s.node, EventCode.SubnetRestored, '', EventSource.Monitor, data = 'Subnet: %s/%s' % (s.subnet, s.cidr))
     s.delete()
+  
+  # Ping the nodes to prepare information for later node processing
+  results, dupes = PingParser.pingHosts(10, nodesToPing)
 
-  # Commit transaction
+  # We MUST commit the current transaction here, because we will be processing
+  # some transactions in parallel and must ensure that this transaction that has
+  # modified the nodes is commited. Otherwise this will deadlock!
   transaction.commit()
+  
+  worker_results = []
+  for node_ip in nodesToPing:
+    worker_results.append(
+      WORKER_POOL.apply_async(process_node, (node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links))
+    )
+  
+  # Wait for all workers to finish processing
+  ex = None
+  for result in worker_results:
+    try:
+      result.get()
+    except Exception, e:
+      ex = e
+  
+  if ex is not None:
+    raise ex
 
 if __name__ == '__main__':
   info = pwd.getpwnam('monitor')
