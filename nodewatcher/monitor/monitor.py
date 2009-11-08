@@ -147,14 +147,18 @@ def check_global_statistics():
   Graph some global statistics.
   """
   transaction.set_dirty()
-  stats = fetch_traffic_statistics()
-  rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
-  RRA.update(None, RRALocalTraffic, rra,
-    stats['statistics:to-inet'],
-    stats['statistics:from-inet'],
-    stats['statistics:internal']
-  )
-  RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra, rra, rra)
+
+  try:
+    stats = fetch_traffic_statistics()
+    rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
+    RRA.update(None, RRALocalTraffic, rra,
+      stats['statistics:to-inet'],
+      stats['statistics:from-inet'],
+      stats['statistics:internal']
+    )
+    RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra, rra, rra)
+  except:
+    logging.warning("Unable to process local server traffic information, skipping!")
 
   # Nodes by status
   nbs = {}
@@ -194,9 +198,12 @@ def check_dead_graphs():
     pathArchive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
     pathImage = graph.graph
     conf = RRA_CONF_MAP[graph.type]
-
-    RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())), dead = True,
-              *[pathArchive for i in xrange(len(conf.sources))])
+    
+    try:
+      RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())), dead = True,
+                *[pathArchive for i in xrange(len(conf.sources))])
+    except OSError:
+      logging.warning("Skipping dead non-existant graph '%s'!" % graph.rra)
 
 @transaction.commit_on_success
 def process_node(node_ip, ping_results, is_duped, peers):
