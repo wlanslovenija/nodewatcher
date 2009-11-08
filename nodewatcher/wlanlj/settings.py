@@ -123,3 +123,8 @@ GRAPH_TIMESPANS = (
   ('month', 2678400),
   ('year',  33053184)
 )
+
+# Monitor configuration
+MONITOR_WORKDIR = '/home/monitor'
+MONITOR_WORKERS = 20
+
