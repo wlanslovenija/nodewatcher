@@ -607,21 +607,24 @@ def check_mesh_status():
     raise ex
 
 if __name__ == '__main__':
-  info = pwd.getpwnam('monitor')
-
   # Configure logger
   logging.basicConfig(level = logging.DEBUG,
                       format = '%(asctime)s %(levelname)-8s %(message)s',
                       datefmt = '%a, %d %b %Y %H:%M:%S',
-                      filename = '/var/log/wlanlj-monitor.log',
+                      filename = settings.MONITOR_LOGFILE,
                       filemode = 'a')
-
-  # Change ownership of RRA directory
-  os.chown(os.path.join(settings.MONITOR_WORKDIR, 'rra'), info.pw_uid, info.pw_gid)
-
-  # Drop user privileges
-  #os.setgid(info.pw_gid)
-  #os.setuid(info.pw_uid)
+  
+  try:
+    info = getpwnam(settings.MONITOR_USER)
+    
+    # Change ownership of RRA directory
+    os.chown(os.path.join(settings.MONITOR_WORKDIR, 'rra'), info.pw_uid, info.pw_gid)
+    
+    # Drop user privileges
+    #os.setgid(info.pw_gid)
+    #os.setuid(info.pw_uid)
+  except:
+    logging.warning("Failed to chown monitor RRA storage directory!")
 
   # Create worker pool and start processing
   logging.info("wlan ljubljana mesh monitoring system is initializing...")
