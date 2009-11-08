@@ -127,4 +127,5 @@ GRAPH_TIMESPANS = (
 # Monitor configuration
 MONITOR_WORKDIR = '/home/monitor'
 MONITOR_WORKERS = 20
+MONITOR_OLSR_HOST = '127.0.0.1'
 
