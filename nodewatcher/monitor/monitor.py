@@ -17,6 +17,8 @@ print "=========================================================================
 parser = OptionParser()
 parser.add_option('--path', dest = 'path', help = 'Path that contains "wlanlj" nodewatcher installation')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
+parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit', action = 'store_true')
+parser.add_option('--graph-type', dest = 'graph_type', help = 'Only regenerate graphs of specified type (in combination with --regenerate-graphs)')
 options, args = parser.parse_args()
 
 if not options.path:
@@ -184,6 +186,28 @@ def check_global_statistics():
   rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
   RRA.update(None, RRAClients, rra, client_count)
   RRA.graph(RRAClients, 'Global Client Count', 'global_client_count.png', rra)
+
+def regenerate_graphs():
+  """
+  Regenerates all undead graphs from RRAs.
+  """
+  global options
+  graphs = GraphItem.objects.filter(dead = False)
+  if options.graph_type:
+    graphs = graphs.filter(type = int(options.graph_type))
+
+  for graph in graphs:
+    # Redraw the graph
+    print ">>> Regenerating graph '%s/%s'..." % (graph.node.ip, graph.title)
+    pathArchive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
+    pathImage = graph.graph
+    conf = RRA_CONF_MAP[graph.type]
+    
+    try:
+      RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())),
+                *[pathArchive for i in xrange(len(conf.sources))])
+    except OSError:
+      print ">>> Unable to regenerate graph from RRA '%s'!" % graph.rra
 
 @transaction.commit_on_success
 def check_dead_graphs():
@@ -644,6 +668,13 @@ if __name__ == '__main__':
     #os.setuid(info.pw_uid)
   except:
     logging.warning("Failed to chown monitor RRA storage directory!")
+
+  # Check if we should just regenerate the graphs
+  if options.regenerate_graphs:
+    print ">>> Regenerating graphs from RRAs..."
+    regenerate_graphs()
+    print ">>> Graph generation completed."
+    exit(0)
   
   # Output warnings when debug mode is enabled
   if settings.DEBUG:
