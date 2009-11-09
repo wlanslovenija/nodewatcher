@@ -211,6 +211,9 @@ class Node(models.Model):
     self.memfree = None
     self.numproc = None
     self.captive_portal_status = True
+
+    # Also remove any LQ graphs with this node on other nodes
+    GraphItem.objects.filter(type = GraphType.LQ, name = self.ip).delete()
   
   def has_time_sync_problems(self):
     """
