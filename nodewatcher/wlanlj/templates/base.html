@@ -67,10 +67,12 @@
         <li><a href="http://wlan-lj.net/wiki/Podrobnosti">Tehnične podrobnosti</a></li>
         <li><a href="http://wlan-lj.net/browser">Izvorna koda</a></li>
         <li><a href="http://wlan-lj.net/report">Opravila, napake</a></li>
+        {% if user.is_authenticated %}
         <li><a href="http://wlan-lj.net/newticket">Novo opravilo, napaka</a></li>
+        {% endif %}
         <li><a accesskey="3" href="http://wlan-lj.net/roadmap">Roadmap</a></li>
         <li><a accesskey="2" href="http://wlan-lj.net/timeline">Timeline</a></li>
-        <li><a accesskey="2" href="http://wlan-lj.net/contact">Kontakt</a></li>
+        <li><a href="http://wlan-lj.net/contact">Stik / Contact</a></li>
       <li id="donate">
 	  <form action="https://www.paypal.com/cgi-bin/webscr" method="post"><div><input type="hidden" name="__FORM_TOKEN" value="00fa7a249fab8848776c4663" />
         <input type="hidden" name="cmd" value="_s-xclick" />
@@ -83,6 +85,7 @@
     <div id="main">
       <div id="ctxtnav" class="nav">
         <h2>Context Navigation</h2>
+{% block ctxtnav %}
 {% spaceless %}
 <ul>
       <li class="first"><a href="/nodes/node_list">{% trans "Node List" %}</a></li>
@@ -93,6 +96,7 @@
       <li><a href="/nodes/map">{% trans "Node Map" %}</a></li>
 </ul>
 {% endspaceless %}
+{% endblock %}
         <hr />
       </div>
 <div id="content" class="{% block contenttype %}nodes{% endblock %}">

@@ -3,6 +3,10 @@
 
 {% block title %}{% trans "Login" %}{% endblock %}
 
+{% block contenttype %}login{% endblock %}
+
+{% block ctxtnav %}{% endblock %}
+
 {% block content %}
 <h1>Login</h1>
 
@@ -24,7 +28,20 @@
 <div>
 {{ form.password.label_tag }}
 {{ form.password }}
+<p class="hint">
+  <a href="http://wlan-lj.net/reset_password">Forgot your password?</a>
+</p>
 </div>
-<div><input type="submit" value="{% trans "Login" %}" /></div>
+<div class="buttons"><input type="submit" value="{% trans "Login" %}" /></div>
 </form>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+$(document).ready(function () {
+  $('#id_username')[0].focus();
+});
+/* ]]> */
+</script>
 {% endblock %}
