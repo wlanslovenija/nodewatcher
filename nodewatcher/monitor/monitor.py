@@ -594,7 +594,15 @@ def check_mesh_status():
   # Ping the nodes to prepare information for later node processing
   results, dupes = PingParser.pingHosts(10, nodesToPing)
   
-  if not settings.MONITOR_DISABLE_MULTIPROCESSING:
+  if hasattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING') and settings.MONITOR_DISABLE_MULTIPROCESSING:
+    # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually
+    # used for debug purpuses where a single process is prefered)
+    for node_ip in nodesToPing:
+      process_node(node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links)
+    
+    # Commit the transaction here since we do everything in the same session
+    transaction.commit()
+  else:
     # We MUST commit the current transaction here, because we will be processing
     # some transactions in parallel and must ensure that this transaction that has
     # modified the nodes is commited. Otherwise this will deadlock!
@@ -616,14 +624,6 @@ def check_mesh_status():
     
     if ex is not None:
       raise ex
-  else:
-    # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually
-    # used for debug purpuses where a single process is prefered)
-    for node_ip in nodesToPing:
-      process_node(node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links)
-    
-    # Commit the transaction here since we do everything in the same session
-    transaction.commit()
 
 if __name__ == '__main__':
   # Configure logger
