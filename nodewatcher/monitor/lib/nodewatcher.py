@@ -1,75 +1,66 @@
-from __future__ import with_statement
-import urllib2
+# XXX Do NOT use urllib2 here as it causes memory leaks!
+import urllib
 import socket
-import threading
-from Queue import Queue, Empty
 
-class NodeWatcher(object):
+def fetch_node_info(node_ip):
   """
-  Parser for nodewatcher feeds from nodes.
+  Fetches node information via HTTP.
   """
-  @staticmethod
-  def fetch(nodeIp):
-    """
-    Fetches node information via HTTP.
-    """
-    socket.setdefaulttimeout(15)
-    try:
-      info = {}
-      data = urllib2.urlopen('http://%s/cgi-bin/nodewatcher' % nodeIp).read(512 * 1024)
-      for line in data.split('\n'):
-        if not line:
-          break
+  socket.setdefaulttimeout(15)
+  try:
+    info = {}
+    data = urllib.urlopen('http://%s/cgi-bin/nodewatcher' % node_ip).read()
+    for line in data.split('\n'):
+      if not line:
+        break
 
-        if line[0] == ';':
-          continue
+      if line[0] == ';':
+        continue
 
-        key, value = line.split(':', 1)
-        value = value.strip()
-        key = key.split('.')
+      key, value = line.split(':', 1)
+      value = value.strip()
+      key = key.split('.')
 
-        d = info
-        for part in key[:-1]:
-          d = d.setdefault(part, {})
-        
-        d[key[-1]] = value
-    except:
-      return None
+      d = info
+      for part in key[:-1]:
+        d = d.setdefault(part, {})
+      
+      d[key[-1]] = value
+  except:
+    return None
 
-    return info
-  
-  @staticmethod
-  def frequency_to_channel(frequency):
-    """
-    Converts a given frequency to a channel number.
-    """
-    try:
-      frequency = float(frequency)
-      if frequency < 10:
-        frequency *= 1000
+  return info
 
-      channels = [2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484]
-      return channels.index(int(frequency)) + 1
-    except:
-      return 0
+def frequency_to_channel(frequency):
+  """
+  Converts a given frequency to a channel number.
+  """
+  try:
+    frequency = float(frequency)
+    if frequency < 10:
+      frequency *= 1000
 
-  @staticmethod
-  def fetchInstalledPackages(nodeIp):
-    """
-    Fetches installed node packages.
-    """
-    socket.setdefaulttimeout(15)
-    try:
-      info = {}
-      data = urllib2.urlopen('http://%s/cgi-bin/opkgwatcher' % nodeIp).read(512 * 1024)
-      for line in data.split('\n'):
-        if not line:
-          break
-        
-        package, x, version, y = line.strip().split(' ')
-        info[package] = version
-    except:
-      return None
+    channels = [2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484]
+    return channels.index(int(frequency)) + 1
+  except:
+    return 0
 
-    return info
+def fetch_installed_packages(node_ip):
+  """
+  Fetches installed node packages.
+  """
+  socket.setdefaulttimeout(15)
+  try:
+    info = {}
+    data = urllib.urlopen('http://%s/cgi-bin/opkgwatcher' % node_ip).read()
+    for line in data.split('\n'):
+      if not line:
+        break
+      
+      package, x, version, y = line.strip().split(' ')
+      info[package] = version
+  except:
+    return None
+
+  return info
 

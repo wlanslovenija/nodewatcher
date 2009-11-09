@@ -39,7 +39,7 @@ from django.conf import settings
 
 # Import other stuff
 from lib.wifi_utils import OlsrParser, PingParser
-from lib.nodewatcher import NodeWatcher
+from lib import nodewatcher
 from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
@@ -110,6 +110,9 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   """
   A helper function for generating graphs.
   """
+  if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+    return
+  
   rra = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', '%s.rrd' % filename))
   try:
     RRA.update(node, conf, rra, *values)
@@ -266,7 +269,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
   n.last_seen = datetime.now()
 
   # Check if we have fetched nodewatcher data
-  info = NodeWatcher.fetch(node_ip)
+  info = nodewatcher.fetch_node_info(node_ip)
   if info is not None:
     try:
       oldUptime = n.uptime or 0
@@ -276,7 +279,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
       n.local_time = safe_date_convert(info['general']['local_time'])
       n.bssid = info['wifi']['bssid']
       n.essid = info['wifi']['essid']
-      n.channel = NodeWatcher.frequency_to_channel(info['wifi']['frequency'])
+      n.channel = nodewatcher.frequency_to_channel(info['wifi']['frequency'])
       n.clients = 0
       n.uptime = safe_uptime_convert(info['general']['uptime'])
 
@@ -291,7 +294,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
 
       if n.has_time_sync_problems():
         n.warnings = True
-
+      
       # Parse nodogsplash client information
       oldNdsStatus = n.captive_portal_status
       if 'nds' in info:
@@ -387,7 +390,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
         last_pkg_update = None
 
       if not last_pkg_update or last_pkg_update < datetime.now() - timedelta(hours = 1):
-        packages = NodeWatcher.fetchInstalledPackages(n.ip) or {}
+        packages = nodewatcher.fetch_installed_packages(n.ip) or {}
 
         # Remove removed packages and update existing package versions
         for package in n.installedpackage_set.all():
@@ -406,7 +409,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
           package.version = version
           package.last_update = datetime.now()
           package.save()
-
+      
       # Check if DNS works
       if 'dns' in info:
         old_dns_works = n.dns_works
@@ -590,28 +593,37 @@ def check_mesh_status():
   
   # Ping the nodes to prepare information for later node processing
   results, dupes = PingParser.pingHosts(10, nodesToPing)
-
-  # We MUST commit the current transaction here, because we will be processing
-  # some transactions in parallel and must ensure that this transaction that has
-  # modified the nodes is commited. Otherwise this will deadlock!
-  transaction.commit()
   
-  worker_results = []
-  for node_ip in nodesToPing:
-    worker_results.append(
-      WORKER_POOL.apply_async(process_node, (node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links))
-    )
-  
-  # Wait for all workers to finish processing
-  ex = None
-  for result in worker_results:
-    try:
-      result.get()
-    except Exception, e:
-      ex = e
-  
-  if ex is not None:
-    raise ex
+  if not settings.MONITOR_DISABLE_MULTIPROCESSING:
+    # We MUST commit the current transaction here, because we will be processing
+    # some transactions in parallel and must ensure that this transaction that has
+    # modified the nodes is commited. Otherwise this will deadlock!
+    transaction.commit()
+    
+    worker_results = []
+    for node_ip in nodesToPing:
+      worker_results.append(
+        WORKER_POOL.apply_async(process_node, (node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links))
+      )
+    
+    # Wait for all workers to finish processing
+    ex = None
+    for result in worker_results:
+      try:
+        result.get()
+      except Exception, e:
+        ex = e
+    
+    if ex is not None:
+      raise ex
+  else:
+    # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually
+    # used for debug purpuses where a single process is prefered)
+    for node_ip in nodesToPing:
+      process_node(node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links)
+    
+    # Commit the transaction here since we do everything in the same session
+    transaction.commit()
 
 if __name__ == '__main__':
   # Configure logger
@@ -632,7 +644,17 @@ if __name__ == '__main__':
     #os.setuid(info.pw_uid)
   except:
     logging.warning("Failed to chown monitor RRA storage directory!")
-
+  
+  # Output warnings when debug mode is enabled
+  if settings.DEBUG:
+    logging.warning("Debug mode is enabled, monitor will leak memory!")
+  
+  if hasattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING') and settings.MONITOR_DISABLE_MULTIPROCESSING:
+    logging.warning("Multiprocessing mode disabled.")
+  
+  if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+    logging.warning("Graph generation disabled.")
+  
   # Create worker pool and start processing
   logging.info("wlan ljubljana mesh monitoring system is initializing...")
   WORKER_POOL = multiprocessing.Pool(processes = settings.MONITOR_WORKERS)
@@ -646,9 +668,9 @@ if __name__ == '__main__':
         check_events()
       except:
         logging.warning(format_exc())
-
+      
       # Go to sleep for a while
-      sleep(60 * 5)
+      sleep(settings.MONITOR_POLL_INTERVAL)
   except:
     logging.warning("Terminating workers...")
     WORKER_POOL.terminate()
