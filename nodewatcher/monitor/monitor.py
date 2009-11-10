@@ -153,7 +153,7 @@ def check_global_statistics():
   transaction.set_dirty()
 
   try:
-    #stats = fetch_traffic_statistics()
+    stats = fetch_traffic_statistics()
     rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
     RRA.update(None, RRALocalTraffic, rra,
       stats['statistics:to-inet'],
