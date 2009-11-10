@@ -40,8 +40,7 @@ from django.db import transaction, models
 from django.conf import settings
 
 # Import other stuff
-from lib.wifi_utils import OlsrParser, PingParser
-from lib import nodewatcher
+from lib import nodewatcher, wifi_utils
 from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
@@ -154,7 +153,7 @@ def check_global_statistics():
   transaction.set_dirty()
 
   try:
-    stats = fetch_traffic_statistics()
+    #stats = fetch_traffic_statistics()
     rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
     RRA.update(None, RRALocalTraffic, rra,
       stats['statistics:to-inet'],
@@ -468,7 +467,7 @@ def check_mesh_status():
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
-  nodes, hna = OlsrParser.getTables(settings.MONITOR_OLSR_HOST)
+  nodes, hna = wifi_utils.get_tables(settings.MONITOR_OLSR_HOST)
 
   # Create a topology plotter
   topology = DotTopologyPlotter()
@@ -616,7 +615,7 @@ def check_mesh_status():
     s.delete()
   
   # Ping the nodes to prepare information for later node processing
-  results, dupes = PingParser.pingHosts(10, nodesToPing)
+  results, dupes = wifi_utils.ping_hosts(10, nodesToPing)
   
   if hasattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING') and settings.MONITOR_DISABLE_MULTIPROCESSING:
     # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually

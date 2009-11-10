@@ -1,11 +1,18 @@
-
-from popen2 import popen2 as popen
+import subprocess
 
 def fetch_traffic_statistics():
+  """
+  Fetches local traffic statistics from iptables.
+  """
   stats = {}
-  rd, wr = popen("/sbin/iptables -v -n -x --list")
+  process = subprocess.Popen(
+    ['/sbin/iptables', '-v', '-n', '-x', '--list'],
+    stdout = subprocess.PIPE,
+    stderr = subprocess.PIPE
+  )
+  
   while True:
-    line = rd.readline()
+    line = process.stdout.readline()
     if not line:
       break
   
