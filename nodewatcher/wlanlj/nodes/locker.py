@@ -43,10 +43,10 @@ def require_lock(*tables):
       cursor = connection.cursor()
 
       if LOCK_TYPE == "postgresql":
-        cursor.execute("LOCK TABLES %s" % ', '.join(["%s WRITE" % x for x in tables]))
-      elif LOCK_TYPE == "mysql":
         cursor.execute("LOCK TABLE %s IN ROW EXCLUSIVE MODE" % ', '.join(tables))
-
+      elif LOCK_TYPE == "mysql":
+        cursor.execute("LOCK TABLES %s" % ', '.join(["%s WRITE" % x for x in tables]))
+      
       try:
         return func(*args,**kws)
       finally:
