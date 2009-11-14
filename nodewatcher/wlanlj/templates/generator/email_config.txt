@@ -12,7 +12,7 @@ and/or are version related. For further information consult:
 
 The generated configuration archive is available here:{% endblocktrans %}
 
-  http://nodes.wlan-lj.net/results/{{ config }}
+  http://bindist.wlan-lj.net/images/{{ config }}
   MD5: {{ checksum }}
 
 {% blocktrans %}Note that these files will only remain available for 5 days. After that
