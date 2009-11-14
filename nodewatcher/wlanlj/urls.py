@@ -56,7 +56,7 @@ urlpatterns = patterns('',
   (r'^auth/logout$', 'django.contrib.auth.views.logout_then_login'),
 )
 
-if settings.DEBUG or True:
+if settings.DEBUG:
   urlpatterns += patterns('',
     (r'^(?P<path>(css|graphs|images|js|results|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_DOC_ROOT, 'show_indexes': True}),
   )
