@@ -248,6 +248,15 @@ def check_dead_graphs():
     dead = True,
     need_redraw = True
   )
+  
+  # Remove RRDs that need removal
+  for graph in GraphItem.objects.filter(need_removal = True):
+    try:
+      os.unlink(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
+    except:
+      pass
+  
+  GraphItem.objects.filter(need_removal = True).delete()
 
 @transaction.commit_on_success
 def process_node(node_ip, ping_results, is_duped, peers):
