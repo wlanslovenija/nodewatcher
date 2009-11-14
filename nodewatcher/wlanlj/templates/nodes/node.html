@@ -116,6 +116,7 @@
     <td>{% trans "External antenna" %}</td>
     <td>{% if node.ant_external %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
   </tr>
+  {% if node.ant_external %}
   <tr>
     <td>{% trans "Type" %}</td>
     <td>{{ node.ant_type_as_string }}</td>
@@ -124,6 +125,7 @@
     <td>{% trans "Polarization" %}</td>
     <td>{{ node.ant_polarization_as_string }}</td>
   </tr>
+  {% endif %}
   {% if node.profile %}
   <tr class="section_title">
     <td colspan="2">
