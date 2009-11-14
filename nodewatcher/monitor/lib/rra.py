@@ -17,6 +17,7 @@ class RoundRobinArchive:
     self.cf = cf
     self.xff = xff
     self.steps = steps
+    self.rows = rows
   
   def __str__(self):
     return "RRA:%s:%s:%s:%s" % (self.cf, self.xff, self.steps, self.rows)
@@ -453,16 +454,11 @@ class RRA:
     """
     options = [
       archive,
-      '--start', str(int(time.time())),
-      [str(x) for x in conf.sources]
+      '--start', str(int(time.time()))
     ]
+    options = options + [str(x) for x in conf.sources]
     options = options + [str(x) for x in conf.archives]
     rrdtool.create(*options)
-    #otherArgs = { 'start' : int(time.time()) - 30, 'step' : conf.interval }
-    #descriptors = [x for x in conf.sources + conf.archives]
-    #rrd = rrdtool.RoundRobinDatabase(archive)
-    #rrd.create(*descriptors, **otherArgs)
-    #return rrd
 
   @staticmethod
   def update(node, conf, archive, *values):
@@ -498,7 +494,6 @@ class RRA:
     """
     Renders a graph from data points.
     """
-    #return
     args = []
     for i, source in enumerate(conf.sources):
       args.append("DEF:%s=%s:%s:AVERAGE" % (source.name, archive, source.name))
