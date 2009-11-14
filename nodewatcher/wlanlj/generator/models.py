@@ -43,7 +43,7 @@ class Template(models.Model):
     """
     Return human readable template name.
     """
-    return self.name
+    return self.name + (" [EXPERIMENTAL]" if self.experimental else "")
 
 class IfaceTemplate(models.Model):
   """
