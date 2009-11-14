@@ -682,6 +682,7 @@ class GraphItem(models.Model, GraphItemNP):
   title = models.CharField(max_length = 50)
   last_update = models.DateTimeField(null = True)
   dead = models.BooleanField(default = False)
+  need_redraw = models.BooleanField(default = False)
 
 class WhitelistItem(models.Model):
   """
