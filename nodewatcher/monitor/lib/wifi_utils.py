@@ -31,18 +31,10 @@ def create_node(ip, nodes, hna):
 
   return node
 
-def get_tables(olsr_ip = "127.0.0.1"):
+def parse_tables(data):
   """
-  Parses OLSR tables to extract topology and announce infos.
-
-  @param olsr_ip: IP address of the router instance
+  Parses the OLSR routing tables.
   """
-  try:
-    response = urllib.urlopen('http://%s:2006' % olsr_ip)
-  except:
-    return None
-
-  data = response.read()
   isTable = False
   isTableHead = False
   currentTable = ''
@@ -99,32 +91,25 @@ def get_tables(olsr_ip = "127.0.0.1"):
   
   return nodes, hna
 
-def ping_hosts(count, hosts):
+def get_tables(olsr_ip = "127.0.0.1"):
   """
-  Pings specified hosts in parallel using fping.
-  
-  @param count: Number of ICMP ECHO packets to send
-  @param hosts: A list of host IP addresses
+  Parses OLSR tables to extract topology and announce infos.
+
+  @param olsr_ip: IP address of the router instance
+  """
+  try:
+    return parse_tables(urllib.urlopen('http://%s:2006' % olsr_ip).read())
+  except:
+    return None
+
+def parse_fping(data):
+  """
+  Parses fping results.
   """
   results = {}
   dupes = {}
   
-  if not hosts:
-    return (results, dupes)
-  
-  # Spawn the fping process to ping hosts in parallel
-  process = subprocess.Popen(
-    ['/usr/sbin/fping', '-c', str(count), '-q'] + hosts,
-    stdout = subprocess.PIPE,
-    stderr = subprocess.PIPE
-  )
-  
-  # Parse results
-  while True:
-    line = process.stderr.readline()
-    if not line:
-      break
-    
+  for line in data.splitlines():
     line = line.split()
     hostIp = line[0]
     up = False
@@ -145,4 +130,23 @@ def ping_hosts(count, hosts):
   
   return (results, dupes)
 
+def ping_hosts(count, hosts):
+  """
+  Pings specified hosts in parallel using fping.
+  
+  @param count: Number of ICMP ECHO packets to send
+  @param hosts: A list of host IP addresses
+  """
+  if not hosts:
+    return {}, {}
+  
+  # Spawn the fping process to ping hosts in parallel
+  process = subprocess.Popen(
+    ['/usr/sbin/fping', '-c', str(count), '-q'] + hosts,
+    stdout = subprocess.PIPE,
+    stderr = subprocess.PIPE
+  )
+  
+  # Parse results
+  return parse_fping(process.stderr.read())
 

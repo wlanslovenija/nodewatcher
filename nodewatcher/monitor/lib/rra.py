@@ -7,31 +7,54 @@ from wlanlj.nodes.models import StatsSolar
 from django.conf import settings
 from datetime import datetime
 
+# Defining some constants and classes for easier usage later
+AverageCF = "AVERAGE"
+GaugeDST = "GAUGE"
+CounterDST = "COUNTER"
+
+class RoundRobinArchive:
+  def __init__(self, cf, xff, steps, rows):
+    self.cf = cf
+    self.xff = xff
+    self.steps = steps
+  
+  def __str__(self):
+    return "RRA:%s:%s:%s:%s" % (self.cf, self.xff, self.steps, self.rows)
+
+class DataSource:
+  def __init__(self, name, type, heartbeat):
+    self.name = name
+    self.type = type
+    self.heartbeat = heartbeat
+  
+  def __str__(self):
+    return "DS:%s:%s:%s:U:U" % (self.name, self.type, self.heartbeat)
+
 class RRAConfiguration:
   last_update = 0
 
   # Standard archives
   archives = [
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
+    RoundRobinArchive(
+      cf = AverageCF,
       xff = 0.5,
       steps = 1,
       rows = 600
     ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
+    RoundRobinArchive(
+      cf = AverageCF,
       xff = 0.5,
       steps = 6,
       rows = 700
     ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
+    RoundRobinArchive(
+      cf = AverageCF,
       xff = 0.5,
       steps = 24,
       rows = 775
     ),
-    rrdtool.RoundRobinArchive(
-      cf = rrdtool.AverageCF,
+    RoundRobinArchive(
+      cf = AverageCF,
       xff = 0.5,
       steps = 288,
       rows = 797
@@ -41,19 +64,19 @@ class RRAConfiguration:
 class RRALocalTraffic(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'toinet',
-      type = rrdtool.CounterDST,
+      type = CounterDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'frominet',
-      type = rrdtool.CounterDST,
+      type = CounterDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'internal',
-      type = rrdtool.CounterDST,
+      type = CounterDST,
       heartbeat = interval * 2
     )
   ]
@@ -79,34 +102,34 @@ class RRALocalTraffic(RRAConfiguration):
 class RRANodesByStatus(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'up',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'down',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'visible',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'invalid',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'pending',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'duped',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -141,14 +164,14 @@ class RRANodesByStatus(RRAConfiguration):
 class RRAIface(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'upload',
-      type = rrdtool.CounterDST,
+      type = CounterDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'download',
-      type = rrdtool.CounterDST,
+      type = CounterDST,
       heartbeat = interval * 2
     )
   ]
@@ -167,9 +190,9 @@ class RRAIface(RRAConfiguration):
 class RRAClients(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'clients',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -185,9 +208,9 @@ class RRAClients(RRAConfiguration):
 class RRARTT(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'rtt',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -204,14 +227,14 @@ class RRARTT(RRAConfiguration):
 class RRALinkQuality(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'lq',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'ilq',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -231,19 +254,19 @@ class RRALinkQuality(RRAConfiguration):
 class RRALoadAverage(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'la1min',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'la5min',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'la15min',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -267,9 +290,9 @@ class RRALoadAverage(RRAConfiguration):
 class RRANumProc(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'nproc',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -286,19 +309,19 @@ class RRANumProc(RRAConfiguration):
 class RRAMemUsage(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'memfree',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'buffers',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'cached',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -321,9 +344,9 @@ class RRAMemUsage(RRAConfiguration):
 class RRAWifiCells(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'cells',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -338,9 +361,9 @@ class RRAWifiCells(RRAConfiguration):
 class RRAOlsrPeers(RRAConfiguration):
   interval = 300
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'peers',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -356,29 +379,29 @@ class RRASolar(RRAConfiguration):
   db_model = StatsSolar
   interval = 1800
   sources = [
-    rrdtool.DataSource(
+    DataSource(
       'batvoltage',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'solvoltage',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'charge',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'state',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     ),
-    rrdtool.DataSource(
+    DataSource(
       'load',
-      type = rrdtool.GaugeDST,
+      type = GaugeDST,
       heartbeat = interval * 2
     )
   ]
@@ -428,11 +451,18 @@ class RRA:
     """
     Creates a new RRD archive.
     """
-    otherArgs = { 'start' : int(time.time()) - 30, 'step' : conf.interval }
-    descriptors = [x for x in conf.sources + conf.archives]
-    rrd = rrdtool.RoundRobinDatabase(archive)
-    rrd.create(*descriptors, **otherArgs)
-    return rrd
+    options = [
+      archive,
+      '--start', str(int(time.time())),
+      [str(x) for x in conf.sources]
+    ]
+    options = options + [str(x) for x in conf.archives]
+    rrdtool.create(*options)
+    #otherArgs = { 'start' : int(time.time()) - 30, 'step' : conf.interval }
+    #descriptors = [x for x in conf.sources + conf.archives]
+    #rrd = rrdtool.RoundRobinDatabase(archive)
+    #rrd.create(*descriptors, **otherArgs)
+    #return rrd
 
   @staticmethod
   def update(node, conf, archive, *values):
@@ -440,11 +470,12 @@ class RRA:
     Updates an existing RRD archive or creates a new one if needed.
     """
     if not os.path.isfile(archive):
-      rrd = RRA.create(conf, archive)
-    else:
-      rrd = rrdtool.RoundRobinDatabase(archive)
-
-    rrd.update(rrdtool.Val(*values), template = [x.name for x in conf.sources])
+      RRA.create(conf, archive)
+    
+    rrdtool.update(
+      archive,
+      "N:" + ":".join([str(x) for x in values])
+    )
 
     # Record data in database store if set
     now = time.time()
@@ -463,13 +494,14 @@ class RRA:
         pass
   
   @staticmethod
-  def graph(conf, title, graph, *archives, **kwargs):
+  def graph(conf, title, graph, archive, **kwargs):
     """
     Renders a graph from data points.
     """
+    #return
     args = []
     for i, source in enumerate(conf.sources):
-      args.append(rrdtool.Def(source.name, archives[i], data_source = source.name, cf = rrdtool.AverageCF))
+      args.append("DEF:%s=%s:%s:AVERAGE" % (source.name, archive, source.name))
     
     if kwargs.get('end_time') is None:
       end_time = int(time.time())
@@ -487,14 +519,14 @@ class RRA:
     args.append('--disable-rrdtool-tag')
 
     for prefix, timespan in settings.GRAPH_TIMESPANS:
-      g = rrdtool.RoundRobinGraph(str(os.path.join(settings.GRAPH_DIR, "%s_%s" % (prefix, graph))))
-      g.graph(
-        alt_y_mrtg = None,
-        width = 500,
-        height = 120,
-        title = title,
-        start = end_time - timespan,
-        end = end_time - 180,
-        *args
-      )
+      options = [
+        str(os.path.join(settings.GRAPH_DIR, "%s_%s" % (prefix, graph))),
+        '--width', '500',
+        '--height', '120',
+        '--start', str(end_time - timespan),
+        '--end', str(end_time - 180),
+        '--title', title
+      ]
+      
+      rrdtool.graph(*(options + args))
 

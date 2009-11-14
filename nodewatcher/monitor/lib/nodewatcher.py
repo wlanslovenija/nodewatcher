@@ -2,14 +2,12 @@
 import urllib
 import socket
 
-def fetch_node_info(node_ip):
+def parse_node_info(data):
   """
-  Fetches node information via HTTP.
+  Parses node information into usable form.
   """
-  socket.setdefaulttimeout(15)
   try:
     info = {}
-    data = urllib.urlopen('http://%s/cgi-bin/nodewatcher' % node_ip).read()
     for line in data.split('\n'):
       if not line:
         break
@@ -30,6 +28,16 @@ def fetch_node_info(node_ip):
     return None
 
   return info
+
+def fetch_node_info(node_ip):
+  """
+  Fetches node information via HTTP.
+  """
+  socket.setdefaulttimeout(15)
+  try:
+    return parse_node_info(urllib.urlopen('http://%s/cgi-bin/nodewatcher' % node_ip).read())
+  except:
+    return None
 
 def frequency_to_channel(frequency):
   """

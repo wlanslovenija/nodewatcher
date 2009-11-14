@@ -17,8 +17,8 @@ print "=========================================================================
 parser = OptionParser()
 parser.add_option('--path', dest = 'path', help = 'Path that contains "wlanlj" nodewatcher installation')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
-parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit', action = 'store_true')
-parser.add_option('--graph-type', dest = 'graph_type', help = 'Only regenerate graphs of specified type (in combination with --regenerate-graphs)')
+parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit (only graphs that have the redraw flag set are regenerated)', action = 'store_true')
+parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 options, args = parser.parse_args()
 
 if not options.path:
@@ -36,11 +36,15 @@ os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType
-from django.db import transaction, models
+from django.db import transaction, models, connection
 from django.conf import settings
 
 # Import other stuff
-from lib import nodewatcher, wifi_utils
+if (hasattr(settings, 'MONITOR_ENABLE_SIMULATION') and settings.MONITOR_ENABLE_SIMULATION) or options.stress_test:
+  from simulator import nodewatcher, wifi_utils
+else:
+  from lib import nodewatcher, wifi_utils
+
 from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
@@ -52,6 +56,7 @@ import pwd
 import logging
 import time
 import multiprocessing
+import gc
 
 RRA_CONF_MAP = {
   GraphType.RTT         : RRARTT,
@@ -119,7 +124,6 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
     RRA.update(node, conf, rra, *values)
   except:
     pass
-  RRA.graph(conf, title, '%s.png' % filename, *[rra for i in xrange(len(values))])
   
   # Get parent instance (toplevel by default)
   parent = attrs.get('parent', None)
@@ -134,6 +138,7 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   graph.title = title
   graph.last_update = datetime.now()
   graph.dead = False
+  graph.need_redraw = True
   graph.save()
   return graph
 
@@ -160,7 +165,6 @@ def check_global_statistics():
       stats['statistics:from-inet'],
       stats['statistics:internal']
     )
-    RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra, rra, rra)
   except:
     logging.warning("Unable to process local server traffic information, skipping!")
 
@@ -178,58 +182,72 @@ def check_global_statistics():
     nbs.get(NodeStatus.Pending, 0),
     nbs.get(NodeStatus.Duped, 0)
   )
-  RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', *([rra] * 6))
 
   # Global client count
   client_count = len(APClient.objects.all())
   rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
   RRA.update(None, RRAClients, rra, client_count)
-  RRA.graph(RRAClients, 'Global Client Count', 'global_client_count.png', rra)
+
+@transaction.commit_on_success
+def regenerate_graph(graph):
+  """
+  Regenerates a single graph.
+  """
+  pathArchive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
+  pathImage = graph.graph
+  conf = RRA_CONF_MAP[graph.type]
+  
+  try:
+    RRA.graph(conf, str(graph.title), pathImage, pathArchive, end_time = int(time.mktime(graph.last_update.timetuple())), dead = graph.dead)
+    
+    # Graph has been regenerated, mark it as such
+    graph.need_redraw = False
+    graph.save()
+  except:
+    logging.warning("Unable to regenerate graph from RRA '%s'!" % graph.rra)
+
+def regenerate_global_statistics_graphs():
+  """
+  Regenerates global statistics graphs.
+  """
+  rra_traffic = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
+  rra_status = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_nodes_by_status.rrd')
+  rra_clients = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
+  
+  try:
+    RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra_traffic)
+    RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', rra_status)
+    RRA.graph(RRAClients, 'Global Client Count', 'global_client_count.png', rra_clients)
+  except:
+    logging.warning("Unable to regenerate some global statistics graphs!")
 
 def regenerate_graphs():
   """
-  Regenerates all undead graphs from RRAs.
+  Regenerates all graphs from RRAs.
   """
-  global options
-  graphs = GraphItem.objects.filter(dead = False)
-  if options.graph_type:
-    graphs = graphs.filter(type = int(options.graph_type))
-
-  for graph in graphs:
-    # Redraw the graph
-    print ">>> Regenerating graph '%s/%s'..." % (graph.node.ip, graph.title)
-    pathArchive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
-    pathImage = graph.graph
-    conf = RRA_CONF_MAP[graph.type]
-    
-    try:
-      RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())),
-                *[pathArchive for i in xrange(len(conf.sources))])
-    except OSError:
-      print ">>> Unable to regenerate graph from RRA '%s'!" % graph.rra
+  # We must close the database connection before we fork the worker pool, otherwise
+  # resources will be shared and problems will arise!
+  connection.close()
+  pool = multiprocessing.Pool(processes = settings.MONITOR_WORKERS)
+  
+  try:
+    pool.map(regenerate_graph, GraphItem.objects.filter(need_redraw = True)[:])
+    pool.apply(regenerate_global_statistics_graphs)
+  except:
+    logging.warning(format_exc())
+  
+  pool.close()
+  pool.join()
 
 @transaction.commit_on_success
 def check_dead_graphs():
   """
   Checks for dead graphs.
   """
-  transaction.set_dirty()
-
-  for graph in GraphItem.objects.filter(dead = False, last_update__lt = datetime.now() - timedelta(minutes = 10)):
-    # Mark graph as dead
-    graph.dead = True
-    graph.save()
-
-    # Redraw the graph with dead status attached
-    pathArchive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
-    pathImage = graph.graph
-    conf = RRA_CONF_MAP[graph.type]
-    
-    try:
-      RRA.graph(conf, str(graph.title), pathImage, end_time = int(time.mktime(graph.last_update.timetuple())), dead = True,
-                *[pathArchive for i in xrange(len(conf.sources))])
-    except OSError:
-      logging.warning("Skipping dead non-existant graph '%s'!" % graph.rra)
+  GraphItem.objects.filter(dead = False, last_update__lt = datetime.now() - timedelta(minutes = 10)).update(
+    dead = True,
+    need_redraw = True
+  )
 
 @transaction.commit_on_success
 def process_node(node_ip, ping_results, is_duped, peers):
@@ -450,8 +468,15 @@ def process_node(node_ip, ping_results, is_duped, peers):
       logging.warning(format_exc())
 
   n.save()
+  
+  # When GC debugging is enabled perform some more work
+  if hasattr(settings, 'MONITOR_ENABLE_GC_DEBUG') and settings.MONITOR_ENABLE_GC_DEBUG:
+    gc.collect()
+    return os.getpid(), len(gc.get_objects())
+  
+  return None, None
 
-@transaction.commit_manually
+@transaction.commit_on_success
 def check_mesh_status():
   """
   Performs a mesh status check.
@@ -468,9 +493,6 @@ def check_mesh_status():
 
   # Fetch routing tables from OLSR
   nodes, hna = wifi_utils.get_tables(settings.MONITOR_OLSR_HOST)
-
-  # Create a topology plotter
-  topology = DotTopologyPlotter()
 
   # Ping nodes present in the database and visible in OLSR
   dbNodes = {}
@@ -536,10 +558,15 @@ def check_mesh_status():
     n.save()
   
   # Add nodes to topology map and generate output
-  for node in dbNodes.values():
-    topology.addNode(node)
+  if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+    pass
+  else:
+    # Only generate topology when graphing is not disabled
+    topology = DotTopologyPlotter()
+    for node in dbNodes.values():
+      topology.addNode(node)
 
-  topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'))
+    topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'))
 
   # Update valid subnet status in the database
   for nodeIp, subnets in hna.iteritems():
@@ -638,15 +665,24 @@ def check_mesh_status():
       )
     
     # Wait for all workers to finish processing
-    ex = None
+    objects = {}
     for result in worker_results:
       try:
-        result.get()
+        k, v = result.get()
+        objects[k] = v
       except Exception, e:
-        ex = e
+        logging.warning(format_exc())
     
-    if ex is not None:
-      raise ex
+    # When GC debugging is enabled make some additional computations
+    if hasattr(settings, 'MONITOR_ENABLE_GC_DEBUG') and settings.MONITOR_ENABLE_GC_DEBUG:
+      global _MAX_GC_OBJCOUNT
+      objcount = sum(objects.values())
+      
+      if '_MAX_GC_OBJCOUNT' not in globals():
+        _MAX_GC_OBJCOUNT = objcount
+      
+      logging.debug("GC object count: %d %s" % (objcount, "!M" if objcount > _MAX_GC_OBJCOUNT else ""))
+      _MAX_GC_OBJCOUNT = max(_MAX_GC_OBJCOUNT, objcount)
 
 if __name__ == '__main__':
   # Configure logger
@@ -670,20 +706,56 @@ if __name__ == '__main__':
 
   # Check if we should just regenerate the graphs
   if options.regenerate_graphs:
+    # Regenerate all graphs that need redrawing
     print ">>> Regenerating graphs from RRAs..."
     regenerate_graphs()
     print ">>> Graph generation completed."
+    exit(0)
+  
+  # Check if we should just perform stress testing
+  if options.stress_test:
+    print ">>> Performing stress test..."
+    
+    # Force some settings
+    settings.MONITOR_ENABLE_SIMULATION = True
+    settings.MONITOR_DISABLE_MULTIPROCESSING = True
+    
+    # Check mesh status in a tight loop
+    try:
+      for i in xrange(1000):
+        check_mesh_status()
+        check_dead_graphs()
+        check_events()
+        
+        # Output progress messages
+        if i > 0 and i % 10 == 0:
+          print "  > Completed %d iterations. (%d gc objects)" % (i, len(gc.get_objects()))
+    except KeyboardInterrupt:
+      print "!!! Aborted by user."
+      exit(1)
+    except:
+      print "!!! Unhandled exception."
+      print_exc()
+      exit(1)
+    
+    print ">>> Stress test completed."
     exit(0)
   
   # Output warnings when debug mode is enabled
   if settings.DEBUG:
     logging.warning("Debug mode is enabled, monitor will leak memory!")
   
+  if hasattr(settings, 'MONITOR_ENABLE_SIMULATION') and settings.MONITOR_ENABLE_SIMULATION:
+    logging.warning("All feeds are being simulated!")
+  
   if hasattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING') and settings.MONITOR_DISABLE_MULTIPROCESSING:
     logging.warning("Multiprocessing mode disabled.")
   
   if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
     logging.warning("Graph generation disabled.")
+  
+  if hasattr(settings, 'MONITOR_ENABLE_GC_DEBUG') and settings.MONITOR_ENABLE_GC_DEBUG:
+    logging.warning("Garbage collection debugging enabled.")
   
   # Create worker pool and start processing
   logging.info("wlan ljubljana mesh monitoring system is initializing...")
@@ -696,6 +768,7 @@ if __name__ == '__main__':
         check_dead_graphs()
         check_global_statistics()
         check_events()
+        regenerate_graphs()
       except:
         logging.warning(format_exc())
       
