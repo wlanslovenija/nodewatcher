@@ -189,7 +189,6 @@ class Node(models.Model):
     self.status = NodeStatus.Pending
     self.last_seen = None
     self.first_seen = None
-    self.graphitem_set.all().delete()
     self.channel = None
     self.wifi_mac = None
     self.vpn_mac = None
@@ -212,8 +211,9 @@ class Node(models.Model):
     self.numproc = None
     self.captive_portal_status = True
 
-    # Also remove any LQ graphs with this node on other nodes
-    GraphItem.objects.filter(type = GraphType.LQ, name = self.ip).delete()
+    # Mark related graph items for removal by the monitoring daemon
+    self.graphitem_set.all().update(need_removal = True)
+    GraphItem.objects.filter(type = GraphType.LQ, name = self.ip).update(need_removal = True)
   
   def has_time_sync_problems(self):
     """
@@ -683,6 +683,7 @@ class GraphItem(models.Model, GraphItemNP):
   last_update = models.DateTimeField(null = True)
   dead = models.BooleanField(default = False)
   need_redraw = models.BooleanField(default = False)
+  need_removal = models.BooleanField(default = False)
 
 class WhitelistItem(models.Model):
   """
