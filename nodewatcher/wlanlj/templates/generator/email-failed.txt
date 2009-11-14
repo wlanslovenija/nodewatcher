@@ -5,9 +5,17 @@ Please report this as a bug on the project's issue tracker:
 
   http://wlan-lj.net/newticket
 
-You can also post the report to our mailing list:
+You can also post the report using our contact web form:
 
-  http://wlan-lj.net/wiki/OOmrezju/PostniSeznam
+  http://wlan-lj.net/contact
+
+on our mailing list:
+
+  http://wlan-lj.net/wiki/OOmrezju/PostniSeznami
+
+or on our IRC channel:
+
+  http://wlan-lj.net/wiki/OOmrezju/IRC
 
 Thank you for your participation in the project!
 
