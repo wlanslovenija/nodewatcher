@@ -58,5 +58,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
   urlpatterns += patterns('',
-    (r'^(?P<path>(css|graphs|images|js|results|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_DOC_ROOT, 'show_indexes': True}),
+    (r'^(?P<path>(common|css|graphs|images|js|site|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_DOC_ROOT, 'show_indexes': True}),
   )
