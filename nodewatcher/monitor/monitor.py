@@ -204,7 +204,7 @@ def regenerate_graph(graph):
     graph.need_redraw = False
     graph.save()
   except:
-    logging.warning("Unable to regenerate graph from RRA '%s'!" % graph.rra)
+    pass
 
 def regenerate_global_statistics_graphs():
   """
@@ -228,7 +228,7 @@ def regenerate_graphs():
   # We must close the database connection before we fork the worker pool, otherwise
   # resources will be shared and problems will arise!
   connection.close()
-  pool = multiprocessing.Pool(processes = settings.MONITOR_WORKERS)
+  pool = multiprocessing.Pool(processes = settings.MONITOR_GRAPH_WORKERS)
   
   try:
     pool.map(regenerate_graph, GraphItem.objects.filter(need_redraw = True)[:])
