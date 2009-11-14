@@ -7,7 +7,7 @@
 import os
 import time
 
-DESTINATION = "/var/www/nodes.wlan-lj.net/results"
+DESTINATION = "/var/www/packages.wlan-lj.net/images"
 
 for root, dirs, files in os.walk(DESTINATION):
   for file in files:

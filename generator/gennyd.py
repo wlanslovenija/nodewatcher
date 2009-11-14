@@ -28,7 +28,7 @@ from base64 import urlsafe_b64encode
 from glob import glob
 
 WORKDIR = "/home/generator"
-DESTINATION = "/var/www/nodes.wlan-lj.net/results"
+DESTINATION = "/var/www/packages.wlan-lj.net/images"
 IMAGEBUILDERS = (
   "imagebuilder.atheros",
   "imagebuilder.brcm24",
