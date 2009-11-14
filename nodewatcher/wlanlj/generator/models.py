@@ -25,6 +25,7 @@ class Template(models.Model):
   name = models.CharField(max_length = 50)
   short_name = models.CharField(max_length = 50)
   description = models.CharField(max_length = 200)
+  experimental = models.BooleanField(default = False)
 
   # Profile metadata for the generator
   openwrt_version = models.CharField(max_length = 20)

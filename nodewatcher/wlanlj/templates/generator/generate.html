@@ -83,6 +83,13 @@
       <span class="small_text">{% blocktrans %}Check this option to generate <b>ONLY</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="http://wlan-lj.net/wiki/Podrobnosti/PoMeri">custom node</a>.{% endblocktrans %}</span>
     </td>
   </tr>
+  {% if node.profile.template.experimental %}
+  <tr>
+    <td colspan="2" class="error">
+      {% blocktrans %}The firmware version you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave">known issues</a> page. If you find any bugs, please report them. Also if you find the image to be working properly for a longer period of time, also report it so it may be moved from its experimental status.{% endblocktrans %}
+    </td>
+  </tr>
+  {% endif %}
   <tr>
     {% if not node.owner.email %}
     <td colspan="2" class="error">
