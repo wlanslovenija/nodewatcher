@@ -464,7 +464,7 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
     self.addPackage('kmod-ipt-conntrack', 'iptables-mod-conntrack')
     self.addPackage('kmod-ipt-nat', 'iptables-mod-nat')
-    self.addPackage('nodewatcher', 'olsrd-mod-actions', 'nodeupgrade')
+    self.addPackage('nodewatcher', 'olsrd-mod-actions', 'nodeupgrade', 'nullhttpd')
     self.addPackage('pv', 'netprofscripts')
     self.addPackage('tc', 'kmod-sched')
     #self.addPackage('kmod-ipv6')
@@ -707,6 +707,14 @@ class OpenWrtConfig(NodeConfig):
     f.write('Pollrate 0.1\n')
     f.write('TcRedundancy 2\n')
     f.write('MprCoverage 1\n')
+    f.write('\n')
+    
+    # Setup actions plugin to trigger a nodewatcher script when the default
+    # route is added or removed from the routing table
+    f.write('LoadPlugin "olsrd_actions.so.0.1"\n')
+    f.write('{\n')
+    f.write('  PlParam "trigger" "0.0.0.0>/etc/actions.d/olsr_gateway_action"\n')
+    f.write('}\n')
     f.write('\n')
     
     # General interface configuration (static)
