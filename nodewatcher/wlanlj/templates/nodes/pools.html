@@ -17,15 +17,10 @@
 
 {% block content %}
 <h1>IP Allocation Pools</h1>
-  {% if not pools %}
-<div class="notice">
-  {% trans "No IP allocation pools found in the database." %}
-</div>
-  {% else %}
 <table border="0" class="listing">
 <thead>
   <tr>
-    <th style="width: 50px;"><b>{% trans "Family" %}</b></th>
+    <th style="width: 70px;"><b>{% trans "Family" %}</b></th>
     <th style="width: 200px;"><b>{% trans "Subnet" %}</b></th>
     <th><b>{% trans "Description" %}</b></th>
   </tr>
@@ -37,9 +32,27 @@
     <td>{{ pool }}</td>
     <td>{{ pool.description }}</td>
   </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3" class="notice">
+      {% trans "No IP allocation pools found in the database." %}
+    </td>
+  </tr>
   {% endfor %}
 </tbody>
 </table>
-{% endif %}
 <br/>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "IP allocation pools",
+    "sortColumn": [[1, "asc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}

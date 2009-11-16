@@ -17,6 +17,7 @@ def nodes(request):
   """
   Display a list of all current nodes and their status.
   """
+  # TODO: #362
   def type_ip_order(x, y):
     c = cmp(x.node_type, y.node_type)
     if c != 0:
@@ -33,8 +34,13 @@ def pools(request):
   """
   Displays IP allocation pools.
   """
+  # TODO: #362
+  def ip_order(x, y):
+    return cmp(long(ipcalc.IP(str(x))), long(ipcalc.IP(str(y))))
+  pools = list(Pool.objects.filter(parent = None))
+  pools.sort(ip_order)
   return render_to_response('nodes/pools.html',
-    { 'pools' : Pool.objects.filter(parent = None).order_by('id') },
+    { 'pools' : pools },
     context_instance = RequestContext(request)
   )
 
@@ -106,6 +112,7 @@ def my_nodes(request):
   """
   Display a list of current user's nodes.
   """
+  # TODO: #362
   nodes = request.user.node_set.order_by('ip')
   
   return render_to_response('nodes/my.html',
@@ -398,7 +405,7 @@ def gcl(request):
   """
   Displays the global client list.
   """
-  clients = APClient.objects.all().order_by('node')
+  clients = APClient.objects.all().order_by('node', 'connected_at')
   return render_to_response('nodes/gcl.html',
     { 'clients' : clients },
     context_instance = RequestContext(request)
@@ -436,7 +443,7 @@ def global_events(request):
   Display a list of global mesh events.
   """
   return render_to_response('nodes/global_events.html',
-    { 'events' : Event.objects.all().order_by('-id')[0:30] },
+    { 'events' : Event.objects.all().order_by('-timestamp', '-id')[0:30] },
     context_instance = RequestContext(request)
   )
 
@@ -446,7 +453,7 @@ def event_list(request):
   Display a list of current user's events.
   """
   return render_to_response('nodes/event_list.html',
-    { 'events' : Event.objects.filter(node__owner = request.user).order_by('-id')[0:30],
+    { 'events' : Event.objects.filter(node__owner = request.user).order_by('-timestamp', '-id')[0:30],
       'subscriptions' : EventSubscription.objects.filter(user = request.user) },
     context_instance = RequestContext(request)
   )

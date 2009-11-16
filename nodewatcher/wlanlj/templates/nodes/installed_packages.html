@@ -15,21 +15,32 @@
   </tr>
 </thead>
 <tbody>
-  {% if not packages %}
-  <tr class="{% cycle 'odd' 'even' %}">
-    <td colspan="8" class="notice">
-      {% trans "No package information is available for this node." %}
-    </td>
-  </tr>
-  {% else %}
   {% for package in packages %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ package.name }}</td>
     <td>{{ package.version }}</td>
     <td>{{ package.last_update|date }}</td>
   </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3" class="notice">
+      {% trans "No package information is available for this node." %}
+    </td>
+  </tr>
   {% endfor %}
-  {% endif %}
 </tbody>
 </table>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "packages",
+    "sortColumn": [[0, "asc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}

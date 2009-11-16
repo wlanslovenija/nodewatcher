@@ -23,8 +23,8 @@
     <th style="width: 22px;"></th>
     <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
     <th style="width: 100px;"><b>IP</b></th>
-    <th style="width: 280px;"><b>{% trans "Last seen up" %}</b></th>
-    <th style="width: 50px;" align="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 260px;"><b>{% trans "Last seen up" %}</b></th>
+    <th style="width: 70px;" align="center"><b>{% trans "Status" %}</b></th>
     <th style="width: 70px;" align="center"><b>{% trans "Peers" %}</b></th>
     <th style="width: 70px;" align="center"><b>{% trans "Clients" %}</b></th>
     <th style="width: 90px;" align="center"><b>{% trans "Project" %}</b></th>
@@ -88,4 +88,17 @@
   <li>{{ "pending"|status:"small" }} - {% trans "node has not yet been seen since registration" %}</li>
 </ul>
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "nodes",
+    "sortColumn": [[2, "asc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}

@@ -32,12 +32,6 @@
 <br/>
 {% endif %}
 <h3>Event subscriptions</h3>
-  {% if not subscriptions %}
-  <div class="notice">
-      {% trans "No event subscriptions have been configured." %}<br />
-   <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
-    </div>
-  {% else %}
 <table border="0" class="listing">
 <thead>
   <tr>
@@ -69,18 +63,20 @@
       {% endif %}
     </td>
   </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4" class="notice">
+      {% trans "No event subscriptions have been configured." %}
+    </td>
+  </tr>  
   {% endfor %}
-  <tr class="table_links"><td colspan="4"><a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a></td></tr>
 </tbody>
 </table>
-  {% endif %}
+<div class="table_links">
+<a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
+</div>
 <br/>
 <h3>{% trans "Latest events for your nodes" %}</h3>
-  {% if not events %}
-<div class="notice">
-      {% trans "No events have been recorded for your nodes." %}
-</div>
-  {% else %}
 <table border="0" class="listing">
 <thead>
   <tr>
@@ -101,10 +97,31 @@
       {% endif %}
     <td>{{ event.code_to_string }}</td>
   </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3" class="notice">
+      {% trans "No events have been recorded for your nodes." %}
+    </td>
+  </tr>
   {% endfor %}
 </tbody>
 </table>
-{% endif %}
-<br/>
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "event subscriptions",
+    "sortColumn": []
+  },
+  {
+    "entryName": "events",
+    "sortColumn": [[0, "desc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}

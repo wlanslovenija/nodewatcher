@@ -5,6 +5,8 @@ register = Library()
 def human_readable_kbytes(value):
   """
   Returns a properly formatted human readable bytes string.
+  
+  This code is duplicated in reverse in jqeury.dataTables.init.js file. Keep them in sync.
   """
   if value > 1048576:
     return "%.02f GB" % (value / 1048576.0)

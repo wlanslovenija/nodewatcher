@@ -27,17 +27,12 @@
   {% endfor %}
 </div>
 {% endif %}
-{% if not whitelist %}
-<div class="notice">
-{% trans "You currently have no MAC addresses whitelisted." %}
-</div>
-{% else %}
 <table border="0" class="listing">
 <thead>
   <tr>
-    <th width="22"></th>
+    <th style="width: 22px"></th>
     <th><b>{% trans "MAC address" %}</b></th>
-    <th width="200"><b>{% trans "Registered at" %}</b></th>
+    <th style="width: 200px"><b>{% trans "Registered at" %}</b></th>
   </tr>
 </thead>
 <tbody>
@@ -53,10 +48,15 @@
     </td>
     <td>{{ item.registred_at|date }}</td>
   </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3" class="notice">
+      {% trans "You currently have no MAC addresses whitelisted." %}
+    </td>
+  </tr>
   {% endfor %}
 </tbody>
 </table>
-{% endif %}
 <p>{% trans "Enter a MAC address (physical address of your WiFi network card) to be whitelisted on all nodes, so no splash screen confirmation will be needed. Please note that after you enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the mesh, so be patient!" %}
 </p>
 <form action="/nodes/whitelisted_mac" method="post">
@@ -80,4 +80,17 @@
 </div>
 </form>
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "MAC addresses",
+    "sortColumn": [[1, "asc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}

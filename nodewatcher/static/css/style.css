@@ -8,6 +8,7 @@ abbr {
 
 table.listing {
   margin-top: 0px;
+  clear: both;
 }
 
 h1 {
@@ -68,17 +69,11 @@ table.listing tbody tr.section_title {
   background-color: #FFFFFF !important;
 }
 
-table.listing tbody tr.table_links:hover,
-table.listing tbody tr.table_links:focus,
-table.listing tbody tr.table_links {
-  background-color: #FFFFFF !important;
-}
-
-table.listing tbody tr.table_links td {
+.table_links {
   text-align: center;
 }
 
-.nodelist table.listing td{
+.nodelist table.listing td {
   font-size: 12px;
 }
 
@@ -165,37 +160,37 @@ table.nodeinfo {
 }
 
 .networksummary h2 {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 .networksummary table.layout td.nodes {
-	text-align: center;
-	vertical-align: baseline;
-	font-size: 2em;
-	font-weight: bold;
+  text-align: center;
+  vertical-align: baseline;
+  font-size: 2em;
+  font-weight: bold;
 }
 
 .legend {
-	font-size: 90%;
-	padding: 10px;
+  font-size: 90%;
+  padding: 10px;
 }
 
 .legend ul {
-	padding: 0;
+  padding: 0;
 }
 
 .legend ul li {
-	list-style: none;
-	margin-left: 0;
-	height: 20px;
+  list-style: none;
+  margin-left: 0;
+  height: 20px;
 }
 
 .legend ul li img {
-	vertical-align: middle;
+  vertical-align: middle;
 }
 
 .gmap_details {
-	font-size: 80%;
+  font-size: 80%;
 }
 
 .optional_packages ul {
@@ -220,4 +215,63 @@ table.nodeinfo {
   clear: both;
   margin: 0 auto;
   width: 566px;
+}
+
+.dataTables_wrapper {
+  clear: both;
+}
+
+.dataTables_filter {
+  width: 50%;
+  float: right;
+  text-align: right;
+}
+
+.dataTables_info {
+  width: 50%;
+  float: left;
+}
+
+.clear {
+  clear: both;
+}
+
+table.listing td.center {
+  text-align: center;
+}
+
+table.listing tbody td.notice, table.listing tbody th.notice {
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -moz-border-radius-topleft:3px;
+  -moz-border-radius-topright:3px;
+  padding: 5px;
+  border: 1px solid #95DA3A;
+  background-color: #E1FFB8;
+  color: #3D6744;
+  text-align: center;
+}
+
+.sorting_asc {
+  background: url('/images/sort_asc.jpg') no-repeat center right;
+}
+
+.sorting_desc {
+  background: url('/images/sort_desc.jpg') no-repeat center right;
+}
+
+.sorting {
+  background: url('/images/sort_both.jpg') no-repeat center right;
+}
+
+.sorting_asc_disabled {
+  background: url('/images/sort_asc_disabled.jpg') no-repeat center right;
+}
+
+.sorting_desc_disabled {
+  background: url('/images/sort_desc_disabled.jpg') no-repeat center right;
+}
+
+.dataTables_empty {
+  text-align: center;
 }

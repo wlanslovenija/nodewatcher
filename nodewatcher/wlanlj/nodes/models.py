@@ -351,6 +351,12 @@ class Node(models.Model):
     Returns properly ordered subnets.
     """
     return self.subnet_set.all().order_by("ip_subnet")
+  
+  def get_peers(self):
+    """
+    Returns properly ordered peers.
+    """
+    return self.src.all().order_by("dst__name")
 
   def ant_type_as_string(self):
     """

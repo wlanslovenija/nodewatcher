@@ -241,88 +241,91 @@
   {% endif %}
 </table>
 <h3>{% trans "Subnets" %}</h3>
-{% if not node.subnet_set.all %}
-<p class="notice">{% trans "No subnets are currently assigned or visible." %}{% if current_owner %}<br /><a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "Add subnet" %}</a>{% endif %}</p>
-  {% else %}
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
-        <tr>
-          {% if current_owner %}<th style="width: 20px;">&nbsp;</th>{% endif %}
-          <th>{% trans "Subnet" %}</th>
-          <th style="width: 120px;">{% trans "Status" %}</th>
-          <th style="width: 150px;">{% trans "Last seen" %}</th>
-        </tr>
+  <tr>
+    {% if current_owner %}<th style="width: 20px;">&nbsp;</th>{% endif %}
+    <th>{% trans "Subnet" %}</th>
+    <th style="width: 120px;">{% trans "Status" %}</th>
+    <th style="width: 150px;">{% trans "Last seen" %}</th>
+  </tr>
 </thead>
 <tbody>
-        {% for subnet in node.get_subnets %}
-        <tr class="{% cycle 'odd' 'even' as subnet_rows %}">
-          {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" /></a>{% endif %}</td>{% endif %}
-          <td>{{ subnet }}</td>
-          <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
-          {% if subnet.last_seen %}
-          <td>{{ subnet.last_seen|date }}</td>
+  {% for subnet in node.get_subnets %}
+  <tr class="{% cycle 'odd' 'even' as subnet_rows %}">
+    {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" /></a>{% endif %}</td>{% endif %}
+    <td>{{ subnet }}</td>
+    <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
+    {% if subnet.last_seen %}
+    <td>{{ subnet.last_seen|date }}</td>
+    {% else %}
+    <td>{% trans "never" %}</td>
+    {% endif %}
+  </tr>
+  {% if subnet.is_conflicting %}
+  <tr class="{% cycle subnet_rows %}">
+    <td colspan="{% if current_owner %}4{% else %}3{% endif %}" class="small_text">
+      <span style="color: red;">Subnet <b>{{ subnet }}</b> conflicts with:<br/>
+      <div style="padding-left: 10px;">
+      {% for conflict in subnet.get_conflicting_subnets %}
+        {% if conflict.is_announced %}
+          {% if conflict.is_properly_announced %}
+          <b>{{ conflict }}</b> allocated to and announced by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
           {% else %}
-          <td>{% trans "never" %}</td>
+          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
           {% endif %}
-        </tr>
-        {% if subnet.is_conflicting %}
-        <tr class="{% cycle subnet_rows %}">
-          <td colspan="{% if current_owner %}4{% else %}3{% endif %}" class="small_text">
-            <span style="color: red;">
-              Subnet <b>{{ subnet }}</b> conflicts with:<br/>
-              <div style="padding-left: 10px;">
-              {% for conflict in subnet.get_conflicting_subnets %}
-              {% if conflict.is_announced %}
-                {% if conflict.is_properly_announced %}
-                <b>{{ conflict }}</b> allocated to and announced by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
-                {% else %}
-                <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
-                {% endif %}
-              {% else %}
-                <b>{{ conflict }}</b> allocated to <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
-              {% endif %}
-              {% endfor %}
-              </div>
-          </td>
-        </tr>
+        {% else %}
+          <b>{{ conflict }}</b> allocated to <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
         {% endif %}
-        {% endfor %}
-{% if current_owner %}
-<tr class="table_links"><td colspan="4">
-<a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "Add subnet" %}</a>
-</td></tr>
-{% endif %}
-</tbody>
-      </table>
+      {% endfor %}
+      </div>
+    </td>
+  </tr>
   {% endif %}
+  {% empty %}
+  <tr>
+    <td colspan="{% if current_owner %}4{% else %}3{% endif %}" class="notice">
+      {% trans "No subnets are currently assigned or visible." %}
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+{% if current_owner %}
+<div class="table_links">
+<a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "Add subnet" %}</a>
+</div>
+{% endif %}
 <h3>{% trans "Immediate Neighbours / Peers" %}</h3>
-  {% if not node.peer_list.all %}
-<p class="notice">{% trans "Node has no immediate neighbours." %}</p>
-  {% else %}
-      <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
+<table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
-        <tr>
-          <th>{% trans "Node" %}</th>
-          <th style="width: 70px;" align="center">LQ</th>
-          <th style="width: 70px;" align="center">ILQ</th>
-          <th style="width: 70px;" align="center">ETX</th>
-        </tr>
+  <tr>
+    <th>{% trans "Node" %}</th>
+    <th style="width: 70px;" align="center">LQ</th>
+    <th style="width: 70px;" align="center">ILQ</th>
+    <th style="width: 70px;" align="center">ETX</th>
+  </tr>
 </thead>
 <tbody>
-        {% for peer in node.src.all %}
-        <tr class="{% cycle 'odd' 'even' %}">
-          <td><a href="/nodes/node/{{ peer.dst.ip }}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
-          <td align="center">{{ peer.lq }}</td>
-          <td align="center">{{ peer.ilq }}</td>
-          <td align="center">{{ peer.etx }}</td>
-        </tr>
-        {% endfor %}
+  {% for peer in node.get_peers %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td><a href="/nodes/node/{{ peer.dst.ip }}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
+    <td align="center">{{ peer.lq }}</td>
+    <td align="center">{{ peer.ilq }}</td>
+    <td align="center">{{ peer.etx }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4" class="notice">
+      {% trans "Node has no immediate neighbours." %}
+    </td>
+  </tr>
+  {% endfor %}
 </tbody>
-      </table>
-  {% endif %}
+</table>
 
-  {% if node.get_graphs %}
-  <h3>{% trans "Graphs" %}</h3>
+{% if node.get_graphs %}
+<h3>{% trans "Graphs" %}</h3>
   {% if node.is_down %}
   <p class="error">{% trans "Node is currently down, so these graphs are out of date!" %}</p>
   {% endif %}
@@ -331,10 +334,24 @@
   {{ graph.render }}<br/>
   {% endfor %}
 </div>
-  {% endif %}
+{% endif %}
 
 {% endblock %}
 
 {% block js %}
 {% do_gmap "mapInit" "" node.geo_lat node.geo_long "" node.status_as_string %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "subnets",
+    "sortColumn": [[{% if current_owner %}1{% else %}0{% endif %}, "asc"]]
+  },
+  {
+    "entryName": "peers",
+    "sortColumn": [[0, "asc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}

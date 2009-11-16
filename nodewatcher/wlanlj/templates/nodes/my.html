@@ -21,19 +21,14 @@
 </div>
 <br/>
 {% endif %}
-  {% if not nodes %}
-<div class="notice">
-{% trans "You currently have no nodes defined. You can use <b>New node</b> option to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly." %}
-</div>
-  {% else %}
 <table border="0" class="listing">
 <thead>
   <tr>
     <th style="width: 22px;"></th>
     <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
     <th style="width: 100px;"><b>IP</b></th>
-    <th style="width: 280px;"><b>{% trans "Last seen up" %}</b></th>
-    <th style="width: 50px;" align="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 260px;"><b>{% trans "Last seen up" %}</b></th>
+    <th style="width: 70px;" align="center"><b>{% trans "Status" %}</b></th>
     <th style="width: 70px;" align="center"><b>{% trans "Peers" %}</b></th>
     <th style="width: 70px;" align="center"><b>{% trans "Clients" %}</b></th>
     <th style="width: 90px;" align="center"><b>{% trans "Project" %}</b></th>
@@ -66,9 +61,27 @@
     {% endif %}
     <td align="center">{{ node.project|default:_("unknown") }}</td>
   </tr>
+  {% empty %}
+  <tr>
+    <td colspan="8" class="notice">
+      {% trans "You currently have no nodes defined. You can use " %}<strong><a href="/nodes/new">New node</a></strong>{% trans " tab to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly." %}
+    </td>
+  </tr>
   {% endfor %}
 </tbody>
 </table>
-{% endif %}
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "nodes",
+    "sortColumn": [[2, "asc"]]
+  }
+];
+/* ]]> */
+</script>
 {% endblock %}
