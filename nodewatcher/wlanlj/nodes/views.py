@@ -405,7 +405,8 @@ def gcl(request):
   """
   Displays the global client list.
   """
-  clients = APClient.objects.all().order_by('node', 'connected_at')
+  # TODO: #362
+  clients = APClient.objects.all().order_by('node__ip', 'connected_at')
   return render_to_response('nodes/gcl.html',
     { 'clients' : clients },
     context_instance = RequestContext(request)
