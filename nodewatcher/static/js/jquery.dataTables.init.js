@@ -196,7 +196,7 @@ $(document).ready(function() {
 				"fnDrawCallback": (sections.length != 0 ? groupDrawCallback(this) : null),
 				"sDom": 'tif<"clear">',
 				"oLanguage": {
-					"sZeroRecords": "No matching records found",
+					"sZeroRecords": "No matching " + entryName + " found",
 					"sInfo": "_TOTAL_ " + entryName + " shown",
 					"sInfoEmpty": "0 " + entryName + " shown",
 					"sInfoFiltered": "(from _MAX_ all " + entryName + ")",
