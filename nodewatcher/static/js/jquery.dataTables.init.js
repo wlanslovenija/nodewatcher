@@ -116,9 +116,7 @@ function groupDrawCallback(table) {
 			var group = oSettings.aoData[oSettings.aiDisplay[displayIndex]]._aData[0];
 			if (group != lastGroup) {
 				$("<tr />").addClass("section_title").append(
-					$("<td />").attr("colspan", colspan).append(
-						$("<strong />").text(group)
-					)
+					$("<td />").attr("colspan", colspan).html(group)
 				).insertBefore($(this));
 				lastGroup = group;
 			}
@@ -141,13 +139,13 @@ $(document).ready(function() {
 		
 		$(this).find('tbody tr').each(function (i) {
 			if ($(this).is('.section_title')) {
-				var text = $(this).find('td').text();
-				sections.push(text);
-				allGroups.push(text);
+				var content = $(this).find('td').html();
+				sections.push(content);
+				allGroups.push(content);
 				$(this).remove();
 			}
 			else if (sections.length != 0) {
-				$(this).prepend($("<td />").text(sections[sections.length - 1]));
+				$(this).prepend($("<td />").html(sections[sections.length - 1]));
 			}
 		});
 		if (sections.length != 0) {
