@@ -225,6 +225,7 @@ table.nodeinfo {
   width: 50%;
   float: right;
   text-align: right;
+  color: #CCCCCC;
 }
 
 .dataTables_info {
@@ -256,22 +257,27 @@ table.listing tbody td.notice, table.listing tbody th.notice {
 
 .sorting_asc {
   background: url('/images/sort_asc.png') no-repeat center right;
+  cursor: pointer;
 }
 
 .sorting_desc {
   background: url('/images/sort_desc.png') no-repeat center right;
+  cursor: pointer;
 }
 
 .sorting {
   background: url('/images/sort_both.png') no-repeat center right;
+  cursor: pointer;
 }
 
 .sorting_asc_disabled {
   background: url('/images/sort_asc_disabled.png') no-repeat center right;
+  cursor: pointer;
 }
 
 .sorting_desc_disabled {
   background: url('/images/sort_desc_disabled.png') no-repeat center right;
+  cursor: pointer;
 }
 
 .dataTables_empty {
