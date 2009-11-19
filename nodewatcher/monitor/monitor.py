@@ -491,7 +491,7 @@ def check_mesh_status():
   Performs a mesh status check.
   """
   # Remove all invalid nodes and mark subnets as not visible
-  Node.objects.filter(status = NodeStatus.Invalid).delete()
+  Node.objects.filter(status = NodeStatus.Invalid).update(visible = False)
   Subnet.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
@@ -510,6 +510,7 @@ def check_mesh_status():
     try:
       # Try to get the node from the database
       dbNodes[nodeIp] = Node.objects.get(ip = nodeIp)
+      dbNodes[nodeIp].visible = True
       dbNodes[nodeIp].peers = len(nodes[nodeIp].links)
 
       # If we have succeeded, add to list
@@ -517,6 +518,7 @@ def check_mesh_status():
     except Node.DoesNotExist:
       # Node does not exist, create an invalid entry for it
       n = Node(ip = nodeIp, status = NodeStatus.Invalid, last_seen = datetime.now())
+      n.visible = True
       n.node_type = NodeType.Unknown
       n.warnings = True
       n.peers = len(nodes[nodeIp].links)
@@ -650,6 +652,9 @@ def check_mesh_status():
     Event.create_event(s.node, EventCode.SubnetRestored, '', EventSource.Monitor, data = 'Subnet: %s/%s' % (s.subnet, s.cidr))
     s.delete()
   
+  # Remove invisible unknown nodes
+  Node.objects.filter(status = NodeStatus.Invalid, visible = False).delete()
+
   # Ping the nodes to prepare information for later node processing
   results, dupes = wifi_utils.ping_hosts(10, nodesToPing)
   
