@@ -42,6 +42,7 @@ wifiAntennas = {
   'wrt54gl'     : (0,         False),
   'wrt54gs'     : (0,         False),
   'wl-500gp'    : (0,         True),
+  'wl-500gp-v1' : (0,         True),
   'wl-500gd'    : (0,         True),
   'rb433'       : (1,         False)
 }
@@ -49,15 +50,16 @@ wifiAntennas = {
 # A list of port layouts (do not forget to add new ones to a list of valid
 # layouts to build_image.py if you add them here)
 portLayouts = {
-               #  LAN           WAN
-  'wrt54gl'    : ('0 1 2 3 5*', '4 5'),
-  'wrt54gs'    : ('1 2 3 4 5*', '0 5'),
-  'whr-hp-g54' : ('1 2 3 4 5*', '0 5'),
-  'wl-500gp'   : ('0 1 2 3 5*', '4 5'),
-  'wl-500gd'   : ('0 1 2 3 5*', '4 5'),
-  'fonera'     : None,
-  'fonera+'    : True,
-  'rb433'      : True # ('1 5*',       '2 5')
+                #  LAN           WAN
+  'wrt54gl'     : ('0 1 2 3 5*', '4 5'),
+  'wrt54gs'     : ('1 2 3 4 5*', '0 5'),
+  'whr-hp-g54'  : ('1 2 3 4 5*', '0 5'),
+  'wl-500gp'    : ('0 1 2 3 5*', '4 5'),
+  'wl-500gp-v1' : ('1 2 3 4 5*', '0 5'),
+  'wl-500gd'    : ('0 1 2 3 5*', '4 5'),
+  'fonera'      : None,
+  'fonera+'     : True,
+  'rb433'       : True # ('1 5*',       '2 5')
 }
 
 class NodeConfig(object):
