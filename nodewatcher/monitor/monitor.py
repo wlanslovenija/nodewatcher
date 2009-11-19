@@ -524,6 +524,9 @@ def check_mesh_status():
       n.peers = len(nodes[nodeIp].links)
       n.save()
       dbNodes[nodeIp] = n
+
+      # Create an event since an unknown node has appeared
+      Event.create_event(n, EventCode.UnknownNodeAppeared, '', EventSource.Monitor)
   
   # Mark invisible nodes as down
   for node in Node.objects.exclude(status = NodeStatus.Invalid):
@@ -653,6 +656,10 @@ def check_mesh_status():
     s.delete()
   
   # Remove invisible unknown nodes
+  for node in Node.objects.filter(status = NodeStatus.Invalid, visible = False).all():
+    # Create an event since an unknown node has disappeared
+    Event.create_event(node, EventCode.UnknownNodeDisappeared, '', EventSource.Monitor)
+
   Node.objects.filter(status = NodeStatus.Invalid, visible = False).delete()
 
   # Ping the nodes to prepare information for later node processing
