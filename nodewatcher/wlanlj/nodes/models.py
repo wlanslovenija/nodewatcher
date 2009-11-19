@@ -145,6 +145,9 @@ class Node(models.Model):
   ant_external = models.BooleanField(default = False)
   ant_polarization = models.IntegerField(default = PolarizationType.Unknown)
   ant_type = models.IntegerField(default = AntennaType.Unknown)
+  
+  # Node visibility between monitoring runs (this is only used by the monitor daemon)
+  visible = models.BooleanField()
 
   # Basic status (set by the monitor daemon)
   warnings = models.BooleanField(default = False)
