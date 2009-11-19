@@ -862,6 +862,8 @@ class EventCode:
   DnsResolverFailed = 14
   DnsResolverRestored = 15
   RedundancyRestored = 16
+  UnknownNodeAppeared = 17
+  UnknownNodeDisappeared = 18
 
   NodeAdded = 100
   NodeRenamed = 101
@@ -913,6 +915,10 @@ class EventCode:
       return _("Node has been renamed")
     elif code == EventCode.NodeRemoved:
       return _("Node has been removed")
+    elif code == EventCode.UnknownNodeAppeared:
+      return _("Unknown node has appeared")
+    elif code == EventCode.UnknownNodeDisappeared:
+      return _("Unknown node is no longer visible")
     else:
       return _("Unknown event")
 
