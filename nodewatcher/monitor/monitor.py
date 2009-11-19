@@ -490,7 +490,7 @@ def check_mesh_status():
   """
   Performs a mesh status check.
   """
-  # Remove all invalid nodes and mark subnets as not visible
+  # Initialize the state of nodes and subnets, remove out of date ap clients and graph items
   Node.objects.filter(status = NodeStatus.Invalid).update(visible = False)
   Subnet.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
