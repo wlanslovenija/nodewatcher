@@ -320,7 +320,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
 
   # Check if we have fetched nodewatcher data
   info = nodewatcher.fetch_node_info(node_ip)
-  if info is not None:
+  if info is not None and 'general' in info:
     try:
       oldUptime = n.uptime or 0
       oldChannel = n.channel or 0
