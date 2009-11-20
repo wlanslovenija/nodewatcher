@@ -121,6 +121,14 @@ tr.inner_header {
   margin-bottom: 10px;
 }
 
+.graphdesc {
+  color: #666;
+  font-size: 85%;
+  text-align: center;
+  clear: both;
+  margin-bottom: 10px;
+}
+
 #details_title {
   clear: both;
 }
