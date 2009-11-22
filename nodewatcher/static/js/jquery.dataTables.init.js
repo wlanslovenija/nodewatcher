@@ -203,7 +203,7 @@ $(document).ready(function() {
 					"sInfoPostFix": "",
 					"sSearch": "Filter:"
 				}
-			});
+			}).fnSettings().oPreviousSearch.bEscapeRegex = false;
 		}
 	});
 });
