@@ -150,9 +150,6 @@ $(document).ready(function() {
 		});
 		if (sections.length != 0) {
 			$(this).find('thead tr').prepend($("<th />"));
-			$.each(sortColumn, function (i, val) {
-				val[0]++;
-			});
 		}
 		
 		var columns = [];
@@ -174,16 +171,29 @@ $(document).ready(function() {
 				});
 			}
 			else {
-				columns.push(null);
+				columns.push({});
 			}
 		});
-		
+	
+		$.each(sortColumn, function (i, val) {
+			if (sections.length != 0) {
+				val[0]++;
+			}
+			if (val[1] == "desc") {
+				columns[val[0]].asSorting = ["desc", "asc"];
+			}
+		});
+	
 		if ($(this).find('tbody td:not([colspan])').length > 0) {
 			$(this).dataTable({
 				"bPaginate": false,
 				"bLengthChange": true,
 				"bFilter": true,
 				"bSort": true,
+				"oSearch": {
+					"sSearch": "",
+					"bEscapeRegex": false
+				},
 				"bInfo": true,
 				"bAutoWidth": false,
 				"bProcessing": false,
@@ -203,7 +213,7 @@ $(document).ready(function() {
 					"sInfoPostFix": "",
 					"sSearch": "Filter:"
 				}
-			}).fnSettings().oPreviousSearch.bEscapeRegex = false;
+			});
 		}
 	});
 });
