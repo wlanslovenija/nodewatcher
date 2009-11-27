@@ -11,7 +11,7 @@ import sys, os
 from optparse import OptionParser
 
 print "============================================================================"
-print "                  Ljubljana WiFi Mesh Monitoring Daemon"
+print "                  wlan ljubljana Mesh Monitoring Daemon"
 print "============================================================================"
 
 parser = OptionParser()
