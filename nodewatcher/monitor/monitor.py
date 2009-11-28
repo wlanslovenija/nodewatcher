@@ -352,6 +352,8 @@ def process_node(node_ip, ping_results, is_duped, peers):
           n.captive_portal_status = False
           n.warnings = True
         else:
+          n.captive_portal_status = True
+
           for cid, client in info['nds'].iteritems():
             if not cid.startswith('client'):
               continue
