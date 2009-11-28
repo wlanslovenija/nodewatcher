@@ -44,10 +44,10 @@
   </tr>
 </table>
   
-  <form method="POST" action="{% url wlanlj.nodes.views.node_remove node.ip %}">
+  <form method="POST" action="{% url remove_node node.pk %}">
   <div class="buttons">
     <input type="submit" value="{% trans "Remove" %}" />&nbsp;
-    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
   </div>
   </form>
 {% endblock %}

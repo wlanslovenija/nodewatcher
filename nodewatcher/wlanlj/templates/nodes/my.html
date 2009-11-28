@@ -39,12 +39,12 @@
   <tr class="{% cycle 'odd' 'even' %}">
     <td align="center">
       {% if node.warnings %}
-      <a href="/nodes/node/{{ node.ip }}">
-        <img src="http://nodes.wlan-lj.net/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
+      <a href="{% url view_node node.pk %}">
+        <img src="/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>
-    <td><a href="/nodes/node/{{ node.ip }}">{{ node.name|default:_("unknown") }}</a></td>
+    <td><a href="{% url view_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     {% if node.last_seen %}
     <td>{{ node.last_seen|date }}</td>

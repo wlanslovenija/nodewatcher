@@ -12,6 +12,7 @@ from wlanlj.account.models import UserAccount
 from wlanlj.policy.models import Policy, PolicyFamily, TrafficControlClass
 from datetime import datetime
 from wlanlj.nodes import ipcalc
+from django.core.urlresolvers import reverse
 
 def nodes(request):
   """
@@ -129,7 +130,7 @@ def node_new(request):
     form = RegisterNodeForm(request.POST)
     if form.is_valid():
       node = form.save(request.user)
-      return HttpResponseRedirect("/nodes/node/" + node.ip)
+      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
     form = RegisterNodeForm()
 
@@ -141,11 +142,11 @@ def node_new(request):
   )
 
 @login_required
-def node_edit(request, node_ip):
+def node_edit(request, node):
   """
   Display a form for registering a new node.
   """
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   if node.status == NodeStatus.Invalid or (node.owner != request.user and not request.user.is_staff):
     raise Http404
   
@@ -153,7 +154,7 @@ def node_edit(request, node_ip):
     form = UpdateNodeForm(node, request.POST)
     if form.is_valid():
       form.save(node, request.user)
-      return HttpResponseRedirect("/nodes/node/" + node.ip)
+      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
     p = {
       'name'                : node.name,
@@ -221,14 +222,11 @@ def node_edit(request, node_ip):
     context_instance = RequestContext(request)
   )
 
-def node(request, node_ip = None):
+def node(request, node):
   """
   Displays node info.
   """
-  if not node_ip:
-    raise Http404
-  
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   
   return render_to_response('nodes/node.html',
     { 'node' : node ,
@@ -237,13 +235,13 @@ def node(request, node_ip = None):
   )
 
 @login_required
-def node_reset(request, node_ip):
+def node_reset(request, node):
   """
   Displays a form where the user can confirm node data reset. If
   confirmed, node data is reset and node is moved into pending
   state.
   """
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
 
@@ -254,7 +252,7 @@ def node_reset(request, node_ip):
       node.reset()
       node.save()
 
-      return HttpResponseRedirect("/nodes/node/%s" % node.ip)
+      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
 
   return render_to_response('nodes/reset.html',
     { 'node' : node },
@@ -262,11 +260,11 @@ def node_reset(request, node_ip):
   )
 
 @login_required
-def node_remove(request, node_ip):
+def node_remove(request, node):
   """
   Displays node info.
   """
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
   
@@ -274,7 +272,7 @@ def node_remove(request, node_ip):
     # Generate node removed event and remove node
     Event.create_event(node, EventCode.NodeRemoved, '', EventSource.NodeDatabase)
     node.delete()
-    return HttpResponseRedirect("/nodes/my_nodes")
+    return HttpResponseRedirect(reverse("my_nodes"))
   
   return render_to_response('nodes/remove.html',
     { 'node' : node },
@@ -283,11 +281,11 @@ def node_remove(request, node_ip):
 
 
 @login_required
-def node_allocate_subnet(request, node_ip):
+def node_allocate_subnet(request, node):
   """
   Displays node info.
   """
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   if node.status == NodeStatus.Invalid or (node.owner != request.user and not request.user.is_staff):
     raise Http404
  
@@ -295,7 +293,7 @@ def node_allocate_subnet(request, node_ip):
     form = AllocateSubnetForm(node, request.POST)
     if form.is_valid():
       form.save(node)
-      return HttpResponseRedirect("/nodes/node/" + node.ip)
+      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
     form = AllocateSubnetForm(node)
 
@@ -320,7 +318,7 @@ def node_deallocate_subnet(request, subnet_id):
       raise Http404
 
     subnet.delete()
-    return HttpResponseRedirect("/nodes/node/%s" % node.ip)
+    return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
 
   return render_to_response('nodes/deallocate_subnet.html',
     { 'node' : node,
@@ -492,11 +490,11 @@ def event_unsubscribe(request, subscription_id):
   return HttpResponseRedirect("/nodes/events")
 
 @login_required
-def package_list(request, node_ip):
+def package_list(request, node):
   """
   Display a list of node's installed packages.
   """
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
 

@@ -93,7 +93,7 @@
       {% if not event.node.name %}
       {{ event.node.ip }}
       {% else %}
-      <a href="/nodes/node/{{ event.node.ip }}">{{ event.node.name }}</a></td>
+      <a href="{% url view_node event.node.pk %}">{{ event.node.name }}</a></td>
       {% endif %}
     <td>{{ event.code_to_string }}</td>
   </tr>

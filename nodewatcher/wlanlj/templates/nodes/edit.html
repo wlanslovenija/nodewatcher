@@ -30,7 +30,7 @@
 </div>
 {% endif %}
 
-<form action="/nodes/edit/{{ node.ip }}" method="post">
+<form action="{% url wlanlj.nodes.views.node_edit node.pk %}" method="post">
 <table border="0" width="700px">
   <tr>
     <td style="width: 200px;">{{ form.name.label }}</td>
@@ -190,7 +190,7 @@
   </tr>
 </table>
 <div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />
-<input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+<input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
 </div>
 </form>
 </div>

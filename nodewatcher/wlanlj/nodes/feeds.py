@@ -29,5 +29,5 @@ class LatestEvents(Feed):
     return item.timestamp
 
   def item_link(self, item):
-    return "http://nodes.wlan-lj.net/nodes/node/%s#evt%s" % (item.node.ip, item.id)
+    return "http://nodes.wlan-lj.net/nodes/node/%s#evt%s" % (item.node.pk, item.id)
 

@@ -9,6 +9,7 @@ from wlanlj.nodes import ipcalc
 from wlanlj.generator.types import IfaceType
 from wlanlj.dns.models import Zone, Record
 from datetime import datetime, timedelta
+import uuid
 
 # This will select the proper IP lookup mechanism, so it will also work on
 # non-PostgreSQL databases (but it will be much slower for larger sets).
@@ -120,7 +121,8 @@ class Node(models.Model):
   """
   This class represents a single node in the mesh.
   """
-  ip = models.CharField(max_length = 40, primary_key = True)
+  uuid = models.CharField(max_length = 40, primary_key = True)
+  ip = models.CharField(max_length = 40, unique = True)
   name = models.CharField(max_length = 50, null = True, unique = True)
   owner = models.ForeignKey(User, null = True)
   location = models.CharField(max_length = 200, null = True)
@@ -392,7 +394,16 @@ class Node(models.Model):
     Returns this node's status as a human readable string.
     """
     return NodeStatus.as_string(self.status)
-
+  
+  def save(self, **kwargs):
+    """
+    Override save so we can generate UUIDs.
+    """
+    if not self.uuid:
+      self.pk = str(uuid.uuid4())
+    
+    super(Node, self).save(**kwargs)
+  
   def __unicode__(self):
     """
     Returns a string representation of this node.

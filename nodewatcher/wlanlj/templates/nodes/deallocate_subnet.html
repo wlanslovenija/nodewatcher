@@ -60,7 +60,7 @@
     {% if not subnet.is_wifi or user.is_staff %}
     <input type="submit" value="{% trans "Remove" %}" />&nbsp;
     {% endif %}
-    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
   </div>
   </form>
 {% endblock %}

@@ -56,7 +56,7 @@
       {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information</i> section." %}
 </p>
 
-<form action="/nodes/allocate_subnet/{{ node.ip }}" method="post">
+<form action="{% url wlanlj.nodes.views.node_allocate_subnet node.pk %}" method="post">
 <table border="0" class="layout">
   {% if user.is_staff %}
   <tr>
@@ -83,7 +83,7 @@
 </table>
   <div class="buttons">
       <input type="submit" value="{% trans "Allocate" %}" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
     </div>
 </form>
 {% endblock %}

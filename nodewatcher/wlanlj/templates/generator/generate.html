@@ -21,7 +21,7 @@
 </div>
 {% endif %}
 
-<form method="POST" action="/generator/request/{{ node.ip }}">
+<form method="POST" action="{% url generate_node node.pk %}">
 <table border="0" width="700">
   <tr class="section_title">
     <td colspan="2">
@@ -55,7 +55,6 @@
   <tr class="section_title">
     <td colspan="2">
       {% trans "Image Generator Information" %}
-      {% if current_owner %}&nbsp;[<a href="/generator/request/{{ node.ip }}">{% trans "generate image" %}</a>]{% endif %}
     </td>
   </tr>
   {% if user.is_staff %}
@@ -112,7 +111,7 @@
       {% if node.has_allocated_subnets and node.owner.email %}
       <input type="submit" value="{% trans "Generate" %}" />&nbsp;
       {% endif %}
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
     </div>
 </form>
 {% endblock %}

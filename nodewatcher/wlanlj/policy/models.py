@@ -87,7 +87,7 @@ class Policy(models.Model):
     p.save()
 
     # Add an update job, just to be sure
-    PolicyJob.add(node.ip, family, addr)
+    PolicyJob.add(node.pk, family, addr)
   
   def delete(self):
     """

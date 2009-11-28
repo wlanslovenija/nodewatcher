@@ -277,7 +277,7 @@ class RegisterNodeForm(forms.Form):
     tc_ingress = self.cleaned_data.get('tc_ingress')
     if tc_ingress:
       Policy.set_policy(node, node.vpn_mac_conf, PolicyAction.Shape, tc_ingress, PolicyFamily.Ethernet)
-
+    
     # Create node profile for image generator
     if self.cleaned_data.get('template'):
       profile = Profile(node = node, template = self.cleaned_data.get('template'))
@@ -304,6 +304,7 @@ class RegisterNodeForm(forms.Form):
       profile.save()
 
     if subnet:
+      subnet.node = node
       subnet.save()
 
     # Update DNS entries

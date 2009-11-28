@@ -24,11 +24,11 @@
 </div>
 <h3 class="section_title">{% trans "General Information" %}
 {% if current_owner %}
-<a href="/nodes/edit/{{ node.ip }}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
+<a href="{% url edit_node node.pk %}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
 {% if node.is_resettable %}
-<a href="/nodes/reset/{{ node.ip }}"><img src="/images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
+<a href="{% url reset_node node.pk %}"><img src="/images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
 {% endif %}
-<a href="/nodes/remove/{{ node.ip }}"><img src="/images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
+<a href="{% url remove_node node.pk %}"><img src="/images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
 {% endif %}
 </h3>
 
@@ -130,7 +130,7 @@
   <tr class="section_title">
     <td colspan="2">
       {% trans "Image Generator Information" %}
-      {% if current_owner %}&nbsp;[<a href="/generator/request/{{ node.ip }}">{% trans "generate image" %}</a>]{% endif %}
+      {% if current_owner %}&nbsp;[<a href="{% url generate_node node.pk %}">{% trans "generate image" %}</a>]{% endif %}
     </td>
   </tr>
   <tr>
@@ -148,7 +148,7 @@
   {% if current_owner and node.installedpackage_set.all %}
   <tr>
     <td>{% trans "Installed packages" %}</td>
-    <td><a href="/nodes/installed_packages/{{ node.ip }}">{% trans "show list" %}</a></td>
+    <td><a href="{% url view_node_packages node.pk %}">{% trans "show list" %}</a></td>
   </tr>
   {% endif %}
   {% endif %}
@@ -270,12 +270,12 @@
       {% for conflict in subnet.get_conflicting_subnets %}
         {% if conflict.is_announced %}
           {% if conflict.is_properly_announced %}
-          <b>{{ conflict }}</b> allocated to and announced by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+          <b>{{ conflict }}</b> allocated to and announced by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
           {% else %}
-          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
           {% endif %}
         {% else %}
-          <b>{{ conflict }}</b> allocated to <a href="{% url wlanlj.nodes.views.node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+          <b>{{ conflict }}</b> allocated to <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
         {% endif %}
       {% endfor %}
       </div>
@@ -293,7 +293,7 @@
 </table>
 {% if current_owner %}
 <div class="table_links">
-<a href="/nodes/allocate_subnet/{{ node.ip }}">{% trans "Add subnet" %}</a>
+<a href="{% url allocate_subnet node.pk %}">{% trans "Add subnet" %}</a>
 </div>
 {% endif %}
 <h3>{% trans "Immediate Neighbours / Peers" %}</h3>
@@ -309,7 +309,7 @@
 <tbody>
   {% for peer in node.get_peers %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="/nodes/node/{{ peer.dst.ip }}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
+    <td><a href="{% url view_node peer.dst.pk %}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
     <td align="center">{{ peer.lq }}</td>
     <td align="center">{{ peer.ilq }}</td>
     <td align="center">{{ peer.etx }}</td>

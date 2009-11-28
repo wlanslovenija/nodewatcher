@@ -8,11 +8,11 @@ from wlanlj.generator.queue import queue_generator_job
 from wlanlj.generator.forms import GenerateImageForm
 
 @login_required
-def request(request, node_ip):
+def request(request, node):
   """
   Displays a confirmation form.
   """
-  node = get_object_or_404(Node, pk = node_ip)
+  node = get_object_or_404(Node, pk = node)
   if node.owner != request.user and not request.user.is_staff:
     raise Http404
 
