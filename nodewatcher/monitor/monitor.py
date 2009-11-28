@@ -119,12 +119,6 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
     return
   
-  rra = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', '%s.rrd' % filename))
-  try:
-    RRA.update(node, conf, rra, *values)
-  except:
-    pass
-  
   # Get parent instance (toplevel by default)
   parent = attrs.get('parent', None)
 
@@ -132,8 +126,14 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
     graph = GraphItem.objects.get(node = node, name = name, type = type, parent = parent)
   except GraphItem.DoesNotExist:
     graph = GraphItem(node = node, name = name, type = type, parent = parent)
-    graph.rra = '%s.rrd' % filename
-    graph.graph = '%s.png' % filename
+    graph.rra = '%s_%s.rrd' % (filename, node.pk)
+    graph.graph = '%s_%s.png' % (filename, node.pk)
+  
+  rra = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
+  try:
+    RRA.update(node, conf, rra, *values)
+  except:
+    pass
   
   graph.title = title
   graph.last_update = datetime.now()
@@ -278,7 +278,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
     n.rtt_min, n.rtt_avg, n.rtt_max, n.pkt_loss = ping_results
     
     # Add RTT graph
-    add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency_%s' % node_ip, n.rtt_avg)
+    add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency', n.rtt_avg)
 
     # Add uptime credit
     if n.uptime_last:
@@ -302,7 +302,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
     Event.create_event(n, EventCode.PacketDuplication, '', EventSource.Monitor)
   
   # Add olsr peer count graph
-  add_graph(n, '', GraphType.OlsrPeers, RRAOlsrPeers, 'Routing Peers', 'olsrpeers_%s' % node_ip, n.peers)
+  add_graph(n, '', GraphType.OlsrPeers, RRAOlsrPeers, 'Routing Peers', 'olsrpeers', n.peers)
 
   # Add LQ/ILQ graphs
   if n.peers > 0:
@@ -311,10 +311,10 @@ def process_node(node_ip, ping_results, is_duped, peers):
       lq_avg += float(peer[1])
       ilq_avg += float(peer[2])
     
-    lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Average Link Quality', 'lq_%s' % node_ip, lq_avg / n.peers, ilq_avg / n.peers)
+    lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Average Link Quality', 'lq', lq_avg / n.peers, ilq_avg / n.peers)
 
     for peer in n.src.all():
-      add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s_%s' % (node_ip, peer.dst.ip), peer.lq, peer.ilq, parent = lq_graph)
+      add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s' % peer.dst.pk, peer.lq, peer.ilq, parent = lq_graph)
 
   n.last_seen = datetime.now()
 
@@ -382,7 +382,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
 
       # Generate a graph for number of wifi cells
       if 'cells' in info['wifi']:
-        add_graph(n, '', GraphType.WifiCells, RRAWifiCells, 'Nearby Wifi Cells', 'wificells_%s' % node_ip, safe_int_convert(info['wifi']['cells']) or 0)
+        add_graph(n, '', GraphType.WifiCells, RRAWifiCells, 'Nearby Wifi Cells', 'wificells', safe_int_convert(info['wifi']['cells']) or 0)
 
       # Update node's MAC address on wifi iface
       if 'mac' in info['wifi']:
@@ -393,7 +393,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
         n.vpn_mac = info['vpn']['mac']
 
       # Generate a graph for number of clients
-      add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients_%s' % node_ip, n.clients)
+      add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients', n.clients)
 
       # Check for IP shortage
       wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
@@ -403,20 +403,20 @@ def process_node(node_ip, ping_results, is_duped, peers):
       # Record interface traffic statistics for all interfaces
       for iid, iface in info['iface'].iteritems():
         if iid not in ('wifi0', 'wmaster0'):
-          add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s_%s' % (node_ip, iid), iface['up'], iface['down'])
+          add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s' % iid, iface['up'], iface['down'])
       
       # Generate load average statistics
       if 'loadavg' in info['general']:
         n.loadavg_1min, n.loadavg_5min, n.loadavg_15min, n.numproc = safe_loadavg_convert(info['general']['loadavg'])
-        add_graph(n, '', GraphType.LoadAverage, RRALoadAverage, 'Load Average', 'loadavg_%s' % node_ip, n.loadavg_1min, n.loadavg_5min, n.loadavg_15min)
-        add_graph(n, '', GraphType.NumProc, RRANumProc, 'Number of Processes', 'numproc_%s' % node_ip, n.numproc)
+        add_graph(n, '', GraphType.LoadAverage, RRALoadAverage, 'Load Average', 'loadavg', n.loadavg_1min, n.loadavg_5min, n.loadavg_15min)
+        add_graph(n, '', GraphType.NumProc, RRANumProc, 'Number of Processes', 'numproc', n.numproc)
 
       # Generate free memory statistics
       if 'memfree' in info['general']:
         n.memfree = safe_int_convert(info['general']['memfree'])
         buffers = safe_int_convert(info['general'].get('buffers', 0))
         cached = safe_int_convert(info['general'].get('cached', 0))
-        add_graph(n, '', GraphType.MemUsage, RRAMemUsage, 'Memory Usage', 'memusage_%s' % node_ip, n.memfree, buffers, cached)
+        add_graph(n, '', GraphType.MemUsage, RRAMemUsage, 'Memory Usage', 'memusage', n.memfree, buffers, cached)
 
       # Generate solar statistics when available
       if 'solar' in info and all([x in info['solar'] for x in ('batvoltage', 'solvoltage', 'charge', 'state', 'load')]):
@@ -427,7 +427,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
           'float'       : 4
         }
 
-        add_graph(n, '', GraphType.Solar, RRASolar, 'Solar Monitor', 'solar_%s' % node_ip,
+        add_graph(n, '', GraphType.Solar, RRASolar, 'Solar Monitor', 'solar',
           info['solar']['batvoltage'],
           info['solar']['solvoltage'],
           info['solar']['charge'],
@@ -511,12 +511,19 @@ def check_mesh_status():
   for nodeIp in nodes.keys():
     try:
       # Try to get the node from the database
-      dbNodes[nodeIp] = Node.objects.get(ip = nodeIp)
-      dbNodes[nodeIp].visible = True
-      dbNodes[nodeIp].peers = len(nodes[nodeIp].links)
+      n = Node.objects.get(ip = nodeIp)
+      n.visible = True
+      n.peers = len(nodes[nodeIp].links)
 
-      # If we have succeeded, add to list
-      nodesToPing.append(nodeIp)
+      # If we have succeeded, add to list (if not invalid)
+      if not n.is_invalid():
+        nodesToPing.append(nodeIp)
+      else:
+        n.last_seen = datetime.now()
+        n.peers = len(nodes[nodeIp].links)
+        n.save()
+      
+      dbNodes[nodeIp] = n
     except Node.DoesNotExist:
       # Node does not exist, create an invalid entry for it
       n = Node(ip = nodeIp, status = NodeStatus.Invalid, last_seen = datetime.now())
