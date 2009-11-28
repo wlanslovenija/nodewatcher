@@ -226,7 +226,10 @@ def node(request, node):
   """
   Displays node info.
   """
-  node = get_object_or_404(Node, pk = node)
+  try:
+    node = Node.objects.get(pk = node)
+  except Node.DoesNotExist:
+    node = get_object_or_404(Node, ip = node)
   
   return render_to_response('nodes/node.html',
     { 'node' : node ,
