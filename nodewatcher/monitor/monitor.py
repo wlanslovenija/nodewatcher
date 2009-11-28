@@ -619,7 +619,16 @@ def check_mesh_status():
         # Check if this is a hijack
         n = dbNodes[nodeIp]
         try:
-          origin = Subnet.objects.get(subnet = subnet, cidr = int(cidr), status__in = (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced))
+          origin = Subnet.objects.ip_filter(
+            # Subnet overlaps with another one
+            ip_subnet__contains = '%s/%s' % (subnet, cidr)
+          ).exclude(
+            # Of another node (= filter all subnets belonging to current node)
+            node = s.node
+          ).get(
+            # That is allocated
+            allocated = True
+          )
           s.status = SubnetStatus.Hijacked
           s.save()
 
@@ -789,7 +798,9 @@ if __name__ == '__main__':
         check_dead_graphs()
         check_global_statistics()
         check_events()
-        regenerate_graphs()
+        
+        if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+          regenerate_graphs()
       except:
         logging.warning(format_exc())
       
