@@ -364,7 +364,7 @@ class UpdateNodeForm(forms.Form):
     initial = 8,
     required = False
   )
-  root_pass = forms.CharField(required = False)
+  root_pass = forms.CharField(required = True)
   use_vpn = forms.BooleanField(required = False,
     label = _("Enable VPN"),
     initial = True
