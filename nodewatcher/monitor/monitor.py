@@ -802,6 +802,8 @@ if __name__ == '__main__':
         check_events()
         
         if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+          pass
+        else:
           regenerate_graphs()
       except:
         logging.warning(format_exc())
