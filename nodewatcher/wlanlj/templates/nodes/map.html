@@ -65,7 +65,7 @@
 /* <![CDATA[ */
   var nodes = [
     {% for node in nodes %}{% if node.should_draw_on_map %}
-    { "project": {{ node.project.pk }}, "lat": {{ node.geo_lat }}, "long": {{ node.geo_long }}, "ip": '{{ node.ip|escapejs }}', "name": '{{ node.name|escapejs }}', "status": '{{ node.status_as_string|escapejs }}', "url": '{{ node.url|default:""|escapejs }}' }{% if not forloop.last %},{% endif %}
+    { "project": {{ node.project.pk }}, "lat": {{ node.geo_lat }}, "long": {{ node.geo_long }}, "pk" : '{{ node.pk }}', "ip": '{{ node.ip|escapejs }}', "name": '{{ node.name|escapejs }}', "status": '{{ node.status_as_string|escapejs }}', "url": '{{ node.url|default:""|escapejs }}' }{% if not forloop.last %},{% endif %}
     {% endif %}{% endfor %}    
   ];
   var links = [
