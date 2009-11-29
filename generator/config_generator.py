@@ -725,6 +725,7 @@ class OpenWrtConfig(NodeConfig):
     def interfaceConfiguration(name):
       f.write('Interface "%s"\n' % name)
       f.write('{\n')
+      f.write('  Ip4Broadcast 255.255.255.255\n')
       f.write('  HelloInterval 4.0\n')
       f.write('  HelloValidityTime 80.0\n')
       f.write('  TcInterval 8.0\n')
