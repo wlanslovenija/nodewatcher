@@ -7,7 +7,7 @@
 <h1>{% trans "Renumber Node" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 
 <div class="error">
- {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool!" %}
+ {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply regenerate and reflash the image to your router." %}
 </div>
  
 <h3>{% trans "General Information" %}</h3>

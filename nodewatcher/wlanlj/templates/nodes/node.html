@@ -24,6 +24,12 @@
   <br/>
   This node's primary address has been recently renumbered to <b>{{ renumbered_ip }}</b>. This message means that the node has not yet been seen with the new address and so is still probably carrying its old address. As soon as the reconfigured node will appear, this message will be removed.
   {% endblocktrans %}<br />
+  {% if current_owner %}
+  <br/>
+  {% blocktrans %}
+  You must <b>update the router's configuration</b> to reflect renumbering changes. You can simply regenerate and reflash the image to your router.
+  {% endblocktrans %}
+  {% endif %}
 </div>
 {% endif %}
 <div class="embedded">
