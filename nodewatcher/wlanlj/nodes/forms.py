@@ -976,6 +976,9 @@ class RenumberForm(forms.Form):
         notice.save()
       
       self.__node.awaiting_renumber = True
+      
+      # Update node's DNS record
+      Record.update_for_node(self.__node)
     
     self.__node.save()
     
