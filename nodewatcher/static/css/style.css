@@ -27,6 +27,10 @@ h1 {
   color: #F8C901;
 }
 
+.node_status_awaitingrenumber {
+  color: #F8C901;
+}
+
 .node_status_new {
   color: #88BD32;
 }

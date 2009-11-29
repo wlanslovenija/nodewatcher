@@ -35,7 +35,7 @@ sys.path.append(options.path)
 os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice
 from django.db import transaction, models, connection
 from django.conf import settings
 
@@ -493,7 +493,7 @@ def check_mesh_status():
   Performs a mesh status check.
   """
   # Initialize the state of nodes and subnets, remove out of date ap clients and graph items
-  Node.objects.filter(status = NodeStatus.Invalid).update(visible = False)
+  Node.objects.filter(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)).update(visible = False)
   Subnet.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
@@ -517,6 +517,23 @@ def check_mesh_status():
 
       # If we have succeeded, add to list (if not invalid)
       if not n.is_invalid():
+        if n.awaiting_renumber:
+          # Reset any status from awaiting renumber to invalid
+          for notice in n.renumber_notices.all():
+            try:
+              rn = Node.objects.get(ip = notice.original_ip)
+              if rn.status == NodeStatus.AwaitingRenumber:
+                rn.status = NodeStatus.Invalid
+                rn.node_type = NodeType.Unknown
+                rn.awaiting_renumber = False
+                rn.save()
+            except Node.DoesNotExist:
+              pass
+            
+            notice.delete()
+          
+          n.awaiting_renumber = False
+        
         nodesToPing.append(nodeIp)
       else:
         n.last_seen = datetime.now()
@@ -531,6 +548,16 @@ def check_mesh_status():
       n.node_type = NodeType.Unknown
       n.warnings = True
       n.peers = len(nodes[nodeIp].links)
+      
+      # Check if there are any renumber notices for this IP address
+      try:
+        notice = RenumberNotice.objects.get(original_ip = nodeIp)
+        n.status = NodeStatus.AwaitingRenumber
+        n.node_type = notice.node.node_type
+        n.awaiting_renumber = True
+      except RenumberNotice.DoesNotExist:
+        pass
+      
       n.save()
       dbNodes[nodeIp] = n
 
@@ -538,7 +565,7 @@ def check_mesh_status():
       Event.create_event(n, EventCode.UnknownNodeAppeared, '', EventSource.Monitor)
   
   # Mark invisible nodes as down
-  for node in Node.objects.exclude(status = NodeStatus.Invalid):
+  for node in Node.objects.exclude(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)):
     oldStatus = node.status
 
     if node.ip not in dbNodes:
@@ -635,8 +662,9 @@ def check_mesh_status():
             # Of another node (= filter all subnets belonging to current node)
             node = s.node
           ).get(
-            # That is allocated
-            allocated = True
+            # That is allocated and visible
+            allocated = True,
+            visible = True
           )
           s.status = SubnetStatus.Hijacked
           s.save()
@@ -678,7 +706,7 @@ def check_mesh_status():
     # Create an event since an unknown node has disappeared
     Event.create_event(node, EventCode.UnknownNodeDisappeared, '', EventSource.Monitor)
 
-  Node.objects.filter(status = NodeStatus.Invalid, visible = False).delete()
+  Node.objects.filter(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber), visible = False).delete()
 
   # Ping the nodes to prepare information for later node processing
   results, dupes = wifi_utils.ping_hosts(10, nodesToPing)

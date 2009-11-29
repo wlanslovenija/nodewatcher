@@ -17,6 +17,15 @@
   {% endfor %}
 </div>
 {% endif %}
+{% if node.awaiting_renumber %}
+<div class="notice">
+  {% blocktrans with node.get_renumbered_ip as renumbered_ip%}
+  <b>NODE IS AWAITING IP RENUMBERING</b><br/>
+  <br/>
+  This node's primary address has been recently renumbered to <b>{{ renumbered_ip }}</b>. This message means that the note has not yet been seen with the new address and so is still probably carrying its old address. As soon as the reconfigured node will appear, this message will be removed.
+  {% endblocktrans %}<br />
+</div>
+{% endif %}
 <div class="embedded">
 {% if node.geo_lat and node.geo_long %}
 <div id="gmap" style="width:400px; height: 300px;"></div>

@@ -84,6 +84,7 @@ class NodeStatus:
   Invalid = 4
   New = 5
   Pending = 6
+  AwaitingRenumber = 7
   
   @staticmethod
   def as_string(status):
@@ -104,6 +105,8 @@ class NodeStatus:
       return "new"
     elif status == NodeStatus.Pending:
       return "pending"
+    elif status == NodeStatus.AwaitingRenumber:
+      return "awaitingrenumber"
     else:
       return "unknown"
 
@@ -162,6 +165,7 @@ class Node(models.Model):
   wifi_mac = models.CharField(max_length = 20, null = True)
   vpn_mac = models.CharField(max_length = 20, null = True)
   vpn_mac_conf = models.CharField(max_length = 20, null = True, unique = True)
+  awaiting_renumber = models.BooleanField(default = False)
 
   # RTT measurements (set by the monitor daemon)
   rtt_min = models.FloatField(null = True)
@@ -254,7 +258,7 @@ class Node(models.Model):
     """
     Returns true if the node is invalid.
     """
-    return self.status == NodeStatus.Invalid
+    return self.status in (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)
 
   def is_mesh_node(self):
     """
@@ -267,7 +271,25 @@ class Node(models.Model):
     Returns true if the node is a mobile node.
     """
     return self.node_type == NodeType.Mobile
-
+  
+  def is_primary_ip_in_subnet(self):
+    """
+    Returns true if node's primary IP is allocated to this node in a subnet.
+    """
+    return self.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.ip).filter(allocated = True).exclude(cidr = 0).count() > 0
+  
+  def get_renumbered_ip(self):
+    """
+    Returns node's new IP address (if it has recently been renumbered).
+    """
+    if self.status == NodeStatus.AwaitingRenumber:
+      try:
+        return RenumberNotice.objects.get(original_ip = self.ip).node.ip
+      except RenumberNotice.DoesNotExist:
+        return _("unknown")
+    else:
+      return self.ip
+  
   def node_type_as_string(self):
     """
     Returns node type as string.
@@ -524,15 +546,18 @@ class Subnet(models.Model):
   @staticmethod
   def is_allocated(network, cidr):
     """
-    Returns true if a node has the specified subnet allocated. This is
-    currently an expensive operation.
+    Returns true if a node has the specified subnet allocated.
     """
-    net = ipcalc.Network(network, cidr)
-    for x in Subnet.objects.filter(allocated = True):
-      comp_net = ipcalc.Network(x.subnet, x.cidr)
-      if net in comp_net or comp_net in net:
-        return True
-
+    overlaps = Subnet.objects.ip_filter(ip_subnet__conflicts = '%s/%s' % (network, cidr)).exclude(cidr = 0)
+    if overlaps.filter(allocated = True).count() > 0:
+      return True
+    
+    if overlaps.filter(status = SubnetStatus.Subset).count() > 0:
+      return True
+    
+    if cidr == 32 and Node.objects.filter(ip = network).count() > 0:
+      return True
+    
     return False
 
   def status_as_string(self):
@@ -557,6 +582,16 @@ class Subnet(models.Model):
     Returns a string representation of this subnet.
     """
     return u"%s/%d" % (self.subnet, self.cidr)
+
+class RenumberNotice(models.Model):
+  """
+  This model is used for taking note of what nodes are still pending to be
+  renumbered and contains backlinks, so nodes pending renumbering don't get
+  Invalid status.
+  """
+  node = models.ForeignKey(Node, unique = True, related_name = 'renumber_notices')
+  original_ip = models.CharField(max_length = 40)
+  renumbered_at = models.DateTimeField()
 
 class APClient(models.Model):
   """
@@ -780,6 +815,9 @@ class Pool(models.Model):
     """
     if not prefix_len:
       prefix_len = self.default_prefix_len
+    
+    if prefix_len != self.default_prefix_len:
+      raise PoolAllocationError('Non-default prefix lengths currently not supported!')
 
     if self.family != PoolFamily.Ipv4:
       raise PoolAllocationError('Only IPv4 allocations are currently supported!')
@@ -879,6 +917,7 @@ class EventCode:
   NodeAdded = 100
   NodeRenamed = 101
   NodeRemoved = 102
+  NodeRenumbered = 103
 
   @staticmethod
   def to_string(code):
@@ -930,6 +969,8 @@ class EventCode:
       return _("Unknown node has appeared")
     elif code == EventCode.UnknownNodeDisappeared:
       return _("Unknown node is no longer visible")
+    elif code == EventCode.NodeRenumbered:
+      return _("Node has been renumbered")
     else:
       return _("Unknown event")
 

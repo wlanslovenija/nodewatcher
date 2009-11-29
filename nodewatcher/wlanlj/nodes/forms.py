@@ -2,7 +2,7 @@ from django import forms
 from django.forms import widgets
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
@@ -796,7 +796,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.DnsResolverRestored, _("DNS resolver restored")),
       (EventCode.NodeAdded, _("A new node has been registered")),
       (EventCode.NodeRenamed, _("Node has been renamed")),
-      (EventCode.NodeRemoved, _("Node has been removed"))
+      (EventCode.NodeRemoved, _("Node has been removed")),
+      (EventCode.NodeRenumbered, _("Node has been renumbered")),
     ],
     required = False
   )
@@ -815,4 +816,169 @@ class EventSubscribeForm(forms.Form):
 
     s.code = int(self.cleaned_data.get('code')) or None
     s.save()
+
+class RenumberAction:
+  """
+  Valid renumber actions.
+  """
+  Keep = 0
+  Remove = -1
+  Renumber = -2
+  SetManually = -3
+
+class RenumberForm(forms.Form):
+  """
+  A form for renumbering a node.
+  """
+  manual_ip = forms.CharField(max_length = 40, required = False)
+  
+  def __init__(self, node, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    super(RenumberForm, self).__init__(*args, **kwargs)
+    self.__node = node
+    
+    # Use renumber with subnet only when this is possible
+    self.fields['primary_ip'] = forms.ChoiceField(
+      choices = [
+        (RenumberAction.SetManually, _("Set manually"))
+      ],
+      initial = RenumberAction.SetManually
+    )
+    
+    if node.is_primary_ip_in_subnet():
+      self.fields['primary_ip'].choices.insert(0,
+        (RenumberAction.Renumber, _("Renumber with subnet"))
+      )
+      self.fields['primary_ip'].initial = RenumberAction.Renumber
+    else:
+      self.fields['primary_ip'].choices.insert(0,
+        (RenumberAction.Keep, _("Keep")),
+      )
+      self.fields['primary_ip'].initial = RenumberAction.Keep
+    
+    # Setup dynamic form fields, depending on how may subnets a node has
+    for subnet in node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
+      pools = []
+      for pool in Pool.objects.filter(parent = None, allocated = False).order_by('network'):
+        pools.append((pool.pk, _("Renumber to %s/%s [%s]") % (pool.network, pool.cidr, pool.description)))
+      
+      self.fields['subnet_%s' % subnet.pk] = forms.ChoiceField(
+        choices = [
+          (RenumberAction.Keep, _("Keep")),
+          (RenumberAction.Remove, _("Remove"))
+        ] + pools,
+        initial = RenumberAction.Keep
+      )
+  
+  def get_subnet_fields(self):
+    """
+    A helper method that returns all subnet fields in order.
+    """
+    for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
+      field = self['subnet_%s' % subnet.pk]
+      field.model = subnet
+      yield field
+  
+  def clean(self):
+    """
+    Additional validation handler.
+    """
+    # Check that the manually set primary IP is not in conflict with anything
+    action = int(self.cleaned_data.get('primary_ip'))
+    manual_ip = self.cleaned_data.get('manual_ip')
+    
+    if action == RenumberAction.SetManually:
+      # Validate entered IP address
+      if not manual_ip or not IPV4_ADDR_RE.match(manual_ip) or manual_ip.startswith('127.'):
+        raise forms.ValidationError(_("Enter a valid primary IP address!"))
+      
+      # Check if the given address already exists
+      if Subnet.is_allocated(manual_ip, 32):
+        raise forms.ValidationError(_("Specified primary IP address is already in use!"))
+
+      # Check if the given subnet is part of any allocation pools
+      if Pool.contains_network(manual_ip, 32):
+        raise forms.ValidationError(_("Specified primary IP is part of an allocation pool and cannot be manually allocated!"))
+    
+    return self.cleaned_data
+  
+  def save(self):
+    """
+    Performs the actual renumbering.
+    """
+    # Determine what subnet primary IP belonged to
+    primary = self.__node.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.__node.ip).filter(allocated = True).exclude(cidr = 0)
+    renumber_primary = False
+    old_router_id = self.__node.ip
+    
+    # Renumber subnets first
+    for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet')[:]:
+      action = int(self.cleaned_data.get('subnet_%s' % subnet.pk))
+      
+      if action == RenumberAction.Keep:
+        pass
+      elif action == RenumberAction.Remove:
+        subnet.delete()
+      else:
+        # This means we should renumber to some other pool
+        pool = Pool.objects.get(pk = action)
+        new_subnet = pool.allocate_subnet(prefix_len = subnet.cidr)
+        
+        # If the old subnet has been the source of node's primary IP remember that
+        save_primary = (not renumber_primary and primary and primary[0] == subnet)
+        
+        # Remove old subnet and create a new one; it is deleted here so the old allocation
+        # is returned to the pool and all status info is reset
+        subnet.delete()
+        
+        s = Subnet(node = self.__node, subnet = new_subnet.network, cidr = new_subnet.cidr)
+        s.allocated = True
+        s.allocated_at = datetime.now()
+        s.status = SubnetStatus.NotAnnounced
+        s.save()
+        
+        if save_primary:
+          primary = s
+          renumber_primary = True
+    
+    # The subnet have now been renumbered, check if we need to renumber the primary IP
+    action = int(self.cleaned_data.get('primary_ip'))
+    router_id_changed = False
+    if action == RenumberAction.Keep:
+      pass
+    elif action == RenumberAction.SetManually:
+      self.__node.ip = self.cleaned_data.get('manual_ip')
+      router_id_changed = True
+    elif action == RenumberAction.Renumber and renumber_primary:
+      net = ipcalc.Network(primary.subnet, primary.cidr)
+      self.__node.ip = str(net.host_first())
+      router_id_changed = True
+    
+    # Node has been renumbered, reset monitoring status as this node is obviously not
+    # visible right after renumbering.
+    if router_id_changed:
+      self.__node.status = NodeStatus.Down
+      self.__node.peers = 0
+      Link.objects.filter(src = self.__node).delete()
+      Link.objects.filter(dst = self.__node).delete()
+      self.__node.subnet_set.filter(allocated = False).delete()
+      self.__node.subnet_set.all().update(status = SubnetStatus.NotAnnounced)
+      
+      # Setup a node renumbered notice (if one doesn't exist yet)
+      try:
+        notice = RenumberNotice.objects.get(node = self.__node)
+      except RenumberNotice.DoesNotExist:
+        notice = RenumberNotice(node = self.__node)
+        notice.original_ip = old_router_id
+        notice.renumbered_at = datetime.now()
+        notice.save()
+      
+      self.__node.awaiting_renumber = True
+    
+    self.__node.save()
+    
+    # Generate node renumbered event
+    Event.create_event(self.__node, EventCode.NodeRenumbered, '', EventSource.NodeDatabase)
 

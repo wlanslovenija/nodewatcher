@@ -21,7 +21,7 @@
   <tr>
     <td>{% trans "Maintainer" %}</td>
     {% if node.owner %}
-    <td><a href="/users/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
+    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
     {% else %}
     <td>{% trans "Unknown" %}</td>
     {% endif %}

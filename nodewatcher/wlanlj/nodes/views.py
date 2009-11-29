@@ -4,9 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models
+from django.forms import forms
 from django.utils.translation import ugettext as _
 from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
-from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm
+from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
 from wlanlj.policy.models import Policy, PolicyFamily, TrafficControlClass
@@ -285,6 +286,34 @@ def node_remove(request, node):
     context_instance = RequestContext(request)
   )
 
+@login_required
+def node_renumber(request, node):
+  """
+  Renumbers a given node.
+  """
+  node = get_object_or_404(Node, pk = node)
+  if not request.user.is_staff:
+    raise Http404
+  
+  if request.method == 'POST':
+    form = RenumberForm(node, request.POST)
+    try:
+      if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+    except:
+      # Something went wrong
+      error = forms.ValidationError(_("Renumbering cannot be completed due to certain conflicts or internal limitations with current settings. For more information please open a new ticket."))
+      form._errors[forms.NON_FIELD_ERRORS] = form.error_class(error.messages)
+  else:
+    form = RenumberForm(node)
+  
+  return render_to_response('nodes/renumber.html',
+    { 'node' : node,
+      'form' : form,
+      'renumber_action_manual' : RenumberAction.SetManually },
+    context_instance = RequestContext(request)
+  )
 
 @login_required
 def node_allocate_subnet(request, node):

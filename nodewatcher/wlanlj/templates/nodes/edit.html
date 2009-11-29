@@ -30,7 +30,7 @@
 </div>
 {% endif %}
 
-<form action="{% url wlanlj.nodes.views.node_edit node.pk %}" method="post">
+<form action="{% url edit_node node.pk %}" method="post">
 <table border="0" width="700px">
   <tr>
     <td style="width: 200px;">{{ form.name.label }}</td>
@@ -42,7 +42,7 @@
   </tr>
   <tr>
     <td>{{ form.ip.label }}</td>
-    <td><b>{{ node.ip }}</b></td>
+    <td><b>{{ node.ip }}</b> [<a href="{% url renumber_node node.pk %}">{% trans "renumber" %}</a>]</td>
   </tr>
   <tr>
     <td>{{ form.project.label }}</td>

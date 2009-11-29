@@ -12,7 +12,7 @@ WRAPPER_TEMPLATE = """<span class="node_status_%(status)s node_status_%(size)s">
 def statusimage(value, arg, autoescape = None):
   value = value.lower()
   
-  if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new')):
+  if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
     return ""
   
   if not (arg in ('big', 'small', 'gmap')):
@@ -24,7 +24,7 @@ def statusimage(value, arg, autoescape = None):
 def status(value, arg, autoescape = None):
   value = value.lower()
   
-  if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new')):
+  if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
     return ""
   
   if not (arg in ('big', 'small', 'gmap')):
