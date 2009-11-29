@@ -533,6 +533,7 @@ def check_mesh_status():
             notice.delete()
           
           n.awaiting_renumber = False
+          n.save()
         
         nodesToPing.append(nodeIp)
       else:
