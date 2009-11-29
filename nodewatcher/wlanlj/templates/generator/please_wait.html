@@ -11,7 +11,7 @@
 </div>
 <br />
 <div style="width: 700px; text-align: center">
-  <input type="button" value="{% trans "Back to Node Information" %}" onclick="document.location='/nodes/node/{{ node.ip }}'" />
+  <input type="button" value="{% trans "Back to Node Information" %}" onclick="document.location='{% url view_node node.pk %}'" />
 </div>
 
 <br /><br/><br/><br/><br/><br/>
