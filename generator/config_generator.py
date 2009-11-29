@@ -717,7 +717,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('{\n')
     f.write('  PlParam "trigger" "0.0.0.0>/etc/actions.d/olsr_gateway_action"\n')
     for dns in self.dns:
-      f.write('  PlParam "trigger" "%s>/etc/actions.d/olsr_dns_action"\n')
+      f.write('  PlParam "trigger" "%s>/etc/actions.d/olsr_dns_action"\n' % dns)
     f.write('}\n')
     f.write('\n')
     
