@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Renumber Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+
+{% block content %}
+<h1>{% trans "Renumber Node" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
+
+<div class="error">
+ {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool!" %}
+</div>
+ 
+<h3>{% trans "General Information" %}</h3>
+<table border="0" width="700">
+  <tr>
+    <td style="width: 200px;">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Name" %}</td>
+    <td>{{ node.name|default:_("unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Maintainer" %}</td>
+    {% if node.owner %}
+    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{% trans "Unknown" %}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Location" %}</td>
+    <td>{{ node.location|default:_("Unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Project" %}</td>
+    <td>{{ node.project.name|default:_("Unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "System node" %}</td>
+    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Border router" %}</td>
+    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+  </tr>
+</table>
+
+<h3>{% trans "Renumber Specification" %}</h3>
+{% if form.errors %}
+<div class="error">
+  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to renumber this node:{% endblocktrans %}<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url renumber_node node.pk %}">
+<table border="0" width="700">
+  <tr>
+    <td width="200"><b>{% trans "Current allocation" %}</b></td>
+    <td><b>{% trans "Renumber action" %}</b></td>
+  </tr>
+  <tr>
+    <td>{{ node.ip }}</td>
+    <td>{{ form.primary_ip }} {{ form.manual_ip }}</td>
+  </tr>
+  {% for subnet in form.get_subnet_fields %}
+  <tr>
+    <td>{{ subnet.model }}</td>
+    <td>{{ subnet }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<script type="text/javascript">
+  function toggleManualIp() {
+    if ($('#id_primary_ip').attr('value') == {{ renumber_action_manual }}) {
+      $('#id_manual_ip').css('display', '');
+    } else {
+      $('#id_manual_ip').css('display', 'none');
+    }
+  }
+  
+  $(document).ready(function () {
+    $('#id_primary_ip').change(function(event) { toggleManualIp(); });
+    toggleManualIp();
+  });
+</script>
+
+<div class="buttons">
+  <input type="submit" value="{% trans "Renumber" %}" />&nbsp;
+  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+</div>
+</form>
+{% endblock %}
