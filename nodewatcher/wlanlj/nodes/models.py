@@ -253,7 +253,13 @@ class Node(models.Model):
     Returns true if the node can be reset.
     """
     return self.status in (NodeStatus.Down, NodeStatus.Pending)
-
+  
+  def is_pending(self):
+    """
+    Returns true if the node hasn't yet been seen on the network.
+    """
+    return self.status == NodeStatus.Pending
+  
   def is_invalid(self):
     """
     Returns true if the node is invalid.

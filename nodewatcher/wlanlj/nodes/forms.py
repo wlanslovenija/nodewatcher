@@ -959,26 +959,27 @@ class RenumberForm(forms.Form):
     # Node has been renumbered, reset monitoring status as this node is obviously not
     # visible right after renumbering.
     if router_id_changed:
-      self.__node.status = NodeStatus.Down
-      self.__node.peers = 0
-      Link.objects.filter(src = self.__node).delete()
-      Link.objects.filter(dst = self.__node).delete()
-      self.__node.subnet_set.filter(allocated = False).delete()
-      self.__node.subnet_set.all().update(status = SubnetStatus.NotAnnounced)
-      
-      # Setup a node renumbered notice (if one doesn't exist yet)
-      try:
-        notice = RenumberNotice.objects.get(node = self.__node)
-      except RenumberNotice.DoesNotExist:
-        notice = RenumberNotice(node = self.__node)
-        notice.original_ip = old_router_id
-        notice.renumbered_at = datetime.now()
-        notice.save()
-      
-      self.__node.awaiting_renumber = True
-      
       # Update node's DNS record
       Record.update_for_node(self.__node)
+      
+      if not self.__node.is_pending():
+        self.__node.status = NodeStatus.Down
+        self.__node.peers = 0
+        Link.objects.filter(src = self.__node).delete()
+        Link.objects.filter(dst = self.__node).delete()
+        self.__node.subnet_set.filter(allocated = False).delete()
+        self.__node.subnet_set.all().update(status = SubnetStatus.NotAnnounced)
+        
+        # Setup a node renumbered notice (if one doesn't exist yet)
+        try:
+          notice = RenumberNotice.objects.get(node = self.__node)
+        except RenumberNotice.DoesNotExist:
+          notice = RenumberNotice(node = self.__node)
+          notice.original_ip = old_router_id
+          notice.renumbered_at = datetime.now()
+          notice.save()
+        
+        self.__node.awaiting_renumber = True
     
     self.__node.save()
     
