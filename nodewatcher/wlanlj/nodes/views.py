@@ -229,7 +229,10 @@ def node(request, node):
   try:
     node = Node.objects.get(pk = node)
   except Node.DoesNotExist:
-    node = get_object_or_404(Node, ip = node)
+    try:
+      node = Node.objects.get(ip = node)
+    except Node.DoesNotExist:
+      node = get_object_or_404(Node, name = node)
   
   return render_to_response('nodes/node.html',
     { 'node' : node ,
