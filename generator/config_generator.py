@@ -84,8 +84,8 @@ class NodeConfig(object):
   subnets = None
   vpn = None
   vpnServer = (("91.185.203.246", 9999), ("91.185.199.246", 9999))
-  dns = ("10.14.0.2", "10.14.0.3")
-  ntp = ("10.14.0.2", "10.14.0.3")
+  dns = ("10.254.0.1", "10.254.0.2")
+  ntp = ("10.254.0.1", "10.254.0.2")
   interfaces = None
   services = None
   captivePortal = False
