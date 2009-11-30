@@ -765,6 +765,14 @@ class PoolFamily:
   Ipv4 = 4
   Ipv6 = 6
 
+class PoolStatus:
+  """
+  Possible pools states.
+  """
+  Free = 0
+  Full = 1
+  Partial = 2
+
 class Pool(models.Model):
   """
   This class represents an IP pool - that is a subnet available for
@@ -775,24 +783,111 @@ class Pool(models.Model):
   family = models.IntegerField(default = 4)
   network = models.CharField(max_length = 50)
   cidr = models.IntegerField()
-  allocated = models.BooleanField(default = False)
-  default_prefix_len = models.IntegerField(default = 27)
-  last_alloc_network = models.CharField(max_length = 50, null = True)
-  last_alloc_cidr = models.IntegerField(null = True)
+  status = models.IntegerField(default = PoolStatus.Free)
   description = models.CharField(max_length = 200, null = True)
+  
+  # Field for indexed lookups
+  ip_subnet = IPField(null = True)
+  
+  # Custom manager
+  objects = IPManager()
+  
+  def save(self, **kwargs):
+    """
+    Saves the model.
+    """
+    self.ip_subnet = '%s/%s' % (self.network, self.cidr)
+    super(Pool, self).save(**kwargs)
+  
+  def split(self):
+    """
+    Splits this pool into two subpools.
+    """
+    net = ipcalc.Network(self.network, self.cidr)
+    net0 = "%s/%d" % (self.network, self.cidr + 1)
+    net1 = str(ipcalc.Network(long(net) + ipcalc.Network(net0).size())) 
+    
+    left = Pool(parent = self, family = self.family, network = self.network, cidr = self.cidr + 1)
+    right = Pool(parent = self, family = self.family, network = net1, cidr = self.cidr + 1)
+    left.save()
+    right.save()
+    
+    self.status = PoolStatus.Partial
+    self.save()
+    
+    return left, right
+  
+  def allocate_buddy(self, prefix_len):
+    """
+    Allocate IP addresses from the pool in a buddy-like allocation scheme. This
+    operation may split existing free pools into smaller ones to accomodate the
+    new allocation.
+    
+    @param prefix_len: Wanted prefix length
+    """
+    if self.cidr > prefix_len:
+      # We have gone too far, allocation has failed
+      return None
+    
+    if prefix_len == self.cidr and self.status == PoolStatus.Free:
+      # We have found a free pool of the proper size, use it
+      self.status = PoolStatus.Full
+      self.save()
+      return self
+    
+    # Pool not found, check if we have children - if we don't we'll have to split
+    # and traverse the left one
+    alloc = None
+    if self.children.count() > 0:
+      for child in self.children.exclude(status = PoolStatus.Full).order_by("ip_subnet"):
+        alloc = child.allocate_buddy(prefix_len)
+        if alloc:
+          break
+      else:
+        return None
+      
+      # Something has been allocated, update our status
+      if self.children.filter(status = PoolStatus.Full).count() == 2:
+        self.status = PoolStatus.Full
+        self.save()
+    else:
+      # Split ourselves into two halves and traverse the left half
+      left, right = self.split()
+      alloc = left.allocate_buddy(prefix_len)
+    
+    return alloc
+  
+  def reclaim_pools(self):
+    """
+    Coalesces free children back into one if possible.
+    """
+    if self.status == PoolStatus.Free:
+      return self.parent.reclaim_pools() if self.parent else None
+    
+    # When all children are free, we don't need them anymore; when only some
+    # are free, we mark this pool as partially free
+    free_children = self.children.filter(status = PoolStatus.Free).count()
+    if  free_children == 2:
+      self.children.all().delete()
+      self.status = PoolStatus.Free
+      self.save()
+      return self.parent.reclaim_pools() if self.parent else None
+    elif free_children == 1:
+      self.status = PoolStatus.Partial
+      self.save()
+
+  def is_leaf(self):
+    """
+    Returns true if this pool has no children.
+    """
+    return self.children.all().count() == 0
 
   @staticmethod
   def contains_network(network, cidr):
     """
     Returns true if any pools contain this network.
     """
-    net = ipcalc.Network(network, cidr)
-    for x in Pool.objects.filter(parent = None):
-      comp_net = ipcalc.Network(x.network, x.cidr)
-      if net in comp_net or comp_net in net:
-        return True
-
-    return False
+    return Pool.objects.ip_filter(ip_subnet__conflicts = "%s/%s" % (network, cidr)).cout() > 0
   
   def family_as_string(self):
     """
@@ -812,70 +907,15 @@ class Pool(models.Model):
     return u"%s/%d" % (self.network, self.cidr)
   
   @require_lock('nodes_pool', 'nodes_subnet')
-  def allocate_subnet(self, prefix_len = None):
+  def allocate_subnet(self, prefix_len = 27):
     """
     Attempts to allocate a subnet from this pool.
 
     @param prefix_len: Wanted prefix length
     @return: A valid Pool instance of the allocated subpool
     """
-    if not prefix_len:
-      prefix_len = self.default_prefix_len
-    
-    if prefix_len != self.default_prefix_len:
-      raise PoolAllocationError('Non-default prefix lengths currently not supported!')
-
-    if self.family != PoolFamily.Ipv4:
-      raise PoolAllocationError('Only IPv4 allocations are currently supported!')
-
-    if self.parent:
-      raise PoolAllocationError('Attempted to allocate from child pool!')
-
-    # First check if there are any children that are marked as free
-    for c in self.children.filter(allocated = False, cidr = prefix_len):
-      # Check for conflicts
-      if Subnet.is_allocated(c.network, c.cidr):
-        raise PoolAllocationError('Subnet allocation conflict found!')
-
-      c.allocated = True
-      c.save()
-      return c
-
-    # No children have been found, create new kids
-    parent_net = ipcalc.Network(self.network, self.cidr)
-    if not self.last_alloc_network:
-      net = ipcalc.Network(self.network, prefix_len)
-      if net not in parent_net:
-        raise PoolAllocationError('Given prefix exceeds pool size!')
-      
-      if prefix_len == 32:
-        # We are allocating a single host, don't let it be .0/32
-        net = ipcalc.Network(self.network, self.cidr)
-        allocation = (str(net.host_first()), 32)
-      else:
-        # Standard subnet allocation
-        allocation = (self.network, prefix_len)
-    else:
-      net = ipcalc.Network(self.last_alloc_network, self.last_alloc_cidr)
-      net = ipcalc.Network(long(net) + net.size(), prefix_len)
-      if net not in parent_net:
-        raise PoolAllocationError('Given prefix exceeds pool size!')
-
-      allocation = (str(net.network()), prefix_len)
-    
-    # Check if this is actually still free
-    if Subnet.is_allocated(*allocation):
-      raise PoolAllocationError('Subnet allocation conflict found! All automatic allocations have been suspended. Contact network operations immediately!')
-
-    # Create a new child
-    child = Pool(parent = self, family = self.family)
-    child.network, child.cidr = allocation
-    child.allocated = True
-    child.default_prefix_len = 0
-    self.last_alloc_network, self.last_alloc_cidr = allocation
-    child.save()
-    self.save()
-    return child
+    pool = self.allocate_buddy(prefix_len)
+    return pool
 
 class StatsSolar(models.Model):
   """
@@ -1179,8 +1219,10 @@ def subnet_on_delete_callback(sender, **kwargs):
 
   try:
     subnet = Pool.objects.get(network = instance.subnet, cidr = instance.cidr)
-    subnet.allocated = False
-    subnet.save()
+    if subnet.status == PoolStatus.Full:
+      subnet.status = PoolStatus.Free
+      subnet.save()
+      subnet.reclaim_pools()
   except Pool.DoesNotExist:
     pass
 
@@ -1193,8 +1235,10 @@ def node_on_delete_callback(sender, **kwargs):
   # Check if node has a /32 subnet assigned and free it if needed
   try:
     subnet = Pool.objects.get(network = kwargs['instance'].ip, cidr = 32)
-    subnet.allocated = False
-    subnet.save()
+    if subnet.status == PoolStatus.Full:
+      subnet.status = PoolStatus.Free
+      subnet.save()
+      subnet.reclaim_pools()
   except Pool.DoesNotExist:
     pass
 
