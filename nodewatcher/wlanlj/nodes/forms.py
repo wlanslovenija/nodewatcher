@@ -2,7 +2,7 @@ from django import forms
 from django.forms import widgets
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
@@ -872,7 +872,7 @@ class RenumberForm(forms.Form):
     # Setup dynamic form fields, depending on how may subnets a node has
     for subnet in node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       pools = []
-      for pool in Pool.objects.filter(parent = None, allocated = False).order_by('network'):
+      for pool in Pool.objects.filter(parent = None).exclude(status = PoolStatus.Full).order_by('network'):
         pools.append((pool.pk, _("Renumber to %s/%s [%s]") % (pool.network, pool.cidr, pool.description)))
       
       self.fields['subnet_%s' % subnet.pk] = forms.ChoiceField(
