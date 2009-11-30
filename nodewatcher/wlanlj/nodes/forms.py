@@ -614,6 +614,17 @@ class AllocateSubnetForm(forms.Form):
     initial = IfaceType.LAN,
     label = _("Interface")
   )
+  prefix_len = forms.ChoiceField(
+    choices = [
+      (24, '/24'),
+      (25, '/25'),
+      (26, '/26'),
+      (27, '/27'),
+      (28, '/28')
+    ],
+    initial = 27,
+    label = _("Prefix length")
+  )
   dhcp = forms.BooleanField(required = False, initial = True, label = _("DHCP announce"))
   
   def __init__(self, node, *args, **kwargs):
@@ -680,7 +691,7 @@ class AllocateSubnetForm(forms.Form):
       subnet.save()
     else:
       pool = node.project.pool
-      allocation = pool.allocate_subnet()
+      allocation = pool.allocate_subnet(int(self.cleaned_data.get('prefix_len')) or 27)
       subnet = Subnet(node = node, subnet = allocation.network, cidr = allocation.cidr)
       subnet.allocated = True
       subnet.allocated_at = datetime.now()
