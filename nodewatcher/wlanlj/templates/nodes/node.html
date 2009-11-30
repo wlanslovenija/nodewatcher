@@ -38,7 +38,7 @@
 {% endif %}
 </div>
 <h3 class="section_title">{% trans "General Information" %}
-{% if current_owner %}
+{% if current_owner and not node.is_invalid %}
 <a href="{% url edit_node node.pk %}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
 {% if node.is_resettable %}
 <a href="{% url reset_node node.pk %}"><img src="/images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
