@@ -22,7 +22,9 @@ class CryptBackend:
         user.save()
     except ValueError:
       pass
-    
+    except User.DoesNotExist:
+      return None
+
     try:
       if crypt(password, user.password) == user.password and user.is_active:
         return user
