@@ -6,7 +6,7 @@ start() {
         include /lib/network
         scan_interfaces
         config_get ifname wan hostname
-        [ -d /www ] && httpd -p 80 -h /www -r ${hostname:-OpenWrt} -R / -H 10.14.0.2
+        [ -d /www ] && httpd -p 80 -h /www -r ${hostname:-OpenWrt} -R / -H 10.254.0.1
 }
 
 stop() {
