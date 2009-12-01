@@ -215,6 +215,7 @@ logging.info("Connected to local beanstalkd instance.")
 try:
   while True:
     j = c.reserve()
+    j.Finish()
 
     try:
       logging.info("Generating an image for '%s/%s'..." % (j.data['vpn_username'], j.data['ip']))
@@ -240,8 +241,6 @@ try:
         [d['email']],
         fail_silently = False
       )
-
-    j.Finish()
 except KeyboardInterrupt:
   logging.info("Terminating due to user abort.")
 except:
