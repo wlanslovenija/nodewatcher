@@ -19,10 +19,10 @@
 {% endif %}
 {% if node.awaiting_renumber %}
 <div class="notice">
-  {% blocktrans with node.get_renumbered_ip as renumbered_ip%}
+  {% blocktrans with node.get_renumbered_ip as renumbered_ip and node.get_original_ip as original_ip %}
   <b>NODE IS AWAITING IP RENUMBERING</b><br/>
   <br/>
-  This node's primary address has been recently renumbered to <b>{{ renumbered_ip }}</b>. This message means that the node has not yet been seen with the new address and so is still probably carrying its old address. As soon as the reconfigured node will appear, this message will be removed.
+  This node's primary address has been recently renumbered from <b>{{ original_ip }}</b> to <b>{{ renumbered_ip }}</b>. This message means that the node has not yet been seen with the new address and so is still probably carrying its old address. As soon as the reconfigured node will appear, this message will be removed.
   {% endblocktrans %}<br />
   {% if current_owner %}
   <br/>

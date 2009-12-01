@@ -295,6 +295,15 @@ class Node(models.Model):
         return _("unknown")
     else:
       return self.ip
+
+  def get_original_ip(self):
+    """
+    Returns node's old IP address (if it has recently been renumbered).
+    """
+    if self.status == NodeStatus.AwaitingRenumber:
+      return self.ip
+    else:
+      return self.renumber_notices.all()[0].original_ip
   
   def node_type_as_string(self):
     """
