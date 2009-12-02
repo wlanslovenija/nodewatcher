@@ -35,6 +35,7 @@ def queue_generator_job(node, email_user, config_only = False):
   profile = UserAccount.for_user(node.owner)
 
   data = {
+    'uuid'            : node.uuid,
     'ip'              : node.ip,
     'hostname'        : node.name,
     'vpn_username'    : node.owner.username,
