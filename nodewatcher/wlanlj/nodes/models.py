@@ -190,6 +190,7 @@ class Node(models.Model):
   numproc = models.IntegerField(null = True)
   captive_portal_status = models.BooleanField(default = True)
   dns_works = models.BooleanField(default = True)
+  reported_uuid = models.CharField(max_length = 40, null = True)
 
   def reset(self):
     """
@@ -366,6 +367,9 @@ class Node(models.Model):
     
     if self.conflicting_subnets:
       w.append(_("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!"))
+    
+    if self.reported_uuid and self.reported_uuid != self.uuid:
+      w.append(_("Reported node UUID does not match this node! This might indicate a node/firmware mismatch."))
 
     return w
   

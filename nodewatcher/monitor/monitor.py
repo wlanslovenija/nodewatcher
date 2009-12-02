@@ -332,6 +332,11 @@ def process_node(node_ip, ping_results, is_duped, peers):
       n.channel = nodewatcher.frequency_to_channel(info['wifi']['frequency'])
       n.clients = 0
       n.uptime = safe_uptime_convert(info['general']['uptime'])
+      
+      if 'uuid' in info['general']:
+        n.reported_uuid = info['general']['uuid']
+        if n.reported_uuid and n.reported_uuid != n.uuid:
+          n.warnings = True
 
       if oldVersion != n.firmware_version:
         Event.create_event(n, EventCode.VersionChange, '', EventSource.Monitor, data = 'Old version: %s\n  New version: %s' % (oldVersion, n.firmware_version))
