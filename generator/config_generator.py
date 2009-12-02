@@ -66,6 +66,7 @@ class NodeConfig(object):
   """
   A class representing mesh router configuration.
   """
+  uuid = ""
   ssid = "open.wlan-lj.net"
   bssid = "02:CA:FF:EE:BA:BE"
   arch = "mipsel"
@@ -105,7 +106,13 @@ class NodeConfig(object):
     self.interfaces = []
     self.services = []
     self.packages = []
-
+  
+  def setUUID(self, uuid):
+    """
+    Sets this node's unique identifier.
+    """
+    self.uuid = uuid
+  
   def setHostname(self, hostname):
     """
     Sets this node's hostname.
@@ -410,6 +417,11 @@ class OpenWrtConfig(NodeConfig):
 
     # Setup passwords
     self.__generatePasswords()
+    
+    # Write UUID to /etc/uuid
+    f = open(os.path.join(directory, 'uuid'), 'w')
+    f.write(self.uuid)
+    f.close()
 
     # Create the 'config' directory
     configPath = os.path.join(directory, 'config')

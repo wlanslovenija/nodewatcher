@@ -56,6 +56,7 @@ def generate_image(d):
     raise Exception("Invalid imagebuilder specified!")
   
   x = OpenWrtConfig()
+  x.setUUID(d['uuid'])
   x.setOpenwrtVersion(d['openwrt_ver'])
   x.setArch(d['arch'])
   x.setPortLayout(d['port_layout'])
