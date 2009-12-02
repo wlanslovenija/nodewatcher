@@ -356,7 +356,7 @@ class Node(models.Model):
     if self.has_time_sync_problems() and not self.is_down():
       w.append(_("Node's local clock is more than 30 minutes out of sync!"))
 
-    if self.redundancy_req and not self.redundancy_link and not self.is_down():
+    if self.redundancy_req and not self.redundancy_link:
       w.append(_("Node requires direct border gateway peering but has none!"))
 
     if not self.captive_portal_status and not self.is_down():
