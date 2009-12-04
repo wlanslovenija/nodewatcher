@@ -1,7 +1,8 @@
 {% load i18n %}{% blocktrans %}Hello {{ username }}!
 
 There has been an error in image generation for {{ hostname }}/{{ ip }}.
-Please report this as a bug on the project's issue tracker:
+Please try again later or report this as a bug on the project's issue
+tracker if the problem persists:
 
   http://wlan-lj.net/newticket
 
