@@ -1,8 +1,8 @@
 {% load i18n %}{% blocktrans %}Hello {{ username }}!
 
-Router configuration for ({{ hostname }}/{{ ip }}) has been generated! You can
-use it as a starting point for your custom router configuration so that its
-settings are compatible with the network.
+Router configuration for ({{ hostname }}/{{ ip }}) has been generated!
+You can use it as a starting point for your custom router configuration so
+that its settings are compatible with the network.
 
 Configuration archive listed below contains files suitable for use with the
 wlan ljubljana firmware. Because of this, some settings may require patches
