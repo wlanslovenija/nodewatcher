@@ -24,30 +24,30 @@
 {% endfor %}
 <br />
 {% trans "Show nodes based on status:" %}
-<input type="checkbox" name="gmap_status" id="gmap_status_up" value="up" checked="checked" />
-<label for="gmap_status_up">up</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_visible" value="visible" checked="checked" />
-<label for="gmap_status_visible">visible</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_down" value="down" checked="checked" />
-<label for="gmap_status_down">down</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_duped" value="duped" checked="checked" />
-<label for="gmap_status_duped">duped</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_new" value="new" checked="checked" />
-<label for="gmap_status_new">new</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_pending" value="pending" checked="checked" />
-<label for="gmap_status_pending">pending</label>
+<input type="checkbox" name="gmap_status" id="gmap_status_up" value="up" checked="checked" title="{% statusdesc "up" %}" />
+<label for="gmap_status_up" title="{% statusdesc "up" %}">up</label>
+<input type="checkbox" name="gmap_status" id="gmap_status_visible" value="visible" checked="checked" title="{% statusdesc "visible" %}" />
+<label for="gmap_status_visible" title="{% statusdesc "visible" %}">visible</label>
+<input type="checkbox" name="gmap_status" id="gmap_status_down" value="down" checked="checked" title="{% statusdesc "down" %}" />
+<label for="gmap_status_down" title="{% statusdesc "down" %}">down</label>
+<input type="checkbox" name="gmap_status" id="gmap_status_duped" value="duped" checked="checked" title="{% statusdesc "duped" %}" />
+<label for="gmap_status_duped" title="{% statusdesc "duped" %}">duped</label>
+<input type="checkbox" name="gmap_status" id="gmap_status_new" value="new" checked="checked" title="{% statusdesc "new" %}" />
+<label for="gmap_status_new" title="{% statusdesc "new" %}">new</label>
+<input type="checkbox" name="gmap_status" id="gmap_status_pending" value="pending" checked="checked" title="{% statusdesc "pending" %}" />
+<label for="gmap_status_pending" title="{% statusdesc "pending" %}">pending</label>
 <div id="gmap" style="width: 700px; height: 700px;"></div>
 <span id="gmap_statusbar">&nbsp;</span>
 </div>
 <div class="legend">
 <h3>{% trans "Node status key" %}:</h3>
 <ul>
-  <li>{{ "up"|status:"gmap" }} - {% trans "node is reachable" %}</li>
-  <li>{{ "visible"|status:"gmap" }} - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
-  <li>{{ "down"|status:"gmap" }}- {% trans "node is not visible via OLSR" %}</li>
-  <li>{{ "duped"|status:"gmap" }} - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
-  <li>{{ "new"|status:"gmap" }} - {% trans "node has just been registered" %}</li>
-  <li>{{ "pending"|status:"gmap" }} - {% trans "node has not yet been seen since registration" %}</li>
+  <li>{{ "up"|status:"gmap" }} - {% statusdesc "up" %}</li>
+  <li>{{ "visible"|status:"gmap" }} - {% statusdesc "visible" %}</li>
+  <li>{{ "down"|status:"gmap" }} - {% statusdesc "down" %}</li>
+  <li>{{ "duped"|status:"gmap" }} - {% statusdesc "duped" %}</li>
+  <li>{{ "new"|status:"gmap" }} - {% statusdesc "new" %}</li>
+  <li>{{ "pending"|status:"gmap" }} - {% statusdesc "pending" %}</li>
 </ul>
 <br/>
 <h3>{% trans "Edge color key" %}:</h3>

@@ -26,7 +26,7 @@
 <table border="0" width="100%">
   <tr>
     <td style="width: 200px;">{% trans "Subnet" %}</td>
-    <td>{{ subnet }}</td>
+    <td>{{ subnet }} [<a href="{% url renumber_node node.pk %}">{% trans "renumber" %}</a>]</td>
   </tr>
   <tr>
     <td>{{ form.description.label }}</td>

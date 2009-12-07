@@ -79,14 +79,14 @@
 <div class="legend">
 <h3>{% trans "Node status key" %}:</h3>
 <ul>
-  <li>{{ "up"|status:"small" }} - {% trans "node is reachable" %}</li>
-  <li>{{ "visible"|status:"small" }} - {% trans "node is visible via OLSR but does not reply to ICMP ECHO" %}</li>
-  <li>{{ "down"|status:"small" }}- {% trans "node is not visible via OLSR" %}</li>
-  <li>{{ "duped"|status:"small" }} - {% trans "duplicate ICMP ECHO packets have been received" %}</li>
-  <li>{{ "invalid"|status:"small" }} - {% trans "IP is not allocated but is seen" %}</li>
-  <li>{{ "new"|status:"small" }} - {% trans "node has just been registered" %}</li>
-  <li>{{ "pending"|status:"small" }} - {% trans "node has not yet been seen since registration" %}</li>
-  <li>{{ "awaitingrenumber"|status:"small" }} - {% trans "node has been recently renumbered" %}</li>
+  <li>{{ "up"|status:"small" }} - {% statusdesc "up" %}</li>
+  <li>{{ "visible"|status:"small" }} - {% statusdesc "visible" %}</li>
+  <li>{{ "down"|status:"small" }} - {% statusdesc "down" %}</li>
+  <li>{{ "duped"|status:"small" }} - {% statusdesc "duped" %}</li>
+  <li>{{ "invalid"|status:"small" }} - {% statusdesc "invalid" %}</li>
+  <li>{{ "new"|status:"small" }} - {% statusdesc "new" %}</li>
+  <li>{{ "pending"|status:"small" }} - {% statusdesc "pending" %}</li>
+  <li>{{ "awaitingrenumber"|status:"small" }} - {% statusdesc "awaitingrenumber" %}</li>
 </ul>
 </div>
 {% endblock %}
