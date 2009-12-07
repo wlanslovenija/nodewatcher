@@ -296,7 +296,7 @@ def node_renumber(request, node):
     raise Http404
   
   if request.method == 'POST':
-    form = RenumberForm(node, request.POST)
+    form = RenumberForm(request.user, node, request.POST)
     try:
       if form.is_valid():
         form.save()
@@ -306,7 +306,7 @@ def node_renumber(request, node):
       error = forms.ValidationError(_("Renumbering cannot be completed due to certain conflicts or internal limitations with current settings. For more information please open a new ticket."))
       form._errors[forms.NON_FIELD_ERRORS] = form.error_class(error.messages)
   else:
-    form = RenumberForm(node)
+    form = RenumberForm(request.user, node)
   
   return render_to_response('nodes/renumber.html',
     { 'node' : node,

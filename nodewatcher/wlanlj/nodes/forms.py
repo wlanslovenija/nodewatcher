@@ -843,7 +843,7 @@ class RenumberForm(forms.Form):
   """
   manual_ip = forms.CharField(max_length = 40, required = False)
   
-  def __init__(self, node, *args, **kwargs):
+  def __init__(self, user, node, *args, **kwargs):
     """
     Class constructor.
     """
@@ -869,17 +869,28 @@ class RenumberForm(forms.Form):
       )
       self.fields['primary_ip'].initial = RenumberAction.Keep
     
+    if not user.is_staff:
+      del self.fields['primary_ip'].choices[1]
+    
     # Setup dynamic form fields, depending on how may subnets a node has
+    primary = node.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % node.ip).filter(allocated = True).exclude(cidr = 0)
+    
     for subnet in node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       pools = []
       for pool in Pool.objects.filter(parent = None).exclude(status = PoolStatus.Full).order_by('network'):
         pools.append((pool.pk, _("Renumber to %s/%s [%s]") % (pool.network, pool.cidr, pool.description)))
       
+      choices = [
+        (RenumberAction.Keep, _("Keep")),
+        (RenumberAction.Remove, _("Remove"))
+      ]
+      
+      # Primary subnets should not be removed
+      if primary and primary[0] == subnet:
+        del choices[1]
+      
       self.fields['subnet_%s' % subnet.pk] = forms.ChoiceField(
-        choices = [
-          (RenumberAction.Keep, _("Keep")),
-          (RenumberAction.Remove, _("Remove"))
-        ] + pools,
+        choices = choices + pools,
         initial = RenumberAction.Keep
       )
   
