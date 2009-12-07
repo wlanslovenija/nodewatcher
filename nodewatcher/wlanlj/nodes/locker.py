@@ -57,3 +57,10 @@ def require_lock(*tables):
           cursor.close()
     return _do_lock
   return _lock
+
+def model_lock(model):
+  cursor = connection.cursor()
+  
+  if LOCK_TYPE == "postgresql":
+    cursor.execute("SELECT 1 FROM %s WHERE %s = '%s' FOR UPDATE" % (model._meta.db_table, model._meta.pk.name, model.pk))
+

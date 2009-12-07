@@ -919,6 +919,10 @@ class RenumberForm(forms.Form):
     """
     Performs the actual renumbering.
     """
+    # We must ensure exclusive access during node updates as otherwise this might happen
+    # in the middle of a monitor update and this would cause unwanted consequences
+    self.__node.ensure_exclusive_access()
+    
     # Determine what subnet primary IP belonged to
     primary = self.__node.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.__node.ip).filter(allocated = True).exclude(cidr = 0)
     renumber_primary = False
@@ -966,6 +970,9 @@ class RenumberForm(forms.Form):
       net = ipcalc.Network(primary.subnet, primary.cidr)
       self.__node.ip = str(net.host_first())
       router_id_changed = True
+    
+    # Remove conflicting invalid nodes (another node with the IP we just renumbered to)
+    Node.objects.filter(ip = self.__node.ip, status = NodeStatus.Invalid).delete()
     
     # Node has been renumbered, reset monitoring status as this node is obviously not
     # visible right after renumbering.

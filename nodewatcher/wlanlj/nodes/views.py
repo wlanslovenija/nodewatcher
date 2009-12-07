@@ -292,7 +292,7 @@ def node_renumber(request, node):
   Renumbers a given node.
   """
   node = get_object_or_404(Node, pk = node)
-  if node.owner != request.user and not request.user.is_staff:
+  if (node.owner != request.user and not request.user.is_staff) or node.is_invalid():
     raise Http404
   
   if request.method == 'POST':

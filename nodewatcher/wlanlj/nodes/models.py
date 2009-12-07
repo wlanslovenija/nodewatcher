@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.template import loader, Context
 from django.conf import settings
-from wlanlj.nodes.locker import require_lock
+from wlanlj.nodes.locker import require_lock, model_lock
 from wlanlj.nodes import ipcalc
 from wlanlj.generator.types import IfaceType
 from wlanlj.dns.models import Zone, Record
@@ -435,6 +435,21 @@ class Node(models.Model):
     Returns this node's status as a human readable string.
     """
     return NodeStatus.as_string(self.status)
+  
+  def ensure_exclusive_access(self):
+    """
+    Locks this model instance for update until end of transaction.
+    """
+    model_lock(self)
+  
+  @staticmethod
+  def get_exclusive(**kwargs):
+    """
+    Returns an object with exclusive access.
+    """
+    n = Node.objects.get(**kwargs)
+    n.ensure_exclusive_access()
+    return Node.objects.get(**kwargs)
   
   def save(self, **kwargs):
     """

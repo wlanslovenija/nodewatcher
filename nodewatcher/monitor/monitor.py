@@ -269,7 +269,16 @@ def process_node(node_ip, ping_results, is_duped, peers):
   @param peers: Peering info from routing daemon
   """
   transaction.set_dirty()
-  n = Node.objects.get(ip = node_ip)
+  
+  try:
+    n = Node.get_exclusive(ip = node_ip)
+  except Node.DoesNotExist:
+    # This might happen when we were in the middle of a renumbering and
+    # did not yet have access to the node. Then after the node has been
+    # renumbered we gain access, but the IP has been changed. In this
+    # case we must ignore processing of this node.
+    return
+  
   oldStatus = n.status
 
   # Determine node status
@@ -516,7 +525,7 @@ def check_mesh_status():
   for nodeIp in nodes.keys():
     try:
       # Try to get the node from the database
-      n = Node.objects.get(ip = nodeIp)
+      n = Node.get_exclusive(ip = nodeIp)
       n.visible = True
       n.peers = len(nodes[nodeIp].links)
 
@@ -564,7 +573,7 @@ def check_mesh_status():
       except RenumberNotice.DoesNotExist:
         pass
       
-      n.save()
+      n.save(force_insert = True)
       dbNodes[nodeIp] = n
 
       # Create an event since an unknown node has appeared
