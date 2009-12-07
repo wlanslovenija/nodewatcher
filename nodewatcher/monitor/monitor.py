@@ -498,7 +498,7 @@ def check_mesh_status():
   Performs a mesh status check.
   """
   # Initialize the state of nodes and subnets, remove out of date ap clients and graph items
-  Node.objects.filter(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)).update(visible = False)
+  Node.objects.all().update(visible = False)
   Subnet.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
@@ -702,7 +702,7 @@ def check_mesh_status():
   Subnet.objects.filter(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Subset), visible = False).delete()
   Subnet.objects.filter(status = SubnetStatus.AnnouncedOk, visible = False).update(status = SubnetStatus.NotAnnounced)
   
-  for subnet in Subnet.objects.filter(status = SubnetStatus.NotAnnounced):
+  for subnet in Subnet.objects.filter(status = SubnetStatus.NotAnnounced, node__visible = True):
     subnet.node.warnings = True
     subnet.node.save()
 
