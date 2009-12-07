@@ -1013,5 +1013,6 @@ class RenumberForm(forms.Form):
     self.__node.save()
     
     # Generate node renumbered event
-    Event.create_event(self.__node, EventCode.NodeRenumbered, '', EventSource.NodeDatabase)
+    Event.create_event(self.__node, EventCode.NodeRenumbered, '', EventSource.NodeDatabase,
+                       data = 'Old address: %s' % old_router_id)
 
