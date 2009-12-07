@@ -701,6 +701,10 @@ def check_mesh_status():
   # Remove (or change their status) subnets that are not visible
   Subnet.objects.filter(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Subset), visible = False).delete()
   Subnet.objects.filter(status = SubnetStatus.AnnouncedOk, visible = False).update(status = SubnetStatus.NotAnnounced)
+  
+  for subnet in Subnet.objects.filter(status = SubnetStatus.NotAnnounced):
+    subnet.node.warnings = True
+    subnet.node.save()
 
   # Remove subnets that were hijacked but are not visible anymore
   for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, visible = False):
