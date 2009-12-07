@@ -219,11 +219,10 @@ class RegisterNodeForm(forms.Form):
       node.ip = str(net.host_first())
       
       # Create a new subnet for this node or use an existing one if available
-      if fresh_subnet.family == 4 and fresh_subnet.cidr != 32:
-        subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
-        subnet.allocated = True
-        subnet.allocated_at = datetime.now()
-        subnet.status = SubnetStatus.NotAnnounced
+      subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
+      subnet.allocated = True
+      subnet.allocated_at = datetime.now()
+      subnet.status = SubnetStatus.NotAnnounced
     else:
       # An IP has been entered, check if this node already exists
       try:
@@ -665,9 +664,14 @@ class AllocateSubnetForm(forms.Form):
       if Subnet.is_allocated(network, cidr):
         raise forms.ValidationError(_("Specified subnet is already in use!"))
 
-      # Check if the given subnet is part of any allocation pools
+      # Check if the given subnet is part of any allocation pools (unless it is allocatable)
       if Pool.contains_network(network, cidr):
-        raise forms.ValidationError(_("Specified subnet is part of an allocation pool and cannot be manually allocated!"))
+        project = self.__node.project
+        
+        if project.pool and project.pool.reserve_subnet(network, cidr, check_only = True):
+          self.cleaned_data['reserve'] = True
+        else:
+          raise forms.ValidationError(_("Specified subnet is part of an allocation pool and cannot be manually allocated!"))
 
       self.cleaned_data['network'] = network
       self.cleaned_data['cidr'] = cidr
@@ -678,10 +682,18 @@ class AllocateSubnetForm(forms.Form):
     """
     Completes subnet allocation.
     """
-    if self.cleaned_data.get('network'):
+    network = self.cleaned_data.get('network')
+    cidr = self.cleaned_data.get('cidr')
+    
+    if network:
+      if self.cleaned_data['reserve']:
+        # We should reserve this manually allocated subnet in the project pool
+        if not node.project.pool.reserve_subnet(network, cidr):
+          return
+      
       subnet = Subnet(node = node)
-      subnet.subnet = self.cleaned_data.get('network')
-      subnet.cidr = self.cleaned_data.get('cidr')
+      subnet.subnet = network
+      subnet.cidr = cidr
       subnet.allocated = True
       subnet.allocated_at = datetime.now()
       subnet.status = SubnetStatus.NotAnnounced
