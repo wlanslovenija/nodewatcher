@@ -1050,13 +1050,18 @@ class RenumberForm(forms.Form):
         # Setup a node renumbered notice (if one doesn't exist yet)
         try:
           notice = RenumberNotice.objects.get(node = self.__node)
+          
+          if notice.original_ip == self.__node.ip:
+            notice.delete()
+            self.__node.awaiting_renumber = False
+          else:
+            self.__node.awaiting_renumber = True
         except RenumberNotice.DoesNotExist:
           notice = RenumberNotice(node = self.__node)
           notice.original_ip = old_router_id
           notice.renumbered_at = datetime.now()
           notice.save()
-        
-        self.__node.awaiting_renumber = True
+          self.__node.awaiting_renumber = True
     
     self.__node.save()
     
