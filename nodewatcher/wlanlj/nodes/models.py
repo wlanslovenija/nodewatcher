@@ -276,7 +276,7 @@ class Node(models.Model):
     """
     Returns true if the node hasn't yet been seen on the network.
     """
-    return self.status == NodeStatus.Pending
+    return self.status in (NodeStatus.Pending, NodeStatus.New)
   
   def is_invalid(self):
     """
