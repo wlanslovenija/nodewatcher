@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}Edit Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<h1>Edit Subnet {{ subnet }}</h1>
+
+{% if form.errors %}
+<div class="error">
+  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to change subnet information:{% endblocktrans %}<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url edit_subnet subnet.id %}">
+<h3>{% trans "Subnet Information" %}</h3>
+<table border="0" width="100%">
+  <tr>
+    <td style="width: 200px;">{% trans "Subnet" %}</td>
+    <td>{{ subnet }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.description.label }}</td>
+    <td>{{ form.description }}</td>
+  </tr>
+</table>
+
+<div class="buttons">
+  <input type="submit" value="{% trans "Save" %}" />&nbsp;
+  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+</div>
+</form>
+{% endblock %}

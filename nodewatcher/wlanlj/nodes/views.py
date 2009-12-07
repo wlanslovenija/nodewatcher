@@ -7,7 +7,7 @@ from django.db import models
 from django.forms import forms
 from django.utils.translation import ugettext as _
 from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
-from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction
+from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
 from wlanlj.policy.models import Policy, PolicyFamily, TrafficControlClass
@@ -341,7 +341,7 @@ def node_allocate_subnet(request, node):
 @login_required
 def node_deallocate_subnet(request, subnet_id):
   """
-  Displays node info.
+  Removes a subnet.
   """
   subnet = get_object_or_404(Subnet, pk = subnet_id)
   node = subnet.node
@@ -358,6 +358,34 @@ def node_deallocate_subnet(request, subnet_id):
   return render_to_response('nodes/deallocate_subnet.html',
     { 'node' : node,
       'subnet' : subnet },
+    context_instance = RequestContext(request)
+  )
+
+@login_required
+def node_edit_subnet(request, subnet_id):
+  """
+  Edits a subnet.
+  """
+  subnet = get_object_or_404(Subnet, pk = subnet_id)
+  node = subnet.node
+  if node.owner != request.user and not request.user.is_staff:
+    raise Http404
+  
+  if request.method == 'POST':
+    form = EditSubnetForm(request.POST)
+    if form.is_valid():
+      subnet.description = form.cleaned_data.get('description')
+      subnet.save()
+      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+  else:
+    form = EditSubnetForm(initial = {
+      'description' : subnet.description
+    })
+
+  return render_to_response('nodes/edit_subnet.html',
+    { 'node'   : node,
+      'subnet' : subnet,
+      'form'   : form },
     context_instance = RequestContext(request)
   )
 

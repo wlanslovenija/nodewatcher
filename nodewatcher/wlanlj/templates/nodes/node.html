@@ -259,7 +259,7 @@
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
   <tr>
-    {% if current_owner %}<th style="width: 20px;">&nbsp;</th>{% endif %}
+    {% if current_owner %}<th style="width: 40px;">&nbsp;</th>{% endif %}
     <th>{% trans "Subnet" %}</th>
     <th style="width: 120px;">{% trans "Status" %}</th>
     <th style="width: 150px;">{% trans "Last seen" %}</th>
@@ -268,8 +268,22 @@
 <tbody>
   {% for subnet in node.get_subnets %}
   <tr class="{% cycle 'odd' 'even' as subnet_rows %}">
-    {% if current_owner %}<td>{% if current_owner and subnet.allocated %}<a href="/nodes/deallocate_subnet/{{ subnet.id }}"><img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" /></a>{% endif %}</td>{% endif %}
-    <td>{{ subnet }}</td>
+    {% if current_owner %}
+    <td>
+      {% if subnet.allocated %}
+      <a href="{% url remove_subnet subnet.pk %}">
+        <img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
+      </a>
+      <a href="{% url edit_subnet subnet.pk %}">
+        <img src="/images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
+      </a>
+      {% endif %}
+    </td>
+    {% endif %}
+    <td>
+      {{ subnet }}
+      {% if subnet.description %}<div class="small_text">{{ subnet.description }}</div>{% endif %}
+    </td>
     <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
     {% if subnet.last_seen %}
     <td>{{ subnet.last_seen|date }}</td>

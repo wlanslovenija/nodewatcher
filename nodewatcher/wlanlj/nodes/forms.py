@@ -704,6 +704,12 @@ class AllocateSubnetForm(forms.Form):
     # Remove any already announced subnets that are the same subnet
     Subnet.objects.filter(node = node, subnet = subnet.subnet, cidr = subnet.cidr, allocated = False).delete()
 
+class EditSubnetForm(forms.Form):
+  """
+  A simple form for editing a subnet.
+  """
+  description = forms.CharField(max_length = 200)
+
 class WhitelistMacForm(forms.Form):
   """
   A simple form for whitelisting a MAC address.
