@@ -3,10 +3,10 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from django.db import models
+from django.db import models, transaction
 from django.forms import forms
 from django.utils.translation import ugettext as _
-from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
+from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
@@ -138,7 +138,7 @@ def node_new(request):
   return render_to_response('nodes/new.html',
     { 'form' : form,
       'mobile_node_type' : NodeType.Mobile,
-      'map_projects' : Project.objects.all().order_by("id") },
+      'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
 
@@ -168,6 +168,7 @@ def node_edit(request, node):
       'ant_type'            : node.ant_type,
       'owner'               : node.owner.id,
       'project'             : node.project.id,
+      'pool'                : node.pool.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
       'node_type'           : node.node_type,
@@ -213,13 +214,13 @@ def node_edit(request, node):
         'optional_packages'   : []
       })
 
-    form = UpdateNodeForm(node, p)
+    form = UpdateNodeForm(node, initial = p)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,
       'node' : node,
       'mobile_node_type' : NodeType.Mobile,
-      'map_projects' : Project.objects.all().order_by("id") },
+      'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
 
@@ -298,12 +299,15 @@ def node_renumber(request, node):
   if request.method == 'POST':
     form = RenumberForm(request.user, node, request.POST)
     try:
+      sid = transaction.savepoint()
       if form.is_valid():
         form.save()
+        transaction.savepoint_commit(sid)
         return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
     except:
       # Something went wrong
-      error = forms.ValidationError(_("Renumbering cannot be completed due to certain conflicts or internal limitations with current settings. For more information please open a new ticket."))
+      transaction.savepoint_rollback(sid)
+      error = forms.ValidationError(_("Renumbering cannot be completed because at least one target pool is incompatible with given subnet prefix length!"))
       form._errors[forms.NON_FIELD_ERRORS] = form.error_class(error.messages)
   else:
     form = RenumberForm(request.user, node)

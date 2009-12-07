@@ -41,6 +41,11 @@ class RegisterNodeForm(forms.Form):
     empty_label = None,
     label = _("Project")
   )
+  pool = forms.ModelChoiceField(
+    Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
+    empty_label = None,
+    label = _("Pool")
+  )
   node_type = forms.ChoiceField(
     choices = [
       (NodeType.Mesh, _("Mesh node")),
@@ -154,6 +159,8 @@ class RegisterNodeForm(forms.Form):
     geo_long = self.cleaned_data.get('geo_long')
     location = self.cleaned_data.get('location')
     node_type = int(self.cleaned_data.get('node_type'))
+    project = self.cleaned_data.get('project')
+    pool = self.cleaned_data.get('pool')
 
     if not name:
       return
@@ -175,6 +182,9 @@ class RegisterNodeForm(forms.Form):
 
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
+    
+    if not project.pools.filter(pk = pool.pk).count():
+      raise forms.ValidationError(_("The specified IP allocation pool cannot be used with selected project!"))
     
     if self.cleaned_data.get('template'):
       if not wan_dhcp and (not wan_ip or not wan_gw):
@@ -208,7 +218,7 @@ class RegisterNodeForm(forms.Form):
     ip = self.cleaned_data.get('ip')
     assign_subnet = self.cleaned_data.get('assign_subnet')
     project = self.cleaned_data.get('project')
-    pool = project.pool
+    pool = self.cleaned_data.get('pool')
     subnet = None
 
     if not ip:
@@ -242,6 +252,7 @@ class RegisterNodeForm(forms.Form):
     # Update node metadata
     node.name = self.cleaned_data.get('name').lower()
     node.project = project
+    node.pool = pool
     node.owner = user
     node.location = self.cleaned_data.get('location')
     node.geo_lat = self.cleaned_data.get('geo_lat')
@@ -334,6 +345,11 @@ class UpdateNodeForm(forms.Form):
     initial = getattr((User.objects.all() or [1])[0], "id", None),
     empty_label = None,
     label = _("Project")
+  )
+  pool = forms.ModelChoiceField(
+    Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
+    empty_label = None,
+    label = _("Pool")
   )
   node_type = forms.ChoiceField(
     choices = [
@@ -462,6 +478,8 @@ class UpdateNodeForm(forms.Form):
     template = self.cleaned_data.get('template')
     location = self.cleaned_data.get('location')
     node_type = int(self.cleaned_data.get('node_type'))
+    project = self.cleaned_data.get('project')
+    pool = self.cleaned_data.get('pool')
 
     if not name:
       return
@@ -487,9 +505,12 @@ class UpdateNodeForm(forms.Form):
         raise forms.ValidationError(_("The specified node name already exists!"))
     except Node.DoesNotExist:
       pass
-
+    
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
+    
+    if not project.pools.filter(pk = pool.pk).count():
+      raise forms.ValidationError(_("The specified IP allocation pool cannot be used with selected project!"))
     
     if self.cleaned_data.get('template'):
       if not wan_dhcp and (not wan_ip or not wan_gw):
@@ -525,6 +546,7 @@ class UpdateNodeForm(forms.Form):
     oldProject = node.project
     
     # Update node metadata
+    node.pool = self.cleaned_data.get('pool')
     node.name = self.cleaned_data.get('name').lower()
     node.owner = self.cleaned_data.get('owner')
     node.location = self.cleaned_data.get('location')
@@ -560,7 +582,8 @@ class UpdateNodeForm(forms.Form):
       Record.update_for_node(node, old_name = oldName, old_project = oldProject)
 
       # Generate node renamed event
-      Event.create_event(node, EventCode.NodeRenamed, '', EventSource.NodeDatabase, data = 'Old name: %s\n  New name: %s' % (oldName, node.name))
+      if oldName != node.name:
+        Event.create_event(node, EventCode.NodeRenamed, '', EventSource.NodeDatabase, data = 'Old name: %s\n  New name: %s' % (oldName, node.name))
 
     # Update node profile for image generator
     try:
@@ -632,6 +655,13 @@ class AllocateSubnetForm(forms.Form):
     """
     super(AllocateSubnetForm, self).__init__(*args, **kwargs)
     self.__node = node
+    
+    # Populate prefix length choices
+    pool = node.get_pool()
+    self.fields['prefix_len'].choices = [
+      (x, '/%d' % x) for x in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)
+    ]
+    self.fields['prefix_len'].initial = pool.default_prefix_len
 
   def clean(self):
     """
@@ -666,9 +696,9 @@ class AllocateSubnetForm(forms.Form):
 
       # Check if the given subnet is part of any allocation pools (unless it is allocatable)
       if Pool.contains_network(network, cidr):
-        project = self.__node.project
+        pool = self.__node.get_pool()
         
-        if project.pool and project.pool.reserve_subnet(network, cidr, check_only = True):
+        if pool and pool.reserve_subnet(network, cidr, check_only = True):
           self.cleaned_data['reserve'] = True
         else:
           raise forms.ValidationError(_("Specified subnet is part of an allocation pool and cannot be manually allocated!"))
@@ -688,7 +718,7 @@ class AllocateSubnetForm(forms.Form):
     if network:
       if self.cleaned_data['reserve']:
         # We should reserve this manually allocated subnet in the project pool
-        if not node.project.pool.reserve_subnet(network, cidr):
+        if not node.get_pool().reserve_subnet(network, cidr):
           return
       
       subnet = Subnet(node = node)
@@ -702,7 +732,7 @@ class AllocateSubnetForm(forms.Form):
       subnet.gen_dhcp = self.cleaned_data.get('dhcp')
       subnet.save()
     else:
-      pool = node.project.pool
+      pool = node.get_pool()
       allocation = pool.allocate_subnet(int(self.cleaned_data.get('prefix_len')) or 27)
       subnet = Subnet(node = node, subnet = allocation.network, cidr = allocation.cidr)
       subnet.allocated = True
@@ -895,7 +925,7 @@ class RenumberForm(forms.Form):
     
     for subnet in node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       pools = []
-      for pool in Pool.objects.filter(parent = None).exclude(status = PoolStatus.Full).order_by('network'):
+      for pool in node.project.pools.exclude(status = PoolStatus.Full).order_by('network'):
         pools.append((pool.pk, _("Renumber to %s/%s [%s]") % (pool.network, pool.cidr, pool.description)))
       
       choices = [

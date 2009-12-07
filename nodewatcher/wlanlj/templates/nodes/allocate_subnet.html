@@ -69,6 +69,10 @@
   </tr>
   {% endif %}
   <tr>
+    <td>{% trans "Pool" %}</td>
+    <td><b>{{ node.get_pool }} [{{ node.get_pool.description }}]</b></td>
+  </tr>
+  <tr>
     <td>{{ form.prefix_len.label }}</td>
     <td>{{ form.prefix_len }}</td>
   </tr>

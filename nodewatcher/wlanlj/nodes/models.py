@@ -36,6 +36,9 @@ class Project(models.Model):
   geo_long = models.FloatField(null = True)
   geo_zoom = models.IntegerField(null = True)
   
+  # Additional IP allocation pools
+  pools = models.ManyToManyField('Pool', related_name = 'projects')
+  
   def has_geoloc(self):
     """
     Returns true if this project has geographical location defined.
@@ -132,6 +135,10 @@ class Node(models.Model):
   project = models.ForeignKey(Project, null = True, related_name = 'nodes')
   notes = models.CharField(max_length = 1000, null = True)
   url = models.CharField(max_length = 200, null = True)
+  
+  # Current default allocation pool (if when not defined, default project
+  # pool is used)
+  pool = models.ForeignKey('Pool', null = True)
 
   # System nodes are special purpuse nodes that provide external
   # services such as VPN
@@ -191,7 +198,17 @@ class Node(models.Model):
   captive_portal_status = models.BooleanField(default = True)
   dns_works = models.BooleanField(default = True)
   reported_uuid = models.CharField(max_length = 40, null = True)
-
+  
+  def get_pool(self):
+    """
+    Returns an allocation pool used by this node for new subnet
+    allocations.
+    """
+    if self.pool:
+      return self.pool
+    
+    return self.project.pool
+  
   def reset(self):
     """
     Resets node data.
@@ -814,6 +831,8 @@ class Pool(models.Model):
   status = models.IntegerField(default = PoolStatus.Free)
   description = models.CharField(max_length = 200, null = True)
   default_prefix_len = models.IntegerField(null = True)
+  min_prefix_len = models.IntegerField(default = 24, null = True)
+  max_prefix_len = models.IntegerField(default = 28, null = True)
   
   # Field for indexed lookups
   ip_subnet = IPField(null = True)
@@ -855,10 +874,13 @@ class Pool(models.Model):
     @param prefix_len: Subnet prefix length
     @param check_only: Should only a check be performed and no actual allocation
     """
+    if not self.parent and (prefix_len < self.min_prefix_len or prefix_len > self.max_prefix_len):
+      return None 
+    
     net = ipcalc.Network(self.network, self.cidr)
     if ipcalc.Network(network, prefix_len) not in net:
       # We don't contain this network, so there is nothing to be done
-      return
+      return None
     
     if network == self.network and self.cidr == prefix_len and self.status == PoolStatus.Free:
       # We are the network, mark as full and save
@@ -1004,6 +1026,9 @@ class Pool(models.Model):
     """
     if not prefix_len:
       prefix_len = self.default_prefix_len
+    
+    if prefix_len < self.min_prefix_len or prefix_len > self.max_prefix_len:
+      return None
     
     pool = self.allocate_buddy(prefix_len)
     return pool

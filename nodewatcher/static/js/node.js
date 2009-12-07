@@ -72,8 +72,19 @@ function updateMapForProject() {
   }
 }
 
+function updatePoolsForProject() {
+  var projectId = $('#id_project').attr('value');
+  var pool = $('#id_pool');
+  pool.empty();
+  
+  pool_list = pools[projectId];
+  for (var i = 0; i < pool_list.length; i++) {
+    pool.append('<option value="' + pool_list[i].id + '">' + pool_list[i].subnet + ' [' + pool_list[i].description + ']</option>');
+  }
+}
+
 $(document).ready(function () {
-  $('#id_project').change(function(event) { updateMapForProject(); });
+  $('#id_project').change(function(event) { updateMapForProject(); updatePoolsForProject(); });
   $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
   $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
   $('#id_node_type').change(function(event) { toggleLocation(); });
@@ -85,4 +96,9 @@ $(document).ready(function () {
   toggleImageGeneratorOptions();
   toggleLocation();
   toggleExtAntenna();
+  updatePoolsForProject();
+  
+  if (initialPoolId) {
+    $('#id_pool').attr('value', '' + initialPoolId);
+  }
 });

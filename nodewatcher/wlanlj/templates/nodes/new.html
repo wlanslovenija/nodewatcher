@@ -59,6 +59,10 @@
     <td>{{ form.project }}</td>
   </tr>
   <tr>
+    <td>{{ form.pool.label }}</td>
+    <td>{{ form.pool }}</td>
+  </tr>
+  <tr>
     <td>{{ form.node_type.label }}</td>
     <td>{{ form.node_type }}</td>
   </tr>
@@ -217,10 +221,30 @@
 /* <![CDATA[ */
   var mobileNodeType = {{ mobile_node_type }};
   var projects = [
-  {% for project in map_projects %}{% if project.has_geoloc %}
-    { "id": {{ project.id }}, "lat": {{ project.geo_lat }}, "long": {{ project.geo_long }}, "zoom": {{ project.geo_zoom }} }{% if not forloop.last %},{% endif %}
+  {% for project in projects %}{% if project.has_geoloc %}
+    {
+      "id": {{ project.id }},
+      "lat": {{ project.geo_lat }},
+      "long": {{ project.geo_long }},
+      "zoom": {{ project.geo_zoom }}
+    }{% if not forloop.last %},{% endif %}
   {% endif %}{% endfor %}
   ];
+  var pools = {
+  {% for project in projects %}
+    {{ project.id }} : [
+      {% for pool in project.pools.all %}
+        {
+          "id" : {{ pool.id }},
+          "subnet" : '{{ pool.ip_subnet }}',
+          "description" : '{{ pool.description }}',
+          "prefix_len" : {{ pool.default_prefix_len }}
+        }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]{% if not forloop.last %},{% endif %}
+  {% endfor %}
+  };
+  var initialPoolId = 0;
 {% if user.is_staff %}
   $(document).ready(function () {
     $('#id_assign_ip').onchange = toggleIpInput;
