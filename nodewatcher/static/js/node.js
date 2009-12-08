@@ -79,7 +79,7 @@ function updatePoolsForProject() {
   
   pool_list = pools[projectId];
   for (var i = 0; i < pool_list.length; i++) {
-    pool.append('<option value="' + pool_list[i].id + '">' + pool_list[i].subnet + ' [' + pool_list[i].description + ']</option>');
+    pool.append('<option value="' + pool_list[i].id + '">' + pool_list[i].description + ' [' + pool_list[i].subnet + ']</option>');
   }
 }
 

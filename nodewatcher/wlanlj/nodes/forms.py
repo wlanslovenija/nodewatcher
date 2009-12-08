@@ -44,7 +44,7 @@ class RegisterNodeForm(forms.Form):
   pool = forms.ModelChoiceField(
     Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
     empty_label = None,
-    label = _("Pool")
+    label = _("IP pool")
   )
   node_type = forms.ChoiceField(
     choices = [
@@ -349,7 +349,7 @@ class UpdateNodeForm(forms.Form):
   pool = forms.ModelChoiceField(
     Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
     empty_label = None,
-    label = _("Pool")
+    label = _("IP pool")
   )
   node_type = forms.ChoiceField(
     choices = [
@@ -926,7 +926,7 @@ class RenumberForm(forms.Form):
     for subnet in node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       pools = []
       for pool in node.project.pools.exclude(status = PoolStatus.Full).order_by('network'):
-        pools.append((pool.pk, _("Renumber to %s/%s [%s]") % (pool.network, pool.cidr, pool.description)))
+        pools.append((pool.pk, _("Renumber to %s [%s/%s]") % (pool.description, pool.network, pool.cidr)))
       
       choices = [
         (RenumberAction.Keep, _("Keep")),
