@@ -49,10 +49,6 @@
     <td>{{ form.project }}</td>
   </tr>
   <tr>
-    <td>{{ form.pool.label }}</td>
-    <td>{{ form.pool }}</td>
-  </tr>
-  <tr>
     <td>{{ form.node_type.label }}</td>
     <td>{{ form.node_type }}</td>
   </tr>
@@ -214,21 +210,7 @@
     }{% if not forloop.last %},{% endif %}
   {% endif %}{% endfor %}
   ];
-  var pools = {
-  {% for project in projects %}
-    {{ project.id }} : [
-      {% for pool in project.pools.all %}
-        {
-          "id" : {{ pool.id }},
-          "subnet" : '{{ pool.ip_subnet }}',
-          "description" : '{{ pool.description }}',
-          "prefix_len" : {{ pool.default_prefix_len }}
-        }{% if not forloop.last %},{% endif %}
-      {% endfor %}
-    ]{% if not forloop.last %},{% endif %}
-  {% endfor %}
-  };
-  var initialPoolId = {{ node.pool.pk }};
+  var pools = 0;
 /* ]]> */
 </script>
 <script type="text/javascript" src="/js/node.js"></script>

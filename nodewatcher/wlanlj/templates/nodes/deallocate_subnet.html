@@ -6,8 +6,8 @@
 {% block content %}
 <h1>Remove Subnet {{ subnet }} ?</h1>
   <div class="error">
-      {% if subnet.is_wifi and not user.is_staff %}
-      {% blocktrans %}<b>ERROR:</b> This is a primary wifi subnet that should not be removed.{% endblocktrans %}
+      {% if subnet.is_primary %}
+      {% blocktrans %}<b>ERROR:</b> This is a primary IP subnet that should not be removed. In order to change it, use the renumbering form.{% endblocktrans %}
       {% else %}
       {% blocktrans %}<b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!{% endblocktrans %}
       {% endif %}
@@ -57,7 +57,7 @@
 
   <form method="POST" action="{% url wlanlj.nodes.views.node_deallocate_subnet subnet.id %}">
   <div class="buttons">
-    {% if not subnet.is_wifi or user.is_staff %}
+    {% if not subnet.is_primary %}
     <input type="submit" value="{% trans "Remove" %}" />&nbsp;
     {% endif %}
     <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />

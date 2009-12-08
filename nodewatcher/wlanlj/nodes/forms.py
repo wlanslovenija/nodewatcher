@@ -252,7 +252,6 @@ class RegisterNodeForm(forms.Form):
     # Update node metadata
     node.name = self.cleaned_data.get('name').lower()
     node.project = project
-    node.pool = pool
     node.owner = user
     node.location = self.cleaned_data.get('location')
     node.geo_lat = self.cleaned_data.get('geo_lat')
@@ -345,11 +344,6 @@ class UpdateNodeForm(forms.Form):
     initial = getattr((User.objects.all() or [1])[0], "id", None),
     empty_label = None,
     label = _("Project")
-  )
-  pool = forms.ModelChoiceField(
-    Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
-    empty_label = None,
-    label = _("IP pool")
   )
   node_type = forms.ChoiceField(
     choices = [
@@ -479,7 +473,6 @@ class UpdateNodeForm(forms.Form):
     location = self.cleaned_data.get('location')
     node_type = int(self.cleaned_data.get('node_type'))
     project = self.cleaned_data.get('project')
-    pool = self.cleaned_data.get('pool')
 
     if not name:
       return
@@ -508,9 +501,6 @@ class UpdateNodeForm(forms.Form):
     
     if ip and (not IPV4_ADDR_RE.match(ip) or ip.startswith('127.')):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
-    
-    if not project.pools.filter(pk = pool.pk).count():
-      raise forms.ValidationError(_("The specified IP allocation pool cannot be used with selected project!"))
     
     if self.cleaned_data.get('template'):
       if not wan_dhcp and (not wan_ip or not wan_gw):
@@ -546,7 +536,6 @@ class UpdateNodeForm(forms.Form):
     oldProject = node.project
     
     # Update node metadata
-    node.pool = self.cleaned_data.get('pool')
     node.name = self.cleaned_data.get('name').lower()
     node.owner = self.cleaned_data.get('owner')
     node.location = self.cleaned_data.get('location')
@@ -636,14 +625,7 @@ class AllocateSubnetForm(forms.Form):
     initial = IfaceType.LAN,
     label = _("Interface")
   )
-  prefix_len = forms.ChoiceField(
-    choices = [
-      (24, '/24'),
-      (25, '/25'),
-      (26, '/26'),
-      (27, '/27'),
-      (28, '/28')
-    ],
+  prefix_len = forms.IntegerField(
     initial = 27,
     label = _("Prefix length")
   )
@@ -657,16 +639,24 @@ class AllocateSubnetForm(forms.Form):
     self.__node = node
     
     # Populate prefix length choices
-    pool = node.get_pool()
-    self.fields['prefix_len'].choices = [
-      (x, '/%d' % x) for x in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)
-    ]
-    self.fields['prefix_len'].initial = pool.default_prefix_len
-
+    self.fields['pool'] = forms.ModelChoiceField(
+      node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
+      empty_label = None,
+      label = _("IP pool"),
+      initial = self.__node.get_primary_ip_pool().pk
+    )
+  
+  def get_pools(self):
+    """
+    A helper method that returns the IP pools.
+    """
+    return self.__node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet")
+  
   def clean(self):
     """
     Additional validation handler.
     """
+    pool = self.cleaned_data.get('pool')
     type = int(self.cleaned_data.get('iface_type'))
     if type == IfaceType.WiFi:
       try:
@@ -696,12 +686,10 @@ class AllocateSubnetForm(forms.Form):
 
       # Check if the given subnet is part of any allocation pools (unless it is allocatable)
       if Pool.contains_network(network, cidr):
-        pool = self.__node.get_pool()
-        
-        if pool and pool.reserve_subnet(network, cidr, check_only = True):
+        if pool.reserve_subnet(network, cidr, check_only = True):
           self.cleaned_data['reserve'] = True
         else:
-          raise forms.ValidationError(_("Specified subnet is part of an allocation pool and cannot be manually allocated!"))
+          raise forms.ValidationError(_("Specified subnet is part of another allocation pool and cannot be manually allocated!"))
 
       self.cleaned_data['network'] = network
       self.cleaned_data['cidr'] = cidr
@@ -714,11 +702,12 @@ class AllocateSubnetForm(forms.Form):
     """
     network = self.cleaned_data.get('network')
     cidr = self.cleaned_data.get('cidr')
+    pool = self.cleaned_data.get('pool')
     
     if network:
       if self.cleaned_data['reserve']:
         # We should reserve this manually allocated subnet in the project pool
-        if not node.get_pool().reserve_subnet(network, cidr):
+        if not pool.reserve_subnet(network, cidr):
           return
       
       subnet = Subnet(node = node)
@@ -732,7 +721,6 @@ class AllocateSubnetForm(forms.Form):
       subnet.gen_dhcp = self.cleaned_data.get('dhcp')
       subnet.save()
     else:
-      pool = node.get_pool()
       allocation = pool.allocate_subnet(int(self.cleaned_data.get('prefix_len')) or 27)
       subnet = Subnet(node = node, subnet = allocation.network, cidr = allocation.cidr)
       subnet.allocated = True

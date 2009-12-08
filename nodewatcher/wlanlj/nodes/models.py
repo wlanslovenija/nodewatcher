@@ -135,10 +135,6 @@ class Node(models.Model):
   project = models.ForeignKey(Project, null = True, related_name = 'nodes')
   notes = models.CharField(max_length = 1000, null = True)
   url = models.CharField(max_length = 200, null = True)
-  
-  # Current default allocation pool (if when not defined, default project
-  # pool is used)
-  pool = models.ForeignKey('Pool', null = True)
 
   # System nodes are special purpuse nodes that provide external
   # services such as VPN
@@ -198,16 +194,6 @@ class Node(models.Model):
   captive_portal_status = models.BooleanField(default = True)
   dns_works = models.BooleanField(default = True)
   reported_uuid = models.CharField(max_length = 40, null = True)
-  
-  def get_pool(self):
-    """
-    Returns an allocation pool used by this node for new subnet
-    allocations.
-    """
-    if self.pool:
-      return self.pool
-    
-    return self.project.pool
   
   def reset(self):
     """
@@ -295,6 +281,12 @@ class Node(models.Model):
     Returns true if the node is a mobile node.
     """
     return self.node_type == NodeType.Mobile
+  
+  def get_primary_ip_pool(self):
+    """
+    Returns the pool the primary IP is located in.
+    """
+    return Pool.objects.ip_filter(ip_subnet__contains = "%s/32" % self.ip).get(parent = None)
   
   def is_primary_ip_in_subnet(self):
     """
@@ -562,6 +554,13 @@ class Subnet(models.Model):
     Returns true if this subnet is a wireless one.
     """
     return self.gen_iface_type == IfaceType.WiFi
+  
+  def is_primary(self):
+    """
+    Returns true if this subnet contains the primary router identifier.
+    """
+    net = ipcalc.Network(self.subnet, self.cidr)
+    return ipcalc.Network(self.node.ip, 32) in net 
   
   def is_conflicting(self):
     """
@@ -1014,7 +1013,10 @@ class Pool(models.Model):
     """
     Returns a string representation of this pool.
     """
-    return u"%s/%d" % (self.network, self.cidr)
+    if self.description:
+      return u"%s [%s/%d]" % (self.description, self.network, self.cidr)
+    else: 
+      return u"%s/%d" % (self.network, self.cidr)
   
   @require_lock('nodes_pool', 'nodes_subnet')
   def allocate_subnet(self, prefix_len = None):

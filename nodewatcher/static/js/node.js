@@ -73,6 +73,9 @@ function updateMapForProject() {
 }
 
 function updatePoolsForProject() {
+  if (!pools)
+    return;
+  
   var projectId = $('#id_project').attr('value');
   var pool = $('#id_pool');
   pool.empty();
@@ -97,8 +100,4 @@ $(document).ready(function () {
   toggleLocation();
   toggleExtAntenna();
   updatePoolsForProject();
-  
-  if (initialPoolId) {
-    $('#id_pool').attr('value', '' + initialPoolId);
-  }
 });

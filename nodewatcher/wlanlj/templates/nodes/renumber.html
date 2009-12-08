@@ -95,7 +95,7 @@
       'def' : {{ pool.default_prefix_len }}
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
-  }
+  };
   
   function toggleManualIp() {
     if ($('#id_primary_ip').attr('value') == {{ renumber_action_manual }}) {

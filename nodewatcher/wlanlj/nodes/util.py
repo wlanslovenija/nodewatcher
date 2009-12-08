@@ -19,6 +19,7 @@ class IPQuerySet(models.query.QuerySet):
       field, op = key.split(LOOKUP_SEP)
       field_obj = self.model._meta.get_field_by_name(field)[0]
       value = field_obj.get_db_prep_lookup('exact', value)[0]
+      field = "%s.%s" % (self.model._meta.db_table, field)
       
       if op == 'contains':
         where_opts.append('%s >>= %s' % (field, value))

@@ -168,7 +168,6 @@ def node_edit(request, node):
       'ant_type'            : node.ant_type,
       'owner'               : node.owner.id,
       'project'             : node.project.id,
-      'pool'                : node.pool.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
       'node_type'           : node.node_type,
@@ -353,7 +352,7 @@ def node_deallocate_subnet(request, subnet_id):
     raise Http404
   
   if request.method == 'POST':
-    if subnet.is_wifi and not request.user.is_staff:
+    if subnet.is_primary():
       raise Http404
 
     subnet.delete()

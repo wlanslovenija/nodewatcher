@@ -69,12 +69,12 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Pool" %}</td>
-    <td><b>{{ node.get_pool.description }} [{{ node.get_pool }}]</b></td>
+    <td>{{ form.pool.label }}</td>
+    <td>{{ form.pool }}</td>
   </tr>
   <tr>
     <td>{{ form.prefix_len.label }}</td>
-    <td>{{ form.prefix_len }}</td>
+    <td><select name="prefix_len" id="id_prefix_len"></select></td>
   </tr>
   <tr>
     <td>{{ form.description.label }}</td>
@@ -94,4 +94,31 @@
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
     </div>
 </form>
+
+<script type="text/javascript">
+  var pool_prefix_lens = {
+    {% for pool in form.get_pools %}
+    {{ pool.id }} : {
+      'min' : {{ pool.min_prefix_len }},
+      'max' : {{ pool.max_prefix_len }},
+      'def' : {{ pool.default_prefix_len }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  };
+  
+  function updatePrefixLens() {
+    var prefs = $('#id_prefix_len'); 
+    prefs.empty();
+    
+    pool = pool_prefix_lens[$('#id_pool').attr('value')];
+    for (var i = pool.min; i <= pool.max; i++) {
+      prefs.append('<option value="' + i + '">/' + i + '</option>');
+    }
+    prefs.attr('value', '' + pool.def); 
+  }
+  
+  $(document).ready(function () {
+    $('#id_pool').change(function(event) { updatePrefixLens(); }).change();
+  });
+</script>
 {% endblock %}
