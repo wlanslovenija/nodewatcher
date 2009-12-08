@@ -375,14 +375,23 @@ def node_edit_subnet(request, subnet_id):
     raise Http404
   
   if request.method == 'POST':
-    form = EditSubnetForm(request.POST)
+    form = EditSubnetForm(node, request.POST)
     if form.is_valid():
       subnet.description = form.cleaned_data.get('description')
+      subnet.gen_dhcp = form.cleaned_data.get('dhcp')
+      
+      if not subnet.is_primary():
+        # One can't reassign the primary subnet, as it should always be on the
+        # mesh interface!
+        subnet.gen_iface_type = form.cleaned_data.get('iface_type')
+      
       subnet.save()
       return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
-    form = EditSubnetForm(initial = {
-      'description' : subnet.description
+    form = EditSubnetForm(node, initial = {
+      'description' : subnet.description,
+      'iface_type' : subnet.gen_iface_type,
+      'dhcp' : subnet.gen_dhcp
     })
 
   return render_to_response('nodes/edit_subnet.html',

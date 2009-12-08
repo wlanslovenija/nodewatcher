@@ -32,6 +32,16 @@
     <td>{{ form.description.label }}</td>
     <td>{{ form.description }}</td>
   </tr>
+  {% if not subnet.is_primary %}
+  <tr>
+    <td>{{ form.iface_type.label }}</td>
+    <td>{{ form.iface_type }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ form.dhcp.label }}</td>
+    <td>{{ form.dhcp }}</td>
+  </tr>
 </table>
 
 <div class="buttons">

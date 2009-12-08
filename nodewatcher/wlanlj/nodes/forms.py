@@ -738,7 +738,47 @@ class EditSubnetForm(forms.Form):
   """
   A simple form for editing a subnet.
   """
-  description = forms.CharField(max_length = 200)
+  description = forms.CharField(max_length = 200, required = False)
+  iface_type = forms.ChoiceField(
+    choices = [
+      (IfaceType.WiFi, 'WiFi'),
+      (IfaceType.LAN, 'LAN')
+    ],
+    initial = IfaceType.LAN,
+    label = _("Interface"),
+    required = False
+  )
+  dhcp = forms.BooleanField(required = False, initial = True, label = _("DHCP announce"))
+  
+  def __init__(self, node, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    super(EditSubnetForm, self).__init__(*args, **kwargs)
+    self.__node = node
+  
+  def clean(self):
+    """
+    Additional validation handler.
+    """
+    try:
+      type = int(self.cleaned_data.get('iface_type'))
+      if type == IfaceType.WiFi:
+        try:
+          subnet = Subnet.objects.get(node = self.__node, gen_iface_type = IfaceType.WiFi)
+          raise forms.ValidationError(_("Only one WiFi subnet may be allocated to a node!"))
+        except Subnet.DoesNotExist:
+          pass
+      
+      try:
+        if type == IfaceType.LAN and not self.__node.profile.template.iface_lan and self.__node.profile.use_vpn:
+          raise forms.ValidationError(_("The specified router only has one ethernet port! You have already enabled VPN, so you cannot add subnets to LAN port!"))
+      except Profile.DoesNotExist:
+        pass
+    except ValueError:
+      pass
+    
+    return self.cleaned_data
 
 class WhitelistMacForm(forms.Form):
   """
