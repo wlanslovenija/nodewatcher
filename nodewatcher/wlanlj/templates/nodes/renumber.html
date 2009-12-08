@@ -74,13 +74,29 @@
   </tr>
   {% for subnet in form.get_subnet_fields %}
   <tr>
-    <td>{{ subnet.model }}</td>
-    <td>{{ subnet }}</td>
+    <td valign="top">{{ subnet.model }}</td>
+    <td>
+      {{ subnet }}
+      <div class="prefix_len_{{ subnet.prefix }}">
+        {% trans "New prefix length:" %}&nbsp;
+        <select name="{{ subnet.prefix }}" id="id_{{ subnet.prefix }}"></select>
+      </div>
+    </td>
   </tr>
   {% endfor %}
 </table>
 
 <script type="text/javascript">
+  var pool_prefix_lens = {
+    {% for pool in form.get_pools %}
+    {{ pool.id }} : {
+      'min' : {{ pool.min_prefix_len }},
+      'max' : {{ pool.max_prefix_len }},
+      'def' : {{ pool.default_prefix_len }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  }
+  
   function toggleManualIp() {
     if ($('#id_primary_ip').attr('value') == {{ renumber_action_manual }}) {
       $('#id_manual_ip').css('display', '');
@@ -89,8 +105,29 @@
     }
   }
   
+  function updatePrefixLensForPool(subnetId, action) {
+    if (action <= 0) {
+      $('.prefix_len_prefix_' + subnetId).css('display', 'none');
+    } else {
+      var prefs = $('#id_prefix_' + subnetId); 
+      $('.prefix_len_prefix_' + subnetId).css('display', '');
+      prefs.empty();
+      
+      pool = pool_prefix_lens[action];
+      for (var i = pool.min; i <= pool.max; i++) {
+        prefs.append('<option value="' + i + '">/' + i + '</option>');
+      }
+      prefs.attr('value', '' + pool.def);
+    }
+  }
+  
   $(document).ready(function () {
     $('#id_primary_ip').change(function(event) { toggleManualIp(); });
+    $('.subnet').change(function(event) {
+      var subnetId = $(this).attr('id').replace('id_subnet_', '');
+      updatePrefixLensForPool(subnetId, $(this).attr('value'));
+    }).change();
+    
     toggleManualIp();
   });
 </script>

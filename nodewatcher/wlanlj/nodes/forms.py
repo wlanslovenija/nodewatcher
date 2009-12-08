@@ -939,8 +939,18 @@ class RenumberForm(forms.Form):
       
       self.fields['subnet_%s' % subnet.pk] = forms.ChoiceField(
         choices = choices + pools,
-        initial = RenumberAction.Keep
+        initial = RenumberAction.Keep,
+        widget = forms.Select(attrs = { 'class' : 'subnet' })
       )
+      
+      # Field for choosing new subnet prefix size
+      self.fields['prefix_%s' % subnet.pk] = forms.IntegerField()
+  
+  def get_pools(self):
+    """
+    A helper method that returns all allocations pools.
+    """
+    return self.__node.project.pools.exclude(status = PoolStatus.Full).order_by('network')
   
   def get_subnet_fields(self):
     """
@@ -949,6 +959,7 @@ class RenumberForm(forms.Form):
     for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       field = self['subnet_%s' % subnet.pk]
       field.model = subnet
+      field.prefix = 'prefix_%s' % subnet.pk
       yield field
   
   def clean(self):
@@ -990,6 +1001,7 @@ class RenumberForm(forms.Form):
     # Renumber subnets first
     for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet')[:]:
       action = int(self.cleaned_data.get('subnet_%s' % subnet.pk))
+      prefix_len = int(self.cleaned_data.get('prefix_%s' % subnet.pk))
       
       if action == RenumberAction.Keep:
         pass
@@ -998,7 +1010,7 @@ class RenumberForm(forms.Form):
       else:
         # This means we should renumber to some other pool
         pool = Pool.objects.get(pk = action)
-        new_subnet = pool.allocate_subnet(prefix_len = subnet.cidr)
+        new_subnet = pool.allocate_subnet(prefix_len)
         
         # If the old subnet has been the source of node's primary IP remember that
         save_primary = (not renumber_primary and primary and primary[0] == subnet)
