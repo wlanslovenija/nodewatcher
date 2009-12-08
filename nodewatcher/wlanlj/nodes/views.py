@@ -277,7 +277,8 @@ def node_remove(request, node):
   
   if request.method == 'POST':
     # Generate node removed event and remove node
-    Event.create_event(node, EventCode.NodeRemoved, '', EventSource.NodeDatabase)
+    Event.create_event(node, EventCode.NodeRemoved, '', EventSource.NodeDatabase,
+                       data = 'Removed by: %s' % request.user.username)
     node.delete()
     return HttpResponseRedirect(reverse("my_nodes"))
   

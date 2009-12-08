@@ -320,7 +320,8 @@ class RegisterNodeForm(forms.Form):
     Record.update_for_node(node)
 
     # Generate node added event
-    Event.create_event(node, EventCode.NodeAdded, '', EventSource.NodeDatabase)
+    Event.create_event(node, EventCode.NodeAdded, '', EventSource.NodeDatabase,
+                       data = 'Maintainer: %s' % node.owner.username)
 
     return node
 
