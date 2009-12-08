@@ -616,7 +616,7 @@ class AllocateSubnetForm(forms.Form):
   A simple form for subnet allocation.
   """
   network = forms.CharField(max_length = 50, required = False)
-  description = forms.CharField(max_length = 200, widget = widgets.TextInput(attrs = {'size': '40'}))
+  description = forms.CharField(max_length = 200, initial = 'LAN', widget = widgets.TextInput(attrs = {'size': '40'}))
   iface_type = forms.ChoiceField(
     choices = [
       (IfaceType.WiFi, 'WiFi'),
