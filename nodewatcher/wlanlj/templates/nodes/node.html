@@ -270,7 +270,7 @@
   <tr class="{% cycle 'odd' 'even' as subnet_rows %}">
     {% if current_owner %}
     <td>
-      {% if subnet.allocated %}
+      {% if subnet.allocated and not subnet.is_primary %}
       <a href="{% url remove_subnet subnet.pk %}">
         <img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
       </a>
