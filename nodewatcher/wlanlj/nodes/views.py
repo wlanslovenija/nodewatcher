@@ -38,7 +38,7 @@ def pools(request):
   """
   # TODO: #362
   def ip_order(x, y):
-    return cmp(long(ipcalc.IP(str(x))), long(ipcalc.IP(str(y))))
+    return cmp(long(ipcalc.IP(str(x.ip_subnet))), long(ipcalc.IP(str(y.ip_subnet))))
   pools = list(Pool.objects.filter(parent = None))
   pools.sort(ip_order)
   return render_to_response('nodes/pools.html',

@@ -29,7 +29,7 @@
   {% for pool in pools %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ pool.family_as_string }}</td>
-    <td>{{ pool }}</td>
+    <td>{{ pool.ip_subnet }}</td>
     <td>{{ pool.description }}</td>
   </tr>
   {% empty %}
