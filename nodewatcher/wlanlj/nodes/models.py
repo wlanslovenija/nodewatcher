@@ -597,7 +597,7 @@ class Subnet(models.Model):
     return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node).order_by("ip_subnet")
 
   @staticmethod
-  def is_allocated(network, cidr):
+  def is_allocated(network, cidr, exclude_node = None):
     """
     Returns true if a node has the specified subnet allocated.
     """
@@ -608,7 +608,7 @@ class Subnet(models.Model):
     if overlaps.filter(status = SubnetStatus.Subset).count() > 0:
       return True
     
-    if cidr == 32 and Node.objects.filter(ip = network).count() > 0:
+    if cidr == 32 and Node.objects.filter(ip = network).exclude(pk = exclude_node.pk if exclude_node else '').count() > 0:
       return True
     
     return False

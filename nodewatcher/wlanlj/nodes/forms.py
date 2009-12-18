@@ -683,7 +683,7 @@ class AllocateSubnetForm(forms.Form):
         raise forms.ValidationError(_("Enter subnet in CIDR notation!"))
 
       # Check if the given subnet already exists
-      if Subnet.is_allocated(network, cidr):
+      if Subnet.is_allocated(network, cidr, exclude_node = self.__node):
         raise forms.ValidationError(_("Specified subnet is already in use!"))
 
       # Check if the given subnet is part of any allocation pools (unless it is allocatable)
