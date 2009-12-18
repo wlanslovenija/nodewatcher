@@ -640,11 +640,12 @@ class AllocateSubnetForm(forms.Form):
     self.__node = node
     
     # Populate prefix length choices
+    primary_pool = self.__node.get_primary_ip_pool() 
     self.fields['pool'] = forms.ModelChoiceField(
       node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None).order_by("ip_subnet"),
       empty_label = None,
       label = _("IP pool"),
-      initial = self.__node.get_primary_ip_pool().pk
+      initial = primary_pool.pk if primary_pool else 0
     )
   
   def get_pools(self):

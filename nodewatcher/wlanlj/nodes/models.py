@@ -286,7 +286,10 @@ class Node(models.Model):
     """
     Returns the pool the primary IP is located in.
     """
-    return Pool.objects.ip_filter(ip_subnet__contains = "%s/32" % self.ip).get(parent = None)
+    try:
+      return Pool.objects.ip_filter(ip_subnet__contains = "%s/32" % self.ip).get(parent = None)
+    except Pool.DoesNotExist:
+      return None
   
   def is_primary_ip_in_subnet(self):
     """
