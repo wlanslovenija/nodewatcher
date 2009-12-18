@@ -662,7 +662,7 @@ class AllocateSubnetForm(forms.Form):
     type = int(self.cleaned_data.get('iface_type'))
     if type == IfaceType.WiFi:
       try:
-        subnet = Subnet.objects.get(node = self.__node, gen_iface_type = IfaceType.WiFi)
+        subnet = Subnet.objects.get(node = self.__node, gen_iface_type = IfaceType.WiFi, allocated = True)
         raise forms.ValidationError(_("Only one WiFi subnet may be allocated to a node!"))
       except Subnet.DoesNotExist:
         pass
