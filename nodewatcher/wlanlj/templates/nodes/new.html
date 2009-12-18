@@ -232,7 +232,9 @@
   ];
   var pools = {
   {% for project in projects %}
-    {{ project.id }} : [
+    {{ project.id }} : {
+      "default" : {{ project.pool.pk }},
+      "list" : [
       {% for pool in project.pools.all %}
         {
           "id" : {{ pool.id }},
@@ -241,7 +243,8 @@
           "prefix_len" : {{ pool.default_prefix_len }}
         }{% if not forloop.last %},{% endif %}
       {% endfor %}
-    ]{% if not forloop.last %},{% endif %}
+      ]
+    }{% if not forloop.last %},{% endif %}
   {% endfor %}
   };
 {% if user.is_staff %}

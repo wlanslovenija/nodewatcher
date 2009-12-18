@@ -80,10 +80,12 @@ function updatePoolsForProject() {
   var pool = $('#id_pool');
   pool.empty();
   
-  pool_list = pools[projectId];
+  pool_list = pools[projectId]["list"];
   for (var i = 0; i < pool_list.length; i++) {
     pool.append('<option value="' + pool_list[i].id + '">' + pool_list[i].description + ' [' + pool_list[i].subnet + ']</option>');
   }
+  
+  pool.attr('value', pools[projectId]["default"]);
 }
 
 $(document).ready(function () {
