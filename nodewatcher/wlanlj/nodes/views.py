@@ -52,7 +52,7 @@ def pools_text(request):
   """
   output = []
   for pool in Pool.objects.filter(parent = None).order_by('id'):
-    output.append("%s\t%s\t%s" % (pool, pool.family_as_string(), pool.description))
+    output.append("%s\t%s\t%s" % (pool.ip_subnet, pool.family_as_string(), pool.description))
 
   return HttpResponse("\n".join(output), content_type = "text/plain")
 
