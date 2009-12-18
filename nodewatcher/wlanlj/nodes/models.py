@@ -919,6 +919,7 @@ class Pool(models.Model):
         # was invalid. Remove all children and become free again.
         self.children.all().delete()
         self.status = PoolStatus.Free
+        self.save()
     
     return alloc
   
