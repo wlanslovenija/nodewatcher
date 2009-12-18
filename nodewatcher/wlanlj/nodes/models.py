@@ -917,7 +917,7 @@ class Pool(models.Model):
       if not alloc or check_only:
         # Nothing has been allocated, this means that the given subnet
         # was invalid. Remove all children and become free again.
-        self.children.delete()
+        self.children.all().delete()
         self.status = PoolStatus.Free
     
     return alloc
