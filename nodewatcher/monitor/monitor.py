@@ -217,7 +217,7 @@ def regenerate_global_statistics_graphs():
   try:
     RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra_traffic)
     RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', rra_status)
-    RRA.graph(RRAClients, 'Global Client Count', 'global_client_count.png', rra_clients)
+    RRA.graph(RRAClients, 'Global Connected Clients', 'global_client_count.png', rra_clients)
   except:
     logging.warning("Unable to regenerate some global statistics graphs!")
 
