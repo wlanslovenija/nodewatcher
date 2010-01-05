@@ -46,15 +46,15 @@ class IP(object):
     # IP range specific information, see IANA allocations.
     _range = {
         4: {
-            '01'                    : 'CLASS A',
-            '10'                    : 'CLASS B',
-            '110'                   : 'CLASS C',
-            '1110'                  : 'CLASS D MULTICAST',
-            '11100000'              : 'CLASS D LINKLOCAL',
-            '1111'                  : 'CLASS E',
-            '00001010'              : 'PRIVATE RFC1918', # 10/8
-            '101011000001'          : 'PRIVATE RFC1918', # 172.16/12
-            '1100000010101000'      : 'PRIVATE RFC1918', # 192.168/16
+            '01'                    : 'PUBLIC',
+            '10'                    : 'PUBLIC',
+            '110'                   : 'PUBLIC',
+            '1110'                  : 'MULTICAST',
+            '11100000'              : 'LINKLOCAL',
+            '1111'                  : 'PUBLIC',
+            '00001010'              : 'PRIVATE', # 10/8
+            '101011000001'          : 'PRIVATE', # 172.16/12
+            '1100000010101000'      : 'PRIVATE', # 192.168/16
             },
         6: {
             '00000000'              : 'RESERVED',       # ::/8
