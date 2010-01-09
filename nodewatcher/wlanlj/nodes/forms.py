@@ -974,7 +974,7 @@ class RenumberForm(forms.Form):
       )
       
       # Field for choosing new subnet prefix size
-      self.fields['prefix_%s' % subnet.pk] = forms.IntegerField()
+      self.fields['prefix_%s' % subnet.pk] = forms.IntegerField(required = False, initial = 27)
   
   def get_pools(self):
     """
@@ -1031,7 +1031,7 @@ class RenumberForm(forms.Form):
     # Renumber subnets first
     for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet')[:]:
       action = int(self.cleaned_data.get('subnet_%s' % subnet.pk))
-      prefix_len = int(self.cleaned_data.get('prefix_%s' % subnet.pk))
+      prefix_len = int(self.cleaned_data.get('prefix_%s' % subnet.pk) or 27)
       
       if action == RenumberAction.Keep:
         pass
