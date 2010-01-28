@@ -401,6 +401,11 @@ def process_node(node_ip, ping_results, is_duped, peers):
       # Update node's MAC address on wifi iface
       if 'mac' in info['wifi']:
         n.wifi_mac = info['wifi']['mac']
+      
+      # Update node's RTS and fragmentation thresholds
+      if 'rts' in info['wifi'] and 'frag' in info['wifi']:
+        n.thresh_rts = safe_int_convert(info['wifi']['rts']) or 2347
+        n.thresh_frag = safe_int_convert(info['wifi']['frag']) or 2347
 
       # Check for VPN statistics
       if 'vpn' in info:

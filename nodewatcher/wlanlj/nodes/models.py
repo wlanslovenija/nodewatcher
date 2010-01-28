@@ -194,6 +194,8 @@ class Node(models.Model):
   captive_portal_status = models.BooleanField(default = True)
   dns_works = models.BooleanField(default = True)
   reported_uuid = models.CharField(max_length = 40, null = True)
+  thresh_rts = models.IntegerField(null = True)
+  thresh_frag = models.IntegerField(null = True)
   
   def reset(self):
     """
@@ -223,6 +225,8 @@ class Node(models.Model):
     self.memfree = None
     self.numproc = None
     self.captive_portal_status = True
+    self.thresh_rts = None
+    self.thresh_frag = None
 
     # Mark related graph items for removal by the monitoring daemon
     self.graphitem_set.all().update(need_removal = True)
