@@ -232,6 +232,20 @@ class Node(models.Model):
     self.graphitem_set.all().update(need_removal = True)
     GraphItem.objects.filter(type = GraphType.LQ, name = self.ip).update(need_removal = True)
   
+  def rename_graphs(self, graph_type, old, new):
+    """
+    Renames node's graph items (changes their unique name).
+    
+    @param graph_type: Only rename items of this type
+    @param old: Old name
+    @param new: New name
+    """
+    if old == new:
+      return
+    
+    self.graphitem_set.filter(type = graph_type, name = new).delete()
+    self.graphitem_set.filter(type = graph_type, name = old).update(name = new)
+  
   def has_time_sync_problems(self):
     """
     Returns true if local and server clocks are too far apart.

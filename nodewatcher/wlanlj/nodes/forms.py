@@ -2,7 +2,7 @@ from django import forms
 from django.forms import widgets
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus
+from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
@@ -584,7 +584,13 @@ class UpdateNodeForm(forms.Form):
     if self.cleaned_data.get('template'):
       if not profile:
         profile = Profile(node = node, template = self.cleaned_data.get('template'))
-
+      
+      # Handle potential hardware changes
+      new_template = self.cleaned_data.get('template')
+      if profile.template != new_template:
+        # Rename traffic graphs to preserve history
+        node.rename_graphs(GraphType.Traffic, profile.template.iface_wifi, new_template.iface_wifi)
+      
       if not self.cleaned_data.get('channel'):
         profile.channel = node.project.channel
       else:

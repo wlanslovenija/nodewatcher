@@ -36,6 +36,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice
+from wlanlj.generator.models import Template
 from django.db import transaction, models, connection
 from django.conf import settings
 
@@ -422,6 +423,13 @@ def process_node(node_ip, ping_results, is_duped, peers):
       # Record interface traffic statistics for all interfaces
       for iid, iface in info['iface'].iteritems():
         if iid not in ('wifi0', 'wmaster0'):
+          # Check mappings for known wifi interfaces so we can handle hardware changes while
+          # the node is up and not generate useless intermediate graphs
+          if n.profile:
+            iface_wifi = n.profile.template.iface_wifi
+            if Template.objects.filter(iface_wifi = iid).count() >= 1:
+              iid = iface_wifi
+          
           add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s' % iid, iface['up'], iface['down'])
       
       # Generate load average statistics
