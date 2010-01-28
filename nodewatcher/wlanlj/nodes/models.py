@@ -312,6 +312,18 @@ class Node(models.Model):
         return _("unknown")
     else:
       return self.ip
+  
+  def is_max_frag_threshold(self):
+    """
+    Returns true if fragmentation threshold is currently at its maximum value.
+    """
+    return self.thresh_frag is not None and self.thresh_frag >= 2347
+
+  def is_max_rts_threshold(self):
+    """
+    Returns true if RTS threshold is currently at its maximum value.
+    """
+    return self.thresh_rts is not None and self.thresh_rts >= 2347
 
   def get_original_ip(self):
     """

@@ -193,6 +193,14 @@
     <td>{% trans "Channel" %}</td>
     <td>{{ node.channel|default:_("Unknown") }}</td>
   </tr>
+  <tr>
+    <td>{% trans "RTS threshold" %}</td>
+    <td>{{ node.thresh_rts|default:_("Unknown") }} B {% if node.is_max_rts_threshold %}(off){% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Fragmentation threshold" %}</td>
+    <td>{{ node.thresh_frag|default:_("Unknown") }} B {% if node.is_max_frag_threshold %}(off){% endif %}</td>
+  </tr>
   {% endif %}
   {% endif %}
   {% if current_owner and node.notes %}
