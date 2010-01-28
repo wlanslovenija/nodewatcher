@@ -97,6 +97,8 @@ class NodeConfig(object):
   lanIface = "eth0.0"
   lanWifiBridge = False
   lanWifiBridgeIface = "br-mesh"
+  primarySubnet = None
+  usedOlsrIps = 1
   
   def __init__(self):
     """
@@ -270,15 +272,15 @@ class NodeConfig(object):
       if gateway and gateway not in ipcalc.Network("%s/%s" % (str(network.network()), cidr)):
         raise Exception('Gateway must be in the same network as the given interface!')
     
-    self.interfaces.append({ 'name'     : name,
-                             'ip'       : ip,
-                             'cidr'     : cidr,
-                             'mask'     : netmask,
-                             'gateway'  : gateway,
-                             'id'       : id,
-                             'init'     : init,
-                             'olsr'     : olsr,
-                             'type'     : type })
+    self.interfaces.insert(0, { 'name'     : name,
+                                'ip'       : ip,
+                                'cidr'     : cidr,
+                                'mask'     : netmask,
+                                'gateway'  : gateway,
+                                'id'       : id,
+                                'init'     : init,
+                                'olsr'     : olsr,
+                                'type'     : type })
   
   def hasInterface(self, id):
     """
@@ -324,16 +326,29 @@ class NodeConfig(object):
       self.dhcpServer = True
     
     network = ipcalc.Network("%s/%s" % (subnet, cidr))
-    self.subnets.append({ 'interface'   : interface,
-                          'subnet'      : subnet,
-                          'cidr'        : cidr,
-                          'mask'        : str(network.netmask()),
-                          'firstIp'     : str(network.host_first()),
-                          'rangeStart'  : str(ipcalc.IP(long(network.network()) + 2)),
-                          'rangeEnd'    : str(network.host_last()),
-                          'dhcp'        : dhcp,
-                          'olsr'        : olsr })
-  
+    subnet = { 'interface'   : interface,
+               'subnet'      : subnet,
+               'cidr'        : cidr,
+               'mask'        : str(network.netmask()),
+               'firstIp'     : str(network.host_first()),
+               'dhcp'        : dhcp,
+               'olsr'        : olsr }
+    
+    self.subnets.append(subnet)
+    
+    if ipcalc.IP(self.ip) in network:
+      self.primarySubnet = subnet
+
+  def allocateIpForOlsr(self):
+    """
+    Allocates an IP address from the primary subnet for use by OLSR
+    as interface identifier.
+    """
+    network = ipcalc.Network("%s/%s" % (self.primarySubnet['subnet'], self.primarySubnet['cidr']))
+    ip = str(ipcalc.IP(long(network.network()) + self.usedOlsrIps + 1))
+    self.usedOlsrIps += 1
+    return ip
+
   def setVpn(self, username, password, mac = None, limit = None):
     """
     Sets VPN parameters.
@@ -448,14 +463,14 @@ class OpenWrtConfig(NodeConfig):
     f = open(os.path.join(directory, 'olsrd.conf'), 'w')
     self.__generateOlsrdConfig(f)
     
+    # Create the VPN configuration
+    if self.vpn:
+      self.__generateVpnConfig(os.path.join(directory, 'openvpn'))
+    
     # Create the DHCP configuration
     if self.dhcpServer:
       f = open(os.path.join(directory, 'dnsmasq.conf'), 'w')
       self.__generateDhcpServerConfig(f)
-    
-    # Create the VPN configuration
-    if self.vpn:
-      self.__generateVpnConfig(os.path.join(directory, 'openvpn'))
     
     # Create the captive portal configuration
     if self.captivePortal and self.dhcpServer:
@@ -527,7 +542,7 @@ class OpenWrtConfig(NodeConfig):
     shuffle(vpnServers)
     for vpn in vpnServers:
       f.write('remote %s %s\n' % vpn)
-    
+
     f.write('resolv-retry infinite\n')
     f.write('nobind\n')
     f.write('persist-key\n')
@@ -538,7 +553,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('auth-user-pass /etc/openvpn/wlanlj-password\n')
     f.write('auth-retry nointeract\n')
     f.write('cipher BF-CBC\n')
-    f.write('ifconfig %s 255.255.0.0\n' % self.ip)
+    f.write('ifconfig %s 255.255.0.0\n' % self.allocateIpForOlsr())
     f.write('verb 3\n')
     f.write('mute 20\n')
     f.write('user nobody\n')
@@ -644,7 +659,15 @@ class OpenWrtConfig(NodeConfig):
     
     for subnet in self.subnets:
       if subnet['dhcp']:
+        network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
+        offset = 1
+        if ipcalc.IP(self.ip) in network:
+          # First few IPs of primary subnet might be used for individual interfaces
+          offset += self.usedOlsrIps - 1
+	
         subnet['ntp'] = self.ntp[0]
+        subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
+        subnet['rangeEnd'] = str(network.host_last())
         
         f.write('# %(subnet)s/%(cidr)s\n' % subnet)
         f.write('dhcp-range=%(interface)s,%(rangeStart)s,%(rangeEnd)s,%(mask)s,30m\n' % subnet)
@@ -809,7 +832,7 @@ class OpenWrtConfig(NodeConfig):
       self.addInterface(
         "lan" if not self.lanWifiBridge else "mesh",
         self.lanIface,
-        self.ip,
+        self.allocateIpForOlsr() if not self.lanWifiBridge else self.ip,
         16,
         olsr = True if not self.lanWifiBridge else False,
         init = True,
