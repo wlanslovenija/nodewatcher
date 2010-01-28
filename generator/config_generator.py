@@ -792,6 +792,15 @@ class OpenWrtConfig(NodeConfig):
     f.write('\toption ipaddr 127.0.0.1\n')
     f.write('\toption netmask 255.0.0.0\n')
     f.write('\n')
+
+    # Router ID
+    f.write('### Router ID\n')
+    f.write('config alias routerid\n')
+    f.write('\toption interface loopback\n')
+    f.write('\toption proto static\n')
+    f.write('\toption ipaddr %s\n' % self.ip)
+    f.write('\toption netmask 255.255.255.255\n')
+    f.write('\n')
     
     # LAN configuration
     if self.lanIface:
