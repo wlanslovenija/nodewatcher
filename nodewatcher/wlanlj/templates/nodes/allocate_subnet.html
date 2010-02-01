@@ -39,16 +39,16 @@
     {% if node.owner %}
     <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
     {% else %}
-    <td>{% trans "Unknown" %}</td>
+    <td>{% trans "unknown" %}</td>
     {% endif %}
   </tr>
   <tr>
     <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("Unknown") }}</td>
+    <td>{{ node.location|default:_("unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:_("Unknown") }}</td>
+    <td>{{ node.project.name|default:_("unknown") }}</td>
   </tr>
 </table>
 

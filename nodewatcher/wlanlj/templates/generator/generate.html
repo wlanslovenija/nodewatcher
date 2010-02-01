@@ -41,16 +41,16 @@
     {% if node.owner %}
     <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
     {% else %}
-    <td>{% trans "Unknown" %}</td>
+    <td>{% trans "unknown" %}</td>
     {% endif %}
   </tr>
   <tr>
     <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:"Unknown" }}</td>
+    <td>{{ node.location|default:"unknown" }}</td>
   </tr>
   <tr>
     <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:"Unknown" }}</td>
+    <td>{{ node.project.name|default:"unknown" }}</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">
@@ -69,11 +69,11 @@
   </tr>
   <tr>
     <td>{% trans "Enable VPN" %}</td>
-    <td>{% if node.profile.use_vpn %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+    <td>{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
     <td>{% trans "Enable captive portal" %}</td>
-    <td>{% if node.profile.use_captive_portal %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+    <td>{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
     <td valign="top">{{ form.config_only.label }}</td>

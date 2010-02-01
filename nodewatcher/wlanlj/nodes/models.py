@@ -361,7 +361,7 @@ class Node(models.Model):
     elif self.node_type == NodeType.Mobile:
       return _("Mobile node")
     else:
-      return _("Unknown node")
+      return _("unknown node")
 
   def node_type_as_string_plural(self):
     """
@@ -376,7 +376,7 @@ class Node(models.Model):
     elif self.node_type == NodeType.Mobile:
       return _("Mobile nodes")
     else:
-      return _("Unknown nodes")
+      return _("unknown nodes")
 
   def get_warnings(self):
     """
@@ -457,7 +457,7 @@ class Node(models.Model):
     elif self.ant_type == AntennaType.Directional:
       return _("Directional")
     else:
-      return _("Unknown")
+      return _("unknown")
 
   def ant_polarization_as_string(self):
     """
@@ -470,7 +470,7 @@ class Node(models.Model):
     elif self.ant_polarization == PolarizationType.Circular:
       return _("Circular")
     else:
-      return _("Unknown")
+      return _("unknown")
 
   def status_as_string(self):
     """
@@ -1041,7 +1041,7 @@ class Pool(models.Model):
     elif self.family == PoolFamily.Ipv6:
       return "IPv6"
     else:
-      return _("Unknown")
+      return _("unknown")
 
   def __unicode__(self):
     """
@@ -1203,7 +1203,7 @@ class Event(models.Model):
     elif self.source == EventSource.NodeDatabase:
       return _("Node database")
     else:
-      return _("Unknown source")
+      return _("unknown source")
   
   def should_show_link(self):
     """

@@ -64,7 +64,7 @@ class IfaceTemplate(models.Model):
     elif self.type == IfaceType.WiFi:
       return "WiFi"
     else:
-      return "Unknown"
+      return "unknown"
 
 class OptionalPackage(models.Model):
   """

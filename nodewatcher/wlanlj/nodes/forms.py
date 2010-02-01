@@ -108,7 +108,7 @@ class RegisterNodeForm(forms.Form):
   ant_external = forms.BooleanField(required = False, label = _("External antenna"))
   ant_polarization = forms.ChoiceField(
     choices = [
-      (PolarizationType.Unknown, _("Unknown")),
+      (PolarizationType.Unknown, _("unknown")),
       (PolarizationType.Horizontal, _("Horizontal")),
       (PolarizationType.Vertical, _("Vertical")),
       (PolarizationType.Circular, _("Circular"))
@@ -118,7 +118,7 @@ class RegisterNodeForm(forms.Form):
   )
   ant_type = forms.ChoiceField(
     choices = [
-      (AntennaType.Unknown, _("Unknown")),
+      (AntennaType.Unknown, _("unknown")),
       (AntennaType.Omni, _("Omni")),
       (AntennaType.Sector, _("Sector")),
       (AntennaType.Directional, _("Directional"))

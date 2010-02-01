@@ -25,24 +25,24 @@
     {% if node.owner %}
     <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
     {% else %}
-    <td>{% trans "Unknown" %}</td>
+    <td>{% trans "unknown" %}</td>
     {% endif %}
   </tr>
   <tr>
     <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("Unknown") }}</td>
+    <td>{{ node.location|default:_("unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:_("Unknown") }}</td>
+    <td>{{ node.project.name|default:_("unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
     <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "YES" %}{% else %}{% trans "NO" %}{% endif %}</td>
+    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
 </table>
 
