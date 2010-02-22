@@ -84,10 +84,12 @@ def parse_tables(data):
       node.append('%s/%s' % (network, cidr))
     elif currentTable == 'MID':
       ip, alias = line.split('\t')
+      alias = alias.split(';')
 
       # Treat MIDs as /32 HNAs
-      l = hna.setdefault(ip, [])
-      l.append('%s/32' % alias)
+      for x in alias:
+        l = hna.setdefault(ip, [])
+        l.append('%s/32' % x)
   
   return nodes, hna
 
