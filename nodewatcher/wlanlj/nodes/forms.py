@@ -1059,6 +1059,9 @@ class RenumberForm(forms.Form):
         s.allocated = True
         s.allocated_at = datetime.now()
         s.status = SubnetStatus.NotAnnounced
+        s.description = subnet.description
+        s.gen_iface_type = subnet.gen_iface_type
+        s.gen_dhcp = subnet.gen_dhcp
         s.save()
         
         if save_primary:
