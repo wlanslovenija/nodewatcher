@@ -545,6 +545,7 @@ class OpenWrtConfig(NodeConfig):
 
     f.write('resolv-retry infinite\n')
     f.write('nobind\n')
+    f.write('fast-io\n')
     f.write('persist-key\n')
     f.write('persist-tun\n')
     f.write('ns-cert-type server\n')
