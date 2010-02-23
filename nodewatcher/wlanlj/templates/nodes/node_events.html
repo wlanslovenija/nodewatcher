@@ -9,7 +9,6 @@
 <thead>
   <tr>
     <th style="width: 200px;"><b>{% trans "Timestamp" %}</b></th>
-    <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
     <th><b>{% trans "Event" %}</b></th>
   </tr>
 </thead>
@@ -17,13 +16,6 @@
   {% for event in events %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ event.timestamp|date }}</td>
-    <td>
-      {% if not event.node.name %}
-      {{ event.node.ip }}
-      {% else %}
-      <a href="{% url view_node event.node.pk %}">{{ event.node.name }}</a>
-      {% endif %}
-    </td>
     <td>{{ event.code_to_string }}</td>
   </tr>
   {% empty %}
