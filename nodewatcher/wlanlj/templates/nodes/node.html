@@ -120,6 +120,10 @@
     <td>{{ node.get_stability|default:_("unknown") }} %</td>
   </tr>
   {% endif %}
+  <tr>
+    <td>{% trans "Events" %}</td>
+    <td><a href="{% url view_node_events node.pk %}">{% trans "show list" %}</a></td>
+  </tr>
 </table>
 <h3 id="details_title">{% trans "Details" %}</h3>
 <table border="0" id="details_list" class="layout">

@@ -522,6 +522,18 @@ def global_events(request):
     context_instance = RequestContext(request)
   )
 
+def node_events(request, node):
+  """
+  Display a list of a node's events.
+  """
+  node = get_object_or_404(Node, pk = node)
+  return render_to_response('nodes/node_events.html',
+    { 'node' : node,
+      'events' : node.event_set.order_by('-timestamp', '-id')[0:30] },
+    context_instance = RequestContext(request)
+  )
+
+
 @login_required
 def event_list(request):
   """

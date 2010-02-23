@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Events - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+
+{% block content %}
+<h1>Events - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
+<table border="0" class="listing">
+<thead>
+  <tr>
+    <th style="width: 200px;"><b>{% trans "Timestamp" %}</b></th>
+    <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
+    <th><b>{% trans "Event" %}</b></th>
+  </tr>
+</thead>
+<tbody>
+  {% for event in events %}
+  <tr class="{% cycle 'odd' 'even' %}">
+    <td>{{ event.timestamp|date }}</td>
+    <td>
+      {% if not event.node.name %}
+      {{ event.node.ip }}
+      {% else %}
+      <a href="{% url view_node event.node.pk %}">{{ event.node.name }}</a>
+      {% endif %}
+    </td>
+    <td>{{ event.code_to_string }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3" class="notice">
+      {% trans "No events have been recorded." %}
+    </td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<br/>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "events",
+    "sortColumn": [[0, "desc"]]
+  }
+];
+/* ]]> */
+</script>
+{% endblock %}
