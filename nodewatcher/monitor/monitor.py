@@ -619,6 +619,14 @@ def check_mesh_status():
     for peerIp, lq, ilq, etx in node.links:
       l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx))
       l.save()
+      
+      # Check if any of the peers has never peered with us before
+      if n.is_adjacency_important() and l.dst.is_adjacency_important() and not n.peer_history.filter(pk = l.dst.pk).count():
+        n.peer_history.add(l.dst)
+        Event.create_event(n, EventCode.AdjacencyEstablished, '', EventSource.Monitor,
+                           data = 'Peer node: %s' % l.dst, aggregate = False)
+        Event.create_event(l.dst, EventCode.AdjacencyEstablished, '', EventSource.Monitor,
+                           data = 'Peer node: %s' % n, aggregate = False)
 
       # Check if we have a peering with any border routers
       if l.dst.border_router:

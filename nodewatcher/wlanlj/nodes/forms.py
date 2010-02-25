@@ -893,6 +893,7 @@ class EventSubscribeForm(forms.Form):
       (EventCode.NodeRenamed, _("Node has been renamed")),
       (EventCode.NodeRemoved, _("Node has been removed")),
       (EventCode.NodeRenumbered, _("Node has been renumbered")),
+      (EventCode.AdjacencyEstablished, _("Adjacency established"))
     ],
     required = False
   )

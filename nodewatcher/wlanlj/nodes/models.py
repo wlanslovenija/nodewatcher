@@ -169,6 +169,9 @@ class Node(models.Model):
   vpn_mac = models.CharField(max_length = 20, null = True)
   vpn_mac_conf = models.CharField(max_length = 20, null = True, unique = True)
   awaiting_renumber = models.BooleanField(default = False)
+  
+  # Peering history
+  peer_history = models.ManyToManyField('self')
 
   # RTT measurements (set by the monitor daemon)
   rtt_min = models.FloatField(null = True)
@@ -231,6 +234,9 @@ class Node(models.Model):
     # Mark related graph items for removal by the monitoring daemon
     self.graphitem_set.all().update(need_removal = True)
     GraphItem.objects.filter(type = GraphType.LQ, name = self.ip).update(need_removal = True)
+    
+    # Clear adjacency history
+    self.peer_history.clear()
   
   def rename_graphs(self, graph_type, old, new):
     """
@@ -293,6 +299,12 @@ class Node(models.Model):
     Returns true if the node is a mesh node.
     """
     return self.node_type in (NodeType.Mesh, NodeType.Test)
+
+  def is_adjacency_important(self):
+    """
+    Returns true if the node's adjacency should be tracked.
+    """
+    return self.node_type in (NodeType.Mesh, NodeType.Server, NodeType.Unknown)
 
   def is_mobile_node(self):
     """
@@ -1111,6 +1123,7 @@ class EventCode:
   RedundancyRestored = 16
   UnknownNodeAppeared = 17
   UnknownNodeDisappeared = 18
+  AdjacencyEstablished = 19
 
   NodeAdded = 100
   NodeRenamed = 101
@@ -1169,6 +1182,8 @@ class EventCode:
       return _("Unknown node is no longer visible")
     elif code == EventCode.NodeRenumbered:
       return _("Node has been renumbered")
+    elif code == EventCode.AdjacencyEstablished:
+      return _("Adjacency established")
     else:
       return _("Unknown event")
 
@@ -1213,14 +1228,14 @@ class Event(models.Model):
     return self.code != EventCode.NodeRemoved
 
   @staticmethod
-  def create_event(node, code, summary, source, data = ""):
+  def create_event(node, code, summary, source, data = "", aggregate = True):
     """
     Creates a new event.
     """
     # Check if this event should be supressed because it has already
     # occurred a short while ago
     events = Event.objects.filter(node = node, code = code, timestamp__gt = datetime.now() - timedelta(minutes = 30))
-    if len(events) and code not in (EventCode.NodeRenamed,):
+    if len(events) and code not in (EventCode.NodeRenamed,) and aggregate:
       event = events[0]
       event.counter += 1
       event.need_resend = True
