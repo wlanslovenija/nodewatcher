@@ -1370,6 +1370,7 @@ class WarningCode:
   DnsDown = 8
   AnnounceConflict = 9
   MismatchedUuid = 10
+  LongRenumber = 11
   
   Custom = 100
   
@@ -1401,6 +1402,8 @@ class WarningCode:
       return _("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!")
     elif code == WarningCode.MismatchedUuid:
       return _("Reported node UUID does not match this node! This might indicate a node/firmware mismatch.")
+    elif code == WarningCode.LongRenumber:
+      return _("Node has been stuck in renumbering state for more than a week!")
     else:
       return _("Unknown warning")
 

@@ -596,6 +596,11 @@ def check_mesh_status():
       NodeWarning.create(n, WarningCode.UnregisteredNode, EventSource.Monitor)
       Event.create_event(n, EventCode.UnknownNodeAppeared, '', EventSource.Monitor)
   
+  # Add a warning to all nodes that have been stuck in renumbering state for over a week
+  for node in Node.objects.filter(renumber_notices__renumbered_at__lt = datetime.now() - timedelta(days = 7)):
+    NodeWarning.create(node, WarningCode.LongRenumber, EventSource.Monitor)
+    node.save()
+  
   # Mark invisible nodes as down
   for node in Node.objects.exclude(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)):
     oldStatus = node.status
