@@ -35,7 +35,7 @@ sys.path.append(options.path)
 os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning
 from wlanlj.generator.models import Template
 from django.db import transaction, models, connection
 from django.conf import settings
@@ -300,7 +300,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
 
   if is_duped:
     n.status = NodeStatus.Duped
-    n.warnings = True
+    NodeWarning.create(n, WarningCode.DupedReplies, EventSource.Monitor)
 
   # Generate status change events
   if oldStatus in (NodeStatus.Down, NodeStatus.Pending, NodeStatus.New) and n.status in (NodeStatus.Up, NodeStatus.Visible):
@@ -346,7 +346,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
       if 'uuid' in info['general']:
         n.reported_uuid = info['general']['uuid']
         if n.reported_uuid and n.reported_uuid != n.uuid:
-          n.warnings = True
+          NodeWarning.create(n, WarningCode.MismatchedUuid, EventSource.Monitor)
 
       if oldVersion != n.firmware_version:
         Event.create_event(n, EventCode.VersionChange, '', EventSource.Monitor, data = 'Old version: %s\n  New version: %s' % (oldVersion, n.firmware_version))
@@ -358,14 +358,14 @@ def process_node(node_ip, ping_results, is_duped, peers):
         Event.create_event(n, EventCode.ChannelChanged, '', EventSource.Monitor, data = 'Old channel: %s\n  New channel %s' % (oldChannel, n.channel))
 
       if n.has_time_sync_problems():
-        n.warnings = True
+        NodeWarning.create(n, WarningCode.TimeOutOfSync, EventSource.Monitor)
       
       # Parse nodogsplash client information
       oldNdsStatus = n.captive_portal_status
       if 'nds' in info:
         if 'down' in info['nds'] and info['nds']['down'] == '1':
           n.captive_portal_status = False
-          n.warnings = True
+          NodeWarning.create(n, WarningCode.CaptivePortalDown, EventSource.Monitor)
         else:
           n.captive_portal_status = True
 
@@ -494,7 +494,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
         old_dns_works = n.dns_works
         n.dns_works = info['dns']['local'] == '0' and info['dns']['remote'] == '0'
         if not n.dns_works:
-          n.warnings = True
+          NodeWarning.create(n, WarningCode.DnsDown, EventSource.Monitor)
 
         if old_dns_works != n.dns_works:
           # Generate a proper event when the state changes
@@ -525,7 +525,8 @@ def check_mesh_status():
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
   GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
 
-  # Mark all nodes as down
+  # Reset some states
+  NodeWarning.objects.all().update(source = EventSource.Monitor, dirty = False)
   Node.objects.all().update(warnings = False, conflicting_subnets = False)
   Link.objects.all().delete()
 
@@ -566,6 +567,9 @@ def check_mesh_status():
       else:
         n.last_seen = datetime.now()
         n.peers = len(nodes[nodeIp].links)
+        
+        # Create a warning since node is not registered
+        NodeWarning.create(n, WarningCode.UnregisteredNode, EventSource.Monitor)
         n.save()
       
       dbNodes[nodeIp] = n
@@ -574,7 +578,6 @@ def check_mesh_status():
       n = Node(ip = nodeIp, status = NodeStatus.Invalid, last_seen = datetime.now())
       n.visible = True
       n.node_type = NodeType.Unknown
-      n.warnings = True
       n.peers = len(nodes[nodeIp].links)
       
       # Check if there are any renumber notices for this IP address
@@ -589,7 +592,8 @@ def check_mesh_status():
       n.save(force_insert = True)
       dbNodes[nodeIp] = n
 
-      # Create an event since an unknown node has appeared
+      # Create an event and append a warning since an unknown node has appeared
+      NodeWarning.create(n, WarningCode.UnregisteredNode, EventSource.Monitor)
       Event.create_event(n, EventCode.UnknownNodeAppeared, '', EventSource.Monitor)
   
   # Mark invisible nodes as down
@@ -639,7 +643,7 @@ def check_mesh_status():
         Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor)
 
     if n.redundancy_req and not n.redundancy_link:
-      n.warnings = True
+      NodeWarning.create(n, WarningCode.NoBorderPeering, EventSource.Monitor)
 
     n.save()
   
@@ -672,7 +676,7 @@ def check_mesh_status():
         elif s.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced):
           s.status = SubnetStatus.AnnouncedOk
         elif not s.node.border_router or s.status == SubnetStatus.Hijacked:
-          s.node.warnings = True
+          NodeWarning.create(s.node, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
           s.node.save()
 
         s.save()
@@ -713,18 +717,18 @@ def check_mesh_status():
         
         # Flag node entry with warnings flag (if not a border router)
         if s.status != SubnetStatus.Subset and (not n.border_router or s.status == SubnetStatus.Hijacked):
-          n.warnings = True
+          NodeWarning.create(n, WarningCode.AnnounceConflict, EventSource.Monitor)
           n.save()
       
       # Detect subnets that cause conflicts and raise warning flags for all involved
       # nodes
       if s.is_conflicting():
-        s.node.warnings = True
+        NodeWarning.create(s.node, WarningCode.AnnounceConflict, EventSource.Monitor)
         s.node.conflicting_subnets = True
         s.node.save()
         
         for cs in s.get_conflicting_subnets():
-          cs.node.warnings = True
+          NodeWarning.create(cs.node, WarningCode.AnnounceConflict, EventSource.Monitor)
           cs.node.conflicting_subnets = True
           cs.node.save()
   
@@ -733,7 +737,7 @@ def check_mesh_status():
   Subnet.objects.filter(status = SubnetStatus.AnnouncedOk, visible = False).update(status = SubnetStatus.NotAnnounced)
   
   for subnet in Subnet.objects.filter(status = SubnetStatus.NotAnnounced, node__visible = True):
-    subnet.node.warnings = True
+    NodeWarning.create(subnet.node, WarningCode.OwnNotAnnounced, EventSource.Monitor)
     subnet.node.save()
 
   # Remove subnets that were hijacked but are not visible anymore
@@ -745,7 +749,7 @@ def check_mesh_status():
   for node in Node.objects.filter(status = NodeStatus.Invalid, visible = False).all():
     # Create an event since an unknown node has disappeared
     Event.create_event(node, EventCode.UnknownNodeDisappeared, '', EventSource.Monitor)
-
+  
   Node.objects.filter(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber), visible = False).delete()
 
   # Ping the nodes to prepare information for later node processing
@@ -790,6 +794,9 @@ def check_mesh_status():
       
       logging.debug("GC object count: %d %s" % (objcount, "!M" if objcount > _MAX_GC_OBJCOUNT else ""))
       _MAX_GC_OBJCOUNT = max(_MAX_GC_OBJCOUNT, objcount)
+  
+  # Cleanup all out of date warnings
+  NodeWarning.clear_obsolete_warnings(EventSource.Monitor)
 
 if __name__ == '__main__':
   # Configure logger

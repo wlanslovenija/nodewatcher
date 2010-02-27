@@ -394,38 +394,18 @@ class Node(models.Model):
     """
     Returns a list of warnings for this node.
     """
-    w = []
-    if self.status == NodeStatus.Invalid:
-      w.append(_("Node is not registered in the node database!"))
+    return self.warning_list.all().order_by('created_at')
+  
+  def render_warnings(self):
+    """
+    Renders the HTML template for warnings.
+    """
+    t = loader.get_template('nodes/warnings.html')
+    c = Context({
+      'node'  : self
+    })
 
-    if self.status == NodeStatus.Duped:
-      w.append(_("Monitor has received duplicate ICMP ECHO packets!"))
-
-    if self.subnet_set.filter(status = SubnetStatus.NotAllocated) and not self.border_router:
-      w.append(_("Node is announcing subnets that are not allocated to it!"))
-
-    if self.subnet_set.filter(status = SubnetStatus.NotAnnounced) and not self.is_down():
-      w.append(_("Node is not announcing its own allocated subnets!"))
-
-    if self.has_time_sync_problems() and not self.is_down():
-      w.append(_("Node's local clock is more than 30 minutes out of sync!"))
-
-    if self.redundancy_req and not self.redundancy_link:
-      w.append(_("Node requires direct border gateway peering but has none!"))
-
-    if not self.captive_portal_status and not self.is_down():
-      w.append(_("Captive portal daemon is down!"))
-
-    if not self.dns_works and not self.is_down():
-      w.append(_("Node's DNS resolver does not respond!"))
-    
-    if self.conflicting_subnets:
-      w.append(_("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!"))
-    
-    if self.reported_uuid and self.reported_uuid != self.uuid:
-      w.append(_("Reported node UUID does not match this node! This might indicate a node/firmware mismatch."))
-
-    return w
+    return t.render(c)
   
   def get_stability(self):
     """
@@ -1100,6 +1080,23 @@ class EventSource:
   Monitor = 1
   UserReport = 2
   NodeDatabase = 3
+  
+  @staticmethod
+  def to_string(source):
+    """
+    A helper method for transforming a source identifier to a
+    human readable string.
+    
+    @param source: A valid source identifier
+    """
+    if source == EventSource.Monitor:
+      return _("Monitor")
+    elif source == EventSource.UserReport:
+      return _("User report")
+    elif source == EventSource.NodeDatabase:
+      return _("Node database")
+    else:
+      return _("Unknown source")
 
 class EventCode:
   """
@@ -1187,7 +1184,6 @@ class EventCode:
     else:
       return _("Unknown event")
 
-
 class Event(models.Model):
   """
   Event model.
@@ -1211,14 +1207,7 @@ class Event(models.Model):
     """
     Converts a source identifier to a string.
     """
-    if self.source == EventSource.Monitor:
-      return _("Monitor")
-    elif self.source == EventSource.UserReport:
-      return _("User report")
-    elif self.source == EventSource.NodeDatabase:
-      return _("Node database")
-    else:
-      return _("unknown source")
+    return EventSource.to_string(self.source)
   
   def should_show_link(self):
     """
@@ -1366,6 +1355,128 @@ class EventSubscription(models.Model):
       [self.user.email],
       fail_silently = True
     )
+
+class WarningCode:
+  """
+  Valid warning code identifiers.
+  """
+  UnregisteredNode = 1
+  DupedReplies = 2
+  UnregisteredAnnounce = 3
+  OwnNotAnnounced = 4
+  TimeOutOfSync = 5
+  NoBorderPeering = 6
+  CaptivePortalDown = 7
+  DnsDown = 8
+  AnnounceConflict = 9
+  MismatchedUuid = 10
+  
+  Custom = 100
+  
+  @staticmethod
+  def to_string(code):
+    """
+    A helper method for transforming a warning code to a human
+    readable string.
+
+    @param code: A valid warning code
+    """
+    if code == WarningCode.UnregisteredNode:
+      return _("Node is not registered in the node database!")
+    elif code == WarningCode.DupedReplies:
+      return _("Monitor has received duplicate ICMP ECHO packets!")
+    elif code == WarningCode.UnregisteredAnnounce:
+      return _("Node is announcing subnets that are not allocated to it!")
+    elif code == WarningCode.OwnNotAnnounced:
+      return _("Node is not announcing its own allocated subnets!")
+    elif code == WarningCode.TimeOutOfSync:
+      return _("Node's local clock is more than 30 minutes out of sync!")
+    elif code == WarningCode.NoBorderPeering:
+      return _("Node requires direct border gateway peering but has none!")
+    elif code == WarningCode.CaptivePortalDown:
+      return _("Captive portal daemon is down!")
+    elif code == WarningCode.DnsDown:
+      return _("Node's DNS resolver does not respond!")
+    elif code == WarningCode.AnnounceConflict:
+      return _("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!")
+    elif code == WarningCode.MismatchedUuid:
+      return _("Reported node UUID does not match this node! This might indicate a node/firmware mismatch.")
+    else:
+      return _("Unknown warning")
+
+class NodeWarning(models.Model):
+  """
+  This model represents a warning that is issued to a node.
+  """
+  node = models.ForeignKey(Node, related_name = 'warning_list')
+  code = models.IntegerField()
+  source = models.IntegerField()
+  summary = models.CharField(max_length = 100)
+  created_at = models.DateTimeField()
+  last_update = models.DateTimeField()
+  dirty = models.BooleanField(default = False)
+  
+  def code_to_string(self):
+    """
+    Converts an event code to a human readable string.
+    """
+    if self.code == WarningCode.Custom:
+      return self.summary
+    else:
+      return WarningCode.to_string(self.code)
+
+  def source_to_string(self):
+    """
+    Converts a source identifier to a string.
+    """
+    return EventSource.to_string(self.source)
+  
+  @staticmethod
+  def create(node, code, source, summary = ''):
+    """
+    A helper method for creating new warnings or updating existing
+    ones.
+    
+    @param nodes: A valid node to warn
+    @param code: Warning code
+    @param source: Warning source
+    @param summary: Warning summary
+    """
+    node.warnings = True
+    
+    if code != WarningCode.Custom:
+      warnings = NodeWarning.objects.filter(node = node, code = code)
+      if warnings:
+        for w in warnings:
+          w.last_update = datetime.now()
+          w.dirty = True
+          w.source = source
+          w.summary = summary
+          w.save()
+        
+        return
+      else:
+        # Create a new warning since the old one does not exist
+        pass
+    else:
+      # Custom warnings must always be created and never updated
+      pass
+    
+    # New warning creation
+    w = NodeWarning(node = node, code = code, source = source, summary = summary)
+    w.last_update = w.created_at = datetime.now()
+    w.dirty = True
+    w.save()
+    return w
+  
+  @staticmethod
+  def clear_obsolete_warnings(source):
+    """
+    Clears all warnings that don't have the dirty flag.
+    
+    @param source: The source to delete for
+    """
+    NodeWarning.objects.filter(source = source, dirty = False).delete()
 
 class InstalledPackage(models.Model):
   """

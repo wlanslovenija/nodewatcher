@@ -8,15 +8,7 @@
 {% block content %}
 <h1><img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 
-{% if node.warnings %}
-<div class="error">
-  {% blocktrans %}<b>WARNING:</b> Some problems were found in this node's configuration! Continued operation of this node might disrupt normal network operations, so these issues must be addressed! The following problems have been detected:{% endblocktrans %}<br />
-  <br>
-  {% for warning in node.get_warnings %}
-  <i>{{ warning }}</i><br/>
-  {% endfor %}
-</div>
-{% endif %}
+{{ node.render_warnings }}
 {% if node.awaiting_renumber %}
 <div class="notice">
   {% blocktrans with node.get_renumbered_ip as renumbered_ip and node.get_original_ip as original_ip %}
