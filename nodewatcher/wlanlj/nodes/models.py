@@ -485,6 +485,10 @@ class Node(models.Model):
     n.ensure_exclusive_access()
     return Node.objects.get(**kwargs)
   
+  def get_url(self):
+    # TODO: Make base URL configurable (or use Django to build it)
+    return "https://nodes.wlan-lj.net/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
+  
   def save(self, **kwargs):
     """
     Override save so we can generate UUIDs.
