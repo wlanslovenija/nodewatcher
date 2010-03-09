@@ -69,6 +69,12 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.5
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15
 
+# Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some mesh events
+#BITLY_LOGIN = "Your bit.ly login"
+#BITLY_API_KEY = "Your bit.ly API key"
+#TWITTER_USERNAME = "Your Twitter username"
+#TWITTER_PASSWORD = "Your Twitter password"
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
   'django.template.loaders.filesystem.load_template_source',

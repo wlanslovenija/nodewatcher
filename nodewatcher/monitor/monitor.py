@@ -59,6 +59,13 @@ import time
 import multiprocessing
 import gc
 
+def tweets_enabled():
+  return settings.BITLY_LOGIN and settings.BITLY_API_KEY and settings.TWITTER_USERNAME and settings.TWITTER_PASSWORD
+
+if tweets_enabled():
+  from lib import bitly
+  import twitter
+
 RRA_CONF_MAP = {
   GraphType.RTT         : RRARTT,
   GraphType.LQ          : RRALinkQuality,
@@ -259,6 +266,15 @@ def check_dead_graphs():
   
   GraphItem.objects.filter(need_removal = True).delete()
 
+def generate_new_node_tweet(node):
+  if not tweets_enabled():
+    return
+  bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
+  twitter_api = twitter.Api(username=settings.TWITTER_USERNAME, settings.TWITTER_PASSWORD)
+  node_link = bit_api.shorten(node.get_url())
+  msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
+  twitter_api.PostUpdate(msg)
+
 @transaction.commit_on_success
 def process_node(node_ip, ping_results, is_duped, peers):
   """
@@ -306,6 +322,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
   if oldStatus in (NodeStatus.Down, NodeStatus.Pending, NodeStatus.New) and n.status in (NodeStatus.Up, NodeStatus.Visible):
     if oldStatus in (NodeStatus.New, NodeStatus.Pending):
       n.first_seen = datetime.now()
+      generate_new_node_tweet(n)
 
     Event.create_event(n, EventCode.NodeUp, '', EventSource.Monitor)
   elif oldStatus != NodeStatus.Duped and n.status == NodeStatus.Duped:
