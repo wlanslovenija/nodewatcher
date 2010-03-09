@@ -41,7 +41,7 @@ from django.db import transaction, models, connection
 from django.conf import settings
 
 # Import other stuff
-if (hasattr(settings, 'MONITOR_ENABLE_SIMULATION') and settings.MONITOR_ENABLE_SIMULATION) or options.stress_test:
+if getattr(settings, 'MONITOR_ENABLE_SIMULATION', None) or options.stress_test:
   from simulator import nodewatcher, wifi_utils
 else:
   from lib import nodewatcher, wifi_utils
@@ -60,7 +60,7 @@ import multiprocessing
 import gc
 
 def tweets_enabled():
-  return settings.BITLY_LOGIN and settings.BITLY_API_KEY and settings.TWITTER_USERNAME and settings.TWITTER_PASSWORD
+  return getattr(settings, 'BITLY_LOGIN', None) and getattr(settings, 'BITLY_API_KEY', None) and getattr(settings, 'TWITTER_USERNAME', None) and getattr(settings, 'TWITTER_PASSWORD', None)
 
 if tweets_enabled():
   from lib import bitly
@@ -124,7 +124,7 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   """
   A helper function for generating graphs.
   """
-  if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+  if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
     return
   
   # Get parent instance (toplevel by default)
@@ -269,11 +269,14 @@ def check_dead_graphs():
 def generate_new_node_tweet(node):
   if not tweets_enabled():
     return
-  bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
-  twitter_api = twitter.Api(username=settings.TWITTER_USERNAME, settings.TWITTER_PASSWORD)
-  node_link = bit_api.shorten(node.get_url())
-  msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
-  twitter_api.PostUpdate(msg)
+  try:
+    bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
+    twitter_api = twitter.Api(username=settings.TWITTER_USERNAME, settings.TWITTER_PASSWORD)
+    node_link = bit_api.shorten(node.get_url())
+    msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
+    twitter_api.PostUpdate(msg)
+  except:
+    logging.warning(format_exc())
 
 @transaction.commit_on_success
 def process_node(node_ip, ping_results, is_duped, peers):
@@ -525,7 +528,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
   n.save()
   
   # When GC debugging is enabled perform some more work
-  if hasattr(settings, 'MONITOR_ENABLE_GC_DEBUG') and settings.MONITOR_ENABLE_GC_DEBUG:
+  if getattr(settings, 'MONITOR_ENABLE_GC_DEBUG', None):
     gc.collect()
     return os.getpid(), len(gc.get_objects())
   
@@ -670,7 +673,7 @@ def check_mesh_status():
     n.save()
   
   # Add nodes to topology map and generate output
-  if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+  if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
     pass
   else:
     # Only generate topology when graphing is not disabled
@@ -777,7 +780,7 @@ def check_mesh_status():
   # Ping the nodes to prepare information for later node processing
   results, dupes = wifi_utils.ping_hosts(10, nodesToPing)
   
-  if hasattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING') and settings.MONITOR_DISABLE_MULTIPROCESSING:
+  if getattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING', None):
     # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually
     # used for debug purpuses where a single process is prefered)
     for node_ip in nodesToPing:
@@ -807,7 +810,7 @@ def check_mesh_status():
         logging.warning(format_exc())
     
     # When GC debugging is enabled make some additional computations
-    if hasattr(settings, 'MONITOR_ENABLE_GC_DEBUG') and settings.MONITOR_ENABLE_GC_DEBUG:
+    if getattr(settings, 'MONITOR_ENABLE_GC_DEBUG', None):
       global _MAX_GC_OBJCOUNT
       objcount = sum(objects.values())
       
@@ -881,16 +884,16 @@ if __name__ == '__main__':
   if settings.DEBUG:
     logging.warning("Debug mode is enabled, monitor will leak memory!")
   
-  if hasattr(settings, 'MONITOR_ENABLE_SIMULATION') and settings.MONITOR_ENABLE_SIMULATION:
+  if getattr(settings, 'MONITOR_ENABLE_SIMULATION', None):
     logging.warning("All feeds are being simulated!")
   
-  if hasattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING') and settings.MONITOR_DISABLE_MULTIPROCESSING:
+  if getattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING', None):
     logging.warning("Multiprocessing mode disabled.")
   
-  if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+  if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
     logging.warning("Graph generation disabled.")
   
-  if hasattr(settings, 'MONITOR_ENABLE_GC_DEBUG') and settings.MONITOR_ENABLE_GC_DEBUG:
+  if getattr(settings, 'MONITOR_ENABLE_GC_DEBUG', None):
     logging.warning("Garbage collection debugging enabled.")
   
   # Create worker pool and start processing
@@ -905,7 +908,7 @@ if __name__ == '__main__':
         check_global_statistics()
         check_events()
         
-        if hasattr(settings, 'MONITOR_DISABLE_GRAPHS') and settings.MONITOR_DISABLE_GRAPHS:
+        if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
           pass
         else:
           regenerate_graphs()
