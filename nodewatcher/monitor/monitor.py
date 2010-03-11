@@ -272,7 +272,7 @@ def generate_new_node_tweet(node):
   try:
     bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
     twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
-    node_link = bit_api.shorten(node.get_url())
+    node_link = bit_api.shorten(node.get_full_url())
     msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
     twitter_api.PostUpdate(msg)
   except:

@@ -24,14 +24,28 @@ class NodeSitemap(HttpsSitemap):
     return node.last_seen
 
   def location(self, node):
-    return node.get_location()
+    return node.get_absolute_url()
 
 class StaticSitemap(HttpsSitemap):
-  priority = "1.0"
+  priority = "0.9"
   locations = [
     '/nodes/statistics',
     '/nodes/topology',
-    '/nodes/map',
+    '/nodes/map'
+  ]
+
+  def items(self):
+    return self.locations
+
+  def lastmod(self, obj):
+    return datetime.now()
+
+  def location(self, obj):
+    return obj
+
+class RootPageSitemap(StaticSitemap):
+  priority = "1.0"
+  locations = [
     '/'
   ]
 

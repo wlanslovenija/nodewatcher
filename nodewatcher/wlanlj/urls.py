@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 from wlanlj.nodes.feeds import LatestEvents
-from wlanlj.nodes.sitemaps import NodeSitemap, StaticSitemap
+from wlanlj.nodes.sitemaps import NodeSitemap, StaticSitemap, RootPageSitemap
 from django.conf import settings
 
 feeds = {
@@ -9,7 +9,8 @@ feeds = {
 
 sitemaps = {
   'nodes'   : NodeSitemap,
-  'static'  : StaticSitemap
+  'static'  : StaticSitemap,
+  'root'    : RootPageSitemap
 }
 
 urlpatterns = patterns('',

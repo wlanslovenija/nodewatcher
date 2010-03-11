@@ -485,11 +485,11 @@ class Node(models.Model):
     n.ensure_exclusive_access()
     return Node.objects.get(**kwargs)
   
-  def get_url(self):
+  def get_full_url(self):
     # TODO: Make base URL configurable (or use Django to build it)
-    return "https://nodes.wlan-lj.net%s" % (self.get_location(),)
+    return "https://nodes.wlan-lj.net%s" % (self.get_absolute_url(),)
   
-  def get_location(self):
+  def get_absolute_url(self):
     return "/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
   
   def save(self, **kwargs):
