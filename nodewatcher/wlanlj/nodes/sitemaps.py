@@ -1,9 +1,21 @@
 from django.contrib.sitemaps import Sitemap
 from wlanlj.nodes.models import Node
 from datetime import datetime
+import re
+from django.conf import settings
 
-class NodeSitemap(Sitemap):
-  changefreq = "daily"
+class HttpsSitemap(Sitemap):
+  http_match = re.compile(r"^http://")
+
+  def get_urls(self, page=1):
+    urls = super(HttpsSitemap, self).get_urls(page)
+    if getattr(settings, 'SITEMAPS_USE_HTTPS', None):
+      for url in urls:
+        url['location'] = self.http_match.sub("https://", url['location'])
+    return urls
+
+class NodeSitemap(HttpsSitemap):
+  priority = "0.8"
 
   def items(self):
     return Node.objects.all()
@@ -12,10 +24,10 @@ class NodeSitemap(Sitemap):
     return node.last_seen
 
   def location(self, node):
-    return "/nodes/node/%s" % node.ip
+    return node.get_location()
 
-class StaticSitemap(Sitemap):
-  changefreq = "daily"
+class StaticSitemap(HttpsSitemap):
+  priority = "1.0"
   locations = [
     '/nodes/statistics',
     '/nodes/topology',
@@ -31,4 +43,3 @@ class StaticSitemap(Sitemap):
 
   def location(self, obj):
     return obj
-

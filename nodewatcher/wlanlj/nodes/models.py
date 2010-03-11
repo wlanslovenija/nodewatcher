@@ -487,7 +487,10 @@ class Node(models.Model):
   
   def get_url(self):
     # TODO: Make base URL configurable (or use Django to build it)
-    return "https://nodes.wlan-lj.net/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
+    return "https://nodes.wlan-lj.net%s" % (self.get_location(),)
+  
+  def get_location(self):
+    return "/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
   
   def save(self, **kwargs):
     """

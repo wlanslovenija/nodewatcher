@@ -58,6 +58,9 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
+# Set to true if you want https instead of http in sitemaps' URLs
+SITEMAPS_USE_HTTPS = False
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '1p)^zvjul0^c)v5*l!8^48g=ili!cn54^l)wl1avvu-x$==k7p'
 
