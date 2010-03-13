@@ -276,7 +276,7 @@ def generate_new_node_tweet(node):
     msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
     twitter_api.PostUpdate(msg)
   except:
-    logging.warning(format_exc())
+    logging.warning("%s/%s: %s" % (node.name, node.ip, format_exc()))
 
 @transaction.commit_on_success
 def process_node(node_ip, ping_results, is_duped, peers):
