@@ -325,7 +325,8 @@ def process_node(node_ip, ping_results, is_duped, peers):
   if oldStatus in (NodeStatus.Down, NodeStatus.Pending, NodeStatus.New) and n.status in (NodeStatus.Up, NodeStatus.Visible):
     if oldStatus in (NodeStatus.New, NodeStatus.Pending):
       n.first_seen = datetime.now()
-      generate_new_node_tweet(n)
+      if n.node_type == NodeType.Mesh:
+        generate_new_node_tweet(n)
 
     Event.create_event(n, EventCode.NodeUp, '', EventSource.Monitor)
   elif oldStatus != NodeStatus.Duped and n.status == NodeStatus.Duped:
