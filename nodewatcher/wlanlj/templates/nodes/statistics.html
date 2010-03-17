@@ -15,17 +15,17 @@
 <td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status|widthlist }}%;" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}"/> {{ s.count }}</td>
 {% empty %}
 <td class="notice">
-  {% trans "There are currently no nodes registered/connected." %}
+  {% trans "There are currently no nodes registered/visible." %}
 </td>
 {% endfor %}
 </tr>
 </table>
 
 <div>
-{% trans "All registered nodes" %}: {{ node_count }}<br/>
-{% trans "Nodes with warnings" %}: {{ nodes_warned }}<br/>
-{% trans "Nodes with an external antenna" %}: {{ external_ant }}<br/>
-{% trans "Test nodes" %}: {{ nodes_test }}<br/>
+{% trans "All registered/visible nodes:" %} {{ node_count }}<br/>
+{% trans "Nodes with warnings:" %} {{ nodes_warned }}<br/>
+{% trans "Nodes with an external antenna:" %} {{ external_ant }}<br/>
+{% trans "Test nodes:" %} {{ nodes_test }}<br/>
 </div>
 
 <h3 id="routers_folder" class="folding closed">{% trans "Nodes by router type" %}</h3>
