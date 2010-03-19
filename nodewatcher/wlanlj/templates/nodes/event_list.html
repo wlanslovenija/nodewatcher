@@ -41,6 +41,13 @@
     <th><b>{% trans "Event code" %}</b></th>
   </tr>
 </thead>
+<tfoot>
+  <tr>
+    <td class="table_menu" colspan="4">
+      <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
+    </td>
+  </tr>
+</tfoot>
 <tbody>
   {% for subscription in subscriptions %}
   <tr class="{% cycle 'odd' 'even' %}">
@@ -72,9 +79,6 @@
   {% endfor %}
 </tbody>
 </table>
-<div class="table_links">
-<a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
-</div>
 <br/>
 <h3>{% trans "Latest events for your nodes" %}</h3>
 <table border="0" class="listing">

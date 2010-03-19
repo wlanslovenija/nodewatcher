@@ -73,6 +73,14 @@ table.listing tbody tr.section_title {
   background-color: #FFFFFF !important;
 }
 
+table.listing tfoot td {
+  background-color: #FFFFFF !important;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #D7D7D7;
+}
+
+
 .table_links {
   text-align: center;
 }
@@ -252,12 +260,8 @@ table.listing td.center {
 }
 
 table.listing tbody td.notice, table.listing tbody th.notice {
-  -moz-border-radius-bottomleft:3px;
-  -moz-border-radius-bottomright:3px;
-  -moz-border-radius-topleft:3px;
-  -moz-border-radius-topright:3px;
   padding: 5px;
-  border: 1px solid #95DA3A;
+  border: 1px solid #D7D7D7;
   background-color: #E1FFB8;
   color: #3D6744;
   text-align: center;
@@ -290,4 +294,79 @@ table.listing tbody td.notice, table.listing tbody th.notice {
 
 .dataTables_empty {
   text-align: center;
+}
+
+tr.subnet td.status,
+tr.subnet td.timestamp {
+  text-align: center;
+}
+
+tr.subnet .description {
+  margin-left: 5px;
+  font-size: 10px;
+  color: #979797;
+}
+
+tr.conflicting .identifier {
+  color: red;
+  font-weight: bold;
+}
+
+tr.conflicting .conflict {
+  color: red;
+  font-size: 10px;
+}
+
+tr.conflicting .conflict ul {
+  margin: 0px;
+  padding: 0px 10px;
+}
+
+tr.conflicting .conflict li {
+  list-style-type: none;
+}
+
+table.warnings td {
+  padding: 5px;
+  vertical-align: top;
+}
+
+table.warnings .description {
+  font-size: 10px;
+  color: #93544B;
+}
+
+.graphs {
+  text-align: center;
+}
+
+.graphs .timespan {
+  padding: 3px 0 20px 0;
+  margin: 0 auto 5px auto;
+  background: white url('/images/timespan.png') no-repeat bottom center;
+  width: 600px;
+  border-bottom: solid white 6px;
+}
+
+.graphs .timespan a {
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -moz-border-radius-topleft:3px;
+  -moz-border-radius-topright:3px;
+  color: #999999;
+  padding: 2px 5px;
+  margin-left: 4px;
+  font-size: 90%;
+}
+
+.graphs .timespan a:hover {
+  background-color: #EEEEEE;
+  text-decoration: none;
+}
+
+.graphs .timespan a.selected,
+.graphs .timespan a.selected:hover {
+  background-color: #CCCCCC;
+  color: white;
+  text-decoration: none;
 }

@@ -2,14 +2,6 @@
 <div class="graph">
 <img src="/graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{{ graph.title }}{% for child in graph.get_children %}, {{ child.title }}{% endfor %}"/>
 <div class="graphmenu">
-<div class="timespan">
-<b>{% trans "Timespan:" %}</b>
-<select id="graph_timespan_select_{{ graph.id }}" onchange="graph_display_changed_{{ graph.id }}()">
-  {% for timespan in graph.get_timespans %}
-  <option value="{{ timespan }}">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</option>
-  {% endfor %}
-</select>
-</div>&nbsp;
 {% if graph.get_children %}
 <b>{% trans "Display:" %}</b>
 <select id="graph_child_select_{{ graph.id }}" onchange="graph_display_changed_{{ graph.id }}()">
@@ -20,13 +12,4 @@
 </select>
 {% endif %}
 </div>
-<script type="text/javascript">
-/* <![CDATA[ */
-  function graph_display_changed_{{ graph.id }}() {
-    var subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
-    var prefix = $('#graph_timespan_select_{{ graph.id }}').attr('value');
-    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + prefix + '_' + subgraph);
-  }
-/* ]]> */
-</script>
 </div>

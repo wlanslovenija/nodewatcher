@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load gmap %}
 {% load conversion %}
+{% load gmap %}
+
 
 {% block title %}{% trans "Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
@@ -24,11 +25,7 @@
   {% endif %}
 </div>
 {% endif %}
-<div class="embedded">
-{% if node.geo_lat and node.geo_long %}
-<div id="gmap" style="width:400px; height: 300px;"></div>
-{% endif %}
-</div>
+
 <h3 class="section_title">{% trans "General Information" %}
 {% if current_owner and not node.is_invalid %}
 <a href="{% url edit_node node.pk %}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
@@ -38,7 +35,11 @@
 <a href="{% url remove_node node.pk %}"><img src="/images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
 {% endif %}
 </h3>
-
+<div class="embedded">
+{% if node.geo_lat and node.geo_long %}
+<div id="gmap" style="width:400px; height: 300px;"></div>
+{% endif %}
+</div>
 <table border="0" width="300">
   <tr>
     <td style="width: 120px;">{% trans "IP address" %}</td>
@@ -279,52 +280,61 @@
     <th style="width: 150px;">{% trans "Last seen" %}</th>
   </tr>
 </thead>
+{% if current_owner %}
+<tfoot>
+  <tr>
+    <td class="table_menu" colspan="{% if current_owner %}4{% else %}3{% endif %}">
+      <a href="{% url allocate_subnet node.pk %}">{% trans "Add subnet" %}</a>
+    </td>
+  </tr>
+</tfoot>
+{% endif %}
 <tbody>
   {% for subnet in node.get_subnets %}
-  <tr class="{% cycle 'odd' 'even' as subnet_rows %}">
+  <tr class="{% cycle 'odd' 'even' as subnet_rows %} subnet {% if subnet.is_conflicting %} conflicting{% endif %}">
     {% if current_owner %}
     <td>
       {% if subnet.allocated and not subnet.is_primary %}
-      <a href="{% url remove_subnet subnet.pk %}">
-        <img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
-      </a>
       <a href="{% url edit_subnet subnet.pk %}">
         <img src="/images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
+      </a>
+      <a href="{% url remove_subnet subnet.pk %}">
+        <img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
       </a>
       {% endif %}
     </td>
     {% endif %}
     <td>
-      {{ subnet }}
-      {% if subnet.description %}<div class="small_text">{{ subnet.description }}</div>{% endif %}
-    </td>
-    <td class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</td>
-    {% if subnet.last_seen %}
-    <td>{{ subnet.last_seen|date }}</td>
-    {% else %}
-    <td>{% trans "never" %}</td>
-    {% endif %}
-  </tr>
+      <span class="identifier">{{ subnet }}</span>
+      {% if subnet.description %}<span class="description">{{ subnet.description }}</span>{% endif %}
   {% if subnet.is_conflicting %}
-  <tr class="{% cycle subnet_rows %}">
-    <td colspan="{% if current_owner %}4{% else %}3{% endif %}" class="small_text">
-      <span style="color: red;">Subnet <b>{{ subnet }}</b> conflicts with:<br/>
-      <div style="padding-left: 10px;">
+      <div class="conflict">Subnet conflicts with:<br/>
+      <ul>
       {% for conflict in subnet.get_conflicting_subnets %}
+        <li>
         {% if conflict.is_announced %}
           {% if conflict.is_properly_announced %}
           <b>{{ conflict }}</b> allocated to and announced by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
           {% else %}
-          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a>
           {% endif %}
         {% else %}
-          <b>{{ conflict }}</b> allocated to <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+          {{ conflict }}</b> allocated to <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a>
         {% endif %}
+        </li>
       {% endfor %}
+      </ul>
       </div>
-    </td>
-  </tr>
   {% endif %}
+    </td>
+    <td class="status"><span class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</span></td>
+    {% if subnet.last_seen %}
+    <td class="timestamp">{{ subnet.last_seen|date }}</td>
+    {% else %}
+    <td>{% trans "never" %}</td>
+    {% endif %}
+  </tr>
+
   {% empty %}
   <tr>
     <td colspan="{% if current_owner %}4{% else %}3{% endif %}" class="notice">
@@ -334,11 +344,7 @@
   {% endfor %}
 </tbody>
 </table>
-{% if current_owner %}
-<div class="table_links">
-<a href="{% url allocate_subnet node.pk %}">{% trans "Add subnet" %}</a>
-</div>
-{% endif %}
+
 <h3>{% trans "Immediate Neighbours / Peers" %}</h3>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
@@ -373,6 +379,26 @@
   <p class="error">{% trans "Node is currently down, so these graphs are out of date!" %}</p>
   {% endif %}
 <div class="graphs">
+<div class="timespan">
+  {% for timespan in node.get_graph_timespans reversed %}
+  <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_display_changed('{{ timespan }}'); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>
+  {% endfor %}
+<script type="text/javascript">
+/* <![CDATA[ */
+  function graph_display_changed(timespan) {
+    var subgraph = '';
+    {% for graph in node.get_graphs %}
+    subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
+    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + timespan + '_' + subgraph);
+    {% endfor %}
+    $('a[id|=timespan_id]').removeClass('selected');
+    $('a#timespan_id-' + timespan).addClass('selected');
+  }
+  $(document).ready(function() { graph_display_changed('{{ node.get_graph_timespans|first }}'); $(".timespan").floater(); });
+  
+/* ]]> */
+</script>
+</div>
   {% for graph in node.get_graphs %}
   {{ graph.render }}<br/>
   {% endfor %}
@@ -382,7 +408,12 @@
 {% endblock %}
 
 {% block js %}
+{% if node.geo_lat and node.geo_long %}
 {% do_gmap "mapInit" "" node.geo_lat node.geo_long "" node.status_as_string %}
+{% endif %}
+{% if not node.is_down %}
+<script type="text/javascript" src="/js/floater.js"></script>
+{% endif %}
 <script type="text/javascript">
 /* <![CDATA[ */
 var tablesConfig = [

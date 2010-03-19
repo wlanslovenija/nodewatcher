@@ -9,6 +9,9 @@ STATIC_DOC_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..',
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# Is generator enabled or not. If set to False the pybeanstalk dependency is not needed.
+ENABLE_IMAGE_GENERATOR = False
+
 # A tuple that lists people who get code error notifications. When
 # DEBUG=False and a view raises an exception, Django will e-mail these
 # people with the full exception information. Each member of the tuple

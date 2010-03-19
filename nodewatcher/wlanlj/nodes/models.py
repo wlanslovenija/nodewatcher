@@ -270,6 +270,14 @@ class Node(models.Model):
     """
     return self.graphitem_set.filter(parent = None).order_by('-type', 'name')
 
+  def get_graph_timespans(self):
+    """
+    Returns a list of available graph image prefixes for different time
+    periods for this node. At the moment only return a global list of
+    prefixes.
+    """
+    return [prefix for  prefix, _ in settings.GRAPH_TIMESPANS]
+
   def is_down(self):
     """
     Returns true if the node is currently down.
@@ -1105,6 +1113,23 @@ class EventSource:
     else:
       return _("Unknown source")
 
+  @staticmethod
+  def to_identifier(source):
+    """
+    A helper method for transforming a source identifier to a
+    human readable string.
+    
+    @param source: A valid source identifier
+    """
+    if source == EventSource.Monitor:
+      return "monitor"
+    elif source == EventSource.UserReport:
+      return "user"
+    elif source == EventSource.NodeDatabase:
+      return "database"
+    else:
+      return "unknown"
+
 class EventCode:
   """
   Valid event code identifiers.
@@ -1215,7 +1240,13 @@ class Event(models.Model):
     Converts a source identifier to a string.
     """
     return EventSource.to_string(self.source)
-  
+
+  def source_to_identifier(self):
+    """
+    Converts a source identifier to a string identifier (machine readable description).
+    """
+    return EventSource.to_identifier(self.source)
+
   def should_show_link(self):
     """
     Returns true if a link to event-generating node should be added
@@ -1441,6 +1472,12 @@ class NodeWarning(models.Model):
     """
     return EventSource.to_string(self.source)
   
+  def source_to_identifier(self):
+    """
+    Converts a source identifier to a string identifier (machine readable description).
+    """
+    return EventSource.to_identifier(self.source)
+
   @staticmethod
   def create(node, code, source, summary = ''):
     """
