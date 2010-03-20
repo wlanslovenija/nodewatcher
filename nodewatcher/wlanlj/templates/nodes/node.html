@@ -408,11 +408,9 @@
 {% endblock %}
 
 {% block js %}
+<script type="text/javascript" src="/js/jquery.floater.js"></script>
 {% if node.geo_lat and node.geo_long %}
 {% do_gmap "mapInit" "" node.geo_lat node.geo_long "" node.status_as_string %}
-{% endif %}
-{% if not node.is_down %}
-<script type="text/javascript" src="/js/floater.js"></script>
 {% endif %}
 <script type="text/javascript">
 /* <![CDATA[ */
