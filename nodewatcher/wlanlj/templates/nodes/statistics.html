@@ -87,8 +87,7 @@
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');
   }
-  //$(document).ready(function() { graph_display_changed('{{ timespans|first }}'); $(".timespan").floater(); });
-  
+  $(document).ready(function() { graph_display_changed('{{ timespans|first }}'); $(".timespan").floater(); });
 /* ]]> */
 </script>
 </div>
