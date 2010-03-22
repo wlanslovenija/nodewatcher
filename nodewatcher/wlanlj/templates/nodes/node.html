@@ -380,21 +380,22 @@
   {% endif %}
 <div class="graphs">
 <div class="timespan">
-  {% for timespan in node.get_graph_timespans reversed %}
-  <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_display_changed('{{ timespan }}'); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>
+  {% for timespan in timespans reversed %}
+  <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_timespan = '{{ timespan }}'; graph_display_changed(); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>
   {% endfor %}
 <script type="text/javascript">
 /* <![CDATA[ */
-  function graph_display_changed(timespan) {
+  var graph_timespan = '{{ timespans|first }}';
+  function graph_display_changed() {
     var subgraph = '';
     {% for graph in node.get_graphs %}
     subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
-    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + timespan + '_' + subgraph);
+    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + graph_timespan + '_' + subgraph);
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
-    $('a#timespan_id-' + timespan).addClass('selected');
+    $('a#timespan_id-' + graph_timespan).addClass('selected');
   }
-  $(document).ready(function() { graph_display_changed('{{ node.get_graph_timespans|first }}'); $(".timespan").floater(); });
+  $(document).ready(function() { graph_display_changed('{{ timespans|first }}'); $(".timespan").floater(); });
   
 /* ]]> */
 </script>

@@ -4,7 +4,7 @@
 <div class="graphmenu">
 {% if graph.get_children %}
 <b>{% trans "Display:" %}</b>
-<select id="graph_child_select_{{ graph.id }}" onchange="graph_display_changed_{{ graph.id }}()">
+<select id="graph_child_select_{{ graph.id }}" onchange="graph_display_changed(); return false;">
   <option value="{{ graph.graph }}" selected="selected">{{ graph.title }}</option>
   {% for child in graph.get_children %}
   <option value="{{ child.graph }}">{{ child.title }}</option>

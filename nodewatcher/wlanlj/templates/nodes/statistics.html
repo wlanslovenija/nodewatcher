@@ -73,6 +73,25 @@
 </div>
 <h2>Graphs</h2>
 <div class="graphs">
+<div class="timespan">
+  {% for timespan in timespans reversed %}
+  <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_timespan = '{{ timespan }}'; graph_display_changed(); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>
+  {% endfor %}
+<script type="text/javascript">
+/* <![CDATA[ */
+  var graph_timespan = '{{ timespans|first }}';
+  function graph_display_changed() {
+    {% for graph in graphs %}
+    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + graph_timespan + '_{{ graph.graph }}' );
+    {% endfor %}
+    $('a[id|=timespan_id]').removeClass('selected');
+    $('a#timespan_id-' + graph_timespan).addClass('selected');
+  }
+  //$(document).ready(function() { graph_display_changed('{{ timespans|first }}'); $(".timespan").floater(); });
+  
+/* ]]> */
+</script>
+</div>
   {% for graph in graphs %}
   {{ graph.render }}<br/>
   {% endfor %}

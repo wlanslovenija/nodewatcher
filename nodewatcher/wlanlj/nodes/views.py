@@ -104,7 +104,8 @@ def statistics(request):
         GraphItemNP(1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
         GraphItemNP(2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
         GraphItemNP(3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
-      ]
+      ],
+      'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS]
     },
     context_instance = RequestContext(request)
   )
@@ -237,6 +238,7 @@ def node(request, node):
   
   return render_to_response('nodes/node.html',
     { 'node' : node ,
+      'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS],
       'current_owner' : node.status != NodeStatus.Invalid and (node.owner == request.user or request.user.is_staff) },
     context_instance = RequestContext(request)
   )

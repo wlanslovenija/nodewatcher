@@ -785,7 +785,7 @@ class GraphItemNP(object):
     Returns a list of graph image prefixes for different time
     periods.
     """
-    return [prefix for  prefix, _ in settings.GRAPH_TIMESPANS]
+    return [prefix for prefix, _ in settings.GRAPH_TIMESPANS]
 
   def get_children(self):
     """
