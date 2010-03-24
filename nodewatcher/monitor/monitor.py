@@ -708,7 +708,11 @@ def check_mesh_status():
         elif not s.node.border_router or s.status == SubnetStatus.Hijacked:
           NodeWarning.create(s.node, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
           s.node.save()
-
+        
+        # Recheck if this is a more specific prefix announce for an allocated prefix
+        if s.status == SubnetStatus.NotAllocated and s.is_more_specific():
+          s.status = SubnetStatus.Subset
+        
         s.save()
       except Subnet.DoesNotExist:
         # Subnet does not exist, prepare one
@@ -716,7 +720,7 @@ def check_mesh_status():
         s.visible = True
 
         # Check if this is a more specific prefix announce for an allocated prefix
-        if Subnet.objects.ip_filter(ip_subnet__contains = '%s/%s' % (subnet, cidr)).filter(node = s.node, allocated = True).count() > 0:
+        if s.is_more_specific():
           s.status = SubnetStatus.Subset
         else:
           s.status = SubnetStatus.NotAllocated

@@ -612,6 +612,13 @@ class Subnet(models.Model):
 
     return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node).count() > 0
   
+  def is_more_specific(self):
+    """
+    Returns true if this subnet is simply a more specific announce of one
+    of node's allocated subnets.
+    """
+    return Subnet.objects.ip_filter(ip_subnet__contains = '%s/%s' % (self.subnet, self.cidr)).filter(node = self.node, allocated = True).count() > 0
+  
   def is_announced(self):
     """
     Returns true if this subnet is being currently announced.
