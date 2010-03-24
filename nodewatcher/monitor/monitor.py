@@ -386,7 +386,11 @@ def process_node(node_ip, ping_results, is_duped, peers):
       if 'nds' in info:
         if 'down' in info['nds'] and info['nds']['down'] == '1':
           n.captive_portal_status = False
-          NodeWarning.create(n, WarningCode.CaptivePortalDown, EventSource.Monitor)
+          
+          # Create a node warning when captive portal is down and the node has it
+          # selected in its image generator profile
+          if not n.profile or n.profile.use_captive_portal:
+            NodeWarning.create(n, WarningCode.CaptivePortalDown, EventSource.Monitor)
         else:
           n.captive_portal_status = True
 
