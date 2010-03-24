@@ -7,7 +7,7 @@
   <tbody>
     {% for warning in node.get_warnings %}
     <tr class="{% cycle 'odd' 'even' %}">
-      <td><img src="/images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="{{ warning.source_to_string }}" /></td>
+      <td class="icon"><img src="/images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="{{ warning.source_to_string }}" /></td>
       <td align="left">{{ warning.created_at|date }}<br /><span class="description">{{ warning.code_to_string }}</span></td>
     </tr>
     {% endfor %}

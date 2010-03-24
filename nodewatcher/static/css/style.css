@@ -336,6 +336,10 @@ table.warnings .description {
   color: #93544B;
 }
 
+table.warnings .icon {
+  width: 20px;
+}
+
 .graphs {
   text-align: center;
 }
