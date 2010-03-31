@@ -19,6 +19,7 @@ parser.add_option('--path', dest = 'path', help = 'Path that contains "wlanlj" n
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
 parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit (only graphs that have the redraw flag set are regenerated)', action = 'store_true')
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
+parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
 options, args = parser.parse_args()
 
 if not options.path:
@@ -45,6 +46,10 @@ if getattr(settings, 'MONITOR_ENABLE_SIMULATION', None) or options.stress_test:
   from simulator import nodewatcher, wifi_utils
 else:
   from lib import nodewatcher, wifi_utils
+  
+  # Setup simulation data collection
+  nodewatcher.COLLECT_SIMULATION_DATA = options.collect_sim
+  wifi_utils.COLLECT_SIMULATION_DATA = options.collect_sim
 
 from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers
 from lib.topology import DotTopologyPlotter

@@ -3,6 +3,9 @@ import re
 import urllib
 import subprocess
 
+# A flag that specifies when we should save fetched data for simulation purpuses
+COLLECT_SIMULATION_DATA = False
+
 class OlsrNode(object):
   """
   A simple class used for containing topology information received
@@ -100,7 +103,16 @@ def get_tables(olsr_ip = "127.0.0.1"):
   @param olsr_ip: IP address of the router instance
   """
   try:
-    return parse_tables(urllib.urlopen('http://%s:2006' % olsr_ip).read())
+    data = urllib.urlopen('http://%s:2006' % olsr_ip).read()
+    if COLLECT_SIMULATION_DATA:
+      try:
+        f = open("simulator/data/olsr.txt", 'w')
+        f.write(data)
+        f.close()
+      except IOError:
+        pass
+    
+    return parse_tables(data)
   except:
     return None
 
@@ -150,5 +162,14 @@ def ping_hosts(count, hosts):
   )
   
   # Parse results
-  return parse_fping(process.stderr.read())
+  data = process.stderr.read()
+  if COLLECT_SIMULATION_DATA:
+    try:
+      f = open("simulator/data/fping.txt", 'w')
+      f.write(data)
+      f.close()
+    except IOError:
+      pass
+  
+  return parse_fping(data)
 

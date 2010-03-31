@@ -1,0 +1,1356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Node List – wlan ljubljana - odprto brezžično omrežje Ljubljane</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <link rel="shortcut icon" href="/site/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/site/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/common/css/trac.css" type="text/css" />
+    <link rel="stylesheet" href="/common/css/report.css" type="text/css" />
+    <link rel="stylesheet" href="/common/css/prefs.css" type="text/css" />
+    <script type="text/javascript" src="/site/jquery.js"></script>
+    <!--[if lt IE 7]>
+    <script type="text/javascript" src="/common/js/ie_pre7_hacks.js"></script>
+    <![endif]-->
+    <!--[if IE]>
+    <script type="text/javascript" src="/js/ie_hacks.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="/site/common.css" />
+    <link rel="stylesheet" type="text/css" href="/site/trac.css" />
+    <link rel='stylesheet' type='text/css' href='/css/style.css' />
+    <link rel='stylesheet' type='text/css' href='/css/table.css' />
+    <script type="text/javascript" src="/site/folding.js"></script>
+    <script type="text/javascript" src="/js/jquery.dataTables.js"></script>
+    
+<script type="text/javascript">
+/* <![CDATA[ */
+var tablesConfig = [
+  {
+    "entryName": "nodes",
+    "sortColumn": [[2, "asc"]]
+  }
+];
+/* ]]> */
+</script>
+
+	<script type="text/javascript" src="/js/jquery.dataTables.init.js"></script>
+    
+  <link rel="alternate" href="/feeds/rss/events" title="wlan ljubljana - Latest mesh events" type="application/rss+xml" />
+
+</head>
+
+<body>
+    <div id="banner">
+      <div id="header">
+    <h1><a href="http://wlan-lj.net/"><span>wlan ljubljana</span></a></h1>
+
+    <h2><a href="http://wlan-lj.net/"><span>odprto brezžično omrežje Ljubljane</span></a></h2>
+  </div>
+      <form id="search" action="http://wlan-lj.net/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/auth/login">Login</a></li><li><a href="http://wlan-lj.net/prefs">Preferences</a></li><li><a href="http://wlan-lj.net/register">Register</a></li>
+    </ul>
+
+  </div>
+    </div>
+
+    <div id="mainnav" class="nav">
+    <ul>
+        <li><a href="http://wlan-lj.net/wiki/OOmrezju">O omrežju</a></li>
+        <li><a href="http://wlan-lj.net/wiki/Sodeluj">Sodeluj</a></li>
+        <li class="active"><a href="https://nodes.wlan-lj.net">Pregled točk</a></li>
+        <li><a href="http://wlan-lj.net/wiki/Tocke">Spletne strani točk</a></li>
+        <li><a href="http://wlan-lj.net/wiki/Navodila">Navodila, pomoč</a></li>
+        <li><a href="http://wlan-lj.net/wiki/Podrobnosti">Tehnične podrobnosti</a></li>
+        <li><a href="http://wlan-lj.net/browser">Izvorna koda</a></li>
+        <li><a href="http://wlan-lj.net/report">Opravila, napake</a></li>
+        
+        <li><a accesskey="3" href="http://wlan-lj.net/roadmap">Roadmap</a></li>
+        <li><a accesskey="2" href="http://wlan-lj.net/timeline">Timeline</a></li>
+        <li><a href="http://wlan-lj.net/wiki/International">International</a></li>
+        <li><a href="http://wlan-lj.net/contact">Stik / Contact</a></li>
+      <li id="donate">
+	  <form action="https://www.paypal.com/cgi-bin/webscr" method="post"><div><input type="hidden" name="__FORM_TOKEN" value="00fa7a249fab8848776c4663" />
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="3295105" />
+        <input type="image" src="https://www.paypal.com/en_GB/i/btn/btn_donate_SM.gif" style="border: none;" name="submit" alt="Donate" /></div>
+      </form></li>
+    </ul>
+
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+
+<ul><li class="first"><a href="/nodes/node_list">Node List</a></li><li><a href="/nodes/statistics">Network Statistics</a></li><li><a href="/nodes/events/global">Events</a></li><li><a href="/nodes/gcl">Global Client List</a></li><li><a href="/nodes/topology">Mesh Topology</a></li><li><a href="/nodes/map">Node Map</a></li></ul>
+
+        <hr />
+      </div>
+<div id="content" class="nodelist">
+  
+<h1>Node List</h1>
+<table border="0" width="100%" class="listing">
+<thead>
+  <tr>
+    <th style="width: 22px;"></th>
+    <th style="width: 150px;"><b>Node name</b></th>
+    <th style="width: 100px;"><b>IP</b></th>
+    <th style="width: 260px;"><b>Last seen up</b></th>
+    <th style="width: 70px;" align="center"><b>Status</b></th>
+    <th style="width: 70px;" align="center"><b>Peers</b></th>
+    <th style="width: 70px;" align="center"><b>Clients</b></th>
+    <th style="width: 90px;" align="center"><b>Project</b></th>
+  </tr>
+</thead>
+<tbody>
+  
+  
+  <tr class="section_title">
+    <td colspan="9"><b>Server nodes</b></td>
+  </tr>
+  
+  <tr class="odd">
+    <td align="center">
+      
+      <a href="/nodes/node/cb6df843-dbf5-4921-9c64-fdfd239000c8">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/cb6df843-dbf5-4921-9c64-fdfd239000c8">core</a></td>
+    <td>10.14.0.1</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">5</td>
+    <td align="center">0</td>
+    
+    <td align="center">Kiberpipa</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+      <a href="/nodes/node/a4ea9419-a149-46cc-a0d7-246613db6762">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/a4ea9419-a149-46cc-a0d7-246613db6762">replicator</a></td>
+    <td>10.254.0.1</td>
+    
+    <td>2010-03-31 02:16:33</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">24</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/84ce874c-a458-455f-add0-a334de5266b5">icarus</a></td>
+    <td>10.254.128.1</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="section_title">
+    <td colspan="9"><b>Mesh nodes</b></td>
+  </tr>
+  
+  <tr class="even">
+    <td align="center">
+      
+      <a href="/nodes/node/ac0cb300-cc89-457d-9c82-0ad0aec911f8">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/ac0cb300-cc89-457d-9c82-0ad0aec911f8">kiberpipa</a></td>
+    <td>10.14.0.10</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Kiberpipa</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/27210962-de0e-42ac-aaa2-29a2c8b5063a">stefanova-15-i</a></td>
+    <td>10.14.0.11</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">3</td>
+    <td align="center">0</td>
+    
+    <td align="center">Kiberpipa</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/c14ff32e-d350-488a-ab45-65c520b41291">stefanova-15-ii</a></td>
+    <td>10.14.0.12</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Kiberpipa</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/70c4feea-2d44-441c-92fd-aeb3c0d99de0">topniska-70</a></td>
+    <td>10.14.0.34</td>
+    
+    <td>2009-09-23 15:47:58</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Kiberpipa</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/c8276b7e-c112-42a3-98cf-4da7acb5b810">bolgarska-7</a></td>
+    <td>10.14.0.35</td>
+    
+    <td>2009-09-23 15:47:51</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Kiberpipa</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/75ad9375-3648-48c4-a490-297b6af4e2d3">privoz-17b</a></td>
+    <td>10.254.128.33</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/211639ea-a1be-4a2c-a742-1449268d775e">mercnikova-1a</a></td>
+    <td>10.254.128.65</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/69bb4245-45f8-4ead-97b7-e6610950b197">scopolijeva-17</a></td>
+    <td>10.254.128.97</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/84095dc9-26de-4244-a157-34c89a62a815">ljudmila</a></td>
+    <td>10.254.128.129</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/6f71e5c0-f2be-4b82-9764-4d1bcec33772">ziherlova-41</a></td>
+    <td>10.254.128.161</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/fb8466e9-c223-4f2d-88ac-6843160cdf78">zaloska-76</a></td>
+    <td>10.254.128.193</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/526fc8b0-0087-45ce-a180-a31861d63957">zaloska-78a-i</a></td>
+    <td>10.254.128.225</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">4</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/98eff417-cb7d-48f8-9eea-65d292318b4f">grintovska-22</a></td>
+    <td>10.254.129.97</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/b4bcbff5-007c-41a5-bbf6-a626d835e73a">vojkova-77-ii</a></td>
+    <td>10.254.129.129</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/b6d08c93-76f9-480c-bc6a-60229d7f7e14">rog-1</a></td>
+    <td>10.254.129.161</td>
+    
+    <td>2010-03-31 01:13:25</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/50c685a3-b1e7-419c-a6de-812cf5f3cf92">nanoska-17</a></td>
+    <td>10.254.129.193</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/35eefec8-7c5a-469a-9b0a-f0ea393d47e3">martinakrpana-5</a></td>
+    <td>10.254.129.225</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/07867565-7187-4681-8de1-a08fbcde7679">prule-3</a></td>
+    <td>10.254.130.1</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/6a40ebbc-d7a9-4534-ace8-2530d8b13e50">jadranska-2</a></td>
+    <td>10.254.130.33</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/2761b516-78f5-4da0-a5e9-bdab78322754">rozmanova-12</a></td>
+    <td>10.254.130.65</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/31b7893a-036a-46bf-805e-44435c5e78bd">dunajska-33</a></td>
+    <td>10.254.130.97</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/e6be4af8-af68-4e49-8b91-030578d7fb52">sketova-6</a></td>
+    <td>10.254.130.129</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+      <a href="/nodes/node/5245ca06-b129-462a-84a8-3a0fae156106">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/5245ca06-b129-462a-84a8-3a0fae156106">celovska</a></td>
+    <td>10.254.130.161</td>
+    
+    <td>2009-07-30 18:58:28</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/18e1e7f7-ab30-4e38-9ad8-213c0c7592b2">jurcicevtrg-2</a></td>
+    <td>10.254.131.65</td>
+    
+    <td>2010-03-31 02:16:33</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/b1bd886f-a558-4302-a0d6-c82fd4f769da">rozmanova-2-i</a></td>
+    <td>10.254.131.129</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">4</td>
+    <td align="center">1</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/5d662456-4cbd-43e1-b985-90466d4582bc">rozmanova-2-ii</a></td>
+    <td>10.254.131.161</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">6</td>
+    <td align="center">1</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/6395749f-fefa-4e44-ac9a-73f996dbee5c">gerbiceva-49</a></td>
+    <td>10.254.131.193</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/62e328ed-5963-4316-818d-a0881b4c1fe6">vranja-5</a></td>
+    <td>10.254.132.1</td>
+    
+    <td>2010-03-31 02:16:33</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/5e2b5f14-39d4-44b2-9864-eacb908c3ada">rozmanova-3</a></td>
+    <td>10.254.132.33</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">4</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/dce9db7b-d84b-4d63-9818-d9b8976f3921">kumrovska-9</a></td>
+    <td>10.254.132.65</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/55abdaaa-b5b6-4aa6-84dd-7776121b7f0f">hrvatskitrg-2</a></td>
+    <td>10.254.132.97</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/1924c0db-80bb-4dd6-b08a-26a40fbf96ad">rog-3</a></td>
+    <td>10.254.132.129</td>
+    
+    <td>2010-03-31 01:53:32</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/f54050eb-0e9d-4cb6-bdcc-50b48656b22e">neubergerjeva-3</a></td>
+    <td>10.254.132.193</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/a9c18585-0fc3-47ac-a0d1-a24b8fafe1c4">glinska-9</a></td>
+    <td>10.254.132.225</td>
+    
+    <td>2010-03-31 02:16:33</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/30fd0693-d64a-431c-a8ec-eef475c66e42">dunajska-156</a></td>
+    <td>10.254.133.33</td>
+    
+    <td>2010-02-17 13:38:12</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/0b2ae8f2-e59d-47bb-919c-c32447017646">ekodom</a></td>
+    <td>10.254.133.65</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/e05ac7a8-58e4-41ee-b4a7-4fa2e882b8ca">kozarska-19</a></td>
+    <td>10.254.133.129</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/c192e9d4-0960-4563-8abd-6d9b0ff80b7c">vojkova-77-i</a></td>
+    <td>10.254.133.161</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/eb1221ff-aa4c-4210-9e1e-d79313f59ada">rog-2</a></td>
+    <td>10.254.133.193</td>
+    
+    <td>2010-03-31 01:13:23</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/d3f185bf-f936-4938-9ba5-baad2ca91e06">ilirska-6</a></td>
+    <td>10.254.134.1</td>
+    
+    <td>2010-03-31 02:16:33</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">4</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/12942fac-c546-4da5-bd60-ac65972615bd">rusjanovtrg-2</a></td>
+    <td>10.254.134.33</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/78b610f8-b8a3-4768-bbed-2e779016c495">fri</a></td>
+    <td>10.254.134.65</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">5</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/cfd99115-aaa7-49fc-9012-7b4b3035b507">peruzzijeva-14</a></td>
+    <td>10.254.134.97</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/99ef742e-5aad-4c33-a5e0-b84c5bd24635">solar</a></td>
+    <td>10.254.134.129</td>
+    
+    <td>2010-03-20 02:31:17</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/536eb749-0047-4315-a2c7-9edeaed43a18">zaloska-78a-ii</a></td>
+    <td>10.254.134.193</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/5d15ba67-ba1c-4c62-b882-b80f6546056f">zaloska-78a-iii</a></td>
+    <td>10.254.134.225</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/39b07ad6-5be8-4120-91c3-ebbfaece9fc2">brilejeva-9</a></td>
+    <td>10.254.135.1</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/5754c925-8556-403b-b590-fc3a51efbf70">beblerjevtrg-1</a></td>
+    <td>10.254.135.33</td>
+    
+    <td>2010-03-31 02:16:33</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">3</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="section_title">
+    <td colspan="9"><b>Test nodes</b></td>
+  </tr>
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/f634d1c7-bb32-4489-bd7f-cdb7a3c5d036">mota</a></td>
+    <td>10.254.129.1</td>
+    
+    <td>2010-03-31 02:16:32</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">1</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/215ff185-7c45-4018-800b-7c3b14882ca3">rovingone</a></td>
+    <td>10.254.129.65</td>
+    
+    <td>2009-12-24 01:05:31</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/7860252b-9cd5-4fb3-8355-8f0530d075e1">zaloska-test</a></td>
+    <td>10.254.130.193</td>
+    
+    <td>2010-03-18 18:42:53</td>
+    
+    <td align="center"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/74d429d0-f447-441f-aa7d-28ec040fb8f2">test-2</a></td>
+    <td>10.254.131.1</td>
+    
+    <td>2010-03-31 02:16:35</td>
+    
+    <td align="center"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/></td>
+    
+    <td align="center">2</td>
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/8169718a-4f88-4258-b057-b554546e9c9d">test-1</a></td>
+    <td>10.254.131.33</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/5c3a5681-648d-40b5-b629-68d32d77069d">steverjan</a></td>
+    <td>10.254.131.225</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/14b188ae-216c-4a68-888a-642bf1426547">marslink</a></td>
+    <td>10.254.134.161</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+  
+  <tr class="section_title">
+    <td colspan="9"><b>unknown nodes</b></td>
+  </tr>
+  
+  <tr class="odd">
+    <td align="center">
+      
+      <a href="/nodes/node/4fba8037-c03c-4b99-87e7-1a3a023981ba">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/4fba8037-c03c-4b99-87e7-1a3a023981ba">unknown</a></td>
+    <td>10.14.127.4</td>
+    
+    <td>2010-03-31 02:16:18</td>
+    
+    <td align="center"><img src="/images/status_invalid_small.png" title="invalid - IP is not allocated but is seen" alt="invalid"/></td>
+    
+    
+    <td align="center">3</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">unknown</td>
+  </tr>
+  
+  
+  <tr class="even">
+    <td align="center">
+      
+      <a href="/nodes/node/7aba1078-51b9-44f5-aec8-5cc0bc5dcfc4">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/7aba1078-51b9-44f5-aec8-5cc0bc5dcfc4">unknown</a></td>
+    <td>10.14.127.7</td>
+    
+    <td>2010-03-31 02:16:18</td>
+    
+    <td align="center"><img src="/images/status_invalid_small.png" title="invalid - IP is not allocated but is seen" alt="invalid"/></td>
+    
+    
+    <td align="center">3</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">unknown</td>
+  </tr>
+  
+  
+  <tr class="odd">
+    <td align="center">
+      
+      <a href="/nodes/node/6f961c96-0c44-41f4-b56a-8766c1d8963d">
+        <img src="/images/warnings_small.png" title="Some problems were detected with this node! Click for details." alt="Warning" />
+      </a>
+      
+    </td>
+    <td><a href="/nodes/node/6f961c96-0c44-41f4-b56a-8766c1d8963d">unknown</a></td>
+    <td>10.14.127.10</td>
+    
+    <td>2010-03-31 02:16:18</td>
+    
+    <td align="center"><img src="/images/status_invalid_small.png" title="invalid - IP is not allocated but is seen" alt="invalid"/></td>
+    
+    
+    <td align="center">3</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">unknown</td>
+  </tr>
+  
+  
+  <tr class="section_title">
+    <td colspan="9"><b>Mobile nodes</b></td>
+  </tr>
+  
+  <tr class="even">
+    <td align="center">
+      
+    </td>
+    <td><a href="/nodes/node/f4255b0b-b84b-4b26-8dea-5f1715e1c82a">android</a></td>
+    <td>10.254.118.1</td>
+    
+    <td>never</td>
+    
+    <td align="center"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/></td>
+    
+    
+    <td align="center">0</td>
+    
+    <td align="center">0</td>
+    
+    <td align="center">Ljubljana</td>
+  </tr>
+  
+</tbody>
+</table>
+<br/>
+<div class="legend">
+<h3>Node status key:</h3>
+<ul>
+  <li><span class="node_status_up node_status_small"><img src="/images/status_up_small.png" title="up - node is reachable" alt="up"/>&nbsp;up</span> - node is reachable</li>
+  <li><span class="node_status_visible node_status_small"><img src="/images/status_visible_small.png" title="visible - node is visible via OLSR but does not reply to ICMP ECHO" alt="visible"/>&nbsp;visible</span> - node is visible via OLSR but does not reply to ICMP ECHO</li>
+  <li><span class="node_status_down node_status_small"><img src="/images/status_down_small.png" title="down - node is not visible via OLSR" alt="down"/>&nbsp;down</span> - node is not visible via OLSR</li>
+  <li><span class="node_status_duped node_status_small"><img src="/images/status_duped_small.png" title="duped - duplicate ICMP ECHO packets have been received" alt="duped"/>&nbsp;duped</span> - duplicate ICMP ECHO packets have been received</li>
+  <li><span class="node_status_invalid node_status_small"><img src="/images/status_invalid_small.png" title="invalid - IP is not allocated but is seen" alt="invalid"/>&nbsp;invalid</span> - IP is not allocated but is seen</li>
+  <li><span class="node_status_new node_status_small"><img src="/images/status_new_small.png" title="new - node has just been registered" alt="new"/>&nbsp;new</span> - node has just been registered</li>
+  <li><span class="node_status_pending node_status_small"><img src="/images/status_pending_small.png" title="pending - node has not yet been seen since registration" alt="pending"/>&nbsp;pending</span> - node has not yet been seen since registration</li>
+  <li><span class="node_status_awaitingrenumber node_status_small"><img src="/images/status_awaitingrenumber_small.png" title="awaitingrenumber - node has been recently renumbered" alt="awaitingrenumber"/>&nbsp;awaitingrenumber</span> - node has been recently renumbered</li>
+</ul>
+</div>
+
+</div>
+<div id="altlinks">
+  <h3>Download in other formats:</h3>
+  <ul>
+    <li class="first last"><a class="rss" href="/feeds/rss/events">RSS Feed</a></li>
+  </ul>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+;
+; wlan ljubljana NodeWatcher Script
+;
+general.uuid: 5d662456-4cbd-43e1-b985-90466d4582bc
+general.version: 2.0b.r987
+general.local_time: 1269994868
+general.uptime: 15421.88 13952.19
+general.loadavg: 0.00 0.05 0.14 1/34 8911
+general.memfree: 1492
+general.buffers: 0
+general.cached: 4116
+wifi.bssid: 02:CA:FF:EE:BA:BE
+wifi.essid: open.wlan-lj.net
+wifi.frequency: 2.447
+wifi.mac: 00:18:84:29:CB:85
+wifi.rts: off
+wifi.frag: off
+dns.local: 0
+dns.remote: 0
+iptables.redirection_problem: 0
+iface.eth0.down: 232263571
+iface.eth0.up: 23714683
+iface.wifi0.down: 90313992
+iface.wifi0.up: 221681152
+iface.ath0.down: 40797726
+iface.ath0.up: 216807957
+iface.tap0.down: 218403932
+iface.tap0.up: 17279800
+nds.client0.avg_down: 526.119
+nds.client0.down: 171120
+nds.client0.added_at: 1269992268
+nds.client0.ip: 10.254.131.177
+nds.client0.up: 4562
+nds.client0.avg_up: 14.0285
+nds.client0.active_duration: 2602
+nds.down: 0

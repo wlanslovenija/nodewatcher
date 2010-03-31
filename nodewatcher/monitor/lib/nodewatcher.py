@@ -2,6 +2,9 @@
 import urllib
 import socket
 
+# A flag that specifies when we should save fetched data for simulation purpuses
+COLLECT_SIMULATION_DATA = False
+
 def parse_node_info(data):
   """
   Parses node information into usable form.
@@ -35,7 +38,16 @@ def fetch_node_info(node_ip):
   """
   socket.setdefaulttimeout(15)
   try:
-    return parse_node_info(urllib.urlopen('http://%s/cgi-bin/nodewatcher' % node_ip).read())
+    data = urllib.urlopen('http://%s/cgi-bin/nodewatcher' % node_ip).read()
+    if COLLECT_SIMULATION_DATA:
+      try:
+        f = open("simulator/data/nodes/%s.txt" % node_ip, 'w')
+        f.write(data)
+        f.close()
+      except IOError:
+        pass
+    
+    return parse_node_info(data)
   except:
     return None
 
