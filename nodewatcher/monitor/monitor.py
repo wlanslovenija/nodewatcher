@@ -447,7 +447,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
 
       # Check for IP shortage
       wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
-      if len(wifiSubnet) and n.clients >= ipcalc.Network(wifiSubnet[0].subnet, wifiSubnet[0].cidr).size() - 4:
+      if len(wifiSubnet) and n.clients > max(0, ipcalc.Network(wifiSubnet[0].subnet, wifiSubnet[0].cidr).size() - 4):
         Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifiSubnet[0], n.clients))
 
       # Record interface traffic statistics for all interfaces
