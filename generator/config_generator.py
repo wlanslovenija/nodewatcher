@@ -62,6 +62,9 @@ portLayouts = {
   'rb433'       : True # ('1 5*',       '2 5')
 }
 
+class PrimarySubnetTooSmall(Exception):
+  pass
+
 class NodeConfig(object):
   """
   A class representing mesh router configuration.
@@ -99,6 +102,7 @@ class NodeConfig(object):
   lanWifiBridgeIface = "br-mesh"
   primarySubnet = None
   usedOlsrIps = 1
+  hasClientSubnet = False
   
   def __init__(self):
     """
@@ -324,6 +328,9 @@ class NodeConfig(object):
     """
     if dhcp:
       self.dhcpServer = True
+      
+      if cidr <= 28 and interface == self.wifiIface:
+        self.hasClientSubnet = True
     
     network = ipcalc.Network("%s/%s" % (subnet, cidr))
     subnet = { 'interface'   : interface,
@@ -346,6 +353,11 @@ class NodeConfig(object):
     """
     network = ipcalc.Network("%s/%s" % (self.primarySubnet['subnet'], self.primarySubnet['cidr']))
     ip = str(ipcalc.IP(long(network.network()) + self.usedOlsrIps + 1))
+    
+    # Sanity check so we don't overstep our bounds
+    if ipcalc.IP(ip) not in network:
+      raise PrimarySubnetTooSmall
+    
     self.usedOlsrIps += 1
     return ip
 
@@ -361,16 +373,23 @@ class NodeConfig(object):
     if not self.hasInterface('wan'):
       raise Exception('VPN requires WAN access configuration!')
     
+    if self.primarySubnet['cidr'] > 30:
+      raise Exception('VPN requires at least /30 primary subnet!')
+    
     self.addInterface('vpn', 'tap0', olsr = True)
     self.vpn = { 'username' : username,
                  'password' : password,
                  'mac'      : mac,
-                 'limit'    : limit }
+                 'limit'    : limit,
+                 'ip'       : self.allocateIpForOlsr() }
   
   def setCaptivePortal(self, value):
     """
     Toggles the use of a captive portal for internet connections.
     """
+    if value and self.primarySubnet['cidr'] > 28:
+      raise Exception('Captive portal requires at least /28 primary subnet!')
+    
     self.captivePortal = value
 
   def addPackage(self, *args):
@@ -468,12 +487,12 @@ class OpenWrtConfig(NodeConfig):
       self.__generateVpnConfig(os.path.join(directory, 'openvpn'))
     
     # Create the DHCP configuration
-    if self.dhcpServer:
+    if self.dhcpServer and self.hasClientSubnet:
       f = open(os.path.join(directory, 'dnsmasq.conf'), 'w')
       self.__generateDhcpServerConfig(f)
     
     # Create the captive portal configuration
-    if self.captivePortal and self.dhcpServer:
+    if self.captivePortal and self.dhcpServer and self.hasClientSubnet:
       self.__generateCaptivePortalConfig(os.path.join(directory, 'nodogsplash'))
     
     # Setup service symlinks
@@ -493,10 +512,15 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
     self.addPackage('kmod-ipt-conntrack', 'iptables-mod-conntrack')
     self.addPackage('kmod-ipt-nat', 'iptables-mod-nat')
-    self.addPackage('nodewatcher', 'olsrd-mod-actions', 'nodeupgrade', 'nullhttpd')
+    self.addPackage('nodewatcher', 'nodeupgrade')
     self.addPackage('pv', 'netprofscripts')
     self.addPackage('tc', 'kmod-sched')
     #self.addPackage('kmod-ipv6')
+    
+    if self.hasClientSubnet:
+      self.addPackage('nullhttpd', 'dnsmasq')
+    else:
+      self.addPackage('-dnsmasq')
 
     # Build the image
     buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
@@ -554,7 +578,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('auth-user-pass /etc/openvpn/wlanlj-password\n')
     f.write('auth-retry nointeract\n')
     f.write('cipher BF-CBC\n')
-    f.write('ifconfig %s 255.255.0.0\n' % self.allocateIpForOlsr())
+    f.write('ifconfig %s 255.255.0.0\n' % self.vpn['ip'])
     f.write('verb 3\n')
     f.write('mute 20\n')
     f.write('user nobody\n')
@@ -659,13 +683,13 @@ class OpenWrtConfig(NodeConfig):
     f.write('\n')
     
     for subnet in self.subnets:
-      if subnet['dhcp']:
+      if subnet['dhcp'] and subnet['cidr'] <= 28:
         network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
         offset = 1
         if ipcalc.IP(self.ip) in network:
           # First few IPs of primary subnet might be used for individual interfaces
           offset += self.usedOlsrIps - 1
-	
+	      
         subnet['ntp'] = self.ntp[0]
         subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
         subnet['rangeEnd'] = str(network.host_last())
@@ -730,7 +754,7 @@ class OpenWrtConfig(NodeConfig):
       f.write('{\n')
       
       for subnet in self.subnets:
-        if subnet['olsr']:
+        if subnet['olsr'] and subnet['cidr'] < 29:
           f.write('  %(subnet)s  %(mask)s\n' % subnet)
       
       f.write('}\n\n')
@@ -753,13 +777,17 @@ class OpenWrtConfig(NodeConfig):
     
     # Setup actions plugin to trigger a nodewatcher script when the default
     # route is added or removed from the routing table
-    f.write('LoadPlugin "olsrd_actions.so.0.1"\n')
-    f.write('{\n')
-    f.write('  PlParam "trigger" "0.0.0.0>/etc/actions.d/olsr_gateway_action"\n')
-    for dns in self.dns:
-      f.write('  PlParam "trigger" "%s>/etc/actions.d/olsr_dns_action"\n' % dns)
-    f.write('}\n')
-    f.write('\n')
+    if self.hasClientSubnet:
+      f.write('LoadPlugin "olsrd_actions.so.0.1"\n')
+      f.write('{\n')
+      f.write('  PlParam "trigger" "0.0.0.0>/etc/actions.d/olsr_gateway_action"\n')
+      for dns in self.dns:
+        f.write('  PlParam "trigger" "%s>/etc/actions.d/olsr_dns_action"\n' % dns)
+      f.write('}\n')
+      f.write('\n')
+      
+      # Add the olsrd-mod-actions package
+      self.addPackage('olsrd-mod-actions')
     
     # General interface configuration (static)
     def interfaceConfiguration(name):
@@ -830,15 +858,19 @@ class OpenWrtConfig(NodeConfig):
     if self.lanIface:
       # When LAN<->WiFi bridge is enabled, this interface is called 'mesh' as firewall
       # rules for 'mesh' interface should be applied.
-      self.addInterface(
-        "lan" if not self.lanWifiBridge else "mesh",
-        self.lanIface,
-        self.allocateIpForOlsr() if not self.lanWifiBridge else self.ip,
-        16,
-        olsr = True if not self.lanWifiBridge else False,
-        init = True,
-        type = None if not self.lanWifiBridge else "bridge"
-      )
+      try:
+        self.addInterface(
+          "lan" if not self.lanWifiBridge else "mesh",
+          self.lanIface,
+          self.allocateIpForOlsr() if not self.lanWifiBridge else self.ip,
+          16,
+          olsr = True if not self.lanWifiBridge else False,
+          init = True,
+          type = None if not self.lanWifiBridge else "bridge"
+        )
+      except PrimarySubnetTooSmall:
+        # Not enough IPs for LAN interface, disable it
+        self.lanIface = ''
     
     # Add wireless interface configuration (when no LAN<->WiFi bridge is enabled)
     if not self.lanWifiBridge:
@@ -930,6 +962,10 @@ class OpenWrtConfig(NodeConfig):
       virtualIfaceIds = {}
       
       for subnetId, subnet in enumerate(self.subnets):
+        # Ignore small subnets
+        if subnet['cidr'] >= 29:
+          continue
+        
         # Generate subnet configuration
         ifaceId = virtualIfaceIds.setdefault(subnet['interface'], 0)
         virtualIfaceIds[subnet['interface']] += 1
