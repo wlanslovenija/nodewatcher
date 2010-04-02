@@ -44,7 +44,8 @@ wifiAntennas = {
   'wl-500gp'    : (0,         True),
   'wl-500gp-v1' : (0,         True),
   'wl-500gd'    : (0,         True),
-  'rb433'       : (1,         False)
+  'rb433'       : (1,         False),
+  'rb411'       : (1,         False),
 }
 
 # A list of port layouts (do not forget to add new ones to a list of valid
@@ -59,7 +60,8 @@ portLayouts = {
   'wl-500gd'    : ('1 2 3 4 5*', '0 5'),
   'fonera'      : None,
   'fonera+'     : True,
-  'rb433'       : True # ('1 5*',       '2 5')
+  'rb433'       : True, # ('1 5*',       '2 5')
+  'rb411'       : None
 }
 
 class PrimarySubnetTooSmall(Exception):
