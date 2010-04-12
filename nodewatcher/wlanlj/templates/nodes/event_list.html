@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Events{% endblock %}
+{% block title %}{% trans "Events" %}{% endblock %}
+{% block heading %}{% trans "Events" %}{% endblock %}
 {% block contenttype %}prefs{% endblock %}
 
 {% block rss %}
@@ -16,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>Events</h1>
+
 <ul id="tabs">
   <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
   <li><a href="/nodes/new">{% trans "New node" %}</a></li>

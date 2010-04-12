@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block title %}Events - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block heading %}Events - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>Events - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 <table border="0" class="listing">
 <thead>
   <tr>

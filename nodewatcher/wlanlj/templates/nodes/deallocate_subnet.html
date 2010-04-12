@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans %}Remove Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% blocktrans %}Remove Subnet {{ subnet }} ?{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<h1>Remove Subnet {{ subnet }} ?</h1>
   <div class="error">
       {% if subnet.is_primary %}
       {% blocktrans %}<b>ERROR:</b> This is a primary IP subnet that should not be removed. In order to change it, use the renumbering form.{% endblocktrans %}

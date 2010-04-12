@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans %}Edit Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% blocktrans %}>Edit Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<h1>Edit Subnet {{ subnet }}</h1>
 
 {% if form.errors %}
 <div class="error">

@@ -2,10 +2,9 @@
 {% load i18n %}
 
 {% block title %}Installed Packages for {{ node.name }} ({{ node.ip }}){% endblock %}
+{% block heading %}Installed Packages for {{ node.name }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>Installed Packages for {{ node.name }} ({{ node.ip }})</h1>
-
 <table border="0" class="listing">
 <thead>
   <tr>

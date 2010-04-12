@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block title %}{% trans "Remove Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block heading %}{% trans "Remove Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>{% trans "Remove Node" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}) ?</h1>
   <div class="error">
       {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your node!" %}
     </div>

@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}IP Allocation Pools{% endblock %}
+{% block title %}{% trans "IP Allocation Pools" %}{% endblock %}
+{% block heading %}{% trans "IP Allocation Pools" %}{% endblock %}
+
 {% block contenttype %}prefs{% endblock %}
 
 {% block rss %}
@@ -16,7 +18,6 @@
 {% endblock %}
 
 {% block content %}
-<h1>IP Allocation Pools</h1>
 <table border="0" class="listing">
 <thead>
   <tr>

@@ -1,14 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Image Generation{% endblock %}
-
+{% block title %}{% trans "Image Generation" %}{% endblock %}
+{% block heading %}{% trans "Image Generation" %}{% endblock %}
 {% block content %}
-<h1>Image Generation Request Queued</h1>
-
-<div class="notice">
-  Your image generation request has been successfully queued in our system. You should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay).
-</div>
+<p>{% trans "If there were no errors and everything goes well you should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay)." %}</p>
 <div class="buttons" style="text-align: center">
   <input type="button" value="{% trans "Back to Node Information" %}" onclick="document.location='{% url view_node node.pk %}'" />
 </div>

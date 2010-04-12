@@ -2,6 +2,8 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
+from django.utils.translation import ugettext as _
+from django.conf import settings
 from wlanlj.nodes.models import Node
 from wlanlj.generator.models import Profile
 from wlanlj.generator.queue import queue_generator_job
@@ -24,8 +26,13 @@ def request(request, node):
   if request.method == 'POST':
     form = GenerateImageForm(request.POST)
     if form.is_valid():
-      email_user = form.save(node)
-      queue_generator_job(node, email_user, form.cleaned_data['config_only'])
+
+      if not settings.ENABLE_IMAGE_GENERATOR:
+        request.user.message_set.create(message=_("The generator is disabled in the settings. Enable it by setting ENABLE_IMAGE_GENERATOR variable to TRUE."))
+      else:
+        email_user = form.save(node)
+        queue_generator_job(node, email_user, form.cleaned_data['config_only'])
+        request.user.message_set.create(message=_("Your image generation request has been successfully queued in our system. "))
 
       return render_to_response('generator/please_wait.html',
         { 'node' : node },

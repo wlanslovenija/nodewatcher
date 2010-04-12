@@ -2,10 +2,9 @@
 {% load i18n %}
 
 {% block title %}Generate Image for {{ node.name }}{% endblock %}
+{% block heading %}Generate Image for {{ node.name }}{% endblock %}
 
 {% block content %}
-<h1>Generate Image for {{ node.name }}</h1>
-
 {% if form.errors %}
 <div class="error">
   {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to process your request:{% endblocktrans %}<br />

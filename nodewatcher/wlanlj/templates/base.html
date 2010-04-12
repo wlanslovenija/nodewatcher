@@ -104,6 +104,16 @@
         <hr />
       </div>
 <div id="content" class="{% block contenttype %}nodes{% endblock %}">
+  <h1>{% block heading %}{% endblock %}</h1>
+{% if messages %}
+<div id="messages">
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
   {% block content %}{% endblock %}
 </div>
 <div id="altlinks">{% block altlinks %}{% endblock %}</div>

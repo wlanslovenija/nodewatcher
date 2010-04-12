@@ -3,8 +3,8 @@
 
 {% block title %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
+{% block heading %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block content %}
-<h1>{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 
 {% if form.errors %}
 <div class="error">

@@ -3,6 +3,7 @@
 {% load nodestatus %}
 
 {% block title %}{% trans "Node List" %}{% endblock %}
+{% block heading %}{% trans "Node List" %}{% endblock %}
 {% block contenttype %}nodelist{% endblock %}
 {% block rss %}
   <link rel="alternate" href="/feeds/rss/events" title="wlan ljubljana - Latest mesh events" type="application/rss+xml" />
@@ -16,7 +17,6 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans "Node List" %}</h1>
 <table border="0" width="100%" class="listing">
 <thead>
   <tr>

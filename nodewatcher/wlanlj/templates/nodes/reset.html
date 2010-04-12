@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block title %}{% trans "Reset Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block heading %}{% trans "Reset Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>{% trans "Reset Node" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}) ?</h1>
   <div class="error">
       {% trans "<b>WARNING:</b> By issuing a reset command you will loose all node statistics (like last seen, first seen, current uptime, client count and others)! Use this option when you have been just performing testing and therefore current statistics are no longer relevant." %}
     </div>

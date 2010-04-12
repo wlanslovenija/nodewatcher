@@ -5,10 +5,8 @@
 
 
 {% block title %}{% trans "Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
-
+{% block heading %}<img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block content %}
-<h1><img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
-
 {{ node.render_warnings }}
 {% if node.awaiting_renumber %}
 <div class="notice">

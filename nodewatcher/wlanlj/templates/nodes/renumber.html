@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block title %}{% trans "Renumber Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block heading %}{% trans "Renumber Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 
 {% block content %}
-<h1>{% trans "Renumber Node" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }})</h1>
 
 <div class="error">
  {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply regenerate and reflash the image to your router." %}

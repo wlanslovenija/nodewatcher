@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load nodestatus %}
 
-{% block title %}My Nodes{% endblock %}
+{% block title %}}{% trans "My Nodes" %}{% endblock %}
+{% block heading %}}{% trans "My Nodes" %}{% endblock %}
 {% block contenttype %}prefs{% endblock %}
 {% block content %}
-<h1>My Nodes</h1>
 <ul id="tabs">
   <li class="active">{% trans "My nodes" %}</li>
   <li><a href="/nodes/new">{% trans "New node" %}</a></li>
