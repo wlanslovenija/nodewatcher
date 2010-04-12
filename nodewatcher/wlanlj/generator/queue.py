@@ -23,7 +23,7 @@ def queue_generator_job(node, email_user, config_only = False):
 
   # Prepare job metadata from profile information
   subnets = []
-  for subnet in node.subnet_set.filter(allocated = True):
+  for subnet in node.subnet_set.filter(allocated = True).order_by('-gen_iface_type'):
     # Resolve actual interface name
     try:
       iface = IfaceTemplate.objects.get(template = node.profile.template, type = subnet.gen_iface_type)
