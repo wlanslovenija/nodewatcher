@@ -2,8 +2,8 @@
 {% load i18n %}
 {% load nodestatus %}
 
-{% block title %}}{% trans "My Nodes" %}{% endblock %}
-{% block heading %}}{% trans "My Nodes" %}{% endblock %}
+{% block title %}{% trans "My Nodes" %}{% endblock %}
+{% block heading %}{% trans "My Nodes" %}{% endblock %}
 {% block contenttype %}prefs{% endblock %}
 {% block content %}
 <ul id="tabs">
@@ -14,13 +14,12 @@
   <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
 </ul>
 <div id="tabcontent">
-<br/>
 {% if not user.email %}
 <div class="error">
-  {% blocktrans %}You have no e-mail address configured in your account! To set one, please visit <a href="http://wlan-lj.net/prefs">http://wlan-lj.net/prefs</a> (you may need to login to see this page) and configure yourself a valid e-mail address. Until then some functions (like image generation) are disabled.{% endblocktrans %}
+  {% blocktrans %}You have no e-mail address configured for your account! Please <a href="http://wlan-lj.net/prefs">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions (like image generation) are disabled.{% endblocktrans %}
 </div>
-<br/>
 {% endif %}
+<br/>
 <table border="0" class="listing">
 <thead>
   <tr>
