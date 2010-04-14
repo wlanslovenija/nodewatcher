@@ -728,6 +728,15 @@ class OpenWrtConfig(NodeConfig):
     f.write('\t\t  nvram set boot_wait=on\n')
     f.write('\t\t  nvram commit\n')
     f.write('\t\t}\n')
+    
+    # Set boardflags on WHR-HP-G54
+    if self.portLayout == 'whr-hp-g54':
+      f.write('\tBOARDFLAGS=`nvram get boardflags`\n')
+      f.write('\t\t[ "$BOARDFLAGS" != "0x3758" ] && {\n')
+      f.write('\t\t  nvram set boardflags=0x3758\n')
+      f.write('\t\t  nvram commit\n')
+      f.write('\t\t}\n')
+    
     f.write('\tfi\n')
     
     f.write('}\n')
