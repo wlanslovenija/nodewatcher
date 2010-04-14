@@ -11,6 +11,9 @@ TEMPLATE_DEBUG = DEBUG
 
 # Is generator enabled or not. If set to False the pybeanstalk dependency is not needed.
 ENABLE_IMAGE_GENERATOR = False
+# Is image generator temporary suspended (like because firmware image it would produce contains errors)?
+# If it is, image requests are not queued and message about that is issued to the user
+IMAGE_GENERATOR_SUSPENDED = False
 
 # A tuple that lists people who get code error notifications. When
 # DEBUG=False and a view raises an exception, Django will e-mail these
