@@ -39,7 +39,7 @@ def request(request, node):
         context_instance = RequestContext(request)
       )
   else:
-    form = GenerateImageForm({
+    form = GenerateImageForm(initial = {
       'email_user'  : node.owner.id
     })
 
