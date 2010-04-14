@@ -100,7 +100,8 @@
     </td>
     {% else %}
     <td colspan="2" class="error">
-      {% blocktrans %}This node has no allocated subnets or none are assigned to the WiFi interface. Image generation is not possible. Please assign it <a href="{% url allocate_subnet node.pk %}">a subnet</a>.{% endblocktrans %}
+      {% url allocate_subnet node.pk as newsubneturl %}
+      {% blocktrans %}This node has no allocated subnets or none are assigned to the WiFi interface. Image generation is not possible. Please assign it <a href="{{ newsubneturl }}">a subnet</a>.{% endblocktrans %}
     </td>
     {% endif %}
     {% endif %}
