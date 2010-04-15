@@ -4,7 +4,7 @@ from wlanlj.generator.types import IfaceType
 from wlanlj.account.models import UserAccount
 from django.conf import settings
 
-if settings.ENABLE_IMAGE_GENERATOR:
+if getattr(settings, 'ENABLE_IMAGE_GENERATOR', None):
   from beanstalk import serverconn
   from beanstalk import job
 
@@ -14,7 +14,7 @@ def queue_generator_job(node, email_user, config_only = False):
   """
   assert(isinstance(node, Node))
   
-  if not settings.ENABLE_IMAGE_GENERATOR:
+  if not getattr(settings, 'ENABLE_IMAGE_GENERATOR', None):
     return
 
   # Open up a connection with beanstalkd

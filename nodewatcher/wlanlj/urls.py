@@ -59,7 +59,7 @@ urlpatterns = patterns('',
   url(r'^auth/logout$', 'django.contrib.auth.views.logout_then_login'),
 )
 
-if settings.DEBUG:
+if getattr(settings, 'DEBUG', None):
   urlpatterns += patterns('',
     url(r'^(?P<path>(common|css|graphs|images|js|site|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_DOC_ROOT, 'show_indexes': True}),
   )

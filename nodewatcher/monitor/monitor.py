@@ -895,7 +895,7 @@ if __name__ == '__main__':
     exit(0)
   
   # Output warnings when debug mode is enabled
-  if settings.DEBUG:
+  if getattr(settings, 'DEBUG', None):
     logging.warning("Debug mode is enabled, monitor will leak memory!")
   
   if getattr(settings, 'MONITOR_ENABLE_SIMULATION', None):

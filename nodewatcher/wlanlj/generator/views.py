@@ -27,14 +27,14 @@ def request(request, node):
     form = GenerateImageForm(request.POST)
     if form.is_valid():
 
-      if settings.ENABLE_IMAGE_GENERATOR and not settings.IMAGE_GENERATOR_SUSPENDED:
+      if getattr(settings, 'ENABLE_IMAGE_GENERATOR', None) and not getattr(settings, 'IMAGE_GENERATOR_SUSPENDED', None):
         email_user = form.save(node)
         queue_generator_job(node, email_user, form.cleaned_data['config_only'])
 
       return render_to_response('generator/please_wait.html',
         { 'node' : node,
-          'image_generator_enabled' : settings.ENABLE_IMAGE_GENERATOR,
-          'image_generator_suspended' : settings.IMAGE_GENERATOR_SUSPENDED },
+          'image_generator_enabled' : getattr(settings, 'ENABLE_IMAGE_GENERATOR', None),
+          'image_generator_suspended' : getattr(settings, 'IMAGE_GENERATOR_SUSPENDED', None) },
         context_instance = RequestContext(request)
       )
   else:
