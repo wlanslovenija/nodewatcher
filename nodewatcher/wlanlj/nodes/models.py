@@ -831,7 +831,7 @@ class GraphItem(models.Model, GraphItemNP):
   name = models.CharField(max_length = 50)
   rra = models.CharField(max_length = 200)
   graph = models.CharField(max_length = 200)
-  title = models.CharField(max_length = 50)
+  title = models.CharField(max_length = 200)
   last_update = models.DateTimeField(null = True)
   dead = models.BooleanField(default = False)
   need_redraw = models.BooleanField(default = False)
