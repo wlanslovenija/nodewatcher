@@ -333,7 +333,13 @@ class Node(models.Model):
     """
     Returns true if node's primary IP is allocated to this node in a subnet.
     """
-    return self.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.ip).filter(allocated = True).exclude(cidr = 0).count() > 0
+    return self.get_primary_subnet().count() > 0
+  
+  def get_primary_subnet(self):
+    """
+    Returns the primary node's subnet.
+    """
+    return self.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.ip).filter(allocated = True).exclude(cidr = 0)
   
   def get_renumbered_ip(self):
     """

@@ -19,13 +19,13 @@ IMAGE_GENERATOR_SUSPENDED = False
 # DEBUG=False and a view raises an exception, Django will e-mail these
 # people with the full exception information. Each member of the tuple
 # should be a tuple of (Full name, e-mail address).
-ADMINS = ()
+ADMINS = (('Jernej Kos', 'k@jst.sm'),)
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'    # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = database_file  # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
+DATABASE_ENGINE = 'postgresql_psycopg2'    # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'wlanlj'  # Or path to database file if using sqlite3.
+DATABASE_USER = 'wlanlj'             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
@@ -140,11 +140,15 @@ GRAPH_TIMESPANS = (
 )
 
 # Monitor configuration
-MONITOR_WORKDIR = '/home/monitor'
+MONITOR_WORKDIR = '/home/kostko/development/wifi/ljwifi/trunk/nodewatcher/monitor'
 MONITOR_WORKERS = 20
 MONITOR_GRAPH_WORKERS = 5
-MONITOR_POLL_INTERVAL = 300
-MONITOR_OLSR_HOST = '127.0.0.1'
+MONITOR_DISABLE_MULTIPROCESSING = False
+MONITOR_DISABLE_GRAPHS = True
+MONITOR_ENABLE_GC_DEBUG = True
+MONITOR_ENABLE_SIMULATION = False
+MONITOR_POLL_INTERVAL = 120
+MONITOR_OLSR_HOST = '10.254.128.33'
 MONITOR_USER = 'monitor'
-MONITOR_LOGFILE = '/var/log/wlanlj-monitor.log'
+MONITOR_LOGFILE = '/home/kostko/development/wifi/ljwifi/trunk/nodewatcher/monitor/wlanlj-monitor.log'
 

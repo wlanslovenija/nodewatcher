@@ -245,15 +245,15 @@ class RegisterNodeForm(forms.Form):
       
       # Reserve existing IP in the pool
       pool.reserve_subnet(ip, 32)
-      
-      # Allocate a new subnet if requested and node has no subnets
-      if assign_subnet and not node.subnet_set:
-        fresh_subnet = pool.allocate_subnet()
-        net = ipcalc.Network(fresh_subnet.network, fresh_subnet.cidr)
-        subnet = Subnet(node = node, subnet = fresh_subnet.network, cidr = fresh_subnet.cidr)
-        subnet.allocated = True
-        subnet.allocated_at = datetime.now()
+      try:
+        subnet = Subnet.objects.get(node = node, subnet = ip, cidr = 32)
+        subnet.status = SubnetStatus.AnnouncedOk
+      except Subnet.DoesNotExist:
+        subnet = Subnet(node = node, subnet = ip, cidr = 32)
         subnet.status = SubnetStatus.NotAnnounced
+      
+      subnet.allocated = True
+      subnet.allocated_at = datetime.now()
 
     # Update node metadata
     node.name = self.cleaned_data.get('name').lower()
