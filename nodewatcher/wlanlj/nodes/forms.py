@@ -186,6 +186,9 @@ class RegisterNodeForm(forms.Form):
     if not project.pools.filter(pk = pool.pk).count():
       raise forms.ValidationError(_("The specified IP allocation pool cannot be used with selected project!"))
     
+    if ip and not pool.reserve_subnet(ip, 32, check_only = True):
+      raise forms.ValidationError(_("Specified IP is part of another allocation pool and cannot be manually allocated!"))
+    
     if self.cleaned_data.get('template'):
       if not wan_dhcp and (not wan_ip or not wan_gw):
         raise forms.ValidationError(_("IP and gateway are required for static WAN configuration!"))
@@ -239,6 +242,9 @@ class RegisterNodeForm(forms.Form):
         node = Node.objects.get(ip = ip)
       except Node.DoesNotExist:
         node = Node(ip = ip)
+      
+      # Reserve existing IP in the pool
+      pool.reserve_subnet(ip, 32)
       
       # Allocate a new subnet if requested and node has no subnets
       if assign_subnet and not node.subnet_set:
