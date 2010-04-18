@@ -72,9 +72,8 @@ class FormWithWarnings(forms.Form):
    
   def warning_or_continue(self, message):
     """
-    If the user has confirmed a warning, this will continue as usual. If
-    she hasn't, calling this method will interrupt the normal program flow
-    with a ValidationWarning exception.
+    Registers a new warning. If the user hasn't confirmed warnings he will
+    get the form again.
     """
     if self.cleaned_data.get('confirm_all_warnings', False):
       return
