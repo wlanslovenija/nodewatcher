@@ -331,11 +331,12 @@
     priority: 1
     template: 4
 - model: generator.ProfileAdaptationChain
-  pk: 1
+  pk: 12
   fields:
     class_name: wlanlj.nodes.transitions.OnePortVPN
     priority: 1
     template: 11
+
 - model: generator.ProfileAdaptationChain
   pk: 2
   fields:

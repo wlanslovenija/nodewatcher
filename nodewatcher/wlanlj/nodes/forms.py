@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
-from wlanlj.nodes.transitions import validates_adaptation_chain
+from wlanlj.nodes.transitions import validates_node_configuration
 from wlanlj.nodes.common import FormWithWarnings
 from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from wlanlj.generator.types import IfaceType
@@ -217,7 +217,7 @@ class RegisterNodeForm(forms.Form):
 
     return self.cleaned_data
   
-  @validates_adaptation_chain
+  @validates_node_configuration
   def save(self, user):
     """
     Completes node registration.
@@ -533,7 +533,7 @@ class UpdateNodeForm(forms.Form):
 
     return self.cleaned_data
   
-  @validates_adaptation_chain
+  @validates_node_configuration
   def save(self, node, user):
     """
     Completes node data update.
@@ -699,7 +699,7 @@ class AllocateSubnetForm(forms.Form):
 
     return self.cleaned_data
 
-  @validates_adaptation_chain
+  @validates_node_configuration
   def save(self, node):
     """
     Completes subnet allocation.

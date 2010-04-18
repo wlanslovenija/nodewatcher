@@ -26,7 +26,7 @@ class RouterTransition(object):
     """
     raise NotImplementedError
 
-def validates_adaptation_chain(f):
+def validates_node_configuration(f):
   """
   A decorator for convenience.
   """
@@ -41,7 +41,7 @@ def validates_adaptation_chain(f):
       # Execute our function
       node = f(self, *args, **kwargs)
       if not isinstance(node, Node):
-        raise ImproperlyConfigured(_("Improper use of validates_adaptation_chain decorator! Decorated function must return a Node instance."))
+        raise ImproperlyConfigured(_("Improper use of validates_node_configuration decorator! Decorated function must return a Node instance."))
       
       # Validate adaptation chain
       try:
