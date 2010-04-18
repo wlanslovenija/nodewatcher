@@ -416,7 +416,7 @@ class Node(models.Model):
     elif self.node_type == NodeType.Mobile:
       return _("Mobile nodes")
     else:
-      return _("unknown nodes")
+      return _("Unknown nodes")
 
   def get_warnings(self):
     """
