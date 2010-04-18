@@ -81,6 +81,14 @@ class OptionalPackage(models.Model):
     """
     return "%s (%s)" % (self.fancy_name, self.description)
 
+class ProfileAdaptationChain(models.Model):
+  """
+  Profile adaptation chain element.
+  """
+  template = models.ForeignKey(Template, related_name = 'adaptation_chain')
+  priority = models.IntegerField(default = 1)
+  class_name = models.CharField(max_length = 200)
+
 class Profile(models.Model):
   """
   This class represents an actual user's configuration profile.

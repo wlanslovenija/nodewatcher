@@ -130,9 +130,8 @@ def node_new(request):
   """
   if request.method == 'POST':
     form = RegisterNodeForm(request.POST)
-    if form.is_valid():
-      node = form.save(request.user)
-      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+    if form.is_valid() and form.save(request.user):
+      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = form.node.pk)))
   else:
     form = RegisterNodeForm()
 
@@ -154,8 +153,7 @@ def node_edit(request, node):
   
   if request.method == 'POST':
     form = UpdateNodeForm(node, request.POST)
-    if form.is_valid():
-      form.save(node, request.user)
+    if form.is_valid() and form.save(node, request.user):
       return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
     p = {
@@ -332,8 +330,7 @@ def node_allocate_subnet(request, node):
  
   if request.method == 'POST':
     form = AllocateSubnetForm(node, request.POST)
-    if form.is_valid():
-      form.save(node)
+    if form.is_valid() and form.save(node):
       return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
     form = AllocateSubnetForm(node)

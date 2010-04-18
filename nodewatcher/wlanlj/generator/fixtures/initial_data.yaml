@@ -1,0 +1,399 @@
+#
+# Image files
+#
+- model: generator.ImageFile
+  pk: 1
+  fields:
+    name: openwrt-wrt54g-squashfs.bin
+    type: null
+- model: generator.ImageFile
+  pk: 2
+  fields:
+    name: openwrt-brcm-2.4-squashfs.trx
+    type: null
+- model: generator.ImageFile
+  pk: 3
+  fields:
+    name: openwrt-atheros-root.jffs2-64k
+    type: root
+- model: generator.ImageFile
+  pk: 4
+  fields:
+    name: openwrt-atheros-vmlinux.lzma
+    type: kernel
+- model: generator.ImageFile
+  pk: 5
+  fields:
+    name: openwrt-wrt54gs-squashfs.bin
+    type: null
+- model: generator.ImageFile
+  pk: 6
+  fields:
+    name: openwrt-ar71xx-vmlinux.elf
+    type: kernel
+- model: generator.ImageFile
+  pk: 7
+  fields:
+    name: openwrt-ar71xx-rootfs.tgz
+    type: root
+
+#
+# Routers
+#
+- model: generator.Template
+  pk: 1 
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: false
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [1, 2]
+    name: Linksys WRT54GL (2.4 kernel)
+    openwrt_version: new
+    port_layout: wrt54gl
+    short_name: wrt54gl
+- model: generator.Template
+  pk: 3
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: false
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [2]
+    name: Buffalo WHR-HP-G54 (2.4 kernel)
+    openwrt_version: new
+    port_layout: whr-hp-g54
+    short_name: whr-hp-g54
+- model: generator.Template
+  pk: 4
+  fields:
+    arch: mips
+    channel: 8
+    description: ''
+    driver: atheros
+    experimental: false
+    iface_lan: ''
+    iface_wan: eth0
+    iface_wifi: ath0
+    imagebuilder: imagebuilder.atheros
+    imagefiles: [3, 4]
+    name: Fonera (2.6 kernel)
+    openwrt_version: new
+    port_layout: fonera
+    short_name: fonera
+- model: generator.Template
+  pk: 5 
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: true
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [2, 5]
+    name: Linksys WRT54GS (2.4 kernel)
+    openwrt_version: new
+    port_layout: wrt54gs
+    short_name: wrt54gs
+- model: generator.Template
+  pk: 6
+  fields:
+    arch: mips
+    channel: 8
+    description: ''
+    driver: atheros
+    experimental: false
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: ath0
+    imagebuilder: imagebuilder.atheros
+    imagefiles: [3, 4]
+    name: Fonera+ (2.6 kernel)
+    openwrt_version: new
+    port_layout: fonera+
+    short_name: fonera+
+- model: generator.Template
+  pk: 7 
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: false
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [2]
+    name: Asus WL-500g Deluxe (2.4 kernel)
+    openwrt_version: new
+    port_layout: wl-500gd
+    short_name: wl-500gd
+- model: generator.Template
+  pk: 8
+  fields:
+    arch: mips
+    channel: 8
+    description: ''
+    driver: atheros
+    experimental: false
+    iface_lan: eth1
+    iface_wan: eth0
+    iface_wifi: ath0
+    imagebuilder: imagebuilder.ar71xx
+    imagefiles: [6, 7]
+    name: MikroTik RB433AH (2.6 kernel)
+    openwrt_version: new
+    port_layout: rb433
+    short_name: rb433ah
+- model: generator.Template
+  pk: 9
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: false
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [2]
+    name: Asus WL-500g Premium v2 (2.4 kernel)
+    openwrt_version: new
+    port_layout: wl-500gp
+    short_name: wl-500gp
+- model: generator.Template
+  pk: 10 
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: false
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [2]
+    name: Asus WL-500g Premium v1 (2.4 kernel)
+    openwrt_version: new
+    port_layout: wl-500gp-v1
+    short_name: wl-500gp-v1
+- model: generator.Template
+  pk: 11 
+  fields:
+    arch: mips
+    channel: 8
+    description: ''
+    driver: atheros
+    experimental: true
+    iface_lan: ''
+    iface_wan: eth0
+    iface_wifi: ath0
+    imagebuilder: imagebuilder.ar71xx
+    imagefiles: [6, 7]
+    name: MikroTik RB411AH (2.6 kernel)
+    openwrt_version: new
+    port_layout: rb411
+    short_name: rb411ah
+
+#
+# Interface mappings
+#
+- fields: {ifname: eth0.0, template: 1, type: 0}
+  model: generator.ifacetemplate
+  pk: 1
+- fields: {ifname: eth0.1, template: 1, type: 1}
+  model: generator.ifacetemplate
+  pk: 2
+- fields: {ifname: wl0, template: 1, type: 2}
+  model: generator.ifacetemplate
+  pk: 3
+- fields: {ifname: eth0.0, template: 3, type: 0}
+  model: generator.ifacetemplate
+  pk: 7
+- fields: {ifname: eth0.1, template: 3, type: 1}
+  model: generator.ifacetemplate
+  pk: 8
+- fields: {ifname: wl0, template: 3, type: 2}
+  model: generator.ifacetemplate
+  pk: 9
+- fields: {ifname: eth0, template: 4, type: 0}
+  model: generator.ifacetemplate
+  pk: 10
+- fields: {ifname: eth0, template: 4, type: 1}
+  model: generator.ifacetemplate
+  pk: 11
+- fields: {ifname: ath0, template: 4, type: 2}
+  model: generator.ifacetemplate
+  pk: 12
+- fields: {ifname: eth0.0, template: 5, type: 0}
+  model: generator.ifacetemplate
+  pk: 13
+- fields: {ifname: eth0.1, template: 5, type: 1}
+  model: generator.ifacetemplate
+  pk: 14
+- fields: {ifname: wl0, template: 5, type: 2}
+  model: generator.ifacetemplate
+  pk: 15
+- fields: {ifname: eth0.0, template: 6, type: 0}
+  model: generator.ifacetemplate
+  pk: 16
+- fields: {ifname: eth0.1, template: 6, type: 1}
+  model: generator.ifacetemplate
+  pk: 17
+- fields: {ifname: ath0, template: 6, type: 2}
+  model: generator.ifacetemplate
+  pk: 18
+- fields: {ifname: eth0.0, template: 7, type: 0}
+  model: generator.ifacetemplate
+  pk: 24
+- fields: {ifname: eth0.1, template: 7, type: 1}
+  model: generator.ifacetemplate
+  pk: 25
+- fields: {ifname: wl0, template: 7, type: 2}
+  model: generator.ifacetemplate
+  pk: 26
+- fields: {ifname: ath0, template: 8, type: 2}
+  model: generator.ifacetemplate
+  pk: 29
+- fields: {ifname: eth0.0, template: 9, type: 0}
+  model: generator.ifacetemplate
+  pk: 30
+- fields: {ifname: eth0.1, template: 9, type: 1}
+  model: generator.ifacetemplate
+  pk: 31
+- fields: {ifname: wl0, template: 9, type: 2}
+  model: generator.ifacetemplate
+  pk: 32
+- fields: {ifname: eth1, template: 8, type: 0}
+  model: generator.ifacetemplate
+  pk: 27
+- fields: {ifname: eth0, template: 8, type: 1}
+  model: generator.ifacetemplate
+  pk: 28
+- fields: {ifname: eth0, template: 11, type: 0}
+  model: generator.ifacetemplate
+  pk: 33
+- fields: {ifname: eth0, template: 11, type: 1}
+  model: generator.ifacetemplate
+  pk: 34
+- fields: {ifname: ath0, template: 11, type: 2}
+  model: generator.ifacetemplate
+  pk: 35
+
+#
+# Optional packages
+#
+- fields: {description: Package for solar powered nodes, fancy_name: solar, name: solar}
+  model: generator.optionalpackage
+  pk: 1
+- fields: {description: USB support, fancy_name: kmod-usb-core, name: kmod-usb-core}
+  model: generator.optionalpackage
+  pk: 3
+- fields: {description: USB2 support, fancy_name: kmod-usb2, name: kmod-usb2}
+  model: generator.optionalpackage
+  pk: 4
+- fields: {description: SCSI support, fancy_name: kmod-scsi-core, name: kmod-scsi-core}
+  model: generator.optionalpackage
+  pk: 5
+- fields: {description: USB storage support, fancy_name: kmod-usb-storage, name: kmod-usb-storage}
+  model: generator.optionalpackage
+  pk: 6
+- fields: {description: ext2 filesystem support, fancy_name: kmod-fs-ext2, name: kmod-fs-ext2}
+  model: generator.optionalpackage
+  pk: 7
+- fields: {description: ext3 filesystem support, fancy_name: kmod-fs-ext3, name: kmod-fs-ext3}
+  model: generator.optionalpackage
+  pk: 8
+
+#
+# Transitions
+#
+- model: generator.ProfileAdaptationChain
+  pk: 1
+  fields:
+    class_name: wlanlj.nodes.transitions.OnePortVPN
+    priority: 1
+    template: 4
+- model: generator.ProfileAdaptationChain
+  pk: 1
+  fields:
+    class_name: wlanlj.nodes.transitions.OnePortVPN
+    priority: 1
+    template: 11
+- model: generator.ProfileAdaptationChain
+  pk: 2
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 1
+- model: generator.ProfileAdaptationChain
+  pk: 3
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 3
+- model: generator.ProfileAdaptationChain
+  pk: 4
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 4
+- model: generator.ProfileAdaptationChain
+  pk: 5
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 5
+- model: generator.ProfileAdaptationChain
+  pk: 6
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 6
+- model: generator.ProfileAdaptationChain
+  pk: 7
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 7
+- model: generator.ProfileAdaptationChain
+  pk: 8
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 8
+- model: generator.ProfileAdaptationChain
+  pk: 9
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 9
+- model: generator.ProfileAdaptationChain
+  pk: 10
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 10
+- model: generator.ProfileAdaptationChain
+  pk: 11
+  fields:
+    class_name: wlanlj.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 11
+

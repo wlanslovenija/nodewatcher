@@ -1,10 +1,12 @@
 from django import forms
 from django.forms import widgets
+from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
+from wlanlj.nodes.transitions import validates_adaptation_chain
 from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from wlanlj.generator.types import IfaceType
 from wlanlj.account.util import generate_random_password
@@ -214,6 +216,7 @@ class RegisterNodeForm(forms.Form):
 
     return self.cleaned_data
   
+  @validates_adaptation_chain
   def save(self, user):
     """
     Completes node registration.
@@ -329,6 +332,7 @@ class RegisterNodeForm(forms.Form):
     Event.create_event(node, EventCode.NodeAdded, '', EventSource.NodeDatabase,
                        data = 'Maintainer: %s' % node.owner.username)
 
+    self.node = node
     return node
 
 class UpdateNodeForm(forms.Form):
@@ -484,12 +488,6 @@ class UpdateNodeForm(forms.Form):
     if not name:
       return
 
-    try:
-      if use_vpn and template and not template.iface_lan and node.has_allocated_subnets(IfaceType.LAN):
-        raise forms.ValidationError(_("The specified router only has one ethernet port! You have already added some LAN subnets to it, so you cannot enable VPN!"))
-    except Profile.DoesNotExist:
-      pass
-
     if not NODE_NAME_RE.match(name):
       raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
 
@@ -534,6 +532,7 @@ class UpdateNodeForm(forms.Form):
 
     return self.cleaned_data
   
+  @validates_adaptation_chain
   def save(self, node, user):
     """
     Completes node data update.
@@ -623,6 +622,8 @@ class UpdateNodeForm(forms.Form):
       profile.save()
     elif profile:
       profile.delete()
+    
+    return node
 
 class AllocateSubnetForm(forms.Form):
   """
@@ -671,19 +672,6 @@ class AllocateSubnetForm(forms.Form):
     Additional validation handler.
     """
     pool = self.cleaned_data.get('pool')
-    type = int(self.cleaned_data.get('iface_type'))
-    if type == IfaceType.WiFi:
-      try:
-        subnet = Subnet.objects.get(node = self.__node, gen_iface_type = IfaceType.WiFi, allocated = True)
-        raise forms.ValidationError(_("Only one WiFi subnet may be allocated to a node!"))
-      except Subnet.DoesNotExist:
-        pass
-    
-    try:
-      if type == IfaceType.LAN and not self.__node.profile.template.iface_lan and self.__node.profile.use_vpn:
-        raise forms.ValidationError(_("The specified router only has one ethernet port! You have already enabled VPN, so you cannot add subnets to LAN port!"))
-    except Profile.DoesNotExist:
-      pass
 
     if self.cleaned_data.get('network'):
       try:
@@ -710,6 +698,7 @@ class AllocateSubnetForm(forms.Form):
 
     return self.cleaned_data
 
+  @validates_adaptation_chain
   def save(self, node):
     """
     Completes subnet allocation.
@@ -747,6 +736,8 @@ class AllocateSubnetForm(forms.Form):
 
     # Remove any already announced subnets that are the same subnet
     Subnet.objects.filter(node = node, subnet = subnet.subnet, cidr = subnet.cidr, allocated = False).delete()
+    
+    return node
 
 class EditSubnetForm(forms.Form):
   """

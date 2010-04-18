@@ -6,6 +6,8 @@ from django.template import loader, Context
 from django.conf import settings
 from wlanlj.nodes.locker import require_lock, model_lock
 from wlanlj.nodes import ipcalc
+from wlanlj.nodes.common import load_plugin
+from wlanlj.nodes.transitions import RouterTransition
 from wlanlj.generator.types import IfaceType
 from wlanlj.dns.models import Zone, Record
 from datetime import datetime, timedelta
@@ -237,6 +239,18 @@ class Node(models.Model):
     
     # Clear adjacency history
     self.peer_history.clear()
+  
+  def adapt_to_router_type(self):
+    """
+    Ensures that new router type is compatible with current configuration.
+    """
+    if not self.profile:
+      return
+    
+    for entry in self.profile.template.adaptation_chain.all().order_by("priority"):
+      cls = load_plugin(entry.class_name, required_super = RouterTransition)
+      transition = cls()
+      transition.adapt(self)
   
   def rename_graphs(self, graph_type, old, new):
     """
