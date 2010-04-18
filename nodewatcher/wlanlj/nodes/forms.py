@@ -7,6 +7,7 @@ from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetS
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.sticker import generate_sticker
 from wlanlj.nodes.transitions import validates_adaptation_chain
+from wlanlj.nodes.common import FormWithWarnings
 from wlanlj.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from wlanlj.generator.types import IfaceType
 from wlanlj.account.util import generate_random_password
@@ -919,7 +920,7 @@ class RenumberAction:
   Renumber = -2
   SetManually = -3
 
-class RenumberForm(forms.Form):
+class RenumberForm(FormWithWarnings):
   """
   A form for renumbering a node.
   """
@@ -1028,7 +1029,7 @@ class RenumberForm(forms.Form):
     self.__node.ensure_exclusive_access()
     
     # Determine what subnet primary IP belonged to
-    primary = self.__node.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.__node.ip).filter(allocated = True).exclude(cidr = 0)
+    primary = self.__node.get_primary_subnet()
     renumber_primary = False
     old_router_id = self.__node.ip
     
@@ -1080,7 +1081,10 @@ class RenumberForm(forms.Form):
       router_id_changed = True
     
     # Remove conflicting invalid nodes (another node with the IP we just renumbered to)
-    Node.objects.filter(ip = self.__node.ip, status = NodeStatus.Invalid).delete()
+    existing_nodes = Node.objects.filter(ip = self.__node.ip, status = NodeStatus.Invalid)
+    if existing_nodes.count() > 0:
+      self.warning_or_continue(_("There is an existing but unregistered node with the same primary IP address you are currently renumbering to! If you continue with this operation, this invalid node will be replaced."))
+    existing_nodes.delete()
     
     # Node has been renumbered, reset monitoring status as this node is obviously not
     # visible right after renumbering.

@@ -1,3 +1,6 @@
+from django import forms
+from django.db import transaction, connection
+
 class InvalidPluginClass(Exception):
   """
   This exception gets raised when the plugin class does not inherit
@@ -24,4 +27,57 @@ def load_plugin(module_path, required_super = None):
     raise InvalidPluginClass
   
   return cls
+
+class ValidationWarning(Exception):
+  pass
+
+class FormWithWarnings(forms.Form):
+  """
+  A form that adds support for emitting warnings.
+  """
+  confirm_all_warnings = forms.BooleanField(initial = False, required = False, widget = forms.HiddenInput())
+  
+  def __init__(self, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    super(FormWithWarnings, self).__init__(*args, **kwargs)
+    self.warnings = []
+    
+    # Wrap save method
+    old_save = self.save
+    def wrapped_save(*args, **kwargs):
+      # Check that the database has savepoint support, otherwise this might have
+      # unindented consequences of data corruption; in such cases we disable warnings
+      if not connection.features.uses_savepoints:
+        return old_save(*args, **kwargs)
+      
+      # First call save normally and if warnings have gone unhandled we
+      # raise a ValidationWarning exception
+      try:
+        sid = transaction.savepoint() 
+        res = old_save(*args, **kwargs)
+        if len(self.warnings):
+          data = self.data.copy()
+          data['confirm_all_warnings'] = True
+          self.data = data
+          raise ValidationWarning
+        
+        transaction.savepoint_commit(sid)
+      except:
+        transaction.savepoint_rollback(sid)
+        raise
+    
+    self.save = wrapped_save
+   
+  def warning_or_continue(self, message):
+    """
+    If the user has confirmed a warning, this will continue as usual. If
+    she hasn't, calling this method will interrupt the normal program flow
+    with a ValidationWarning exception.
+    """
+    if self.cleaned_data.get('confirm_all_warnings', False):
+      return
+    
+    self.warnings.append(message)
 

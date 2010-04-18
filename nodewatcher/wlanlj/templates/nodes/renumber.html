@@ -61,8 +61,18 @@
   {% endfor %}
 </div>
 {% endif %}
+{% if form.warnings %}
+<div class="warning">
+  {% blocktrans %}<b>WARNING:</b> Renumbering procedure has encountered some non-fatal potential problems. Please review them and resubmit this form if they are acceptable (otherwise abort this operation).{% endblocktrans %}<br/>
+  <br/>
+  {% for warning in form.warnings %}
+  <i>{{ warning }}</i><br/>
+  {% endfor %} 
+</div>
+{% endif %}
 
 <form method="POST" action="{% url renumber_node node.pk %}">
+{{ form.confirm_all_warnings }}
 <table border="0" width="700">
   <tr>
     <td width="200"><b>{% trans "Current allocation" %}</b></td>

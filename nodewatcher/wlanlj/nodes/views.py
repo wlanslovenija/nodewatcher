@@ -8,6 +8,7 @@ from django.forms import forms
 from django.utils.translation import ugettext as _
 from wlanlj.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
 from wlanlj.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
+from wlanlj.nodes.common import ValidationWarning
 from wlanlj.generator.models import Profile
 from wlanlj.account.models import UserAccount
 from wlanlj.policy.models import Policy, PolicyFamily, TrafficControlClass
@@ -304,6 +305,12 @@ def node_renumber(request, node):
         form.save()
         transaction.savepoint_commit(sid)
         return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+    except ValidationWarning:
+      # We must display a warning before the user may continue; node must be reloaded
+      # because savepoint has been rolled back and any modifications have actually been
+      # invalidated (but remain in memory)
+      transaction.savepoint_rollback(sid)
+      node = Node.objects.get(pk = node.pk)
     except:
       # Something went wrong
       transaction.savepoint_rollback(sid)

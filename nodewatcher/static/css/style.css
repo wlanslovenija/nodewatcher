@@ -108,6 +108,20 @@ tr.inner_header {
   text-align: center;
 }
 
+.warning {
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -moz-border-radius-topleft:3px;
+  -moz-border-radius-topright:3px;
+  width: 680px;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #cdc71d;
+  background-color: #fffee9;
+  color: #938c00;
+  text-align: center;
+}
+
 .notice {
   -moz-border-radius-bottomleft:3px;
   -moz-border-radius-bottomright:3px;
