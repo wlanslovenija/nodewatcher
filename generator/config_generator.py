@@ -724,6 +724,7 @@ class OpenWrtConfig(NodeConfig):
     # Allow txtinfo access when selected
     if 'olsrd-mod-txtinfo' in self.packages:
       f.write('\tiptables -A INPUT -p tcp --dport 2006 -j ACCEPT\n')
+      f.write('\n')
     
     # Set boot_wait to on if it is not set
     f.write('\tif [ -x /usr/sbin/nvram ]; then\n')
@@ -796,6 +797,7 @@ class OpenWrtConfig(NodeConfig):
       f.write('{\n')
       f.write('  PlParam "accept" "0.0.0.0"\n')
       f.write('}\n')
+      f.write('\n')
     
     # Setup actions plugin to trigger a nodewatcher script when the default
     # route is added or removed from the routing table
