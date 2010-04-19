@@ -216,39 +216,9 @@
     <td colspan="2">{{ node.notes|linebreaksbr }}</td>
   </tr>
   {% endif %}
+  {% if node.has_status_information %}
   <tr class="section_title">
     <td colspan="2">{% trans "Status Information" %}</td>
-  </tr>
-  {% if node.is_down %}
-  <tr>
-    <td colspan="2" class="notice">
-      {% if node.is_invalid %}
-      {% trans "Node is not registered in this database, so no status information is available." %}
-      {% else %}
-      {% trans "Node is currently down, so no status information is available." %}
-      {% endif %}
-    </td>
-  </tr>
-  {% else %}
-  <tr>
-    <td>{% trans "RTT MIN" %}</td>
-    <td>{{ node.rtt_min|default:"/" }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "RTT AVG" %}</td>
-    <td>{{ node.rtt_avg|default:"/" }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "RTT MAX" %}</td>
-    <td>{{ node.rtt_max|default:"/" }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Packet loss" %} (%)</td>
-    <td>{{ node.pkt_loss|default_if_none:"/" }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Peers" %}</td>
-    <td>{{ node.peers }}</td>
   </tr>
   {% if node.uptime %}
   <tr>
