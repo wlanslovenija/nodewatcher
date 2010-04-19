@@ -721,6 +721,10 @@ class OpenWrtConfig(NodeConfig):
     f.write('\tdate $DT\n')
     f.write('\n')
     
+    # Allow txtinfo access when selected
+    if 'olsrd-mod-txtinfo' in self.packages:
+      f.write('\tiptables -A INPUT -p tcp --dport 2006 -j ACCEPT\n')
+    
     # Set boot_wait to on if it is not set
     f.write('\tif [ -x /usr/sbin/nvram ]; then\n')
     f.write('\t\tBOOT_WAIT=`nvram get boot_wait`\n')
@@ -785,6 +789,13 @@ class OpenWrtConfig(NodeConfig):
     f.write('MprCoverage 3\n')
     f.write('NatThreshold 0.75\n')
     f.write('\n')
+    
+    # Setup txtinfo plugin when selected
+    if 'olsrd-mod-txtinfo' in self.packages:
+      f.write('LoadPlugin "olsrd_txtinfo.so.0.1"\n')
+      f.write('{\n')
+      f.write('  PlParam "accept" "0.0.0.0"\n')
+      f.write('}\n')
     
     # Setup actions plugin to trigger a nodewatcher script when the default
     # route is added or removed from the routing table

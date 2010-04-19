@@ -320,6 +320,12 @@
 - fields: {description: ext3 filesystem support, fancy_name: kmod-fs-ext3, name: kmod-fs-ext3}
   model: generator.optionalpackage
   pk: 8
+- model: generator.OptionalPackage
+  pk: 9
+  fields:
+    name: olsrd-mod-txtinfo
+    fancy_name: olsrd-mod-txtinfo
+    description: olsrd txtinfo plugin
 
 #
 # Transitions
