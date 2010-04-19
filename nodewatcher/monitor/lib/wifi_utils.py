@@ -144,7 +144,7 @@ def parse_fping(data):
   
   return (results, dupes)
 
-def ping_hosts(count, hosts):
+def ping_hosts(count, hosts, packet_size = 56):
   """
   Pings specified hosts in parallel using fping.
   
@@ -156,7 +156,7 @@ def ping_hosts(count, hosts):
   
   # Spawn the fping process to ping hosts in parallel
   process = subprocess.Popen(
-    ['/usr/sbin/fping', '-c', str(count), '-q'] + hosts,
+    ['/usr/sbin/fping', '-c', str(count), '-q', '-b%d' % packet_size] + hosts,
     stdout = subprocess.PIPE,
     stderr = subprocess.PIPE
   )

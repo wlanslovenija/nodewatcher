@@ -225,6 +225,61 @@ class RRARTT(RRAConfiguration):
     '--lower-limit', '0'
   ]
 
+class RRAPacketLoss(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'loss_def',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'loss_100',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'loss_500',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'loss_1000',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'loss_1480',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE1:loss_def#0080ff:65 byte packets",
+    r'GPRINT:loss_def:LAST:  Current\:%8.2lf',
+    r'GPRINT:loss_def:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:loss_def:MAX:Maximum\:%8.2lf\n',
+    "LINE1:loss_100#7fff00:100 byte packets",
+    r'GPRINT:loss_100:LAST: Current\:%8.2lf',
+    r'GPRINT:loss_100:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:loss_100:MAX:Maximum\:%8.2lf\n',
+    "LINE1:loss_500#4b0082:500 byte packets",
+    r'GPRINT:loss_500:LAST: Current\:%8.2lf',
+    r'GPRINT:loss_500:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:loss_500:MAX:Maximum\:%8.2lf\n',
+    "LINE1:loss_1000#ff0000:1000 byte packets",
+    r'GPRINT:loss_1000:LAST:Current\:%8.2lf',
+    r'GPRINT:loss_1000:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:loss_1000:MAX:Maximum\:%8.2lf\n',
+    "LINE1:loss_1480#ffd700:1480 byte packets",
+    r'GPRINT:loss_1480:LAST:Current\:%8.2lf',
+    r'GPRINT:loss_1480:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:loss_1480:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0',
+    '--lower-limit', '0'
+  ]
+
 class RRALinkQuality(RRAConfiguration):
   interval = 300
   sources = [

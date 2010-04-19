@@ -13,6 +13,6 @@ def get_tables(olsr_ip = None):
 def parse_fping(data):
   return wifi_utils.parse_fping(data)
 
-def ping_hosts(count, hosts):
+def ping_hosts(count, hosts, packet_size = 56):
   return parse_fping(SIMULATED_FPING)
 

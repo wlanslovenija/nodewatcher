@@ -745,6 +745,7 @@ class GraphType:
   WifiCells = 7
   OlsrPeers = 5
   GatewayTraffic = 40
+  PacketLoss = 4
 
   # Global graphs
   NodesByStatus = 1000
@@ -780,6 +781,8 @@ class GraphType:
       return "gwtraffic"
     elif type == GraphType.NodesByStatus:
       return "nodesbystatus"
+    elif type == GraphType.PacketLoss:
+      return "packetloss"
     else:
       return "unknown"
 

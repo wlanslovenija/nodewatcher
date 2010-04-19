@@ -51,7 +51,7 @@ else:
   nodewatcher.COLLECT_SIMULATION_DATA = options.collect_sim
   wifi_utils.COLLECT_SIMULATION_DATA = options.collect_sim
 
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers, RRAPacketLoss
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
@@ -81,7 +81,8 @@ RRA_CONF_MAP = {
   GraphType.MemUsage    : RRAMemUsage,
   GraphType.Solar       : RRASolar,
   GraphType.WifiCells   : RRAWifiCells,
-  GraphType.OlsrPeers   : RRAOlsrPeers
+  GraphType.OlsrPeers   : RRAOlsrPeers,
+  GraphType.PacketLoss  : RRAPacketLoss
 }
 WORKER_POOL = None
 
@@ -272,8 +273,12 @@ def check_dead_graphs():
   GraphItem.objects.filter(need_removal = True).delete()
 
 def generate_new_node_tweet(node):
+  """
+  Generates a tweet when a new node connects to the mesh.
+  """
   if not tweets_enabled():
     return
+  
   try:
     bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
     twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
@@ -284,7 +289,7 @@ def generate_new_node_tweet(node):
     logging.warning("%s/%s: %s" % (node.name, node.ip, format_exc()))
 
 @transaction.commit_on_success
-def process_node(node_ip, ping_results, is_duped, peers):
+def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
   """
   Processes a single node.
 
@@ -292,6 +297,7 @@ def process_node(node_ip, ping_results, is_duped, peers):
   @param ping_results: Results obtained from ICMP ECHO tests
   @param is_duped: True if duplicate echos received
   @param peers: Peering info from routing daemon
+  @param varsize_results: Results of ICMP ECHO tests with variable payloads
   """
   transaction.set_dirty()
   
@@ -321,7 +327,12 @@ def process_node(node_ip, ping_results, is_duped, peers):
     n.uptime_last = datetime.now()
   else:
     n.status = NodeStatus.Visible
-
+  
+  # Measure packet loss with different packet sizes and generate a graph
+  if ping_results is not None and varsize_results is not None:
+    losses = [n.pkt_loss] + varsize_results
+    add_graph(n, '', GraphType.PacketLoss, RRAPacketLoss, 'Packet Loss', 'packetloss', *losses)
+  
   if is_duped:
     n.status = NodeStatus.Duped
     NodeWarning.create(n, WarningCode.DupedReplies, EventSource.Monitor)
@@ -792,13 +803,18 @@ def check_mesh_status():
   Node.objects.filter(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber), visible = False).delete()
 
   # Ping the nodes to prepare information for later node processing
+  varsize_results = {}
   results, dupes = wifi_utils.ping_hosts(10, nodesToPing)
+  for packet_size in (100, 500, 1000, 1480):
+    r, d = wifi_utils.ping_hosts(10, nodesToPing, packet_size - 8)
+    for node_ip, res in r.iteritems():
+      varsize_results.setdefault(node_ip, []).append(res[3])
   
   if getattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING', None):
     # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually
     # used for debug purpuses where a single process is prefered)
     for node_ip in nodesToPing:
-      process_node(node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links)
+      process_node(node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links, varsize_results.get(node_ip))
     
     # Commit the transaction here since we do everything in the same session
     transaction.commit()
@@ -811,7 +827,7 @@ def check_mesh_status():
     worker_results = []
     for node_ip in nodesToPing:
       worker_results.append(
-        WORKER_POOL.apply_async(process_node, (node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links))
+        WORKER_POOL.apply_async(process_node, (node_ip, results.get(node_ip), node_ip in dupes, nodes[node_ip].links, varsize_results.get(node_ip)))
       )
     
     # Wait for all workers to finish processing
