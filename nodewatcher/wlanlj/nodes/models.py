@@ -244,7 +244,11 @@ class Node(models.Model):
     """
     Ensures that new router type is compatible with current configuration.
     """
-    if not self.profile:
+    from wlanlj.generator.models import Profile
+    
+    try:
+      self.profile
+    except Profile.DoesNotExist:
       return
     
     for entry in self.profile.template.adaptation_chain.all().order_by("priority"):
