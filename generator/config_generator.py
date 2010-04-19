@@ -426,8 +426,8 @@ class OpenWrtConfig(NodeConfig):
     NodeConfig.__init__(self)
     
     # Add some basic services
-    self.addService('S35', 'misc')
-    self.addService('K35', 'misc')
+    self.addService('S46', 'misc')
+    self.addService('K46', 'misc')
   
   def generate(self, directory):
     """
@@ -706,10 +706,8 @@ class OpenWrtConfig(NodeConfig):
   
   def __generateMiscScript(self, f):
     f.write('#!/bin/sh /etc/rc.common\n')
-    f.write('START=35')
-    f.write('\n')
-    f.write('STOP=35')
-    f.write('\n')
+    f.write('START=46\n')
+    f.write('STOP=46\n')
     f.write('start() {\n')
     
     # Prevent the time from reseting to far into the past
