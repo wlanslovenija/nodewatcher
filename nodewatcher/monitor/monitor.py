@@ -844,8 +844,8 @@ def check_mesh_status():
   results, dupes = wifi_utils.ping_hosts(10, nodesToPing)
   for packet_size in (100, 500, 1000, 1480):
     r, d = wifi_utils.ping_hosts(10, nodesToPing, packet_size - 8)
-    for node_ip, res in r.iteritems():
-      varsize_results.setdefault(node_ip, []).append(res[3])
+    for node_ip in nodesToPing:
+      varsize_results.setdefault(node_ip, []).append(r[node_ip][3] if node_ip in r else None)
   
   if getattr(settings, 'MONITOR_DISABLE_MULTIPROCESSING', None):
     # Multiprocessing is disabled (the MONITOR_DISABLE_MULTIPROCESSING option is usually

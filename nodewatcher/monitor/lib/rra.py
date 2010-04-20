@@ -732,9 +732,16 @@ class RRA:
     if not os.path.isfile(archive):
       RRA.create(conf, archive)
     
+    nvalues = []
+    for idx, value in enumerate(values):
+      if value is None:
+        nvalues.append("U")
+      else:
+        nvalues.append(str(value))
+    
     rrdtool.update(
       archive,
-      "N:" + ":".join([str(x) for x in values])
+      "N:" + ":".join(nvalues)
     )
 
     # Record data in database store if set
