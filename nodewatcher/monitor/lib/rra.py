@@ -761,8 +761,8 @@ class RRA:
     args = []
     for i, source in enumerate(conf.sources):
       args.append("DEF:%s=%s:%s:AVERAGE" % (source.name, archive, source.name))
-      args.append("DEF:%s_min=%s:%s:MIN" % (source.name, archive, source.name))
-      args.append("DEF:%s_max=%s:%s:MAX" % (source.name, archive, source.name))
+      args.append("DEF:%s_cmin=%s:%s:MIN" % (source.name, archive, source.name))
+      args.append("DEF:%s_cmax=%s:%s:MAX" % (source.name, archive, source.name))
     
     if kwargs.get('end_time') is None:
       end_time = int(time.time())
