@@ -148,7 +148,7 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   try:
     RRA.update(node, conf, rra, *values)
   except:
-    pass
+    logging.warning(format_exc())
   
   graph.title = title
   graph.last_update = datetime.now()
@@ -257,6 +257,15 @@ def update_rrds():
   
   try:
     pool.map(update_rrd, GraphItem.objects.all()[:])
+    
+    # Don't forget the global graphs
+    rra_traffic = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
+    rra_status = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_nodes_by_status.rrd')
+    rra_clients = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
+    
+    RRA.convert(RRALocalTraffic, rra_traffic)
+    RRA.convert(RRANodesByStatus, rra_status)
+    RRA.convert(RRAClients, rra_clients) 
   except:
     logging.warning(format_exc())
   
