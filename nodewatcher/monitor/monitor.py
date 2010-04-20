@@ -20,6 +20,7 @@ parser.add_option('--settings', dest = 'settings', help = 'Django settings to us
 parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit (only graphs that have the redraw flag set are regenerated)', action = 'store_true')
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
+parser.add_option('--update-rrds', dest = 'update_rrds', help = 'Update RRDs', action = 'store_true')
 options, args = parser.parse_args()
 
 if not options.path:
@@ -235,6 +236,33 @@ def regenerate_global_statistics_graphs():
   except:
     logging.warning("Unable to regenerate some global statistics graphs!")
 
+def update_rrd(item):
+  """
+  Updates a single RRD.
+  """
+  archive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', item.rra))
+  conf = RRA_CONF_MAP[item.type]
+  
+  # Update the RRD
+  RRA.convert(conf, archive)
+
+def update_rrds():
+  """
+  Updates RRDs.
+  """
+  # We must close the database connection before we fork the worker pool, otherwise
+  # resources will be shared and problems will arise!
+  connection.close()
+  pool = multiprocessing.Pool(processes = settings.MONITOR_GRAPH_WORKERS)
+  
+  try:
+    pool.map(update_rrd, GraphItem.objects.all()[:])
+  except:
+    logging.warning(format_exc())
+  
+  pool.close()
+  pool.join()
+
 def regenerate_graphs():
   """
   Regenerates all graphs from RRAs.
@@ -318,7 +346,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
     n.rtt_min, n.rtt_avg, n.rtt_max, n.pkt_loss = ping_results
     
     # Add RTT graph
-    add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency', n.rtt_avg)
+    add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency', n.rtt_avg, n.rtt_min, n.rtt_max)
 
     # Add uptime credit
     if n.uptime_last:
@@ -879,6 +907,13 @@ if __name__ == '__main__':
     print ">>> Regenerating graphs from RRAs..."
     regenerate_graphs()
     print ">>> Graph generation completed."
+    exit(0)
+  
+  # Check if we should just update RRDs
+  if options.update_rrds:
+    print ">>> Updating RRDs..."
+    update_rrds()
+    print ">>> RRD updates completed."
     exit(0)
   
   # Check if we should just perform stress testing

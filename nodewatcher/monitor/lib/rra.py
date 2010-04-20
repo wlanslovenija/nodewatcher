@@ -1,14 +1,19 @@
 import rrdtool
 import time
 import os
+import subprocess
+import re
 
 # Models
 from wlanlj.nodes.models import StatsSolar
 from django.conf import settings
 from datetime import datetime
+from xml.etree import cElementTree as ElementTree
 
 # Defining some constants and classes for easier usage later
 AverageCF = "AVERAGE"
+MinCF = "MIN"
+MaxCF = "MAX"
 GaugeDST = "GAUGE"
 CounterDST = "COUNTER"
 
@@ -59,7 +64,55 @@ class RRAConfiguration:
       xff = 0.5,
       steps = 288,
       rows = 797
-    )
+    ),
+    RoundRobinArchive(
+      cf = MinCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 600
+    ),
+    RoundRobinArchive(
+      cf = MinCF,
+      xff = 0.5,
+      steps = 6,
+      rows = 700
+    ),
+    RoundRobinArchive(
+      cf = MinCF,
+      xff = 0.5,
+      steps = 24,
+      rows = 775
+    ),
+    RoundRobinArchive(
+      cf = MinCF,
+      xff = 0.5,
+      steps = 288,
+      rows = 797
+    ),
+    RoundRobinArchive(
+      cf = MaxCF,
+      xff = 0.5,
+      steps = 1,
+      rows = 600
+    ),
+    RoundRobinArchive(
+      cf = MaxCF,
+      xff = 0.5,
+      steps = 6,
+      rows = 700
+    ),
+    RoundRobinArchive(
+      cf = MaxCF,
+      xff = 0.5,
+      steps = 24,
+      rows = 775
+    ),
+    RoundRobinArchive(
+      cf = MaxCF,
+      xff = 0.5,
+      steps = 288,
+      rows = 797
+    ),
   ]
 
 class RRALocalTraffic(RRAConfiguration):
@@ -213,7 +266,17 @@ class RRARTT(RRAConfiguration):
       'rtt',
       type = GaugeDST,
       heartbeat = interval * 2
-    )
+    ),
+    DataSource(
+      'rtt_min',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'rtt_max',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
   ]
   graph = [
     "LINE1:rtt#0000ff:RTT [ms]",
@@ -277,7 +340,8 @@ class RRAPacketLoss(RRAConfiguration):
     r'GPRINT:loss_1480:MAX:Maximum\:%8.2lf\n',
     '--alt-y-grid',
     '--units-exponent', '0',
-    '--lower-limit', '0'
+    '--lower-limit', '0',
+    '--upper-limit', '100'
   ]
 
 class RRALinkQuality(RRAConfiguration):
@@ -503,6 +567,151 @@ class RRA:
   A wrapper class for managing round-robin archives via RRDTool.
   """
   @staticmethod
+  def convert(conf, archive):
+    """
+    Converts 
+    """
+    try:
+      os.stat(archive)
+    except OSError:
+      return
+    
+    # Dump the archive into XML form
+    process = subprocess.Popen(
+      ['/usr/bin/rrdtool', 'dump', archive],
+      stdout = subprocess.PIPE,
+      stderr = subprocess.PIPE
+    )
+    
+    # Make any transformations needed
+    xml = ElementTree.parse(process.stdout)
+    wanted_source_names = [source.name for source in conf.sources]
+    start_offset = 3
+    changed = False
+    
+    # A simple marker to rescan sources as something has been modified
+    class RescanSources(Exception): pass
+    
+    while True:
+      data_sources = xml.findall('/ds')
+      data_source_names = [source.findtext('./name').strip() for source in data_sources]
+      
+      try:
+        for ds in data_source_names:
+          if ds not in wanted_source_names:
+            print "WARNING: Removal of sources currently not supported!"
+            # If we remove something we must continue the loop
+            # raise RescanSources
+        
+        for idx, ds in enumerate(wanted_source_names):
+          if ds not in data_source_names:
+            print "INFO: Adding data source '%s' to RRD '%s.'" % (ds, os.path.basename(archive))
+            
+            # Update header
+            dse = ElementTree.Element("ds")
+            ElementTree.SubElement(dse, "name").text = conf.sources[idx].name
+            ElementTree.SubElement(dse, "type").text = conf.sources[idx].type
+            ElementTree.SubElement(dse, "minimal_heartbeat").text = str(conf.sources[idx].heartbeat) 
+            ElementTree.SubElement(dse, "min").text = "NaN"
+            ElementTree.SubElement(dse, "max").text = "NaN"
+            ElementTree.SubElement(dse, "last_ds").text = "UNKN"
+            ElementTree.SubElement(dse, "value").text = "0.0000000000e+00"
+            ElementTree.SubElement(dse, "unknown_sec").text = "0"
+            xml.getroot().insert(start_offset + idx, dse)
+            
+            # Update all RRAs
+            for rra in xml.findall('/rra'):
+              # Update RRA header
+              cdp = rra.find('./cdp_prep')
+              dse = ElementTree.Element("ds")
+              ElementTree.SubElement(dse, "primary_value").text = "NaN"
+              ElementTree.SubElement(dse, "secondary_value").text = "NaN"
+              ElementTree.SubElement(dse, "value").text = "NaN"
+              ElementTree.SubElement(dse, "unknown_datapoints").text = "0"
+              cdp.insert(idx, dse)
+              
+              # Update all RRA datapoints
+              for row in rra.findall('./database/row'):
+                v = ElementTree.Element("v")
+                v.text = "NaN"
+                row.insert(idx, v)
+            
+            changed = True
+        
+        break
+      except RescanSources:
+        pass
+    
+    # Add RRAs when they have changed (only addition is supported)
+    for wanted_rra in conf.archives:
+      for rra in xml.findall('/rra'):
+        cf = rra.findtext('./cf').strip()
+        steps = int(rra.findtext('./pdp_per_row').strip())
+        rows = len(rra.findall('./database/row'))
+        xff = float(rra.findtext('./params/xff').strip())
+        
+        match = all([
+          cf == wanted_rra.cf,
+          steps == wanted_rra.steps,
+          rows == wanted_rra.rows,
+          xff == wanted_rra.xff
+        ])
+        
+        if match:
+          break
+      else:
+        # Not found in existing RRAs, we need to add it
+        print "INFO: Adding new RRA '%s' to '%s'." % (wanted_rra, os.path.basename(archive)) 
+        changed =  True
+        
+        rra = ElementTree.SubElement(xml.getroot(), "rra")
+        ElementTree.SubElement(rra, "cf").text = wanted_rra.cf
+        ElementTree.SubElement(rra, "pdp_per_row").text = str(wanted_rra.steps)
+        params = ElementTree.SubElement(rra, "params")
+        ElementTree.SubElement(params, "xff").text = str(wanted_rra.xff)
+        cdp_prep = ElementTree.SubElement(rra, "cdp_prep")
+        
+        for ds in conf.sources:
+          dse = ElementTree.SubElement(cdp_prep, "ds")
+          ElementTree.SubElement(dse, "primary_value").text = "NaN"
+          ElementTree.SubElement(dse, "secondary_value").text = "NaN"
+          ElementTree.SubElement(dse, "value").text = "NaN"
+          ElementTree.SubElement(dse, "unknown_datapoints").text = "0"
+        
+        database = ElementTree.SubElement(rra, "database")
+        for row in xrange(wanted_rra.rows):
+          row = ElementTree.SubElement(database, "row")
+          for v in xrange(len(conf.sources)):
+            ElementTree.SubElement(row, "v").text = "NaN"
+    
+    if changed:
+      try:
+        os.rename(archive, "%s__bak" % archive)
+        process = subprocess.Popen(
+          ['/usr/bin/rrdtool', 'restore', '-', archive],
+          stdin = subprocess.PIPE,
+          stdout = subprocess.PIPE,
+          stderr = subprocess.PIPE
+        )
+        
+        # Fix all empty last_ds values otherwise rrdtool will complain on restore
+        for last_ds in xml.findall('/ds/last_ds'):
+          if not last_ds.text:
+            last_ds.text = "UNKN"
+        
+        process.communicate(ElementTree.tostring(xml.getroot()))
+        if process.returncode != 0:
+          raise Exception
+        
+        try:
+          os.unlink("%s__bak" % archive)
+        except:
+          pass
+      except:
+        os.rename("%s__bak" % archive, archive)
+        raise
+  
+  @staticmethod
   def create(conf, archive):
     """
     Creates a new RRD archive.
@@ -552,6 +761,8 @@ class RRA:
     args = []
     for i, source in enumerate(conf.sources):
       args.append("DEF:%s=%s:%s:AVERAGE" % (source.name, archive, source.name))
+      args.append("DEF:%s_min=%s:%s:MIN" % (source.name, archive, source.name))
+      args.append("DEF:%s_max=%s:%s:MAX" % (source.name, archive, source.name))
     
     if kwargs.get('end_time') is None:
       end_time = int(time.time())
