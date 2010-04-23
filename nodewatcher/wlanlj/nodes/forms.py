@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from django.db import transaction
+from django.db import transaction, models
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from wlanlj.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType
@@ -538,6 +538,7 @@ class UpdateNodeForm(forms.Form):
     """
     Completes node data update.
     """
+    self.requires_firmware_update = False
     ip = self.cleaned_data.get('ip')
     oldName = node.name
     oldProject = node.project
@@ -597,29 +598,46 @@ class UpdateNodeForm(forms.Form):
         # Rename traffic graphs to preserve history
         node.rename_graphs(GraphType.Traffic, profile.template.iface_wifi, new_template.iface_wifi)
       
+      def set_and_check(**kwargs):
+        for key, value in kwargs.iteritems():
+          field = getattr(profile, key)
+          meta = profile._meta.get_field(key)
+          prep = meta.get_db_prep_value(value)
+          
+          if isinstance(meta, models.ManyToManyField):
+            if set([m.pk for m in field.all()]) != set([m.pk for m in value]):
+              self.requires_firmware_update = True
+          elif field != prep:
+            self.requires_firmware_update = True
+          
+          setattr(profile, key, value)
+      
       if not self.cleaned_data.get('channel'):
-        profile.channel = node.project.channel
+        set_and_check(channel = node.project.channel)
       else:
-        profile.channel = self.cleaned_data.get('channel')
-      profile.template = self.cleaned_data.get('template')
-      profile.root_pass = self.cleaned_data.get('root_pass')
-      profile.use_vpn = self.cleaned_data.get('use_vpn')
-      profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
-      profile.antenna = self.cleaned_data.get('ant_conn') or 0
-      profile.lan_bridge = self.cleaned_data.get('lan_bridge') or False
-      profile.wan_dhcp = self.cleaned_data.get('wan_dhcp')
-      profile.wan_ip = self.cleaned_data.get('wan_ip')
-      profile.wan_cidr = self.cleaned_data.get('wan_cidr')
-      profile.wan_gw = self.cleaned_data.get('wan_gw')
-
+        set_and_check(channel = self.cleaned_data.get('channel'))
+      
+      set_and_check(
+        template = self.cleaned_data.get('template'),
+        root_pass = self.cleaned_data.get('root_pass'),
+        use_vpn = self.cleaned_data.get('use_vpn'),
+        use_captive_portal = self.cleaned_data.get('use_captive_portal'),
+        antenna = self.cleaned_data.get('ant_conn') or 0,
+        lan_bridge = self.cleaned_data.get('lan_bridge') or False,
+        wan_dhcp = self.cleaned_data.get('wan_dhcp'),
+        wan_ip = self.cleaned_data.get('wan_ip'),
+        wan_cidr = self.cleaned_data.get('wan_cidr'),
+        wan_gw = self.cleaned_data.get('wan_gw')
+      )
+      
       if self.cleaned_data.get('tc_egress'):
-        profile.vpn_egress_limit = self.cleaned_data.get('tc_egress').bandwidth
+        set_and_check(vpn_egress_limit = self.cleaned_data.get('tc_egress').bandwidth)
       else:
-        profile.vpn_egress_limit = None
+        set_and_check(vpn_egress_limit = None)
  
       profile.save()
 
-      profile.optional_packages = self.cleaned_data.get('optional_packages')
+      set_and_check(optional_packages = self.cleaned_data.get('optional_packages'))
       profile.save()
     elif profile:
       profile.delete()

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Firmware Update Needed" %}{% endblock %}
+{% block heading %}{% trans "Firmware Update Needed" %}{% endblock %}
+{% block content %}
+<div class="notice">
+{% blocktrans %}
+Your node settings have been updated. However, at least one of the settings you have changed requires a firmware update. You can generate a new image for this node by clicking the <i>Generate Image</i> button below.
+{% endblocktrans %}
+</div>
+<div class="buttons" style="text-align: center">
+  <input type="button" value="{% trans "Generate Image" %}" onclick="document.location='{% url generate_node node.pk %}'" />&nbsp;
+  <input type="button" value="{% trans "Back to Node Information" %}" onclick="document.location='{% url view_node node.pk %}'" />
+</div>
+
+{% endblock %}

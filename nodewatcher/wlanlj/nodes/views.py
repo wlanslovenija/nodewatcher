@@ -155,7 +155,14 @@ def node_edit(request, node):
   if request.method == 'POST':
     form = UpdateNodeForm(node, request.POST)
     if form.is_valid() and form.save(node, request.user):
-      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+      if form.requires_firmware_update:
+        return render_to_response('nodes/firmware_update_needed.html', {
+            'node' : node
+          },
+          context_instance = RequestContext(request)
+        )
+      else:
+        return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
   else:
     p = {
       'name'                : node.name,
