@@ -1128,11 +1128,11 @@ class StatsSolar(models.Model):
   """
   node = models.ForeignKey(Node)
   timestamp = models.DateTimeField()
-  batvoltage = models.FloatField()
-  solvoltage = models.FloatField()
-  charge = models.FloatField()
-  load = models.FloatField()
-  state = models.IntegerField()
+  batvoltage = models.FloatField(null = True)
+  solvoltage = models.FloatField(null = True)
+  charge = models.FloatField(null = True)
+  load = models.FloatField(null = True)
+  state = models.IntegerField(null = True)
 
 class EventSource:
   """
