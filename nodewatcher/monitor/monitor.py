@@ -538,12 +538,16 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           'absorption'  : 3,
           'float'       : 4
         }
-
+        
+        for key, value in info['solar'].iteritems():
+          if not value.strip():
+            info['solar'][key] = None
+        
         add_graph(n, '', GraphType.Solar, RRASolar, 'Solar Monitor', 'solar',
           info['solar']['batvoltage'],
           info['solar']['solvoltage'],
           info['solar']['charge'],
-          states.get(info['solar']['state'], 1),
+          states.get(info['solar']['state']),
           info['solar']['load']
         )
 
