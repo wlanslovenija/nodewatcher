@@ -21,6 +21,9 @@ parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Jus
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
 parser.add_option('--update-rrds', dest = 'update_rrds', help = 'Update RRDs', action = 'store_true')
+parser.add_option('--reverse-populate', dest = 'reverse_populate', help = 'Reverse populate RRD with data from a database', action = 'store_true')
+parser.add_option('--reverse-populate-node', dest = 'rp_node', help = 'Node to populate data for')
+parser.add_option('--reverse-populate-graph', dest = 'rp_graph', help = 'Graph type to populate data for')
 options, args = parser.parse_args()
 
 if not options.path:
@@ -29,6 +32,10 @@ if not options.path:
   exit(1)
 elif not options.settings:
   print "ERROR: Settings specification is required!\n"
+  parser.print_help()
+  exit(1)
+elif options.reverse_populate and (not options.rp_node or not options.rp_graph):
+  print "ERROR: Reverse populate requires node and graph type!\n"
   parser.print_help()
   exit(1)
 
@@ -923,6 +930,32 @@ if __name__ == '__main__':
     print ">>> Updating RRDs..."
     update_rrds()
     print ">>> RRD updates completed."
+    exit(0)
+  
+  # Check if we should just perform reverse population of RRDs
+  if options.reverse_populate:
+    try:
+      node = Node.objects.get(pk = options.rp_node)
+    except Node.DoesNotExist:
+      print "ERROR: Invalid node specified."
+      exit(1)
+    
+    try:
+      conf = RRA_CONF_MAP[int(options.rp_graph)]
+    except (ValueError, KeyError):
+      print "ERROR: Invalid graph type specified."
+      exit(1)
+    
+    print ">>> Reverse populating RRDs for node '%s', graph '%s'..." % (node.name, conf.__name__)
+    
+    try:
+      graph = GraphItem.objects.filter(node = node, type = int(options.rp_graph))[0]
+    except IndexError:
+      print "ERROR: No graph items of specified type are available for this node."
+      exit(1)
+    
+    archive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
+    RRA.reverse_populate(node, conf, archive)
     exit(0)
   
   # Check if we should just perform stress testing

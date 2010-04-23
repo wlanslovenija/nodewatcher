@@ -712,18 +712,47 @@ class RRA:
         raise
   
   @staticmethod
-  def create(conf, archive):
+  def create(conf, archive, start = None):
     """
     Creates a new RRD archive.
     """
+    if start is None:
+      start = int(time.time())
+    
     options = [
       archive,
-      '--start', str(int(time.time()))
+      '--start', str(start)
     ]
     options = options + [str(x) for x in conf.sources]
     options = options + [str(x) for x in conf.archives]
     rrdtool.create(*options)
-
+  
+  @staticmethod
+  def reverse_populate(node, conf, archive):
+    """
+    """
+    if not hasattr(conf, 'db_model'):
+      print "ERROR: Specified graph is not database-backed!"
+      exit(1)
+    
+    if os.path.isfile(archive):
+      print "ERROR: RRD exists for given graph. Please remove it before proceeding."
+      exit(1)
+    
+    items = conf.db_model.objects.filter(node = node).order_by("timestamp")
+    RRA.create(conf, archive, start = int(time.mktime(items[0].timestamp.timetuple())) - 10)
+    
+    for item in items:
+      values = []
+      for x in conf.sources:
+        v = str(getattr(item, x.name))
+        values.append(v if v is not None else "U")
+      
+      rrdtool.update(
+        archive,
+        "%d:%s" % (int(time.mktime(item.timestamp.timetuple())), ":".join(values))
+      )
+  
   @staticmethod
   def update(node, conf, archive, *values):
     """
