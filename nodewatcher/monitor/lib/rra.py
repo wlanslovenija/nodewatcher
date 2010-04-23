@@ -279,10 +279,24 @@ class RRARTT(RRAConfiguration):
     ),
   ]
   graph = [
-    "LINE1:rtt#0000ff:RTT [ms]",
+    "CDEF:delta=rtt_max,rtt_min,-",
+    "LINE1:rtt_min::",
+    "AREA:delta#dfdfdf::STACK",
+    
+    "LINE1:rtt#0000ff:AVG [ms]",
     r'GPRINT:rtt:LAST:  Current\:%8.2lf',
     r'GPRINT:rtt:AVERAGE:Average\:%8.2lf',
     r'GPRINT:rtt:MAX:Maximum\:%8.2lf\n',
+    "LINE1:rtt_min#c5c5c5:MIN [ms]",
+    r'GPRINT:rtt_min:LAST:  Current\:%8.2lf',
+    r'GPRINT:rtt_min:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:rtt_min:MAX:Maximum\:%8.2lf\n',
+    "LINE1:rtt_max#c5c5c5:MAX [ms]",
+    r'GPRINT:rtt_max:LAST:  Current\:%8.2lf',
+    r'GPRINT:rtt_max:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:rtt_max:MAX:Maximum\:%8.2lf\n',
+    "LINE1:rtt#0000ff:",
+    
     '--alt-y-grid',
     '--units-exponent', '0',
     '--lower-limit', '0'
