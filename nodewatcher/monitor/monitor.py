@@ -398,13 +398,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
   # Add LQ/ILQ graphs
   if n.peers > 0:
     lq_avg = ilq_avg = 0.0
-    for peer in peers:
-      lq_avg += float(peer[1])
-      ilq_avg += float(peer[2])
+    for peer in n.get_peers():
+      lq_avg += float(peer.lq)
+      ilq_avg += float(peer.ilq)
     
     lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Average Link Quality', 'lq', lq_avg / n.peers, ilq_avg / n.peers)
 
-    for peer in n.src.all():
+    for peer in n.get_peers():
       add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s' % peer.dst.pk, peer.lq, peer.ilq, parent = lq_graph)
 
   n.last_seen = datetime.now()
@@ -440,6 +440,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
 
       if n.has_time_sync_problems():
         NodeWarning.create(n, WarningCode.TimeOutOfSync, EventSource.Monitor)
+      
+      if 'net' in info:
+        loss_count = safe_int_convert(info['net']['losses'])
+        if loss_count > n.loss_count and loss_count > 1:
+          Event.create_event(n, EventCode.ConnectivityLoss, '', EventSource.Monitor, data = 'Old count: %s\n  New count: %s' % (n.loss_count, loss_count))
+        
+        n.loss_count = loss_count
       
       # Parse nodogsplash client information
       oldNdsStatus = n.captive_portal_status

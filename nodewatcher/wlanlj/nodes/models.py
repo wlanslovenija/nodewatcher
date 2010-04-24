@@ -201,6 +201,7 @@ class Node(models.Model):
   reported_uuid = models.CharField(max_length = 40, null = True)
   thresh_rts = models.IntegerField(null = True)
   thresh_frag = models.IntegerField(null = True)
+  loss_count = models.IntegerField(null = True)
   
   def reset(self):
     """
@@ -232,6 +233,7 @@ class Node(models.Model):
     self.captive_portal_status = True
     self.thresh_rts = None
     self.thresh_frag = None
+    self.loss_count = None
 
     # Mark related graph items for removal by the monitoring daemon
     self.graphitem_set.all().update(need_removal = True)
@@ -1199,6 +1201,7 @@ class EventCode:
   UnknownNodeAppeared = 17
   UnknownNodeDisappeared = 18
   AdjacencyEstablished = 19
+  ConnectivityLoss = 20
 
   NodeAdded = 100
   NodeRenamed = 101
@@ -1259,6 +1262,8 @@ class EventCode:
       return _("Node has been renumbered")
     elif code == EventCode.AdjacencyEstablished:
       return _("Adjacency established")
+    elif code == EventCode.ConnectivityLoss:
+      return _("Connectivity loss has been detected")
     else:
       return _("Unknown event")
 
