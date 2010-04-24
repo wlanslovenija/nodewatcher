@@ -565,6 +565,7 @@ class Link(models.Model):
   lq = models.FloatField()
   ilq = models.FloatField()
   etx = models.FloatField()
+  vtime = models.FloatField()
 
   def should_draw_on_map(self):
     """
