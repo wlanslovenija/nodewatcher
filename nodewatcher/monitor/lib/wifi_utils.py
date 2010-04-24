@@ -2,6 +2,8 @@
 import re
 import urllib
 import subprocess
+import logging
+from traceback import format_exc
 
 # A flag that specifies when we should save fetched data for simulation purpuses
 COLLECT_SIMULATION_DATA = False
@@ -63,7 +65,12 @@ def parse_tables(data):
       continue
     
     if currentTable == 'Topology':
-      srcIp, dstIp, LQ, ILQ, ETX = line.split('\t')
+      try:
+        srcIp, dstIp, LQ, ILQ, ETX, vtime = line.split('\t')
+      except ValueError:
+        srcIp, dstIp, LQ, ILQ, ETX = line.split('\t')
+        vtime = 0.0
+
       try:
         if not float(ETX):
           continue
@@ -74,19 +81,15 @@ def parse_tables(data):
       srcNode = create_node(srcIp, nodes, hna)
       dstNode = create_node(dstIp, nodes, hna)
 
-      srcNode.links.append((dstIp, LQ, ILQ, ETX))
+      srcNode.links.append((dstIp, LQ, ILQ, ETX, vtime))
     elif currentTable == 'HNA':
-      try:
-        network, cidr, gwIp = line.split('\t')
-      except ValueError:
-        # Newer OLSR versions have changed the format
-        network, gwIp = line.split('\t')
-        network, cidr = network.split('/')
+      network, gwIp = line.split('\t')[0:2]
+      network, cidr = network.split('/')
 
       node = hna.setdefault(gwIp, [])
       node.append('%s/%s' % (network, cidr))
     elif currentTable == 'MID':
-      ip, alias = line.split('\t')
+      ip, alias = line.split('\t')[0:2]
       alias = alias.split(';')
 
       # Treat MIDs as /32 HNAs
@@ -114,6 +117,7 @@ def get_tables(olsr_ip = "127.0.0.1"):
     
     return parse_tables(data)
   except:
+    logging.warning(format_exc())
     return None
 
 def parse_fping(data):

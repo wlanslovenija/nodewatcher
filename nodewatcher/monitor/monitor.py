@@ -627,7 +627,11 @@ def check_mesh_status():
   Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
-  nodes, hna = wifi_utils.get_tables(settings.MONITOR_OLSR_HOST)
+  try:
+    nodes, hna = wifi_utils.get_tables(settings.MONITOR_OLSR_HOST)
+  except TypeError:
+    logging.error("Unable to fetch routing tables from '%s'!" % settings.MONITOR_OLSR_HOST)
+    return
 
   # Ping nodes present in the database and visible in OLSR
   dbNodes = {}
@@ -721,8 +725,8 @@ def check_mesh_status():
     oldRedundancyLink = n.redundancy_link
     n.redundancy_link = False
 
-    for peerIp, lq, ilq, etx in node.links:
-      l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx))
+    for peerIp, lq, ilq, etx, vtime in node.links:
+      l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx), vtime = vtime)
       l.save()
       
       # Check if any of the peers has never peered with us before
