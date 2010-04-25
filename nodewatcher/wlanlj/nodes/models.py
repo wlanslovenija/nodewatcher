@@ -1461,6 +1461,9 @@ class WarningCode:
   AnnounceConflict = 9
   MismatchedUuid = 10
   LongRenumber = 11
+  OptPackageNotFound = 12
+  BSSIDMismatch = 13
+  ESSIDMismatch = 14
   
   Custom = 100
   
@@ -1494,6 +1497,12 @@ class WarningCode:
       return _("Reported node UUID does not match this node! This might indicate a node/firmware mismatch.")
     elif code == WarningCode.LongRenumber:
       return _("Node has been stuck in renumbering state for more than a week!")
+    elif code == WarningCode.OptPackageNotFound:
+      return _("Selected optional packages not found in installed node packages!")
+    elif code == WarningCode.BSSIDMismatch:
+      return _("WiFi BSSID does not match node configuration!")
+    elif code == WarningCode.ESSIDMismatch:
+      return _("WiFi ESSID does not match node configuration!")
     else:
       return _("Unknown warning")
 

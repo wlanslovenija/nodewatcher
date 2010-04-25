@@ -45,7 +45,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
 from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning
-from wlanlj.generator.models import Template
+from wlanlj.generator.models import Template, Profile
 from django.db import transaction, models, connection
 from django.conf import settings
 
@@ -424,6 +424,16 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       n.clients = 0
       n.uptime = safe_uptime_convert(info['general']['uptime'])
       
+      # Validate BSSID and ESSID
+      if n.bssid != "02:CA:FF:EE:BA:BE":
+        NodeWarning.create(n, WarningCode.BSSIDMismatch, EventSource.Monitor)
+      
+      try:
+        if n.essid != n.project.ssid:
+          NodeWarning.create(n, WarningCode.ESSIDMismatch, EventSource.Monitor)
+      except Project.DoesNotExist:
+        pass
+      
       if 'uuid' in info['general']:
         n.reported_uuid = info['general']['uuid']
         if n.reported_uuid and n.reported_uuid != n.uuid:
@@ -456,8 +466,11 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           
           # Create a node warning when captive portal is down and the node has it
           # selected in its image generator profile
-          if not n.profile or n.profile.use_captive_portal:
-            NodeWarning.create(n, WarningCode.CaptivePortalDown, EventSource.Monitor)
+          try:
+            if n.profile.use_captive_portal:
+              NodeWarning.create(n, WarningCode.CaptivePortalDown, EventSource.Monitor)
+          except Profile.DoesNotExist:
+            pass
         else:
           n.captive_portal_status = True
 
@@ -511,7 +524,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
       if len(wifiSubnet) and n.clients > max(0, ipcalc.Network(wifiSubnet[0].subnet, wifiSubnet[0].cidr).size() - 4):
         Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifiSubnet[0], n.clients))
-
+      
       # Record interface traffic statistics for all interfaces
       for iid, iface in info['iface'].iteritems():
         if iid not in ('wifi0', 'wmaster0'):
@@ -584,6 +597,18 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           package.version = version
           package.last_update = datetime.now()
           package.save()
+      
+      # Check if all selected optional packages are present in package listing
+      try:
+        missing_packages = []
+        for package in n.profile.optional_packages.all():
+          if n.installedpackage_set.filter(name = package.name).count() == 0:
+            missing_packages.append(package.name)
+        
+        if missing_packages:
+          NodeWarning.create(n, WarningCode.OptPackageNotFound, EventSource.Monitor, summary = ", ".join(missing_packages))
+      except Profile.DoesNotExist:
+        pass
       
       # Check if DNS works
       if 'dns' in info:
