@@ -1464,8 +1464,11 @@ class WarningCode:
   OptPackageNotFound = 12
   BSSIDMismatch = 13
   ESSIDMismatch = 14
+  VPNMacMismatch = 15
+  VPNLimitMismatch = 16
   
   Custom = 100
+  NodewatcherInterpretFailed = 101
   
   @staticmethod
   def to_string(code):
@@ -1503,6 +1506,12 @@ class WarningCode:
       return _("WiFi BSSID does not match node configuration!")
     elif code == WarningCode.ESSIDMismatch:
       return _("WiFi ESSID does not match node configuration!")
+    elif code == WarningCode.VPNMacMismatch:
+      return _("Reported VPN MAC address does not match assigned MAC address! Download traffic limits will not work.") 
+    elif code == WarningCode.VPNLimitMismatch:
+      return _("Reported VPN upload traffic limit does not match the configured value!")
+    elif code == WarningCode.NodewatcherInterpretFailed:
+      return _("There was a problem while interpreting nodewatcher output from this node! Please check monitor exception log for more information.")
     else:
       return _("Unknown warning")
 

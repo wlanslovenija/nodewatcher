@@ -457,6 +457,20 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           Event.create_event(n, EventCode.ConnectivityLoss, '', EventSource.Monitor, data = 'Old count: %s\n  New count: %s' % (n.loss_count, loss_count))
         
         n.loss_count = loss_count
+        
+        # Check VPN configuration 
+        if 'vpn' in info['net']:
+          n.vpn_mac = info['net']['vpn']['mac'] or None
+          upload_limit = safe_int_convert(info['net']['vpn']['upload_limit'][:-3]) // 1000
+          
+          if n.vpn_mac and n.vpn_mac != n.vpn_mac_conf:
+            NodeWarning.create(n, WarningCode.VPNMacMismatch, EventSource.Monitor)
+          
+          try:
+            if upload_limit != n.profile.vpn_egress_limit:
+              NodeWarning.create(n, WarningCode.VPNLimitMismatch, EventSource.Monitor)
+          except Profile.DoesNotExist:
+            pass
       
       # Parse nodogsplash client information
       oldNdsStatus = n.captive_portal_status
@@ -512,10 +526,6 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       if 'rts' in info['wifi'] and 'frag' in info['wifi']:
         n.thresh_rts = safe_int_convert(info['wifi']['rts']) or 2347
         n.thresh_frag = safe_int_convert(info['wifi']['frag']) or 2347
-
-      # Check for VPN statistics
-      if 'vpn' in info:
-        n.vpn_mac = info['vpn']['mac']
 
       # Generate a graph for number of clients
       add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients', n.clients)
@@ -625,6 +635,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
             Event.create_event(n, EventCode.DnsResolverFailed, '', EventSource.Monitor)
     except:
       logging.warning(format_exc())
+      NodeWarning.create(n, WarningCode.NodewatcherInterpretFailed, EventSource.Monitor)
 
   n.save()
   
