@@ -226,14 +226,10 @@
     <td>{{ node.uptime|time_delta }}</td>
   </tr>
   {% endif %}
-  {% if node.is_mesh_node %}
+  {% if node.is_mesh_node or node.local_time %}
   <tr>
     <td>{% trans "Local time" %}</td>
     <td>{{ node.local_time|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Connected clients" %}</td>
-    <td>{{ node.clients|default:"0" }} <a href="/nodes/gcl#n{{ node.ip }}"><img src="/images/users.png" title="{% trans "Global client list" %}" alt="{% trans "Global client list" %}" /></a></td>
   </tr>
   {% endif %}
   {% endif %}
