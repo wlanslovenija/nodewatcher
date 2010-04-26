@@ -461,7 +461,10 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         # Check VPN configuration 
         if 'vpn' in info['net']:
           n.vpn_mac = info['net']['vpn']['mac'] or None
-          upload_limit = safe_int_convert(info['net']['vpn']['upload_limit'][:-3]) // 1000
+          try:
+            upload_limit = safe_int_convert(info['net']['vpn']['upload_limit'][:-3]) // 1000
+          except TypeError:
+            upload_limit = None
           
           if n.vpn_mac and n.vpn_mac != n.vpn_mac_conf:
             NodeWarning.create(n, WarningCode.VPNMacMismatch, EventSource.Monitor)
@@ -634,6 +637,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           else:
             Event.create_event(n, EventCode.DnsResolverFailed, '', EventSource.Monitor)
     except:
+      logging.warning("Failed to interpret nodewatcher data for node '%s (%s)'!" % (n.name, n.ip))
       logging.warning(format_exc())
       NodeWarning.create(n, WarningCode.NodewatcherInterpretFailed, EventSource.Monitor)
 
