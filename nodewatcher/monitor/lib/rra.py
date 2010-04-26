@@ -545,10 +545,10 @@ class RRASolar(RRAConfiguration):
   ]
   graph = [
     # State definitions for background areas
-    "CDEF:boost=state,0.8,1.2,LIMIT,state,EQ,INF,0,IF",
-    "CDEF:equalize=state,1.8,2.2,LIMIT,state,EQ,INF,0,IF",
-    "CDEF:absorption=state,2.8,3.2,LIMIT,state,EQ,INF,0,IF",
-    "CDEF:float=state,3.8,4.2,LIMIT,state,EQ,INF,0,IF",
+    "CDEF:boost=state,0.5,1.5,LIMIT,state,EQ,INF,0,IF",
+    "CDEF:equalize=state,1.5,2.5,LIMIT,state,EQ,INF,0,IF",
+    "CDEF:absorption=state,2.5,3.5,LIMIT,state,EQ,INF,0,IF",
+    "CDEF:float=state,3.5,4.5,LIMIT,state,EQ,INF,0,IF",
     "CDEF:inval=state,UN,INF,0,IF",
     
     # Graphical elements
