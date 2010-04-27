@@ -453,7 +453,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       
       if 'net' in info:
         loss_count = safe_int_convert(info['net']['losses'])
-        if loss_count > n.loss_count and loss_count > 1:
+        if loss_count != n.loss_count and loss_count > 1:
           Event.create_event(n, EventCode.ConnectivityLoss, '', EventSource.Monitor, data = 'Old count: %s\n  New count: %s' % (n.loss_count, loss_count))
         
         n.loss_count = loss_count
