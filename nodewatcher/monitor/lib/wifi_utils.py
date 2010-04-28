@@ -8,6 +8,9 @@ from traceback import format_exc
 # A flag that specifies when we should save fetched data for simulation purpuses
 COLLECT_SIMULATION_DATA = False
 
+# Location of fping binary
+FPING_BIN = '/usr/sbin/fping'
+
 class OlsrNode(object):
   """
   A simple class used for containing topology information received
@@ -160,7 +163,7 @@ def ping_hosts(count, hosts, packet_size = 56):
   
   # Spawn the fping process to ping hosts in parallel
   process = subprocess.Popen(
-    ['/usr/sbin/fping', '-c', str(count), '-q', '-b%d' % packet_size] + hosts,
+    [FPING_BIN, '-c', str(count), '-q', '-b%d' % packet_size] + hosts,
     stdout = subprocess.PIPE,
     stderr = subprocess.PIPE
   )

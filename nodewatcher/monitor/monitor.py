@@ -450,6 +450,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
 
       if n.has_time_sync_problems():
         NodeWarning.create(n, WarningCode.TimeOutOfSync, EventSource.Monitor)
+
+      if 'errors' in info['wifi']:
+        error_count = safe_int_convert(info['wifi']['errors'])
+        if error_count != n.wifi_error_count and error_count > 0:
+          Event.create_event(n, EventCode.WifiErrors, '', EventSource.Monitor, data = 'Old count: %s\n  New count: %s' % (n.wifi_error_count, error_count))
+        
+        n.wifi_error_count = error_count
       
       if 'net' in info:
         loss_count = safe_int_convert(info['net']['losses'])
@@ -971,6 +978,20 @@ if __name__ == '__main__':
     #os.setuid(info.pw_uid)
   except:
     logging.warning("Failed to chown monitor RRA storage directory!")
+  
+  # Autodetect fping location
+  FPING_LOCATIONS = [
+    '/usr/sbin/fping',
+    '/usr/bin/fping'
+  ]
+  for fping_loc in FPING_LOCATIONS:
+    if os.path.isfile(fping_loc):
+      wifi_utils.FPING_BIN = fping_loc
+      logging.info("Found fping in %s." % fping_loc)
+      break
+  else:
+    print "ERROR: Failed to find fping binary! Check that it is installed properly."
+    exit(1)
 
   # Check if we should just regenerate the graphs
   if options.regenerate_graphs:

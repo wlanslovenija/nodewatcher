@@ -202,6 +202,7 @@ class Node(models.Model):
   thresh_rts = models.IntegerField(null = True)
   thresh_frag = models.IntegerField(null = True)
   loss_count = models.IntegerField(null = True)
+  wifi_error_count = models.IntegerField(null = True)
   
   def reset(self):
     """
@@ -234,6 +235,7 @@ class Node(models.Model):
     self.thresh_rts = None
     self.thresh_frag = None
     self.loss_count = None
+    self.wifi_error_count = None
 
     # Mark related graph items for removal by the monitoring daemon
     self.graphitem_set.all().update(need_removal = True)
@@ -1203,6 +1205,7 @@ class EventCode:
   UnknownNodeDisappeared = 18
   AdjacencyEstablished = 19
   ConnectivityLoss = 20
+  WifiErrors = 21
 
   NodeAdded = 100
   NodeRenamed = 101
@@ -1265,6 +1268,8 @@ class EventCode:
       return _("Adjacency established")
     elif code == EventCode.ConnectivityLoss:
       return _("Connectivity loss has been detected")
+    elif code == EventCode.WifiErrors:
+      return _("WiFi interface errors have been detected")
     else:
       return _("Unknown event")
 

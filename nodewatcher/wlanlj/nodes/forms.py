@@ -910,7 +910,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.NodeRemoved, _("Node has been removed")),
       (EventCode.NodeRenumbered, _("Node has been renumbered")),
       (EventCode.AdjacencyEstablished, _("Adjacency established")),
-      (EventCode.ConnectivityLoss, _("Connectivity loss has been detected"))
+      (EventCode.ConnectivityLoss, _("Connectivity loss has been detected")),
+      (EventCode.WifiErrors, _("WiFi interface errors have been detected"))
     ],
     required = False
   )
