@@ -243,6 +243,10 @@ class Node(models.Model):
     
     # Clear adjacency history
     self.peer_history.clear()
+    
+    # Clear tweets
+    for t in self.tweets.all():
+      t.delete()
   
   def adapt_to_router_type(self):
     """
@@ -1664,6 +1668,38 @@ class InstalledPackage(models.Model):
   version = models.CharField(max_length = 50)
   last_update = models.DateTimeField()
 
+class Tweet(models.Model):
+  """
+  This class represents a tweet.
+  """
+  tweet_id = models.IntegerField(null = False, blank = False, unique = True)
+  node = models.ForeignKey(Node, null = False, related_name = 'tweets')
+  
+  @staticmethod
+  def tweets_enabled():
+    return getattr(settings, 'BITLY_LOGIN', None) and getattr(settings, 'BITLY_API_KEY', None) and getattr(settings, 'TWITTER_USERNAME', None) and getattr(settings, 'TWITTER_PASSWORD', None)
+  
+  @staticmethod
+  def post_tweet(node, msg):
+    if not Tweet.tweets_enabled():
+      return
+  
+    import twitter
+    twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
+    status = twitter_api.PostUpdate(msg)
+    
+    t = Tweet(node = node, tweet_id = status.id)
+    t.save()
+    return t
+  
+  def delete(self, *args, **kwargs):
+    if Tweet.tweets_enabled():
+      import twitter
+      twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
+      twitter_api.DestroyStatus(self.tweet_id)
+    
+    super(Tweet, self).save(*args, **kwargs)
+
 def subnet_on_delete_callback(sender, **kwargs):
   """
   On delete callback for Subnets.
@@ -1699,4 +1735,3 @@ def node_on_delete_callback(sender, **kwargs):
 
 models.signals.pre_delete.connect(subnet_on_delete_callback, sender = Subnet)
 models.signals.pre_delete.connect(node_on_delete_callback, sender = Node)
-

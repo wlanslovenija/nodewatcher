@@ -44,7 +44,7 @@ sys.path.append(options.path)
 os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning
+from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning, Tweet
 from wlanlj.generator.models import Template, Profile
 from django.db import transaction, models, connection
 from django.conf import settings
@@ -72,12 +72,8 @@ import time
 import multiprocessing
 import gc
 
-def tweets_enabled():
-  return getattr(settings, 'BITLY_LOGIN', None) and getattr(settings, 'BITLY_API_KEY', None) and getattr(settings, 'TWITTER_USERNAME', None) and getattr(settings, 'TWITTER_PASSWORD', None)
-
-if tweets_enabled():
+if Tweet.tweets_enabled():
   from lib import bitly
-  import twitter
 
 RRA_CONF_MAP = {
   GraphType.RTT         : RRARTT,
@@ -320,15 +316,14 @@ def generate_new_node_tweet(node):
   """
   Generates a tweet when a new node connects to the mesh.
   """
-  if not tweets_enabled():
+  if not Tweet.tweets_enabled():
     return
   
   try:
     bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
-    twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
     node_link = bit_api.shorten(node.get_full_url())
     msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
-    twitter_api.PostUpdate(msg)
+    Tweet.post_tweet(node, msg)
   except:
     logging.warning("%s/%s: %s" % (node.name, node.ip, format_exc()))
 
