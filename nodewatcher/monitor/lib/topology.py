@@ -1,4 +1,5 @@
 import subprocess
+from traceback import print_exc
 from wlanlj.nodes.models import NodeType
 
 class DotTopologyPlotter:
@@ -64,25 +65,27 @@ class DotTopologyPlotter:
 
     self.__output += "".join(links.values())
 
-  def save(self, filename):
+  def save(self, filename_graph, filename_dot):
     """
     Saves generated graph to a PNG file.
 
-    @param filename: The filename
+    @param filename_graph: The filename of resulting graph image
+    @param filename_dot: The filename of resulting graph dot file
     """
-    s = "graph topology {\n%s}\n" % self.__output
-    process = subprocess.Popen(
-      [
-        '/usr/bin/neato', '-Tpng',
-        '-Gsize=10.0,1000.0', '-Gfontpath=/usr/share/fonts/corefonts',
-        '-Nfontname=verdana', '-Nfontsize=12',
-        '-Efontname=verdana', '-Efontsize=10', '-Elen=3', '-Earrowsize=1',
-        '-o', filename
-      ],
-      stdin = subprocess.PIPE,
-      stdout = subprocess.PIPE,
-      stderr = subprocess.PIPE
-    )
+    dot = open(filename_dot, 'w')
+    dot.write("graph topology {\n%s}\n" % self.__output)
+    dot.close()
     
-    process.communicate(s)
-
+    try:
+      subprocess.check_call(
+        [
+          '/usr/bin/neato', '-Tpng',
+          '-Gsize=10.0,1000.0', '-Gfontpath=/usr/share/fonts/corefonts',
+          '-Nfontname=verdana', '-Nfontsize=12',
+          '-Efontname=verdana', '-Efontsize=10', '-Elen=3', '-Earrowsize=1',
+          '-o', filename_graph,
+          filename_dot
+        ]
+      )
+    except:
+      print_exc()

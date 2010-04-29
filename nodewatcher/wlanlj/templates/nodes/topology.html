@@ -6,7 +6,7 @@
 
 {% block content %}
 <br/>
-<img src="http://nodes.wlan-lj.net/graphs/mesh_topology.png" alt="{% trans "Mesh Topology View" %}" /><br/>
+<img src="/graphs/mesh_topology.png" alt="{% trans "Mesh Topology View" %}" /><br/>
 <br/>
 <br/>
 {% trans "Edge color key" %}:<br/>
@@ -23,5 +23,11 @@
   <li><span style="background-color: #A7F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "testing node" %}</li>
   <li><span style="background-color: #F26006;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "unknown node (not in node database)" %}</li>
 </ul>
-<br/>
+{% endblock %}
+
+{% block altlinks %}
+  <h3>{% trans "Download in other formats" %}:</h3>
+  <ul>
+    <li class="first last"><a href="/graphs/mesh_topology.dot">{% trans "Dot File" %}</a></li>
+  </ul>
 {% endblock %}

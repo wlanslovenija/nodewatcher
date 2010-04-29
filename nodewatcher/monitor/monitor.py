@@ -800,15 +800,12 @@ def check_mesh_status():
     n.save()
   
   # Add nodes to topology map and generate output
-  if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
-    pass
-  else:
+  if not getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
     # Only generate topology when graphing is not disabled
     topology = DotTopologyPlotter()
     for node in dbNodes.values():
       topology.addNode(node)
-
-    topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'))
+    topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'), os.path.join(settings.GRAPH_DIR, 'mesh_topology.dot'))
 
   # Update valid subnet status in the database
   for nodeIp, subnets in hna.iteritems():
