@@ -1,4 +1,5 @@
 import subprocess
+import logging
 from traceback import print_exc
 from wlanlj.nodes.models import NodeType
 
@@ -88,4 +89,4 @@ class DotTopologyPlotter:
         ]
       )
     except:
-      print_exc()
+      logging.warning(print_exc())
