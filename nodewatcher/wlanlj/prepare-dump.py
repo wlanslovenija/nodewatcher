@@ -1,4 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+# This script is used to prepare daily database dump
 
 # Setup import paths, since we are using Django models
 import sys, os

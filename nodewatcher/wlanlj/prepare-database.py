@@ -1,4 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+# This script prepares the database for nodewatcher and optionally injects existing data from dump file (passed as argument)
 
 # Setup import paths, since we are using Django models
 import sys, os
@@ -12,6 +14,7 @@ from django.core import serializers
 from django.core.management.color import no_style
 import time
 from traceback import print_exc
+import subprocess
 
 if len(sys.argv) > 2:
   print "Usage: %s [<dump file>]" % sys.argv[0]
@@ -42,7 +45,7 @@ if os.path.isfile('scripts/%s_init.sh' % db_backend):
     exit(1)
 
   print ">>> Executing database setup script 'scripts/%s_init.sh'..." % db_backend
-  ensure_success(os.system("scripts/%s_init.sh %s" % (db_backend, settings.DATABASE_NAME)))
+  ensure_success(subprocess.call(["scripts/%s_init.sh" % db_backend, settings.DATABASE_NAME]))
 else:
   print "!!! NOTE: This script assumes that you have created and configured"
   print "!!! a proper database via settings.py! The database MUST be completely"
@@ -64,9 +67,9 @@ else:
 
 print ">>> Performing initial database sync..."
 if len(sys.argv) < 2:
-  ensure_success(os.system("%s manage.py syncdb" % sys.executable))
+  ensure_success(subprocess.call([sys.executable, "-u", "manage.py", "syncdb"]))
 else:
-  ensure_success(os.system("%s manage.py syncdb --noinput" % sys.executable))
+  ensure_success(subprocess.call([sys.executable, "-u", "manage.py", "syncdb", "--noinput"]))
 
 if len(sys.argv) < 2:
   print ">>> Initialization completed."
