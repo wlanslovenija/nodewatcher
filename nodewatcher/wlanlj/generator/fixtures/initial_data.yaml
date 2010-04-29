@@ -299,7 +299,7 @@
 #
 # Optional packages
 #
-- fields: {description: Package for solar powered nodes, fancy_name: solar, name: solar}
+- fields: {description: package for solar powered nodes, fancy_name: solar, name: solar}
   model: generator.optionalpackage
   pk: 1
 - fields: {description: USB support, fancy_name: kmod-usb-core, name: kmod-usb-core}
