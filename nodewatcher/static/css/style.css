@@ -342,7 +342,7 @@ table.warnings td {
   vertical-align: top;
 }
 
-table.warnings .description {
+table.warnings .help, table.warnings .datetime {
   font-size: 10px;
   color: #93544B;
 }

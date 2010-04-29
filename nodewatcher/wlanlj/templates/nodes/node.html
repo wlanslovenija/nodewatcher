@@ -3,11 +3,10 @@
 {% load conversion %}
 {% load gmap %}
 
-
 {% block title %}{% trans "Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block heading %}<img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block content %}
-{{ node.render_warnings }}
+{% include "nodes/warnings.html" %}
 {% if node.awaiting_renumber %}
 <div class="notice">
   {% blocktrans with node.get_renumbered_ip as renumbered_ip and node.get_original_ip as original_ip %}

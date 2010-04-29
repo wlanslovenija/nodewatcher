@@ -245,7 +245,7 @@ def node(request, node):
   return render_to_response('nodes/node.html',
     { 'node' : node ,
       'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS],
-      'current_owner' : node.status != NodeStatus.Invalid and (node.owner == request.user or request.user.is_staff) },
+      'current_owner' : node.is_current_owner(request) },
     context_instance = RequestContext(request)
   )
 

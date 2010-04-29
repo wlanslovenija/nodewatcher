@@ -432,17 +432,6 @@ class Node(models.Model):
     """
     return self.warning_list.all().order_by('created_at')
   
-  def render_warnings(self):
-    """
-    Renders the HTML template for warnings.
-    """
-    t = loader.get_template('nodes/warnings.html')
-    c = Context({
-      'node'  : self
-    })
-
-    return t.render(c)
-  
   def get_stability(self):
     """
     Returns this node's stability factor.
@@ -539,6 +528,9 @@ class Node(models.Model):
   
   def get_absolute_url(self):
     return "/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
+  
+  def is_current_owner(self, request):
+    return self.status != NodeStatus.Invalid and (self.owner == request.user or request.user.is_staff)
   
   def save(self, **kwargs):
     """
@@ -1162,13 +1154,13 @@ class EventSource:
     elif source == EventSource.NodeDatabase:
       return _("Node database")
     else:
-      return _("Unknown source")
+      return _("unknown")
 
   @staticmethod
   def to_identifier(source):
     """
     A helper method for transforming a source identifier to a
-    human readable string.
+    machine readable string.
     
     @param source: A valid source identifier
     """
@@ -1271,7 +1263,7 @@ class EventCode:
     elif code == EventCode.WifiErrors:
       return _("WiFi interface errors have been detected")
     else:
-      return _("Unknown event")
+      return _("unknown event")
 
 class Event(models.Model):
   """
@@ -1476,10 +1468,10 @@ class WarningCode:
   NodewatcherInterpretFailed = 101
   
   @staticmethod
-  def to_string(code):
+  def to_description_string(code):
     """
     A helper method for transforming a warning code to a human
-    readable string.
+    readable description string.
 
     @param code: A valid warning code
     """
@@ -1494,15 +1486,15 @@ class WarningCode:
     elif code == WarningCode.TimeOutOfSync:
       return _("Node's local clock is more than 30 minutes out of sync!")
     elif code == WarningCode.NoBorderPeering:
-      return _("Node requires direct border gateway peering but has none!")
+      return _("Node requires direct border gateway peering (includes VPN servers) but has none!")
     elif code == WarningCode.CaptivePortalDown:
       return _("Captive portal daemon is down!")
     elif code == WarningCode.DnsDown:
       return _("Node's DNS resolver does not respond!")
     elif code == WarningCode.AnnounceConflict:
-      return _("Node is announcing or has allocated one or more subnets that are in conflict with other nodes! Please check subnet listing and investigate why the problem is ocurring!")
+      return _("Node is announcing or has allocated one or more subnets that are in conflict with other nodes!")
     elif code == WarningCode.MismatchedUuid:
-      return _("Reported node UUID does not match this node! This might indicate a node/firmware mismatch.")
+      return _("Reported node UUID does not match this node!")
     elif code == WarningCode.LongRenumber:
       return _("Node has been stuck in renumbering state for more than a week!")
     elif code == WarningCode.OptPackageNotFound:
@@ -1512,13 +1504,58 @@ class WarningCode:
     elif code == WarningCode.ESSIDMismatch:
       return _("WiFi ESSID does not match node configuration!")
     elif code == WarningCode.VPNMacMismatch:
-      return _("Reported VPN MAC address does not match assigned MAC address! Download traffic limits will not work.") 
+      return _("Reported VPN MAC address does not match assigned MAC address!") 
     elif code == WarningCode.VPNLimitMismatch:
       return _("Reported VPN upload traffic limit does not match the configured value!")
     elif code == WarningCode.NodewatcherInterpretFailed:
-      return _("There was a problem while interpreting nodewatcher output from this node! Please check monitor exception log for more information.")
+      return _("There was a problem while interpreting nodewatcher output from this node!")
     else:
-      return _("Unknown warning")
+      return _("unknown warning")
+     
+  @staticmethod
+  def to_help_string(code):
+    """
+    A helper method for transforming a warning code to a human
+    readable help string.
+
+    @param code: A valid warning code
+    """
+    if code == WarningCode.UnregisteredNode:
+      return _("Please register a node and use assigned configuration and IP address or contact network administrators to resolve the issue.")
+    elif code == WarningCode.DupedReplies:
+      return _("Probably just a temporary glitch but if it persists it could signify dangerous routing cycles.")
+    elif code == WarningCode.UnregisteredAnnounce:
+      return _("Please use only registered subnets otherwise serious conflicts between node configurations can happen.")
+    elif code == WarningCode.OwnNotAnnounced:
+      return _("Could be a temporary glitch but if it persists the node is probably not configured correctly or have not yet been flashed with new configuration.")
+    elif code == WarningCode.TimeOutOfSync:
+      return _("Clock can be out of sync just after the node boots up but if it persists it could signify a firmware bug.")
+    elif code == WarningCode.NoBorderPeering:
+      return _("Link to a VPN server has probably fallen. If link does not reconnect soon please investigate node's Internet uplink.")
+    elif code == WarningCode.CaptivePortalDown:
+      return _("Could be a temporary glitch but if it persists it could signify a firmware bug.")
+    elif code == WarningCode.DnsDown:
+      return _("Could be a temporary glitch especially on nodes with unstable link to the mesh. If it persists it could signify a firmware bug or a network's DNS server problems.")
+    elif code == WarningCode.AnnounceConflict:
+      return _("Please check subnets list and investigate why the problem is occurring. Conflicts hinder connectivity in the network and are a really serious problem.")
+    elif code == WarningCode.MismatchedUuid:
+      return _("This is a bug or really strange things are happening. Please report it.")
+    elif code == WarningCode.LongRenumber:
+      return _("Please flash the node with new firmeware image to apply new configuration.")
+    elif code == WarningCode.OptPackageNotFound:
+      return _("If you do not want this package/s anymore please deselect it/them in node configuration.")
+    elif code == WarningCode.BSSIDMismatch:
+      return _("The node will not connect with other nodes in the mesh because of this. It is probably a bug. Please report it.")
+    elif code == WarningCode.ESSIDMismatch:
+      return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get into a contact with network administrators to arrange new project entry with you own ESSID for you.")
+    elif code == WarningCode.VPNMacMismatch:
+      return _("Download traffic limits will not work because of this. It is very likely a bug. Please report it.") 
+    elif code == WarningCode.VPNLimitMismatch:
+      return _("If you changed configured traffic limits you have to flash the node with new firmware image to apply new configuration. Or it could be a bug somewhere.")
+    elif code == WarningCode.NodewatcherInterpretFailed:
+      return _("Please check monitor log for more information or inform network administrator do to so. There is a bug somewhere.")
+    else:
+      return None
 
 class NodeWarning(models.Model):
   """
@@ -1527,19 +1564,37 @@ class NodeWarning(models.Model):
   node = models.ForeignKey(Node, related_name = 'warning_list')
   code = models.IntegerField()
   source = models.IntegerField()
-  summary = models.CharField(max_length = 100)
+  details = models.TextField()
   created_at = models.DateTimeField()
   last_update = models.DateTimeField()
   dirty = models.BooleanField(default = False)
   
-  def code_to_string(self):
+  def to_description_string(self):
     """
-    Converts an event code to a human readable string.
+    Converts a warning to a human readable description string.
     """
     if self.code == WarningCode.Custom:
-      return self.summary
+      return self.details
     else:
-      return WarningCode.to_string(self.code)
+      return WarningCode.to_description_string(self.code)
+    
+  def to_help_string(self):
+    """
+    Converts a warning to a human readable help string.
+    """
+    if self.code == WarningCode.Custom:
+      return None
+    else:
+      return WarningCode.to_help_string(self.code)
+  
+  def get_details(self):
+    """
+    Returns warning details.
+    """
+    if self.code == WarningCode.Custom:
+      return None
+    else:
+      return self.details
 
   def source_to_string(self):
     """
@@ -1554,7 +1609,7 @@ class NodeWarning(models.Model):
     return EventSource.to_identifier(self.source)
 
   @staticmethod
-  def create(node, code, source, summary = ''):
+  def create(node, code, source, details = ''):
     """
     A helper method for creating new warnings or updating existing
     ones.
@@ -1562,7 +1617,7 @@ class NodeWarning(models.Model):
     @param nodes: A valid node to warn
     @param code: Warning code
     @param source: Warning source
-    @param summary: Warning summary
+    @param details: Warning details
     """
     node.warnings = True
     
@@ -1573,7 +1628,7 @@ class NodeWarning(models.Model):
           w.last_update = datetime.now()
           w.dirty = True
           w.source = source
-          w.summary = summary
+          w.details = details
           w.save()
         
         return
@@ -1585,7 +1640,7 @@ class NodeWarning(models.Model):
       pass
     
     # New warning creation
-    w = NodeWarning(node = node, code = code, source = source, summary = summary)
+    w = NodeWarning(node = node, code = code, source = source, details = details)
     w.last_update = w.created_at = datetime.now()
     w.dirty = True
     w.save()

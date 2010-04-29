@@ -7,13 +7,18 @@
   <tbody>
     {% for warning in node.get_warnings %}
     <tr class="{% cycle 'odd' 'even' %}">
-      <td class="icon"><img src="/images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="{{ warning.source_to_string }}" /></td>
+      <td class="icon"><img src="/images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="Source: {{ warning.source_to_string|lower }}" /></td>
       <td align="left">
-        {{ warning.created_at|date }}<br />
-        <span class="description">
-          {{ warning.code_to_string }}
-          {% if warning.summary %}<br /><b>{% trans "Details:" %}</b> {{ warning.summary }}{% endif %}
+        <span class="datetime">
+          {{ warning.created_at|date }}<br />
         </span>
+        {{ warning.to_description_string }}
+        {% if current_owner or node.is_invalid %}
+        <span class="help">
+          {% if warning.get_details %}<br /><b>{% trans "Details:" %}</b> {{ warning.get_details }}{% endif %}
+          {% if warning.to_help_string %}<br /><b>{% trans "Help:" %}</b> {{ warning.to_help_string }}{% endif %}
+        </span>
+        {% endif %}
       </td>
     </tr>
     {% endfor %}

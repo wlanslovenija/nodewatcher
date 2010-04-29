@@ -626,7 +626,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
             missing_packages.append(package.name)
         
         if missing_packages:
-          NodeWarning.create(n, WarningCode.OptPackageNotFound, EventSource.Monitor, summary = ", ".join(missing_packages))
+          NodeWarning.create(n, WarningCode.OptPackageNotFound, EventSource.Monitor, details = ("Packages missing: %s" % ", ".join(missing_packages)))
       except Profile.DoesNotExist:
         pass
       
