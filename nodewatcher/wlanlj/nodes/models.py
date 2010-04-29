@@ -1677,10 +1677,19 @@ class Tweet(models.Model):
   
   @staticmethod
   def tweets_enabled():
+    """
+    Returns true if tweets are enabled.
+    """
     return getattr(settings, 'BITLY_LOGIN', None) and getattr(settings, 'BITLY_API_KEY', None) and getattr(settings, 'TWITTER_USERNAME', None) and getattr(settings, 'TWITTER_PASSWORD', None)
   
   @staticmethod
   def post_tweet(node, msg):
+    """
+    Posts a new tweet and links it with the specified node.
+    
+    @param node: Node instance
+    @param msg: Message to tweet
+    """
     if not Tweet.tweets_enabled():
       return
   
@@ -1693,12 +1702,15 @@ class Tweet(models.Model):
     return t
   
   def delete(self, *args, **kwargs):
+    """
+    Deletes this tweet (also via the Twitter API).
+    """
     if Tweet.tweets_enabled():
       import twitter
       twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
       twitter_api.DestroyStatus(self.tweet_id)
     
-    super(Tweet, self).save(*args, **kwargs)
+    super(Tweet, self).delete(*args, **kwargs)
 
 def subnet_on_delete_callback(sender, **kwargs):
   """
