@@ -1672,7 +1672,7 @@ class Tweet(models.Model):
   """
   This class represents a tweet.
   """
-  tweet_id = models.IntegerField(null = False, blank = False, unique = True)
+  tweet_id = models.CharField(max_length = 50, null = False, unique = True)
   node = models.ForeignKey(Node, null = False, related_name = 'tweets')
   
   @staticmethod
