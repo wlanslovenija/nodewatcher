@@ -9,6 +9,9 @@ class DotTopologyPlotter:
   """
   __output = None
   __edges = None
+  
+  # Location of graphviz binary
+  GRAPHVIZ_BIN = '/usr/bin/neato'
 
   def __init__(self):
     """
@@ -80,7 +83,7 @@ class DotTopologyPlotter:
     try:
       subprocess.check_call(
         [
-          '/usr/bin/neato', '-Tpng',
+          DotTopologyPlotter.GRAPHVIZ_BIN, '-Tpng',
           '-Gsize=10.0,1000.0', '-Gfontpath=/usr/share/fonts/corefonts',
           '-Nfontname=verdana', '-Nfontsize=12',
           '-Efontname=verdana', '-Efontsize=10', '-Elen=3', '-Earrowsize=1',

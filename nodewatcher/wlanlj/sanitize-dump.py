@@ -31,6 +31,9 @@ def object_transformator():
       object.vpn_password = 'XXX'
       object.phone = '5551234'
     elif name == 'User':
+      object.first_name = ""
+      object.last_name = ""
+      object.email = "user@example.com"
       object.password = '$1$1qL5F...$ZPQdHpHMsvNQGI4rIbAG70' # Password for all users is 123
     elif name == 'Profile':
       object.root_pass = 'XXX'
@@ -43,4 +46,3 @@ def object_transformator():
 out = open(sys.argv[3], 'w')
 serializers.serialize(sys.argv[1], object_transformator(), stream = out)
 out.close()
-

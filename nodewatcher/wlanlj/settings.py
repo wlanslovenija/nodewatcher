@@ -30,6 +30,11 @@ DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
+# For local development it is better to send all e-mails to console
+# Disable for production use and e-mails will be really send to users
+# With version 1.2 Django supports e-mail backends which can be used instead of this
+EMAIL_TO_CONSOLE = True
+
 EMAIL_HOST = 'localhost'
 EMAIL_SUBJECT_PREFIX = '[wlan-lj] '
 
@@ -130,6 +135,11 @@ INSTALLED_APPS = (
   'wlanlj.policy',
 )
 
+# External programs configuration
+# If you have programs installed in exotic locations you can specify them here
+#GRAPHVIZ_BIN = /path/to/neato
+#FPING_BIN = /path/to/fping
+
 # Graph configuration
 GRAPH_DIR = os.path.join(STATIC_DOC_ROOT, 'graphs').replace('\\', '/')
 GRAPH_TIMESPANS = (
@@ -140,11 +150,10 @@ GRAPH_TIMESPANS = (
 )
 
 # Monitor configuration
-MONITOR_WORKDIR = '/home/monitor'
-MONITOR_WORKERS = 20
+MONITOR_WORKDIR = STATIC_DOC_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/')
+MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections
 MONITOR_GRAPH_WORKERS = 5
 MONITOR_POLL_INTERVAL = 300
-MONITOR_OLSR_HOST = '127.0.0.1'
-MONITOR_USER = 'monitor'
-MONITOR_LOGFILE = '/var/log/wlanlj-monitor.log'
-
+MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
+MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
+MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')

@@ -1439,13 +1439,19 @@ class EventSubscription(models.Model):
     else:
       name_ip = event.node.ip
 
-    send_mail(
-      '[wlan-lj] %s - %s' % (name_ip, event.code_to_string()),
-      t.render(c),
-      'events@wlan-lj.net',
-      [self.user.email],
-      fail_silently = True
-    )
+    # Should we really send an e-mail?
+    if getattr(settings, 'EMAIL_TO_CONSOLE', None):
+      print 'Subject: %s%s - %s' % (settings.EMAIL_SUBJECT_PREFIX or "", name_ip, event.code_to_string())
+      print 'To: %s' % self.user.email
+      print t.render(c)
+    else:
+      send_mail(
+        '%s%s - %s' % (settings.EMAIL_SUBJECT_PREFIX or "", name_ip, event.code_to_string()),
+        t.render(c),
+        'events@wlan-lj.net',
+        [self.user.email],
+        fail_silently = True
+      )
 
 class WarningCode:
   """

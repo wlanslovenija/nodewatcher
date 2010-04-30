@@ -17,6 +17,7 @@ print "=========================================================================
 parser = OptionParser()
 parser.add_option('--path', dest = 'path', help = 'Path that contains "wlanlj" nodewatcher installation')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
+parser.add_option('--olsr-host', dest = 'olsr_host', help = 'A host with OLSR txt-info plugin running (overrides settings file)')
 parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit (only graphs that have the redraw flag set are regenerated)', action = 'store_true')
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
@@ -48,6 +49,10 @@ from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient
 from wlanlj.generator.models import Template, Profile
 from django.db import transaction, models, connection
 from django.conf import settings
+
+# Possibly override MONITOR_OLSR_HOST setting with comomand line option
+if options.olsr_host:
+  settings.MONITOR_OLSR_HOST = options.olsr_host
 
 # Import other stuff
 if getattr(settings, 'MONITOR_ENABLE_SIMULATION', None) or options.stress_test:
@@ -233,9 +238,9 @@ def regenerate_global_statistics_graphs():
   rra_clients = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
   
   try:
-    RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra_traffic)
     RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', rra_status)
     RRA.graph(RRAClients, 'Global Connected Clients', 'global_client_count.png', rra_clients)
+    RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra_traffic) # This should be last as it can fail on installations for local development
   except:
     logging.warning("Unable to regenerate some global statistics graphs!")
 
@@ -973,16 +978,37 @@ if __name__ == '__main__':
   
   # Autodetect fping location
   FPING_LOCATIONS = [
+    getattr(settings, 'FPING_BIN', None),
     '/usr/sbin/fping',
-    '/usr/bin/fping'
+    '/usr/bin/fping',
+    '/sw/sbin/fping'
   ]
   for fping_loc in FPING_LOCATIONS:
+    if not fping_loc:
+      continue
     if os.path.isfile(fping_loc):
       wifi_utils.FPING_BIN = fping_loc
       logging.info("Found fping in %s." % fping_loc)
       break
   else:
     print "ERROR: Failed to find fping binary! Check that it is installed properly."
+    exit(1)
+  
+  # Autodetect graphviz location
+  GRAPHVIZ_LOCATIONS = [
+    getattr(settings, 'GRAPHVIZ_BIN', None),
+    '/usr/bin/neato',
+    '/sw/bin/neato'
+  ]
+  for graphviz_loc in GRAPHVIZ_LOCATIONS:
+    if not graphviz_loc:
+      continue
+    if os.path.isfile(graphviz_loc):
+      DotTopologyPlotter.GRAPHVIZ_BIN = graphviz_loc
+      logging.info("Found graphviz in %s." % graphviz_loc)
+      break
+  else:
+    print "ERROR: Failed to find graphviz binary! Check that it is installed properly."
     exit(1)
 
   # Check if we should just regenerate the graphs
