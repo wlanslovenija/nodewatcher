@@ -150,7 +150,7 @@ GRAPH_TIMESPANS = (
 )
 
 # Monitor configuration
-MONITOR_WORKDIR = STATIC_DOC_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/')
+MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/')
 MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections
 MONITOR_GRAPH_WORKERS = 5
 MONITOR_POLL_INTERVAL = 300
