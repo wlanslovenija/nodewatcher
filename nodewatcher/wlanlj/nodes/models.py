@@ -1712,9 +1712,12 @@ class Tweet(models.Model):
     Deletes this tweet (also via the Twitter API).
     """
     if Tweet.tweets_enabled():
-      import twitter
-      twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
-      twitter_api.DestroyStatus(self.tweet_id)
+      try:
+        import twitter
+        twitter_api = twitter.Api(username = settings.TWITTER_USERNAME, password = settings.TWITTER_PASSWORD)
+        twitter_api.DestroyStatus(self.tweet_id)
+      except:
+        pass
     
     super(Tweet, self).delete(*args, **kwargs)
 
