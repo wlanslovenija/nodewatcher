@@ -137,8 +137,8 @@ INSTALLED_APPS = (
 
 # External programs configuration
 # If you have programs installed in exotic locations you can specify them here
-#GRAPHVIZ_BIN = /path/to/neato
-#FPING_BIN = /path/to/fping
+#GRAPHVIZ_BIN = '/path/to/neato'
+#FPING_BIN = '/path/to/fping'
 
 # Graph configuration
 GRAPH_DIR = os.path.join(STATIC_DOC_ROOT, 'graphs').replace('\\', '/')
