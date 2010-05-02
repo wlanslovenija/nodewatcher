@@ -6,7 +6,7 @@
 
 {% block content %}
   <div class="error">
-      {% trans "<b>WARNING:</b> By issuing a reset command you will loose all node statistics (like last seen, first seen, current uptime, client count and others)! Use this option when you have been just performing testing and therefore current statistics are no longer relevant." %}
+      {% trans "<b>WARNING:</b> By issuing a reset command you will reset (erase) all node statistics and graphs! Use this option <b>only when</b> you have been just <b>performing testing</b> and therefore current statistics are no longer relevant. <b>Do not use it on a node which have been running for some time</b> (for example to improve its statistics) as it is important to have history records of network's growth and development." %}
     </div>
 <h3>{% trans "General Information" %}</h3>
 <table border="0" width="700">
