@@ -176,6 +176,9 @@ class RegisterNodeForm(forms.Form):
     
     if not location and node_type == NodeType.Mesh:
       raise forms.ValidationError(_("Location is required for mesh nodes!"))
+    
+    if (not geo_lat or not geo_long) and node_type == NodeType.Mesh:
+      raise forms.ValidationError(_("Geographical coordinates are required for mesh nodes!"))
 
     try:
       node = Node.objects.get(name = name)
@@ -497,6 +500,9 @@ class UpdateNodeForm(forms.Form):
 
     if not location and node_type == NodeType.Mesh:
       raise forms.ValidationError(_("Location is required for mesh nodes!"))
+    
+    if (not geo_lat or not geo_long) and node_type == NodeType.Mesh:
+      raise forms.ValidationError(_("Geographical coordinates are required for mesh nodes!"))
 
     try:
       node = Node.objects.get(name = name)
