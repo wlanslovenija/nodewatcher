@@ -80,6 +80,13 @@ table.listing tfoot td {
   border: 1px solid #D7D7D7;
 }
 
+table.listing tbody tr.webclient {
+  background-color: #EEFFD6 !important;
+}
+
+table.listing tbody tr.webclient td.name {
+  font-weight: bold !important;
+}
 
 .table_links {
   text-align: center;
@@ -122,6 +129,7 @@ tr.inner_header {
   text-align: center;
 }
 
+div.webclient,
 .notice {
   -moz-border-radius-bottomleft:3px;
   -moz-border-radius-bottomright:3px;

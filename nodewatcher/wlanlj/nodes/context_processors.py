@@ -1,4 +1,4 @@
-from wlanlj.nodes.models import Subnet
+from wlanlj.nodes.models import Subnet, Node
 
 def web_client_node(request):
   """
@@ -9,6 +9,7 @@ def web_client_node(request):
   try:
     subnet = Subnet.objects.ip_filter(ip_subnet__contains = request.META["REMOTE_ADDR"]).exclude(cidr = 0)[0]
     node = subnet.node
+    #node = Node.objects.get(name="grintovska-22")
   except IndexError:
     node = None
   

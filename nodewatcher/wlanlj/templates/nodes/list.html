@@ -17,6 +17,11 @@
 {% endblock %}
 
 {% block content %}
+{% if web_client_node %}
+<div class="webclient">
+You are visiting this page through the <em>wlan ljubljana</em> network using the <a href="{% url view_node web_client_node.pk %}">{{ web_client_node.name|default:_("unknown") }}</a> node.
+</div>
+{% endif %}
 <table border="0" width="100%" class="listing">
 <thead>
   <tr>
@@ -46,7 +51,7 @@
     <td colspan="9"><b>{{ node.node_type_as_string_plural }}</b></td>
   </tr>
   {% endifchanged %}
-  <tr class="{% cycle 'odd' 'even' %}">
+  <tr class="{% cycle 'odd' 'even' %}{% if web_client_node %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}{% endif %}">
     <td align="center">
       {% if node.warnings %}
       <a href="{% url view_node node.pk %}">
@@ -54,7 +59,7 @@
       </a>
       {% endif %}
     </td>
-    <td><a href="{% url view_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+    <td class="name"><a href="{% url view_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     {% if node.last_seen %}
     <td>{{ node.last_seen|date }}</td>
