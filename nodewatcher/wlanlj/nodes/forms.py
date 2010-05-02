@@ -231,7 +231,7 @@ class RegisterNodeForm(forms.Form):
     pool = self.cleaned_data.get('pool')
     subnet = None
 
-    if not ip:
+    if not ip or not user.is_staff:
       # Assign a new IP address from the selected pool (if no IP address selected)
       node = Node()
       fresh_subnet = pool.allocate_subnet()

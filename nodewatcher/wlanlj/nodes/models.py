@@ -534,7 +534,12 @@ class Node(models.Model):
     return "/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
   
   def is_current_owner(self, request):
-    return self.status != NodeStatus.Invalid and (self.owner == request.user or request.user.is_staff)
+    """
+    Returns true if current user owns this node.
+    
+    @param request: The request to get the current user from
+    """
+    return not self.is_invalid() and (self.owner == request.user or request.user.is_staff)
   
   def save(self, **kwargs):
     """

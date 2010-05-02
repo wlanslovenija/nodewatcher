@@ -149,7 +149,7 @@ def node_edit(request, node):
   Display a form for registering a new node.
   """
   node = get_object_or_404(Node, pk = node)
-  if node.status == NodeStatus.Invalid or (node.owner != request.user and not request.user.is_staff):
+  if not node.is_current_owner(request):
     raise Http404
   
   if request.method == 'POST':
@@ -257,7 +257,7 @@ def node_reset(request, node):
   state.
   """
   node = get_object_or_404(Node, pk = node)
-  if node.owner != request.user and not request.user.is_staff:
+  if not node.is_current_owner(request):
     raise Http404
 
   if request.method == 'POST':
@@ -280,7 +280,7 @@ def node_remove(request, node):
   Displays node info.
   """
   node = get_object_or_404(Node, pk = node)
-  if node.owner != request.user and not request.user.is_staff:
+  if not node.is_current_owner(request):
     raise Http404
   
   if request.method == 'POST':
@@ -301,7 +301,7 @@ def node_renumber(request, node):
   Renumbers a given node.
   """
   node = get_object_or_404(Node, pk = node)
-  if (node.owner != request.user and not request.user.is_staff) or node.is_invalid():
+  if not node.is_current_owner(request):
     raise Http404
   
   if request.method == 'POST':
@@ -339,7 +339,7 @@ def node_allocate_subnet(request, node):
   Displays node info.
   """
   node = get_object_or_404(Node, pk = node)
-  if node.status == NodeStatus.Invalid or (node.owner != request.user and not request.user.is_staff):
+  if not node.is_current_owner(request):
     raise Http404
  
   if request.method == 'POST':
@@ -362,7 +362,7 @@ def node_deallocate_subnet(request, subnet_id):
   """
   subnet = get_object_or_404(Subnet, pk = subnet_id)
   node = subnet.node
-  if node.owner != request.user and not request.user.is_staff:
+  if not node.is_current_owner(request):
     raise Http404
   
   if request.method == 'POST':
@@ -385,7 +385,7 @@ def node_edit_subnet(request, subnet_id):
   """
   subnet = get_object_or_404(Subnet, pk = subnet_id)
   node = subnet.node
-  if node.owner != request.user and not request.user.is_staff:
+  if not node.is_current_owner(request):
     raise Http404
   
   if request.method == 'POST':
@@ -596,7 +596,7 @@ def package_list(request, node):
   Display a list of node's installed packages.
   """
   node = get_object_or_404(Node, pk = node)
-  if node.owner != request.user and not request.user.is_staff:
+  if not node.is_current_owner(request):
     raise Http404
 
   return render_to_response('nodes/installed_packages.html',
