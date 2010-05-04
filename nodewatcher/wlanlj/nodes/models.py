@@ -1478,6 +1478,7 @@ class WarningCode:
   ESSIDMismatch = 14
   VPNMacMismatch = 15
   VPNLimitMismatch = 16
+  ChannelMismatch = 17
   
   Custom = 100
   NodewatcherInterpretFailed = 101
@@ -1522,6 +1523,8 @@ class WarningCode:
       return _("Reported VPN MAC address does not match assigned MAC address!") 
     elif code == WarningCode.VPNLimitMismatch:
       return _("Reported VPN upload traffic limit does not match the configured value!")
+    elif code == WarningCode.ChannelMismatch:
+      return _("WiFi channel does not match node configuration!")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("There was a problem while interpreting nodewatcher output from this node!")
     else:
@@ -1546,7 +1549,7 @@ class WarningCode:
     elif code == WarningCode.TimeOutOfSync:
       return _("Clock can be out of sync just after the node boots up but if it persists it could signify a firmware bug.")
     elif code == WarningCode.NoBorderPeering:
-      return _("Link to a VPN server has probably fallen. If link does not reconnect soon please investigate node's Internet uplink.")
+      return _("Link to a VPN server has probably failed. If link does not reconnect soon please investigate node's Internet uplink.")
     elif code == WarningCode.CaptivePortalDown:
       return _("Could be a temporary glitch but if it persists it could signify a firmware bug.")
     elif code == WarningCode.DnsDown:
@@ -1567,8 +1570,10 @@ class WarningCode:
       return _("Download traffic limits will not work because of this. It is very likely a bug. Please report it.") 
     elif code == WarningCode.VPNLimitMismatch:
       return _("If you changed configured traffic limits you have to flash the node with new firmware image to apply new configuration. Or it could be a bug somewhere.")
+    elif code == WarningCode.ChannelMismatch:
+      return _("The node will not connect with other nodes in the mesh because of this. It is probably a bug. Please report it.")
     elif code == WarningCode.NodewatcherInterpretFailed:
-      return _("Please check monitor log for more information or inform network administrator do to so. There is a bug somewhere.")
+      return _("Please check monitor log for more information or inform network administrator to do so. There is a bug somewhere.")
     else:
       return None
 

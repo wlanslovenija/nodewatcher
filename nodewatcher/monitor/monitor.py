@@ -447,6 +447,12 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
 
       if oldChannel != n.channel and oldChannel != 0:
         Event.create_event(n, EventCode.ChannelChanged, '', EventSource.Monitor, data = 'Old channel: %s\n  New channel %s' % (oldChannel, n.channel))
+      
+      try:
+        if n.channel != n.profile.channel:
+          NodeWarning.create(n, WarningCode.ChannelMismatch, EventSource.Monitor)
+      except Profile.DoesNotExist:
+        pass
 
       if n.has_time_sync_problems():
         NodeWarning.create(n, WarningCode.TimeOutOfSync, EventSource.Monitor)
