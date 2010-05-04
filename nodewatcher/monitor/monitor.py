@@ -221,7 +221,7 @@ def regenerate_graph(graph):
   conf = RRA_CONF_MAP[graph.type]
   
   try:
-    RRA.graph(conf, str(graph.title), pathImage, pathArchive, end_time = int(time.mktime(graph.last_update.timetuple())), dead = graph.dead)
+    RRA.graph(conf, str(graph.title), pathImage, pathArchive, end_time = int(time.mktime(graph.last_update.timetuple())), dead = graph.dead, last_update = graph.last_update)
     
     # Graph has been regenerated, mark it as such
     graph.need_redraw = False

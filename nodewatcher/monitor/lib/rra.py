@@ -826,11 +826,13 @@ class RRA:
     if kwargs.get('dead') == True:
       args.append('--pango-markup')
       title = '%s <span foreground="red">[OUT OF DATE]</span>' % title
-
+    
+    if kwargs.get('last_update') is not None:
+      args.append('COMMENT:Last updated on %s\\c' % kwargs['last_update'].strftime('%Y-%m-%d %H\:%M\:%S'))
+    
     args = args + conf.graph
     args.append('--font')
     args.append('DEFAULT:0:DejaVu Sans Mono')
-    
     args.append('--disable-rrdtool-tag')
 
     for prefix, timespan in settings.GRAPH_TIMESPANS:
