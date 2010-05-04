@@ -1,0 +1,7 @@
+<div class="notice {{type}}">
+{% ifnotequal type "" %}
+<div style="float: left;"><img src="/images/notice_{{type}}.png" alt="{{type}}"/></div>
+{% endifnotequal %}
+{{ notice }}
+<div style="clear: both;"></div>
+</div>

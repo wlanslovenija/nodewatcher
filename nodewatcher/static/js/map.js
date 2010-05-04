@@ -25,9 +25,10 @@ function updateNodes(filtersChanged, zoomChanged, moved) {
     shownNodesNumber = 0;
     shownLinks = [];
     for (var i = 0; i < nodes.length; i++) {
+
       if ($('#gmap_project_' + nodes[i].project + ':checked').length == 0) continue;
       if ($('#gmap_status_' + nodes[i].status + ':checked').length == 0) continue;
-      
+
       shownNodes[nodes[i].ip] = nodes[i];
       shownNodesNumber++;
       createMarker(nodes[i]);

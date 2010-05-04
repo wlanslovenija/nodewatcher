@@ -49,6 +49,9 @@
   <li>{{ "new"|status:"gmap" }} - {% statusdesc "new" %}</li>
   <li>{{ "pending"|status:"gmap" }} - {% statusdesc "pending" %}</li>
 </ul>
+{% if web_client_node %}
+The node marked with symbol <img src="/images/symbol_wc.png" alt="Client node symbol" /> is the node through which you are connected to the network.
+{% endif %}
 <br/>
 <h3>{% trans "Edge color key" %}:</h3>
 <ul>
@@ -65,7 +68,7 @@
 /* <![CDATA[ */
   var nodes = [
     {% for node in nodes %}{% if node.should_draw_on_map %}
-    { "project": {{ node.project.pk }}, "lat": {{ node.geo_lat }}, "long": {{ node.geo_long }}, "pk" : '{{ node.pk }}', "ip": '{{ node.ip|escapejs }}', "name": '{{ node.name|escapejs }}', "status": '{{ node.status_as_string|escapejs }}', "url": '{{ node.url|default:""|escapejs }}' }{% if not forloop.last %},{% endif %}
+    { "project": {{ node.project.pk }}, "lat": {{ node.geo_lat }}, "long": {{ node.geo_long }}, "pk" : '{{ node.pk }}', "ip": '{{ node.ip|escapejs }}', "name": '{{ node.name|escapejs }}', "status": '{{ node.status_as_string|escapejs }}', "url": '{{ node.url|default:""|escapejs }}', "current" : {% ifequal node.pk web_client_node.pk %}1{% else %}0{% endifequal %} }{% if not forloop.last %},{% endif %}
     {% endif %}{% endfor %}    
   ];
   var links = [

@@ -6,6 +6,7 @@ function createIcon(status) {
     return icons[status];
 
   icon = new google.maps.Icon();
+
   icon.image = "/images/status_" + status + "_gmap.png";
   icon.shadow = "/images/gmap_node_shadow.png";
   icon.transparent = "/images/gmap_node_transparent.png";
@@ -19,7 +20,7 @@ function createIcon(status) {
 }
 
 function createMarker(node) {
-  var opts = { "title" : node.name + " (" + node.ip + ")", "icon" : createIcon(node.status) };
+  var opts = { "title" : node.name + " (" + node.ip + ")", "icon" : createIcon(node.status + (node.current ? "wc" : "")) };
   var m = new google.maps.Marker(new google.maps.LatLng(node.lat, node.long), opts);
   GEvent.addListener(m, "click", function() {
     html = "<b>" + node.name + "</b> (" + node.ip + ")<div class=\"gmap_details\">Status: <span class=\"node_status_" +

@@ -22,32 +22,47 @@ WRAPPER_TEMPLATE = """<span class="node_status_%(status)s node_status_%(size)s">
 
 def statusimage(value, arg, autoescape = None):
   value = value.lower()
-  
-  if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
+  if value.endswith("wc"):
+    status = value[:-2]
+  else:
+    status = value
+
+  if not (status in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
     return ""
   
   if not (arg in ('big', 'small', 'gmap')):
     arg = "small"
   
-  params = {"status" : value, "size" : arg, "title" : ("%s - %s" % (value, DESCRIPTIONS[value]))}
+  params = {"status" : value, "size" : arg, "title" : ("%s - %s" % (value, DESCRIPTIONS[status]))}
   return mark_safe(IMAGE_TEMPLATE % params)
 
 def status(value, arg, autoescape = None):
   value = value.lower()
-  
-  if not (value in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
+  print value
+
+  if value.endswith("wc"):
+    status = value[:-2]
+  else:
+    status = value
+
+  if not (status in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
     return ""
   
   if not (arg in ('big', 'small', 'gmap')):
     arg = "small"
   
-  params = {"status" : value, "size" : arg, "title" : ("%s - %s" % (value, DESCRIPTIONS[value]))}
+  params = {"status" : value, "size" : arg, "title" : ("%s - %s" % (value, DESCRIPTIONS[status]))}
   params['content'] = (IMAGE_TEMPLATE % params) + "&nbsp;" + value
   return mark_safe(WRAPPER_TEMPLATE % params)
 
 @register.simple_tag
 def statusdesc(value):
-  return DESCRIPTIONS[value]
+  if value.endswith("wc"):
+    status = value[:2]
+  else:
+    status = value
+
+  return DESCRIPTIONS[status]
 
 status.needs_autoescape = True
 statusimage.needs_autoescape = True

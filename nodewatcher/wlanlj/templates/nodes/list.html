@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load nodestatus %}
+{% load misc %}
 
 {% block title %}{% trans "Node List" %}{% endblock %}
 {% block heading %}{% trans "Node List" %}{% endblock %}
@@ -18,9 +19,11 @@
 
 {% block content %}
 {% if web_client_node %}
-<div class="webclient">
-You are visiting this page through the <em>wlan ljubljana</em> network using the <a href="{% url view_node web_client_node.pk %}">{{ web_client_node.name|default:_("unknown") }}</a> node.
-</div>
+{% notice webclient %}
+<b>You are visiting this page through the <em>wlan ljubljana</em> network</b><br />
+<br />
+You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client_node.name|default:_("unknown") }}</a> node to connect to the network.
+{% endnotice %}
 {% endif %}
 <table border="0" width="100%" class="listing">
 <thead>
@@ -51,7 +54,7 @@ You are visiting this page through the <em>wlan ljubljana</em> network using the
     <td colspan="9"><b>{{ node.node_type_as_string_plural }}</b></td>
   </tr>
   {% endifchanged %}
-  <tr class="{% cycle 'odd' 'even' %}{% if web_client_node %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}{% endif %}">
+  <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
     <td align="center">
       {% if node.warnings %}
       <a href="{% url view_node node.pk %}">

@@ -2,15 +2,16 @@
 {% load i18n %}
 {% load conversion %}
 {% load gmap %}
+{% load misc %}
 
 {% block title %}{% trans "Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block heading %}<img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% trans "Node Information" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block content %}
 {% include "nodes/warnings.html" %}
 {% if node.awaiting_renumber %}
-<div class="notice">
+{% notice renumber %}
   {% blocktrans with node.get_renumbered_ip as renumbered_ip and node.get_original_ip as original_ip %}
-  <b>NODE IS AWAITING IP RENUMBERING</b><br/>
+  <b>This node is awaiting IP renumbering</b><br/>
   <br/>
   This node's primary address has been recently renumbered from <b>{{ original_ip }}</b> to <b>{{ renumbered_ip }}</b>. This message means that the node has not yet been seen with the new address and so is still probably carrying its old address. As soon as the reconfigured node will appear, this message will be removed.
   {% endblocktrans %}<br />
@@ -20,7 +21,7 @@
   You must <b>update the router's configuration</b> to reflect renumbering changes. You can simply regenerate and reflash the image to your router.
   {% endblocktrans %}
   {% endif %}
-</div>
+{% endnotice %}
 {% endif %}
 
 <h3 class="section_title">{% trans "General Information" %}
