@@ -78,13 +78,20 @@ def statistics(request):
     templates_by_usage.append({ 'template' : _("unknown"), 'count' : others, 'special' : True })
 
   # Nodes by project
+  all_nodes = Node.objects.exclude(node_type = NodeType.Test).values('project__name', 'project__pk').annotate(count = models.Count('ip'))
+  up_nodes = all_nodes.filter(status = NodeStatus.Up)
   nodes_by_project = []
   others = 0
-  for p in Node.objects.exclude(node_type = NodeType.Test).values('project__name').annotate(count = models.Count('ip')).order_by('project__id'):
+  for p in all_nodes.order_by('project__id'):
     if not p['project__name']:
       others = p['count']
     else:
-      nodes_by_project.append({ 'name' : p['project__name'], 'count' : p['count']})
+      try:
+        up_count = filter(lambda x: x['project__pk'] == p['project__pk'], up_nodes)[0]['count']
+      except IndexError:
+        up_count = 0
+      
+      nodes_by_project.append({ 'name' : p['project__name'], 'count' : p['count'], 'up_count' : up_count})
   
   if others > 0:
     nodes_by_project.append({ 'name' : _("unknown"), 'count' : others, 'special' : True})

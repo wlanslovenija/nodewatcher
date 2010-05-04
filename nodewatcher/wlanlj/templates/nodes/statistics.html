@@ -52,7 +52,7 @@
     {% for p in nodes_by_project %}
     <tr class="{% cycle 'odd' 'even' %}">
       <td>{% if p.special %}<i>{% endif %}{{ p.name }}{% if p.special %}</i>{% endif %}</td>
-      <td>{{ p.count }}</td>
+      <td>{{ p.count }}{% if p.up_count %} ({{ p.up_count }}){% endif %}</td>
     </tr>
     {% empty %}
     <tr>
