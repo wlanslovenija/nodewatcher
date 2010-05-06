@@ -107,7 +107,7 @@ def statistics(request):
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
       'external_ant' : Node.objects.filter(ant_external = True).exclude(node_type = NodeType.Test).count(),
       'template_usage' : templates_by_usage,
-      'peers_avg' : Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'],
+      'peers_avg' : round(Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'], 2),
       'graphs' : [
         GraphItemNP(1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
         GraphItemNP(2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
