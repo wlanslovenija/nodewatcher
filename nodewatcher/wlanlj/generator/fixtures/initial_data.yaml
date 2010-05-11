@@ -124,7 +124,7 @@
     name: Fonera+ (2.6 kernel)
     openwrt_version: new
     port_layout: fonera+
-    short_name: fonera+
+    short_name: foneraplus
 - model: generator.Template
   pk: 7 
   fields:
