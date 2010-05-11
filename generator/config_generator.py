@@ -825,10 +825,6 @@ class OpenWrtConfig(NodeConfig):
       f.write('  HnaInterval 18.0\n')
       f.write('  HnaValidityTime 324.0\n')
       
-      # Penalize traffic via VPN
-      if name == "tap0":
-        f.write('  LinkQualityMult default 0.80\n')
-      
       f.write('}\n')
       f.write('\n')
     
