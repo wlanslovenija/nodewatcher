@@ -876,7 +876,7 @@ def check_mesh_status():
         
         # Flag node entry with warnings flag (if not a border router)
         if s.status != SubnetStatus.Subset and (not n.border_router or s.status == SubnetStatus.Hijacked):
-          NodeWarning.create(n, WarningCode.AnnounceConflict, EventSource.Monitor)
+          NodeWarning.create(n, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
           n.save()
       
       # Detect subnets that cause conflicts and raise warning flags for all involved
