@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}Remove Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% blocktrans %}Remove Subnet {{ subnet }} ?{% endblocktrans %}{% endblock %}
+
+{% block content %}
+  <div class="error">
+      {% if subnet.is_primary %}
+      {% blocktrans %}<b>ERROR:</b> This is a primary IP subnet that should not be removed. In order to change it, use the renumbering form.{% endblocktrans %}
+      {% else %}
+      {% blocktrans %}<b>WARNING:</b> By removing this subnet you will be returning it back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your subnet!{% endblocktrans %}
+      {% endif %}
+    </div>
+<h3>{% trans "General Node Information" %}</h3>
+<table border="0" width="100%">
+  <tr>
+    <td style="width: 200px;">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Name" %}</td>
+    <td>{{ node.name|default:_("unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Maintainer" %}</td>
+    {% if node.owner %}
+    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{% trans "unknown" %}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Location" %}</td>
+    <td>{{ node.location|default:_("unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Project" %}</td>
+    <td>{{ node.project.name|default:_("unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "System node" %}</td>
+    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Border router" %}</td>
+    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+  </tr>
+</table>
+<h3>{% trans "Subnet Information" %}</h3>
+<table border="0" width="100%">
+  <tr>
+    <td style="width: 200px;">{% trans "Subnet" %}</td>
+    <td>{{ subnet }}</td>
+  </tr>
+</table>
+
+  <form method="POST" action="{% url web.nodes.views.node_deallocate_subnet subnet.id %}">
+  <div class="buttons">
+    {% if not subnet.is_primary %}
+    <input type="submit" value="{% trans "Remove" %}" />&nbsp;
+    {% endif %}
+    <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+  </div>
+  </form>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+
+{% block heading %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block content %}
+
+{% if form.errors %}
+<div class="error">
+  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to allocate a subnet:{% endblocktrans %}<br />
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  {{ field.label }}: <i>{{ error|escape }}</i><br/>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+<table border="0" class="nodeinfo layout">
+  <tr class="section_title">
+    <td colspan="2">
+      {% trans "General Node Information" %}
+    </td>
+  </tr>
+  <tr>
+    <td style="width: 100px;">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Name" %}</td>
+    <td>{{ node.name|default:_("unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Maintainer" %}</td>
+    {% if node.owner %}
+    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{% trans "unknown" %}</td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td>{% trans "Location" %}</td>
+    <td>{{ node.location|default:_("unknown") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Project" %}</td>
+    <td>{{ node.project.name|default:_("unknown") }}</td>
+  </tr>
+</table>
+
+<p>
+      {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information</i> section." %}
+</p>
+
+<form action="{% url web.nodes.views.node_allocate_subnet node.pk %}" method="post">
+<table border="0" class="layout">
+  {% if user.is_staff %}
+  <tr>
+    <td>{{ form.network.label }}</td>
+    <td>{{ form.network }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">{% trans "Leave blank for auto-allocation." %}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ form.pool.label }}</td>
+    <td>{{ form.pool }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.prefix_len.label }}</td>
+    <td><select name="prefix_len" id="id_prefix_len"></select></td>
+  </tr>
+  <tr>
+    <td>{{ form.description.label }}</td>
+    <td>{{ form.description }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.iface_type.label }}</td>
+    <td>{{ form.iface_type }}</td>
+  </tr>
+  <tr>
+    <td>{{ form.dhcp.label }}</td>
+    <td>{{ form.dhcp }}</td>
+  </tr>
+</table>
+  <div class="buttons">
+      <input type="submit" value="{% trans "Allocate" %}" />&nbsp;
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+    </div>
+</form>
+
+<script type="text/javascript">
+  var pool_prefix_lens = {
+    {% for pool in form.get_pools %}
+    {{ pool.id }} : {
+      'min' : {{ pool.min_prefix_len }},
+      'max' : {{ pool.max_prefix_len }},
+      'def' : {{ pool.default_prefix_len }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  };
+  
+  function updatePrefixLens() {
+    var prefs = $('#id_prefix_len'); 
+    prefs.empty();
+    
+    pool = pool_prefix_lens[$('#id_pool').attr('value')];
+    for (var i = pool.min; i <= pool.max; i++) {
+      prefs.append('<option value="' + i + '">/' + i + '</option>');
+    }
+    prefs.attr('value', '' + pool.def); 
+  }
+  
+  $(document).ready(function () {
+    $('#id_pool').change(function(event) { updatePrefixLens(); }).change();
+  });
+</script>
+{% endblock %}

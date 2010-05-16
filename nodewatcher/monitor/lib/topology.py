@@ -1,7 +1,7 @@
 import subprocess
 import logging
 from traceback import print_exc
-from wlanlj.nodes.models import NodeType
+from web.nodes.models import NodeType
 
 class DotTopologyPlotter:
   """

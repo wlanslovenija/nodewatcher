@@ -3,10 +3,10 @@
 # Setup import paths, since we are using Django models
 import sys, os
 sys.path.append('/var/www/django')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings_production'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'web.settings_production'
 
 # Import our models
-from wlanlj.account.models import UserAccount
+from web.account.models import UserAccount
 from django.contrib.auth.models import User
 from django.db import transaction
 

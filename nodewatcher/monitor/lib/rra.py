@@ -5,7 +5,7 @@ import subprocess
 import re
 
 # Models
-from wlanlj.nodes.models import StatsSolar
+from web.nodes.models import StatsSolar
 from django.conf import settings
 from datetime import datetime
 from xml.etree import cElementTree as ElementTree

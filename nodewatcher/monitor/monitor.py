@@ -15,7 +15,7 @@ print "                  wlan ljubljana Mesh Monitoring Daemon"
 print "============================================================================"
 
 parser = OptionParser()
-parser.add_option('--path', dest = 'path', help = 'Path that contains "wlanlj" nodewatcher installation')
+parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "web" Python module')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
 parser.add_option('--olsr-host', dest = 'olsr_host', help = 'A host with OLSR txt-info plugin running (overrides settings file)')
 parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit (only graphs that have the redraw flag set are regenerated)', action = 'store_true')
@@ -45,8 +45,8 @@ sys.path.append(options.path)
 os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
-from wlanlj.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning, Tweet
-from wlanlj.generator.models import Template, Profile
+from web.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning, Tweet
+from web.generator.models import Template, Profile
 from django.db import transaction, models, connection
 from django.conf import settings
 
