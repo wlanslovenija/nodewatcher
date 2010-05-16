@@ -2,7 +2,6 @@
 {% if node.warnings and node.get_warnings %}
 <div class="error">
   {% blocktrans %}<b>WARNING:</b> Some problems were found in this node's configuration! Continued operation of this node might disrupt normal network operations, so these issues must be addressed! The following problems have been detected:{% endblocktrans %}<br />
-  <br>
   <table border="0" width="100%" cellpadding="0" cellspacing="0" class="warnings">
   <tbody>
     {% for warning in node.get_warnings %}
