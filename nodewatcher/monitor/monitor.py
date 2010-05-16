@@ -11,7 +11,7 @@ import sys, os
 from optparse import OptionParser
 
 print "============================================================================"
-print "                  wlan ljubljana Mesh Monitoring Daemon"
+print "                     nodewatcher mesh monitoring daemon"
 print "============================================================================"
 
 parser = OptionParser()
@@ -1107,7 +1107,7 @@ if __name__ == '__main__':
     logging.warning("Garbage collection debugging enabled.")
   
   # Create worker pool and start processing
-  logging.info("wlan ljubljana mesh monitoring system is initializing...")
+  logging.info("nodewatcher mesh monitoring system is initializing...")
   WORKER_POOL = multiprocessing.Pool(processes = settings.MONITOR_WORKERS)
   try:
     while True:

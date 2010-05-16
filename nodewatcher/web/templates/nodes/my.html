@@ -16,7 +16,7 @@
 <div id="tabcontent">
 {% if not user.email %}
 <div class="error">
-  {% blocktrans %}You have no e-mail address configured for your account! Please <a href="http://wlan-lj.net/prefs">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions (like image generation) are disabled.{% endblocktrans %}
+  {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions (like image generation) are disabled.{% endblocktrans %}
 </div>
 {% endif %}
 <br/>
