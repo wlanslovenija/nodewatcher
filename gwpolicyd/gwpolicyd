@@ -340,7 +340,7 @@ def watch_loop():
 
 if __name__ == '__main__':
   print "============================================================================"
-  print "                    wlan Ljubljana gateway policy daemon                    "
+  print "                    wlan ljubljana gateway policy daemon                    "
   print "============================================================================"
 
   if os.getuid() != 0:

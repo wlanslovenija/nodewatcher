@@ -14,6 +14,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings_production'
 from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
 from django.template import loader, Context
+from django.conf import settings
 
 # Other stuff
 from beanstalk import serverconn
@@ -130,13 +131,17 @@ def generate_image(d):
       'ip'        : d['ip'],
       'username'  : d['vpn_username'],
       'config'    : result,
-      'checksum'  : checksum
+      'checksum'  : checksum,
+      'network'   : { 'name'        : settings.NETWORK_NAME,
+                      'contact'     : settings.NETWORK_CONTACT,
+                      'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
+                    }
     })
 
     send_mail(
-      '[wlan-lj] ' + (_("Configuration for %s/%s") % (d['hostname'], d['ip'])),
+      setting.EMAIL_SUBJECT_PREFIX + (_("Configuration for %s/%s") % (d['hostname'], d['ip'])),
       t.render(c),
-      'generator@wlan-lj.net',
+      settings.EMAIL_IMAGE_GENERATOR_SENDER,
       [d['email']],
       fail_silently = False
     )
@@ -179,13 +184,17 @@ def generate_image(d):
       'hostname'  : d['hostname'],
       'ip'        : d['ip'],
       'username'  : d['vpn_username'],
-      'files'     : files
+      'files'     : files,
+      'network'   : { 'name'        : settings.NETWORK_NAME,
+                      'contact'     : settings.NETWORK_CONTACT,
+                      'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
+                    }
     })
     
     send_mail(
-      '[wlan-lj] ' + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
+      settings.EMAIL_SUBJECT_PREFIX + (_("Router images for %s/%s") % (d['hostname'], d['ip'])),
       t.render(c),
-      'generator@wlan-lj.net',
+      settings.EMAIL_IMAGE_GENERATOR_SENDER,
       [d['email']],
       fail_silently = False
     )
@@ -232,13 +241,17 @@ try:
       ctx = Context({
         'hostname'  : d['hostname'],
         'ip'        : d['ip'],
-        'username'  : d['vpn_username']
+        'username'  : d['vpn_username'],
+        'network'   : { 'name'        : settings.NETWORK_NAME,
+                        'contact'     : settings.NETWORK_CONTACT,
+                        'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
+                      }
       })
 
       send_mail(
-        '[wlan-lj] ' + (_("Image generation failed for %s/%s") % (d['hostname'], d['ip'])),
+        settings.EMAIL_SUBJECT_PREFIX + (_("Image generation failed for %s/%s") % (d['hostname'], d['ip'])),
         t.render(ctx),
-        'generator@wlan-lj.net',
+        settings.EMAIL_IMAGE_GENERATOR_SENDER,
         [d['email']],
         fail_silently = False
       )
