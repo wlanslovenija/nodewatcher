@@ -11,7 +11,7 @@ The generated files for your node are available here:{% endblocktrans %}
   http://bindist.wlan-lj.net/images/{{ file.name }}
   MD5: {{ file.checksum }}
 {% endfor %}
-{% blocktrans %}Note that these files will only remain available for 5 days. After that
+{% blocktrans with network.name as network_name and network.contact as network_contact %}Note that these files will only remain available for 5 days. After that
 time, they will be removed from the server and you will have to regenerate
 the image.
 
@@ -23,5 +23,5 @@ node container. More about that can be found here:
 Thank you for your participation in the project!
 
 Best regards,
-{{ network.name }} network <{{ network.contact }}>
+{{ network_name }} network <{{ network_contact }}>
 {% endblocktrans %}
