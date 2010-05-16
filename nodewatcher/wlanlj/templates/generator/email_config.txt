@@ -5,7 +5,7 @@ You can use it as a starting point for your custom router configuration so
 that its settings are compatible with the network.
 
 Configuration archive listed below contains files suitable for use with the
-wlan ljubljana firmware. Because of this, some settings may require patches
+{{ network.name }} firmware. Because of this, some settings may require patches
 and/or are version related. For further information consult:
 
   http://wlan-lj.net/wiki/Podrobnosti/PoMeri
@@ -22,5 +22,5 @@ again.
 Thank you for your participation in the project!
 
 Best regards,
-wlan ljubljana network <open@wlan-lj.net>
+{{ network.name }} network <{{ network.contact }}>
 {% endblocktrans %}

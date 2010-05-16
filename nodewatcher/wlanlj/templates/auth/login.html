@@ -29,7 +29,7 @@
 {{ form.password.label_tag }}
 {{ form.password }}
 <p class="hint">
-  <a href="http://wlan-lj.net/reset_password">Forgot your password?</a>
+  <a href="{{ reset_password_url }}">Forgot your password?</a>
 </p>
 </div>
 <div class="buttons"><input type="submit" value="{% trans "Login" %}" /></div>

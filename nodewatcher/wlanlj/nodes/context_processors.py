@@ -1,3 +1,4 @@
+from django.conf import settings
 from wlanlj.nodes.models import Subnet
 
 def web_client_node(request):
@@ -16,3 +17,14 @@ def web_client_node(request):
     'web_client_node' : node
   }
 
+def global_values(request):
+  """
+  Adds some global values to the context.
+  """
+  return {
+   'network' : { 'name'        : settings.NETWORK_NAME,
+                 'contact'     : settings.NETWORK_CONTACT,
+                 'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
+               },
+   'reset_password_url' : settings.RESET_PASSWORD_URL
+  }

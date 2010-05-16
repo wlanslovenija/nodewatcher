@@ -22,4 +22,4 @@ the following URL:
   http://nodes.wlan-lj.net/nodes/events
 
 Best regards,
-wlan ljubljana network <open@wlan-lj.net>
+{{ network.name }} network <{{ network.contact }}>

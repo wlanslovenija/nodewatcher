@@ -1,4 +1,5 @@
 from django.template import Context, loader
+from django.contrib.sites.models import Site
 import subprocess, os
 
 def generate_sticker(user, regenerate = False):
@@ -7,9 +8,11 @@ def generate_sticker(user, regenerate = False):
 
   @param user: A valid User instance
   """
+  url_base = "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
+  
   if user.info_sticker and not regenerate:
     # User already has a sticker generated, just return the path
-    return 'http://nodes.wlan-lj.net/stickers/sticker-%s.pdf' % user.id
+    return '%s/stickers/sticker-%s.pdf' % (url_base, user.id)
 
   # Generate one using pdflatex
   t = loader.get_template('nodes/stickers/%s' % user.project.sticker)
@@ -42,5 +45,5 @@ def generate_sticker(user, regenerate = False):
   user.info_sticker = True
   user.save()
 
-  return 'http://nodes.wlan-lj.net/stickers/sticker-%s.pdf' % user.id
+  return '%s/stickers/sticker-%s.pdf' % (user.id, url_base)
 

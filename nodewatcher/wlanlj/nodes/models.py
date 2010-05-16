@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.template import loader, Context
 from django.conf import settings
+from django.contrib.sites.models import Site
 from wlanlj.nodes.locker import require_lock, model_lock
 from wlanlj.nodes import ipcalc
 from wlanlj.nodes.common import load_plugin
@@ -527,8 +528,8 @@ class Node(models.Model):
     return Node.objects.get(**kwargs)
   
   def get_full_url(self):
-    # TODO: Make base URL configurable (or use Django to build it)
-    return "https://nodes.wlan-lj.net%s" % (self.get_absolute_url(),)
+    base_url = "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
+    return "%s%s" % (base_url, self.get_absolute_url())
   
   def get_absolute_url(self):
     return "/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
@@ -1435,7 +1436,11 @@ class EventSubscription(models.Model):
     t = loader.get_template('nodes/event_mail.txt')
     c = Context({
       'user'  : self.user,
-      'event' : event
+      'event' : event,
+      'network' : { 'name'        : settings.NETWORK_NAME,
+                    'contact'     : settings.NETWORK_CONTACT,
+                    'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
+                  }
     })
 
     # Format node name and IP
@@ -1453,7 +1458,7 @@ class EventSubscription(models.Model):
       send_mail(
         '%s%s - %s' % (settings.EMAIL_SUBJECT_PREFIX or "", name_ip, event.code_to_string()),
         t.render(c),
-        'events@wlan-lj.net',
+        settings.EMAIL_EVENTS_SENDER,
         [self.user.email],
         fail_silently = True
       )

@@ -1,8 +1,10 @@
+# coding=utf-8
 # Development Django settings for nodewatcher project.
 
 import os.path
 database_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'db.sqlite').replace('\\', '/')
-template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates').replace('\\', '/')
+default_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates').replace('\\', '/')
+wlanlj_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'wlanlj', 'templates').replace('\\', '/')
 
 STATIC_DOC_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static').replace('\\', '/')
 
@@ -37,6 +39,12 @@ EMAIL_TO_CONSOLE = True
 
 EMAIL_HOST = 'localhost'
 EMAIL_SUBJECT_PREFIX = '[wlan-lj] '
+EMAIL_EVENTS_SENDER = 'events@wlan-lj.net'
+EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-lj.net'
+
+NETWORK_NAME = 'wlan ljubljana'
+NETWORK_CONTACT = 'open@wlan-lj.net'
+NETWORK_DESCRIPTION = 'odprto brezžično omrežje Ljubljane'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -69,8 +77,9 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
-# Set to true if you want https instead of http in sitemaps' URLs
+# Set to true if you want https instead of http in sitemaps' and feeds' URLs
 SITEMAPS_USE_HTTPS = False
+FEEDS_USE_HTTPS = False
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '1p)^zvjul0^c)v5*l!8^48g=ili!cn54^l)wl1avvu-x$==k7p'
@@ -78,10 +87,12 @@ SECRET_KEY = '1p)^zvjul0^c)v5*l!8^48g=ili!cn54^l)wl1avvu-x$==k7p'
 # Google Maps API key for 127.0.0.1
 GOOGLE_MAPS_API_KEY = 'ABQIAAAAsSAo-sxy6T5T7_DN1d9N4xRi_j0U6kJrkFvY4-OX2XYmEAa76BRH5tgaUAj1SaWR_RbmjkZ4zO7dDA'
 
+# Where the map displaying all nodes is initially positioned
+# Where the map is initially positioned when adding a new node is configured for each project in the database
 GOOGLE_MAPS_DEFAULT_LAT = 46.05
 GOOGLE_MAPS_DEFAULT_LONG = 14.507
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
-GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15
+GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
 
 # Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some mesh events
 #BITLY_LOGIN = "Your bit.ly login"
@@ -101,7 +112,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'django.core.context_processors.debug',
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
-  'wlanlj.nodes.context_processors.web_client_node'
+  'wlanlj.nodes.context_processors.web_client_node',
+  'wlanlj.nodes.context_processors.global_values'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -118,13 +130,15 @@ TEMPLATE_DIRS = (
   # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
   # Always use forward slashes, even on Windows.
   # Don't forget to use absolute paths, not relative paths.
-  template_dir,
+  wlanlj_template_dir,
+  default_template_dir,
 )
 
 DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/nodes/my_nodes'
 LOGIN_URL = '/auth/login'
+RESET_PASSWORD_URL = 'http://wlan-lj.net/reset_password'
 AUTH_PROFILE_MODULE = 'account.useraccount'
 AUTHENTICATION_BACKENDS = (
   'wlanlj.account.auth.CryptBackend',

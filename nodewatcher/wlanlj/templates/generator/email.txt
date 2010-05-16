@@ -23,5 +23,5 @@ node container. More about that can be found here:
 Thank you for your participation in the project!
 
 Best regards,
-wlan ljubljana network <open@wlan-lj.net>
+{{ network.name }} network <{{ network.contact }}>
 {% endblocktrans %}
