@@ -8,7 +8,7 @@
 # Setup import paths, since we are using Django models
 import sys, os
 sys.path.append('/var/www/django')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'wlanlj.settings_production'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'web.settings_production'
 
 # Django stuff
 from django.core.mail import send_mail
