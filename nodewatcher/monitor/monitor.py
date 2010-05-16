@@ -556,10 +556,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         if iid not in ('wifi0', 'wmaster0'):
           # Check mappings for known wifi interfaces so we can handle hardware changes while
           # the node is up and not generate useless intermediate graphs
-          if n.profile:
-            iface_wifi = n.profile.template.iface_wifi
-            if Template.objects.filter(iface_wifi = iid).count() >= 1:
-              iid = iface_wifi
+          try:
+            if n.profile:
+              iface_wifi = n.profile.template.iface_wifi
+              if Template.objects.filter(iface_wifi = iid).count() >= 1:
+                iid = iface_wifi
+          except Profile.DoesNotExist:
+            pass
           
           add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s' % iid, iface['up'], iface['down'])
       
