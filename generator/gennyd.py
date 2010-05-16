@@ -139,7 +139,7 @@ def generate_image(d):
     })
 
     send_mail(
-      setting.EMAIL_SUBJECT_PREFIX + (_("Configuration for %s/%s") % (d['hostname'], d['ip'])),
+      settings.EMAIL_SUBJECT_PREFIX + (_("Configuration for %s/%s") % (d['hostname'], d['ip'])),
       t.render(c),
       settings.EMAIL_IMAGE_GENERATOR_SENDER,
       [d['email']],
