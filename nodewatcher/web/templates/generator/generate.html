@@ -91,7 +91,11 @@
   <tr>
     {% if not node.owner.email %}
     <td colspan="2" class="error">
+      {% if profile_configuration_url %}
       {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions (like image generation) are disabled.{% endblocktrans %}
+      {% else %}
+      {% blocktrans %}You have no e-mail address configured for your account!{% endblocktrans %}
+      {% endif %}
     </td>
     {% else %}
     {% if node.has_allocated_subnets %}

@@ -28,9 +28,11 @@
 <div>
 {{ form.password.label_tag }}
 {{ form.password }}
+{% if reset_password_url %}
 <p class="hint">
   <a href="{{ reset_password_url }}">Forgot your password?</a>
 </p>
+{% endif %}
 </div>
 <div class="buttons"><input type="submit" value="{% trans "Login" %}" /></div>
 </form>
