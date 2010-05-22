@@ -475,7 +475,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         if 'vpn' in info['net']:
           n.vpn_mac = info['net']['vpn']['mac'] or None
           try:
-            upload_limit = safe_int_convert(info['net']['vpn']['upload_limit'][:-3]) // 1000
+            offset = -3
+            unit = 1000
+            if 'Kbit' in info['net']['vpn']['upload_limit']:
+              offset = -4
+              unit = 1
+            
+            upload_limit = safe_int_convert(info['net']['vpn']['upload_limit'][:offset]) // unit
           except TypeError:
             upload_limit = None
           
