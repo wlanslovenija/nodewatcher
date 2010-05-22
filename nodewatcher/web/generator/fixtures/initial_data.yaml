@@ -429,4 +429,10 @@
     class_name: web.nodes.transitions.OneWiFiSubnet
     priority: 1
     template: 11
+- model: generator.ProfileAdaptationChain
+  pk: 13
+  fields:
+    class_name: web.nodes.transitions.OneWiFiSubnet
+    priority: 1
+    template: 12
 
