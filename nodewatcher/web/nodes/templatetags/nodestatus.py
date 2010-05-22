@@ -38,7 +38,6 @@ def statusimage(value, arg, autoescape = None):
 
 def status(value, arg, autoescape = None):
   value = value.lower()
-  print value
 
   if value.endswith("wc"):
     status = value[:-2]
