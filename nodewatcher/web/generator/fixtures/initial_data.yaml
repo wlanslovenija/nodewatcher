@@ -104,7 +104,7 @@
     iface_wifi: wl0
     imagebuilder: imagebuilder.brcm24
     imagefiles: [2, 5]
-    name: Linksys WRT54GS (2.4 kernel)
+    name: Linksys WRT54GS v1.0-4.0 (2.4 kernel)
     openwrt_version: new
     port_layout: wrt54gs
     short_name: wrt54gs
@@ -210,6 +210,23 @@
     openwrt_version: new
     port_layout: rb411
     short_name: rb411ah
+- model: generator.Template
+  pk: 12
+  fields:
+    arch: mipsel
+    channel: 8
+    description: ''
+    driver: broadcom
+    experimental: true
+    iface_lan: eth0.0
+    iface_wan: eth0.1
+    iface_wifi: wl0
+    imagebuilder: imagebuilder.brcm24
+    imagefiles: [1, 2]
+    name: Linksys WRT54G v1.0-4.0 (2.4 kernel)
+    openwrt_version: new
+    port_layout: wrt54gs
+    short_name: wrt54g
 
 #
 # Interface mappings
@@ -295,6 +312,15 @@
 - fields: {ifname: ath0, template: 11, type: 2}
   model: generator.ifacetemplate
   pk: 35
+- fields: {ifname: eth0.0, template: 12, type: 0}
+  model: generator.ifacetemplate
+  pk: 36
+- fields: {ifname: eth0.1, template: 12, type: 1}
+  model: generator.ifacetemplate
+  pk: 37
+- fields: {ifname: wl0, template: 12, type: 2}
+  model: generator.ifacetemplate
+  pk: 38
 
 #
 # Optional packages
