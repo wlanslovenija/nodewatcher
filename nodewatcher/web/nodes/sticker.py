@@ -1,5 +1,6 @@
 from django.template import Context, loader
 from django.contrib.sites.models import Site
+from django.conf import settings
 import subprocess, os
 
 def generate_sticker(user, regenerate = False):
