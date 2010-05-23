@@ -1,5 +1,6 @@
 Name: {{ obj.name|default:_("unknown") }}<br/>
 Location: {{ obj.location|default:_("unknown") }}<br/>
-Project: {{ obj.project.name }}<br/>
+SSID: {{ obj.essid|default:obj.project.ssid|default:_("unknown") }}<br/>
+Project: {{ obj.project.name|default:_("unknown") }}<br/>
 Latitude: {{ obj.geo_lat }}<br/>
 Longitude: {{ obj.geo_long }}
