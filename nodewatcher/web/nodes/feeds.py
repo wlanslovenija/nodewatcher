@@ -32,7 +32,8 @@ class LatestEvents(Feed):
     return item.timestamp
 
   def item_link(self, item):
-    return item.node.get_full_url()
+    # Has to use anchors so that links are unique otherwise RSS readers collapse events per node
+    return "%s#event%s" % (item.node.get_full_url(), item.id)
 
 class ActiveNodes(GeoFeed):
   link = "%s://%s/" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
