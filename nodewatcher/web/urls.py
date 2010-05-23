@@ -1,10 +1,11 @@
 from django.conf.urls.defaults import *
-from web.nodes.feeds import LatestEvents
+from web.nodes.feeds import LatestEvents, ActiveNodes
 from web.nodes.sitemaps import NodeSitemap, StaticSitemap, RootPageSitemap
 from django.conf import settings
 
 feeds = {
-  'events'  : LatestEvents
+  'events'  : LatestEvents,
+  'active'  : ActiveNodes
 }
 
 sitemaps = {

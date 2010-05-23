@@ -1,0 +1,5 @@
+Name: {{ obj.name|default:_("unknown") }}<br/>
+Location: {{ obj.location|default:_("unknown") }}<br/>
+Project: {{ obj.project.name }}<br/>
+Latitude: {{ obj.geo_lat }}<br/>
+Longitude: {{ obj.geo_long }}
