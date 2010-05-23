@@ -43,7 +43,7 @@ class ActiveNodes(GeoFeed):
     return "%s - Active nodes" % settings.NETWORK_NAME
   
   def items(self):
-    return Node.objects.filter(node_type = NodeType.Mesh).filter(status = NodeStatus.Up).exclude(geo_lat = None).exclude(geo_long = None).order_by('ip')
+    return Node.objects.filter(node_type = NodeType.Mesh).filter(status = NodeStatus.Up).exclude(geo_lat = None).exclude(geo_long = None)
 
   def item_pubdate(self, item):
     return item.last_seen
