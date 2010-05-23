@@ -32,7 +32,7 @@ class LatestEvents(Feed):
     return item.timestamp
 
   def item_link(self, item):
-    return item.get_full_url()
+    return item.node.get_full_url()
 
 class ActiveNodes(GeoFeed):
   link = "%s://%s/" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
