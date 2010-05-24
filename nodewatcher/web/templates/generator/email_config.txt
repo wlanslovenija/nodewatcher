@@ -1,11 +1,11 @@
-{% load i18n %}{% blocktrans %}Hello {{ username }}!
+{% load i18n %}{% blocktrans with network.name as network_name %}Hello {{ username }}!
 
 Router configuration for ({{ hostname }}/{{ ip }}) has been generated!
 You can use it as a starting point for your custom router configuration so
 that its settings are compatible with the network.
 
 Configuration archive listed below contains files suitable for use with the
-{{ network.name }} firmware. Because of this, some settings may require patches
+{{ network_name }} firmware. Because of this, some settings may require patches
 and/or are version related. For further information consult:
 
   http://wlan-lj.net/wiki/Podrobnosti/PoMeri
