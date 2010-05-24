@@ -3,12 +3,12 @@
 ;
 general.uuid: 18e1e7f7-ab30-4e38-9ad8-213c0c7592b2
 general.version: 2.0b.r996
-general.local_time: 1269994863
-general.uptime: 649192.26 623971.76
-general.loadavg: 0.01 0.03 0.00 1/34 6435
-general.memfree: 1140
+general.local_time: 1274704557
+general.uptime: 414476.11 388689.47
+general.loadavg: 0.00 0.03 0.00 2/34 24976
+general.memfree: 1356
 general.buffers: 0
-general.cached: 3128
+general.cached: 3024
 wifi.bssid: 02:CA:FF:EE:BA:BE
 wifi.essid: open.wlan-lj.net
 wifi.frequency: 2.447
@@ -18,12 +18,19 @@ wifi.frag: off
 dns.local: 0
 dns.remote: 0
 iptables.redirection_problem: 0
-iface.eth0.down: 376862850
-iface.eth0.up: 56039613
-iface.wifi0.down: 390997033
-iface.wifi0.up: 63400404
-iface.ath0.down: 8079406
-iface.ath0.up: 26880550
-iface.tap0.down: 432244842
-iface.tap0.up: 29592343
+iface.eth0.down: 2587908961
+iface.eth0.up: 304133894
+iface.wifi0.down: 553715484
+iface.wifi0.up: 2232856353
+iface.ath0.down: 237291516
+iface.ath0.up: 2151673567
+iface.tap0.down: 2458791521
+iface.tap0.up: 177187441
+nds.client0.avg_down: 0.023473
+nds.client0.down: 5
+nds.client0.added_at: 1274702784
+nds.client0.ip: 10.254.131.83
+nds.client0.up: 5
+nds.client0.avg_up: 0.0252297
+nds.client0.active_duration: 1776
 nds.down: 0

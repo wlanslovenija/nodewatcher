@@ -3,12 +3,12 @@
 ;
 general.uuid: 98eff417-cb7d-48f8-9eea-65d292318b4f
 general.version: 2.0b.r938
-general.local_time: 1269994867
-general.uptime: 3246379.81 3113928.93
-general.loadavg: 0.18 0.09 0.02 1/34 18111
-general.memfree: 1948
+general.local_time: 1274704559
+general.uptime: 1273948.35 1211458.91
+general.loadavg: 0.00 0.02 0.00 1/34 12736
+general.memfree: 1524
 general.buffers: 0
-general.cached: 3768
+general.cached: 3984
 wifi.bssid: 02:CA:FF:EE:BA:BE
 wifi.essid: open.wlan-lj.net
 wifi.frequency: 2.447
@@ -16,12 +16,12 @@ wifi.mac: 00:18:84:23:D4:49
 dns.local: 0
 dns.remote: 0
 iptables.redirection_problem: 0
-iface.eth0.down: 2316455083
-iface.eth0.up: 488626023
-iface.wifi0.down: 85083184
-iface.wifi0.up: 803341614
-iface.ath0.down: 53036532
-iface.ath0.up: 737412164
-iface.tap0.down: 2484040411
-iface.tap0.up: 241052082
+iface.eth0.down: 3638616223
+iface.eth0.up: 321952007
+iface.wifi0.down: 1282002303
+iface.wifi0.up: 2856554040
+iface.ath0.down: 120386522
+iface.ath0.up: 2716170562
+iface.tap0.down: 3658070065
+iface.tap0.up: 243906959
 nds.down: 0

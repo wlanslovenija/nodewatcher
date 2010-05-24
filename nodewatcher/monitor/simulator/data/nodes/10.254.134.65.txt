@@ -2,28 +2,39 @@
 ; wlan ljubljana NodeWatcher Script
 ;
 general.uuid: 78b610f8-b8a3-4768-bbed-2e779016c495
-general.version: 2.0b.r987
-general.local_time: 1269994863
-general.uptime: 909252.91 731490.38
-general.loadavg: 0.04 0.05 0.00 1/33 15781
-general.memfree: 1700
+general.version: 2.0b.r1116
+general.local_time: 1274704558
+general.uptime: 1517005.95 1151456.65
+general.loadavg: 0.52 0.29 0.17 1/34 17393
+general.memfree: 1728
 general.buffers: 0
-general.cached: 2636
+general.cached: 3044
 wifi.bssid: 02:CA:FF:EE:BA:BE
 wifi.essid: open.wlan-lj.net
 wifi.frequency: 2.427
 wifi.mac: 00:18:84:25:28:F5
 wifi.rts: off
 wifi.frag: off
+wifi.errors: 14
 dns.local: 0
 dns.remote: 0
 iptables.redirection_problem: 0
-iface.eth0.down: 1075310637
-iface.eth0.up: 797341972
-iface.wifi0.down: 169337821
-iface.wifi0.up: 3715051247
-iface.ath0.down: 3431576780
-iface.ath0.up: 3055259133
-iface.tap0.down: 3176681893
-iface.tap0.up: 2228688176
+net.losses: 1
+net.vpn.upload_limit: 
+net.vpn.mac: 00:ff:0e:da:61:9d
+iface.eth0.down: 1442386566
+iface.eth0.up: 2125482852
+iface.wifi0.down: 2714066934
+iface.wifi0.up: 3363855388
+iface.ath0.down: 3533917397
+iface.ath0.up: 2689223746
+iface.tap0.down: 2993559712
+iface.tap0.up: 339331301
+nds.client0.avg_down: 98.5796
+nds.client0.down: 185637
+nds.client0.added_at: 1274689497
+nds.client0.ip: 10.254.134.67
+nds.client0.up: 6702
+nds.client0.avg_up: 3.55948
+nds.client0.active_duration: 15065
 nds.down: 0

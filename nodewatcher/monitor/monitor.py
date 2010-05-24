@@ -550,7 +550,8 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         n.thresh_frag = safe_int_convert(info['wifi']['frag']) or 2347
 
       # Generate a graph for number of clients
-      add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients', n.clients)
+      if 'nds' in info:
+        add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients', n.clients)
 
       # Check for IP shortage
       wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)

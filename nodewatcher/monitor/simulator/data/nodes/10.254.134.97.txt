@@ -3,12 +3,12 @@
 ;
 general.uuid: cfd99115-aaa7-49fc-9012-7b4b3035b507
 general.version: 2.0b.r996
-general.local_time: 1269994868
-general.uptime: 654117.48 616346.33
-general.loadavg: 0.00 0.01 0.00 2/30 24497
-general.memfree: 944
-general.buffers: 668
-general.cached: 3656
+general.local_time: 1274704561
+general.uptime: 5363937.83 5132033.95
+general.loadavg: 0.04 0.01 0.00 2/30 15953
+general.memfree: 992
+general.buffers: 416
+general.cached: 3172
 wifi.bssid: 02:CA:FF:EE:BA:BE
 wifi.essid: open.wlan-lj.net
 wifi.frequency: 2.447
@@ -18,14 +18,14 @@ wifi.frag: off
 dns.local: 0
 dns.remote: 0
 iptables.redirection_problem: 0
-iface.eth0.down: 424350635
-iface.eth0.up: 143585727
-iface.eth0.0.down: 2762497
-iface.eth0.0.up: 31462503
-iface.eth0.1.down: 399791910
-iface.eth0.1.up: 107430953
-iface.wl0.down: 0
-iface.wl0.up: 21184244
-iface.tap0.down: 439990649
-iface.tap0.up: 28296946
+iface.eth0.down: 4284921022
+iface.eth0.up: 2023370047
+iface.eth0.0.down: 181231152
+iface.eth0.0.up: 823995174
+iface.eth0.1.down: 3885130376
+iface.eth0.1.up: 1150366948
+iface.wl0.down: 684
+iface.wl0.up: 172561114
+iface.tap0.down: 198728856
+iface.tap0.up: 628876301
 nds.down: 1
