@@ -78,13 +78,13 @@
     <td valign="top">{{ form.config_only.label }}</td>
     <td>
       {{ form.config_only }}<br/>
-      <span class="small_text">{% blocktrans %}Check this option to generate <b>ONLY</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="http://wlan-lj.net/wiki/Podrobnosti/PoMeri">custom node</a>.{% endblocktrans %}</span>
+      <span class="small_text">{% blocktrans with documentation_links.custom_image as custom_image_url %}Check this option to generate <b>ONLY</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="{{ custom_image_url }}">custom node</a>.{% endblocktrans %}</span>
     </td>
   </tr>
   {% if node.profile.template.experimental %}
   <tr>
     <td colspan="2" class="error">
-      {% blocktrans %}The firmware version you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave">known issues</a> page. If you find any bugs, please <a href="http://wlan-lj.net/newticket"">report them</a>. Also if you find the image to be working properly for a longer period of time, also <a href="http://wlan-lj.net/newticket">report it</a> so it may be moved from its experimental status.{% endblocktrans %}
+      {% blocktrans with documentation_links.known_issues as known_issues_url and documentation_links.report_issue as report_issue_url %}The firmware version you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="{{ known_issues_url }}">known issues</a> page. If you find any bugs, please <a href="{{ report_issue_url }}">report them</a>. Also if you find the image to be working properly for a longer period of time, also <a href="{{ report_issue_url }}">report it</a> so it may be moved from its experimental status.{% endblocktrans %}
     </td>
   </tr>
   {% endif %}
@@ -92,7 +92,7 @@
     {% if not node.owner.email %}
     <td colspan="2" class="error">
       {% if profile_configuration_url %}
-      {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions (like image generation) are disabled.{% endblocktrans %}
+      {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions are disabled.{% endblocktrans %}
       {% else %}
       {% blocktrans %}You have no e-mail address configured for your account!{% endblocktrans %}
       {% endif %}

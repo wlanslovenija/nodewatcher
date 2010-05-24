@@ -19,7 +19,7 @@ Additional data:
 
 You may configure event subscriptions via settings available by going to
 the following URL:
-  http://nodes.wlan-lj.net/nodes/events
+  {{ base_url }}/nodes/events
 
 Best regards,
 {{ network.name }} network <{{ network.contact }}>

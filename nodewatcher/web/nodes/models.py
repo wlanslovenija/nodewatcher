@@ -1440,7 +1440,8 @@ class EventSubscription(models.Model):
       'network' : { 'name'        : settings.NETWORK_NAME,
                     'contact'     : settings.NETWORK_CONTACT,
                     'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
-                  }
+                  },
+      'base_url' : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
     })
 
     # Format node name and IP

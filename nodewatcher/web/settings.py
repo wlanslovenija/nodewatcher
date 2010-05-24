@@ -17,6 +17,8 @@ ENABLE_IMAGE_GENERATOR = False
 # If it is, image requests are not queued and message about that is issued to the user
 IMAGE_GENERATOR_SUSPENDED = False
 
+IMAGES_BINDIST_URL = 'http://bindist.wlan-lj.net/images/'
+
 # A tuple that lists people who get code error notifications. When
 # DEBUG=False and a view raises an exception, Django will e-mail these
 # people with the full exception information. Each member of the tuple
@@ -182,3 +184,11 @@ MONITOR_POLL_INTERVAL = 300
 MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
 MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
 MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')
+
+DOCUMENTATION_LINKS = {
+  'custom_image'    : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',
+  'known_issues'    : 'http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave',
+  'report_issue'    : 'http://wlan-lj.net/newticket',
+  'diversity'       : 'http://wlan-lj.net/wiki/Diversity',
+  'decimal_degrees' : 'http://en.wikipedia.org/wiki/Decimal_degrees'
+}

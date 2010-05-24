@@ -1,23 +1,17 @@
 {% load i18n %}{% blocktrans with network.name as network_name %}Hello {{ username }}!
 
 Router configuration for ({{ hostname }}/{{ ip }}) has been generated!
-You can use it as a starting point for your custom router configuration so
-that its settings are compatible with the network.
-
-Configuration archive listed below contains files suitable for use with the
-{{ network_name }} firmware. Because of this, some settings may require patches
-and/or are version related. For further information consult:
-
-  http://wlan-lj.net/wiki/Podrobnosti/PoMeri
+You can use it as a starting point for your custom router configuration
+so that its settings are compatible with the network. Some settings may
+require patches and/or are version related.
 
 The generated configuration archive is available here:{% endblocktrans %}
 
-  http://bindist.wlan-lj.net/images/{{ config }}
+  {{ images_bindist_url }}{{ config }}
   MD5: {{ checksum }}
 
-{% blocktrans with network.name as network_name and network.contact as network_contact %}Note that these files will only remain available for 5 days. After that
-time, they will be removed from the server and you will have to request them
-again.
+{% blocktrans with network.name as network_name and network.contact as network_contact %}Note that these files could be removed after some time. In this case you
+will have to request them again.
 
 Thank you for your participation in the project!
 

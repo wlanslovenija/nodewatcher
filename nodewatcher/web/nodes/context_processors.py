@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.sites.models import Site
 from web.nodes.models import Subnet
 
 def web_client_node(request):
@@ -26,7 +27,10 @@ def global_values(request):
                  'contact'     : settings.NETWORK_CONTACT,
                  'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                },
+   'base_url'                  : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain),
    'reset_password_url'        : getattr(settings, 'RESET_PASSWORD_URL', None),
    'profile_configuration_url' : getattr(settings, 'PROFILE_CONFIGURATION_URL', None),
-   'register_user_url'         : getattr(settings, 'REGISTER_USER_URL', None)
+   'register_user_url'         : getattr(settings, 'REGISTER_USER_URL', None),
+   'images_bindist_url'        : getattr(settings, 'IMAGES_BINDIST_URL', None),
+   'documentation_links'       : getattr(settings, 'DOCUMENTATION_LINKS', {})
   }
