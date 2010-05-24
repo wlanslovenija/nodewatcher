@@ -135,7 +135,8 @@ def generate_image(d):
       'network'   : { 'name'        : settings.NETWORK_NAME,
                       'contact'     : settings.NETWORK_CONTACT,
                       'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
-                    }
+                    },
+      'images_bindist_url' : getattr(settings, 'IMAGES_BINDIST_URL', None)
     })
 
     send_mail(
@@ -188,7 +189,8 @@ def generate_image(d):
       'network'   : { 'name'        : settings.NETWORK_NAME,
                       'contact'     : settings.NETWORK_CONTACT,
                       'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
-                    }
+                    },
+      'images_bindist_url' : getattr(settings, 'IMAGES_BINDIST_URL', None)
     })
     
     send_mail(
@@ -245,7 +247,8 @@ try:
         'network'   : { 'name'        : settings.NETWORK_NAME,
                         'contact'     : settings.NETWORK_CONTACT,
                         'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
-                      }
+                      },
+        'images_bindist_url' : getattr(settings, 'IMAGES_BINDIST_URL', None)
       })
 
       send_mail(
