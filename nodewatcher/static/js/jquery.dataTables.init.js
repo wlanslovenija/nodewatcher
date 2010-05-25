@@ -4,24 +4,35 @@
 // There should be no be equally named groups in different tables
 var allGroups = [];
 
+function testIP(data) {
+	return /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/.test(data);
+}
+
+function extractFirstElementText(data) {
+	return $(data).eq(0).text();
+}
+
 jQuery.fn.dataTableExt.aTypes.push(
 	function (sData) {
-		if (/^\s*$/.test(sData.replace(/<.*?>/g, ""))) {
-			// Nothing except HTML tags are in data, we will try to use alt attribute
-			return 'html-alt';
-		}
-		return null;
-	},
-	function (sData) {
-		// We use valid HTML data where this characters should be escaped in text
-		if (/[<>]/.test(sData)) {
-			return 'html';
-		}
-		return null;
-	},
-	function (sData) {
-		if (/^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/.test(sData)) {
+		if (testIP(sData)) {
 			return 'ip-address';
+		}
+		return null;
+	},
+	function (sData) {
+		// We use valid HTML data where this characters should be escaped in text so we can find tags this way
+		if (/[<>]/.test(sData)) {
+			if (testIP(extractFirstElementText(sData))) {
+				return 'html-ip-address';
+			}
+			else if (/^\s*$/.test(sData.replace(/<.*?>/g, ""))) {
+				// Nothing except HTML tags are in data, we will try to use alt attribute
+				return 'html-alt';
+			}
+			else {
+				// Will use text between HTML tags
+				return 'html';
+			}
 		}
 		return null;
 	},
@@ -92,6 +103,14 @@ jQuery.fn.dataTableExt.oSort['ip-address-asc'] = function (a, b) {
 
 jQuery.fn.dataTableExt.oSort['ip-address-desc'] = function (a, b) {
 	return jQuery.fn.dataTableExt.oSort['ip-address-asc'](b, a);
+};
+
+jQuery.fn.dataTableExt.oSort['html-ip-address-asc'] = function (a, b) {
+	return jQuery.fn.dataTableExt.oSort['ip-address-asc'](extractFirstElementText(a), extractFirstElementText(b));
+}
+
+jQuery.fn.dataTableExt.oSort['html-ip-address-desc'] = function (a, b) {
+	return jQuery.fn.dataTableExt.oSort['html-ip-address-asc'](b, a);
 };
 
 jQuery.fn.dataTableExt.oSort['group-sort-asc'] = function (a, b) {
