@@ -194,23 +194,6 @@
     port_layout: wl-500gp-v1
     short_name: wl-500gp-v1
 - model: generator.Template
-  pk: 11 
-  fields:
-    arch: mips
-    channel: 8
-    description: ''
-    driver: atheros
-    experimental: true
-    iface_lan: ''
-    iface_wan: eth0
-    iface_wifi: ath0
-    imagebuilder: imagebuilder.ar71xx
-    imagefiles: [6, 7]
-    name: MikroTik RB411AH (2.6 kernel)
-    openwrt_version: new
-    port_layout: rb411
-    short_name: rb411ah
-- model: generator.Template
   pk: 12
   fields:
     arch: mipsel
@@ -303,15 +286,6 @@
 - fields: {ifname: eth0, template: 8, type: 1}
   model: generator.ifacetemplate
   pk: 28
-- fields: {ifname: eth0, template: 11, type: 0}
-  model: generator.ifacetemplate
-  pk: 33
-- fields: {ifname: eth0, template: 11, type: 1}
-  model: generator.ifacetemplate
-  pk: 34
-- fields: {ifname: ath0, template: 11, type: 2}
-  model: generator.ifacetemplate
-  pk: 35
 - fields: {ifname: eth0.0, template: 12, type: 0}
   model: generator.ifacetemplate
   pk: 36
@@ -423,12 +397,6 @@
     class_name: web.nodes.transitions.OneWiFiSubnet
     priority: 1
     template: 10
-- model: generator.ProfileAdaptationChain
-  pk: 11
-  fields:
-    class_name: web.nodes.transitions.OneWiFiSubnet
-    priority: 1
-    template: 11
 - model: generator.ProfileAdaptationChain
   pk: 13
   fields:
