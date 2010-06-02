@@ -295,6 +295,16 @@
 - fields: {ifname: wl0, template: 12, type: 2}
   model: generator.ifacetemplate
   pk: 38
+- fields: {ifname: eth0.0, template: 10, type: 0}
+  model: generator.ifacetemplate
+  pk: 39
+- fields: {ifname: eth0.1, template: 10, type: 1}
+  model: generator.ifacetemplate
+  pk: 40
+- fields: {ifname: wl0, template: 10, type: 2}
+  model: generator.ifacetemplate
+  pk: 41
+
 
 #
 # Optional packages
@@ -336,12 +346,6 @@
     class_name: web.nodes.transitions.OnePortVPN
     priority: 1
     template: 4
-- model: generator.ProfileAdaptationChain
-  pk: 12
-  fields:
-    class_name: web.nodes.transitions.OnePortVPN
-    priority: 1
-    template: 11
 
 - model: generator.ProfileAdaptationChain
   pk: 2
