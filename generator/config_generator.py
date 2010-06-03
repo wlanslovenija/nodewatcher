@@ -672,7 +672,6 @@ class OpenWrtConfig(NodeConfig):
   def __generateDhcpServerConfig(self, f):
     f.write('domain-needed\n')
     f.write('bogus-priv\n')
-    f.write('filterwin2k\n')
     f.write('localise-queries\n')
     f.write('no-negcache\n')
     f.write('no-resolv\n')
