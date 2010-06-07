@@ -13,7 +13,7 @@
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>
   <ul>
-    <li class="first last"><a class="rss" href="/feeds/rss/active">{% trans "RSS Feed" %}</a></li>
+    <li class="first last"><a class="rss" href="/feeds/rss/active">{% trans "RSS Feed" %}</a> ({% trans "open in" %} <a href="http://maps.google.com/maps?q={{ base_url|urlencode }}{{ "/feeds/rss/active"|urlencode }}">Google Maps</a>)</li>
   </ul>
 {% endblock %}
 
