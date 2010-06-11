@@ -12,6 +12,7 @@ else
 fi
 
 # Drop can fail if there is no database already defined
-dropdb -U postgres nodewatcher
+dropdb -U postgres nodewatcher || true
+createuser -U postgres -S -D -R nodewatcher || true
 createdb -U postgres -E UNICODE -O nodewatcher nodewatcher
 psql -U postgres nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
