@@ -424,6 +424,10 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       n.clients = 0
       n.uptime = safe_uptime_convert(info['general']['uptime'])
       
+      # Treat missing firmware version file as NULL version
+      if n.firmware_version == "missing":
+        n.firmware_version = None
+      
       # Validate BSSID and ESSID
       if n.bssid != "02:CA:FF:EE:BA:BE":
         NodeWarning.create(n, WarningCode.BSSIDMismatch, EventSource.Monitor)
