@@ -787,28 +787,21 @@ class EditSubnetForm(forms.Form):
     super(EditSubnetForm, self).__init__(*args, **kwargs)
     self.__node = node
   
-  def clean(self):
+  @validates_node_configuration
+  def save(self, subnet):
     """
-    Additional validation handler.
+    Completes subnet edit.
     """
-    try:
-      type = int(self.cleaned_data.get('iface_type'))
-      if type == IfaceType.WiFi:
-        try:
-          subnet = Subnet.objects.get(node = self.__node, gen_iface_type = IfaceType.WiFi)
-          raise forms.ValidationError(_("Only one WiFi subnet may be allocated to a node!"))
-        except Subnet.DoesNotExist:
-          pass
-      
-      try:
-        if type == IfaceType.LAN and not self.__node.profile.template.iface_lan and self.__node.profile.use_vpn:
-          raise forms.ValidationError(_("The specified router only has one ethernet port! You have already enabled VPN, so you cannot add subnets to LAN port!"))
-      except Profile.DoesNotExist:
-        pass
-    except ValueError:
-      pass
+    subnet.description = self.cleaned_data.get('description')
+    subnet.gen_dhcp = self.cleaned_data.get('dhcp')
     
-    return self.cleaned_data
+    if not subnet.is_primary():
+      # One can't reassign the primary subnet, as it should always be on the
+      # mesh interface!
+      subnet.gen_iface_type = self.cleaned_data.get('iface_type')
+    
+    subnet.save()
+    return self.__node
 
 class WhitelistMacForm(forms.Form):
   """
