@@ -78,10 +78,6 @@
     <td width="200"><b>{% trans "Current allocation" %}</b></td>
     <td><b>{% trans "Renumber action" %}</b></td>
   </tr>
-  <tr>
-    <td>{{ node.ip }}</td>
-    <td>{{ form.primary_ip }} {{ form.manual_ip }}</td>
-  </tr>
   {% for subnet in form.get_subnet_fields %}
   <tr>
     <td valign="top">{{ subnet.model }}</td>
@@ -90,6 +86,10 @@
       <div class="prefix_len_{{ subnet.prefix }}">
         {% trans "New prefix length:" %}&nbsp;
         <select name="{{ subnet.prefix }}" id="id_{{ subnet.prefix }}"></select>
+        {% if user.is_staff %}
+        <br/>{% trans "Subnet (optional):" %}&nbsp;
+        {{ subnet.manual_ip }}
+        {% endif %}
       </div>
     </td>
   </tr>
@@ -106,14 +106,6 @@
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
   };
-  
-  function toggleManualIp() {
-    if ($('#id_primary_ip').attr('value') == {{ renumber_action_manual }}) {
-      $('#id_manual_ip').css('display', '');
-    } else {
-      $('#id_manual_ip').css('display', 'none');
-    }
-  }
   
   function updatePrefixLensForPool(subnetId, action) {
     if (action <= 0) {
@@ -132,13 +124,10 @@
   }
   
   $(document).ready(function () {
-    $('#id_primary_ip').change(function(event) { toggleManualIp(); });
     $('.subnet').change(function(event) {
       var subnetId = $(this).attr('id').replace('id_subnet_', '');
       updatePrefixLensForPool(subnetId, $(this).attr('value'));
     }).change();
-    
-    toggleManualIp();
   });
 </script>
 

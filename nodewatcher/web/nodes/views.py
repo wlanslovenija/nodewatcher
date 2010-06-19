@@ -335,8 +335,7 @@ def node_renumber(request, node):
   
   return render_to_response('nodes/renumber.html',
     { 'node' : node,
-      'form' : form,
-      'renumber_action_manual' : RenumberAction.SetManually },
+      'form' : form },
     context_instance = RequestContext(request)
   )
 

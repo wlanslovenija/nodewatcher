@@ -943,7 +943,6 @@ class RenumberForm(FormWithWarnings):
   """
   A form for renumbering a node.
   """
-  manual_ip = forms.CharField(max_length = 40, required = False)
   
   def __init__(self, user, node, *args, **kwargs):
     """
@@ -951,28 +950,6 @@ class RenumberForm(FormWithWarnings):
     """
     super(RenumberForm, self).__init__(*args, **kwargs)
     self.__node = node
-    
-    # Use renumber with subnet only when this is possible
-    self.fields['primary_ip'] = forms.ChoiceField(
-      choices = [
-        (RenumberAction.SetManually, _("Set manually"))
-      ],
-      initial = RenumberAction.SetManually
-    )
-    
-    if node.is_primary_ip_in_subnet():
-      self.fields['primary_ip'].choices.insert(0,
-        (RenumberAction.Renumber, _("Renumber with subnet"))
-      )
-      self.fields['primary_ip'].initial = RenumberAction.Renumber
-    else:
-      self.fields['primary_ip'].choices.insert(0,
-        (RenumberAction.Keep, _("Keep")),
-      )
-      self.fields['primary_ip'].initial = RenumberAction.Keep
-    
-    if not user.is_staff:
-      del self.fields['primary_ip'].choices[1]
     
     # Setup dynamic form fields, depending on how may subnets a node has
     primary = node.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % node.ip).filter(allocated = True).exclude(cidr = 0)
@@ -999,6 +976,9 @@ class RenumberForm(FormWithWarnings):
       
       # Field for choosing new subnet prefix size
       self.fields['prefix_%s' % subnet.pk] = forms.IntegerField(required = False, initial = 27)
+      
+      # Field for manual subnet specification
+      self.fields['manual_%s' % subnet.pk] = forms.CharField(required = False)
   
   def get_pools(self):
     """
@@ -1014,28 +994,29 @@ class RenumberForm(FormWithWarnings):
       field = self['subnet_%s' % subnet.pk]
       field.model = subnet
       field.prefix = 'prefix_%s' % subnet.pk
+      field.manual_ip = self['manual_%s' % subnet.pk]
       yield field
   
   def clean(self):
     """
     Additional validation handler.
     """
-    # Check that the manually set primary IP is not in conflict with anything
-    action = int(self.cleaned_data.get('primary_ip'))
-    manual_ip = self.cleaned_data.get('manual_ip')
-    
-    if action == RenumberAction.SetManually:
-      # Validate entered IP address
-      if not manual_ip or not IPV4_ADDR_RE.match(manual_ip) or manual_ip.startswith('127.'):
-        raise forms.ValidationError(_("Enter a valid primary IP address!"))
+    for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
+      manual_ip = self.cleaned_data.get('manual_%s' % subnet.pk)
+      if not manual_ip:
+        continue
       
-      # Check if the given address already exists
-      if Subnet.is_allocated(manual_ip, 32):
-        raise forms.ValidationError(_("Specified primary IP address is already in use!"))
-
-      # Check if the given subnet is part of any allocation pools
-      if Pool.contains_network(manual_ip, 32):
-        raise forms.ValidationError(_("Specified primary IP is part of an allocation pool and cannot be manually allocated!"))
+      action = int(self.cleaned_data.get('subnet_%s' % subnet.pk))
+      prefix_len = int(self.cleaned_data.get('prefix_%s' % subnet.pk) or 27)
+      
+      # Validate IP address format
+      if not IPV4_ADDR_RE.match(manual_ip):
+        raise forms.ValidationError(_("Enter a valid IP address or leave the subnet field empty!"))
+      
+      # Validate pool status
+      pool = Pool.objects.get(pk = action)
+      if not pool.reserve_subnet(manual_ip, prefix_len, check_only = True):
+        raise forms.ValidationError(_("Subnet %(subnet)s/%(prefix_len)d cannot be allocated from %(pool)s!") % { 'subnet' : manual_ip, 'prefix_len' : prefix_len, 'pool' : unicode(pool) })
     
     return self.cleaned_data
   
@@ -1056,6 +1037,7 @@ class RenumberForm(FormWithWarnings):
     for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet')[:]:
       action = int(self.cleaned_data.get('subnet_%s' % subnet.pk))
       prefix_len = int(self.cleaned_data.get('prefix_%s' % subnet.pk) or 27)
+      manual_ip = self.cleaned_data.get('manual_%s' % subnet.pk)
       
       if action == RenumberAction.Keep:
         pass
@@ -1064,7 +1046,10 @@ class RenumberForm(FormWithWarnings):
       else:
         # This means we should renumber to some other pool
         pool = Pool.objects.get(pk = action)
-        new_subnet = pool.allocate_subnet(prefix_len)
+        if manual_ip:
+          new_subnet = pool.reserve_subnet(manual_ip, prefix_len)
+        else:
+          new_subnet = pool.allocate_subnet(prefix_len)
         
         # If the old subnet has been the source of node's primary IP remember that
         save_primary = (not renumber_primary and primary and primary[0] == subnet)
@@ -1087,14 +1072,8 @@ class RenumberForm(FormWithWarnings):
           renumber_primary = True
     
     # The subnet have now been renumbered, check if we need to renumber the primary IP
-    action = int(self.cleaned_data.get('primary_ip'))
     router_id_changed = False
-    if action == RenumberAction.Keep:
-      pass
-    elif action == RenumberAction.SetManually:
-      self.__node.ip = self.cleaned_data.get('manual_ip')
-      router_id_changed = True
-    elif action == RenumberAction.Renumber and renumber_primary:
+    if renumber_primary:
       net = ipcalc.Network(primary.subnet, primary.cidr)
       self.__node.ip = str(net.host_first())
       router_id_changed = True
