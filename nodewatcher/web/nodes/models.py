@@ -125,6 +125,7 @@ class NodeType:
   Test = 3
   Unknown = 4
   Mobile = 5
+  Dead = 6
 
 class Node(models.Model):
   """
@@ -289,7 +290,7 @@ class Node(models.Model):
     """
     Returns true if this node should be visible on the map.
     """
-    return not self.system_node and self.geo_lat and self.geo_long
+    return not self.system_node and self.geo_lat and self.geo_long and not self.is_dead()
   
   def get_graphs(self):
     """
@@ -346,6 +347,12 @@ class Node(models.Model):
     Returns true if the node is a mobile node.
     """
     return self.node_type == NodeType.Mobile
+  
+  def is_dead(self):
+    """
+    Returns true if the node is marked as dead.
+    """
+    return self.node_type == NodeType.Dead
   
   def get_primary_ip_pool(self):
     """
@@ -413,6 +420,8 @@ class Node(models.Model):
       return _("Test node")
     elif self.node_type == NodeType.Mobile:
       return _("Mobile node")
+    elif self.node_type == NodeType.Dead:
+      return _("Dead node")
     else:
       return _("unknown node")
 
@@ -428,6 +437,8 @@ class Node(models.Model):
       return _("Test nodes")
     elif self.node_type == NodeType.Mobile:
       return _("Mobile nodes")
+    elif self.node_type == NodeType.Dead:
+      return _("Dead nodes")
     else:
       return _("Unknown nodes")
 

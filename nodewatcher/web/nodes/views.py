@@ -64,13 +64,13 @@ def statistics(request):
   # Nodes by status
   node_count = Node.objects.all().count()
   nodes_by_status = []
-  for s in Node.objects.exclude(node_type = NodeType.Test).order_by('status').values('status').annotate(count = models.Count('ip')):
+  for s in Node.objects.exclude(node_type__in = (NodeType.Test, NodeType.Dead)).order_by('status').values('status').annotate(count = models.Count('ip')):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
   # Nodes by template usage
   others = Node.objects.exclude(node_type = NodeType.Test).count()
   templates_by_usage = []
-  for t in Profile.objects.exclude(node__node_type = NodeType.Test).values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
+  for t in Profile.objects.exclude(node__node_type__in = (NodeType.Test, NodeType.Dead)).values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
     others -= t['count']
   
@@ -78,7 +78,7 @@ def statistics(request):
     templates_by_usage.append({ 'template' : _("unknown"), 'count' : others, 'special' : True })
 
   # Nodes by project
-  all_nodes = Node.objects.exclude(node_type = NodeType.Test).values('project__name', 'project__pk').annotate(count = models.Count('ip'))
+  all_nodes = Node.objects.exclude(node_type__in = (NodeType.Test, NodeType.Dead)).values('project__name', 'project__pk').annotate(count = models.Count('ip'))
   up_nodes = all_nodes.filter(status = NodeStatus.Up)
   nodes_by_project = []
   others = 0
@@ -100,12 +100,12 @@ def statistics(request):
     { 'node_count' : node_count,
       'nodes_by_status' : nodes_by_status,
       'nodes_by_project' : nodes_by_project,
-      'nodes_warned' : Node.objects.filter(warnings = True).exclude(node_type = NodeType.Test).count(),
+      'nodes_warned' : Node.objects.filter(warnings = True).exclude(node_type__in = (NodeType.Test, NodeType.Dead)).count(),
       'nodes_test' : Node.objects.filter(node_type = NodeType.Test).count(),
       'subnet_count' : Subnet.objects.all().count(),
       'clients_online' : APClient.objects.all().count(),
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
-      'external_ant' : Node.objects.filter(ant_external = True).exclude(node_type = NodeType.Test).count(),
+      'external_ant' : Node.objects.filter(ant_external = True).exclude(node_type__in = (NodeType.Test, NodeType.Dead)).count(),
       'template_usage' : templates_by_usage,
       'peers_avg' : round(Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'], 2),
       'graphs' : [
