@@ -336,6 +336,12 @@
     name: olsrd-mod-txtinfo
     fancy_name: olsrd-mod-txtinfo
     description: olsrd txtinfo plugin
+- model: generator.OptionalPackage
+  pk: 10
+  fields:
+    name: digitemp
+    fancy_name: digitemp
+    description: read data from 1-wire devices
 
 #
 # Transitions
