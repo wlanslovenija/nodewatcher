@@ -686,7 +686,6 @@ def check_mesh_status():
   Node.objects.all().update(visible = False)
   Subnet.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
-  GraphItem.objects.filter(last_update__lt = datetime.now() - timedelta(days = 30)).delete()
 
   # Reset some states
   NodeWarning.objects.all().update(source = EventSource.Monitor, dirty = False)
