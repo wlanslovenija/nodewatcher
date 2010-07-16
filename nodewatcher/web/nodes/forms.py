@@ -365,7 +365,8 @@ class UpdateNodeForm(forms.Form):
       (NodeType.Mesh, _("Mesh node")),
       (NodeType.Server, _("Server node")),
       (NodeType.Test, _("Test node")),
-      (NodeType.Mobile, _("Mobile node"))
+      (NodeType.Mobile, _("Mobile node")),
+      (NodeType.Dead, _("Dead node"))
     ],
     initial = NodeType.Mesh,
     label = _("Node type")
