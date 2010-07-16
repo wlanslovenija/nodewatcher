@@ -102,6 +102,7 @@ def statistics(request):
       'nodes_by_project' : nodes_by_project,
       'nodes_warned' : Node.objects.filter(warnings = True).exclude(node_type__in = (NodeType.Test, NodeType.Dead)).count(),
       'nodes_test' : Node.objects.filter(node_type = NodeType.Test).count(),
+      'nodes_dead' : Node.objects.filter(node_type = NodeType.Dead).count(),
       'subnet_count' : Subnet.objects.all().count(),
       'clients_online' : APClient.objects.all().count(),
       'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
