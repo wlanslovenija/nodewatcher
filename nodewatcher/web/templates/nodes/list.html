@@ -28,14 +28,14 @@ You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client
 <table border="0" width="100%" class="listing">
 <thead>
   <tr>
-    <th style="width: 22px;"></th>
-    <th style="width: 150px;"><b>{% trans "Node name" %}</b></th>
-    <th style="width: 100px;"><b>IP</b></th>
-    <th style="width: 260px;"><b>{% trans "Last seen up" %}</b></th>
-    <th style="width: 70px;" align="center"><b>{% trans "Status" %}</b></th>
-    <th style="width: 70px;" align="center"><b>{% trans "Peers" %}</b></th>
-    <th style="width: 70px;" align="center"><b>{% trans "Clients" %}</b></th>
-    <th style="width: 90px;" align="center"><b>{% trans "Project" %}</b></th>
+    <th style="width: 4%;"></th>
+    <th style="width: 23%;"><b>{% trans "Node name" %}</b></th>
+    <th style="width: 15%;"><b>IP</b></th>
+    <th style="width: 20%;"><b>{% trans "Last seen up" %}</b></th>
+    <th style="width: 8%;" align="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 8%;" align="center"><b>{% trans "Peers" %}</b></th>
+    <th style="width: 8%;" align="center"><b>{% trans "Clients" %}</b></th>
+    <th style="width: 10%;" align="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 {% if user.is_authenticated %}
@@ -51,7 +51,7 @@ You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client
   {% for node in nodes %}
   {% ifchanged node.node_type %}
   <tr class="section_title">
-    <td colspan="9"><b>{{ node.node_type_as_string_plural }}</b></td>
+    <td colspan="8"><b>{{ node.node_type_as_string_plural }}</b></td>
   </tr>
   {% endifchanged %}
   <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
@@ -65,7 +65,7 @@ You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client
     <td class="name"><a href="{% url view_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     {% if node.last_seen %}
-    <td>{{ node.last_seen|date }}</td>
+    <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>
     {% else %}
     <td>{% trans "never" %}</td>
     {% endif %}

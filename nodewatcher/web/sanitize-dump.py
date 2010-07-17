@@ -26,7 +26,9 @@ def object_transformator():
     
     # Some objects need to be sanitized
     if name == 'web.nodes.models.Node':
-      object.notes = ''
+      if not object.is_dead():
+        # We do not clean notes for dead nodes as they explain death background
+        object.notes = ''
     elif name == 'web.account.models.UserAccount':
       object.vpn_password = 'XXX'
       object.name = ""

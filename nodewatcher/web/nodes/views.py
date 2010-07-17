@@ -125,8 +125,13 @@ def my_nodes(request):
   Display a list of current user's nodes.
   """
   # TODO: #362
-  nodes = request.user.node_set.order_by('ip')
-  
+  def type_ip_order(x, y):
+    c = cmp(x.node_type, y.node_type)
+    if c != 0:
+      return c
+    return cmp(long(ipcalc.IP(x.ip)), long(ipcalc.IP(y.ip)))
+  nodes = list(request.user.node_set.all())
+  nodes.sort(type_ip_order)  
   return render_to_response('nodes/my.html',
     { 'nodes' : nodes },
     context_instance = RequestContext(request)

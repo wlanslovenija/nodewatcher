@@ -23,6 +23,9 @@
   {% endif %}
 {% endnotice %}
 {% endif %}
+{% if node.is_dead %}
+<div class="notice">{% blocktrans %}This node is marked as <b>dead</b> which means it <b>does not exist anymore</b>.<br />Data presented here is purely for archival and historical reasons.{% endblocktrans %}</div>
+{% endif %}
 
 <h3 class="section_title">{% trans "General Information" %}
 {% if current_owner and not node.is_invalid %}
@@ -105,7 +108,7 @@
     <td>{{ node.clients_so_far|default:"0" }}</td>
   </tr>
   {% endif %}
-  {% if node.get_stability %}
+  {% if node.get_stability and not node.is_dead %}
   <tr>
     <td>{% trans "Stability" %}</td>
     <td>{{ node.get_stability|default:_("unknown") }} %</td>
@@ -116,6 +119,7 @@
     <td><a href="{% url view_node_events node.pk %}">{% trans "show list" %}</a></td>
   </tr>
 </table>
+{% if not node.is_dead %}
 <h3 id="details_title">{% trans "Details" %}</h3>
 <table border="0" id="details_list" class="layout">
   <tr>
@@ -208,14 +212,6 @@
   {% endif %}
   {% endif %}
   {% endif %}
-  {% if current_owner and node.notes %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Notes" %}</td>
-  </tr>
-  <tr>
-    <td colspan="2">{{ node.notes|linebreaksbr }}</td>
-  </tr>
-  {% endif %}
   {% if node.has_status_information %}
   <tr class="section_title">
     <td colspan="2">{% trans "Status Information" %}</td>
@@ -234,6 +230,15 @@
   {% endif %}
   {% endif %}
 </table>
+{% endif %}
+
+{% if node.notes %}
+{% if current_owner or node.is_dead %}
+<h3>{% trans "Notes" %}</h3>
+{{ node.notes|linebreaks }}
+{% endif %}
+{% endif %}
+
 <h3>{% trans "Subnets" %}</h3>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
@@ -309,6 +314,7 @@
 </tbody>
 </table>
 
+{% if not node.is_dead %}
 <h3>{% trans "Immediate Neighbours / Peers" %}</h3>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
@@ -336,11 +342,16 @@
   {% endfor %}
 </tbody>
 </table>
+{% endif %}
 
 {% if node.get_graphs %}
 <h3>{% trans "Graphs" %}</h3>
   {% if node.is_down %}
+  {% if node.is_dead %}
+  <p class="error">{% trans "Node is marked as dead, so these graphs are out of date!" %}</p>
+  {% else %}
   <p class="error">{% trans "Node is currently down, so these graphs are out of date!" %}</p>
+  {% endif %}
   {% endif %}
 <div class="graphs">
 <div class="timespan">
