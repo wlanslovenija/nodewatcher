@@ -76,7 +76,7 @@ function toKbytes(n) {
 }
 
 jQuery.fn.dataTableExt.oSort['byte-size-asc'] = function (a, b) {
-	return compare(toKbytes(a), toKbytes(b))
+	return compare(toKbytes(a), toKbytes(b));
 };
 
 jQuery.fn.dataTableExt.oSort['byte-size-desc'] = function (a, b) {
@@ -203,7 +203,7 @@ $(document).ready(function() {
 			}
 		});
 	
-		if ($(this).find('tbody td:not([colspan])').length > 0) {
+		if (($(this).find('tbody td:not([colspan])').length > 0) || ($('table.listing').find('tbody td[colspan=1]').length > 0)) {
 			$(this).dataTable({
 				"bPaginate": false,
 				"bLengthChange": true,
