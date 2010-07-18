@@ -57,6 +57,7 @@
 </p>
 
 <form action="{% url web.nodes.views.node_allocate_subnet node.pk %}" method="post">
+{% csrf_token %}
 <table border="0" class="layout">
   {% if user.is_staff %}
   <tr>

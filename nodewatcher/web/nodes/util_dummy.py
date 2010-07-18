@@ -78,7 +78,7 @@ class IPField(models.Field):
     """
     return 'CharField'
   
-  def get_db_prep_value(self, value):
+  def get_db_prep_value(self, value, connection, prepared = False):
     """
     Properly formats a value for this field.
     """
@@ -89,12 +89,12 @@ class IPField(models.Field):
     
     return value
   
-  def get_db_prep_lookup(self, lookup_type, value):
+  def get_db_prep_lookup(self, lookup_type, value, connection, prepared = False):
     """
     Prepares this field for a database lookup.
     """
     if lookup_type != 'exact':
       raise TypeError('Lookup type %s not supported.' % lookup_type)
     
-    return [self.get_db_prep_value(value)]
+    return [self.get_db_prep_value(value, connection)]
 

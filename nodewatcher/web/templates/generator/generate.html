@@ -21,6 +21,7 @@
 {% endif %}
 
 <form method="POST" action="{% url generate_node node.pk %}">
+{% csrf_token %}
 <table border="0" width="700">
   <tr class="section_title">
     <td colspan="2">

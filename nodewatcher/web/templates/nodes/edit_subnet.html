@@ -22,6 +22,7 @@
 {% endif %}
 
 <form method="POST" action="{% url edit_subnet subnet.id %}">
+{% csrf_token %}
 <h3>{% trans "Subnet Information" %}</h3>
 <table border="0" width="100%">
   <tr>

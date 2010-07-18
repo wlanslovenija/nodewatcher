@@ -30,7 +30,8 @@
 </div>
 {% endif %}
 
-<form action="/nodes/event_subscribe" method="POST">
+<form action="{% url web.nodes.views.event_subscribe %}" method="POST">
+{% csrf_token %}
 <table border="0" width="700">
   <tr>
     <td>{{ form.type.label }}</td>

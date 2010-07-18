@@ -44,10 +44,11 @@
   </tr>
 </table>
   
-  <form method="POST" action="{% url reset_node node.pk %}">
-    <div class="buttons">
-     <input type="submit" value="{% trans "Reset" %}" />&nbsp;
-     <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
-    </div>
-  </form>
+<form method="POST" action="{% url reset_node node.pk %}">
+{% csrf_token %}
+  <div class="buttons">
+   <input type="submit" value="{% trans "Reset" %}" />&nbsp;
+   <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+  </div>
+</form>
 {% endblock %}

@@ -55,12 +55,13 @@
   </tr>
 </table>
 
-  <form method="POST" action="{% url web.nodes.views.node_deallocate_subnet subnet.id %}">
+<form method="POST" action="{% url web.nodes.views.node_deallocate_subnet subnet.id %}">
+{% csrf_token %}
   <div class="buttons">
     {% if not subnet.is_primary %}
     <input type="submit" value="{% trans "Remove" %}" />&nbsp;
     {% endif %}
     <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
   </div>
-  </form>
+</form>
 {% endblock %}

@@ -72,6 +72,7 @@
 {% endif %}
 
 <form method="POST" action="{% url renumber_node node.pk %}">
+{% csrf_token %}
 {{ form.confirm_all_warnings }}
 <table border="0" width="700">
   <tr>

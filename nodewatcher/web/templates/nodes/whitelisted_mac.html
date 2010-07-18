@@ -59,7 +59,8 @@
 </table>
 <p>{% trans "Enter a MAC address (physical address of your WiFi network card) to be whitelisted on all nodes, so no splash screen confirmation will be needed. Please note that after you enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the mesh, so be patient!" %}
 </p>
-<form action="/nodes/whitelisted_mac" method="post">
+<form action="{% url web.nodes.views.whitelisted_mac %}" method="post">
+{% csrf_token %}
 <table border="0" width="700">
   <tr>
     <td>{{ form.mac.label }}</td>

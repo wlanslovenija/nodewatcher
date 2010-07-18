@@ -44,10 +44,11 @@
   </tr>
 </table>
   
-  <form method="POST" action="{% url remove_node node.pk %}">
+<form method="POST" action="{% url remove_node node.pk %}">
+{% csrf_token %}
   <div class="buttons">
     <input type="submit" value="{% trans "Remove" %}" />&nbsp;
     <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
   </div>
-  </form>
+</form>
 {% endblock %}

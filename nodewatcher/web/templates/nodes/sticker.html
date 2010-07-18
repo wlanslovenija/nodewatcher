@@ -30,7 +30,8 @@
 <p>
 {% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
 </p>
-<form action="/nodes/sticker" method="post">
+<form action="{% url web.nodes.views.sticker %}" method="post">
+{% csrf_token %}
 <table border="0" width="700">
 
   <tr>

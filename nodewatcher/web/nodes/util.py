@@ -1,4 +1,4 @@
-from django.db import models, connection
+from django.db import models, connections, connection, DEFAULT_DB_ALIAS
 from django.db.models.sql.constants import LOOKUP_SEP
 from django.conf import settings
 from web.nodes import ipcalc
@@ -14,11 +14,12 @@ class IPQuerySet(models.query.QuerySet):
     """
     Performs an IP4 lookup.
     """
+    connection = connections[self._db or DEFAULT_DB_ALIAS]
     where_opts = []
     for key, value in kwargs.iteritems():
       field, op = key.split(LOOKUP_SEP)
       field_obj = self.model._meta.get_field_by_name(field)[0]
-      value = field_obj.get_db_prep_lookup('exact', value)[0]
+      value = field_obj.get_db_prep_lookup('exact', value, connection = connection)[0]
       field = "%s.%s" % (self.model._meta.db_table, field)
       
       if op == 'contains':
@@ -53,13 +54,13 @@ class IPField(models.Field):
   """
   A custom ip4r field.
   """
-  def db_type(self):
+  def db_type(self, connection):
     """
     Returns the database field type name.
     """
     return 'ip4r'
   
-  def get_db_prep_value(self, value):
+  def get_db_prep_value(self, value, connection, prepared = False):
     """
     Properly formats a value for this field.
     """
@@ -70,7 +71,7 @@ class IPField(models.Field):
     
     return "ip4r('%s')" % value
   
-  def get_db_prep_save(self, value):
+  def get_db_prep_save(self, value, connection):
     """
     Properly formats a value for this field.
     """
@@ -81,20 +82,20 @@ class IPField(models.Field):
     
     return value
   
-  def get_placeholder(self, value):
+  def get_placeholder(self, value, connection):
     """
     Returns a proper placeholder for the database value.
     """
     return "ip4r(%s)"
   
-  def get_db_prep_lookup(self, lookup_type, value):
+  def get_db_prep_lookup(self, lookup_type, value, connection, prepared = False):
     """
     Prepares this field for a database lookup.
     """
     if lookup_type != 'exact':
       raise TypeError('Lookup type %s not supported.' % lookup_type)
     
-    return [self.get_db_prep_value(value)]
+    return [self.get_db_prep_value(value, connection = connection)]
   
   def post_create_sql(self, style, db_table):
     """
