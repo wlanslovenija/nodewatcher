@@ -6,6 +6,7 @@ import re
 
 # Models
 from web.nodes.models import StatsSolar
+from web.nodes import data_archive
 from django.conf import settings
 from datetime import datetime
 from xml.etree import cElementTree as ElementTree
@@ -772,7 +773,7 @@ class RRA:
       )
   
   @staticmethod
-  def update(node, conf, archive, *values):
+  def update(node, conf, archive, *values, **kwargs):
     """
     Updates an existing RRD archive or creates a new one if needed.
     """
@@ -792,13 +793,13 @@ class RRA:
     )
 
     # Record data in database store if set
+    data = {}
+    for i, x in enumerate(conf.sources):
+      data[x.name] = values[i]
+    
     now = time.time()
     if 'db_model' in conf.__dict__ and now - conf.last_update >= conf.interval:
       try:
-        data = {}
-        for i, x in enumerate(conf.sources):
-          data[x.name] = values[i]
-        
         m = conf.db_model(**data)
         m.node = node
         m.timestamp = datetime.now()
@@ -806,6 +807,10 @@ class RRA:
         conf.last_update = now
       except ValueError:
         pass
+    
+    # Record data in archive when available
+    if kwargs.get('graph') is not None:
+      data_archive.record_data(kwargs.get('graph'), datetime.now(), data)
   
   @staticmethod
   def graph(conf, title, graph, archive, **kwargs):

@@ -154,7 +154,7 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   
   rra = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
   try:
-    RRA.update(node, conf, rra, *values)
+    RRA.update(node, conf, rra, *values, graph = graph.pk)
   except:
     logging.warning(format_exc())
   
@@ -186,7 +186,8 @@ def check_global_statistics():
     RRA.update(None, RRALocalTraffic, rra,
       stats['statistics:to-inet'],
       stats['statistics:from-inet'],
-      stats['statistics:internal']
+      stats['statistics:internal'],
+      graph = -1
     )
   except:
     logging.warning("Unable to process local server traffic information, skipping!")
@@ -203,13 +204,14 @@ def check_global_statistics():
     nbs.get(NodeStatus.Visible, 0),
     nbs.get(NodeStatus.Invalid, 0),
     nbs.get(NodeStatus.Pending, 0),
-    nbs.get(NodeStatus.Duped, 0)
+    nbs.get(NodeStatus.Duped, 0),
+    graph = -2
   )
 
   # Global client count
   client_count = len(APClient.objects.all())
   rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
-  RRA.update(None, RRAClients, rra, client_count)
+  RRA.update(None, RRAClients, rra, client_count, graph = -3)
 
 @transaction.commit_on_success
 def regenerate_graph(graph):

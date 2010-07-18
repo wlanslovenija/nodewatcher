@@ -185,6 +185,12 @@ MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
 MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
 MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')
 
+# Data archive configuration
+DATA_ARCHIVE_ENABLED = False
+DATA_ARCHIVE_HOST = '127.0.0.1'
+DATA_ARCHIVE_PORT = 27017
+DATA_ARCHIVE_DB = 'nodewatcher'
+
 DOCUMENTATION_LINKS = {
   'custom_image'    : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',
   'known_issues'    : 'http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave',

@@ -6,7 +6,7 @@ from django.template import loader, Context
 from django.conf import settings
 from django.contrib.sites.models import Site
 from web.nodes.locker import require_lock, model_lock
-from web.nodes import ipcalc
+from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.generator.types import IfaceType
@@ -893,6 +893,16 @@ class GraphItem(models.Model, GraphItemNP):
   dead = models.BooleanField(default = False)
   need_redraw = models.BooleanField(default = False)
   need_removal = models.BooleanField(default = False)
+  
+  def get_archive_data(self, start = None, sort = False):
+    """
+    Returns complete archive data for this graph. Will return an empty
+    list when data archival is disabled in configuration.
+    
+    @param start: Start datetime
+    @param sort: Set to true to sort by timestamp
+    """
+    return data_archive.fetch_data(self.pk, start = start, sort = sort)
 
 class WhitelistItem(models.Model):
   """
