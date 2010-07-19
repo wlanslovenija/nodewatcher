@@ -1,4 +1,5 @@
 from django.conf import settings
+from datetime import datetime
 
 if getattr(settings, 'DATA_ARCHIVE_ENABLED', False):
   # Only do this if data archival is enabled
@@ -24,11 +25,19 @@ if getattr(settings, 'DATA_ARCHIVE_ENABLED', False):
     @param timestamp: Timestamp
     @param data: Data dictionary
     """
-    data.update({
+    if timestamp > datetime.now():
+      return
+    
+    if all([x == "NaN" or x == None for x in data.values()]):
+      return
+    
+    q = {
       'graph' : graph,
       'timestamp' : timestamp
-    })
-    db.statistics.insert(data)
+    }
+    
+    data.update(q)
+    db.statistics.update(q, data, upsert = True)
   
   def fetch_data(graph, start = None, sort = False):
     """

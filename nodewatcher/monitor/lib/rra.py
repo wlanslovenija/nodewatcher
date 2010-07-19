@@ -9,7 +9,7 @@ from web.nodes.models import StatsSolar
 from web.nodes import data_archive
 from django.conf import settings
 from datetime import datetime
-from xml.etree import cElementTree as ElementTree
+import lxml.etree as ElementTree
 
 # Defining some constants and classes for easier usage later
 AverageCF = "AVERAGE"
@@ -586,7 +586,7 @@ class RRA:
   A wrapper class for managing round-robin archives via RRDTool.
   """
   @staticmethod
-  def convert(conf, archive):
+  def convert(conf, archive, action = "refresh", graph = None):
     """
     Converts 
     """
@@ -608,100 +608,126 @@ class RRA:
     start_offset = 3
     changed = False
     
-    # A simple marker to rescan sources as something has been modified
-    class RescanSources(Exception): pass
-    
-    while True:
-      data_sources = xml.findall('/ds')
-      data_source_names = [source.findtext('./name').strip() for source in data_sources]
+    if action == "refresh":
+      # A simple marker to rescan sources as something has been modified
+      class RescanSources(Exception): pass
       
-      try:
-        for ds in data_source_names:
-          if ds not in wanted_source_names:
-            print "WARNING: Removal of sources currently not supported!"
-            # If we remove something we must continue the loop
-            # raise RescanSources
+      while True:
+        data_sources = xml.findall('/ds')
+        data_source_names = [source.findtext('./name').strip() for source in data_sources]
         
-        for idx, ds in enumerate(wanted_source_names):
-          if ds not in data_source_names:
-            print "INFO: Adding data source '%s' to RRD '%s.'" % (ds, os.path.basename(archive))
-            
-            # Update header
-            dse = ElementTree.Element("ds")
-            ElementTree.SubElement(dse, "name").text = conf.sources[idx].name
-            ElementTree.SubElement(dse, "type").text = conf.sources[idx].type
-            ElementTree.SubElement(dse, "minimal_heartbeat").text = str(conf.sources[idx].heartbeat) 
-            ElementTree.SubElement(dse, "min").text = "NaN"
-            ElementTree.SubElement(dse, "max").text = "NaN"
-            ElementTree.SubElement(dse, "last_ds").text = "UNKN"
-            ElementTree.SubElement(dse, "value").text = "0.0000000000e+00"
-            ElementTree.SubElement(dse, "unknown_sec").text = "0"
-            xml.getroot().insert(start_offset + idx, dse)
-            
-            # Update all RRAs
-            for rra in xml.findall('/rra'):
-              # Update RRA header
-              cdp = rra.find('./cdp_prep')
-              dse = ElementTree.Element("ds")
-              ElementTree.SubElement(dse, "primary_value").text = "NaN"
-              ElementTree.SubElement(dse, "secondary_value").text = "NaN"
-              ElementTree.SubElement(dse, "value").text = "NaN"
-              ElementTree.SubElement(dse, "unknown_datapoints").text = "0"
-              cdp.insert(idx, dse)
+        try:
+          for ds in data_source_names:
+            if ds not in wanted_source_names:
+              print "WARNING: Removal of sources currently not supported!"
+              # If we remove something we must continue the loop
+              # raise RescanSources
+          
+          for idx, ds in enumerate(wanted_source_names):
+            if ds not in data_source_names:
+              print "INFO: Adding data source '%s' to RRD '%s.'" % (ds, os.path.basename(archive))
               
-              # Update all RRA datapoints
-              for row in rra.findall('./database/row'):
-                v = ElementTree.Element("v")
-                v.text = "NaN"
-                row.insert(idx, v)
-            
-            changed = True
-        
-        break
-      except RescanSources:
-        pass
-    
-    # Add RRAs when they have changed (only addition is supported)
-    for wanted_rra in conf.archives:
+              # Update header
+              dse = ElementTree.Element("ds")
+              ElementTree.SubElement(dse, "name").text = conf.sources[idx].name
+              ElementTree.SubElement(dse, "type").text = conf.sources[idx].type
+              ElementTree.SubElement(dse, "minimal_heartbeat").text = str(conf.sources[idx].heartbeat) 
+              ElementTree.SubElement(dse, "min").text = "NaN"
+              ElementTree.SubElement(dse, "max").text = "NaN"
+              ElementTree.SubElement(dse, "last_ds").text = "UNKN"
+              ElementTree.SubElement(dse, "value").text = "0.0000000000e+00"
+              ElementTree.SubElement(dse, "unknown_sec").text = "0"
+              xml.getroot().insert(start_offset + idx, dse)
+              
+              # Update all RRAs
+              for rra in xml.findall('/rra'):
+                # Update RRA header
+                cdp = rra.find('./cdp_prep')
+                dse = ElementTree.Element("ds")
+                ElementTree.SubElement(dse, "primary_value").text = "NaN"
+                ElementTree.SubElement(dse, "secondary_value").text = "NaN"
+                ElementTree.SubElement(dse, "value").text = "NaN"
+                ElementTree.SubElement(dse, "unknown_datapoints").text = "0"
+                cdp.insert(idx, dse)
+                
+                # Update all RRA datapoints
+                for row in rra.findall('./database/row'):
+                  v = ElementTree.Element("v")
+                  v.text = "NaN"
+                  row.insert(idx, v)
+              
+              changed = True
+          
+          break
+        except RescanSources:
+          pass
+      
+      # Add RRAs when they have changed (only addition is supported)
+      for wanted_rra in conf.archives:
+        for rra in xml.findall('/rra'):
+          cf = rra.findtext('./cf').strip()
+          steps = int(rra.findtext('./pdp_per_row').strip())
+          rows = len(rra.findall('./database/row'))
+          xff = float(rra.findtext('./params/xff').strip())
+          
+          match = all([
+            cf == wanted_rra.cf,
+            steps == wanted_rra.steps,
+            rows == wanted_rra.rows,
+            xff == wanted_rra.xff
+          ])
+          
+          if match:
+            break
+        else:
+          # Not found in existing RRAs, we need to add it
+          print "INFO: Adding new RRA '%s' to '%s'." % (wanted_rra, os.path.basename(archive)) 
+          changed =  True
+          
+          rra = ElementTree.SubElement(xml.getroot(), "rra")
+          ElementTree.SubElement(rra, "cf").text = wanted_rra.cf
+          ElementTree.SubElement(rra, "pdp_per_row").text = str(wanted_rra.steps)
+          params = ElementTree.SubElement(rra, "params")
+          ElementTree.SubElement(params, "xff").text = str(wanted_rra.xff)
+          cdp_prep = ElementTree.SubElement(rra, "cdp_prep")
+          
+          for ds in conf.sources:
+            dse = ElementTree.SubElement(cdp_prep, "ds")
+            ElementTree.SubElement(dse, "primary_value").text = "NaN"
+            ElementTree.SubElement(dse, "secondary_value").text = "NaN"
+            ElementTree.SubElement(dse, "value").text = "NaN"
+            ElementTree.SubElement(dse, "unknown_datapoints").text = "0"
+          
+          database = ElementTree.SubElement(rra, "database")
+          for row in xrange(wanted_rra.rows):
+            row = ElementTree.SubElement(database, "row")
+            for v in xrange(len(conf.sources)):
+              ElementTree.SubElement(row, "v").text = "NaN"
+    elif action == "archive":
+      # Archives data from RRDs
+      print "INFO: Archiving RRD '%s.'" % os.path.basename(archive)
+      
       for rra in xml.findall('/rra'):
         cf = rra.findtext('./cf').strip()
-        steps = int(rra.findtext('./pdp_per_row').strip())
-        rows = len(rra.findall('./database/row'))
-        xff = float(rra.findtext('./params/xff').strip())
-        
-        match = all([
-          cf == wanted_rra.cf,
-          steps == wanted_rra.steps,
-          rows == wanted_rra.rows,
-          xff == wanted_rra.xff
-        ])
-        
-        if match:
-          break
-      else:
-        # Not found in existing RRAs, we need to add it
-        print "INFO: Adding new RRA '%s' to '%s'." % (wanted_rra, os.path.basename(archive)) 
-        changed =  True
-        
-        rra = ElementTree.SubElement(xml.getroot(), "rra")
-        ElementTree.SubElement(rra, "cf").text = wanted_rra.cf
-        ElementTree.SubElement(rra, "pdp_per_row").text = str(wanted_rra.steps)
-        params = ElementTree.SubElement(rra, "params")
-        ElementTree.SubElement(params, "xff").text = str(wanted_rra.xff)
-        cdp_prep = ElementTree.SubElement(rra, "cdp_prep")
-        
-        for ds in conf.sources:
-          dse = ElementTree.SubElement(cdp_prep, "ds")
-          ElementTree.SubElement(dse, "primary_value").text = "NaN"
-          ElementTree.SubElement(dse, "secondary_value").text = "NaN"
-          ElementTree.SubElement(dse, "value").text = "NaN"
-          ElementTree.SubElement(dse, "unknown_datapoints").text = "0"
-        
-        database = ElementTree.SubElement(rra, "database")
-        for row in xrange(wanted_rra.rows):
-          row = ElementTree.SubElement(database, "row")
-          for v in xrange(len(conf.sources)):
-            ElementTree.SubElement(row, "v").text = "NaN"
+        if cf == 'AVERAGE':
+          timestamp = None
+          
+          for item in rra.findall('./database')[0]:
+            if item.tag == "row":
+              # Data
+              values = [x.text.strip() for x in item.findall('./v')]
+              data = {}
+              for i, x in enumerate(conf.sources):
+                data[x.name] = values[i]
+              
+              if graph is not None:
+                data_archive.record_data(graph, timestamp, data)
+            else:
+              # Comment
+              timestamp = datetime.fromtimestamp(int(item.text.split("/")[1].strip()))
+    else:
+      print "ERROR: Invalid RRD convert action '%s'!" % action
+      return
     
     if changed:
       try:

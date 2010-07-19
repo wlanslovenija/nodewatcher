@@ -22,6 +22,7 @@ parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Jus
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
 parser.add_option('--update-rrds', dest = 'update_rrds', help = 'Update RRDs', action = 'store_true')
+parser.add_option('--update-rrd-type', dest = 'update_rrd_type', help = 'Update RRD type (refresh, archive)', default = 'refresh')
 parser.add_option('--reverse-populate', dest = 'reverse_populate', help = 'Reverse populate RRD with data from a database', action = 'store_true')
 parser.add_option('--reverse-populate-node', dest = 'rp_node', help = 'Node to populate data for')
 parser.add_option('--reverse-populate-graph', dest = 'rp_graph', help = 'Graph type to populate data for')
@@ -254,7 +255,7 @@ def update_rrd(item):
   conf = RRA_CONF_MAP[item.type]
   
   # Update the RRD
-  RRA.convert(conf, archive)
+  RRA.convert(conf, archive, action = options.update_rrd_type, graph = item.pk)
 
 def update_rrds():
   """
@@ -273,9 +274,9 @@ def update_rrds():
     rra_status = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_nodes_by_status.rrd')
     rra_clients = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
     
-    RRA.convert(RRALocalTraffic, rra_traffic)
-    RRA.convert(RRANodesByStatus, rra_status)
-    RRA.convert(RRAClients, rra_clients) 
+    RRA.convert(RRALocalTraffic, rra_traffic, action = options.update_rrd_type, graph = -1)
+    RRA.convert(RRANodesByStatus, rra_status, action = options.update_rrd_type, graph = -2)
+    RRA.convert(RRAClients, rra_clients, action = options.update_rrd_type, graph = -3)
   except:
     logging.warning(format_exc())
   
