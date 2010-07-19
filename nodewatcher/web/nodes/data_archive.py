@@ -63,6 +63,6 @@ else:
   def record_data(graph, timestamp, data):
     pass
   
-  def fetch_data(graph, sort = False):
+  def fetch_data(graph, start = None, sort = False):
     return []
 
