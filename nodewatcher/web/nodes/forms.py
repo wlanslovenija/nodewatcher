@@ -666,14 +666,6 @@ class AllocateSubnetForm(forms.Form):
   """
   network = forms.CharField(max_length = 50, required = False)
   description = forms.CharField(max_length = 200, initial = 'LAN', widget = widgets.TextInput(attrs = {'size': '40'}))
-  iface_type = forms.ChoiceField(
-    choices = [
-      (IfaceType.WiFi, 'WiFi'),
-      (IfaceType.LAN, 'LAN')
-    ],
-    initial = IfaceType.LAN,
-    label = _("Interface")
-  )
   prefix_len = forms.IntegerField(
     initial = 27,
     label = _("Prefix length")
@@ -755,7 +747,7 @@ class AllocateSubnetForm(forms.Form):
       subnet.allocated_at = datetime.now()
       subnet.status = SubnetStatus.NotAnnounced
       subnet.description = self.cleaned_data.get('description')
-      subnet.gen_iface_type = self.cleaned_data.get('iface_type')
+      subnet.gen_iface_type = IfaceType.LAN
       subnet.gen_dhcp = self.cleaned_data.get('dhcp')
       subnet.save()
     else:
@@ -765,7 +757,7 @@ class AllocateSubnetForm(forms.Form):
       subnet.allocated_at = datetime.now()
       subnet.status = SubnetStatus.NotAnnounced
       subnet.description = self.cleaned_data.get('description')
-      subnet.gen_iface_type = self.cleaned_data.get('iface_type')
+      subnet.gen_iface_type = IfaceType.LAN
       subnet.gen_dhcp = self.cleaned_data.get('dhcp')
       subnet.save()
 
@@ -779,15 +771,6 @@ class EditSubnetForm(forms.Form):
   A simple form for editing a subnet.
   """
   description = forms.CharField(max_length = 200, required = False)
-  iface_type = forms.ChoiceField(
-    choices = [
-      (IfaceType.WiFi, 'WiFi'),
-      (IfaceType.LAN, 'LAN')
-    ],
-    initial = IfaceType.LAN,
-    label = _("Interface"),
-    required = False
-  )
   dhcp = forms.BooleanField(required = False, initial = True, label = _("DHCP announce"))
   
   def __init__(self, node, *args, **kwargs):
@@ -804,12 +787,6 @@ class EditSubnetForm(forms.Form):
     """
     subnet.description = self.cleaned_data.get('description')
     subnet.gen_dhcp = self.cleaned_data.get('dhcp')
-    
-    if not subnet.is_primary():
-      # One can't reassign the primary subnet, as it should always be on the
-      # mesh interface!
-      subnet.gen_iface_type = self.cleaned_data.get('iface_type')
-    
     subnet.save()
     return self.__node
 

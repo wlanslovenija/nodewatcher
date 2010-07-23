@@ -409,7 +409,6 @@ def node_edit_subnet(request, subnet_id):
   else:
     form = EditSubnetForm(node, initial = {
       'description' : subnet.description,
-      'iface_type' : subnet.gen_iface_type,
       'dhcp' : subnet.gen_dhcp
     })
 
