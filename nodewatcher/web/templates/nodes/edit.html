@@ -2,10 +2,11 @@
 {% load i18n %}
 {% load gmap %}
 
-{% block title %}{% trans "Edit Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
-{% block heading %}{% trans "Edit Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block contenttype %}prefs{% endblock %}
+
 {% block content %}
 <ul id="tabs">
   <li class="active">{% trans "My nodes" %}</li>

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Events - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
-{% block heading %}Events - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <table border="0" class="listing">

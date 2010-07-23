@@ -20,10 +20,10 @@ function createIcon(status) {
 }
 
 function createMarker(node) {
-  var opts = { "title" : node.name + " (" + node.ip + ")", "icon" : createIcon(node.status + (node.current ? "wc" : "")) };
+  var opts = { "title" : "Node " + node.name, "icon" : createIcon(node.status + (node.current ? "wc" : "")) };
   var m = new google.maps.Marker(new google.maps.LatLng(node.lat, node.long), opts);
   GEvent.addListener(m, "click", function() {
-    html = "<b>" + node.name + "</b> (" + node.ip + ")<div class=\"gmap_details\">Status: <span class=\"node_status_" +
+    html = "<b>Node " + node.name + "</b><div class=\"gmap_details\">Status: <span class=\"node_status_" +
            node.status + "\">" + node.status + "</span><br><a href=\"/nodes/node/" + node.pk +"\">more information</a>";
     if (node.url) html = html + " | <a href=\"" + node.url + "\">visit home page</a>";
     m.openInfoWindowHtml(html + "</div>");

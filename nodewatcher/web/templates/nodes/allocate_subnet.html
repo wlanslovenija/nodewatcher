@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
-{% block heading %}{% trans "Subnet Allocation" %} - {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
 {% block content %}
-
 {% if form.errors %}
 <div class="error">
   {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to allocate a subnet:{% endblocktrans %}<br />

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Reset Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
-{% block heading %}{% trans "Reset Node" %} {{ node.name|default:_("unknown") }} ({{ node.ip }}){% endblock %}
+{% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Reset Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Reset Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
   <div class="error">
