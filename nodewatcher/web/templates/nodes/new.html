@@ -35,7 +35,7 @@
 
 <form action="{% url new_node %}" method="post">
 {% csrf_token %}
-<table border="0" width="700px">
+<table border="0" width="700">
   <tr>
     <td style="width: 200px;">{{ form.name.label }}</td>
     <td>{{ form.name }}</td>

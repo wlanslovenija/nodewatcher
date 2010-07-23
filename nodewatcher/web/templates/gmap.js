@@ -22,16 +22,22 @@
 
       {% if clickable %}
       google.maps.Event.addListener(map, "click", function(overlay, p) {
-        if (!m) {
-          m = new google.maps.Marker(p, {'icon': createIcon('new')});
-          map.addOverlay(m);
-        }
-        else {
-          m.setLatLng(p);
-        }
+        if (!overlay) {
+          if (!m) {
+            m = new google.maps.Marker(p, {'icon': createIcon('new'), 'clickable': false, 'draggable': true});
+            google.maps.Event.addListener(m, "dragend", function(p) {
+              document.getElementById("id_geo_lat").value = p.lat();
+              document.getElementById("id_geo_long").value = p.lng();
+            });
+            map.addOverlay(m);
+          }
+          else {
+            m.setLatLng(p);
+          }
 
-        document.getElementById("id_geo_lat").value = p.lat();
-        document.getElementById("id_geo_long").value = p.lng();
+          document.getElementById("id_geo_lat").value = p.lat();
+          document.getElementById("id_geo_long").value = p.lng();
+        }
       });
       {% endif %}
       {% endif %}
