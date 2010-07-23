@@ -23,8 +23,15 @@
   {% endif %}
 {% endnotice %}
 {% endif %}
+{% if node.pk == web_client_node.pk %}
+{% notice %}
+You are using this node to connect to the <em>{{ network.name }}</em> network.
+{% endnotice %}
+{% endif %}
 {% if node.is_dead %}
-<div class="notice">{% blocktrans %}This node is marked as <b>dead</b> which means it <b>does not exist anymore</b>.<br />Data presented here is purely for archival and historical reasons.{% endblocktrans %}</div>
+{% notice %}
+{% blocktrans %}This node is marked as <b>dead</b> which means it <b>does not exist anymore</b>.<br />Data presented here is purely for archival and historical reasons.{% endblocktrans %}
+{% endnotice %}
 {% endif %}
 
 <h3 class="section_title">{% trans "General Information" %}
