@@ -98,3 +98,33 @@ class IPField(models.Field):
     
     return [self.get_db_prep_value(value, connection)]
 
+def do_cmp(cmp_func, field):
+  """
+  Helper function for sorting the queryset.
+  """
+  if field.find("__") != -1:
+    raise ValueError("Unsupported field name for sorting.")
+  if field[0] == "-":
+    reverse = True
+    field = field[1:]
+  else:
+    reverse = False
+  c = cmp_func(field)
+  if reverse:
+    c *= -1
+  return c
+
+def queryset_by_ip(queryset, field_name, *sort_first):
+  """
+  Sorts the `query` by `field_name` where it represents some IP typed field. It can first sorts
+  lexicographically by `sort_first` fields, which it sorts normally.
+  
+  On non-PostgreSQL databases we manually sort whole queryset by converting in code values to integers and sort them.
+  """
+  def compare(x, y):
+    for field in sort_first:
+      c = do_cmp(lambda field: cmp(getattr(x, field), getattr(y, field)), field)
+      if c != 0:
+        return c
+    return do_cmp(lambda field: cmp(long(ipcalc.IP(str(getattr(x, field)))), long(ipcalc.IP(str(getattr(y, field))))), field_name)
+  return sorted(queryset, compare)

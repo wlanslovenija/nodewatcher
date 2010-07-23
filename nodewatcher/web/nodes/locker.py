@@ -20,15 +20,15 @@ from django.conf import settings
 
 # Check for database drivers, this is not done in the decorator
 # so this check is executed only once upon module load
-if settings.DATABASE_ENGINE.startswith('postgresql'):
+if settings.DATABASES['default']['ENGINE'].find('postgresql') != -1:
   # READ COMMITTED is the default isolation level in PostgreSQL so
   # we add explicit locking to support default isolation level.
   LOCK_TYPE = "postgresql"
-elif settings.DATABASE_ENGINE.startswith('mysql'):
+elif settings.DATABASES['default']['ENGINE'].find('mysql') != -1:
   # MySQL InnoDB default isolation level is REPEATABLE READ so we
   # add explicit locking to support default isolation level.
   LOCK_TYPE = "mysql"
-elif settings.DATABASE_ENGINE.startswith('sqlite'):
+elif settings.DATABASES['default']['ENGINE'].find('sqlite') != -1:
   # Locking is not necessary for SQLite as default isolation
   # level for SQLite is SERIALIZABLE. (This means concurrent
   # transactions can fail and users have to retry their requests.)

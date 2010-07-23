@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
 from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.common import ValidationWarning
+from web.nodes.util import queryset_by_ip
 from web.generator.models import Profile
 from web.account.models import UserAccount
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
@@ -20,16 +21,8 @@ def nodes(request):
   """
   Display a list of all current nodes and their status.
   """
-  # TODO: #362
-  def type_ip_order(x, y):
-    c = cmp(x.node_type, y.node_type)
-    if c != 0:
-      return c
-    return cmp(long(ipcalc.IP(x.ip)), long(ipcalc.IP(y.ip)))
-  nodes = list(Node.objects.all())
-  nodes.sort(type_ip_order)
   return render_to_response('nodes/list.html',
-    { 'nodes' : nodes },
+    { 'nodes' : queryset_by_ip(Node.objects.all(), 'ip', 'node_type') },
     context_instance = RequestContext(request)
   )
 
@@ -37,13 +30,8 @@ def pools(request):
   """
   Displays IP allocation pools.
   """
-  # TODO: #362
-  def ip_order(x, y):
-    return cmp(long(ipcalc.IP(str(x.ip_subnet))), long(ipcalc.IP(str(y.ip_subnet))))
-  pools = list(Pool.objects.filter(parent = None))
-  pools.sort(ip_order)
   return render_to_response('nodes/pools.html',
-    { 'pools' : pools },
+    { 'pools' : queryset_by_ip(Pool.objects.filter(parent = None), 'ip_subnet') },
     context_instance = RequestContext(request)
   )
 
@@ -124,16 +112,8 @@ def my_nodes(request):
   """
   Display a list of current user's nodes.
   """
-  # TODO: #362
-  def type_ip_order(x, y):
-    c = cmp(x.node_type, y.node_type)
-    if c != 0:
-      return c
-    return cmp(long(ipcalc.IP(x.ip)), long(ipcalc.IP(y.ip)))
-  nodes = list(request.user.node_set.all())
-  nodes.sort(type_ip_order)  
   return render_to_response('nodes/my.html',
-    { 'nodes' : nodes },
+    { 'nodes' : queryset_by_ip(request.user.node_set.all(), 'ip', 'node_type') },
     context_instance = RequestContext(request)
   )
 
@@ -496,8 +476,7 @@ def gcl(request):
   """
   Displays the global client list.
   """
-  # TODO: #362
-  clients = APClient.objects.all().order_by('node__ip', 'connected_at')
+  clients = APClient.objects.all().order_by('node__name', 'connected_at')
   return render_to_response('nodes/gcl.html',
     { 'clients' : clients },
     context_instance = RequestContext(request)

@@ -9,17 +9,11 @@ from web.nodes.locker import require_lock, model_lock
 from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
+from web.nodes.util import IPField, IPManager, queryset_by_ip
 from web.generator.types import IfaceType
 from web.dns.models import Zone, Record
 from datetime import datetime, timedelta
 import uuid
-
-# This will select the proper IP lookup mechanism, so it will also work on
-# non-PostgreSQL databases (but it will be much slower for larger sets).
-if settings.DATABASE_ENGINE.startswith('postgresql'):
-  from web.nodes.util import IPField, IPManager
-else:
-  from web.nodes.util_dummy import IPField, IPManager
 
 class Project(models.Model):
   """
@@ -483,7 +477,7 @@ class Node(models.Model):
     """
     Returns properly ordered subnets.
     """
-    return self.subnet_set.all().order_by("ip_subnet")
+    return queryset_by_ip(self.subnet_set.all(), "ip_subnet")
   
   def get_peers(self):
     """
@@ -692,7 +686,7 @@ class Subnet(models.Model):
     if self.cidr == 0:
       return Subnet.objects.none()
 
-    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node).order_by("ip_subnet")
+    return queryset_by_ip(Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node), "ip_subnet")
 
   @staticmethod
   def is_allocated(network, cidr, exclude_node = None):
@@ -1056,7 +1050,7 @@ class Pool(models.Model):
     # and traverse the left one
     alloc = None
     if self.children.count() > 0:
-      for child in self.children.exclude(status = PoolStatus.Full).order_by("ip_subnet"):
+      for child in queryset_by_ip(self.children.exclude(status = PoolStatus.Full), "ip_subnet"):
         alloc = child.allocate_buddy(prefix_len)
         if alloc:
           break
