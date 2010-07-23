@@ -3,6 +3,7 @@ from django.forms import widgets
 from django.db import transaction, models
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
+from django.core import validators as core_validators
 from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType
 from web.nodes import ipcalc
 from web.nodes.sticker import generate_sticker
@@ -76,15 +77,19 @@ class RegisterNodeForm(forms.Form):
     label = _("Channel"),
     required = False
   )
-  root_pass = forms.CharField(required = False)
+  root_pass = forms.CharField(required = True,
+    validators = [core_validators.MinLengthValidator(4)],
+    initial = generate_random_password(8),
+    label = _("Root password"),
+  )
   use_vpn = forms.BooleanField(required = False, initial = True,
     label = _("Enable VPN"),
   )
   use_captive_portal = forms.BooleanField(required = False, initial = True,
-    label = _("Enable captive portal")
+    label = _("Enable captive portal"),
   )
   lan_bridge = forms.BooleanField(required = False, initial = False,
-    label = _("Enable LAN/WiFi bridge")
+    label = _("Enable LAN/WiFi bridge"),
   )
   optional_packages = forms.ModelMultipleChoiceField(
     queryset = OptionalPackage.objects.all().order_by("fancy_name"),
@@ -98,13 +103,13 @@ class RegisterNodeForm(forms.Form):
     TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Download limit"),
     required = False,
-    empty_label = _("Unlimited")
+    empty_label = _("Unlimited"),
   )
   tc_egress = forms.ModelChoiceField(
     TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Upload limit"),
     required = False,
-    empty_label = _("Unlimited")
+    empty_label = _("Unlimited"),
   )
 
   # Antenna type
@@ -307,7 +312,7 @@ class RegisterNodeForm(forms.Form):
         profile.channel = node.project.channel
       else:
         profile.channel = self.cleaned_data.get('channel')
-      profile.root_pass = self.cleaned_data.get('root_pass') or generate_random_password(8)
+      profile.root_pass = self.cleaned_data.get('root_pass')
       profile.use_vpn = self.cleaned_data.get('use_vpn')
       profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
       profile.antenna = self.cleaned_data.get('ant_conn') or 0
@@ -382,31 +387,35 @@ class UpdateNodeForm(forms.Form):
   template = forms.ModelChoiceField(
     Template.objects.all().order_by('name'),
     label = _("Router type"),
-    required = False
+    required = False,
   )
   channel = forms.ChoiceField(
     choices = [(x, x) for x in xrange(1, 11)],
     label = _("Channel"),
     initial = 8,
-    required = False
+    required = False,
   )
-  root_pass = forms.CharField(required = False)
+  root_pass = forms.CharField(required = True,
+    validators = [core_validators.MinLengthValidator(4)],
+    initial = generate_random_password(8),
+    label = _("Root password"),
+  )
   use_vpn = forms.BooleanField(required = False,
     label = _("Enable VPN"),
-    initial = True
+    initial = True,
   )
   use_captive_portal = forms.BooleanField(required = False,
     label = _("Enable captive portal"),
-    initial = True
+    initial = True,
   )
   lan_bridge = forms.BooleanField(required = False, initial = False,
-    label = _("Enable LAN/WiFi bridge")
+    label = _("Enable LAN/WiFi bridge"),
   )
   optional_packages = forms.ModelMultipleChoiceField(
     queryset = OptionalPackage.objects.all().order_by("fancy_name"),
     label = _("Optional packages"),
     required = False,
-    widget = widgets.CheckboxSelectMultiple
+    widget = widgets.CheckboxSelectMultiple,
   )
 
   # Traffic policy settings
@@ -414,13 +423,13 @@ class UpdateNodeForm(forms.Form):
     TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Download limit"),
     required = False,
-    empty_label = _("Unlimited")
+    empty_label = _("Unlimited"),
   )
   tc_egress = forms.ModelChoiceField(
     TrafficControlClass.objects.all().order_by("bandwidth"),
     label = _("Upload limit"),
     required = False,
-    empty_label = _("Unlimited")
+    empty_label = _("Unlimited"),
   )
 
   # Antenna type

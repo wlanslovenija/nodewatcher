@@ -172,6 +172,10 @@
     <td>{{ form.root_pass }}</td>
   </tr>
   <tr class="imagegen_opts">
+    <td></td>
+    <td class="small_text">{% trans "This password is used for remote maintenance access to the node. <b>Do not share it with anybody as it can compromise node's and network's security!</b>" %}</td>
+  </tr>
+  <tr class="imagegen_opts">
     <td valign="top">{{ form.optional_packages.label }}</td>
     <td class="optional_packages">{{ form.optional_packages }}</td>
   </tr>

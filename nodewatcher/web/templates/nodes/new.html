@@ -191,7 +191,7 @@
   </tr>
   <tr class="imagegen_opts">
     <td></td>
-    <td class="small_text">{% trans "Leave blank for auto-generated password." %}</td>
+    <td class="small_text">{% trans "This password is used for remote maintenance access to the node. <b>Do not share it with anybody as it can compromise node's and network's security!</b> It will be accessible (to view or change) later through <i>edit node</i> page to node's maintainer (that's you)." %}</td>
   </tr>
   <tr class="imagegen_opts">
     <td valign="top">{{ form.optional_packages.label }}</td>
@@ -201,7 +201,7 @@
     <td valign="top">{{ form.notes.label }}</td>
     <td>
       {{ form.notes }}<br/>
-      <span class="small_text">These notes are only visible to node's maintainer (that's you).</span>
+      <span class="small_text">These notes are only visible to node's maintainer (that's you). They are public if the node is marked as dead and should describe background of node's death.</span>
     </td>
   </tr>
   <tr>

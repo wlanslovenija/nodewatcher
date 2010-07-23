@@ -1,5 +1,5 @@
 from random import choice
-from string import letters, digits
+from string import ascii_letters, digits
 
 def generate_random_password(length = 20):
   """
@@ -7,7 +7,7 @@ def generate_random_password(length = 20):
   """
   x = ''
   for i in xrange(0, length):
-    x += choice(letters + digits)
+    x += choice(ascii_letters + digits)
   
   return x
 

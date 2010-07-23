@@ -88,6 +88,17 @@ function updatePoolsForProject() {
   pool.attr('value', pools[projectId]["default"]);
 }
 
+function generateRandomPassword(event) {
+  event.preventDefault();
+  var choices = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  var password = "";
+  for (var i = 0; i < 8; i++) {
+    password += choices.charAt(Math.floor(Math.random() * choices.length));
+  }
+  $('#id_root_pass').val(password);
+  return false;
+}
+
 $(document).ready(function () {
   $('#id_project').change(function(event) { updateMapForProject(); updatePoolsForProject(); });
   $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
@@ -95,7 +106,9 @@ $(document).ready(function () {
   $('#id_node_type').change(function(event) { toggleLocation(); });
   $('#id_ant_external').change(function(event) { toggleExtAntenna(); });
   $('#id_use_vpn').change(function(event) { toggleVpnOptions(); });
-
+  
+  $('#id_root_pass').after(']').after($('<a/>').attr('href', '#').text('generate new').click(generateRandomPassword)).after(' [');
+  
   toggleAutoConfiguration();
   toggleVpnOptions();
   toggleImageGeneratorOptions();

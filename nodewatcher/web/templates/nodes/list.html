@@ -20,7 +20,7 @@
 {% block content %}
 {% if web_client_node %}
 {% notice webclient %}
-<b>You are visiting this page through the <em>{{ network.name }}</em> network.</b><br />
+<b>You are visiting this page through the <i>{{ network.name }}</i> network.</b><br />
 <br />
 You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client_node.name|default:_("unknown") }}</a> node to connect to the network.
 {% endnotice %}
