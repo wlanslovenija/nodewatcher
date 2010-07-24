@@ -107,7 +107,7 @@ $(document).ready(function () {
   $('#id_ant_external').change(function(event) { toggleExtAntenna(); });
   $('#id_use_vpn').change(function(event) { toggleVpnOptions(); });
   
-  $('#id_root_pass').after(']').after($('<a/>').attr('href', '#').text('generate new').click(generateRandomPassword)).after(' [');
+  $('#id_root_pass').after(']').after($('<a />').attr('href', '#').text('generate new').click(generateRandomPassword)).after(' [');
   
   toggleAutoConfiguration();
   toggleVpnOptions();
