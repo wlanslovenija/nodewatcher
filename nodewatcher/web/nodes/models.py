@@ -538,12 +538,27 @@ class Node(models.Model):
     n.ensure_exclusive_access()
     return Node.objects.get(**kwargs)
   
+  def get_current_id(self):
+    """
+    Return current ID for the node. Node's name for registered node and node's pk for unknown nodes.
+    """
+    return self.pk if self.is_invalid() else self.name
+  
   def get_full_url(self):
+    """
+    Returns (full) absolute URL for the node.
+    """
     base_url = "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
     return "%s%s" % (base_url, self.get_absolute_url())
   
+  @models.permalink
   def get_absolute_url(self):
-    return "/nodes/node/%s" % (self.pk if self.is_invalid() else self.name,)
+    """
+    Returns (local) absolute URL for the node.
+    """
+    return ('view_node', (), {
+      'node': self.get_current_id(),
+    })
   
   def is_current_owner(self, request):
     """

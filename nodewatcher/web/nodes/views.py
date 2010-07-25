@@ -125,7 +125,7 @@ def node_new(request):
   if request.method == 'POST':
     form = RegisterNodeForm(request.POST)
     if form.is_valid() and form.save(request.user):
-      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = form.node.pk)))
+      return HttpResponseRedirect(reverse("view_node", (), {'node': form.node.pk}))
   else:
     form = RegisterNodeForm()
 
@@ -155,7 +155,7 @@ def node_edit(request, node):
           context_instance = RequestContext(request)
         )
       else:
-        return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+        return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
   else:
     p = {
       'name'                : node.name,
@@ -260,7 +260,7 @@ def node_reset(request, node):
       node.reset()
       node.save()
 
-      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+      return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
 
   return render_to_response('nodes/reset.html',
     { 'node' : node },
@@ -304,7 +304,7 @@ def node_renumber(request, node):
       if form.is_valid():
         form.save()
         transaction.savepoint_commit(sid)
-        return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+        return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
     except ValidationWarning:
       # We must display a warning before the user may continue; node must be reloaded
       # because savepoint has been rolled back and any modifications have actually been
@@ -337,7 +337,7 @@ def node_allocate_subnet(request, node):
   if request.method == 'POST':
     form = AllocateSubnetForm(node, request.POST)
     if form.is_valid() and form.save(node):
-      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+      return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
   else:
     form = AllocateSubnetForm(node)
 
@@ -348,7 +348,7 @@ def node_allocate_subnet(request, node):
   )
 
 @login_required
-def node_deallocate_subnet(request, subnet_id):
+def node_deallocate_subnet(request, node, subnet_id):
   """
   Removes a subnet.
   """
@@ -362,7 +362,7 @@ def node_deallocate_subnet(request, subnet_id):
       raise Http404
 
     subnet.delete()
-    return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+    return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
 
   return render_to_response('nodes/deallocate_subnet.html',
     { 'node' : node,
@@ -371,7 +371,7 @@ def node_deallocate_subnet(request, subnet_id):
   )
 
 @login_required
-def node_edit_subnet(request, subnet_id):
+def node_edit_subnet(request, node, subnet_id):
   """
   Edits a subnet.
   """
@@ -383,7 +383,7 @@ def node_edit_subnet(request, subnet_id):
   if request.method == 'POST':
     form = EditSubnetForm(node, request.POST)
     if form.is_valid() and form.save(subnet):
-      return HttpResponseRedirect(reverse("view_node", kwargs = dict(node = node.pk)))
+      return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
     else:
       subnet = Subnet.objects.get(pk = subnet_id)
   else:
@@ -408,7 +408,7 @@ def whitelisted_mac(request):
     form = WhitelistMacForm(request.POST)
     if form.is_valid():
       form.save(request.user)
-      return HttpResponseRedirect("/nodes/whitelisted_mac")
+      return HttpResponseRedirect(reverse('my_whitelist'))
   else:
     form = WhitelistMacForm()
 
@@ -429,7 +429,7 @@ def unwhitelist_mac(request, item_id):
     raise Http404
   
   item.delete()
-  return HttpResponseRedirect("/nodes/whitelisted_mac")
+  return HttpResponseRedirect(reverse('my_whitelist'))
 
 def whitelist(request):
   """
@@ -547,10 +547,10 @@ def event_subscribe(request):
   Display a form for subscribing to an event.
   """
   if request.method == 'POST':
-    form = EventSubscribeForm(request.POST)
+    form = EventSubscribeForm(request.POST, request=request)
     if form.is_valid():
       form.save(request.user)
-      return HttpResponseRedirect("/nodes/events")
+      return HttpResponseRedirect(reverse('my_events'))
   else:
     form = EventSubscribeForm()
 
@@ -571,7 +571,7 @@ def event_unsubscribe(request, subscription_id):
   
   s.delete()
 
-  return HttpResponseRedirect("/nodes/events")
+  return HttpResponseRedirect(reverse('my_events'))
 
 @login_required
 def package_list(request, node):

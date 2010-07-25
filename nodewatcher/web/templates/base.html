@@ -33,12 +33,12 @@
 {% block ctxtnav %}
 {% spaceless %}
 <ul>
-      <li class="first"><a href="/nodes/node_list">{% trans "Node List" %}</a></li>
-      <li><a href="/nodes/statistics">{% trans "Network Statistics" %}</a></li>
-      <li><a href="/nodes/events/global">{% trans "Events" %}</a></li>
-      <li><a href="/nodes/gcl">{% trans "Global Client List" %}</a></li>
-      <li><a href="/nodes/topology">{% trans "Mesh Topology" %}</a></li>
-      <li><a href="/nodes/map">{% trans "Node Map" %}</a></li>
+      <li class="first"><a href="{% url nodes_list %}">{% trans "Node List" %}</a></li>
+      <li><a href="{% url network_statistics %}">{% trans "Network Statistics" %}</a></li>
+      <li><a href="{% url network_events %}">{% trans "Events" %}</a></li>
+      <li><a href="{% url network_clients %}">{% trans "Global Client List" %}</a></li>
+      <li><a href="{% url network_topology %}">{% trans "Mesh Topology" %}</a></li>
+      <li><a href="{% url network_map %}">{% trans "Node Map" %}</a></li>
 </ul>
 {% endspaceless %}
 {% endblock %}

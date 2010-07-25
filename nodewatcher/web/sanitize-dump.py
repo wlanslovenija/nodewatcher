@@ -39,7 +39,7 @@ def object_transformator():
       object.email = "user@example.com"
       object.password = '$1$1qL5F...$ZPQdHpHMsvNQGI4rIbAG70' # Password for all users is 123
     elif name == 'web.generator.models.Profile':
-      object.root_pass = 'XXX'
+      object.root_pass = 'XXXX'
     elif name == 'web.generator.models.StatsSolar':
       continue
     elif name == 'web.generator.models.WhitelistItem':

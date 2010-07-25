@@ -10,7 +10,7 @@
 {% block content %}
 <h1>Login</h1>
 
-<form action="/auth/login" method="post" id="acctmgr_loginform" >
+<form action="{% url auth_login %}" method="post" id="acctmgr_loginform" >
 {% csrf_token %}
 
 {% if form.non_field_errors %}

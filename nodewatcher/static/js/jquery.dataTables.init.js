@@ -223,7 +223,7 @@ $(document).ready(function() {
 				"aaSortingFixed": (sections.length != 0 ? [[ 0, 'asc' ]] : null),
 				"aaSorting": sortColumn,
 				"fnDrawCallback": (sections.length != 0 ? groupDrawCallback(this) : null),
-				"sDom": 'tif<"clear">',
+				"sDom": 'ift<"clear">',
 				"oLanguage": {
 					"sZeroRecords": "No matching " + entryName + " found",
 					"sInfo": "_TOTAL_ " + entryName + " shown",

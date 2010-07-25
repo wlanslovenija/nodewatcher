@@ -142,7 +142,7 @@ TEMPLATE_DIRS = (
 
 DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
-LOGIN_REDIRECT_URL = '/nodes/my_nodes'
+LOGIN_REDIRECT_URL = '/my/nodes'
 LOGIN_URL = '/auth/login'
 RESET_PASSWORD_URL = 'http://wlan-lj.net/reset_password'
 PROFILE_CONFIGURATION_URL = 'http://wlan-lj.net/prefs'

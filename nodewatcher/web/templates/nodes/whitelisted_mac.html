@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Whitelisted MAC addresses" %}{% endblock %}
-{% block heading %}{% trans "Whitelisted MAC addresses" %}{% endblock %}
+{% block title %}{% trans "MAC Whitelist" %}{% endblock %}
+{% block heading %}{% trans "MAC Whitelist" %}{% endblock %}
 {% block contenttype %}prefs{% endblock %}
 {% block content %}
 <ul id="tabs">
-  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
-  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li class="active"><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
-  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
-  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
+  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
+  <li class="active">{% trans "MAC whitelist" %}</li>
+  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
+  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
 </ul>
 <div id="tabcontent">
 {% if form.errors %}
@@ -38,7 +38,7 @@
 <tbody>
   {% for item in whitelist %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="/nodes/unwhitelist_mac/{{ item.id }}"><img src="/images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
+    <td align="center"><a href="{% url my_whitelist_remove item.id %}"><img src="/images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
     <td>
       {{ item.mac }}
       {% if item.description %}
@@ -77,7 +77,7 @@
 </table>
 <div class="buttons">
       <input type="submit" value="{% trans "Whitelist" %}" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/my_nodes'" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_nodes %}'" />
 </div>
 </form>
 </div>

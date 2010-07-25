@@ -8,22 +8,17 @@
 {% block content %}
 <ul id="tabs">
   <li class="active">{% trans "My nodes" %}</li>
-  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
-  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
-  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
+  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
+  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
+  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
 </ul>
 <div id="tabcontent">
+
 {% if not user.email %}
-<div class="error">
-  {% if profile_configuration_url %}
-  {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions are disabled.{% endblocktrans %}
-  {% else %}
-  {% blocktrans %}You have no e-mail address configured for your account!{% endblocktrans %}
-  {% endif %}
-</div>
+{% include "nodes/missing_email_error.html" %}
 {% endif %}
-<br/>
+
 <table border="0" class="listing">
 <thead>
   <tr>
@@ -40,7 +35,7 @@
 <tfoot>
   <tr>
     <td class="table_menu" colspan="8">
-      <a href="/nodes/new">{% trans "Add new node" %}</a>
+      <a href="{% url new_node %}">{% trans "Add new node" %}</a>
     </td>
   </tr>
 </tfoot>
@@ -79,7 +74,7 @@
   {% empty %}
   <tr>
     <td colspan="8" class="notice">
-      {% trans "You currently have no nodes defined. You can use " %}<strong><a href="/nodes/new">New node</a></strong>{% trans " tab to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly." %}
+      {% url new_node as new_node %}{% blocktrans %}You currently have no nodes defined. You can use <strong><a href="{{ new_node }}">New node</a></strong> tab to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly.{% endblocktrans %}
     </td>
   </tr>
   {% endfor %}

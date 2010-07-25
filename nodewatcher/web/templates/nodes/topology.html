@@ -5,24 +5,23 @@
 {% block heading %}{% trans "Mesh Topology View" %}{% endblock %}
 
 {% block content %}
-<br/>
 <img src="/graphs/mesh_topology.png" alt="{% trans "Mesh Topology View" %}" /><br/>
-<br/>
-<br/>
-{% trans "Edge color key" %}:<br/>
+<div class="legend">
+<h3>{% trans "Edge color key:" %}</h3>
 <ul>
-  <li><span style="color: #00ff00;">{% trans "green" %}</span> - {% trans "ETX is between 1.0 and 2.0" %}</li>
-  <li><span style="color: #0000ff;">{% trans "blue" %}</span> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
-  <li><span style="color: #ff0000;">{% trans "red" %}</span> - {% trans "ETX is greater than 5.0" %}</li>
+  <li><span style="color: #00ff00;">{% trans "green" %}</span> – {% trans "ETX is between 1.0 and 2.0" %}</li>
+  <li><span style="color: #0000ff;">{% trans "blue" %}</span> – {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
+  <li><span style="color: #ff0000;">{% trans "red" %}</span> – {% trans "ETX is greater than 5.0" %}</li>
 </ul>
-{% trans "Node color key" %}:<br/>
+<h3>{% trans "Node color key:" %}</h3>
 <ul>
-  <li><span style="background-color: #BFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "mesh node" %}</li>
-  <li><span style="background-color: #FFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "border router" %}</li>
-  <li><span style="background-color: #E2F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "server node" %}</li>
-  <li><span style="background-color: #A7F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "testing node" %}</li>
-  <li><span style="background-color: #F26006;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> - {% trans "unknown node (not in node database)" %}</li>
+  <li><span style="background-color: #BFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "mesh node" %}</li>
+  <li><span style="background-color: #FFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "border router" %}</li>
+  <li><span style="background-color: #E2F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "server node" %}</li>
+  <li><span style="background-color: #A7F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "testing node" %}</li>
+  <li><span style="background-color: #F26006;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "unknown node (not in node database)" %}</li>
 </ul>
+</div>
 {% endblock %}
 
 {% block altlinks %}

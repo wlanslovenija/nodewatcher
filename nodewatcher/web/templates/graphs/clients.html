@@ -1,5 +1,5 @@
 {% load i18n %}
 {% load graphimg %}{% show_graph %}
 <div class="graphdesc">
-  {% blocktrans %}More detailed global list of currently connected clients is <a href="/nodes/gcl">also available</a>.{% endblocktrans %}
+  {% url network_clients as network_clients %}{% blocktrans %}More detailed global list of currently connected clients is <a href="{{ network_clients }}">also available</a>.{% endblocktrans %}
 </div>

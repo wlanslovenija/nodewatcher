@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% trans "Image Generation" %}{% endblock %}
 {% block heading %}{% trans "Image Generation Request Queued" %}{% endblock %}
 {% block content %}
 {% if image_generator_enabled and not image_generator_suspended %}
-<div class="notice">
+{% notice %}
 Your image generation request has been successfully queued in our system. You should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay).
-</div>
+{% endnotice %}
 {% else %}
 <div class="error">
 {% if image_generator_suspended %}

@@ -19,24 +19,18 @@
 {% block content %}
 
 <ul id="tabs">
-  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
-  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
-  <li class="active">{% trans "Event log" %}</li>
-  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
+  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
+  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
+  <li class="active">{% trans "Events" %}</li>
+  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
 </ul>
 <div id="tabcontent">
+<h3 class="no-top-margin">Event subscriptions</h3>
+
 {% if not user.email %}
-<div class="error">
-  {% if profile_configuration_url %}
-  {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions are disabled.{% endblocktrans %}
-  {% else %}
-  {% blocktrans %}You have no e-mail address configured for your account!{% endblocktrans %}
-  {% endif %}
-</div>
-<br/>
-{% endif %}
-<h3>Event subscriptions</h3>
+{% include "nodes/missing_email_error.html" %}
+{% else %}
 <table border="0" class="listing">
 <thead>
   <tr>
@@ -49,20 +43,20 @@
 <tfoot>
   <tr>
     <td class="table_menu" colspan="4">
-      <a href="/nodes/event_subscribe">{% trans "Add event subscription" %}</a>
+      <a href="{% url my_events_subscribe %}">{% trans "Add event subscription" %}</a>
     </td>
   </tr>
 </tfoot>
 <tbody>
   {% for subscription in subscriptions %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="/nodes/event_unsubscribe/{{ subscription.id }}"><img src="/images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
+    <td align="center"><a href="{% url my_events_unsubscribe subscription.id %}"><img src="/images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
     <td>
       {{ subscription.type_to_string }}
     </td>
     <td>
       {% if subscription.is_single_node %}
-      <a href="/nodes/node/{{ subscription.node.ip }}">{{ subscription.node.name }}</a>
+      <a href="{{ subscription.node.get_absolute_url }}">{{ subscription.node.name }}</a>
       {% else %}
       -
       {% endif %}
@@ -84,7 +78,8 @@
   {% endfor %}
 </tbody>
 </table>
-<br/>
+{% endif %}
+
 <h3>{% trans "Latest events for your nodes" %}</h3>
 <table border="0" class="listing">
 <thead>

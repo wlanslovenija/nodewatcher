@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
-{% block title %}Generate Image for {{ node.name }}{% endblock %}
-{% block heading %}Generate Image for {{ node.name }}{% endblock %}
+{% block title %}Generate Image for Node {{ node.name }}{% endblock %}
+{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Generate Image for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 {% if form.errors %}
@@ -20,43 +21,32 @@
 </div>
 {% endif %}
 
-<form method="POST" action="{% url generate_node node.pk %}">
-{% csrf_token %}
-<table border="0" width="700">
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "General Node Information" %}
-    </td>
-  </tr>
-  <tr>
-    <td style="width: 200px;">{% trans "IP address" %}</td>
-    <td>{{ node.ip }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:"???" }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Maintainer" %}</td>
-    {% if node.owner %}
-    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
-    {% else %}
-    <td>{% trans "unknown" %}</td>
+{% if not node.owner.email %}
+  {% include "nodes/missing_email_error.html" %}
+{% else %}
+  {% if node.has_allocated_subnets %}
+    {% if node.profile.template.experimental %}
+    <div class="error">
+      {% blocktrans with documentation_links.known_issues as known_issues_url and documentation_links.report_issue as report_issue_url %}<b>WARNING:</b> The support for router type you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="{{ known_issues_url }}">known issues</a> page. If you find any bugs, please <a href="{{ report_issue_url }}">report them</a>. Also if you find the image to be working properly for a longer period of time, also <a href="{{ report_issue_url }}">report it</a> so it may be moved from its experimental status.{% endblocktrans %}
+    </div>
     {% endif %}
-  </tr>
-  <tr>
-    <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:"unknown" }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:"unknown" }}</td>
-  </tr>
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "Image Generator Information" %}
-    </td>
-  </tr>
+    {% notice %}
+      {% blocktrans %}After you press <b>Generate</b> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.{% endblocktrans %}
+    {% endnotice %}
+  {% else %}
+    <div class="error">
+      {% url allocate_subnet node.pk as newsubneturl %}
+      {% blocktrans %}<b>ERROR:</b> This node has no allocated subnets or none are assigned to the WiFi interface. Image generation is not possible. Please assign it <a href="{{ newsubneturl }}">a subnet</a>.{% endblocktrans %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% include "nodes/general_info.html" %}
+
+<form method="post" action="{% url generate_node node.pk %}">
+{% csrf_token %}
+<h3>{% trans "Image Generator Information" %}</h3>
+<table border="0" width="700">
   {% if user.is_staff %}
   <tr>
     <td>{{ form.email_user.label }}</td>
@@ -64,7 +54,7 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Router type" %}</td>
+    <td class="first_column_width">{% trans "Router type" %}</td>
     <td>{{ node.profile.template.name }}</td>
   </tr>
   <tr>
@@ -79,37 +69,8 @@
     <td valign="top">{{ form.config_only.label }}</td>
     <td>
       {{ form.config_only }}<br/>
-      <span class="small_text">{% blocktrans with documentation_links.custom_image as custom_image_url %}Check this option to generate <b>ONLY</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="{{ custom_image_url }}">custom node</a>.{% endblocktrans %}</span>
+      <span class="small_text">{% blocktrans with documentation_links.custom_image as custom_image_url %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="{{ custom_image_url }}">custom node</a>.{% endblocktrans %}</span>
     </td>
-  </tr>
-  {% if node.profile.template.experimental %}
-  <tr>
-    <td colspan="2" class="error">
-      {% blocktrans with documentation_links.known_issues as known_issues_url and documentation_links.report_issue as report_issue_url %}The firmware version you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="{{ known_issues_url }}">known issues</a> page. If you find any bugs, please <a href="{{ report_issue_url }}">report them</a>. Also if you find the image to be working properly for a longer period of time, also <a href="{{ report_issue_url }}">report it</a> so it may be moved from its experimental status.{% endblocktrans %}
-    </td>
-  </tr>
-  {% endif %}
-  <tr>
-    {% if not node.owner.email %}
-    <td colspan="2" class="error">
-      {% if profile_configuration_url %}
-      {% blocktrans %}You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions are disabled.{% endblocktrans %}
-      {% else %}
-      {% blocktrans %}You have no e-mail address configured for your account!{% endblocktrans %}
-      {% endif %}
-    </td>
-    {% else %}
-    {% if node.has_allocated_subnets %}
-    <td colspan="2" class="notice">
-      {% blocktrans %}After you press <b>Generate</b> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.{% endblocktrans %}
-    </td>
-    {% else %}
-    <td colspan="2" class="error">
-      {% url allocate_subnet node.pk as newsubneturl %}
-      {% blocktrans %}This node has no allocated subnets or none are assigned to the WiFi interface. Image generation is not possible. Please assign it <a href="{{ newsubneturl }}">a subnet</a>.{% endblocktrans %}
-    </td>
-    {% endif %}
-    {% endif %}
   </tr>
 </table>
   <div class="buttons">

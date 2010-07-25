@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
-{% block title %}{% blocktrans %}Edit Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% blocktrans %}Edit Subnet {{ subnet }}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node {{ node_name}}{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 
@@ -21,12 +22,18 @@
 </div>
 {% endif %}
 
-<form method="POST" action="{% url edit_subnet subnet.id %}">
-{% csrf_token %}
+{% notice %}
+{% blocktrans %}Do not forget that you must update the router's configuration to reflect some subnet changes. You can simply generate a new image with new configuration for your router and flash it.{% endblocktrans %}
+{% endnotice %}
+
+{% include "nodes/general_info_small.html" %}
+
 <h3>{% trans "Subnet Information" %}</h3>
-<table border="0" width="100%">
+<form method="post" action="{% url edit_subnet node.pk subnet.id %}">
+{% csrf_token %}
+<table border="0" class="layout">
   <tr>
-    <td style="width: 200px;">{% trans "Subnet" %}</td>
+    <td class="first_column_width">{% trans "Subnet" %}</td>
     <td>{{ subnet }} [<a href="{% url renumber_node node.pk %}">{% trans "renumber" %}</a>]</td>
   </tr>
   <tr>

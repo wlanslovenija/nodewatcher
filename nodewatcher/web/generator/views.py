@@ -39,7 +39,7 @@ def request(request, node):
       )
   else:
     form = GenerateImageForm(initial = {
-      'email_user'  : node.owner.id
+      'email_user'  : node.owner.pk,
     })
 
   return render_to_response('generator/generate.html',

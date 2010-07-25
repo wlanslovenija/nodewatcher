@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
-{% block title %}{% trans "Events" %}{% endblock %}
-{% block heading %}{% trans "Events" %}{% endblock %}
+{% block title %}{% trans "Subscribe to Event" %}{% endblock %}
+{% block heading %}{% trans "Subscribe to Event" %}{% endblock %}
 {% block contenttype %}prefs{% endblock %}
 {% block content %}
 <ul id="tabs">
-  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
-  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
-  <li class="active">{% trans "Event log" %}</li>
-  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
+  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
+  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
+  <li class="active">{% trans "Events" %}</li>
+  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
 </ul>
 <div id="tabcontent">
-<h3>{% trans "Subscribe to Event" %}</h3>
+<h3 class="no-top-margin">{% trans "Subscribe to Event" %}</h3>
 
 {% if form.errors %}
 <div class="error">
@@ -30,7 +31,11 @@
 </div>
 {% endif %}
 
-<form action="{% url web.nodes.views.event_subscribe %}" method="POST">
+{% if not user.email %}
+{% include "nodes/missing_email_error.html" %}
+{% endif %}
+
+<form method="post" action="{% url web.nodes.views.event_subscribe %}">
 {% csrf_token %}
 <table border="0" width="700">
   <tr>
@@ -47,8 +52,10 @@
   </tr>
 </table>
   <div class="buttons">
-      <input type="submit" value="{% trans "Add Subscription" %}" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/events'" />
+      {% if user.email %}
+      <input type="submit" value="{% trans "Subscribe" %}" />&nbsp;
+      {% endif %}
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_events %}'" />
     </div>
 </form>
 </div>

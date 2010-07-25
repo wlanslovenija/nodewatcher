@@ -178,7 +178,7 @@ table.layout .section_title td {
   font-weight: bold;
 }
 
-table.nodeinfo {
+table.smallnodeinfo {
   float: right;
   -moz-border-radius-bottomleft:3px;
   -moz-border-radius-bottomright:3px;
@@ -191,7 +191,11 @@ table.nodeinfo {
   width: auto;
 }
 
-.nodeinfo td {
+.smallnodeinfo .first_column_width {
+  width: 100px;
+}
+
+.smallnodeinfo td {
   font-size: 60%;
 }
 
@@ -221,6 +225,10 @@ table.nodeinfo {
 
 .legend ul {
   padding: 0;
+}
+
+.status_legend {
+  margin-bottom: 2em;
 }
 
 .legend ul li {
@@ -391,4 +399,12 @@ table.warnings .icon {
   background-color: #CCCCCC;
   color: white;
   text-decoration: none;
+}
+
+.first_column_width {
+  width: 200px;
+}
+
+.no-top-margin {
+  margin-top: 0px;
 }

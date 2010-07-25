@@ -3,6 +3,7 @@ from web.nodes.models import Node
 from datetime import datetime
 import re
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 class HttpsSitemap(Sitemap):
   http_match = re.compile(r"^http://")
@@ -28,11 +29,15 @@ class NodeSitemap(HttpsSitemap):
 
 class StaticSitemap(HttpsSitemap):
   priority = "0.9"
-  locations = [
-    '/nodes/statistics',
-    '/nodes/topology',
-    '/nodes/map'
-  ]
+  locations = []
+  
+  def __init__(self, *args, **kwargs):
+    super(StaticSitemap, self).__init__(*args, **kwargs)
+    self.locations = [
+      reverse('network_statistics'),
+      reverse('network_clients'),
+      reverse('network_map')
+    ]
 
   def items(self):
     return self.locations

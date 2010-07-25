@@ -2,49 +2,15 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 
 <div class="error">
- {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply regenerate and reflash the image to your router." %}
+ {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply generate a new image with new configuration for your router and flash it." %}
 </div>
  
-<h3>{% trans "General Information" %}</h3>
-<table border="0" width="700">
-  <tr>
-    <td style="width: 200px;">{% trans "IP address" %}</td>
-    <td>{{ node.ip }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Maintainer" %}</td>
-    {% if node.owner %}
-    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
-    {% else %}
-    <td>{% trans "unknown" %}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-  </tr>
-</table>
+{% include "nodes/general_info.html" %}
 
 <h3>{% trans "Renumber Specification" %}</h3>
 {% if form.errors %}
@@ -71,12 +37,12 @@
 </div>
 {% endif %}
 
-<form method="POST" action="{% url renumber_node node.pk %}">
+<form method="post" action="{% url renumber_node node.pk %}">
 {% csrf_token %}
-{{ form.confirm_all_warnings }}
+<div style='display:none'>{{ form.confirm_all_warnings }}</div>
 <table border="0" width="700">
   <tr>
-    <td width="200"><b>{% trans "Current allocation" %}</b></td>
+    <td class="first_column_width"><b>{% trans "Current allocation" %}</b></td>
     <td><b>{% trans "Renumber action" %}</b></td>
   </tr>
   {% for subnet in form.get_subnet_fields %}
@@ -98,6 +64,7 @@
 </table>
 
 <script type="text/javascript">
+/* <![CDATA[ */
   var pool_prefix_lens = {
     {% for pool in form.get_pools %}
     {{ pool.id }} : {
@@ -130,6 +97,7 @@
       updatePrefixLensForPool(subnetId, $(this).attr('value'));
     }).change();
   });
+/* ]]> */
 </script>
 
 <div class="buttons">

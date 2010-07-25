@@ -10,10 +10,10 @@
 {% block content %}
 <ul id="tabs">
   <li class="active">{% trans "My nodes" %}</li>
-  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
-  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
-  <li><a href="/nodes/sticker">{% trans "Info sticker" %}</a></li>
+  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
+  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
+  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
+  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
 </ul>
 <div id="tabcontent">
 {% if form.errors %}
@@ -35,7 +35,7 @@
 {% csrf_token %}
 <table border="0" width="700">
   <tr>
-    <td style="width: 200px;">{{ form.name.label }}</td>
+    <td class="first_column_width">{{ form.name.label }}</td>
     <td>{{ form.name }}</td>
   </tr>
   <tr>

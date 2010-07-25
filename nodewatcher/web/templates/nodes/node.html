@@ -156,7 +156,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   <tr class="section_title">
     <td colspan="2">
       {% trans "Image Generator Information" %}
-      {% if current_owner %}&nbsp;[<a href="{% url generate_node node.pk %}">{% trans "generate image" %}</a>]{% endif %}
+      {% if current_owner %}[<a href="{% url generate_node node.pk %}">{% trans "generate image" %}</a>]{% endif %}
     </td>
   </tr>
   <tr>
@@ -272,10 +272,10 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     {% if current_owner %}
     <td>
       {% if subnet.allocated and not subnet.is_primary %}
-      <a href="{% url edit_subnet subnet.pk %}">
+      <a href="{% url edit_subnet node.pk subnet.pk %}">
         <img src="/images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
       </a>
-      <a href="{% url remove_subnet subnet.pk %}">
+      <a href="{% url remove_subnet node.pk subnet.pk %}">
         <img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
       </a>
       {% endif %}

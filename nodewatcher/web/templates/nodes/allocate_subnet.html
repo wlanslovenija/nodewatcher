@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 {% if form.errors %}
@@ -19,42 +20,14 @@
   {% endfor %}
 </div>
 {% endif %}
-<table border="0" class="nodeinfo layout">
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "General Node Information" %}
-    </td>
-  </tr>
-  <tr>
-    <td style="width: 100px;">{% trans "IP address" %}</td>
-    <td>{{ node.ip }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Maintainer" %}</td>
-    {% if node.owner %}
-    <td><a href="/user/profile/{{ node.owner.id }}">{{ node.owner.username }}</a></td>
-    {% else %}
-    <td>{% trans "unknown" %}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:_("unknown") }}</td>
-  </tr>
-</table>
 
-<p>
-      {% trans "A new subnet will be allocated from the project's IP pool for your node as soon as you press <i>Allocate</i>. It will be displayed on node information page and you can then reconfigure your router or just download an updated flashable image by selecting <b>generate image</b> next to <i>Image generator information</i> section." %}
-</p>
+{% notice %}
+{% blocktrans %}A new subnet will be allocated from the pool for your node as soon as you press <i>Allocate</i>. Do not forget that you must update the router's configuration to reflect subnet allocation changes. You can simply generate a new image with new configuration for your router and flash it.{% endblocktrans %}
+{% endnotice %}
 
+{% include "nodes/general_info_small.html" %}
+
+<h3>{% trans "Subnet Information" %}</h3>
 <form action="{% url web.nodes.views.node_allocate_subnet node.pk %}" method="post">
 {% csrf_token %}
 <table border="0" class="layout">
@@ -92,6 +65,7 @@
 </form>
 
 <script type="text/javascript">
+/* <![CDATA[ */
   var pool_prefix_lens = {
     {% for pool in form.get_pools %}
     {{ pool.id }} : {
@@ -116,5 +90,6 @@
   $(document).ready(function () {
     $('#id_pool').change(function(event) { updatePrefixLens(); }).change();
   });
+/* ]]> */
 </script>
 {% endblock %}

@@ -19,7 +19,7 @@ Additional data:
 
 You may configure event subscriptions via settings available by going to
 the following URL:
-  {{ base_url }}/nodes/events
+  {{ base_url }}{% url my_events %}
 
 Best regards,
 {{ network.name }} network <{{ network.contact }}>

@@ -2,49 +2,16 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Remove Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Remove Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Remove Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
   <div class="error">
-      {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove your node!" %}
-    </div>
-<h3>{% trans "General Information" %}</h3>
-<table border="0" width="700">
-  <tr>
-    <td style="width: 200px;">{% trans "IP address" %}</td>
-    <td>{{ node.ip }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Maintainer" %}</td>
-    {% if node.owner %}
-    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
-    {% else %}
-    <td>{% trans "unknown" %}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:_("unknown") }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-  </tr>
-</table>
-  
-<form method="POST" action="{% url remove_node node.pk %}">
+    {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove it!" %}
+  </div>
+
+{% include "nodes/general_info.html" %}
+
+<form method="post" action="{% url remove_node node.pk %}">
 {% csrf_token %}
   <div class="buttons">
     <input type="submit" value="{% trans "Remove" %}" />&nbsp;

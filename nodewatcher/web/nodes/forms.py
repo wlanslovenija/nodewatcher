@@ -904,6 +904,20 @@ class EventSubscribeForm(forms.Form):
     ],
     required = False
   )
+  
+  def __init__(self, *args, **kwargs):
+    request = kwargs.pop('request', None)
+    super(EventSubscribeForm, self).__init__(*args, **kwargs)
+    self.request = request
+
+  def clean(self):
+    """
+    Additional validation handler to check if user has e-mail address configured.
+    """
+    if not self.request.user.email:
+      raise forms.ValidationError(_("Specified user does not have an e-mail configured!"))
+
+    return self.cleaned_data
 
   def save(self, user):
     """

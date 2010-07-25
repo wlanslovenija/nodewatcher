@@ -6,10 +6,10 @@
 {% block contenttype %}prefs{% endblock %}
 {% block content %}
 <ul id="tabs">
-  <li><a href="/nodes/my_nodes">{% trans "My nodes" %}</a></li>
-  <li><a href="/nodes/new">{% trans "New node" %}</a></li>
-  <li><a href="/nodes/whitelisted_mac">{% trans "Whitelisted MAC addresses" %}</a></li>
-  <li><a href="/nodes/events">{% trans "Event log" %}</a></li>
+  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
+  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
+  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
+  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
   <li class="active">{% trans "Info sticker" %}</li>
 </ul>
 <div id="tabcontent">
@@ -27,7 +27,7 @@
   {% endfor %}
 </div>
 {% endif %}
-<p>
+<p class="no-top-margin">
 {% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
 </p>
 <form action="{% url web.nodes.views.sticker %}" method="post">
@@ -49,7 +49,7 @@
 </table>
   <div class="buttons">
       <input type="submit" value="{% trans "Generate" %}" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/nodes/my_nodes'" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_nodes %}'" />
     </div>
 </form>
 </div>

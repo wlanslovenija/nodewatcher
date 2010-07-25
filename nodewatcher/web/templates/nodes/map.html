@@ -39,24 +39,23 @@
 <span id="gmap_statusbar">&nbsp;</span>
 </div>
 <div class="legend">
-<h3>{% trans "Node status key" %}:</h3>
-<ul>
-  <li>{{ "up"|status:"gmap" }} - {% statusdesc "up" %}</li>
-  <li>{{ "visible"|status:"gmap" }} - {% statusdesc "visible" %}</li>
-  <li>{{ "down"|status:"gmap" }} - {% statusdesc "down" %}</li>
-  <li>{{ "duped"|status:"gmap" }} - {% statusdesc "duped" %}</li>
-  <li>{{ "new"|status:"gmap" }} - {% statusdesc "new" %}</li>
-  <li>{{ "pending"|status:"gmap" }} - {% statusdesc "pending" %}</li>
+<h3>{% trans "Node status key:" %}</h3>
+<ul class="status_legend">
+  <li>{{ "up"|status:"gmap" }} – {% statusdesc "up" %}</li>
+  <li>{{ "visible"|status:"gmap" }} – {% statusdesc "visible" %}</li>
+  <li>{{ "down"|status:"gmap" }} – {% statusdesc "down" %}</li>
+  <li>{{ "duped"|status:"gmap" }} – {% statusdesc "duped" %}</li>
+  <li>{{ "new"|status:"gmap" }} – {% statusdesc "new" %}</li>
+  <li>{{ "pending"|status:"gmap" }} – {% statusdesc "pending" %}</li>
 </ul>
 {% if web_client_node %}
 The node marked with symbol <img src="/images/symbol_wc.png" alt="Client node symbol" /> is the node through which you are connected to the network.
 {% endif %}
-<br/>
-<h3>{% trans "Edge color key" %}:</h3>
+<h3>{% trans "Edge color key:" %}</h3>
 <ul>
-  <li><span style="color: #00ff00;">{% trans "green" %}</span> - {% trans "ETX is between 1.0 and 2.0" %}</li>
-  <li><span style="color: #0000ff;">{% trans "blue" %}</span> - {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
-  <li><span style="color: #ff0000;">{% trans "red" %}</span> - {% trans "ETX is greater than 5.0" %}</li>
+  <li><span style="color: #00ff00;">{% trans "green" %}</span> – {% trans "ETX is between 1.0 and 2.0" %}</li>
+  <li><span style="color: #0000ff;">{% trans "blue" %}</span> – {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
+  <li><span style="color: #ff0000;">{% trans "red" %}</span> – {% trans "ETX is greater than 5.0" %}</li>
 </ul>
 </div>
 {% endblock %}
