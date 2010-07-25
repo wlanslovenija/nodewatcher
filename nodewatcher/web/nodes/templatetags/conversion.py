@@ -2,6 +2,7 @@ from django.template import Library
 
 register = Library()
 
+@register.filter
 def human_readable_kbytes(value):
   """
   Returns a properly formatted human readable bytes string.
@@ -15,6 +16,7 @@ def human_readable_kbytes(value):
   else:
     return "%.02f KB" % value
 
+@register.filter
 def time_delta(value):
   """
   Returns properly formatted time delta string.
@@ -34,7 +36,3 @@ def time_delta(value):
     value = value - minutes*60
 
   return "%02d d %02d h %02d min %02d sec" % (days, hours, minutes, value)
-
-register.filter('human_readable_kbytes', human_readable_kbytes)
-register.filter('time_delta', time_delta)
-

@@ -1,18 +1,10 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "MAC Whitelist" %}{% endblock %}
 {% block heading %}{% trans "MAC Whitelist" %}{% endblock %}
-{% block contenttype %}prefs{% endblock %}
-{% block content %}
-<ul id="tabs">
-  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
-  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
-  <li class="active">{% trans "MAC whitelist" %}</li>
-  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
-  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
-</ul>
-<div id="tabcontent">
+
+{% block my_content %}
 {% if form.errors %}
 <div class="error">
   {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to whitelist a MAC address:" %}<br />
@@ -80,7 +72,6 @@
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_nodes %}'" />
 </div>
 </form>
-</div>
 {% endblock %}
 
 {% block js %}

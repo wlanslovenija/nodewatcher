@@ -1,19 +1,11 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% load i18n %}
 {% load gmap %}
 
 {% block title %}{% trans "New Node Registration" %}{% endblock %}
-{% block contenttype %}prefs{% endblock %}
 {% block heading %}{% trans "New Node Registration" %}{% endblock %}
-{% block content %}
-<ul id="tabs">
-  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
-  <li class="active">{% trans "New node" %}</li>
-  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
-  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
-  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
-</ul>
-<div id="tabcontent">
+
+{% block my_content %}
 <p class="no-top-margin">
   {% url nodes_list as nodes_list %}{% blocktrans %}Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="{{ nodes_list }}" rel="external">the existing node list</a>). After your node is registered you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.{% endblocktrans %}
 </p>
@@ -214,7 +206,6 @@
 </table>
 <div class="buttons"><input type="submit" value="{% trans "Register new node" %}" /></div>
 </form>
-</div>
 {% endblock %}
 
 {% block js %}

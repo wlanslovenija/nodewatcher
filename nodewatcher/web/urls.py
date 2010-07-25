@@ -4,7 +4,7 @@ from web.nodes.sitemaps import NodeSitemap, StaticSitemap, RootPageSitemap
 from django.conf import settings
 from django.shortcuts import redirect
 
-# Legacy feeds (GeoDjango feeds have not yet been updated to new code)
+# Legacy feeds (GeoDjango feeds have not yet been upgraded to new code)
 feeds = {
   'active'  : ActiveNodes,
 }

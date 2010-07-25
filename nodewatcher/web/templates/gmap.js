@@ -14,8 +14,8 @@
       
       {% if not full %}
       var m = null;
-      {% if mlat and mlong %}
-      m = new google.maps.Marker(new google.maps.LatLng({{ mlat }}, {{ mlong }}), {'icon': createIcon('{{ status|escapejs }}')});
+      {% if marker_lat and marker_long %}
+      m = new google.maps.Marker(new google.maps.LatLng({{ marker_lat }}, {{ marker_long }}), {'icon': createIcon('{{ status|escapejs }}')});
       map.addOverlay(m);
       map.setCenter(m.getLatLng(), {{ node_zoom }});
       {% endif %}
@@ -42,9 +42,11 @@
       {% endif %}
       {% endif %}
       
+      {% if callback %}
       if (typeof {{ callback }} == "function") {
         {{ callback }}(map);
       }
+      {% endif %}
     }
   }
 

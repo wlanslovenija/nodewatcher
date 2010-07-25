@@ -1,25 +1,31 @@
-from django import template
 from django.conf import settings
 from django.template import Library
-from django.template import RequestContext
-from django.template import resolve_variable
 
 register = Library()
 
-import sys
-
-@register.inclusion_tag('gmap.js')
-def do_gmap(callback=None, full=False, mlat=0.0, mlong=0.0, clickable=True, status='up'):
-  return {
+@register.inclusion_tag('gmap.js', takes_context=True)
+def do_gmap(context, callback=None, full=False, marker_lat=None, marker_long=None, clickable=True, status='up'):
+  """
+  Renders Google Maps JavaScript code.
+  
+  @param callback: Name of the callback function to call at the end of Google Maps initialization
+  @parm full: Draw full map or only small map around optional marker
+  @param marker_lat: Optional marker to draw - latitude
+  @param marker_long: Optional marker to draw - longitude
+  @param clickable: Is map clickable - when the user clicks marker is put and `id_geo_lat` and `id_geo_long` page elements are updated
+  @param status: Status of optional marker
+  """
+  context.update({
     'google_key': settings.GOOGLE_MAPS_API_KEY,
     'lat': settings.GOOGLE_MAPS_DEFAULT_LAT,
     'long': settings.GOOGLE_MAPS_DEFAULT_LONG,
     'zoom': settings.GOOGLE_MAPS_DEFAULT_ZOOM,
     'node_zoom': settings.GOOGLE_MAPS_DEFAULT_NODE_ZOOM,
-    'mlat': mlat,
-    'mlong': mlong,
+    'marker_lat': marker_lat,
+    'marker_long': marker_long,
     'clickable': clickable,
     'full': full,
     'callback': callback,
     'status': status          
-  }
+  })
+  return context

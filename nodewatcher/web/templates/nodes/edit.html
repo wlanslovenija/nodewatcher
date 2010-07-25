@@ -5,17 +5,7 @@
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 {% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
-{% block contenttype %}prefs{% endblock %}
-
 {% block content %}
-<ul id="tabs">
-  <li class="active">{% trans "My nodes" %}</li>
-  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
-  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
-  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
-  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
-</ul>
-<div id="tabcontent">
 {% if form.errors %}
 <div class="error">
   {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to change node information:{% endblocktrans %}<br />
@@ -199,7 +189,6 @@
 <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
 </div>
 </form>
-</div>
 {% endblock %}
 
 {% block js %}

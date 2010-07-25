@@ -1,19 +1,10 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% load i18n %}
-{% load misc %}
 
 {% block title %}{% trans "Subscribe to Event" %}{% endblock %}
 {% block heading %}{% trans "Subscribe to Event" %}{% endblock %}
-{% block contenttype %}prefs{% endblock %}
-{% block content %}
-<ul id="tabs">
-  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
-  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
-  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
-  <li class="active">{% trans "Events" %}</li>
-  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
-</ul>
-<div id="tabcontent">
+
+{% block my_content %}
 <h3 class="no-top-margin">{% trans "Subscribe to Event" %}</h3>
 
 {% if form.errors %}
@@ -58,21 +49,24 @@
       <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_events %}'" />
     </div>
 </form>
-</div>
+{% endblock %}
 
-<script>
-  function toggleSingleNode()
-  {
-    if ($('#id_type').attr('value') == {{ single_node_type }}) {
-      $('.single_node_subscribe').css('display', '');
-    } else {
-      $('.single_node_subscribe').css('display', 'none');
-    }
+{% block js %}
+<script type="text/javascript">
+/* <![CDATA[ */
+function toggleSingleNode() {
+  if ($('#id_type').attr('value') == {{ single_node_type }}) {
+    $('.single_node_subscribe').css('display', '');
   }
+  else {
+    $('.single_node_subscribe').css('display', 'none');
+  }
+}
 
+$(document).ready(function () {
   $('#id_type').change(function(event) { toggleSingleNode(); });
-  $(function() {
-    toggleSingleNode();
-  });
+  toggleSingleNode();
+});
+/* ]]> */
 </script>
 {% endblock %}

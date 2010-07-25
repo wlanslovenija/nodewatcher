@@ -1,19 +1,11 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% load i18n %}
 {% load nodestatus %}
 
 {% block title %}{% trans "My Nodes" %}{% endblock %}
 {% block heading %}{% trans "My Nodes" %}{% endblock %}
-{% block contenttype %}prefs{% endblock %}
-{% block content %}
-<ul id="tabs">
-  <li class="active">{% trans "My nodes" %}</li>
-  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
-  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
-  <li><a href="{% url my_events %}">{% trans "Events" %}</a></li>
-  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
-</ul>
-<div id="tabcontent">
+
+{% block my_content %}
 
 {% if not user.email %}
 {% include "nodes/missing_email_error.html" %}
@@ -80,7 +72,6 @@
   {% endfor %}
 </tbody>
 </table>
-</div>
 {% endblock %}
 
 {% block js %}

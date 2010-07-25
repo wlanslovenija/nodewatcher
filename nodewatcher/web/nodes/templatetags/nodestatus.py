@@ -21,6 +21,7 @@ DESCRIPTIONS = {
 IMAGE_TEMPLATE = """<img src="%(media_url)simages/status_%(status)s_%(size)s.png" title="%(title)s" alt="%(status)s" />"""
 WRAPPER_TEMPLATE = """<span class="node_status_%(status)s node_status_%(size)s">%(content)s</span>"""
 
+@register.filter
 def statusimage(value, arg, autoescape = None):
   value = value.lower()
   if value.endswith("wc"):
@@ -37,6 +38,9 @@ def statusimage(value, arg, autoescape = None):
   params = {"status" : value, "size" : arg, "title" : ("%s - %s" % (value, DESCRIPTIONS[status])), "media_url" : settings.MEDIA_URL}
   return mark_safe(IMAGE_TEMPLATE % params)
 
+statusimage.needs_autoescape = True
+
+@register.filter
 def status(value, arg, autoescape = None):
   value = value.lower()
 
@@ -55,6 +59,8 @@ def status(value, arg, autoescape = None):
   params['content'] = (IMAGE_TEMPLATE % params) + "&nbsp;" + value
   return mark_safe(WRAPPER_TEMPLATE % params)
 
+status.needs_autoescape = True
+
 @register.simple_tag
 def statusdesc(value):
   if value.endswith("wc"):
@@ -64,8 +70,3 @@ def statusdesc(value):
 
   return DESCRIPTIONS[status]
 
-status.needs_autoescape = True
-statusimage.needs_autoescape = True
-
-register.filter('statusimage', statusimage)
-register.filter('status', status)

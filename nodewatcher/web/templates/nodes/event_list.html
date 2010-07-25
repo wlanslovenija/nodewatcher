@@ -1,9 +1,8 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Events" %}{% endblock %}
 {% block heading %}{% trans "Events" %}{% endblock %}
-{% block contenttype %}prefs{% endblock %}
 
 {% block rss %}
   <link rel="alternate" href="{% url events_feed user.username %}" title="{{ network.name }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
@@ -16,16 +15,7 @@
   </ul>
 {% endblock %}
 
-{% block content %}
-
-<ul id="tabs">
-  <li><a href="{% url my_nodes %}">{% trans "My nodes" %}</a></li>
-  <li><a href="{% url new_node %}">{% trans "New node" %}</a></li>
-  <li><a href="{% url my_whitelist %}">{% trans "MAC whitelist" %}</a></li>
-  <li class="active">{% trans "Events" %}</li>
-  <li><a href="{% url my_sticker %}">{% trans "Info sticker" %}</a></li>
-</ul>
-<div id="tabcontent">
+{% block my_content %}
 <h3 class="no-top-margin">Event subscriptions</h3>
 
 {% if not user.email %}
@@ -110,7 +100,6 @@
   {% endfor %}
 </tbody>
 </table>
-</div>
 {% endblock %}
 
 {% block js %}
