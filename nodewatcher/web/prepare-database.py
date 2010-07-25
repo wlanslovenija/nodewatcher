@@ -25,12 +25,12 @@ def ensure_success(errcode):
     print "ERROR: Command failed to execute, aborting!"
     exit(1)
 
-db_backend = settings.DATABASE_ENGINE
-if settings.DATABASE_ENGINE.startswith('postgresql'):
+db_backend = settings.DATABASES['default']['ENGINE']
+if db_backend.startswith('postgresql'):
   db_backend = 'postgresql'
-elif settings.DATABASE_ENGINE.startswith('sqlite'):
+elif db_backend.startswith('sqlite'):
   db_backend = 'sqlite'
-elif settings.DATABASE_ENGINE.startswith('mysql'):
+elif db_backend.startswith('mysql'):
   db_backend = 'mysql'
 
 if os.path.isfile('scripts/%s_init.sh' % db_backend):
@@ -45,7 +45,7 @@ if os.path.isfile('scripts/%s_init.sh' % db_backend):
     exit(1)
 
   print ">>> Executing database setup script 'scripts/%s_init.sh'..." % db_backend
-  ensure_success(subprocess.call(["scripts/%s_init.sh" % db_backend, settings.DATABASE_NAME]))
+  ensure_success(subprocess.call(["scripts/%s_init.sh" % db_backend, settings.DATABASES['default']['NAME']]))
 else:
   print "!!! NOTE: This script assumes that you have created and configured"
   print "!!! a proper database via settings.py! The database MUST be completely"
