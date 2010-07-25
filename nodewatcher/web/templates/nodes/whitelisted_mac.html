@@ -38,7 +38,7 @@
 <tbody>
   {% for item in whitelist %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="{% url my_whitelist_remove item.id %}"><img src="/images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
+    <td align="center"><a href="{% url my_whitelist_remove item.pk %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Unwhitelist" %}" alt="{% trans "Unwhitelist" %}" /></a></td>
     <td>
       {{ item.mac }}
       {% if item.description %}

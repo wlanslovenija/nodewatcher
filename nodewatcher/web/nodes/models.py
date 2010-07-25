@@ -544,11 +544,11 @@ class Node(models.Model):
     """
     return self.pk if self.is_invalid() else self.name
   
-  def get_full_url(self):
+  def get_full_url(self, use_https=getattr(settings, 'USE_HTTPS', None)):
     """
     Returns (full) absolute URL for the node.
     """
-    base_url = "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
+    base_url = "%s://%s" % ('https' if use_https else 'http', Site.objects.get_current().domain)
     return "%s%s" % (base_url, self.get_absolute_url())
   
   @models.permalink
@@ -1477,7 +1477,7 @@ class EventSubscription(models.Model):
                     'contact'     : settings.NETWORK_CONTACT,
                     'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                   },
-      'base_url' : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
+      'base_url' : "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
     })
 
     # Format node name and IP

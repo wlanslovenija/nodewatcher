@@ -12,7 +12,7 @@
 <table class="layout">
 <tr>
 {% for s in nodes_by_status %}
-<td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status|widthlist }}%;" ><img src="/images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}"/> {{ s.count }}</td>
+<td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status|widthlist }}%;" ><img src="{{ MEDIA_URL }}images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}" /> {{ s.count }}</td>
 {% empty %}
 <td class="notice">
   {% trans "There are currently no nodes registered/visible." %}
@@ -82,7 +82,7 @@
   var graph_timespan = '{{ timespans|first }}';
   function graph_display_changed() {
     {% for graph in graphs %}
-    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + graph_timespan + '_{{ graph.graph }}' );
+    $('#graph_{{ graph.id }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_{{ graph.graph }}' );
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');
@@ -97,5 +97,5 @@
 </div>
 {% endblock %}
 {% block js %}
-<script type="text/javascript" src="/js/jquery.floater.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.floater.js"></script>
 {% endblock %}

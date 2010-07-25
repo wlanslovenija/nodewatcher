@@ -50,7 +50,7 @@
     <td align="center">
       {% if node.warnings %}
       <a href="{% url view_node node.pk %}">
-        <img src="/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
+        <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>

@@ -27,7 +27,8 @@ def global_values(request):
                  'contact'     : settings.NETWORK_CONTACT,
                  'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                },
-   'base_url'                  : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain),
+   'base_url'                  : "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', Site.objects.get_current().domain),
+   'feeds_base_url'            : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain),
    'reset_password_url'        : getattr(settings, 'RESET_PASSWORD_URL', None),
    'profile_configuration_url' : getattr(settings, 'PROFILE_CONFIGURATION_URL', None),
    'register_user_url'         : getattr(settings, 'REGISTER_USER_URL', None),

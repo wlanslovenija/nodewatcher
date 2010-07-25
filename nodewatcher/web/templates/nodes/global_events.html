@@ -6,13 +6,13 @@
 {% block contenttype %}prefs{% endblock %}
 
 {% block rss %}
-  <link rel="alternate" href="/feeds/rss/events" title="{{ network.name }} - Latest network events" type="application/rss+xml" />
+  <link rel="alternate" href="{% url events_feed %}" title="{{ network.name }} – Latest network events" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>
   <ul>
-    <li class="first last"><a class="rss" href="/feeds/rss/events">{% trans "RSS Feed" %}</a></li>
+    <li class="first last"><a class="rss" href="{% url events_feed %}">{% trans "RSS Feed" %}</a></li>
   </ul>
 {% endblock %}
 

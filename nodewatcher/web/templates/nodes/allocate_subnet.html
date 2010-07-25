@@ -28,7 +28,7 @@
 {% include "nodes/general_info_small.html" %}
 
 <h3>{% trans "Subnet Information" %}</h3>
-<form action="{% url web.nodes.views.node_allocate_subnet node.pk %}" method="post">
+<form action="{% url allocate_subnet node.pk %}" method="post">
 {% csrf_token %}
 <table border="0" class="layout">
   {% if user.is_staff %}

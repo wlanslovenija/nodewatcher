@@ -49,7 +49,7 @@
   <li>{{ "pending"|status:"gmap" }} – {% statusdesc "pending" %}</li>
 </ul>
 {% if web_client_node %}
-The node marked with symbol <img src="/images/symbol_wc.png" alt="Client node symbol" /> is the node through which you are connected to the network.
+The node marked with symbol <img src="{{ MEDIA_URL }}images/symbol_wc.png" alt="Client node symbol" /> is the node through which you are connected to the network.
 {% endif %}
 <h3>{% trans "Edge color key:" %}</h3>
 <ul>
@@ -61,7 +61,7 @@ The node marked with symbol <img src="/images/symbol_wc.png" alt="Client node sy
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="/js/jquery.hashchange.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.hashchange.js"></script>
 <script type="text/javascript">
 /* <![CDATA[ */
   var nodes = [
@@ -77,5 +77,5 @@ The node marked with symbol <img src="/images/symbol_wc.png" alt="Client node sy
 /* ]]> */
 </script>
 {% do_gmap "mapInit" "true" %}
-<script type="text/javascript" src="/js/map.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/map.js"></script>
 {% endblock %}

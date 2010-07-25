@@ -9,7 +9,7 @@ def generate_sticker(user, regenerate = False):
 
   @param user: A valid User instance
   """
-  url_base = "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
+  url_base = "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
   
   if user.info_sticker and not regenerate:
     # User already has a sticker generated, just return the path

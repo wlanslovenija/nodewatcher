@@ -125,7 +125,7 @@ def node_new(request):
   if request.method == 'POST':
     form = RegisterNodeForm(request.POST)
     if form.is_valid() and form.save(request.user):
-      return HttpResponseRedirect(reverse("view_node", (), {'node': form.node.pk}))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': form.node.pk }))
   else:
     form = RegisterNodeForm()
 
@@ -155,7 +155,7 @@ def node_edit(request, node):
           context_instance = RequestContext(request)
         )
       else:
-        return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
+        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
   else:
     p = {
       'name'                : node.name,
@@ -260,7 +260,7 @@ def node_reset(request, node):
       node.reset()
       node.save()
 
-      return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
 
   return render_to_response('nodes/reset.html',
     { 'node' : node },
@@ -304,7 +304,7 @@ def node_renumber(request, node):
       if form.is_valid():
         form.save()
         transaction.savepoint_commit(sid)
-        return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
+        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
     except ValidationWarning:
       # We must display a warning before the user may continue; node must be reloaded
       # because savepoint has been rolled back and any modifications have actually been
@@ -337,7 +337,7 @@ def node_allocate_subnet(request, node):
   if request.method == 'POST':
     form = AllocateSubnetForm(node, request.POST)
     if form.is_valid() and form.save(node):
-      return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
   else:
     form = AllocateSubnetForm(node)
 
@@ -362,7 +362,7 @@ def node_deallocate_subnet(request, node, subnet_id):
       raise Http404
 
     subnet.delete()
-    return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
+    return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
 
   return render_to_response('nodes/deallocate_subnet.html',
     { 'node' : node,
@@ -383,7 +383,7 @@ def node_edit_subnet(request, node, subnet_id):
   if request.method == 'POST':
     form = EditSubnetForm(node, request.POST)
     if form.is_valid() and form.save(subnet):
-      return HttpResponseRedirect(reverse("view_node", (), {'node': node.pk}))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
     else:
       subnet = Subnet.objects.get(pk = subnet_id)
   else:

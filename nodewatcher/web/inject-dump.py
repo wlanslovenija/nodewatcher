@@ -28,7 +28,7 @@ try:
   print "static files"
   static = file.getmembers()
   static.remove(file.getmember("data.json"))
-  file.extractall(path=settings.STATIC_DOC_ROOT, members=static)
+  file.extractall(path=settings.MEDIA_ROOT, members=static)
   file.close()
 finally:
   os.remove(filename)

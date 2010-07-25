@@ -35,7 +35,7 @@
 {% include "nodes/missing_email_error.html" %}
 {% endif %}
 
-<form method="post" action="{% url web.nodes.views.event_subscribe %}">
+<form method="post" action="{% url my_events_subscribe %}">
 {% csrf_token %}
 <table border="0" width="700">
   <tr>

@@ -6,13 +6,13 @@
 {% block contenttype %}prefs{% endblock %}
 
 {% block rss %}
-  <link rel="alternate" href="/feeds/rss/events/{{ user.id }}" title="{{ network.name }} - Latest network events for {{ user.username }}" type="application/rss+xml" />
+  <link rel="alternate" href="{% url events_feed user.username %}" title="{{ network.name }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>
   <ul>
-    <li class="first last"><a class="rss" href="/feeds/rss/events/{{ user.id }}">{% trans "RSS Feed" %}</a></li>
+    <li class="first last"><a class="rss" href="{% url events_feed user.username %}">{% trans "RSS Feed" %}</a></li>
   </ul>
 {% endblock %}
 
@@ -50,7 +50,7 @@
 <tbody>
   {% for subscription in subscriptions %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="{% url my_events_unsubscribe subscription.id %}"><img src="/images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
+    <td align="center"><a href="{% url my_events_unsubscribe subscription.id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
     <td>
       {{ subscription.type_to_string }}
     </td>

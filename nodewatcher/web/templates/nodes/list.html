@@ -7,13 +7,13 @@
 {% block heading %}{% trans "Node List" %}{% endblock %}
 {% block contenttype %}nodelist{% endblock %}
 {% block rss %}
-  <link rel="alternate" href="/feeds/rss/active" title="{{ network.name }} - Active nodes" type="application/rss+xml" />
+  <link rel="alternate" href="{% url feeds "active" %}" title="{{ network.name }} – Active nodes" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>
   <ul>
-    <li class="first last"><a class="rss" href="/feeds/rss/active">{% trans "RSS Feed" %}</a> ({% trans "open in" %} <a href="http://maps.google.com/maps?q={{ base_url|urlencode }}{{ "/feeds/rss/active"|urlencode }}">Google Maps</a>)</li>
+    <li class="first last"><a class="rss" href="{% url feeds "active" %}">{% trans "RSS Feed" %}</a> ({% trans "open in" %} <a href="http://maps.google.com/maps?q={{ feeds_base_url|urlencode }}{% url feeds "active" as feeds_active %}{{ feeds_active|urlencode }}">Google Maps</a>)</li>
   </ul>
 {% endblock %}
 
@@ -58,7 +58,7 @@ You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client
     <td align="center">
       {% if node.warnings %}
       <a href="{% url view_node node.pk %}">
-        <img src="/images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
+        <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>

@@ -5,7 +5,7 @@
 {% block heading %}{% trans "Mesh Topology View" %}{% endblock %}
 
 {% block content %}
-<img src="/graphs/mesh_topology.png" alt="{% trans "Mesh Topology View" %}" /><br/>
+<img src="{{ MEDIA_URL }}graphs/mesh_topology.png" alt="{% trans "Mesh Topology View" %}" /><br/>
 <div class="legend">
 <h3>{% trans "Edge color key:" %}</h3>
 <ul>
@@ -27,6 +27,6 @@
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>
   <ul>
-    <li class="first last"><a href="/graphs/mesh_topology.dot">{% trans "Dot File" %}</a></li>
+    <li class="first last"><a href="{{ MEDIA_URL }}graphs/mesh_topology.dot">{% trans "Dot File" %}</a></li>
   </ul>
 {% endblock %}

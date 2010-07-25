@@ -4,15 +4,15 @@ from web.nodes.sitemaps import NodeSitemap, StaticSitemap, RootPageSitemap
 from django.conf import settings
 from django.shortcuts import redirect
 
+# Legacy feeds (GeoDjango feeds have not yet been updated to new code)
 feeds = {
-  'events'  : LatestEvents,
-  'active'  : ActiveNodes
+  'active'  : ActiveNodes,
 }
 
 sitemaps = {
   'nodes'   : NodeSitemap,
   'static'  : StaticSitemap,
-  'root'    : RootPageSitemap
+  'root'    : RootPageSitemap,
 }
 
 urlpatterns = patterns('',
@@ -63,11 +63,12 @@ urlpatterns = patterns('',
   
   # Feeds
   url(r'^feeds/whitelist$', 'web.nodes.views.whitelist'),
-  url(r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }),
+  url(r'^feeds/rss/events(?:/(?P<username>.+))?$', LatestEvents(), name = 'events_feed'),
+  url(r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }, name = 'feeds'),
 
   # Pools
-  url(r'^pools$', 'web.nodes.views.pools'),
-  url(r'^pools/txt$', 'web.nodes.views.pools_text'),
+  url(r'^pools$', 'web.nodes.views.pools', name = 'pools'),
+  url(r'^pools/txt$', 'web.nodes.views.pools_text', name = 'pools_text'),
 
   # Sitemap
   url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', { 'sitemaps' : sitemaps }),
@@ -76,12 +77,19 @@ urlpatterns = patterns('',
   url(r'^generator/request/(?P<node>.*)$', 'web.generator.views.request', name = 'generate_node'),
 
   # Authentication
-  url(r'^auth/login$', 'django.contrib.auth.views.login', {'template_name' : 'auth/login.html'}, name = 'auth_login'),
+  url(r'^auth/login$', 'django.contrib.auth.views.login', { 'template_name' : 'auth/login.html' }, name = 'auth_login'),
   url(r'^auth/logout$', 'django.contrib.auth.views.logout_then_login', name = 'auth_logout'),
   url(r'^auth/$', lambda request: redirect('auth_login', permanent=True)),
 )
 
-if getattr(settings, 'DEBUG', None):
+if getattr(settings, 'DEBUG', None) and not settings.MEDIA_URL.startswith('http'):
+  # Server static files with Django when running in debug mode and MEDIA_URL is local
+  
+  static_patterns = patterns('',
+    url(r'^(?P<path>(?:common|css|graphs|images|js|site|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+  )
+  
+  media_url = settings.MEDIA_URL.lstrip('/')
   urlpatterns += patterns('',
-    url(r'^(?P<path>(common|css|graphs|images|js|site|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_DOC_ROOT, 'show_indexes': True}),
+    (r'^%s' % media_url, include(static_patterns)),
   )

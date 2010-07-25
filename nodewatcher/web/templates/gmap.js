@@ -1,5 +1,5 @@
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ google_key|escape }}" type="text/javascript"></script>
-<script src="/js/gmap.js" type="text/javascript"></script>
+<script src="{{ MEDIA_URL }}js/gmap.js" type="text/javascript"></script>
 <script type="text/javascript">
 /* <![CDATA[ */
   function createMap() {

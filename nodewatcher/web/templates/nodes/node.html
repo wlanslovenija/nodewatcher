@@ -5,7 +5,7 @@
 {% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}<img src="/images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}"/>&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 {% include "nodes/warnings.html" %}
@@ -37,11 +37,11 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 
 <h3 class="section_title">{% trans "General Information" %}
 {% if current_owner and not node.is_invalid %}
-<a href="{% url edit_node node.pk %}"><img src="/images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
+<a href="{% url edit_node node.pk %}"><img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
 {% if node.is_resettable %}
-<a href="{% url reset_node node.pk %}"><img src="/images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
+<a href="{% url reset_node node.pk %}"><img src="{{ MEDIA_URL }}images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
 {% endif %}
-<a href="{% url remove_node node.pk %}"><img src="/images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
+<a href="{% url remove_node node.pk %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
 {% endif %}
 </h3>
 <div class="embedded">
@@ -273,10 +273,10 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td>
       {% if subnet.allocated and not subnet.is_primary %}
       <a href="{% url edit_subnet node.pk subnet.pk %}">
-        <img src="/images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
+        <img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
       </a>
       <a href="{% url remove_subnet node.pk subnet.pk %}">
-        <img src="/images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
+        <img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
       </a>
       {% endif %}
     </td>
@@ -373,7 +373,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     var subgraph = '';
     {% for graph in node.get_graphs %}
     subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
-    $('#graph_{{ graph.id }}').attr('src', '/graphs/' + graph_timespan + '_' + subgraph);
+    $('#graph_{{ graph.id }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_' + subgraph);
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');
@@ -392,7 +392,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="/js/jquery.floater.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.floater.js"></script>
 {% if node.geo_lat and node.geo_long %}
 {% do_gmap "mapInit" "" node.geo_lat node.geo_long "" node.status_as_string %}
 {% endif %}

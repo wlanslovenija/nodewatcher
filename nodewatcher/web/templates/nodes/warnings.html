@@ -6,7 +6,7 @@
   <tbody>
     {% for warning in node.get_warnings %}
     <tr class="{% cycle 'odd' 'even' %}">
-      <td class="icon"><img src="/images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="Source: {{ warning.source_to_string|lower }}" /></td>
+      <td class="icon"><img src="{{ MEDIA_URL }}images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="Source: {{ warning.source_to_string|lower }}" /></td>
       <td align="left">
         <span class="datetime">
           {{ warning.created_at|date }}<br />

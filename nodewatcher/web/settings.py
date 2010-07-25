@@ -5,8 +5,7 @@ import os.path
 database_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'db.sqlite').replace('\\', '/')
 default_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates').replace('\\', '/')
 wlanlj_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'wlanlj', 'templates').replace('\\', '/')
-
-STATIC_DOC_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static').replace('\\', '/')
+static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static').replace('\\', '/')
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -71,12 +70,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = static_dir
 
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+# URL that handles the media served from MEDIA_ROOT. Make sure to always
+# use a trailing slash.
+# Examples: "http://media.lawrence.com/", "http://example.com/media/"
+MEDIA_URL = '/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -86,6 +85,8 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Set to true if you want https instead of http in sitemaps' and feeds' URLs
 SITEMAPS_USE_HTTPS = False
 FEEDS_USE_HTTPS = False
+# In general use https when constructing full URLs to nodewatcher?
+USE_HTTPS = False
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '1p)^zvjul0^c)v5*l!8^48g=ili!cn54^l)wl1avvu-x$==k7p'
@@ -172,7 +173,7 @@ INSTALLED_APPS = (
 #FPING_BIN = '/path/to/fping'
 
 # Graph configuration
-GRAPH_DIR = os.path.join(STATIC_DOC_ROOT, 'graphs').replace('\\', '/')
+GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs').replace('\\', '/')
 GRAPH_TIMESPANS = (
   ('day',   86400),
   ('week',  604800),
