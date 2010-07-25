@@ -221,22 +221,22 @@
 <script type="text/javascript">
 /* <![CDATA[ */
   var mobileNodeType = {{ mobile_node_type }};
-  var projects = [
+  var projects = {
   {% for project in projects %}{% if project.has_geoloc %}
-    {
-      "id": {{ project.id }},
+    {% ifchanged "" %}{% else %},{% endifchanged %}
+    {{ project.id }} : {
       "lat": {{ project.geo_lat }},
       "long": {{ project.geo_long }},
       "zoom": {{ project.geo_zoom }}
-    }{% if not forloop.last %},{% endif %}
+    }
   {% endif %}{% endfor %}
-  ];
+  };
   var pools = {
   {% for project in projects %}
     {{ project.id }} : {
       "default" : {{ project.pool.pk }},
       "list" : [
-      {% for pool in project.pools.all %}
+      {% for pool in project.get_pools %}
         {
           "id" : {{ pool.id }},
           "subnet" : '{{ pool.ip_subnet }}',

@@ -64,11 +64,9 @@ function toggleIpInput() {
 
 function updateMapForProject() {
   var projectId = $('#id_project').attr('value');
-  for (var i = 0; i < projects.length; i++) {
-    if (projectId == projects[i].id) {
-      gmap.setCenter(new google.maps.LatLng(projects[i].lat, projects[i].long), projects[i].zoom);
-      return;
-    }
+  if (projects[projectId]) {
+    gmap.setCenter(new google.maps.LatLng(projects[projectId].lat, projects[projectId].long), projects[projectId].zoom);
+    return;
   }
 }
 

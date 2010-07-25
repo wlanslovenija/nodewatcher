@@ -48,6 +48,12 @@ class Project(models.Model):
     """
     return self.nodes.all().count() > 0
 
+  def get_pools(self):
+    """
+    A helper method that returns the IP pools.
+    """
+    return queryset_by_ip(self.pools.all(), 'ip_subnet', 'description')
+
   def __unicode__(self):
     """
     Returns this project's name.

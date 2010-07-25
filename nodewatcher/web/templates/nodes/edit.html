@@ -206,17 +206,17 @@
 <script type="text/javascript">
 /* <![CDATA[ */
   var mobileNodeType = {{ mobile_node_type }};
-  var projects = [
+  var projects = {
   {% for project in projects %}{% if project.has_geoloc %}
-    {
-      "id": {{ project.id }},
+    {% ifchanged "" %}{% else %},{% endifchanged %}
+    {{ project.id }} : {
       "lat": {{ project.geo_lat }},
       "long": {{ project.geo_long }},
       "zoom": {{ project.geo_zoom }}
-    }{% if not forloop.last %},{% endif %}
+    }
   {% endif %}{% endfor %}
-  ];
-  var pools = 0;
+  };
+  var pools = {};
 /* ]]> */
 </script>
 <script type="text/javascript" src="/js/node.js"></script>

@@ -47,7 +47,8 @@ class RegisterNodeForm(forms.Form):
     label = _("Project")
   )
   pool = forms.ModelChoiceField(
-    queryset_by_ip(Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None), "ip_subnet"),
+    # Cannot use queryset_by_ip as proper queryset is expected
+    Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
     empty_label = None,
     label = _("IP pool")
   )
@@ -683,7 +684,8 @@ class AllocateSubnetForm(forms.Form):
     # Populate prefix length choices
     primary_pool = self.__node.get_primary_ip_pool() 
     self.fields['pool'] = forms.ModelChoiceField(
-      queryset_by_ip(node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None), "ip_subnet"),
+      # Cannot use queryset_by_ip as proper queryset is expected
+      node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
       empty_label = None,
       label = _("IP pool"),
       initial = primary_pool.pk if primary_pool else 0
@@ -693,7 +695,7 @@ class AllocateSubnetForm(forms.Form):
     """
     A helper method that returns the IP pools.
     """
-    return queryset_by_ip(self.__node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None), "ip_subnet")
+    return queryset_by_ip(self.__node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None), 'ip_subnet', 'description')
   
   def clean(self):
     """
@@ -944,7 +946,7 @@ class RenumberForm(FormWithWarnings):
     
     for subnet in queryset_by_ip(node.subnet_set.filter(allocated = True), 'ip_subnet'):
       pools = []
-      for pool in node.project.pools.exclude(status = PoolStatus.Full).order_by('network'):
+      for pool in queryset_by_ip(node.project.pools.exclude(status = PoolStatus.Full), 'ip_subnet', 'description'):
         pools.append((pool.pk, _("Renumber to %s [%s/%s]") % (pool.description, pool.network, pool.cidr)))
       
       choices = [
@@ -972,7 +974,7 @@ class RenumberForm(FormWithWarnings):
     """
     A helper method that returns all allocations pools.
     """
-    return self.__node.project.pools.exclude(status = PoolStatus.Full).order_by('network')
+    return queryset_by_ip(self.__node.project.pools.exclude(status = PoolStatus.Full), 'ip_subnet', 'description')
   
   def get_subnet_fields(self):
     """
