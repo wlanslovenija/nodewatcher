@@ -239,7 +239,7 @@ try:
 
       # Send an e-mail
       d = no_unicodes(j.data)
-      t = loader.get_template('generator/email-failed.txt')
+      t = loader.get_template('generator/email_failed.txt')
       ctx = Context({
         'hostname'  : d['hostname'],
         'ip'        : d['ip'],
