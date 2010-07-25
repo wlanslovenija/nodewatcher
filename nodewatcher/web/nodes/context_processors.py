@@ -25,6 +25,7 @@ def global_values(request):
   return {
     'network' : {
       'name'        : settings.NETWORK_NAME,
+      'home'        : settings.NETWORK_HOME,
       'contact'     : settings.NETWORK_CONTACT,
       'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
     },

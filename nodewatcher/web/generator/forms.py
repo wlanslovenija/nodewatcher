@@ -31,9 +31,11 @@ class GenerateImageForm(forms.Form):
 
     return self.cleaned_data
   
-  def save(self, node):
+  def save(self, request, node):
     """
-    Saves modifiable stuff into the profile
+    Returns user to which we will send the image.
     """
-    return node.owner if not self.cleaned_data.get('email_user') else self.cleaned_data.get('email_user')
-
+    if not request.user.user.is_staff() or not self.cleaned_data.get('email_user'):
+      return node.owner
+    else:
+      return self.cleaned_data.get('email_user')

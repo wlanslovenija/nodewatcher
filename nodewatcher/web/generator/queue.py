@@ -4,7 +4,7 @@ from web.generator.types import IfaceType
 from web.account.models import UserAccount
 from django.conf import settings
 
-if getattr(settings, 'ENABLE_IMAGE_GENERATOR', None):
+if getattr(settings, 'IMAGE_GENERATOR_ENABLED', None):
   from beanstalk import serverconn
   from beanstalk import job
 
@@ -14,7 +14,7 @@ def queue_generator_job(node, email_user, config_only = False):
   """
   assert(isinstance(node, Node))
   
-  if not getattr(settings, 'ENABLE_IMAGE_GENERATOR', None):
+  if not getattr(settings, 'IMAGE_GENERATOR_ENABLED', None):
     return
 
   # Open up a connection with beanstalkd

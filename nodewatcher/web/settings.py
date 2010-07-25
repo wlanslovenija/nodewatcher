@@ -10,14 +10,6 @@ static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'sta
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-# Is generator enabled or not. If set to False the pybeanstalk dependency is not needed.
-ENABLE_IMAGE_GENERATOR = False
-# Is image generator temporary suspended (like because firmware image it would produce contains errors)?
-# If it is, image requests are not queued and message about that is issued to the user
-IMAGE_GENERATOR_SUSPENDED = False
-
-IMAGES_BINDIST_URL = 'http://bindist.wlan-lj.net/images/'
-
 # A tuple that lists people who get code error notifications. When
 # DEBUG=False and a view raises an exception, Django will e-mail these
 # people with the full exception information. Each member of the tuple
@@ -48,6 +40,7 @@ EMAIL_EVENTS_SENDER = 'events@wlan-lj.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-lj.net'
 
 NETWORK_NAME = 'wlan ljubljana'
+NETWORK_HOME = 'http://wlan-lj.net'
 NETWORK_CONTACT = 'open@wlan-lj.net'
 NETWORK_DESCRIPTION = 'odprto brezžično omrežje Ljubljane'
 
@@ -171,6 +164,15 @@ INSTALLED_APPS = (
 # If you have programs installed in exotic locations you can specify them here
 #GRAPHVIZ_BIN = '/path/to/neato'
 #FPING_BIN = '/path/to/fping'
+#PDFLATEX = '/path/to/pdflatex'
+
+# Is image generator enabled or not. If set to False the pybeanstalk dependency is not needed.
+IMAGE_GENERATOR_ENABLED = False
+# Is image generator temporary suspended (like because firmware image it would produce contains errors)?
+# If it is, image requests are not queued and message about that is issued to the user
+IMAGE_GENERATOR_SUSPENDED = False
+
+IMAGES_BINDIST_URL = 'http://bindist.wlan-lj.net/images/'
 
 # Graph configuration
 GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs').replace('\\', '/')
@@ -195,6 +197,11 @@ DATA_ARCHIVE_ENABLED = False
 DATA_ARCHIVE_HOST = '127.0.0.1'
 DATA_ARCHIVE_PORT = 27017
 DATA_ARCHIVE_DB = 'nodewatcher'
+
+# Are stickers enabled or not. If set to False the pdflatex dependency is not needed.
+STICKERS_ENABLED = False
+STICKERS_TEMP_DIR = '/tmp/'
+STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers').replace('\\', '/')
 
 DOCUMENTATION_LINKS = {
   'custom_image'    : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',

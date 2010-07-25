@@ -488,12 +488,16 @@ def sticker(request):
   Display a form for generating an info sticker.
   """
   user = UserAccount.for_user(request.user)
-  show_errors = True
-
+  
+  # We want disabled error to show only after POST (to be same as image generation behavior)
+  disabled = False
   if request.method == 'POST':
     form = InfoStickerForm(request.POST)
     if form.is_valid():
-      return HttpResponseRedirect(form.save(user))
+      if getattr(settings, 'STICKERS_ENABLED', None):
+        return HttpResponseRedirect(form.save(user))
+      else:
+        disabled = True
   else:
     form = InfoStickerForm({
       'name'    : user.name,
@@ -501,11 +505,9 @@ def sticker(request):
       'project' : user.project.id if user.project else 0
     })
 
-    show_errors = False
-
   return render_to_response('nodes/sticker.html',
     { 'form' : form,
-      'show_errors' : show_errors },
+      'stickers_disabled' : disabled },
     context_instance = RequestContext(request)
   )
 

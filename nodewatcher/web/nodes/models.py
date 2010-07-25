@@ -1474,6 +1474,7 @@ class EventSubscription(models.Model):
       'user'  : self.user,
       'event' : event,
       'network' : { 'name'        : settings.NETWORK_NAME,
+                    'home'        : settings.NETWORK_HOME,
                     'contact'     : settings.NETWORK_CONTACT,
                     'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                   },

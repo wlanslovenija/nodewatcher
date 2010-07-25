@@ -7,19 +7,19 @@
 {% block content %}
 {% if image_generator_enabled and not image_generator_suspended %}
 {% notice %}
-Your image generation request has been successfully queued in our system. You should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay).
+{% blocktrans %}Your image generation request has been successfully queued in our system. You should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay).{% endblocktrans %}
 {% endnotice %}
 {% else %}
 <div class="error">
 {% if image_generator_suspended %}
-Image generation is temporary suspended by administrator. Please try again later and/or get into the contact with administrator.
+{% blocktrans %}<b>ERROR:</b> Image generation is temporary suspended by administrator. Please try again later and/or get into the contact with administrator.{% endblocktrans %}
 {% else %}
-The generator is disabled in settings so your image generation request was not queued. Enable it by setting ENABLE_IMAGE_GENERATOR to True.
+{% blocktrans %}<b>ERROR:</b> The generator is disabled in settings so your image generation request was not queued. Enable it by setting IMAGE_GENERATOR_ENABLED to True.{% endblocktrans %}
 {% endif %}
 </div>
 {% endif %}
 <div class="buttons" style="text-align: center">
-  <input type="button" value="{% trans "Back to Node Information" %}" onclick="document.location='{% url view_node node.pk %}'" />
+  <input type="button" value="{% trans "Back to Node" %}" onclick="document.location='{% url view_node node.pk %}'" />
 </div>
 
 {% endblock %}

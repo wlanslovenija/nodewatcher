@@ -5,7 +5,7 @@
 {% block heading %}{% trans "Generate an Info Sticker" %}{% endblock %}
 
 {% block my_content %}
-{% if form.errors and show_errors %}
+{% if form.errors %}
 <div class="error">
   {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to generate a sticker:" %}<br />
   <br/>
@@ -19,8 +19,13 @@
   {% endfor %}
 </div>
 {% endif %}
+{% if stickers_disabled %}
+<div class="error">
+{% blocktrans %}<b>ERROR:</b> Info stickers are disabled in settings so your info sticker was not generated. Enable them by setting STICKERS_ENABLED to True.{% endblocktrans %}
+</div>
+{% endif %}
 <p class="no-top-margin">
-{% trans "Enter your name and contact phone number as you would like them displayed on the sticker. A nice PDF will then be generated that you can print out and include on the node container." %}
+{% trans "Enter your name and contact phone number as you would like them displayed on the info sticker. A PDF will then be generated that you can print out and include on the node container." %}
 </p>
 <form action="{% url my_sticker %}" method="post">
 {% csrf_token %}
