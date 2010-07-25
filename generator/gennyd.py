@@ -133,6 +133,7 @@ def generate_image(d):
       'config'    : result,
       'checksum'  : checksum,
       'network'   : { 'name'        : settings.NETWORK_NAME,
+                      'home'        : settings.NETWORK_HOME,
                       'contact'     : settings.NETWORK_CONTACT,
                       'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                     },
@@ -187,6 +188,7 @@ def generate_image(d):
       'username'  : d['vpn_username'],
       'files'     : files,
       'network'   : { 'name'        : settings.NETWORK_NAME,
+                      'home'        : settings.NETWORK_HOME,
                       'contact'     : settings.NETWORK_CONTACT,
                       'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                     },
@@ -245,6 +247,7 @@ try:
         'ip'        : d['ip'],
         'username'  : d['vpn_username'],
         'network'   : { 'name'        : settings.NETWORK_NAME,
+                        'home'        : settings.NETWORK_HOME,
                         'contact'     : settings.NETWORK_CONTACT,
                         'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                       },
