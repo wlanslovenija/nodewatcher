@@ -5,12 +5,15 @@
 {% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Deallocate Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
-  <div class="error">
-    {% if subnet.is_primary %}
+  {% if subnet.is_primary %}
+    <div class="error">
     {% url renumber_node node.get_current_id as renumber_node %}{% blocktrans %}<b>ERROR:</b> This is a primary IP subnet that cannot be deallocated. In order to change it <a href="{{ renumber_node }}">renumber node</a>.{% endblocktrans %}
-    {% else %}
+    </div>
+  {% else %}
+    <div class="warning">
     {% blocktrans %}<b>WARNING:</b> By deallocating this subnet you will be returning it back to the pool. It is available for immediate allocation for other nodes afterwards, so please be sure that you really wish to deallocate it!{% endblocktrans %}
-    {% endif %}
+    </div>
+  {% endif %}
   </div>
 
 {% include "nodes/general_info_small.html" %}

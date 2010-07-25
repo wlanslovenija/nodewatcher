@@ -10,19 +10,19 @@
 {% block content %}
 {% include "nodes/warnings.html" %}
 {% if node.awaiting_renumber %}
-{% notice renumber %}
+<div class="warning">
   {% blocktrans with node.get_renumbered_ip as renumbered_ip and node.get_original_ip as original_ip %}
-  <b>This node is awaiting IP renumbering</b><br/>
+  <b>WARNING: This node is awaiting IP renumbering.</b><br/>
   <br/>
   This node's primary address has been recently renumbered from <b>{{ original_ip }}</b> to <b>{{ renumbered_ip }}</b>. This message means that the node has not yet been seen with the new address and so is still probably carrying its old address. As soon as the reconfigured node will appear, this message will be removed.
   {% endblocktrans %}<br />
   {% if current_owner %}
   <br/>
   {% blocktrans %}
-  You must <b>update the router's configuration</b> to reflect renumbering changes. You can simply regenerate and reflash the image to your router.
+  You must <b>update the router's configuration</b> to reflect renumbering changes. You can simply generate a new image with new configuration for your router and flash it.
   {% endblocktrans %}
   {% endif %}
-{% endnotice %}
+</div>
 {% endif %}
 {% if node.pk == web_client_node.pk %}
 {% notice %}

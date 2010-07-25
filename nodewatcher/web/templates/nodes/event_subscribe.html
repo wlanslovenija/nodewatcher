@@ -7,20 +7,9 @@
 {% block my_content %}
 <h3 class="no-top-margin">{% trans "Subscribe to Event" %}</h3>
 
-{% if form.errors %}
-<div class="error">
-  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to add an event subscription:" %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "subscribe to event" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
 
 {% if not user.email %}
 {% include "nodes/missing_email_error.html" %}

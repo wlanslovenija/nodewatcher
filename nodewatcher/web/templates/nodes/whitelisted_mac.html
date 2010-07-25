@@ -5,20 +5,10 @@
 {% block heading %}{% trans "MAC Whitelist" %}{% endblock %}
 
 {% block my_content %}
-{% if form.errors %}
-<div class="error">
-  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to whitelist a MAC address:" %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "whitelist a MAC address" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
+
 <table border="0" class="listing">
 <thead>
   <tr>

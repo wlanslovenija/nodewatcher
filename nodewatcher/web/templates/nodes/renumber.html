@@ -6,27 +6,9 @@
 
 {% block content %}
 
-<div class="error">
- {% trans "<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply generate a new image with new configuration for your router and flash it." %}
-</div>
- 
-{% include "nodes/general_info.html" %}
-
-<h3>{% trans "Renumber Specification" %}</h3>
-{% if form.errors %}
-<div class="error">
-  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to renumber this node:{% endblocktrans %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "renumber the node" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
 {% if form.warnings %}
 <div class="warning">
   {% blocktrans %}<b>WARNING:</b> Renumbering procedure has encountered some non-fatal potential problems. Please review them and resubmit this form if they are acceptable (otherwise abort this operation).{% endblocktrans %}<br/>
@@ -36,6 +18,14 @@
   {% endfor %} 
 </div>
 {% endif %}
+
+<div class="warning">
+ {% blocktrans %}<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply generate a new image with new configuration for your router and flash it.{% endblocktrans %}
+</div>
+ 
+{% include "nodes/general_info.html" %}
+
+<h3>{% trans "Renumber Specification" %}</h3>
 
 <form method="post" action="{% url renumber_node node.pk %}">
 {% csrf_token %}

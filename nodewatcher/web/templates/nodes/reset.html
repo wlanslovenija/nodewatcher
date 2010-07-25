@@ -5,9 +5,9 @@
 {% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Reset Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
-  <div class="error">
-    {% trans "<b>WARNING:</b> By issuing a reset command you will reset (erase) all node statistics and graphs! Use this option <b>only when</b> you have been just <b>performing testing</b> and therefore current statistics are no longer relevant. <b>Do not use it on a node which have been running for some time</b> (for example to improve its statistics) as it is important to have history records of network's growth and development." %}
-  </div>
+<div class="warning">
+  {% blocktrans %}<b>WARNING:</b> By issuing a reset command you will reset (erase) all node statistics and graphs! Use this option <b>only when</b> you have been just <b>performing testing</b> and therefore current statistics are no longer relevant. <b>Do not use it on a node which have been running for some time</b> (for example to improve its statistics) as it is important to have history records of network's growth and development. Consider marking it as a dead node and registering a new node.{% endblocktrans %}
+</div>
 
 {% include "nodes/general_info.html" %}
 

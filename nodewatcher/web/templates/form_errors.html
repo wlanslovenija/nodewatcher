@@ -1,0 +1,19 @@
+{% load i18n %}
+{% if form.errors %}
+<div class="error">
+  {% if form_errors_context %}
+  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to {{ form_errors_context }}:{% endblocktrans %}<br />
+  {% else %}
+  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred:{% endblocktrans %}<br />
+  {% endif %}
+  <br/>
+  {% for error in form.non_field_errors %}
+  <i>{{ error }}</i><br/>
+  {% endfor %}
+  {% for field in form %}
+    {% for error in field.errors %}
+    {{ field.label }}: <i>{{ error }}</i><br/>
+    {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}

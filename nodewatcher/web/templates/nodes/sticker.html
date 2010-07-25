@@ -5,20 +5,10 @@
 {% block heading %}{% trans "Generate an Info Sticker" %}{% endblock %}
 
 {% block my_content %}
-{% if form.errors %}
-<div class="error">
-  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to generate a sticker:" %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "generate an info sticker" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
+
 {% if stickers_disabled %}
 <div class="error">
 {% blocktrans %}<b>ERROR:</b> Info stickers are disabled in settings so your info sticker was not generated. Enable them by setting STICKERS_ENABLED to True.{% endblocktrans %}

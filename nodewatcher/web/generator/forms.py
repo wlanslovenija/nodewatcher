@@ -15,9 +15,10 @@ class GenerateImageForm(forms.Form):
   config_only = forms.BooleanField(initial = False, required = False, label = _("Configuration only"))
   email_user = forms.ModelChoiceField(
     User.objects.filter(is_active = True).order_by("username"),
-    initial = User.objects.filter(is_active = True)[0].id,
+    initial = User.objects.filter(is_active = True)[0].pk,
     required = False,
-    label = _("Send image to")
+    label = _("Send image to"),
+    empty_label = None
   )
 
   def clean(self):

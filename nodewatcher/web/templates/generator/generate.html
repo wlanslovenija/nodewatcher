@@ -6,27 +6,16 @@
 {% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Generate Image for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
-{% if form.errors %}
-<div class="error">
-  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to process your request:{% endblocktrans %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "process your request" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
 
 {% if not node.owner.email %}
   {% include "nodes/missing_email_error.html" %}
 {% else %}
   {% if node.has_allocated_subnets %}
     {% if node.profile.template.experimental %}
-    <div class="error">
+    <div class="warning">
       {% blocktrans with documentation_links.known_issues as known_issues_url and documentation_links.report_issue as report_issue_url %}<b>WARNING:</b> The support for router type you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="{{ known_issues_url }}">known issues</a> page. If you find any bugs, please <a href="{{ report_issue_url }}">report them</a>. Also if you find the image to be working properly for a longer period of time, also <a href="{{ report_issue_url }}">report it</a> so it may be moved from its experimental status.{% endblocktrans %}
     </div>
     {% endif %}

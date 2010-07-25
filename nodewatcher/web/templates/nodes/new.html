@@ -6,21 +6,9 @@
 {% block heading %}{% trans "New Node Registration" %}{% endblock %}
 
 {% block my_content %}
-
-{% if form.errors %}
-<div class="error">
-  {% trans "<b>Oooops!</b> The following errors have ocurred while attempting to register a new node:" %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "register a new node" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
 
 <p class="no-top-margin">
   {% url nodes_list as nodes_list %}{% blocktrans %}Please provide some basic information about your newly established node. Node's name should reflect its location and/or purpuse. As a guideline, consider using lowercased <i>street names</i> (for some examples, please see <a href="{{ nodes_list }}" rel="external">the existing node list</a>). After your node is registered you will be able to generate a flashable image for use with your router hardware. A subnet will be automatically assigned to your node as you complete the registration procedure.{% endblocktrans %}

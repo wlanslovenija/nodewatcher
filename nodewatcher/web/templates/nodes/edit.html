@@ -6,20 +6,9 @@
 {% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-{% if form.errors %}
-<div class="error">
-  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to change node information:{% endblocktrans %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "change node" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
 
 <form action="{% url edit_node node.pk %}" method="post">
 {% csrf_token %}

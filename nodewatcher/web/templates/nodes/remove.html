@@ -5,9 +5,9 @@
 {% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Remove Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
-  <div class="error">
-    {% trans "<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove it!" %}
-  </div>
+<div class="warning">
+  {% blocktrans %}<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove it!{% endblocktrans %}
+</div>
 
 {% include "nodes/general_info.html" %}
 

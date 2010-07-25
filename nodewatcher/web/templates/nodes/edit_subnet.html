@@ -6,21 +6,9 @@
 {% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
-
-{% if form.errors %}
-<div class="error">
-  {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to change subnet information:{% endblocktrans %}<br />
-  <br/>
-  {% for error in form.non_field_errors %}
-  <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% for field in form %}
-  {% for error in field.errors %}
-  {{ field.label }}: <i>{{ error|escape }}</i><br/>
-  {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
+{% with "change subnet" as form_errors_context %}
+{% include "form_errors.html" %}
+{% endwith %}
 
 {% notice %}
 {% blocktrans %}Do not forget that you must update the router's configuration to reflect some subnet changes. You can simply generate a new image with new configuration for your router and flash it.{% endblocktrans %}
