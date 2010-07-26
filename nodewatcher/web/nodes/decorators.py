@@ -27,7 +27,7 @@ def redirect_helper(view_func, node_obj, *args, **kwargs):
   url = urlresolvers.reverse(view_func_name, args=args, kwargs=kwargs)
   return http.HttpResponseRedirect(url)
 
-def node_parameter(function=None, try_ip=False):
+def node_argument(function=None, try_ip=False):
   """
   A decorator for views which accept `web.nodes.models.Node` object as the first argument. It translates possible
   identificators (primary key/uuid, name and optionally ip) into Node object so view wrapped with this decorator

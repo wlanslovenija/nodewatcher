@@ -11,7 +11,7 @@ from web.generator.forms import GenerateImageForm
 from web.nodes import decorators
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def request(request, node):
   """
   Displays a confirmation form.

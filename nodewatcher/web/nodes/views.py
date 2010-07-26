@@ -138,7 +138,7 @@ def node_new(request):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_edit(request, node):
   """
   Display a form for registering a new node.
@@ -224,7 +224,7 @@ def node_edit(request, node):
     context_instance = RequestContext(request)
   )
 
-@decorators.node_parameter(try_ip=True)
+@decorators.node_argument(try_ip=True)
 def node(request, node):
   """
   Displays node info.
@@ -237,7 +237,7 @@ def node(request, node):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_reset(request, node):
   """
   Displays a form where the user can confirm node data reset. If
@@ -262,7 +262,7 @@ def node_reset(request, node):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_remove(request, node):
   """
   Displays node info.
@@ -283,7 +283,7 @@ def node_remove(request, node):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_renumber(request, node):
   """
   Renumbers a given node.
@@ -320,7 +320,7 @@ def node_renumber(request, node):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_allocate_subnet(request, node):
   """
   Displays node info.
@@ -342,7 +342,7 @@ def node_allocate_subnet(request, node):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_deallocate_subnet(request, node, subnet_id):
   """
   Removes a subnet.
@@ -367,7 +367,7 @@ def node_deallocate_subnet(request, node, subnet_id):
   )
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def node_edit_subnet(request, node, subnet_id):
   """
   Edits a subnet.
@@ -518,7 +518,7 @@ def global_events(request):
     context_instance = RequestContext(request)
   )
 
-@decorators.node_parameter
+@decorators.node_argument
 def node_events(request, node):
   """
   Display a list of a node's events.
@@ -574,7 +574,7 @@ def event_unsubscribe(request, subscription_id):
   return HttpResponseRedirect(reverse('my_events'))
 
 @login_required
-@decorators.node_parameter
+@decorators.node_argument
 def package_list(request, node):
   """
   Display a list of node's installed packages.
