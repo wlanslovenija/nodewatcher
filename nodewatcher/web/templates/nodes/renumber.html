@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 
@@ -92,7 +92,7 @@
 
 <div class="buttons">
   <input type="submit" value="{% trans "Renumber" %}" />&nbsp;
-  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
 </div>
 </form>
 {% endblock %}

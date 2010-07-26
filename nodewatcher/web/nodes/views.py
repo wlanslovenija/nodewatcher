@@ -16,6 +16,7 @@ from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 from datetime import datetime
 from web.nodes import ipcalc
 from django.core.urlresolvers import reverse
+from web.nodes import decorators
 
 def nodes(request):
   """
@@ -125,7 +126,7 @@ def node_new(request):
   if request.method == 'POST':
     form = RegisterNodeForm(request.POST)
     if form.is_valid() and form.save(request.user):
-      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': form.node.pk }))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': form.node.get_current_id() }))
   else:
     form = RegisterNodeForm()
 
@@ -137,11 +138,11 @@ def node_new(request):
   )
 
 @login_required
+@decorators.node_parameter
 def node_edit(request, node):
   """
   Display a form for registering a new node.
   """
-  node = get_object_or_404(Node, pk = node)
   if not node.is_current_owner(request):
     raise Http404
   
@@ -155,7 +156,7 @@ def node_edit(request, node):
           context_instance = RequestContext(request)
         )
       else:
-        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
+        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
   else:
     p = {
       'name'                : node.name,
@@ -223,18 +224,11 @@ def node_edit(request, node):
     context_instance = RequestContext(request)
   )
 
+@decorators.node_parameter(try_ip=True)
 def node(request, node):
   """
   Displays node info.
   """
-  try:
-    node = Node.objects.get(pk = node)
-  except Node.DoesNotExist:
-    try:
-      node = Node.objects.get(ip = node)
-    except Node.DoesNotExist:
-      node = get_object_or_404(Node, name = node)
-  
   return render_to_response('nodes/node.html',
     { 'node' : node ,
       'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS],
@@ -243,13 +237,13 @@ def node(request, node):
   )
 
 @login_required
+@decorators.node_parameter
 def node_reset(request, node):
   """
   Displays a form where the user can confirm node data reset. If
   confirmed, node data is reset and node is moved into pending
   state.
   """
-  node = get_object_or_404(Node, pk = node)
   if not node.is_current_owner(request):
     raise Http404
 
@@ -260,7 +254,7 @@ def node_reset(request, node):
       node.reset()
       node.save()
 
-      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
 
   return render_to_response('nodes/reset.html',
     { 'node' : node },
@@ -268,11 +262,11 @@ def node_reset(request, node):
   )
 
 @login_required
+@decorators.node_parameter
 def node_remove(request, node):
   """
   Displays node info.
   """
-  node = get_object_or_404(Node, pk = node)
   if not node.is_current_owner(request):
     raise Http404
   
@@ -289,11 +283,11 @@ def node_remove(request, node):
   )
 
 @login_required
+@decorators.node_parameter
 def node_renumber(request, node):
   """
   Renumbers a given node.
   """
-  node = get_object_or_404(Node, pk = node)
   if not node.is_current_owner(request):
     raise Http404
   
@@ -304,7 +298,7 @@ def node_renumber(request, node):
       if form.is_valid():
         form.save()
         transaction.savepoint_commit(sid)
-        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
+        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
     except ValidationWarning:
       # We must display a warning before the user may continue; node must be reloaded
       # because savepoint has been rolled back and any modifications have actually been
@@ -326,18 +320,18 @@ def node_renumber(request, node):
   )
 
 @login_required
+@decorators.node_parameter
 def node_allocate_subnet(request, node):
   """
   Displays node info.
   """
-  node = get_object_or_404(Node, pk = node)
   if not node.is_current_owner(request):
     raise Http404
  
   if request.method == 'POST':
     form = AllocateSubnetForm(node, request.POST)
     if form.is_valid() and form.save(node):
-      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
   else:
     form = AllocateSubnetForm(node)
 
@@ -348,12 +342,14 @@ def node_allocate_subnet(request, node):
   )
 
 @login_required
+@decorators.node_parameter
 def node_deallocate_subnet(request, node, subnet_id):
   """
   Removes a subnet.
   """
   subnet = get_object_or_404(Subnet, pk = subnet_id)
-  node = subnet.node
+  if node.pk != subnet.node.pk:
+    raise Http404
   if not node.is_current_owner(request):
     raise Http404
   
@@ -362,7 +358,7 @@ def node_deallocate_subnet(request, node, subnet_id):
       raise Http404
 
     subnet.delete()
-    return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
+    return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
 
   return render_to_response('nodes/deallocate_subnet.html',
     { 'node' : node,
@@ -371,19 +367,21 @@ def node_deallocate_subnet(request, node, subnet_id):
   )
 
 @login_required
+@decorators.node_parameter
 def node_edit_subnet(request, node, subnet_id):
   """
   Edits a subnet.
   """
   subnet = get_object_or_404(Subnet, pk = subnet_id)
-  node = subnet.node
+  if node.pk != subnet.node.pk:
+    raise Http404
   if not node.is_current_owner(request):
     raise Http404
   
   if request.method == 'POST':
     form = EditSubnetForm(node, request.POST)
     if form.is_valid() and form.save(subnet):
-      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.pk }))
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
     else:
       subnet = Subnet.objects.get(pk = subnet_id)
   else:
@@ -520,11 +518,11 @@ def global_events(request):
     context_instance = RequestContext(request)
   )
 
+@decorators.node_parameter
 def node_events(request, node):
   """
   Display a list of a node's events.
   """
-  node = get_object_or_404(Node, pk = node)
   return render_to_response('nodes/node_events.html',
     { 'node' : node,
       'events' : node.event_set.order_by('-timestamp', '-id')[0:30] },
@@ -576,11 +574,11 @@ def event_unsubscribe(request, subscription_id):
   return HttpResponseRedirect(reverse('my_events'))
 
 @login_required
+@decorators.node_parameter
 def package_list(request, node):
   """
   Display a list of node's installed packages.
   """
-  node = get_object_or_404(Node, pk = node)
   if not node.is_current_owner(request):
     raise Http404
 

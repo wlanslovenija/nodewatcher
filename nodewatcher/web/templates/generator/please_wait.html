@@ -19,7 +19,7 @@
 </div>
 {% endif %}
 <div class="buttons" style="text-align: center">
-  <input type="button" value="{% trans "Back to Node" %}" onclick="document.location='{% url view_node node.pk %}'" />
+  <input type="button" value="{% trans "Back to Node" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
 </div>
 
 {% endblock %}

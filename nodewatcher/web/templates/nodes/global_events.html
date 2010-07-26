@@ -29,13 +29,7 @@
   {% for event in events %}
   <tr class="{% cycle 'odd' 'even' %}">
     <td>{{ event.timestamp|date }}</td>
-    <td>
-      {% if not event.node.name %}
-      {{ event.node.ip }}
-      {% else %}
-      <a href="{% url view_node event.node.pk %}">{{ event.node.name }}</a>
-      {% endif %}
-    </td>
+    <td><a href="{% url view_node event.node.get_current_id %}">{{ event.node.name|default:_("unknown") }}</a></td>
     <td>{{ event.code_to_string }}</td>
   </tr>
   {% empty %}

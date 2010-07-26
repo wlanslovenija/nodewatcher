@@ -22,7 +22,7 @@
 {% notice webclient %}
 <b>You are visiting this page through the <i>{{ network.name }}</i> network.</b><br />
 <br />
-You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client_node.name|default:_("unknown") }}</a> node to connect to the network.
+You are using the <a href="{% url view_node web_client_node.get_current_id %}">{{ web_client_node.name|default:_("unknown") }}</a> node to connect to the network.
 {% endnotice %}
 {% endif %}
 <table border="0" width="100%" class="listing">
@@ -57,12 +57,12 @@ You are using the <a href="{% url view_node web_client_node.pk %}">{{ web_client
   <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
     <td align="center">
       {% if node.warnings %}
-      <a href="{% url view_node node.pk %}">
+      <a href="{% url view_node node.get_current_id %}">
         <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>
-    <td class="name"><a href="{% url view_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+    <td class="name"><a href="{% url view_node node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     {% if node.last_seen %}
     <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>

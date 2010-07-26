@@ -41,12 +41,12 @@
   <tr class="{% cycle 'odd' 'even' %}">
     <td align="center">
       {% if node.warnings %}
-      <a href="{% url view_node node.pk %}">
+      <a href="{% url view_node node.get_current_id %}">
         <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
       </a>
       {% endif %}
     </td>
-    <td><a href="{% url view_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+    <td><a href="{% url view_node node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     {% if node.last_seen %}
     <td>{{ node.last_seen|date:"y-m-d H:i:s" }}</td>
@@ -66,7 +66,7 @@
   {% empty %}
   <tr>
     <td colspan="8" class="notice">
-      {% url new_node as new_node %}{% blocktrans %}You currently have no nodes defined. You can use <strong><a href="{{ new_node }}">New node</a></strong> tab to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly.{% endblocktrans %}
+      {% url new_node as new_node %}{% blocktrans %}You currently have no nodes defined. You can use <i><a href="{{ new_node }}">New node</a></i> tab to register a new node. If you don't have any IP/subnet allocations, you will be allocated some during the node registration process. The node registration process can also generate a flashable image for you, so you can set up your router directly.{% endblocktrans %}
     </td>
   </tr>
   {% endfor %}

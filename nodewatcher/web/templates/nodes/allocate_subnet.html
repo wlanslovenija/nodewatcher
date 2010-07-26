@@ -3,7 +3,7 @@
 {% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 {% with "allocate a subnet" as form_errors_context %}
@@ -17,7 +17,7 @@
 {% include "nodes/general_info_small.html" %}
 
 <h3>{% trans "Subnet Information" %}</h3>
-<form action="{% url allocate_subnet node.pk %}" method="post">
+<form method="post" action="{% url allocate_subnet node.pk %}">
 {% csrf_token %}
 <table border="0" class="layout">
   {% if user.is_staff %}
@@ -49,7 +49,7 @@
 </table>
   <div class="buttons">
       <input type="submit" value="{% trans "Allocate" %}" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
     </div>
 </form>
 

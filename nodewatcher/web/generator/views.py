@@ -8,14 +8,15 @@ from web.nodes.models import Node
 from web.generator.models import Profile
 from web.generator.queue import queue_generator_job
 from web.generator.forms import GenerateImageForm
+from web.nodes import decorators
 
 @login_required
+@decorators.node_parameter
 def request(request, node):
   """
   Displays a confirmation form.
   """
-  node = get_object_or_404(Node, pk = node)
-  if node.owner != request.user and not request.user.is_staff:
+  if not node.is_current_owner(request):
     raise Http404
 
   try:

@@ -3,7 +3,7 @@
 {% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node {{ node_name}}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 {% with "change subnet" as form_errors_context %}
@@ -22,7 +22,7 @@
 <table border="0" class="layout">
   <tr>
     <td class="first_column_width">{% trans "Subnet" %}</td>
-    <td>{{ subnet }} [<a href="{% url renumber_node node.pk %}">{% trans "renumber" %}</a>]</td>
+    <td>{{ subnet }} [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</td>
   </tr>
   <tr>
     <td>{{ form.description.label }}</td>
@@ -36,7 +36,7 @@
 
 <div class="buttons">
   <input type="submit" value="{% trans "Save" %}" />&nbsp;
-  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
 </div>
 </form>
 {% endblock %}

@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.pk as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <table border="0" class="listing">

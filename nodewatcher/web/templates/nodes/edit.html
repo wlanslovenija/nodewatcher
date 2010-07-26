@@ -3,14 +3,14 @@
 {% load gmap %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
+{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
 
 {% block content %}
 {% with "change node" as form_errors_context %}
 {% include "form_errors.html" %}
 {% endwith %}
 
-<form action="{% url edit_node node.pk %}" method="post">
+<form method="post" action="{% url edit_node node.pk %}">
 {% csrf_token %}
 <table border="0" width="700">
   <tr>
@@ -23,7 +23,7 @@
   </tr>
   <tr>
     <td>{{ form.ip.label }}</td>
-    <td><b>{{ node.ip }}</b> [<a href="{% url renumber_node node.pk %}">{% trans "renumber" %}</a>]</td>
+    <td><b>{{ node.ip }}</b> [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</td>
   </tr>
   <tr>
     <td>{{ form.project.label }}</td>
@@ -175,7 +175,7 @@
   </tr>
 </table>
 <div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />
-<input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.pk %}'" />
+<input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
 </div>
 </form>
 {% endblock %}

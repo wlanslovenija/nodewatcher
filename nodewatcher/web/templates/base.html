@@ -20,9 +20,11 @@
     <link rel='stylesheet' type='text/css' href='{{ MEDIA_URL }}css/style.css' />
     <script type="text/javascript" src="{{ MEDIA_URL }}site/folding.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
+    {{ form.media }}
     {% block js %}{% endblock %}
 	<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.init.js"></script>
     {% block rss %}{% endblock %}
+    {% block permalink %}{% endblock %}
 </head>
 
 <body>

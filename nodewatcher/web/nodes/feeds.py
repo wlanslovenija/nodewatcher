@@ -55,7 +55,7 @@ class LatestEvents(Feed):
     return "%s-event-%s" % (item.node.pk, item.pk)
   
   def item_link(self, item):
-    return "%s%s" % (self.base_link, reverse('view_node_events', kwargs={'node': item.node.get_current_id()}))
+    return "%s%s" % (self.base_link, reverse('view_node_events', kwargs={ 'node': item.node.get_current_id() }))
 
 class ActiveNodes(GeoFeed):
   base_link = "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain)

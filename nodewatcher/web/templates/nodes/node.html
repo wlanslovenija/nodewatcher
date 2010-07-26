@@ -7,6 +7,10 @@
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 {% block heading %}<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
+{% block permalink %}
+<link rel="bookmark" href="{% url view_node node.pk %}" />
+{% endblock %}
+
 {% block content %}
 {% include "nodes/warnings.html" %}
 {% if node.awaiting_renumber %}
@@ -37,11 +41,11 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 
 <h3 class="section_title">{% trans "General Information" %}
 {% if current_owner and not node.is_invalid %}
-<a href="{% url edit_node node.pk %}"><img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
+<a href="{% url edit_node node.get_current_id %}"><img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
 {% if node.is_resettable %}
-<a href="{% url reset_node node.pk %}"><img src="{{ MEDIA_URL }}images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
+<a href="{% url reset_node node.get_current_id %}"><img src="{{ MEDIA_URL }}images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
 {% endif %}
-<a href="{% url remove_node node.pk %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
+<a href="{% url remove_node node.get_current_id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
 {% endif %}
 </h3>
 <div class="embedded">
@@ -64,6 +68,10 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td class="small_text"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></td>
   </tr>
   {% endif %}
+  <tr>
+    <td></td>
+    <td class="small_text">[<a href="{% url view_node node.pk %}">{% trans "permalink" %}</a>]</td>
+  </tr>
   <tr>
     <td>{% trans "Maintainer" %}</td>
     {% if node.owner %}
@@ -124,7 +132,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   {% endif %}
   <tr>
     <td>{% trans "Events" %}</td>
-    <td><a href="{% url view_node_events node.pk %}">{% trans "show list" %}</a></td>
+    <td><a href="{% url view_node_events node.get_current_id %}">{% trans "show list" %}</a></td>
   </tr>
 </table>
 {% if not node.is_dead %}
@@ -156,7 +164,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   <tr class="section_title">
     <td colspan="2">
       {% trans "Image Generator Information" %}
-      {% if current_owner %}[<a href="{% url generate_node node.pk %}">{% trans "generate image" %}</a>]{% endif %}
+      {% if current_owner %}[<a href="{% url generate_node node.get_current_id %}">{% trans "generate image" %}</a>]{% endif %}
     </td>
   </tr>
   <tr>
@@ -174,7 +182,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   {% if current_owner and node.installedpackage_set.all %}
   <tr>
     <td>{% trans "Installed packages" %}</td>
-    <td><a href="{% url view_node_packages node.pk %}">{% trans "show list" %}</a></td>
+    <td><a href="{% url view_node_packages node.get_current_id %}">{% trans "show list" %}</a></td>
   </tr>
   {% endif %}
   {% endif %}
@@ -261,7 +269,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 <tfoot>
   <tr>
     <td class="table_menu" colspan="{% if current_owner %}4{% else %}3{% endif %}">
-      <a href="{% url allocate_subnet node.pk %}">{% trans "Add subnet" %}</a>
+      <a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a>
     </td>
   </tr>
 </tfoot>
@@ -272,10 +280,10 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     {% if current_owner %}
     <td>
       {% if subnet.allocated and not subnet.is_primary %}
-      <a href="{% url edit_subnet node.pk subnet.pk %}">
+      <a href="{% url edit_subnet node.get_current_id subnet.pk %}">
         <img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
       </a>
-      <a href="{% url remove_subnet node.pk subnet.pk %}">
+      <a href="{% url remove_subnet node.get_current_id subnet.pk %}">
         <img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
       </a>
       {% endif %}
@@ -291,12 +299,12 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
         <li>
         {% if conflict.is_announced %}
           {% if conflict.is_properly_announced %}
-          <b>{{ conflict }}</b> allocated to and announced by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a><br/>
+          <b>{{ conflict }}</b> allocated to and announced by <a href="{% url view_node conflict.node.get_current_id %}">{{ conflict.node }}</a><br/>
           {% else %}
-          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a>
+          <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url view_node conflict.node.get_current_id %}">{{ conflict.node }}</a>
           {% endif %}
         {% else %}
-          {{ conflict }}</b> allocated to <a href="{% url view_node conflict.node.pk %}">{{ conflict.node }}</a>
+          {{ conflict }}</b> allocated to <a href="{% url view_node conflict.node.get_current_id %}">{{ conflict.node }}</a>
         {% endif %}
         </li>
       {% endfor %}
@@ -336,7 +344,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 <tbody>
   {% for peer in node.get_peers %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url view_node peer.dst.pk %}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
+    <td><a href="{% url view_node peer.dst.get_current_id %}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
     <td align="center">{{ peer.lq }}</td>
     <td align="center">{{ peer.ilq }}</td>
     <td align="center">{{ peer.etx }}</td>
