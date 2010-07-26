@@ -18,6 +18,10 @@
     <td>{{ form.name }}</td>
   </tr>
   <tr>
+    <td></td>
+    <td class="small_text">{% url view_node node.pk as permalink %}{% blocktrans %}If you rename the node do not forget to update links containing node's name you maybe made elsewhere. This is why it is better to use [<a href="{{ permalink }}">permalink</a>] when linking to the node.{% endblocktrans %}</td>
+  </tr>
+  <tr>
     <td>{{ form.owner.label }}</td>
     <td>{{ form.owner }}</td>
   </tr>
@@ -90,21 +94,25 @@
   {% endif %}
   <tr>
     <td>{{ form.redundancy_req.label }}</td>
-    <td>
-      {{ form.redundancy_req }}<br/>
-      <span class="small_text">Warn if node has no direct peering with a border gateway (includes VPN servers).</span> 
-    </td>
+    <td>{{ form.redundancy_req }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">{% trans "Warn if node has no direct peering with a border gateway (includes VPN servers)." %}</td>
   </tr>
   <tr class="section_title">
     <td colspan="2">{% trans "Image Generator Options" %}</td>
   </tr>
   <tr>
-    <td valign="top">{{ form.template.label }}</td>
-    <td>
-      {{ form.template }}<br/>
-      <span class="small_text">You can leave it unconfigured if you are using custom firmware or hardware and you are not
+    <td>{{ form.template.label }}</td>
+    <td>{{ form.template }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">
+      {% blocktrans %}You can leave it unconfigured if you are using custom firmware or hardware and you are not
       interested in automatic image building. Maybe use notes field bellow to describe node software, hardware and
-      configuration.</span>
+      configuration.{% endblocktrans %}
     </td>
   </tr>
   <tr class="imagegen_opts">
@@ -161,17 +169,22 @@
   </tr>
   <tr>
     <td valign="top">{{ form.notes.label }}</td>
-    <td>
-      {{ form.notes }}<br/>
-      <span class="small_text">These notes are only visible to node's maintainer (that's you). They are public if the node is marked as dead and should describe background of node's death.</span>
+    <td>{{ form.notes }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">
+      {% blocktrans %}These notes are only visible to node's maintainer (that's you). They are public if the node is marked
+      as dead and should describe background of node's death.{% endblocktrans %}
     </td>
   </tr>
   <tr>
-    <td valign="top">{{ form.url.label }}</td>
-    <td>
-      {{ form.url }}<br/>
-      <span class="small_text">You may enter any URL that will be displayed on node's info page.</span>
-    </td>
+    <td>{{ form.url.label }}</td>
+    <td>{{ form.url }}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="small_text">{% trans "You may enter any URL that will be displayed on node's info page." %}</td>
   </tr>
 </table>
 <div class="buttons"><input type="submit" value="{% trans "Update Node" %}" />

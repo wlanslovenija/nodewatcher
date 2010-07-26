@@ -1774,6 +1774,13 @@ class Tweet(models.Model):
     
     super(Tweet, self).delete(*args, **kwargs)
 
+class NodeNames(models.Model):
+  """
+  This model represents stored names for all nodes so that they can be retrieved also after renames.
+  """
+  name = models.CharField(max_length = 50, primary_key = True)
+  node = models.ForeignKey(Node, related_name = 'names')
+
 def subnet_on_delete_callback(sender, **kwargs):
   """
   On delete callback for Subnets.

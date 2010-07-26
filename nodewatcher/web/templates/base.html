@@ -18,13 +18,13 @@
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/common.css" />
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/trac.css" />
     <link rel='stylesheet' type='text/css' href='{{ MEDIA_URL }}css/style.css' />
+    {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
     <script type="text/javascript" src="{{ MEDIA_URL }}site/folding.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
     {{ form.media }}
     {% block js %}{% endblock %}
 	<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.init.js"></script>
     {% block rss %}{% endblock %}
-    {% block permalink %}{% endblock %}
 </head>
 
 <body>
@@ -47,7 +47,8 @@
         <hr />
       </div>
 <div id="content" class="{% block contenttype %}nodes{% endblock %}">
-  <h1>{% block heading %}{% endblock %}</h1>
+{% block permalink %}{% if permalink %}<div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>{% endif %}{% endblock %}
+<h1>{% block heading %}{% endblock %}</h1>
 {% if messages %}
 <div id="messages">
   <ul>

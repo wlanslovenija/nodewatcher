@@ -4,7 +4,7 @@ from django.db import transaction, models
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.core import validators as core_validators
-from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType
+from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType, NodeNames
 from web.nodes import ipcalc
 from web.nodes.sticker import generate_sticker
 from web.nodes.transitions import validates_node_configuration
@@ -338,6 +338,9 @@ class RegisterNodeForm(forms.Form):
 
     # Update DNS entries
     Record.update_for_node(node)
+    
+    # Registers node name
+    NodeNames(name = node.name, node = node).save()
 
     # Generate node added event
     Event.create_event(node, EventCode.NodeAdded, '', EventSource.NodeDatabase,
@@ -659,6 +662,9 @@ class UpdateNodeForm(forms.Form):
       profile.save()
     elif profile:
       profile.delete()
+    
+    # Registers node name
+    NodeNames(name = node.name, node = node).save()
     
     return node
 

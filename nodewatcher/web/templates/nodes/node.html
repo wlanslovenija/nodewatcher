@@ -7,9 +7,8 @@
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 {% block heading %}<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
-{% block permalink %}
-<link rel="bookmark" href="{% url view_node node.pk %}" />
-{% endblock %}
+{% block permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
+{% block head_permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
 
 {% block content %}
 {% include "nodes/warnings.html" %}
@@ -68,10 +67,6 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td class="small_text"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></td>
   </tr>
   {% endif %}
-  <tr>
-    <td></td>
-    <td class="small_text">[<a href="{% url view_node node.pk %}">{% trans "permalink" %}</a>]</td>
-  </tr>
   <tr>
     <td>{% trans "Maintainer" %}</td>
     {% if node.owner %}

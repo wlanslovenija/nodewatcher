@@ -224,7 +224,7 @@ def node_edit(request, node):
     context_instance = RequestContext(request)
   )
 
-@decorators.node_argument(try_ip=True)
+@decorators.node_argument(be_robust=True)
 def node(request, node):
   """
   Displays node info.
@@ -518,7 +518,7 @@ def global_events(request):
     context_instance = RequestContext(request)
   )
 
-@decorators.node_argument
+@decorators.node_argument(be_robust=True)
 def node_events(request, node):
   """
   Display a list of a node's events.

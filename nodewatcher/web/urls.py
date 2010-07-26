@@ -44,11 +44,14 @@ urlpatterns = patterns('',
   url(r'^my/sticker$', 'web.nodes.views.sticker', name = 'my_sticker'),
   url(r'^nodes/sticker$', lambda request: redirect('my_sticker', permanent=True)), # Legacy
   
-  # Node itself
+  # Node itself, public
+  # (Those views should have permalinks defined and are also those which have be_robust set to True)
   url(r'^node/(?P<node>[^/]+)$', 'web.nodes.views.node', name = 'view_node'),
   url(r'^nodes/node/(?P<node>.*)$', lambda request, node: redirect('view_node', permanent=True, node=node)), # Legacy
   url(r'^node/(?P<node>[^/]+)/events$', 'web.nodes.views.node_events', name = 'view_node_events'),
   url(r'^nodes/events/(?P<node>.*)$', lambda request, node: redirect('view_node_events', permanent=True, node=node)), # Legacy
+  
+  # Node itself, private
   url(r'^node/(?P<node>[^/]+)/packages$', 'web.nodes.views.package_list', name = 'view_node_packages'),
   url(r'^nodes/installed_packages/(?P<node>.*)$', lambda request, node: redirect('view_node_packages', permanent=True, node=node)), # Legacy
   

@@ -408,3 +408,12 @@ table.warnings .icon {
 .no-top-margin {
   margin-top: 0px;
 }
+
+.permalink {
+  float: right;
+  margin-top: 0.4em;
+}
+
+#main h1 {
+  clear: none;
+}
