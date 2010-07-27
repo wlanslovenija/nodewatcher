@@ -36,7 +36,7 @@ class GenerateImageForm(forms.Form):
     """
     Returns user to which we will send the image.
     """
-    if not request.user.user.is_staff() or not self.cleaned_data.get('email_user'):
+    if not request.user.is_staff() or not self.cleaned_data.get('email_user'):
       return node.owner
     else:
       return self.cleaned_data.get('email_user')
