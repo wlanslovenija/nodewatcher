@@ -9,6 +9,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'web.settings_production'
 
 # Imports
 from django.core import serializers
+from random import choice
+from web.nodes import ipcalc
 
 if len(sys.argv) != 4:
   print "Usage: %s format input-file output-file" % sys.argv[0]
@@ -17,6 +19,9 @@ if len(sys.argv) != 4:
 if sys.argv[1] not in ('json', 'xml'):
   print "Invalid format '%s'! Valid formats are: json xml" % sys.argv[1]
   exit(1)
+
+def generate_random_ip():
+  return ".".join([str(choice(range(1, 255))) for i in xrange(4)])
 
 def object_transformator():
   # Read all objects one by one
@@ -40,6 +45,11 @@ def object_transformator():
       object.password = '$1$1qL5F...$ZPQdHpHMsvNQGI4rIbAG70' # Password for all users is 123
     elif name == 'web.generator.models.Profile':
       object.root_pass = 'XXXX'
+      if not object.wan_dhcp:
+        object.wan_ip = generate_random_ip()
+        object.wan_cidr = 24
+        net = ipcalc.Network(object.wan_ip, object.wan_cidr)
+        object.wan_gw = str(net.host_first())
     elif name == 'web.generator.models.StatsSolar':
       continue
     elif name == 'web.generator.models.WhitelistItem':
