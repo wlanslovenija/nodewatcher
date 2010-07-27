@@ -178,9 +178,6 @@ class RegisterNodeForm(forms.Form):
     if not NODE_NAME_RE.match(name):
       raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
 
-    if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
-      raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
-    
     if not location and node_type == NodeType.Wireless:
       raise forms.ValidationError(_("Location is required for wireless nodes!"))
     
@@ -509,9 +506,6 @@ class UpdateNodeForm(forms.Form):
 
     if not NODE_NAME_RE.match(name):
       raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
-
-    if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
-      raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
     if not location and node_type == NodeType.Wireless:
       raise forms.ValidationError(_("Location is required for wireless nodes!"))
