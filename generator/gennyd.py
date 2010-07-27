@@ -43,7 +43,7 @@ def no_unicodes(x):
   """
   for k, v in x.iteritems():
     if isinstance(v, unicode):
-      x[k] = str(v)
+      x[k] = v.encode('utf8')
 
   return x
 
