@@ -207,7 +207,7 @@ def node_edit(request, node):
         'wan_dhcp'            : True,
         'wan_ip'              : '',
         'wan_gw'              : '',
-        'root_pass'           : '',
+        'root_pass'           : 'XXXX',
         'channel'             : node.project.channel,
         'lan_bridge'          : False,
         'ant_conn'            : 3,
