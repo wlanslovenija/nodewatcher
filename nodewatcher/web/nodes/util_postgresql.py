@@ -123,4 +123,5 @@ def queryset_by_ip(queryset, field_name, *sort_first):
   """
   sort = list(sort_first)
   sort.append(field_name)
-  return query.order_by(*sort)
+  return queryset.order_by(*sort)
+
