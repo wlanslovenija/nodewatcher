@@ -1614,7 +1614,7 @@ class WarningCode:
     elif code == WarningCode.BSSIDMismatch:
       return _("The node will not connect with other nodes in the network because of this. It is probably a bug. Please report it.")
     elif code == WarningCode.ESSIDMismatch:
-      return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get into a contact with network administrators to arrange new project entry with you own ESSID for you.")
+      return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get in contact with network administrators to arrange a new project entry with your own ESSID for you.")
     elif code == WarningCode.VPNMacMismatch:
       return _("Download traffic limits will not work because of this. It is very likely a bug. Please report it.") 
     elif code == WarningCode.VPNLimitMismatch:
