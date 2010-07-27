@@ -17,6 +17,7 @@ from datetime import datetime
 from web.nodes import ipcalc
 from django.core.urlresolvers import reverse
 from web.nodes import decorators
+from web.account.util import generate_random_password
 
 def nodes(request):
   """
@@ -207,7 +208,7 @@ def node_edit(request, node):
         'wan_dhcp'            : True,
         'wan_ip'              : '',
         'wan_gw'              : '',
-        'root_pass'           : 'XXXX',
+        'root_pass'           : generate_random_password(8),
         'channel'             : node.project.channel,
         'lan_bridge'          : False,
         'ant_conn'            : 3,
