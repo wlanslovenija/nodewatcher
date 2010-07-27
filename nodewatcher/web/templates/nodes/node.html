@@ -42,23 +42,27 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 <h2 class="section_title">{% trans "General Information" %}</h2>
 <div class="embedded">
 {% if node.geo_lat and node.geo_long %}
-<div id="gmap" style="width:400px; height: 300px;"></div>
+<div id="gmap" style="width:398px; height: 298px;"></div>
 {% endif %}
 {% if current_owner %}
 <div class="actions">
 <ul>
 <li><a href="{% url edit_node node.get_current_id %}">{% trans "Edit node configuration" %}</a></li>
+{% if not node.is_dead %}
 {% if node.profile %}
 <li><a href="{% url generate_node node.get_current_id %}">{% trans "Generate firmware image" %}</a></li>
 {% endif %}
 <li><a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a></li>
 </ul>
+{% endif %}
+{% if not node.is_dead %}
 <ul>
 {% if node.is_resettable %}
 <li><a href="{% url reset_node node.get_current_id %}">{% trans "Reset node statistics" %}</a></li>
 {% endif %}
 <li><a href="{% url remove_node node.get_current_id %}">{% trans "Delete node" %}</a></li>
 </ul>
+{% endif %}
 </div>
 {% endif %}
 </div>
@@ -216,11 +220,16 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 {% else %}
 <h3>{% trans "Node History" %}</h3>
 {% endif %}
+<div{% if node.is_dead %} style="width: 300px;"{% endif %}>
 {{ node.notes|linebreaks }}
+</div>
 {% endif %}
 {% endif %}
 
 <h2 class="details_title">{% trans "Subnets" %}</h2>
+<p>A node announces subnets to the rest of the network so traffic for network equipment (like clients' computers) connected
+(wirelessly or directly) to the node can be routed from the network to the node for it to pass the traffic to equipment
+in question.</p>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
   <tr>
@@ -230,15 +239,15 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <th style="width: 23%;">{% trans "Last seen" %}</th>
   </tr>
 </thead>
-{% if current_owner %}
+{% if current_owner and not node.is_dead %}
 <tfoot>
   <tr>
     <td class="table_menu" colspan="{% if current_owner %}4{% else %}3{% endif %}">
       <a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a>
-{% if not node.has_allocated_subnets_to_lan %}
+{% if node.is_wireless_node and node.is_primary_ip_in_subnet and node.has_client_subnet and not node.has_allocated_subnets_to_lan %}
 <p class="small_text">{% blocktrans %}By default clients can connect only to node's wireless interface using node's
-primary subnet.<br />If you want for clients to be able to connect also to node's LAN ethernet interface you have to allocate
-additional subnet to the node.{% endblocktrans %}</p>
+primary subnet and LAN ethernet interface<br />is used to interconnect with possible other nodes. If you want for clients to be able to connect also to
+<br />node's LAN ethernet interface you have to allocate additional subnet to the node.{% endblocktrans %}</p>
 {% endif %}
     </td>
   </tr>

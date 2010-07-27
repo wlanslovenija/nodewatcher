@@ -375,6 +375,16 @@ class Node(models.Model):
     """
     return self.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % self.ip).filter(allocated = True).exclude(cidr = 0)
   
+  def has_client_subnet(self, subnet=None):
+    """
+    Is node configured to have a subnet for clients?
+    """
+    if not subnet:
+      subnets = self.subnet_set.filter(allocated = True, gen_iface_type = IfaceType.WiFi)
+      if subnets:
+        subnet = subnets[0]
+    return subnet and subnet.cidr <= 28 and subnet.gen_iface_type == IfaceType.WiFi
+  
   def get_renumbered_ip(self):
     """
     Returns node's new IP address (if it has recently been renumbered).

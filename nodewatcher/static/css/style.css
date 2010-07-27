@@ -144,8 +144,12 @@ tr.inner_header {
 }
 
 .embedded #gmap {
-  width: 400px !important;
+  width: 398px !important;
   float: right;
+}
+
+#gmap {
+  border: 1px solid #D7D7D7;
 }
 
 .embedded .actions {
