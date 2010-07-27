@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# WiFi Mesh Monitoring Daemon
+# nodewatcher monitoring daemon
 #
 # Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
 #
@@ -11,7 +11,7 @@ import sys, os
 from optparse import OptionParser
 
 print "============================================================================"
-print "                     nodewatcher mesh monitoring daemon"
+print "                       nodewatcher monitoring daemon"
 print "============================================================================"
 
 parser = OptionParser()
@@ -322,7 +322,7 @@ def check_dead_graphs():
 
 def generate_new_node_tweet(node):
   """
-  Generates a tweet when a new node connects to the mesh.
+  Generates a tweet when a new node connects to the network.
   """
   if not Tweet.tweets_enabled():
     return
@@ -330,7 +330,7 @@ def generate_new_node_tweet(node):
   try:
     bit_api = bitly.Api(login=settings.BITLY_LOGIN, apikey=settings.BITLY_API_KEY)
     node_link = bit_api.shorten(node.get_full_url())
-    msg = "A new node %s has just connected to the mesh %s" % (node.name, node_link)
+    msg = "A new node %s has just connected to the network %s" % (node.name, node_link)
     Tweet.post_tweet(node, msg)
   except:
     logging.warning("%s/%s: %s" % (node.name, node.ip, format_exc()))
@@ -388,7 +388,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
   if oldStatus in (NodeStatus.Down, NodeStatus.Pending, NodeStatus.New) and n.status in (NodeStatus.Up, NodeStatus.Visible):
     if oldStatus in (NodeStatus.New, NodeStatus.Pending):
       n.first_seen = datetime.now()
-      if n.node_type == NodeType.Mesh:
+      if n.node_type == NodeType.Wireless:
         generate_new_node_tweet(n)
 
     Event.create_event(n, EventCode.NodeUp, '', EventSource.Monitor)
@@ -681,9 +681,9 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
   return None, None
 
 @transaction.commit_on_success
-def check_mesh_status():
+def check_network_status():
   """
-  Performs a mesh status check.
+  Performs the network status check.
   """
   # Initialize the state of nodes and subnets, remove out of date ap clients and graph items
   Node.objects.all().update(visible = False)
@@ -827,7 +827,7 @@ def check_mesh_status():
     topology = DotTopologyPlotter()
     for node in dbNodes.values():
       topology.addNode(node)
-    topology.save(os.path.join(settings.GRAPH_DIR, 'mesh_topology.png'), os.path.join(settings.GRAPH_DIR, 'mesh_topology.dot'))
+    topology.save(os.path.join(settings.GRAPH_DIR, 'network_topology.png'), os.path.join(settings.GRAPH_DIR, 'network_topology.dot'))
 
   # Update valid subnet status in the database
   for nodeIp, subnets in hna.iteritems():
@@ -1082,10 +1082,10 @@ if __name__ == '__main__':
     settings.MONITOR_ENABLE_SIMULATION = True
     settings.MONITOR_DISABLE_MULTIPROCESSING = True
     
-    # Check mesh status in a tight loop
+    # Check network status in a tight loop
     try:
       for i in xrange(1000):
-        check_mesh_status()
+        check_network_status()
         check_dead_graphs()
         check_events()
         
@@ -1120,13 +1120,13 @@ if __name__ == '__main__':
     logging.warning("Garbage collection debugging enabled.")
   
   # Create worker pool and start processing
-  logging.info("nodewatcher mesh monitoring system is initializing...")
+  logging.info("nodewatcher network monitoring system is initializing...")
   WORKER_POOL = multiprocessing.Pool(processes = settings.MONITOR_WORKERS)
   try:
     while True:
       # Perform all processing
       try:
-        check_mesh_status()
+        check_network_status()
         check_dead_graphs()
         check_global_statistics()
         check_events()

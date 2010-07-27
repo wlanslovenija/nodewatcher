@@ -1,8 +1,7 @@
 Hello {{ user.username }}!
 
-You have requested to be notified when certain events regarding nodes
-participating in the mesh occur within the network. This is an automated
-notification of an event.
+You have requested to be notified when certain events occur in the network.
+This is an automated notification of the event.
 {% if event.has_repeated %}
 WARNING: This event has repeated {{ event.counter }} times within 30 minutes from
 its original creation time!

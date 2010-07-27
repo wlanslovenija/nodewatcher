@@ -22,13 +22,16 @@ urlpatterns = patterns('',
   url(r'^nodes/node_list$', lambda request: redirect('nodes_list', permanent=True)), # Legacy
 
   # Global nodes information
-  url(r'^nodes/statistics$', 'web.nodes.views.statistics', name = 'network_statistics'),
-  url(r'^nodes/events', 'web.nodes.views.global_events', name = 'network_events'),
+  url(r'^network/statistics$', 'web.nodes.views.statistics', name = 'network_statistics'),
+  url(r'^nodes/statistics$', lambda request: redirect('network_statistics', permanent=True)), # Legacy
+  url(r'^network/events$', 'web.nodes.views.global_events', name = 'network_events'),
   url(r'^nodes/events/global$', lambda request: redirect('network_events', permanent=True)), # Legacy
-  url(r'^nodes/clients', 'web.nodes.views.gcl', name = 'network_clients'),
+  url(r'^network/clients$', 'web.nodes.views.gcl', name = 'network_clients'),
   url(r'^nodes/gcl$', lambda request: redirect('network_clients', permanent=True)), # Legacy
-  url(r'^nodes/topology$', 'web.nodes.views.topology', name = 'network_topology'),
-  url(r'^nodes/map$', 'web.nodes.views.map', name = 'network_map'),
+  url(r'^network/topology$', 'web.nodes.views.topology', name = 'network_topology'),
+  url(r'^nodes/topology$', lambda request: redirect('network_topology', permanent=True)), # Legacy
+  url(r'^network/map$', 'web.nodes.views.map', name = 'network_map'),
+  url(r'^nodes/map$', lambda request: redirect('network_map', permanent=True)), # Legacy
   
   # Node maintainers
   url(r'^my/nodes$', 'web.nodes.views.my_nodes', name = 'my_nodes'),
@@ -39,7 +42,7 @@ urlpatterns = patterns('',
   url(r'^nodes/whitelisted_mac$', lambda request: redirect('my_whitelist', permanent=True)), # Legacy
   url(r'^my/whitelist/remove/(?P<item_id>\d+)$', 'web.nodes.views.unwhitelist_mac', name = 'my_whitelist_remove'),  
   url(r'^my/events$', 'web.nodes.views.event_list', name = 'my_events'),
-  url(r'^my/events/subscribe', 'web.nodes.views.event_subscribe', name = 'my_events_subscribe'),
+  url(r'^my/events/subscribe$', 'web.nodes.views.event_subscribe', name = 'my_events_subscribe'),
   url(r'^my/events/unsubscribe/(?P<subscription_id>\d+)$', 'web.nodes.views.event_unsubscribe', name = 'my_events_unsubscribe'),
   url(r'^my/sticker$', 'web.nodes.views.sticker', name = 'my_sticker'),
   url(r'^nodes/sticker$', lambda request: redirect('my_sticker', permanent=True)), # Legacy
@@ -62,7 +65,7 @@ urlpatterns = patterns('',
   url(r'^node/(?P<node>[^/]+)/renumber$', 'web.nodes.views.node_renumber', name = 'renumber_node'),
   url(r'^node/(?P<node>[^/]+)/subnet/allocate$', 'web.nodes.views.node_allocate_subnet', name = 'allocate_subnet'),
   url(r'^node/(?P<node>[^/]+)/subnet/(?P<subnet_id>\d+)/deallocate$', 'web.nodes.views.node_deallocate_subnet', name = 'remove_subnet'),
-  url(r'^node/(?P<node>[^/]+)/subnet/(?P<subnet_id>\d+)/edit', 'web.nodes.views.node_edit_subnet', name = 'edit_subnet'),
+  url(r'^node/(?P<node>[^/]+)/subnet/(?P<subnet_id>\d+)/edit$', 'web.nodes.views.node_edit_subnet', name = 'edit_subnet'),
   
   # Feeds
   url(r'^feeds/whitelist$', 'web.nodes.views.whitelist'),

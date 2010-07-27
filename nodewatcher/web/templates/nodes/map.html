@@ -3,8 +3,8 @@
 {% load gmap %}
 {% load nodestatus %}
 
-{% block title %}{% trans "Mesh Map View" %}{% endblock %}
-{% block heading %}{% trans "Mesh Map View" %}{% endblock %}
+{% block title %}{% trans "Node Map" %}{% endblock %}
+{% block heading %}{% trans "Node Map" %}{% endblock %}
 
 {% block content %}
 <div style="margin-left: 10px;">
@@ -39,6 +39,9 @@
 <span id="gmap_statusbar">&nbsp;</span>
 </div>
 <div class="legend">
+{% url network_topology as network_topology %}
+<p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
+<a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
 <h3>{% trans "Node status key:" %}</h3>
 <ul class="status_legend">
   <li>{{ "up"|status:"gmap" }} – {% statusdesc "up" %}</li>
@@ -57,6 +60,9 @@ The node marked with symbol <img src="{{ MEDIA_URL }}images/symbol_wc.png" alt="
   <li><span style="color: #0000ff;">{% trans "blue" %}</span> – {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
   <li><span style="color: #ff0000;">{% trans "red" %}</span> – {% trans "ETX is greater than 5.0" %}</li>
 </ul>
+<p>{% blocktrans %}Green links are usable links in the network. Blue and red ones are those where nodes connected with each
+other but bad link quality (packet loss on the link) interfere with usefulness of the link. Closer the ETX (measure of the
+link quality) is to 1.0 better it is.{% endblocktrans %}</p>
 </div>
 {% endblock %}
 

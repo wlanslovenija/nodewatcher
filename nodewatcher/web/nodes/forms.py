@@ -54,12 +54,12 @@ class RegisterNodeForm(forms.Form):
   )
   node_type = forms.ChoiceField(
     choices = [
-      (NodeType.Mesh, _("Mesh node")),
+      (NodeType.Wireless, _("Wireless node")),
       (NodeType.Server, _("Server node")),
       (NodeType.Test, _("Test node")),
       (NodeType.Mobile, _("Mobile node"))
     ],
-    initial = NodeType.Mesh,
+    initial = NodeType.Wireless,
     label = _("Node type")
   )
   
@@ -181,11 +181,11 @@ class RegisterNodeForm(forms.Form):
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
     
-    if not location and node_type == NodeType.Mesh:
-      raise forms.ValidationError(_("Location is required for mesh nodes!"))
+    if not location and node_type == NodeType.Wireless:
+      raise forms.ValidationError(_("Location is required for wireless nodes!"))
     
-    if (not geo_lat or not geo_long) and node_type == NodeType.Mesh:
-      raise forms.ValidationError(_("Geographical coordinates are required for mesh nodes!"))
+    if (not geo_lat or not geo_long) and node_type == NodeType.Wireless:
+      raise forms.ValidationError(_("Geographical coordinates are required for wireless nodes!"))
 
     try:
       node = Node.objects.get(name = name)
@@ -372,13 +372,13 @@ class UpdateNodeForm(forms.Form):
   )
   node_type = forms.ChoiceField(
     choices = [
-      (NodeType.Mesh, _("Mesh node")),
+      (NodeType.Wireless, _("Wireless node")),
       (NodeType.Server, _("Server node")),
       (NodeType.Test, _("Test node")),
       (NodeType.Mobile, _("Mobile node")),
       (NodeType.Dead, _("Dead node"))
     ],
-    initial = NodeType.Mesh,
+    initial = NodeType.Wireless,
     label = _("Node type")
   )
   notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
@@ -513,11 +513,11 @@ class UpdateNodeForm(forms.Form):
     if (geo_lat or geo_long) and (not (45 <= geo_lat <= 47) or not (13 <= geo_long <= 17)):
       raise forms.ValidationError(_("The specified latitude/longitude are out of range!"))
 
-    if not location and node_type == NodeType.Mesh:
-      raise forms.ValidationError(_("Location is required for mesh nodes!"))
+    if not location and node_type == NodeType.Wireless:
+      raise forms.ValidationError(_("Location is required for wireless nodes!"))
     
-    if (not geo_lat or not geo_long) and node_type == NodeType.Mesh:
-      raise forms.ValidationError(_("Geographical coordinates are required for mesh nodes!"))
+    if (not geo_lat or not geo_long) and node_type == NodeType.Wireless:
+      raise forms.ValidationError(_("Geographical coordinates are required for wireless nodes!"))
 
     try:
       node = Node.objects.get(name = name)
@@ -872,7 +872,7 @@ class EventSubscribeForm(forms.Form):
     choices = [
       (SubscriptionType.SingleNode, _("Match a single node")),
       (SubscriptionType.AllNodes, _("Match all nodes")),
-      (SubscriptionType.MyNodes, _("Match only own nodes"))
+      (SubscriptionType.MyNodes, _("Match only my nodes"))
     ],
     label = _("Type")
   )

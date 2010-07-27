@@ -14,11 +14,10 @@
     {% blocktrans %}<b>WARNING:</b> By deallocating this subnet you will be returning it back to the pool. It is available for immediate allocation for other nodes afterwards, so please be sure that you really wish to deallocate it!{% endblocktrans %}
     </div>
   {% endif %}
-  </div>
 
 {% include "nodes/general_info_small.html" %}
 
-<h3>{% trans "Subnet Information" %}</h3>
+<h2>{% trans "Subnet Information" %}</h2>
 <form method="post" action="{% url remove_subnet node.pk subnet.id %}">
 {% csrf_token %}
 <table border="0" class="layout">

@@ -8,14 +8,14 @@ from django.conf import settings
 register = Library()
 
 DESCRIPTIONS = {
-  'up': 'node is reachable',
-  'visible': 'node is visible via OLSR but does not reply to ICMP ECHO',
-  'down': 'node is not visible via OLSR',
+  'up': 'the node is reachable',
+  'visible': 'the node is connected to the network but does not reply to ICMP ECHO',
+  'down': 'the node is not connected to the network',
   'duped': 'duplicate ICMP ECHO packets have been received',
-  'invalid': 'IP is not allocated but is seen',
-  'new': 'node has just been registered',
-  'pending': 'node has not yet been seen since registration',
-  'awaitingrenumber': 'node has been recently renumbered'
+  'invalid': 'IP address is not allocated but is seen',
+  'new': 'the node has just been registered',
+  'pending': 'the node has not yet been seen since registration',
+  'awaitingrenumber': 'the node has been recently renumbered'
 }
 
 IMAGE_TEMPLATE = """<img src="%(media_url)simages/status_%(status)s_%(size)s.png" title="%(title)s" alt="%(status)s" />"""
@@ -52,11 +52,14 @@ def status(value, arg, autoescape = None):
   if not (status in ('up', 'down', 'invalid', 'visible', 'duped', 'pending', 'new', 'awaitingrenumber')):
     return ""
   
-  if not (arg in ('big', 'small', 'gmap')):
+  if not (arg in ('big', 'small', 'gmap', 'text')):
     arg = "small"
   
   params = {"status" : value, "size" : arg, "title" : ("%s - %s" % (value, DESCRIPTIONS[status])), "media_url" : settings.MEDIA_URL}
-  params['content'] = (IMAGE_TEMPLATE % params) + "&nbsp;" + value
+  if arg == 'text':
+    params['content'] = value
+  else:
+    params['content'] = (IMAGE_TEMPLATE % params) + "&nbsp;" + value
   return mark_safe(WRAPPER_TEMPLATE % params)
 
 status.needs_autoescape = True

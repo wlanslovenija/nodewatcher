@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block my_content %}
-<h3 class="no-top-margin">Event subscriptions</h3>
+<h2 class="no-top-margin">Event subscriptions</h2>
 
 {% if not user.email %}
 {% include "nodes/missing_email_error.html" %}
@@ -70,7 +70,7 @@
 </table>
 {% endif %}
 
-<h3>{% trans "Latest events for your nodes" %}</h3>
+<h2>{% trans "Latest events for your nodes" %}</h2>
 <table border="0" class="listing">
 <thead>
   <tr>

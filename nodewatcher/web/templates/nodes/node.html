@@ -3,6 +3,7 @@
 {% load conversion %}
 {% load gmap %}
 {% load misc %}
+{% load graphs %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 {% block heading %}<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
@@ -38,64 +39,35 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 {% endnotice %}
 {% endif %}
 
-<h3 class="section_title">{% trans "General Information" %}
-{% if current_owner and not node.is_invalid %}
-<a href="{% url edit_node node.get_current_id %}"><img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit node configuration" %}" alt="{% trans "Edit" %}" /></a>
-{% if node.is_resettable %}
-<a href="{% url reset_node node.get_current_id %}"><img src="{{ MEDIA_URL }}images/clean.png" title="{% trans "Reset node statistics" %}" alt="{% trans "Reset" %}" /></a>
-{% endif %}
-<a href="{% url remove_node node.get_current_id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Delete node" %}" alt="{% trans "Delete" %}" /></a>
-{% endif %}
-</h3>
+<h2 class="section_title">{% trans "General Information" %}</h2>
 <div class="embedded">
 {% if node.geo_lat and node.geo_long %}
 <div id="gmap" style="width:400px; height: 300px;"></div>
 {% endif %}
+{% if current_owner %}
+<div class="actions">
+<ul>
+<li><a href="{% url edit_node node.get_current_id %}">{% trans "Edit node configuration" %}</a></li>
+{% if node.profile %}
+<li><a href="{% url generate_node node.get_current_id %}">{% trans "Generate firmware image" %}</a></li>
+{% endif %}
+<li><a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a></li>
+</ul>
+<ul>
+{% if node.is_resettable %}
+<li><a href="{% url reset_node node.get_current_id %}">{% trans "Reset node statistics" %}</a></li>
+{% endif %}
+<li><a href="{% url remove_node node.get_current_id %}">{% trans "Delete node" %}</a></li>
+</ul>
 </div>
-<table border="0" width="300">
+{% endif %}
+</div>
+{% include "nodes/general_info_node.html" %}
+<h3>{% trans "Node in the Network" %}</h3>
+<table border="0" width="300" class="node_info">
   <tr>
-    <td style="width: 120px;">{% trans "IP address" %}</td>
+    <td class="first_column_width">{% trans "IP address" %}</td>
     <td>{{ node.ip }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Name" %}</td>
-    <td>{{ node.name|default:_("unknown") }}</td>
-  </tr>
-  {% if node.url %}
-  <tr>
-    <td></td>
-    <td class="small_text"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></td>
-  </tr>
-  {% endif %}
-  <tr>
-    <td>{% trans "Maintainer" %}</td>
-    {% if node.owner %}
-    {% if user.is_authenticated and node.owner.email %}
-    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
-    {% else %}
-    <td>{{ node.owner.username }}</td>
-    {% endif %}
-    {% else %}
-    <td>{% trans "unknown" %}</td>
-    {% endif %}
-  </tr>
-  <tr>
-    <td>{% trans "Node type" %}</td>
-    <td>{{ node.node_type_as_string }}</td>
-  </tr>
-  {% if node.location or node.is_mesh_node %}
-  <tr>
-    <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("unknown") }}</td>
-  </tr>
-  {% endif %}
-  <tr>
-    <td>{% trans "Node status" %}</td>
-    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Project" %}</td>
-    <td>{{ node.project.name|default:_("unknown") }}</td>
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
@@ -105,15 +77,12 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td>{% trans "Border router" %}</td>
     <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
-  <tr>
-    <td>{% trans "Last seen" %}</td>
-    {% if node.last_seen %}
-    <td>{{ node.last_seen|date }}</td>
-    {% else %}
-    <td>{% trans "never" %}</td>
-    {% endif %}
-  </tr>
-  {% if node.is_mesh_node %}
+</table>
+
+{% if node.is_wireless_node or node.get_stability and not node.is_dead %}
+<h3>{% trans "Node History" %}</h3>
+<table border="0" width="300" class="node_info">
+  {% if node.is_wireless_node %}
   <tr>
     <td>{% trans "Clients so far" %}</td>
     <td>{{ node.clients_so_far|default:"0" }}</td>
@@ -124,46 +93,40 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td>{% trans "Stability" %}</td>
     <td>{{ node.get_stability|default:_("unknown") }} %</td>
   </tr>
-  {% endif %}
   <tr>
-    <td>{% trans "Events" %}</td>
+    <td class="first_column_width">{% trans "Events" %}</td>
     <td><a href="{% url view_node_events node.get_current_id %}">{% trans "show list" %}</a></td>
   </tr>
+  {% endif %}
 </table>
+{% endif %}
+
 {% if not node.is_dead %}
-<h3 id="details_title">{% trans "Details" %}</h3>
-<table border="0" id="details_list" class="layout">
+{% if node.is_wireless_node or node.is_mobile_node %}
+<h2 class="details_title">{% trans "Details" %}</h2>
+<h3>{% trans "Antenna Information" %}</h3>
+<table border="0" class="layout details">
   <tr>
-    <td style="width: 300px;"></td>
-    <td></td>
-  </tr>
-  {% if node.is_mesh_node or node.is_mobile_node %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Antenna Information" %}</td>
-  </tr>
-  <tr>
-    <td>{% trans "External antenna" %}</td>
+    <td class="first_column_width">{% trans "External antenna" %}</td>
     <td>{% if node.ant_external %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   {% if node.ant_external %}
   <tr>
     <td>{% trans "Type" %}</td>
-    <td>{{ node.ant_type_as_string }}</td>
+    <td>{{ node.ant_type_as_string|lower }}</td>
   </tr>
   <tr>
     <td>{% trans "Polarization" %}</td>
-    <td>{{ node.ant_polarization_as_string }}</td>
+    <td>{{ node.ant_polarization_as_string|lower }}</td>
   </tr>
   {% endif %}
-  {% if node.profile %}
-  <tr class="section_title">
-    <td colspan="2">
-      {% trans "Image Generator Information" %}
-      {% if current_owner %}[<a href="{% url generate_node node.get_current_id %}">{% trans "generate image" %}</a>]{% endif %}
-    </td>
-  </tr>
+</table>
+
+{% if node.profile %}
+<h3>{% trans "Image Generator Information" %}</h3>
+<table border="0" class="layout details">
   <tr>
-    <td>{% trans "Router type" %}</td>
+    <td class="first_column_width">{% trans "Router type" %}</td>
     <td>{{ node.profile.template.name|default:_("unknown") }}</td>
   </tr>
   <tr>
@@ -180,11 +143,12 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td><a href="{% url view_node_packages node.get_current_id %}">{% trans "show list" %}</a></td>
   </tr>
   {% endif %}
-  {% endif %}
-  {% if not node.is_down %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Node Configuration" %}</td>
-  </tr>
+</table>
+{% endif %}
+  
+{% if not node.is_down %}
+<h3>{% trans "Node Configuration" %}</h3>
+<table border="0" class="layout details">
   {% if node.firmware_version %}
   <tr>
     <td>{% trans "Firmware version" %}</td>
@@ -192,7 +156,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "BSSID" %}</td>
+    <td class="first_column_width">{% trans "BSSID" %}</td>
     <td>{{ node.bssid|default:_("unknown") }}</td>
   </tr>
   <tr>
@@ -221,43 +185,49 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     <td>{{ node.thresh_frag|default:_("unknown") }} B {% if node.is_max_frag_threshold %}(off){% endif %}</td>
   </tr>
   {% endif %}
-  {% endif %}
-  {% endif %}
-  {% if node.has_status_information %}
-  <tr class="section_title">
-    <td colspan="2">{% trans "Status Information" %}</td>
-  </tr>
+</table>
+{% endif %}
+{% endif %}
+
+{% if node.has_status_information %}
+<h3>{% trans "Status Information" %}</h3>
+<table border="0" class="layout details">
   {% if node.uptime %}
   <tr>
-    <td>{% trans "Uptime" %}</td>
+    <td class="first_column_width">{% trans "Uptime" %}</td>
     <td>{{ node.uptime|time_delta }}</td>
   </tr>
   {% endif %}
-  {% if node.is_mesh_node or node.local_time %}
+  {% if node.is_wireless_node or node.local_time %}
   <tr>
-    <td>{% trans "Local time" %}</td>
+    <td class="first_column_width">{% trans "Local time" %}</td>
     <td>{{ node.local_time|default:_("unknown") }}</td>
   </tr>
-  {% endif %}
   {% endif %}
 </table>
 {% endif %}
 
+{% endif %}
+
 {% if node.notes %}
 {% if current_owner or node.is_dead %}
+{% if not node.is_dead %}
 <h3>{% trans "Notes" %}</h3>
+{% else %}
+<h3>{% trans "Node History" %}</h3>
+{% endif %}
 {{ node.notes|linebreaks }}
 {% endif %}
 {% endif %}
 
-<h3>{% trans "Subnets" %}</h3>
+<h2 class="details_title">{% trans "Subnets" %}</h2>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
   <tr>
-    {% if current_owner %}<th style="width: 40px;">&nbsp;</th>{% endif %}
+    {% if current_owner %}<th style="width: 7.5%">&nbsp;</th>{% endif %}
     <th>{% trans "Subnet" %}</th>
-    <th style="width: 120px;">{% trans "Status" %}</th>
-    <th style="width: 150px;">{% trans "Last seen" %}</th>
+    <th style="width: 17%;">{% trans "Status" %}</th>
+    <th style="width: 23%;">{% trans "Last seen" %}</th>
   </tr>
 </thead>
 {% if current_owner %}
@@ -265,6 +235,11 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   <tr>
     <td class="table_menu" colspan="{% if current_owner %}4{% else %}3{% endif %}">
       <a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a>
+{% if not node.has_allocated_subnets_to_lan %}
+<p class="small_text">{% blocktrans %}By default clients can connect only to node's wireless interface using node's
+primary subnet.<br />If you want for clients to be able to connect also to node's LAN ethernet interface you have to allocate
+additional subnet to the node.{% endblocktrans %}</p>
+{% endif %}
     </td>
   </tr>
 </tfoot>
@@ -311,7 +286,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
     {% if subnet.last_seen %}
     <td class="timestamp">{{ subnet.last_seen|date }}</td>
     {% else %}
-    <td>{% trans "never" %}</td>
+    <td class="timestamp">{% trans "never" %}</td>
     {% endif %}
   </tr>
 
@@ -326,7 +301,8 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 </table>
 
 {% if not node.is_dead %}
-<h3>{% trans "Immediate Neighbours / Peers" %}</h3>
+<h2>{% trans "Immediate Neighbours (Peers)" %}</h2>
+<p>{% trans "Each node can have multiple immediate neighbours (peers) to which it is connected with different link quality." %}</p>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
   <tr>
@@ -353,10 +329,18 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
   {% endfor %}
 </tbody>
 </table>
+<div class="legend">
+<h3>{% trans "Columns:" %}</h3>
+<ul>
+  <li><b>LQ</b> – {% trans "the ratio of packets that are successfully received from the node's neighbour" %}</li>
+  <li><b>ILQ</b> – {% trans "the ratio of packets that are successfully sent from the node to it's neighbour" %}</li>
+  <li><b>ETX</b> – {% trans "measure of the link quality calculated from <b>LQ</b> and <b>ILQ</b> and used for routing decissions; closer to 1.0, better" %}</li>
+</ul>
+</div>
 {% endif %}
 
 {% if node.get_graphs %}
-<h3>{% trans "Graphs" %}</h3>
+<h2>{% trans "Graphs" %}</h2>
   {% if node.is_down %}
   {% if node.is_dead %}
   <p class="error">{% trans "Node is marked as dead, so these graphs are out of date!" %}</p>
@@ -387,7 +371,7 @@ You are using this node to connect to the <i>{{ network.name }}</i> network.
 </script>
 </div>
   {% for graph in node.get_graphs %}
-  {{ graph.render }}<br/>
+  {% show_full_graph graph %}<br/>
   {% endfor %}
 </div>
 {% endif %}

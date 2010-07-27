@@ -25,7 +25,7 @@
  
 {% include "nodes/general_info.html" %}
 
-<h3>{% trans "Renumber Specification" %}</h3>
+<h2>{% trans "Renumber Specification" %}</h2>
 
 <form method="post" action="{% url renumber_node node.pk %}">
 {% csrf_token %}

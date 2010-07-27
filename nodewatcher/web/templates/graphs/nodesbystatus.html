@@ -1,1 +1,12 @@
-{% load graphimg %}{% show_graph %}
+{% load nodestatus %}
+{% load graphs %}{% show_graph %}
+<div class="graphdesc">
+<ul>
+  <li>{{ "up"|status:"text" }} – {% statusdesc "up" %}</li>
+  <li>{{ "visible"|status:"text" }} – {% statusdesc "visible" %}</li>
+  <li>{{ "down"|status:"text" }} – {% statusdesc "down" %}</li>
+  <li>{{ "duped"|status:"text" }} – {% statusdesc "duped" %}</li>
+  <li>{{ "invalid"|status:"text" }} – {% statusdesc "invalid" %}</li>
+  <li>{{ "pending"|status:"text" }} – {% statusdesc "pending" %}</li>
+</ul>
+</div>

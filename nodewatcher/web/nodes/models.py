@@ -121,7 +121,7 @@ class NodeType:
   Valid node types.
   """
   Server = 1
-  Mesh = 2
+  Wireless = 2
   Test = 3
   Unknown = 4
   Mobile = 5
@@ -129,7 +129,7 @@ class NodeType:
 
 class Node(models.Model):
   """
-  This class represents a single node in the mesh.
+  This class represents a single node in the network.
   """
   uuid = models.CharField(max_length = 40, primary_key = True)
   ip = models.CharField(max_length = 40, unique = True)
@@ -144,7 +144,7 @@ class Node(models.Model):
   # services such as VPN
   system_node = models.BooleanField(default = False)
   border_router = models.BooleanField(default = False)
-  node_type = models.IntegerField(default = NodeType.Mesh)
+  node_type = models.IntegerField(default = NodeType.Wireless)
   redundancy_link = models.BooleanField(default = False)
   redundancy_req = models.BooleanField(default = False)
   conflicting_subnets = models.BooleanField(default = False)
@@ -330,17 +330,17 @@ class Node(models.Model):
     """
     return self.status in (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)
 
-  def is_mesh_node(self):
+  def is_wireless_node(self):
     """
-    Returns true if the node is a mesh node.
+    Returns true if the node is a wireless node.
     """
-    return self.node_type in (NodeType.Mesh, NodeType.Test)
+    return self.node_type in (NodeType.Wireless, NodeType.Test)
 
   def is_adjacency_important(self):
     """
     Returns true if the node's adjacency should be tracked.
     """
-    return self.node_type in (NodeType.Mesh, NodeType.Server, NodeType.Unknown)
+    return self.node_type in (NodeType.Wireless, NodeType.Server, NodeType.Unknown)
 
   def is_mobile_node(self):
     """
@@ -412,8 +412,8 @@ class Node(models.Model):
     """
     Returns node type as string.
     """
-    if self.node_type == NodeType.Mesh:
-      return _("Mesh node")
+    if self.node_type == NodeType.Wireless:
+      return _("Wireless node")
     elif self.node_type == NodeType.Server:
       return _("Server node")
     elif self.node_type == NodeType.Test:
@@ -429,8 +429,8 @@ class Node(models.Model):
     """
     Returns node type as string.
     """
-    if self.node_type == NodeType.Mesh:
-      return _("Mesh nodes")
+    if self.node_type == NodeType.Wireless:
+      return _("Wireless nodes")
     elif self.node_type == NodeType.Server:
       return _("Server nodes")
     elif self.node_type == NodeType.Test:
@@ -467,7 +467,7 @@ class Node(models.Model):
     
     return any([
       self.uptime,
-      self.is_mesh_node()
+      self.is_wireless_node()
     ])
 
   def has_allocated_subnets(self, type = IfaceType.WiFi):
@@ -478,6 +478,15 @@ class Node(models.Model):
       return True
 
     return False
+  
+  def has_allocated_subnets_to_lan(self):
+    """
+    Returns true if node has subnets allocated to the lan interface.
+    """
+    if self.subnet_set.filter(allocated = True, gen_iface_type = IfaceType.LAN):
+      return True
+
+    return False    
   
   def get_subnets(self):
     """
@@ -626,8 +635,7 @@ class SubnetStatus:
 
 class Subnet(models.Model):
   """
-  This class represents a subnet allocated to a specific node in the
-  wifi mesh.
+  This class represents a subnet allocated to a specific node in the network.
   """
   node = models.ForeignKey(Node)
   subnet = models.CharField(max_length = 40)
@@ -874,18 +882,6 @@ class GraphItemNP(object):
       return []
 
     return self.children.order_by('-type', 'name')
-
-  def render(self):
-    """
-    Renders the surrounding HTML (uses a custom template if one is
-    available).
-    """
-    t = loader.get_template('graphs/%s.html' % GraphType.as_string(self.type))
-    c = Context({
-      'graph'  : self
-    })
-
-    return t.render(c)
 
   def type_as_string(self):
     """
@@ -1596,7 +1592,7 @@ class WarningCode:
     elif code == WarningCode.CaptivePortalDown:
       return _("Could be a temporary glitch but if it persists it could signify a firmware bug.")
     elif code == WarningCode.DnsDown:
-      return _("Could be a temporary glitch especially on nodes with unstable link to the mesh. If it persists it could signify a firmware bug or a network's DNS server problems.")
+      return _("Could be a temporary glitch especially on nodes with unstable link to the network. If it persists it could signify a firmware bug or a network's DNS server problems.")
     elif code == WarningCode.AnnounceConflict:
       return _("Please check subnets list and investigate why the problem is occurring. Conflicts hinder connectivity in the network and are a really serious problem.")
     elif code == WarningCode.MismatchedUuid:
@@ -1606,7 +1602,7 @@ class WarningCode:
     elif code == WarningCode.OptPackageNotFound:
       return _("If you do not want this package/s anymore please deselect it/them in node configuration.")
     elif code == WarningCode.BSSIDMismatch:
-      return _("The node will not connect with other nodes in the mesh because of this. It is probably a bug. Please report it.")
+      return _("The node will not connect with other nodes in the network because of this. It is probably a bug. Please report it.")
     elif code == WarningCode.ESSIDMismatch:
       return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get into a contact with network administrators to arrange new project entry with you own ESSID for you.")
     elif code == WarningCode.VPNMacMismatch:
@@ -1614,7 +1610,7 @@ class WarningCode:
     elif code == WarningCode.VPNLimitMismatch:
       return _("If you changed configured traffic limits you have to flash the node with new firmware image to apply new configuration. Or it could be a bug somewhere.")
     elif code == WarningCode.ChannelMismatch:
-      return _("The node will not connect with other nodes in the mesh because of this. It is probably a bug. Please report it.")
+      return _("The node will not connect with other nodes in the network because of this. It is probably a bug. Please report it.")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("Please check monitor log for more information or inform network administrator to do so. There is a bug somewhere.")
     else:

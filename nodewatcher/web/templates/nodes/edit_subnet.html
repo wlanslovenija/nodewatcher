@@ -16,7 +16,7 @@
 
 {% include "nodes/general_info_small.html" %}
 
-<h3>{% trans "Subnet Information" %}</h3>
+<h2>{% trans "Subnet Information" %}</h2>
 <form method="post" action="{% url edit_subnet node.pk subnet.id %}">
 {% csrf_token %}
 <table border="0" class="layout">

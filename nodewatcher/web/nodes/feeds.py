@@ -68,7 +68,7 @@ class ActiveNodes(GeoFeed):
     return "%s%s" % (self.base_link, reverse('nodes_list'))
   
   def items(self):
-    return Node.objects.filter(node_type = NodeType.Mesh).filter(status = NodeStatus.Up).exclude(geo_lat = None).exclude(geo_long = None)
+    return Node.objects.filter(node_type = NodeType.Wireless).filter(status = NodeStatus.Up).exclude(geo_lat = None).exclude(geo_long = None)
 
   def item_pubdate(self, item):
     return item.last_seen

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.template import Context, RequestContext, loader
+from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
@@ -441,7 +441,7 @@ def whitelist(request):
 
 def topology(request):
   """
-  Displays mesh topology.
+  Displays network topology.
   """
   return render_to_response('nodes/topology.html', {},
     context_instance = RequestContext(request)
@@ -449,7 +449,7 @@ def topology(request):
 
 def map(request):
   """
-  Displays mesh map.
+  Displays network map.
   """
   # Remove duplicate links
   links = []
@@ -511,7 +511,7 @@ def sticker(request):
 
 def global_events(request):
   """
-  Display a list of global mesh events.
+  Display a list of global network events.
   """
   return render_to_response('nodes/global_events.html',
     { 'events' : Event.objects.all().order_by('-timestamp', '-id')[0:30] },

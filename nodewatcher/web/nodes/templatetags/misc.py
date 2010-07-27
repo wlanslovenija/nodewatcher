@@ -4,13 +4,6 @@ from django.template.loader import render_to_string
 register = template.Library()
 
 @register.filter
-def widthlist(list, width=100):
-  """
-  Returns width of equally wide columns based on the number of elements in the given list. By default in percent.
-  """
-  return width / len(list) if len(list) != 0 else 0
-
-@register.filter
 def startswith(value, arg):
   """
   Returns True if the given string starts with an argument prefix, otherwise returns False.

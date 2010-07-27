@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load nodestatus %}
-{% load misc %}
+{% load graphs %}
 
 {% block title %}{% trans "Network Statistics" %}{% endblock %}
 {% block heading %}{% trans "Network Statistics" %}{% endblock %}
@@ -12,7 +12,7 @@
 <table class="layout">
 <tr>
 {% for s in nodes_by_status %}
-<td class="node_status_{{ s.status }} nodes" style="width: {{ nodes_by_status|widthlist }}%;" ><img src="{{ MEDIA_URL }}images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}" /> {{ s.count }}</td>
+<td class="node_status_{{ s.status }} nodes" style="width: {% widthratio 1 nodes_by_status|length 100 %}%;" ><img src="{{ MEDIA_URL }}images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}" /> {{ s.count }}</td>
 {% empty %}
 <td class="notice">
   {% trans "There are currently no nodes registered/visible." %}
@@ -66,10 +66,10 @@
   </div>
 
   <h2>Clients</h2>
-  {% trans "Clients connected so far" %}: {{ clients_ever }}<br/>
+  {% trans "Clients (non-unique) connected so far" %}: {{ clients_ever }}<br/>
   <h2>Network</h2>  
   {% trans "Number of subnets" %}: {{ subnet_count }}<br/>
-  {% trans "Average peers per node" %}: {{ peers_avg }}<br/>
+  {% trans "Average immediate neighbours (peers) per node" %}: {{ peers_avg }}<br/>
 </div>
 <h2>Graphs</h2>
 <div class="graphs">
@@ -92,7 +92,7 @@
 </script>
 </div>
   {% for graph in graphs %}
-  {{ graph.render }}<br/>
+  {% show_full_graph graph %}<br/>
   {% endfor %}
 </div>
 {% endblock %}

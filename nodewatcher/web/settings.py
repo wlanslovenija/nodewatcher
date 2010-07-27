@@ -94,7 +94,7 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.507
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
 
-# Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some mesh events
+# Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
 #BITLY_LOGIN = "Your bit.ly login"
 #BITLY_API_KEY = "Your bit.ly API key"
 #TWITTER_USERNAME = "Your Twitter username"
@@ -209,4 +209,6 @@ DOCUMENTATION_LINKS = {
   'report_issue'    : 'http://wlan-lj.net/newticket',
   'diversity'       : 'http://wlan-lj.net/wiki/Diversity',
   'decimal_degrees' : 'http://en.wikipedia.org/wiki/Decimal_degrees',
+  'ip_address'      : 'http://wlan-lj.net/wiki/IPNaslov',
+  'solar'           : 'http://wlan-lj.net/wiki/Podrobnosti/Solar',
 }

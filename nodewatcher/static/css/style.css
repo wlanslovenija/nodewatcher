@@ -148,6 +148,29 @@ tr.inner_header {
   float: right;
 }
 
+.embedded .actions {
+  width: 400px !important;
+  float: right;
+}
+
+.actions ul {
+  border-top: 1px solid #D7D7D7;
+  text-align: center;
+  padding: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.actions ul li {
+  list-style: none;
+  margin-left: 0;
+  border: 1px solid #D7D7D7;
+  border-top: 0;
+  padding: 5px;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
 .graphs div.graph {
   text-align: center;
   clear: both;
@@ -165,10 +188,18 @@ tr.inner_header {
   width: 566px;
 }
 
-#details_title {
-  clear: both;
+.graphdesc ul {
+  padding: 0;
 }
 
+.graphdesc ul li {
+  list-style: none;
+  margin-left: 0;
+}
+
+.details_title {
+  clear: both;
+}
 
 table.layout {
   width: 100%;
@@ -399,6 +430,14 @@ table.warnings .icon {
   background-color: #CCCCCC;
   color: white;
   text-decoration: none;
+}
+
+.node_info .first_column_width {
+  width: 120px;
+}
+
+.details .first_column_width {
+  width: 300px;
 }
 
 .first_column_width {

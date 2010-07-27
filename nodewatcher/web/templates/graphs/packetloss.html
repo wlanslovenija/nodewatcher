@@ -1,4 +1,2 @@
-{% load graphimg %}{% show_graph %}
-<div class="graphdesc">
-  Packet loss is measured from a central location and does not indicate connectivity quality to neighbouring nodes. To evaluate peer connectivity check the individual <i>Link Quality</i> graphs.
-</div>
+{% load i18n %}{% load graphs %}{% show_graph %}
+<div class="graphdesc">{% trans "Packet loss is measured from a central location and does not indicate connectivity quality to neighbouring nodes. To evaluate immediate neighbour (peer) connectivity check the individual <i>Link Quality</i> graphs. The graph does correlate with packet loss on the connection to/from the Internet." %}</div>

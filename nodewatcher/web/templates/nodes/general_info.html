@@ -1,28 +1,18 @@
 {% load i18n %}
 {% block tableheader %}
-<h3>{% trans "General Node Information" %}</h3>
+<h2>{% trans "General Node Information" %}</h2>
 <table border="0" width="700">
 {% endblock %}
   <tr>
-    <td class="first_column_width">{% trans "IP address" %}</td>
-    <td>{{ node.ip }}</td>
-  </tr>
-  <tr>
-    <td>{% trans "Name" %}</td>
+    <td class="first_column_width">{% trans "Name" %}</td>
     <td>{{ node.name|default:_("unknown") }}</td>
   </tr>
+  {% if node.url %}
   <tr>
-    <td>{% trans "Maintainer" %}</td>
-    {% if node.owner %}
-    {% if node.owner.email %}
-    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
-    {% else %}
-    <td>{{ node.owner.username }}</td>
-    {% endif %}
-    {% else %}
-    <td>{% trans "unknown" %}</td>
-    {% endif %}
+    <td></td>
+    <td class="small_text"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></td>
   </tr>
+  {% endif %}
   <tr>
     <td>{% trans "Location" %}</td>
     <td>{{ node.location|default:_("unknown") }}</td>
@@ -32,11 +22,31 @@
     <td>{{ node.project.name|default:_("unknown") }}</td>
   </tr>
   <tr>
-    <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{% trans "Maintainer" %}</td>
+    {% if node.owner %}
+    {% if user.is_authenticated and node.owner.email %}
+    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
+    {% else %}
+    <td>{{ node.owner.username }}</td>
+    {% endif %}
+    {% else %}
+    <td>{% trans "unknown" %}</td>
+    {% endif %}
   </tr>
   <tr>
-    <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{% trans "Node type" %}</td>
+    <td>{{ node.node_type_as_string|lower }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Node status" %}</td>
+    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Last seen" %}</td>
+    {% if node.last_seen %}
+    <td>{{ node.last_seen|date }}</td>
+    {% else %}
+    <td>{% trans "never" %}</td>
+    {% endif %}
   </tr>
 </table>

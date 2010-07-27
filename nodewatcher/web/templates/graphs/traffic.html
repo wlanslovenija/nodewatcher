@@ -1,1 +1,4 @@
-{% load graphimg %}{% show_graph %}{% ifequal graph.name "tap0" %}<div class="graphdesc">This graph represents traffic of node's Internet uplink.</div>{% endifequal %}
+{% load i18n %}{% load misc %}{% load graphs %}{% show_graph %}
+{% if graph.name == "tap0" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's Internet uplink." %}</div>{% endif %}
+{% if graph.name|startswith:"eth" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's ethernet interface." %}</div>{% endif %}
+{% if graph.name|startswith:"wl" or graph.name|startswith:"ath" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's wireless interface." %}</div>{% endif %}
