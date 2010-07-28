@@ -37,9 +37,6 @@ class RegisterNodeForm(forms.Form):
 
   # Additional flags
   assign_ip = forms.BooleanField(required = False, label = _("No IP yet? Assign me one!"), initial = True)
-  assign_subnet = forms.BooleanField(required = False, initial = True,
-    label = _("Assign a new subnet")
-  )
   project = forms.ModelChoiceField(
     Project.objects.all(),
     initial = getattr((Project.objects.all() or [1])[0], "id", None),
@@ -230,7 +227,6 @@ class RegisterNodeForm(forms.Form):
     Completes node registration.
     """
     ip = self.cleaned_data.get('ip')
-    assign_subnet = self.cleaned_data.get('assign_subnet')
     project = self.cleaned_data.get('project')
     pool = self.cleaned_data.get('pool')
     subnet = None
