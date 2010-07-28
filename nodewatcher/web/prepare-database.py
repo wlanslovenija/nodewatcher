@@ -26,11 +26,11 @@ def ensure_success(errcode):
     exit(1)
 
 db_backend = settings.DATABASES['default']['ENGINE']
-if db_backend.startswith('postgresql'):
+if db_backend.find('postgresql') != -1:
   db_backend = 'postgresql'
-elif db_backend.startswith('sqlite'):
+elif db_backend.find('sqlite') != -1:
   db_backend = 'sqlite'
-elif db_backend.startswith('mysql'):
+elif db_backend.find('mysql') != -1:
   db_backend = 'mysql'
 
 if os.path.isfile('scripts/%s_init.sh' % db_backend):
