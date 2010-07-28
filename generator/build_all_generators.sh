@@ -4,7 +4,6 @@
 OPENWRT="../openwrt-200901"
 GENERATORS=(
   "config-broadcom-2.4 brcm24 brcm-2.4"
-  "config-broadcom-2.6 broadcom brcm47xx"
   "config-fonera atheros atheros"
   "config-rb433 ar71xx ar71xx"
 )
