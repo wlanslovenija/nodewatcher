@@ -77,6 +77,10 @@ def queue_generator_job(node, email_user, config_only = False):
     'only_config'     : config_only,
     'email'           : email_user.email
   }
+  
+  # Add per-project packages
+  for x in node.project.packages.all():
+    data['opt_pkg'].append(x.name)
 
   # Queue the actual job
   j = job.Job(conn = queue)

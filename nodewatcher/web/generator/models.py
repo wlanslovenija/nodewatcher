@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from web.nodes.models import Node, Subnet as SubnetAllocation
+from web.nodes.models import Project, Node, Subnet as SubnetAllocation
 from web.generator.types import IfaceType
 import os
 
@@ -80,6 +80,19 @@ class OptionalPackage(models.Model):
     Returns a string representation of this model.
     """
     return "%s (%s)" % (self.fancy_name, self.description)
+
+class ProjectPackage(models.Model):
+  """
+  Additional package that gets installed for nodes of specified project.
+  """
+  project = models.ForeignKey(Project, related_name = 'packages')
+  name = models.CharField(max_length = 100)
+  
+  def __unicode__(self):
+    """
+    Returns a string representation of this model.
+    """
+    return self.name
 
 class ProfileAdaptationChain(models.Model):
   """
