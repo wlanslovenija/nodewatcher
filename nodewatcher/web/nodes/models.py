@@ -25,6 +25,7 @@ class Project(models.Model):
   pool = models.ForeignKey('Pool')
   channel = models.IntegerField()
   ssid = models.CharField(max_length = 50)
+  captive_portal = models.BooleanField()
   sticker = models.CharField(max_length = 50)
   zone = models.ForeignKey(Zone, null = True)
   

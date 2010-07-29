@@ -190,7 +190,6 @@ def node_edit(request, node):
         'template'            : node.profile.template.id,
         'use_vpn'             : node.profile.use_vpn,
         'tc_egress'           : TrafficControlClass.objects.get(bandwidth = node.profile.vpn_egress_limit).id if node.profile.vpn_egress_limit else None,
-        'use_captive_portal'  : node.profile.use_captive_portal,
         'wan_dhcp'            : node.profile.wan_dhcp,
         'wan_ip'              : "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr) if node.profile.wan_ip and node.profile.wan_cidr else None,
         'wan_gw'              : node.profile.wan_gw,
@@ -204,7 +203,6 @@ def node_edit(request, node):
       p.update({
         'template'            : None,
         'use_vpn'             : True,
-        'use_captive_portal'  : True,
         'wan_dhcp'            : True,
         'wan_ip'              : '',
         'wan_gw'              : '',

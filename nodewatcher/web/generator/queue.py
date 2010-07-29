@@ -55,7 +55,7 @@ def queue_generator_job(node, email_user, config_only = False):
     'root_pass'       : node.profile.root_pass,
     'vpn'             : node.profile.use_vpn,
     'vpn_limit'       : node.profile.vpn_egress_limit,
-    'captive_portal'  : node.profile.use_captive_portal,
+    'captive_portal'  : node.project.captive_portal,
     'wan_dhcp'        : node.profile.wan_dhcp,
     'wan_ip'          : node.profile.wan_ip,
     'wan_cidr'        : node.profile.wan_cidr,

@@ -84,9 +84,6 @@ class RegisterNodeForm(forms.Form):
   use_vpn = forms.BooleanField(required = False, initial = True,
     label = _("Enable VPN"),
   )
-  use_captive_portal = forms.BooleanField(required = False, initial = True,
-    label = _("Enable captive portal"),
-  )
   lan_bridge = forms.BooleanField(required = False, initial = False,
     label = _("Enable LAN/WiFi bridge"),
   )
@@ -309,7 +306,6 @@ class RegisterNodeForm(forms.Form):
         profile.channel = self.cleaned_data.get('channel')
       profile.root_pass = self.cleaned_data.get('root_pass')
       profile.use_vpn = self.cleaned_data.get('use_vpn')
-      profile.use_captive_portal = self.cleaned_data.get('use_captive_portal')
       profile.antenna = self.cleaned_data.get('ant_conn') or 0
       profile.lan_bridge = self.cleaned_data.get('lan_bridge') or False
       profile.wan_dhcp = self.cleaned_data.get('wan_dhcp')
@@ -400,10 +396,6 @@ class UpdateNodeForm(forms.Form):
   )
   use_vpn = forms.BooleanField(required = False,
     label = _("Enable VPN"),
-    initial = True,
-  )
-  use_captive_portal = forms.BooleanField(required = False,
-    label = _("Enable captive portal"),
     initial = True,
   )
   lan_bridge = forms.BooleanField(required = False, initial = False,
@@ -632,7 +624,6 @@ class UpdateNodeForm(forms.Form):
         template = self.cleaned_data.get('template'),
         root_pass = self.cleaned_data.get('root_pass'),
         use_vpn = self.cleaned_data.get('use_vpn'),
-        use_captive_portal = self.cleaned_data.get('use_captive_portal'),
         antenna = self.cleaned_data.get('ant_conn') or 0,
         lan_bridge = self.cleaned_data.get('lan_bridge') or False,
         wan_dhcp = self.cleaned_data.get('wan_dhcp'),
