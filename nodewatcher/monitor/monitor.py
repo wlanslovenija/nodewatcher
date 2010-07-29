@@ -510,7 +510,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           # Create a node warning when captive portal is down and the node has it
           # selected in its image generator profile
           try:
-            if n.profile.use_captive_portal:
+            if n.project.captive_portal:
               NodeWarning.create(n, WarningCode.CaptivePortalDown, EventSource.Monitor)
           except Profile.DoesNotExist:
             pass
