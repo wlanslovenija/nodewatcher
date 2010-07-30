@@ -134,6 +134,7 @@ def node_new(request):
   return render_to_response('nodes/new.html',
     { 'form' : form,
       'mobile_node_type' : NodeType.Mobile,
+      'dead_node_type' : NodeType.Dead,
       'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )

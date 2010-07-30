@@ -31,7 +31,7 @@
   </tr>
   <tr>
     <td></td>
-    <td class="small_text">{% blocktrans %}You can mark node as dead by choosing <i>Dead node</i> node type. Consider using that instead of removing the node which has some history.{% endblocktrans %}</td>
+    <td class="small_text">{% blocktrans %}Project (pre)defines different aspects of the node (initial location, IP pools, splash screen, SSID, installed packages...).{% endblocktrans %}</td>
   </tr>
   <tr>
     <td>{{ form.name.label }}</td>
@@ -252,6 +252,7 @@
 <script type="text/javascript">
 /* <![CDATA[ */
   var mobileNodeType = {{ mobile_node_type }};
+  var deadNodeType = {{ dead_node_type }};
   var projects = {
   {% for project in projects %}{% if project.has_geoloc %}
     {% ifchanged "" %}{% else %},{% endifchanged %}
