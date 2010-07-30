@@ -17,17 +17,28 @@
 			}
 			else if (outsideWindow) {
 				if (!visible) {
+					// The problem is that there is no easy way to get "auto" CSS value which would be the proper value
+					// to set margin-left and margin-right to (as it is currently defined in our CSS so)
+					if ((self.css('margin-left') == 'auto') || (self.css('margin-right') == 'auto')) {
+						// We have a browser which returns "auto", hopefully no work for us
+						marginLeft = self.css('margin-left');
+						marginRight = self.css('margin-right');
+					}
+					else {
+						// Or margins are not set to "auto" or browser does not tell us so, we will set (only) left margin to fixed value
+						// Reading margin-left gives offset in Safari and position().left in Firefox, together they work, but for how long?
+						marginLeft = parseInt(self.css('margin-left')) + self.position().left + "px";
+						marginRight = "0px";
+					}
 					self.floatPlaceholder.css({
 						'display': 'block',
 						'width': self.outerWidth(),
 						'height': self.outerHeight(),
-						// The problem is that there is no easy way to get "auto" CSS value which would be the proper value
-						// to set margin-left and margin-right to (as it is currently defined in our CSS so)
-						// Reading margin-left gives offset in Safari and position().left in Firefox, together they work, but for how long?
-						'margin-left': parseInt(self.css('margin-left')) + self.position().left + "px",
+						'margin-left': marginLeft,
+						'margin-right': marginRight,
 						'margin-top': self.css('margin-top'),
 						'margin-bottom': self.css('margin-bottom')
-					});					
+					});
 				}
 				visible = true;
 			}
@@ -38,6 +49,7 @@
 					'left': self.floatPlaceholder.offset().left - $(window).scrollLeft()
 				});
 			}
+			return true;
 		};
 	}
 	
@@ -48,6 +60,7 @@
 			self.before(self.floatPlaceholder);
 			$(window).scroll(handleEvent(self));
 			$(window).resize(handleEvent(self));
+			handleEvent(self)();
 		});
 	};
 })(jQuery);
