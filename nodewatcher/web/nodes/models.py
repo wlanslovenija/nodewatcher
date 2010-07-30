@@ -317,7 +317,7 @@ class Node(models.Model):
     """
     Returns true if the node can be reset.
     """
-    return self.status in (NodeStatus.Down, NodeStatus.Pending)
+    return self.status == NodeStatus.Down
   
   def is_pending(self):
     """
