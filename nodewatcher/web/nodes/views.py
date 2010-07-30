@@ -58,7 +58,7 @@ def statistics(request):
     nodes_by_status.append({ 'status' : NodeStatus.as_string(s['status']), 'count' : s['count'] })
 
   # Nodes by template usage
-  others = Node.objects.exclude(node_type = NodeType.Test).count()
+  others = Node.objects.exclude(node_type__in = (NodeType.Test, NodeType.Dead)).count()
   templates_by_usage = []
   for t in Profile.objects.exclude(node__node_type__in = (NodeType.Test, NodeType.Dead)).values('template__name').annotate(count = models.Count('node')).order_by('template__name'):
     templates_by_usage.append({ 'template' : t['template__name'], 'count' : t['count'] })
@@ -219,6 +219,7 @@ def node_edit(request, node):
     { 'form' : form,
       'node' : node,
       'mobile_node_type' : NodeType.Mobile,
+      'dead_node_type' : NodeType.Dead,
       'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )

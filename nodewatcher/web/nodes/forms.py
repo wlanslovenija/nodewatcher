@@ -21,22 +21,23 @@ import re
 IPV4_ADDR_RE = re.compile(r'^\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b$')
 MAC_ADDR_RE = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
 MAC_ADDR_RE_ALT = re.compile(r'^([0-9A-Fa-f]{2}-){5}[0-9A-Fa-f]{2}$') # Windows displays MAC address as physical address with dashes
-NODE_NAME_RE = re.compile('(?:[a-zA-Z0-9]+-?[a-zA-Z0-9]*)*[a-zA-Z0-9]$')
+# This format is used also in node.js so keep it in sync
+NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
 
 class RegisterNodeForm(forms.Form):
   """
   A simple form for new node registration.
   """
-  name = forms.CharField(max_length = 50, label = _("Node name"))
+  name = forms.CharField(max_length = 50, label = _("Node name"), widget = widgets.TextInput(attrs = {'size': '40'}))
   ip = forms.CharField(max_length = 40, required = False, label = _("IP address"))
   location = forms.CharField(required = False, max_length = 200, widget = widgets.TextInput(attrs = {'size': '40'}))
-  geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
+  geo_lat = forms.FloatField(required = False, label = _("Latitude"))
   geo_long = forms.FloatField(required = False, label = _("Longitude"))
-  notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
-  url = forms.CharField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
+  notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea(attrs={'cols':'80', 'rows': 5}))
+  url = forms.URLField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Additional flags
-  assign_ip = forms.BooleanField(required = False, label = _("No IP yet? Assign me one!"), initial = True)
+  assign_ip = forms.BooleanField(required = False, label = _("Assign automatically from the IP pool"), initial = True)
   project = forms.ModelChoiceField(
     Project.objects.all(),
     initial = getattr((Project.objects.all() or [1])[0], "id", None),
@@ -144,11 +145,11 @@ class RegisterNodeForm(forms.Form):
 
   # WAN options
   wan_dhcp = forms.BooleanField(required = False, label = _("WAN auto-configuration (DHCP)"), initial = True)
-  wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
-  wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
+  wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP address/mask"))
+  wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN gateway IP address"))
 
   # Other options
-  redundancy_req = forms.BooleanField(required = False, label = _("Enable no direct peering with a border gateway warning"))
+  redundancy_req = forms.BooleanField(required = False, label = _("Require a direct connection to a border gateway"))
 
   def clean(self):
     """
@@ -170,7 +171,7 @@ class RegisterNodeForm(forms.Form):
       return
 
     if not NODE_NAME_RE.match(name):
-      raise forms.ValidationError(_("The specified node name is not valid. A node name may only contain letters, numbers and hyphens!"))
+      raise forms.ValidationError(_("The specified node name is not valid. A node name may contain only lower case letters, numbers and hyphens!"))
 
     if not location and node_type == NodeType.Wireless:
       raise forms.ValidationError(_("Location is required for wireless nodes!"))
@@ -342,7 +343,7 @@ class UpdateNodeForm(forms.Form):
   """
   A simple form for updating node information.
   """
-  name = forms.CharField(max_length = 50, label = _("Node name"))
+  name = forms.CharField(max_length = 50, label = _("Node name"), widget = widgets.TextInput(attrs = {'size': '40'}))
   ip = forms.CharField(max_length = 40, required = False, label = _("IP address"))
   location = forms.CharField(required = False, max_length = 200, widget = widgets.TextInput(attrs = {'size': '40'}))
   geo_lat = forms.FloatField(required = False, label = _("Lattitude"))
@@ -370,8 +371,8 @@ class UpdateNodeForm(forms.Form):
     initial = NodeType.Wireless,
     label = _("Node type")
   )
-  notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea)
-  url = forms.CharField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
+  notes = forms.CharField(max_length = 1000, required = False, label = _("Notes"), widget = widgets.Textarea(attrs={'cols':'80', 'rows': 5}))
+  url = forms.URLField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Special node properties (can only be set by staff)
   system_node = forms.BooleanField(required = False)
@@ -458,8 +459,8 @@ class UpdateNodeForm(forms.Form):
 
   # WAN options
   wan_dhcp = forms.BooleanField(required = False, label = _("WAN auto-configuration (DHCP)"), initial = True)
-  wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP/mask"))
-  wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN GW"))
+  wan_ip = forms.CharField(max_length = 45, required = False, label = _("WAN IP address/mask"))
+  wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN gateway IP address"))
 
   # Other options
   redundancy_req = forms.BooleanField(required = False, label = _("Enable no direct peering with a border gateway warning"))
@@ -791,6 +792,10 @@ class WhitelistMacForm(forms.Form):
     """
     Additional validation handler.
     """
+    if not self.cleaned_data.get('mac'):
+      # This field is required
+      return self.cleaned_data
+    
     mac = self.cleaned_data.get('mac')
     if MAC_ADDR_RE_ALT.match(mac):
       self.cleaned_data['mac'] = mac.replace('-', ':')

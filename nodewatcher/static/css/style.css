@@ -201,10 +201,6 @@ tr.inner_header {
   margin-left: 0;
 }
 
-.details_title {
-  clear: both;
-}
-
 table.layout {
   width: 100%;
 }
@@ -258,22 +254,45 @@ table.smallnodeinfo {
   padding: 0px 10px;
 }
 
-.legend ul {
+.legend dl {
   padding: 0;
 }
 
-.status_legend {
-  margin-bottom: 2em;
+.legend dt {
+  display: table-cell;
+  white-space: nowrap;
 }
 
-.legend ul li {
-  list-style: none;
-  margin-left: 0;
-  height: 20px;
+.legend dt:after {
+  margin-left: 0.5em;
+  content: '–';
+  white-space: nowrap;
 }
 
-.legend ul li img {
+.legend dl dt img {
   vertical-align: middle;
+}
+
+.legend dd {
+  display: table-cell;
+  padding-left: 0.5em;
+}
+
+.legend dd.defintion_end {
+  display: block;
+  height: 0;
+}
+
+.status_legend dt img {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: -0.5em;
+}
+
+.status_legend dt {
+  padding-left: 20px;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
 }
 
 .gmap_details {

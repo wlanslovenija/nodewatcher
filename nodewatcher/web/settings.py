@@ -42,6 +42,7 @@ EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-lj.net'
 NETWORK_NAME = 'wlan ljubljana'
 NETWORK_HOME = 'http://wlan-lj.net'
 NETWORK_CONTACT = 'open@wlan-lj.net'
+NETWORK_CONTACT_PAGE = 'http://wlan-lj.net/contact'
 NETWORK_DESCRIPTION = 'odprto brezžično omrežje Ljubljane'
 
 # Local time zone for this installation. Choices can be found here:
@@ -211,4 +212,7 @@ DOCUMENTATION_LINKS = {
   'decimal_degrees' : 'http://en.wikipedia.org/wiki/Decimal_degrees',
   'ip_address'      : 'http://wlan-lj.net/wiki/IPNaslov',
   'solar'           : 'http://wlan-lj.net/wiki/Podrobnosti/Solar',
+  'antenna_type'    : 'http://wlan-lj.net/wiki/Antena',
+  'antenna_polarization' : 'http://wlan-lj.net/wiki/Antena#Polarizacija',
+  'vpn'             : 'http://wlan-lj.net/wiki/VPN',
 }

@@ -94,26 +94,56 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
 </table>
 <div class="legend">
 <h3>{% trans "Node status key:" %}</h3>
-<ul>
-  <li>{{ "up"|status:"small" }} – {% statusdesc "up" %}</li>
-  <li>{{ "visible"|status:"small" }} – {% statusdesc "visible" %}</li>
-  <li>{{ "down"|status:"small" }} – {% statusdesc "down" %}</li>
-  <li>{{ "duped"|status:"small" }} – {% statusdesc "duped" %}</li>
-  <li>{{ "invalid"|status:"small" }} – {% statusdesc "invalid" %}</li>
-  <li>{{ "new"|status:"small" }} – {% statusdesc "new" %}</li>
-  <li>{{ "pending"|status:"small" }} – {% statusdesc "pending" %}</li>
-  <li>{{ "awaitingrenumber"|status:"small" }} – {% statusdesc "awaitingrenumber" %}</li>
-</ul>
+<dl>
+  <dt>{{ "up"|status:"small" }}</dt>
+  <dd>{% statusdesc "up" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "visible"|status:"small" }}</dt>
+  <dd>{% statusdesc "visible" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "down"|status:"small" }}</dt>
+  <dd>{% statusdesc "down" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "duped"|status:"small" }}</dt>
+  <dd>{% statusdesc "duped" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "invalid"|status:"small" }}</dt>
+  <dd>{% statusdesc "invalid" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "new"|status:"small" }}</dt>
+  <dd>{% statusdesc "new" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "pending"|status:"small" }}</dt>
+  <dd>{% statusdesc "pending" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "awaitingrenumber"|status:"small" }}</dt>
+  <dd>{% statusdesc "awaitingrenumber" %}</dd>
+  <dd class="defintion_end"></dd>
+</dl>
 <h3>{% trans "Columns:" %}</h3>
-<ul>
-  <li><b>Node name</b> – name of the node</li>
-  <li><b>IP</b> – <a href="{{ documentation_links.ip_address }}" rel="external">IP address</a> of the node</li>
-  <li><b>Last seen up</b> – when was the node last seen connected to the network</li>
-  <li><b>Status</b> – current status of the node</li>
-  <li><b>Peers</b> – number of nodes in immediate neighbourhood to which the node is currently connected</li>
-  <li><b>Clients</b> – number of currently connected clients to the node</li>
-  <li><b>Project</b> – the project to which the node belongs</li> 
-</ul>
+<dl>
+  <dt><b>Node name</b></dt>
+  <dd>{% blocktrans %}the name of the node{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><b>IP</b></dt>
+  <dd>{% blocktrans with documentation_links.ip_address as ip_address %}primary <a href="{{ ip_address }}" rel="external">IP address</a> of the node{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><b>Last seen up</b></dt>
+  <dd>{% blocktrans %}when was the node last seen connected to the network{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><b>Status</b></dt>
+  <dd>{% blocktrans %}current status of the node{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><b>Peers</b></dt>
+  <dd>{% blocktrans %}number of nodes in immediate neighbourhood to which the node is currently connected{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><b>Clients</b></dt>
+  <dd>{% blocktrans %}number of currently connected clients to the node{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><b>Project</b></dt>
+  <dd>{% blocktrans %}the project to which the node belongs{% endblocktrans %}</dd>
+  <dd class="defintion_end"></dd>
+</dl>
 </div>
 {% endblock %}
 

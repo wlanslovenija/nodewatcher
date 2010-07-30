@@ -1,7 +1,45 @@
 var gmap;
+var geocoder;
+
+var autofillNameEnabled;
+var autofillMapEnabled;
+
+var streetNumber = /\d+[a-z]*/;
+// This format is used also in forms.py so keep it in sync
+// We remove all those characters as we are constructing the name by appending the street number ourselves
+var nodeName = /[^a-z]/g;
 
 function mapInit(map) {
   gmap = map;
+}
+
+function mapEditInit(map) {
+  mapInit(map);
+  
+  var lat = $('#id_geo_lat').val();
+  var long = $('#id_geo_long').val();
+  
+  autofillMapEnabled = !lat && !long;
+  autofillNameEnabled = !$('#id_name').val();
+  
+  if (lat && long) {
+    lat = parseFloat(lat);
+    long = parseFloat(long);
+    if (isFinite(lat) && isFinite(long)) {
+      var point = new google.maps.LatLng(lat, long);
+      if (point) {
+        putMarker(map, point);
+        map.setCenter(point);
+      }
+    }
+  }
+  
+  geocoder = new google.maps.ClientGeocoder();
+  geocoder.setViewport(map.getBounds());
+}
+
+function mapClick(map, point) {
+  autofillMapEnabled = false;
 }
 
 function toggleAutoConfiguration() {
@@ -13,13 +51,17 @@ function toggleAutoConfiguration() {
   }
 }
 
-function toggleImageGeneratorOptions() {
+function toggleImageGeneratorOptions(dontToggleExtAntenna) {
   if ($('#id_template').attr('value') == '') {
     $('.imagegen_opts').css('display', 'none');
   }
   else {
     $('.imagegen_opts').css('display', '');
     toggleAutoConfiguration();
+    toggleVpnOptions();
+    if (!dontToggleExtAntenna) {
+      toggleExtAntenna(true);
+    }
   }
 }
 
@@ -41,9 +83,26 @@ function toggleLocation() {
   }
 }
 
-function toggleExtAntenna() {
+function toggleDead() {
+  if ($('#id_node_type').attr('value') == deadNodeType) {
+    $('.alive').css('display', 'none');
+    $('#content :input').not('.dead_active :input').attr('disabled', 'disabled');
+    clickEnabled = false;
+  }
+  else {
+    $('.alive').css('display', '');
+    $('#content :input').removeAttr('disabled');
+    toggleIpInput();
+    clickEnabled = true;
+  }
+}
+
+function toggleExtAntenna(dontToggleImageGenerator) {
   if ($('#id_ant_external').is(':checked')) {
     $('.extantenna_opts').css('display', '');
+    if (!dontToggleImageGenerator) {
+      toggleImageGeneratorOptions(true);
+    }
   }
   else {
     $('.extantenna_opts').css('display', 'none');
@@ -61,10 +120,14 @@ function toggleIpInput() {
 }
 
 function updateMapForProject() {
+  if (nodeMarker) {
+    // marker is already set so we will not move map
+    return;
+  }
   var projectId = $('#id_project').attr('value');
   if (projects[projectId]) {
     gmap.setCenter(new google.maps.LatLng(projects[projectId].lat, projects[projectId].long), projects[projectId].zoom);
-    return;
+    geocoder.setViewport(gmap.getBounds());
   }
 }
 
@@ -95,20 +158,70 @@ function generateRandomPassword(event) {
   return false;
 }
 
+function fillMapLocation() {
+  if (($('#id_geo_lat').val() || $('#id_geo_long').val()) && !autofillMapEnabled) {
+    return;
+  }
+  autofillMapEnabled = true;
+
+  geocoder.getLatLng(
+    $('#id_location').val(),
+    function (point) {
+      if (autofillMapEnabled && point && gmap.getBounds().containsLatLng(point)) {
+        putMarker(gmap, point);
+      }
+    }
+  );
+}
+
+function fillName() {
+  if ($('#id_name').val() && !autofillNameEnabled) {
+    return;
+  }
+  autofillNameEnabled = true;
+
+  var name = unidecode($('#id_location').val()).toLowerCase();
+  number = name.match(streetNumber);
+  name = name.replace(streetNumber, "");
+  name = name.replace(nodeName, "");
+  if (number) {
+    name += "-" + number;
+  }
+  $('#id_name').val(name);
+}
+
 $(document).ready(function () {
-  $('#id_project').change(function(event) { updateMapForProject(); updatePoolsForProject(); });
-  $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); });
-  $('#id_template').change(function(event) { toggleImageGeneratorOptions(); });
-  $('#id_node_type').change(function(event) { toggleLocation(); });
-  $('#id_ant_external').change(function(event) { toggleExtAntenna(); });
-  $('#id_use_vpn').change(function(event) { toggleVpnOptions(); });
+  $('#id_project').change(function(event) {
+    updateMapForProject();
+    updatePoolsForProject();
+    return true;
+  });
+  $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); return true; });
+  $('#id_template').change(function(event) { toggleImageGeneratorOptions(); return true; });
+  $('#id_node_type').change(function(event) {
+    toggleLocation();
+    toggleDead();
+    return true;
+  });
+  $('#id_ant_external').change(function(event) { toggleExtAntenna(); return true; });
+  $('#id_use_vpn').change(function(event) { toggleVpnOptions(); return true; });
+  
+  $('#id_location').keyup(function(event) {
+    fillMapLocation();
+    fillName();
+    return true;
+  });
+  $('#id_geo_lat').change(function(event) { autofillMapEnabled = false; return true; });
+  $('#id_geo_long').change(function(event) { autofillMapEnabled = false; return true; });
+  $('#id_name').change(function(event) { autofillNameEnabled = false; return true; })
   
   $('#id_root_pass').after(']').after($('<a />').attr('href', '#').text('generate new').click(generateRandomPassword)).after(' [');
-  
+    
   toggleAutoConfiguration();
   toggleVpnOptions();
   toggleImageGeneratorOptions();
   toggleLocation();
   toggleExtAntenna();
   updatePoolsForProject();
+  toggleDead();
 });

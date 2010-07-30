@@ -20,7 +20,7 @@
 {% endif %}
 
 <div class="warning">
- {% blocktrans %}<b>WARNING:</b> By renumbering this node you will put node's old allocated subnets back into the pool! After you renumber you must <b>update the router's configuration</b> to reflect renumbering changes. You can simply generate a new image with new configuration for your router and flash it.{% endblocktrans %}
+ {% blocktrans %}<b>WARNING:</b> By renumbering you can change node's subnets (and thus also node's primary IP address). Be careful, as you will put node's old allocated subnets back into the IP pool where they will be available for immediate allocation by other nodes. After you renumber you must <b>update the node's router configuration</b> to reflect renumbering changes. You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}
 </div>
  
 {% include "nodes/general_info.html" %}

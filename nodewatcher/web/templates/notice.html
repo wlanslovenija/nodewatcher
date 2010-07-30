@@ -1,4 +1,4 @@
-<div class="notice{% if type %} {{ type }}{% endif %}">
+<div class="notice{% if type %} {{ type }}{% endif %}{% if classes %} {{ classes }}{% endif %}">
 {% if type %}
 <div style="float: left;"><img src="{{ MEDIA_URL }}images/notice_{{ type }}.png" alt="{{ type }}" /></div>
 {% endif %}

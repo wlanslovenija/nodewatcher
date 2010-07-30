@@ -4,11 +4,12 @@ from django.template import Library
 register = Library()
 
 @register.inclusion_tag('gmap.js', takes_context=True)
-def do_gmap(context, callback=None, full=False, marker_lat=None, marker_long=None, clickable=True, status='up'):
+def do_gmap(context, callback=None, click_callback=None, full=False, marker_lat=None, marker_long=None, clickable=True, status='up'):
   """
   Renders Google Maps JavaScript code.
   
   @param callback: Name of the callback function to call at the end of Google Maps initialization
+  @param click_callback: Name of the callbak function to call on every click on Google Maps
   @parm full: Draw full map or only small map around optional marker
   @param marker_lat: Optional marker to draw - latitude
   @param marker_long: Optional marker to draw - longitude
@@ -26,6 +27,7 @@ def do_gmap(context, callback=None, full=False, marker_lat=None, marker_long=Non
     'clickable': clickable,
     'full': full,
     'callback': callback,
+    'click_callback': click_callback,
     'status': status          
   })
   return context

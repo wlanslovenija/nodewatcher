@@ -20,7 +20,7 @@ class FullGraphNode(template.Node):
     self.graph = template.Variable(graph)
 
   def render(self, context):
-    try:  
+    try:
       graph = self.graph.resolve(context)
       return loader.render_to_string(
         'graphs/%s.html' % models.GraphType.as_string(graph.type), {

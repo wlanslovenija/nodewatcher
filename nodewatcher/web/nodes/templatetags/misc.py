@@ -1,5 +1,5 @@
 from django import template
-from django.template.loader import render_to_string
+from django.template import loader
 
 register = template.Library()
 
@@ -11,13 +11,21 @@ def startswith(value, arg):
   return value.startswith(arg)
 
 class NoticeNode(template.Node):
-  def __init__(self, nodelist, var):
+  def __init__(self, nodelist, notice_type, classes):
     self.nodelist = nodelist
-    self.var = var
+    self.notice_type = template.Variable(notice_type)
+    self.classes = template.Variable(classes)
 
   def render(self, context):
-    return render_to_string('notice.html',
-      { 'type' : self.var, 'notice' : self.nodelist.render(context) })
+    try:
+      return loader.render_to_string(
+        'notice.html', {
+          'type' : self.notice_type.resolve(context),
+          'classes' : self.classes.resolve(context),
+          'notice' : self.nodelist.render(context),
+        }, context)
+    except template.VariableDoesNotExist:
+      return ''
 
 @register.tag
 def notice(parser, token):
@@ -25,14 +33,13 @@ def notice(parser, token):
   Renders notice.
   """
   nodelist = parser.parse(('endnotice',))
-  bits = list(token.split_contents())
+  args = list(token.split_contents())
 
-  if len(bits) > 2 :
-    raise TemplateSyntaxError("Only one parameter expected")
-  if len(bits) > 1 :
-    var = parser.compile_filter(bits[1])
-  else:
-    var = ""
-
+  if len(args) > 3:
+    raise TemplateSyntaxError("'notice' tag requires at most two arguments.")
+  classes = args[2] if len(args) > 2 else '""'
+  notice_type = args[1] if len(args) > 1 else '""'
+  
   parser.delete_first_token()
-  return NoticeNode(nodelist, var)
+  
+  return NoticeNode(nodelist, notice_type, classes)

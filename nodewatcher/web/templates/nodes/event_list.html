@@ -40,7 +40,7 @@
 <tbody>
   {% for subscription in subscriptions %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td align="center"><a href="{% url my_events_unsubscribe subscription.id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Delete event subscription" %}" border="0" /></a></td>
+    <td align="center"><a href="{% url my_events_unsubscribe subscription.id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Remove event subscription" %}" alt="{% trans "Remove" %}" /></a></td>
     <td>
       {{ subscription.type_to_string }}
     </td>

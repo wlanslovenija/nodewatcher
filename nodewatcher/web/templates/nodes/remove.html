@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="warning">
-  {% blocktrans %}<b>WARNING:</b> By removing this node you will be returning all its allocated IP space back to the pool. It is available for immediate allocation afterwards, so please be sure that you really wish to remove it!{% endblocktrans %}
+  {% url edit_node node.get_current_id as edit_node %}{% blocktrans %}<b>WARNING:</b> <b>This action is irreversible.</b> Consider instead marking it as a dead node (<a href="{{ edit_node }}">change its type</a>) if the node has some history as it is important to have history records of network's growth and development. Be careful, by removing this node you will be returning all its allocated IP space back into the IP pool where it will be available for immediate allocation by other nodes.{% endblocktrans %}
 </div>
 
 {% include "nodes/general_info.html" %}

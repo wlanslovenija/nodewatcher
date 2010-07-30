@@ -13,22 +13,38 @@ immediate neighbours (peers) to which it is connected with different link qualit
 structure and color of edges between nodes. Topology does not fully represent geographical relations between nodes. For this
 check the <a href="{{ network_map }}">node map</a> view.{% endblocktrans %}</p>
 <h3>{% trans "Edge color key:" %}</h3>
-<ul>
-  <li><span style="color: #00ff00;">{% trans "green" %}</span> – {% trans "ETX is between 1.0 and 2.0" %}</li>
-  <li><span style="color: #0000ff;">{% trans "blue" %}</span> – {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
-  <li><span style="color: #ff0000;">{% trans "red" %}</span> – {% trans "ETX is greater than 5.0" %}</li>
-</ul>
+<dl>
+  <dt><span style="color: #00ff00;">{% trans "green" %}</span></dt>
+  <dd>{% trans "ETX is between 1.0 and 2.0" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="color: #0000ff;">{% trans "blue" %}</span></dt>
+  <dd>{% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="color: #ff0000;">{% trans "red" %}</span></dt>
+  <dd>{% trans "ETX is greater than 5.0" %}</dd>
+  <dd class="defintion_end"></dd>
+</dl>
 <p>{% blocktrans %}Green links are usable links in the network. Blue and red ones are those where nodes connected with each
 other but bad link quality (packet loss on the link) interfere with usefulness of the link. Closer the ETX (measure of the
 link quality) is to 1.0 better it is.{% endblocktrans %}</p>
 <h3>{% trans "Node color key:" %}</h3>
-<ul>
-  <li><span style="background-color: #BFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "wireless node" %}</li>
-  <li><span style="background-color: #FFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "border router" %}</li>
-  <li><span style="background-color: #E2F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "server node" %}</li>
-  <li><span style="background-color: #A7F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "testing node" %}</li>
-  <li><span style="background-color: #F26006;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> – {% trans "unknown node (not in node database)" %}</li>
-</ul>
+<dl>
+  <dt><span style="background-color: #BFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></dt>
+  <dd>{% trans "wireless node" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="background-color: #FFCB05;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></dt>
+  <dd>{% trans "border router" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="background-color: #E2F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></dt>
+  <dd>{% trans "server node" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="background-color: #A7F206;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></dt>
+  <dd>{% trans "testing node" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="background-color: #F26006;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></dt>
+  <dd>{% trans "unknown node (not in node database)" %}</dd>
+  <dd class="defintion_end"></dd>
+</dl>
 </div>
 {% endblock %}
 

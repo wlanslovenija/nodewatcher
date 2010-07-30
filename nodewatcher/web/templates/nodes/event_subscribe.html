@@ -1,21 +1,27 @@
 {% extends "my_base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% trans "Subscribe to Event" %}{% endblock %}
 {% block heading %}{% trans "Subscribe to Event" %}{% endblock %}
 
 {% block my_content %}
-
 {% with "subscribe to event" as form_errors_context %}
+{% with "no-top-margin" as classes %}
 {% include "form_errors.html" %}
+{% endwith %}
 {% endwith %}
 
 {% if not user.email %}
+{% with "no-top-margin" as classes %}
 {% include "nodes/missing_email_error.html" %}
+{% endwith %}
 {% endif %}
 
-<p class="no-top-margin">{% blocktrans %}Here you can subscribe to events in the network. For each event an e-mail can be send to your e-mail address
-informing you about the event in the network. You can specify different criteria for which events you are interested in.{% endblocktrans %}</p>
+{% notice "" "no-top-margin" %}
+{% blocktrans %}Here you can subscribe to events in the network. For each event an e-mail can be send to your e-mail address
+informing you about the event in the network. You can specify different criteria for which events you are interested in.{% endblocktrans %}
+{% endnotice %}
 
 <form method="post" action="{% url my_events_subscribe %}">
 {% csrf_token %}

@@ -24,10 +24,11 @@ def global_values(request):
   """
   return {
     'network' : {
-      'name'        : settings.NETWORK_NAME,
-      'home'        : settings.NETWORK_HOME,
-      'contact'     : settings.NETWORK_CONTACT,
-      'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
+      'name'         : settings.NETWORK_NAME,
+      'home'         : settings.NETWORK_HOME,
+      'contact'      : settings.NETWORK_CONTACT,
+      'contact_page' : settings.NETWORK_CONTACT_PAGE,
+      'description'  : getattr(settings, 'NETWORK_DESCRIPTION', None)
     },
     'request' : {
       'path' : request.path,

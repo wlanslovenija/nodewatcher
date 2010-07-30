@@ -43,23 +43,41 @@
 <p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
 <a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
 <h3>{% trans "Node status key:" %}</h3>
-<ul class="status_legend">
-  <li>{{ "up"|status:"gmap" }} – {% statusdesc "up" %}</li>
-  <li>{{ "visible"|status:"gmap" }} – {% statusdesc "visible" %}</li>
-  <li>{{ "down"|status:"gmap" }} – {% statusdesc "down" %}</li>
-  <li>{{ "duped"|status:"gmap" }} – {% statusdesc "duped" %}</li>
-  <li>{{ "new"|status:"gmap" }} – {% statusdesc "new" %}</li>
-  <li>{{ "pending"|status:"gmap" }} – {% statusdesc "pending" %}</li>
-</ul>
+<dl class="status_legend">
+  <dt>{{ "up"|status:"gmap" }}</dt>
+  <dd>{% statusdesc "up" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "visible"|status:"gmap" }}</dt>
+  <dd>{% statusdesc "visible" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "down"|status:"gmap" }}</dt>
+  <dd>{% statusdesc "down" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "duped"|status:"gmap" }}</dt>
+  <dd>{% statusdesc "duped" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "new"|status:"gmap" }}</dt>
+  <dd>{% statusdesc "new" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt>{{ "pending"|status:"gmap" }}</dt>
+  <dd>{% statusdesc "pending" %}</dd>
+  <dd class="defintion_end"></dd>
+</dl>
 {% if web_client_node %}
 The node marked with symbol <img src="{{ MEDIA_URL }}images/symbol_wc.png" alt="Client node symbol" /> is the node through which you are connected to the network.
 {% endif %}
 <h3>{% trans "Edge color key:" %}</h3>
-<ul>
-  <li><span style="color: #00ff00;">{% trans "green" %}</span> – {% trans "ETX is between 1.0 and 2.0" %}</li>
-  <li><span style="color: #0000ff;">{% trans "blue" %}</span> – {% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</li>
-  <li><span style="color: #ff0000;">{% trans "red" %}</span> – {% trans "ETX is greater than 5.0" %}</li>
-</ul>
+<dl>
+  <dt><span style="color: #00ff00;">{% trans "green" %}</span></dt>
+  <dd>{% trans "ETX is between 1.0 and 2.0" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="color: #0000ff;">{% trans "blue" %}</span></dt>
+  <dd>{% trans "ETX is greater than 2.0 and lower or equal to 5.0" %}</dd>
+  <dd class="defintion_end"></dd>
+  <dt><span style="color: #ff0000;">{% trans "red" %}</span></dt>
+  <dd>{% trans "ETX is greater than 5.0" %}</dd>
+  <dd class="defintion_end"></dd>
+</dl>
 <p>{% blocktrans %}Green links are usable links in the network. Blue and red ones are those where nodes connected with each
 other but bad link quality (packet loss on the link) interfere with usefulness of the link. Closer the ETX (measure of the
 link quality) is to 1.0 better it is.{% endblocktrans %}</p>
@@ -82,6 +100,6 @@ link quality) is to 1.0 better it is.{% endblocktrans %}</p>
   ];
 /* ]]> */
 </script>
-{% do_gmap "mapInit" "true" %}
+{% do_gmap "mapInit" "" "true" %}
 <script type="text/javascript" src="{{ MEDIA_URL }}js/map.js"></script>
 {% endblock %}

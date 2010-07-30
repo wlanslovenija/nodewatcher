@@ -1,6 +1,6 @@
 {% load i18n %}
 {% if form.errors %}
-<div class="error">
+<div class="error{% if classes %} {{ classes }}{% endif %}">
   {% if form_errors_context %}
   {% blocktrans %}<b>Oooops!</b> The following errors have ocurred while attempting to {{ form_errors_context }}:{% endblocktrans %}<br />
   {% else %}

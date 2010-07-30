@@ -469,18 +469,6 @@ class Node(models.Model):
     dt = abs(self.first_seen - datetime.now())
     return "%.02f" % (float(self.uptime_so_far) / (dt.days*3600*24 + dt.seconds) * 100)
 
-  def has_status_information(self):
-    """
-    Returns true if there is any status information to display.
-    """
-    if self.is_down():
-      return False
-    
-    return any([
-      self.uptime,
-      self.is_wireless_node()
-    ])
-
   def has_allocated_subnets(self, type = IfaceType.WiFi):
     """
     Returns true if node has subnets allocated to the specified interface.
