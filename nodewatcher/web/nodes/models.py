@@ -247,6 +247,10 @@ class Node(models.Model):
     # Clear adjacency history
     self.peer_history.clear()
     
+    # Clear renumbering notices
+    self.awaiting_renumber = False
+    self.renumber_notices.all().delete()
+    
     # Clear tweets
     for t in self.tweets.all():
       t.delete()
