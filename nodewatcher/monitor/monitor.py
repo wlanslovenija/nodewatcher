@@ -836,64 +836,57 @@ def check_network_status():
 
     for subnet in subnets:
       subnet, cidr = subnet.split("/")
-
+      
       try:
         s = Subnet.objects.get(node__ip = nodeIp, subnet = subnet, cidr = int(cidr))
         s.last_seen = datetime.now()
         s.visible = True
-        
-        if s.status == SubnetStatus.Subset:
-          pass
-        elif s.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAnnounced):
-          s.status = SubnetStatus.AnnouncedOk
-        elif not s.node.border_router or s.status == SubnetStatus.Hijacked:
-          NodeWarning.create(s.node, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
-          s.node.save()
-        
-        # Recheck if this is a more specific prefix announce for an allocated prefix
-        if s.status == SubnetStatus.NotAllocated and s.is_more_specific():
-          s.status = SubnetStatus.Subset
-        
-        s.save()
       except Subnet.DoesNotExist:
-        # Subnet does not exist, prepare one
         s = Subnet(node = dbNodes[nodeIp], subnet = subnet, cidr = int(cidr), last_seen = datetime.now())
         s.visible = True
-
-        # Check if this is a more specific prefix announce for an allocated prefix
-        if s.is_more_specific():
-          s.status = SubnetStatus.Subset
-        else:
-          s.status = SubnetStatus.NotAllocated
-        s.save()
-
-        # Check if this is a hijack
-        n = dbNodes[nodeIp]
-        try:
-          origin = Subnet.objects.ip_filter(
-            # Subnet overlaps with another one
-            ip_subnet__contains = '%s/%s' % (subnet, cidr)
-          ).exclude(
-            # Of another node (= filter all subnets belonging to current node)
-            node = s.node
-          ).get(
-            # That is allocated and visible
-            allocated = True,
-            visible = True
-          )
-          s.status = SubnetStatus.Hijacked
-          s.save()
-
-          # Generate an event
-          Event.create_event(n, EventCode.SubnetHijacked, '', EventSource.Monitor,
-                             data = 'Subnet: %s/%s\n  Allocated to: %s' % (s.subnet, s.cidr, origin.node))
-        except Subnet.DoesNotExist:
-          pass
-        
-        # Flag node entry with warnings flag (if not a border router)
-        if s.status != SubnetStatus.Subset and (not n.border_router or s.status == SubnetStatus.Hijacked):
-          NodeWarning.create(n, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
-          n.save()
+        s.allocated = False
+      
+      # Save previous subnet status for later use
+      old_status = s.status
+      
+      # Set status accoording to allocation flag
+      if s.allocated:
+        s.status = SubnetStatus.AnnouncedOk
+      else:
+        s.status = SubnetStatus.NotAllocated
+      
+      # Check if this is a more specific prefix announce for an allocated prefix
+      if s.is_more_specific() and not s.allocated:
+        s.status = SubnetStatus.Subset
+      
+      # Check if this is a hijack
+      try:
+        origin = Subnet.objects.ip_filter(
+          # Subnet overlaps with another one
+          ip_subnet__contains = '%s/%s' % (subnet, cidr)
+        ).exclude(
+          # Of another node (= filter all subnets belonging to current node)
+          node = s.node
+        ).get(
+          # That is allocated and visible
+          allocated = True,
+          visible = True
+        )
+        s.status = SubnetStatus.Hijacked
+      except Subnet.DoesNotExist:
+        pass
+      
+      # Generate an event if status has changed
+      if old_status != s.status and s.status == SubnetStatus.Hijacked:
+        Event.create_event(n, EventCode.SubnetHijacked, '', EventSource.Monitor,
+                           data = 'Subnet: %s/%s\n  Allocated to: %s' % (s.subnet, s.cidr, origin.node))
+      
+      # Flag node entry with warnings flag for unregistered announces
+      if not s.is_properly_announced() and (not s.node.border_router or s.status == SubnetStatus.Hijacked):
+        NodeWarning.create(s.node, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
+        s.node.save()
+      
+      s.save()
       
       # Detect subnets that cause conflicts and raise warning flags for all involved
       # nodes
@@ -907,18 +900,18 @@ def check_network_status():
           cs.node.conflicting_subnets = True
           cs.node.save()
   
-  # Remove (or change their status) subnets that are not visible
-  Subnet.objects.filter(status__in = (SubnetStatus.NotAllocated, SubnetStatus.Subset), visible = False).delete()
-  Subnet.objects.filter(status = SubnetStatus.AnnouncedOk, visible = False).update(status = SubnetStatus.NotAnnounced)
-  
-  for subnet in Subnet.objects.filter(status = SubnetStatus.NotAnnounced, node__visible = True):
-    NodeWarning.create(subnet.node, WarningCode.OwnNotAnnounced, EventSource.Monitor)
-    subnet.node.save()
-
   # Remove subnets that were hijacked but are not visible anymore
   for s in Subnet.objects.filter(status = SubnetStatus.Hijacked, visible = False):
     Event.create_event(s.node, EventCode.SubnetRestored, '', EventSource.Monitor, data = 'Subnet: %s/%s' % (s.subnet, s.cidr))
     s.delete()
+  
+  # Remove (or change their status) subnets that are not visible
+  Subnet.objects.filter(allocated = False, visible = False).delete()
+  Subnet.objects.filter(allocated = True, visible = False).update(status = SubnetStatus.NotAnnounced)
+  
+  for subnet in Subnet.objects.filter(status = SubnetStatus.NotAnnounced, node__visible = True):
+    NodeWarning.create(subnet.node, WarningCode.OwnNotAnnounced, EventSource.Monitor)
+    subnet.node.save()
   
   # Remove invisible unknown nodes
   for node in Node.objects.filter(status = NodeStatus.Invalid, visible = False).all():
