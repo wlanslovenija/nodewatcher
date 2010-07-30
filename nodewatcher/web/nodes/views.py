@@ -498,7 +498,7 @@ def sticker(request):
       else:
         disabled = True
   else:
-    form = InfoStickerForm({
+    form = InfoStickerForm(initial = {
       'name'    : user.name,
       'phone'   : user.phone,
       'project' : user.project.id if user.project else 0
