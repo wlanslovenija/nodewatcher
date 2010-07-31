@@ -1,2 +1,7 @@
 {% load i18n %}{% load graphs %}{% show_graph %}
-<div class="graphdesc">{% url network_clients as network_clients %}{% blocktrans %}A more detailed global list of currently connected clients is <a href="{{ network_clients }}">also available</a>.{% endblocktrans %}</div>
+<div class="graphdesc">{% url network_clients as network_clients %}
+{% if node %}
+{% blocktrans with node.get_current_id as node_id %}A more detailed global list of currently connected clients is <a href="{{ network_clients }}#node-{{ node_id }}">also available</a>.{% endblocktrans %}</div>
+{% else %}
+{% blocktrans %}A more detailed global list of currently connected clients is <a href="{{ network_clients }}">also available</a>.{% endblocktrans %}</div>
+{% endif %}

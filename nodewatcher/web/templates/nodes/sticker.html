@@ -3,7 +3,12 @@
 {% load misc %}
 
 {% block title %}{% trans "Generate an Info Sticker" %}{% endblock %}
-{% block heading %}{% trans "Generate an Info Sticker" %}{% endblock %}
+
+{% block heading %}
+{% with _("Generate an Info Sticker") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block my_content %}
 {% with "generate an info sticker" as form_errors_context %}

@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Deallocate Subnet {{ subnet }} for Node {{ node_name}}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Deallocate Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+{% url view_node node.get_current_id as node_url %}
+{% blocktrans with node.name|default:_("unknown") as node_name %}Deallocate Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
 
 {% block content %}
   {% if subnet.is_primary %}
@@ -17,7 +25,7 @@
 
 {% include "nodes/general_info_small.html" %}
 
-<h2>{% trans "Subnet Information" %}</h2>
+{% heading 2 _("Subnet Information") %}
 <form method="post" action="{% url remove_subnet node.pk subnet.id %}">
 {% csrf_token %}
 <table border="0" class="layout">

@@ -6,7 +6,13 @@
 {% load graphs %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
 
 {% block permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
 {% block head_permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
@@ -49,7 +55,7 @@
   {% endnotice %}
 {% endif %}
 
-<h2 class="section_title">{% trans "General Information" %}</h2>
+{% heading 2 _("General Information") %}
 
 <div class="embedded">
 
@@ -88,7 +94,7 @@
 
 {% if node.notes %}
   {% if current_owner or node.is_dead %}
-    <h3>{% trans "Notes" %}</h3>
+    {% heading 3 _("Notes") %}
     <div style="width: 300px;">
     {{ node.notes|linebreaks }}
     </div>
@@ -97,7 +103,7 @@
 
 {% if not node.is_pending %}
   {% if node.is_wireless_node or node.get_stability and not node.is_dead %}
-    <h3>{% trans "Node History" %}</h3>
+    {% heading 3 _("Node History") %}
     <table border="0" width="300" class="node_info">
       {% if node.is_wireless_node %}
         <tr>
@@ -119,7 +125,7 @@
   {% endif %}
 {% endif %}
 
-<h3>{% trans "Node in the Network" %}</h3>
+{% heading 3 _("Node in the Network") %}
 <table border="0" width="300" class="node_info">
   <tr>
     <td class="first_column_width">{% trans "IP address" %}</td>
@@ -136,11 +142,11 @@
 </table>
 
 {% if not node.is_dead %}
-  <h2 class="clear">{% trans "Details" %}</h2>
+  {% heading 2 _("Details") "clear" %}
 
   {% if not node.is_down %}
     {% if node.uptime or node.is_wireless_node or node.local_time %}
-      <h3>{% trans "Status Information" %}</h3>
+      {% heading 3 _("Status Information") %}
       <table border="0" class="layout details">
         {% if node.uptime %}
           <tr>
@@ -159,7 +165,7 @@
   {% endif %}
 
   {% if node.is_wireless_node or node.is_mobile_node %}
-    <h3>{% trans "Antenna Information" %}</h3>
+    {% heading 3 _("Antenna Information") %}
     <table border="0" class="layout details">
       <tr>
         <td class="first_column_width">{% trans "External antenna" %}</td>
@@ -178,7 +184,7 @@
     </table>
 
     {% if node.profile %}
-      <h3>{% trans "Image Generator Information" %}</h3>
+      {% heading 3 _("Image Generator Information") %}
       <table border="0" class="layout details">
         <tr>
           <td class="first_column_width">{% trans "Router type" %}</td>
@@ -202,7 +208,7 @@
     {% endif %}
     
     {% if not node.is_down %}
-      <h3>{% trans "Node Configuration" %}</h3>
+      {% heading 3 _("Node Configuration") %}
       <table border="0" class="layout details">
         {% if node.firmware_version %}
           <tr>
@@ -246,7 +252,7 @@
 
 {% endif %}
 
-<h2 class="clear">{% trans "Subnets" %}</h2>
+{% heading 2 _("Subnets") "clear" %}
 <p>{% blocktrans %}A node announces subnets to the rest of the network so traffic for network equipment (like clients'
 computers) connected (wirelessly or directly) to the node can be routed from the network to the node for it to pass the
 traffic to equipment in question.{% endblocktrans %}</p>
@@ -329,7 +335,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
 </tbody>
 </table>
 <div class="legend">
-<h3>{% trans "Subnet status key:" %}</h3>
+{% heading 3 _("Subnet status key:") %}
 <dl>
   <dt><span class="subnet_status_ok">ok</span></dt>
   <dd>{% trans "the allocated/registered subnet is announced properly by the node" %}</dd>
@@ -347,7 +353,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
 </div>
 
 {% if not node.is_dead %}
-<h2>{% trans "Immediate Neighbours (Peers)" %}</h2>
+{% heading 2 _("Immediate Neighbours (Peers)") %}
 <p>{% trans "Each node can have multiple immediate neighbours (peers) to which it is connected with different link quality." %}</p>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="listing">
 <thead>
@@ -376,7 +382,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
 </tbody>
 </table>
 <div class="legend">
-<h3>{% trans "Columns:" %}</h3>
+{% heading 3 _("Columns:") %}
 <dl>
   <dt><b>Node</b></dt>
   <dd>{% blocktrans with documentation_links.ip_address as ip_address %}the node and its primary <a href="{{ ip_address }}" rel="external">IP address</a>{% endblocktrans %}</dd>
@@ -395,7 +401,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
 {% endif %}
 
 {% if node.get_graphs %}
-<h2>{% trans "Graphs" %}</h2>
+{% heading 2 _("Graphs") %}
   {% if node.is_down %}
   {% if node.is_dead %}
   <p class="error">{% trans "Node is marked as dead, so these graphs are out of date!" %}</p>
@@ -415,7 +421,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
     var subgraph = '';
     {% for graph in node.get_graphs %}
     subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
-    $('#graph_{{ graph.id }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_' + subgraph);
+    $('#graph-{{ graph.title|anchorify }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_' + subgraph);
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');

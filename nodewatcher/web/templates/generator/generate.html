@@ -3,7 +3,14 @@
 {% load misc %}
 
 {% block title %}Generate Image for Node {{ node.name }}{% endblock %}
-{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Generate Image for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+{% url view_node node.get_current_id as node_url %}
+{% blocktrans with node.name|default:_("unknown") as node_name %}Generate Image for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
 
 {% block content %}
 {% with "process your request" as form_errors_context %}
@@ -34,7 +41,7 @@
 
 <form method="post" action="{% url generate_node node.pk %}">
 {% csrf_token %}
-<h2>{% trans "Image Generator Information" %}</h2>
+{% heading 2 _("Image Generator Information") %}
 <table border="0" width="700">
   {% if user.is_staff %}
   <tr>

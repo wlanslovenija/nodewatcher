@@ -2,13 +2,19 @@
 {% load i18n %}
 {% load nodestatus %}
 {% load graphs %}
+{% load misc %}
 
 {% block title %}{% trans "Network Statistics" %}{% endblock %}
-{% block heading %}{% trans "Network Statistics" %}{% endblock %}
+
+{% block heading %}
+{% with _("Network Statistics") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block content %}
 <div class="networksummary">
-  <h2>Nodes</h2>
+{% heading 2 _("Nodes") %}
 <table class="layout">
 <tr>
 {% for s in nodes_by_status %}
@@ -29,7 +35,7 @@
 {% trans "Dead nodes:" %} {{ nodes_dead }}<br/>
 </div>
 
-<h3 id="routers_folder" class="folding closed">{% trans "Nodes by router type" %}</h3>
+{% heading 3 _("Nodes by router type") "folding closed" %}
   <div style="padding-left: 20px;" id="routers_foldee">
     <table border="0" style="width: 90%; !important;" class="listing">
     {% for t in template_usage %}
@@ -47,7 +53,7 @@
     </table>
   </div>
 
-<h3 id="projects_folder" class="folding closed">{% trans "Nodes by project" %}</h3>
+{% heading 3 _("Nodes by project") "folding closed" %}
   <div style="padding-left: 20px;" id="projects_foldee">
     <table border="0" style="width: 90%; !important;" class="listing">
     {% for p in nodes_by_project %}
@@ -65,13 +71,13 @@
     </table>
   </div>
 
-  <h2>Clients</h2>
+  {% heading 2 _("Clients") %}
   {% trans "Clients (non-unique) connected so far" %}: {{ clients_ever }}<br/>
-  <h2>Network</h2>  
+  {% heading 2 _("Network") %}
   {% trans "Number of subnets" %}: {{ subnet_count }}<br/>
   {% trans "Average immediate neighbours (peers) per node" %}: {{ peers_avg }}<br/>
 </div>
-<h2>Graphs</h2>
+{% heading 2 _("Graphs") %}
 <div class="graphs">
 <div class="timespan">
   {% for timespan in timespans reversed %}
@@ -82,7 +88,7 @@
   var graph_timespan = '{{ timespans|first }}';
   function graph_display_changed() {
     {% for graph in graphs %}
-    $('#graph_{{ graph.id }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_{{ graph.graph }}' );
+    $('#graph-{{ graph.title|anchorify }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_{{ graph.graph }}' );
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');

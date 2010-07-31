@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load gmap %}
+{% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+{% url view_node node.get_current_id as node_url %}
+{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
 
 {% block content %}
 {% with "change node" as form_errors_context %}
 {% include "form_errors.html" %}
 {% endwith %}
 
-<h2>{% trans "General Information" %}</h2>
+{% heading 2 _("General Information") %}
 <form method="post" action="{% url edit_node node.pk %}">
 {% csrf_token %}
 <table border="0" width="700">
@@ -84,7 +92,7 @@
   </tr>
 </table>
 
-<h3>{% trans "Notes" %}</h3>
+{% heading 3 _("Notes") %}
 <table border="0" width="700">
   <tr class="dead_active">
     <td>{{ form.notes }}</td>
@@ -100,7 +108,7 @@
 {% if not user.is_staff %}
 <div class="alive">
 {% endif %}
-<h3>{% trans "Node in the Network" %}</h3>
+{% heading 3 _("Node in the Network") %}
 <table border="0" width="700">
   <tr>
     <td class="first_column_width">{{ form.ip.label }}</td>
@@ -130,9 +138,9 @@
 {% endif %}
 
 <div class="alive">
-<h2>{% trans "Details" %}</h2>
+{% heading 2 _("Details") %}
 
-<h3>{% trans "Antenna Information" %}</h3>
+{% heading 3 _("Antenna Information") %}
 <table border="0" width="700">
   <tr>
     <td class="first_column_width">{{ form.ant_external.label }}</td>
@@ -160,7 +168,7 @@
   </tr>  
 </table>
 
-<h3>{% trans "Image Generator Options" %}</h3>
+{% heading 3 _("Image Generator Options") %}
 <table border="0" width="700">
   <tr>
     <td class="first_column_width">{{ form.template.label }}</td>

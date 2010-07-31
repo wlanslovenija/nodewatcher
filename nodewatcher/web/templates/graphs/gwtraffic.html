@@ -1,5 +1,8 @@
-{% load i18n %}{% load graphs %}
-<h2>{% trans "VPN gateway traffic" %} <span class="small_text">({% trans "in bytes per second" %})</span></h2>
+{% load i18n %}{% load graphs %}{% load misc %}
+{% setcontext as heading %}
+{% trans "VPN gateway traffic" %} <span class="small_text">({% trans "in bytes per second" %})</span>
+{% endsetcontext %}
+{% heading 2 heading %}
 {% show_graph %}
 <div class="graphdesc">
 <ul>

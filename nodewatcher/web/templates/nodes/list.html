@@ -4,7 +4,13 @@
 {% load misc %}
 
 {% block title %}{% trans "Node List" %}{% endblock %}
-{% block heading %}{% trans "Node List" %}{% endblock %}
+
+{% block heading %}
+{% with _("Node List") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
 {% block contenttype %}nodelist{% endblock %}
 {% block rss %}
   <link rel="alternate" href="{% url feeds "active" %}" title="{{ network.name }} – Active nodes" type="application/rss+xml" />
@@ -51,7 +57,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
   {% for node in nodes %}
   {% ifchanged node.node_type %}
   <tr class="section_title">
-    <td colspan="8"><b>{{ node.node_type_as_string_plural }}</b></td>
+    <td colspan="8">{% heading 3 node.node_type_as_string_plural %}</td>
   </tr>
   {% endifchanged %}
   <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
@@ -93,7 +99,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
 </tbody>
 </table>
 <div class="legend">
-<h3>{% trans "Node status key:" %}</h3>
+{% heading 3 _("Node status key:") %}
 <dl>
   <dt>{{ "up"|status:"small" }}</dt>
   <dd>{% statusdesc "up" %}</dd>
@@ -120,7 +126,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
   <dd>{% statusdesc "awaitingrenumber" %}</dd>
   <dd class="defintion_end"></dd>
 </dl>
-<h3>{% trans "Columns:" %}</h3>
+{% heading 3 _("Columns:") %}
 <dl>
   <dt><b>Node name</b></dt>
   <dd>{% blocktrans %}the name of the node{% endblocktrans %}</dd>

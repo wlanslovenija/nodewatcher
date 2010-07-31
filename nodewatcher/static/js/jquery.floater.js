@@ -1,4 +1,4 @@
-(function($) {
+(function ($) {
 	function isOutsideWindow(element, limit) {
 		var top = $(window).scrollTop();
 		var y0 = $(element).offset().top;

@@ -3,7 +3,13 @@
 {% load misc %}
 
 {% block title %}{% trans "Image Generation" %}{% endblock %}
-{% block heading %}{% trans "Image Generation Request Queued" %}{% endblock %}
+
+{% block heading %}
+{% with _("Image Generation Request Queued") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
 {% block content %}
 {% if image_generator_enabled and not image_generator_suspended %}
 {% notice %}

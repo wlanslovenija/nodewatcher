@@ -2,7 +2,13 @@
 {% load i18n %}
 
 {% block title %}{% trans "Events" %}{% endblock %}
-{% block heading %}{% trans "Events" %}{% endblock %}
+
+{% block heading %}
+{% with _("Events") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
 {% block contenttype %}prefs{% endblock %}
 
 {% block rss %}

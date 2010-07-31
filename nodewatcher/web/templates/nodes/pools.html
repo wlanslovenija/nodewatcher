@@ -2,7 +2,12 @@
 {% load i18n %}
 
 {% block title %}{% trans "IP Allocation Pools" %}{% endblock %}
-{% block heading %}{% trans "IP Allocation Pools" %}{% endblock %}
+
+{% block heading %}
+{% with _("IP Allocation Pools") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>

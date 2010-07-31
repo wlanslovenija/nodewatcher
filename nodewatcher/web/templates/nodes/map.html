@@ -2,9 +2,15 @@
 {% load i18n %}
 {% load gmap %}
 {% load nodestatus %}
+{% load misc %}
 
 {% block title %}{% trans "Node Map" %}{% endblock %}
-{% block heading %}{% trans "Node Map" %}{% endblock %}
+
+{% block heading %}
+{% with _("Node Map") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block content %}
 <div style="margin-left: 10px;">
@@ -42,7 +48,7 @@
 {% url network_topology as network_topology %}
 <p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
 <a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
-<h3>{% trans "Node status key:" %}</h3>
+{% heading 3 _("Node status key:") %}
 <dl class="status_legend">
   <dt>{{ "up"|status:"gmap" }}</dt>
   <dd>{% statusdesc "up" %}</dd>
@@ -66,7 +72,7 @@
 {% if web_client_node %}
 The node marked with symbol <img src="{{ MEDIA_URL }}images/symbol_wc.png" alt="Client node symbol" /> is the node through which you are connected to the network.
 {% endif %}
-<h3>{% trans "Edge color key:" %}</h3>
+{% heading 3 _("Edge color key:") %}
 <dl>
   <dt><span style="color: #00ff00;">{% trans "green" %}</span></dt>
   <dd>{% trans "ETX is between 1.0 and 2.0" %}</dd>

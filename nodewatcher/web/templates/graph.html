@@ -1,6 +1,6 @@
-{% load i18n %}
+{% load i18n %}{% load misc %}
 <div class="graph">
-<img src="{{ MEDIA_URL }}graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph_{{ graph.id }}" alt="{{ graph.title }}{% for child in graph.get_children %}, {{ child.title }}{% endfor %}" />
+<img src="{{ MEDIA_URL }}graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph-{{ graph.title|anchorify }}" alt="{{ graph.title }}{% for child in graph.get_children %}, {{ child.title }}{% endfor %}" />
 <div class="graphmenu">
 {% if graph.get_children %}
 <b>{% trans "Display:" %}</b>

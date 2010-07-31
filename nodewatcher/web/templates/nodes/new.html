@@ -4,7 +4,12 @@
 {% load misc %}
 
 {% block title %}{% trans "New Node Registration" %}{% endblock %}
-{% block heading %}{% trans "New Node Registration" %}{% endblock %}
+
+{% block heading %}
+{% with _("New Node Registration") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block my_content %}
 {% with "register a new node" as form_errors_context %}
@@ -17,7 +22,7 @@
 {% url nodes_list as nodes_list %}{% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
 {% endnotice %}
 
-<h2>{% trans "General Information" %}</h2>
+{% heading 2 _("General Information") %}
 <form action="{% url new_node %}" method="post">
 {% csrf_token %}
 <table border="0" width="700">
@@ -79,7 +84,7 @@
   </tr>
 </table>
 
-<h3>{% trans "Notes" %}</h3>
+{% heading 3 _("Notes") %}
 <table border="0" width="700">
   <tr>
     <td>{{ form.notes }}</td>
@@ -92,7 +97,7 @@
   </tr>
 </table>
 
-<h3>{% trans "Node in the Network" %}</h3>
+{% heading 3 _("Node in the Network") %}
 <table border="0" width="700">
   <tr>
     <td class="first_column_width">{{ form.pool.label }}</td>
@@ -130,9 +135,9 @@
   </tr>  
 </table>
 
-<h2>{% trans "Details" %}</h2>
+{% heading 2 _("Details") %}
 
-<h3>{% trans "Antenna Information" %}</h3>
+{% heading 3 _("Antenna Information") %}
 <table border="0" width="700">
   <tr>
     <td class="first_column_width">{{ form.ant_external.label }}</td>
@@ -160,7 +165,7 @@
   </tr>  
 </table>
 
-<h3>{% trans "Image Generator Options" %}</h3>
+{% heading 3 _("Image Generator Options") %}
 <table border="0" width="700">
   <tr>
     <td class="first_column_width">{{ form.template.label }}</td>

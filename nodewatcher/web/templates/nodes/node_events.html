@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+{% url view_node node.get_current_id as node_url %}
+{% blocktrans with node.name|default:_("unknown") as node_name %}Events for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
 
 {% block permalink %}{% url view_node_events node.pk as permalink %}{{ block.super }}{% endblock %}
 {% block head_permalink %}{% url view_node_events node.pk as permalink %}{{ block.super }}{% endblock %}

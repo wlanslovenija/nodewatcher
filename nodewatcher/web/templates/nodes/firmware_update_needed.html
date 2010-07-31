@@ -2,7 +2,13 @@
 {% load i18n %}
 
 {% block title %}{% trans "Router Configuration Update Needed" %}{% endblock %}
-{% block heading %}{% trans "Router Configuration Update Needed" %}{% endblock %}
+
+{% block heading %}
+{% with _("Router Configuration Update Needed") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
 {% block content %}
 <div class="notice">
 {% blocktrans %}Your node has been updated. However, at least one of settings you have changed requires that you <b>update the node's router configuration</b> to reflect that change. <b>Before you update the router configuration those changes will not be in effect.</b> You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}

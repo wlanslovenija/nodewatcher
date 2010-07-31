@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node {{ node_name }}{% endblocktrans %}{% endblock %}
-{% block heading %}{% url view_node node.get_current_id as node_url %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+{% url view_node node.get_current_id as node_url %}
+{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
 
 {% block content %}
 
@@ -25,7 +33,7 @@
  
 {% include "nodes/general_info.html" %}
 
-<h2>{% trans "Renumber Specification" %}</h2>
+{% heading 2 _("Renumber Specification") %}
 
 <form method="post" action="{% url renumber_node node.pk %}">
 {% csrf_token %}

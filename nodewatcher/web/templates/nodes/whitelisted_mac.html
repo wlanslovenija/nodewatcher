@@ -2,7 +2,12 @@
 {% load i18n %}
 
 {% block title %}{% trans "MAC Whitelist" %}{% endblock %}
-{% block heading %}{% trans "MAC Whitelist" %}{% endblock %}
+
+{% block heading %}
+{% with _("MAC Whitelist") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block my_content %}
 {% with "whitelist a MAC address" as form_errors_context %}

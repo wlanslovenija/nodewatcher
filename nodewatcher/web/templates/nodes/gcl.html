@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load conversion %}
+{% load misc %}
 
 {% block title %}{% trans "Global Client List" %}{% endblock %}
-{% block heading %}{% trans "Global Client List" %}{% endblock %}
+
+{% block heading %}
+{% with _("Global Client List") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block content %}
 <table border="0" width="100%" class="listing">
@@ -20,7 +26,13 @@
   {% for client in clients %}
   {% ifchanged client.node %}
   <tr class="section_title">
-    <td colspan="5"><a name="n{{ client.node.get_current_id }}"></a><b>{% trans "Node" %} <a href="{% url view_node client.node.get_current_id %}">{{ client.node.name }}</a></b></td>
+    <td colspan="5">
+      {% setcontext as heading %}
+      {% url view_node client.node.get_current_id as node_url %}
+      {% blocktrans with client.node.name|default:_("unknown") as node_name %}Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+      {% endsetcontext %}
+      {% heading 3 heading %}
+    </td>
   </tr>
   {% endifchanged %}
   <tr class="{% cycle 'odd' 'even' %}">

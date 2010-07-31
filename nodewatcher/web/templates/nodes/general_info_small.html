@@ -1,12 +1,10 @@
 {% extends "nodes/general_info.html" %}
 
-{% load i18n %}
+{% load misc %}
 
 {% block tableheader %}
 <table border="0" class="smallnodeinfo layout">
   <tr class="section_title">
-    <td colspan="2">
-      {% trans "General Node Information" %}
-    </td>
+    <td colspan="2">{% heading 3 _("General Node Information") %}</td>
   </tr>
 {% endblock %}

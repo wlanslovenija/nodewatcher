@@ -1,4 +1,4 @@
-{% load i18n %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load i18n %}{% load misc %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>{% block title %}{% endblock %} – {{ network.name }}{% if network.description %} – {{ network.description }}{% endif %}</title>
@@ -20,6 +20,7 @@
     <link rel='stylesheet' type='text/css' href='{{ MEDIA_URL }}css/style.css' />
     {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
     <script type="text/javascript" src="{{ MEDIA_URL }}site/folding.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
     {{ form.media }}
     {% block js %}{% endblock %}
@@ -48,7 +49,7 @@
       </div>
 <div id="content" class="{% block contenttype %}nodes{% endblock %}">
 {% block permalink %}{% if permalink %}<div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>{% endif %}{% endblock %}
-<h1>{% block heading %}{% endblock %}</h1>
+{% block heading %}{% heading 1 heading %}{% endblock %}
 {% if messages %}
 <div id="messages">
   <ul>

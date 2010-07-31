@@ -209,6 +209,12 @@ table.layout .section_title td {
   font-weight: bold;
 }
 
+.section_title h3 {
+  margin: 0;
+  font: 13px Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif;
+  font-weight: bold;
+}
+
 table.smallnodeinfo {
   float: right;
   -moz-border-radius-bottomleft:3px;
@@ -228,6 +234,10 @@ table.smallnodeinfo {
 
 .smallnodeinfo td {
   font-size: 60%;
+}
+
+.smallnodeinfo h3 {
+  font-size: 110%;
 }
 
 .summary {

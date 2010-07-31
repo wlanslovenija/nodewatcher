@@ -1,8 +1,14 @@
 {% extends "my_base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% trans "Events" %}{% endblock %}
-{% block heading %}{% trans "Events" %}{% endblock %}
+
+{% block heading %}
+{% with _("Events") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block rss %}
   <link rel="alternate" href="{% url events_feed user.username %}" title="{{ network.name }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
@@ -16,7 +22,8 @@
 {% endblock %}
 
 {% block my_content %}
-<h2 class="no-top-margin">Event subscriptions</h2>
+
+{% heading 2 _("Event subscriptions") "no-top-margin" %}
 
 {% if not user.email %}
 {% include "nodes/missing_email_error.html" %}
@@ -70,7 +77,7 @@
 </table>
 {% endif %}
 
-<h2>{% trans "Latest events for your nodes" %}</h2>
+{% heading 2 _("Latest events for your nodes") %}
 <table border="0" class="listing">
 <thead>
   <tr>
