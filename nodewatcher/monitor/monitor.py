@@ -145,13 +145,17 @@ def add_graph(node, name, type, conf, title, filename, *values, **attrs):
   
   # Get parent instance (toplevel by default)
   parent = attrs.get('parent', None)
+  graph_image_name = '%s_%s.png' % (filename, node.pk)
+  graph_rra_name = '%s_%s.rrd' % (filename, node.pk)
 
   try:
     graph = GraphItem.objects.get(node = node, name = name, type = type, parent = parent)
+    if graph.graph != graph_image_name:
+      graph.graph = graph_image_name
   except GraphItem.DoesNotExist:
     graph = GraphItem(node = node, name = name, type = type, parent = parent)
-    graph.rra = '%s_%s.rrd' % (filename, node.pk)
-    graph.graph = '%s_%s.png' % (filename, node.pk)
+    graph.rra = graph_rra_name
+    graph.graph = graph_image_name
   
   rra = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
   try:
