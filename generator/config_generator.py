@@ -1024,6 +1024,7 @@ class OpenWrtConfig(NodeConfig):
     f.write('\toption hidden 0\n')
     f.write('\toption bgscan 0\n')
     f.write('\toption encryption none\n')
+    f.write('\toption mcast_rate 5500\n')
     f.write('\n')
     
     f.close()
