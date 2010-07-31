@@ -1521,6 +1521,7 @@ class WarningCode:
   VPNMacMismatch = 15
   VPNLimitMismatch = 16
   ChannelMismatch = 17
+  McastRateMismatch = 18
   
   Custom = 100
   NodewatcherInterpretFailed = 101
@@ -1564,9 +1565,11 @@ class WarningCode:
     elif code == WarningCode.VPNMacMismatch:
       return _("Reported VPN MAC address does not match assigned MAC address!") 
     elif code == WarningCode.VPNLimitMismatch:
-      return _("Reported VPN upload traffic limit does not match the configured value!")
+      return _("Reported VPN upload traffic limit does not match node configuration!")
     elif code == WarningCode.ChannelMismatch:
       return _("WiFi channel does not match node configuration!")
+    elif code == WarningCode.McastRateMismatch:
+      return _("WiFi multicast rate does not match node configuration!")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("There was a problem while interpreting nodewatcher output from this node!")
     else:
@@ -1614,6 +1617,8 @@ class WarningCode:
       return _("If you changed configured traffic limits you have to flash the node with new firmware image to apply new configuration. Or it could be a bug somewhere.")
     elif code == WarningCode.ChannelMismatch:
       return _("The node will not connect with other nodes in the network because of this. It is probably a bug. Please report it.")
+    elif code == WarningCode.McastRateMismatch:
+      return _("If this is not intentional, you are using an old firmware version or it is a bug. In the later case please report it. If it is intentional, please get in contact with network administrators to arrange a configuration option in the firmware for it.")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("Please check monitor log for more information or inform network administrator to do so. There is a bug somewhere.")
     else:

@@ -560,7 +560,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       if 'rts' in info['wifi'] and 'frag' in info['wifi']:
         n.thresh_rts = safe_int_convert(info['wifi']['rts']) or 2347
         n.thresh_frag = safe_int_convert(info['wifi']['frag']) or 2347
-
+      
+      # Check node's multicast rate
+      if 'mcast_rate' in info['wifi']:
+        rate = safe_int_convert(info['wifi']['mcast_rate'])
+        if rate != 5500:
+          NodeWarning.create(n, WarningCode.McastRateMismatch, EventSource.Monitor)
+      
       # Generate a graph for number of clients
       if 'nds' in info:
         add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients', n.clients)
