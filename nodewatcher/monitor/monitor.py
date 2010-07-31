@@ -48,6 +48,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 # Import our models
 from web.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning, Tweet
 from web.generator.models import Template, Profile
+from web.nodes import data_archive
 from django.db import transaction, models, connection
 from django.conf import settings
 
@@ -792,15 +793,21 @@ def check_network_status():
       node.uptime_last = None
       node.save()
   
+  # Generate timestamp and snapshot identifier
+  timestamp = datetime.now()
+  snapshot_id = int(time.time())
+  
   # Setup all node peerings
   for nodeIp, node in nodes.iteritems():
     n = dbNodes[nodeIp]
     oldRedundancyLink = n.redundancy_link
     n.redundancy_link = False
+    links = []
 
     for peerIp, lq, ilq, etx, vtime in node.links:
       l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx), vtime = vtime)
       l.save()
+      links.append(l)
       
       # Check if any of the peers has never peered with us before
       if n.is_adjacency_important() and l.dst.is_adjacency_important() and not n.peer_history.filter(pk = l.dst.pk).count():
@@ -822,8 +829,11 @@ def check_network_status():
 
     if n.redundancy_req and not n.redundancy_link:
       NodeWarning.create(n, WarningCode.NoBorderPeering, EventSource.Monitor)
-
+    
     n.save()
+    
+    # Archive topology information
+    data_archive.record_topology_entry(snapshot_id, timestamp, n, links)
   
   # Add nodes to topology map and generate output
   if not getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
