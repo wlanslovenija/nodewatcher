@@ -13,6 +13,6 @@
 })(jQuery);
 
 $(document).ready(function () {
-  $("#content").find("h1,h2,h3,h4,h5,h6").addAnchor("Link to this section");
+  $("#content").not(".login").find("h1,h2,h3,h4,h5,h6").addAnchor("Link to this section");
   $(".graph img").addAnchor("Link to this graph");
 });

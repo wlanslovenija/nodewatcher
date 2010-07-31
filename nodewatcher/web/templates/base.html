@@ -49,7 +49,7 @@
       </div>
 <div id="content" class="{% block contenttype %}nodes{% endblock %}">
 {% block permalink %}{% if permalink %}<div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>{% endif %}{% endblock %}
-{% block heading %}{% heading 1 heading %}{% endblock %}
+{% block heading %}{% if heading %}{% heading 1 heading %}{% endif %}{% endblock %}
 {% if messages %}
 <div id="messages">
   <ul>

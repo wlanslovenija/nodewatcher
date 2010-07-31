@@ -1,15 +1,20 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load misc %}
 
 {% block title %}{% trans "Login" %}{% endblock %}
+
+{% block heading %}
+{% with _("Login") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
 {% block contenttype %}login{% endblock %}
 
 {% block ctxtnav %}{% endblock %}
 
 {% block content %}
-<h1>Login</h1>
-
 <form action="{% url auth_login %}" method="post" id="acctmgr_loginform" >
 {% csrf_token %}
 
