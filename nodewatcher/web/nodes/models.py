@@ -1618,7 +1618,7 @@ class WarningCode:
     elif code == WarningCode.ChannelMismatch:
       return _("The node will not connect with other nodes in the network because of this. It is probably a bug. Please report it.")
     elif code == WarningCode.McastRateMismatch:
-      return _("If this is not intentional, you are using an old firmware version or it is a bug. In the later case please report it. If it is intentional, please get in contact with network administrators to arrange a configuration option in the firmware for it.")
+      return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get in contact with network administrators to arrange a configuration option in the firmware for it.")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("Please check monitor log for more information or inform network administrator to do so. There is a bug somewhere.")
     else:
