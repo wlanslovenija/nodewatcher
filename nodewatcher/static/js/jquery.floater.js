@@ -18,16 +18,20 @@
 			else if (outsideWindow) {
 				if (!visible) {
 					// The problem is that there is no easy way to get "auto" CSS value which would be the proper value
-					// to set margin-left and margin-right to (as it is currently defined in our CSS so)
+					// to copy/set margin-left and margin-right to if defined so in CSS
 					if ((self.css('margin-left') == 'auto') || (self.css('margin-right') == 'auto')) {
 						// We have a browser which returns "auto", hopefully no work for us
 						marginLeft = self.css('margin-left');
 						marginRight = self.css('margin-right');
 					}
+					else if (parseInt(self.css('margin-left')) != 0) {
+						// Works in Safari also for "auto" CSS value as it returns computed/current value (offset)
+						marginLeft = self.css('margin-left');
+						marginRight = "0px";
+					}
 					else {
-						// Or margins are not set to "auto" or browser does not tell us so, we will set (only) left margin to fixed value
-						// Reading margin-left gives offset in Safari and position().left in Firefox, together they work, but for how long?
-						marginLeft = parseInt(self.css('margin-left')) + self.position().left + "px";
+						// We calculate offset manually by comparing parent's absolute offset with ours
+						marginLeft = self.offset().left - self.parent().offset().left + "px";
 						marginRight = "0px";
 					}
 					self.floatPlaceholder.css({
