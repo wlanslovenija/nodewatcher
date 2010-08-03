@@ -153,7 +153,7 @@ def safe_dbm_convert(dbm):
     
     if dbm > 127:
       # Convert from unsigned char into signed one
-      dbm = struct.unpack("b", struct.pack("<i", dbm)[0])
+      dbm = struct.unpack("b", struct.pack("<i", dbm)[0])[0]
     
     return dbm
   except:
@@ -732,12 +732,12 @@ def check_network_status():
   # Initialize the state of nodes and subnets, remove out of date ap clients and graph items
   Node.objects.all().update(visible = False)
   Subnet.objects.all().update(visible = False)
+  Link.objects.all().update(visible = False)
   APClient.objects.filter(last_update__lt = datetime.now() -  timedelta(minutes = 11)).delete()
 
   # Reset some states
   NodeWarning.objects.all().update(source = EventSource.Monitor, dirty = False)
   Node.objects.all().update(warnings = False, conflicting_subnets = False)
-  Link.objects.all().delete()
 
   # Fetch routing tables from OLSR
   try:
@@ -839,12 +839,23 @@ def check_network_status():
   # Setup all node peerings
   for nodeIp, node in nodes.iteritems():
     n = dbNodes[nodeIp]
-    oldRedundancyLink = n.redundancy_link
     n.redundancy_link = False
     links = []
+    
+    # Find old border peers
+    old_border_peers = set([p.dst for p in n.get_peers().filter(dst__border_router = True)])
 
     for peerIp, lq, ilq, etx, vtime in node.links:
-      l = Link(src = n, dst = dbNodes[peerIp], lq = float(lq), ilq = float(ilq), etx = float(etx), vtime = vtime)
+      try:
+        l = Link.objects.get(src = n, dst = dbNodes[peerIp])
+      except Link.DoesNotExist:
+        l = Link(src = n, dst = dbNodes[peerIp])
+      
+      l.lq = float(lq)
+      l.ilq = float(ilq)
+      l.etx = float(etx)
+      l.vtime = vtime
+      l.visible = True
       l.save()
       links.append(l)
       
@@ -861,13 +872,25 @@ def check_network_status():
         n.redundancy_link = True
     
     if not n.is_invalid():
-      if oldRedundancyLink and not n.redundancy_link:
-        Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor)
-      elif not oldRedundancyLink and n.redundancy_link:
-        Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor)
-
-    if n.redundancy_req and not n.redundancy_link:
-      NodeWarning.create(n, WarningCode.NoBorderPeering, EventSource.Monitor)
+      # Determine new border peers
+      new_border_peers = set([p.dst for p in n.get_peers().filter(visible = True, dst__border_router = True)])
+      
+      if old_border_peers != new_border_peers:
+        for p in old_border_peers:
+          if p not in new_border_peers:
+            # Redundancy loss has ocurred
+            Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor,
+                               data = 'Border gateway: %s' % p)
+        
+        for p in new_border_peers:
+          if p not in old_border_peers:
+            # Redundancy restoration has ocurred
+            Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor,
+                               data = 'Border gateway: %s' % p)
+      
+      # Issue a warning when node requires peering but has none
+      if n.redundancy_req and not n.redundancy_link:
+        NodeWarning.create(n, WarningCode.NoBorderPeering, EventSource.Monitor)
     
     n.save()
     
@@ -972,6 +995,9 @@ def check_network_status():
     Event.create_event(node, EventCode.UnknownNodeDisappeared, '', EventSource.Monitor)
   
   Node.objects.filter(status__in = (NodeStatus.Invalid, NodeStatus.AwaitingRenumber), visible = False).delete()
+  
+  # Remove invisible links
+  Link.objects.filter(visible = False).delete()
 
   # Ping the nodes to prepare information for later node processing
   varsize_results = {}

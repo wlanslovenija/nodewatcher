@@ -608,6 +608,8 @@ class Link(models.Model):
   ilq = models.FloatField()
   etx = models.FloatField()
   vtime = models.FloatField()
+  visible = models.BooleanField(db_index = True)
+  # TODO need composite index on (src, dst)
 
   def should_draw_on_map(self):
     """
@@ -648,7 +650,7 @@ class Subnet(models.Model):
   allocated_at = models.DateTimeField(null = True)
 
   # Basic status (set by the monitor daemon)
-  visible = models.BooleanField()
+  visible = models.BooleanField(db_index = True)
   status = models.IntegerField()
   last_seen = models.DateTimeField(null = True)
 
@@ -914,9 +916,9 @@ class GraphItem(models.Model, GraphItemNP):
   graph = models.CharField(max_length = 200)
   title = models.CharField(max_length = 200)
   last_update = models.DateTimeField(null = True)
-  dead = models.BooleanField(default = False)
-  need_redraw = models.BooleanField(default = False)
-  need_removal = models.BooleanField(default = False)
+  dead = models.BooleanField(default = False, db_index = True)
+  need_redraw = models.BooleanField(default = False, db_index = True)
+  need_removal = models.BooleanField(default = False, db_index = True)
   
   def get_archive_data(self, start = None, sort = False):
     """
