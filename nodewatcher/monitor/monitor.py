@@ -594,7 +594,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         bitrate = safe_int_convert(info['wifi']['bitrate'])
         signal = safe_dbm_convert(info['wifi']['signal'])
         noise = safe_dbm_convert(info['wifi']['noise'])
-        snr = float(signal) / float(noise)
+        snr = float(signal) - float(noise)
         
         add_graph(n, '', GraphType.WifiBitrate, RRAWifiBitrate, 'Wifi Bitrate', 'wifibitrate', bitrate)
         add_graph(n, '', GraphType.WifiSignalNoise, RRAWifiSignalNoise, 'Wifi Signal/Noise', 'wifisignalnoise', signal, noise)
