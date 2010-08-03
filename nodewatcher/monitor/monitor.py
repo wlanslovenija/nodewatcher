@@ -66,7 +66,7 @@ else:
   nodewatcher.COLLECT_SIMULATION_DATA = options.collect_sim
   wifi_utils.COLLECT_SIMULATION_DATA = options.collect_sim
 
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers, RRAPacketLoss
+from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers, RRAPacketLoss, RRAWifiBitrate, RRAWifiSignalNoise, RRAWifiSNR
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
@@ -78,22 +78,26 @@ import logging
 import time
 import multiprocessing
 import gc
+import struct
 
 if Tweet.tweets_enabled():
   from lib import bitly
 
 RRA_CONF_MAP = {
-  GraphType.RTT         : RRARTT,
-  GraphType.LQ          : RRALinkQuality,
-  GraphType.Clients     : RRAClients,
-  GraphType.Traffic     : RRAIface,
-  GraphType.LoadAverage : RRALoadAverage,
-  GraphType.NumProc     : RRANumProc,
-  GraphType.MemUsage    : RRAMemUsage,
-  GraphType.Solar       : RRASolar,
-  GraphType.WifiCells   : RRAWifiCells,
-  GraphType.OlsrPeers   : RRAOlsrPeers,
-  GraphType.PacketLoss  : RRAPacketLoss
+  GraphType.RTT             : RRARTT,
+  GraphType.LQ              : RRALinkQuality,
+  GraphType.Clients         : RRAClients,
+  GraphType.Traffic         : RRAIface,
+  GraphType.LoadAverage     : RRALoadAverage,
+  GraphType.NumProc         : RRANumProc,
+  GraphType.MemUsage        : RRAMemUsage,
+  GraphType.Solar           : RRASolar,
+  GraphType.WifiCells       : RRAWifiCells,
+  GraphType.OlsrPeers       : RRAOlsrPeers,
+  GraphType.PacketLoss      : RRAPacketLoss,
+  GraphType.WifiBitrate     : RRAWifiBitrate,
+  GraphType.WifiSignalNoise : RRAWifiSignalNoise,
+  GraphType.WifiSNR         : RRAWifiSNR
 }
 WORKER_POOL = None
 
@@ -134,6 +138,24 @@ def safe_date_convert(timestamp):
   """
   try:
     return datetime.fromtimestamp(int(timestamp))
+  except:
+    return None
+
+def safe_dbm_convert(dbm):
+  """
+  A helper method for converting a string into a valid dBm integer
+  value. This also takes care of unsigned/signed char conversions.
+  """
+  try:
+    dbm = safe_int_convert(dbm)
+    if dbm is None:
+      return None
+    
+    if dbm > 127:
+      # Convert from unsigned char into signed one
+      dbm = struct.unpack("b", struct.pack("<i", dbm)[0])
+    
+    return dbm
   except:
     return None
 
@@ -566,6 +588,17 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         rate = safe_int_convert(info['wifi']['mcast_rate'])
         if rate != 5500:
           NodeWarning.create(n, WarningCode.McastRateMismatch, EventSource.Monitor)
+      
+      # Check node's wifi bitrate, level and noise
+      if 'signal' in info['wifi']:
+        bitrate = safe_int_convert(info['wifi']['bitrate'])
+        signal = safe_dbm_convert(info['wifi']['signal'])
+        noise = safe_dbm_convert(info['wifi']['noise'])
+        snr = float(signal) / float(noise)
+        
+        add_graph(n, '', GraphType.WifiBitrate, RRAWifiBitrate, 'Wifi Bitrate', 'wifibitrate', bitrate)
+        add_graph(n, '', GraphType.WifiSignalNoise, RRAWifiSignalNoise, 'Wifi Signal/Noise', 'wifisignalnoise', signal, noise)
+        add_graph(n, '', GraphType.WifiSNR, RRAWifiSNR, 'Wifi Signal/Noise Ratio', 'wifisnr', snr)
       
       # Generate a graph for number of clients
       if 'nds' in info:

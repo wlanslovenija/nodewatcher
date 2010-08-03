@@ -802,6 +802,10 @@ class GraphType:
   OlsrPeers = 5
   GatewayTraffic = 40
   PacketLoss = 4
+  WifiBitrate = 8
+  WifiSignalNoise = 9
+  WifiSNR = 6
+  # XXX this id-based ordering is bad
 
   # Global graphs
   NodesByStatus = 1000
@@ -839,6 +843,12 @@ class GraphType:
       return "nodesbystatus"
     elif type == GraphType.PacketLoss:
       return "packetloss"
+    elif type == GraphType.WifiBitrate:
+      return "wifibitrate"
+    elif type == GraphType.WifiSignalNoise:
+      return "wifisignalnoise"
+    elif type == GraphType.WifiSNR:
+      return "wifisnr"
     else:
       return "unknown"
 

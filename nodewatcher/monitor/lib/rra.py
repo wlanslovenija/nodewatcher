@@ -514,6 +514,67 @@ class RRAOlsrPeers(RRAConfiguration):
     '--lower-limit', '0'
   ]
 
+class RRAWifiBitrate(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'bitrate',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE2:bitrate#54aaff:Bitrate [Mb/s]",
+    r'GPRINT:bitrate:LAST:Current\:%8.2lf',
+    r'GPRINT:bitrate:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:bitrate:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0'
+  ]
+
+class RRAWifiSignalNoise(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'signal',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'noise',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE2:signal#7fff00:Signal [dBm]",
+    r'GPRINT:signal:LAST:  Current\:%8.2lf',
+    r'GPRINT:signal:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:signal:MAX:Maximum\:%8.2lf\n',
+    "LINE2:noise#4b0082:Noise [dBm]",
+    r'GPRINT:noise:LAST:  Current\:%8.2lf',
+    r'GPRINT:noise:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:noise:MAX:Maximum\:%8.2lf\n',
+    '--upper-limit', '0'
+  ]
+
+class RRAWifiSNR(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'snr',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE2:snr#ff0000:SNR",
+    r'GPRINT:snr:LAST:Current\:%8.2lf',
+    r'GPRINT:snr:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:snr:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0',
+    '--units-exponent', '0'
+  ]
+
 class RRASolar(RRAConfiguration):
   db_model = StatsSolar
   interval = 1800
