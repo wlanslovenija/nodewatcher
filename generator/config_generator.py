@@ -64,6 +64,13 @@ portLayouts = {
   'rb411'       : None
 }
 
+# Optional packages that should be removed when configuring a router-only node
+clientOnlyPackages = [
+  "splash-ljubljana",
+  "splash-maribor",
+  "splash-slovenija",
+]
+
 class PrimarySubnetTooSmall(Exception):
   pass
 
@@ -523,6 +530,12 @@ class OpenWrtConfig(NodeConfig):
       self.addPackage('nullhttpd', 'dnsmasq')
     else:
       self.addPackage('-dnsmasq')
+      
+      # Remove optional packages that should not be installed if this is a router-only
+      # configuration (without a client subnet)
+      for package in clientOnlyPackages:
+        if package in self.packages:
+          self.packages.remove(package)
 
     # Build the image
     buildString = 'make image FILES="../files" PACKAGES="-ppp -ppp-mod-pppoe -nas -hostapd-mini %s"' % " ".join(self.packages)
