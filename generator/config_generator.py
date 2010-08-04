@@ -383,7 +383,9 @@ class NodeConfig(object):
       raise Exception('VPN requires WAN access configuration!')
     
     if self.primarySubnet['cidr'] > 30:
-      raise Exception('VPN requires at least /30 primary subnet!')
+      # Prevent VPN from being enabled when primary subnet is too small
+      # for allocation of additional IP addresses (less than /30)
+      return
     
     self.addInterface('vpn', 'tap0', olsr = True)
     self.vpn = { 'username' : username,
