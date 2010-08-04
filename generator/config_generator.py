@@ -397,9 +397,11 @@ class NodeConfig(object):
     Toggles the use of a captive portal for internet connections.
     """
     if value and self.primarySubnet['cidr'] > 28:
-      raise Exception('Captive portal requires at least /28 primary subnet!')
-    
-    self.captivePortal = value
+      # Prevent captive portal from being enabled when primary subnet is too
+      # small for any clients (less than /28)
+      self.captivePortal = False
+    else:
+      self.captivePortal = value
 
   def addPackage(self, *args):
     """
