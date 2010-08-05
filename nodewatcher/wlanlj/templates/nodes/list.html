@@ -38,10 +38,10 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
     <th style="width: 22%;"><b>{% trans "Node name" %}</b></th>
     <th style="width: 15%;"><b>IP</b></th>
     <th style="width: 21%;"><b>{% trans "Last seen up" %}</b></th>
-    <th style="width: 8%;" class="center"><b>{% trans "Status" %}</b></th>
-    <th style="width: 8%;" class="center"><b>{% trans "Peers" %}</b></th>
-    <th style="width: 8%;" class="center"><b>{% trans "Clients" %}</b></th>
-    <th style="width: 10%;" class="center"><b>{% trans "Project" %}</b></th>
+    <th style="width: 8%;" align="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 8%;" align="center"><b>{% trans "Peers" %}</b></th>
+    <th style="width: 8%;" align="center"><b>{% trans "Clients" %}</b></th>
+    <th style="width: 10%;" align="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 {% if user.is_authenticated %}
@@ -75,19 +75,19 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
     {% else %}
     <td>{% trans "never" %}</td>
     {% endif %}
-    <td class="center">{{ node.status_as_string|statusimage:"small" }}</td>
+    <td align="center">{{ node.status_as_string|statusimage:"small" }}</td>
     {% if node.is_down %}
     {% if node.is_invalid %}
-    <td class="center">{{ node.peers }}</td>
+    <td align="center">{{ node.peers }}</td>
     {% else %}
-    <td class="center">0</td>
+    <td align="center">0</td>
     {% endif %}
-    <td class="center">0</td>
+    <td align="center">0</td>
     {% else %}
-    <td class="center">{{ node.peers }}</td>
-    <td class="center">{{ node.clients|default:"0" }}</td>
+    <td align="center">{{ node.peers }}</td>
+    <td align="center">{{ node.clients|default:"0" }}</td>
     {% endif %}
-    <td class="center">{{ node.project|default:_("unknown") }}</td>
+    <td align="center">{{ node.project|default:_("unknown") }}</td>
   </tr>
   {% empty %}
   <tr>

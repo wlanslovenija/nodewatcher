@@ -5,6 +5,9 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <link rel="shortcut icon" href="{{ MEDIA_URL }}site/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="{{ MEDIA_URL }}site/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}common/css/trac.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}common/css/report.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}common/css/prefs.css" type="text/css" />
     <script type="text/javascript" src="{{ MEDIA_URL }}site/jquery.js"></script>
     <!--[if lt IE 7]>
     <script type="text/javascript" src="{{ MEDIA_URL }}common/js/ie_pre7_hacks.js"></script>
@@ -12,9 +15,9 @@
     <!--[if IE]>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/ie_hacks.js"></script>
     <![endif]-->
-    <!--link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/common.css" />
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/trac.css" /-->
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/screen.css" media="screen, projection" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/common.css" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/trac.css" />
+    <link rel='stylesheet' type='text/css' href='{{ MEDIA_URL }}wlanlj/css/style.css' />
     {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
     <script type="text/javascript" src="{{ MEDIA_URL }}site/folding.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>
@@ -26,8 +29,8 @@
 </head>
 
 <body>
-<div id="main">
 {% include "header.html" %}
+    <div id="main">
       <div id="ctxtnav" class="nav">
         <h2>Context Navigation</h2>
 {% block ctxtnav %}
@@ -59,8 +62,7 @@
   {% block content %}{% endblock %}
 </div>
 <div id="altlinks">{% block altlinks %}{% endblock %}</div>
-
-{% include "footer.html" %}
 </div>
+{% include "footer.html" %}
 </body>
 </html>

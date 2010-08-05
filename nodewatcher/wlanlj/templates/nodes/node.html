@@ -9,7 +9,7 @@
 
 {% block heading %}
 {% setcontext as heading %}
-{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}
+<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_small.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />&nbsp;{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}
 {% endsetcontext %}
 {{ block.super }}
 {% endblock %}
@@ -55,7 +55,13 @@
   {% endnotice %}
 {% endif %}
 
+{% heading 2 _("General Information") %}
+
 <div class="embedded">
+
+{% if node.geo_lat and node.geo_long %}
+  <div id="gmap" style="width:398px; height: 298px;"></div>
+{% endif %}
 
 {% if current_owner %}
   <div class="actions">
@@ -82,15 +88,6 @@
   </div>
 {% endif %}
 
-<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_big.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />
-
-
-{% if node.geo_lat and node.geo_long %}
-  <div id="gmap" ></div>
-{% endif %}
-
-
-
 </div>
 
 {% include "nodes/general_info_node.html" %}
@@ -104,25 +101,24 @@
   {% endif %}
 {% endif %}
 
-<div class="node_details">
 {% if not node.is_pending %}
   {% if node.is_wireless_node or node.get_stability and not node.is_dead %}
     {% heading 3 _("Node History") %}
-    <table border="0" width="300" class="proptable">
+    <table border="0" width="300" class="node_info">
       {% if node.is_wireless_node %}
         <tr>
-          <td class="proplabel">{% trans "Clients so far" %}</td>
-          <td class="propbody">{{ node.clients_so_far|default:"0" }}</td>
+          <td>{% trans "Clients so far" %}</td>
+          <td>{{ node.clients_so_far|default:"0" }}</td>
         </tr>
       {% endif %}
       {% if node.get_stability and not node.is_dead %}
         <tr>
-          <td class="proplabel">{% trans "Stability" %}</td>
-          <td class="propbody">{{ node.get_stability|default:_("unknown") }} %</td>
+          <td>{% trans "Stability" %}</td>
+          <td>{{ node.get_stability|default:_("unknown") }} %</td>
         </tr>
         <tr>
-          <td class="proplabel">{% trans "Events" %}</td>
-          <td class="propbody"><a href="{% url view_node_events node.get_current_id %}">{% trans "show list" %}</a></td>
+          <td class="first_column_width">{% trans "Events" %}</td>
+          <td><a href="{% url view_node_events node.get_current_id %}">{% trans "show list" %}</a></td>
         </tr>
       {% endif %}
     </table>
@@ -130,18 +126,18 @@
 {% endif %}
 
 {% heading 3 _("Node in the Network") %}
-<table border="0" width="300" class="proptable">
+<table border="0" width="300" class="node_info">
   <tr>
-    <td class="proplabel">{% trans "IP address" %}</td>
-    <td class="propbody">{{ node.ip }}</td>
+    <td class="first_column_width">{% trans "IP address" %}</td>
+    <td>{{ node.ip }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{% trans "System node" %}</td>
-    <td class="propbody">{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{% trans "System node" %}</td>
+    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
-    <td class="proplabel">{% trans "Border router" %}</td>
-    <td class="propbody">{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{% trans "Border router" %}</td>
+    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
 </table>
 
@@ -151,17 +147,17 @@
   {% if not node.is_down %}
     {% if node.uptime or node.is_wireless_node or node.local_time %}
       {% heading 3 _("Status Information") %}
-      <table border="0" class="layout details proptable">
+      <table border="0" class="layout details">
         {% if node.uptime %}
           <tr>
-            <td class="proplabel">{% trans "Uptime" %}</td>
-            <td class="propbody">{{ node.uptime|time_delta }}</td>
+            <td class="first_column_width">{% trans "Uptime" %}</td>
+            <td>{{ node.uptime|time_delta }}</td>
           </tr>
         {% endif %}
         {% if node.is_wireless_node or node.local_time %}
           <tr>
-            <td class="proplabel">{% trans "Local time" %}</td>
-            <td class="propbody">{{ node.local_time|default:_("unknown") }}</td>
+            <td class="first_column_width">{% trans "Local time" %}</td>
+            <td>{{ node.local_time|default:_("unknown") }}</td>
           </tr>
         {% endif %}
       </table>
@@ -170,42 +166,42 @@
 
   {% if node.is_wireless_node or node.is_mobile_node %}
     {% heading 3 _("Antenna Information") %}
-    <table border="0" class="layout details proptable">
+    <table border="0" class="layout details">
       <tr>
-        <td class="proplabel">{% trans "External antenna" %}</td>
-        <td class="propbody">{% if node.ant_external %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+        <td class="first_column_width">{% trans "External antenna" %}</td>
+        <td>{% if node.ant_external %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
       </tr>
       {% if node.ant_external %}
         <tr>
-          <td class="proplabel">{% trans "Type" %}</td>
-          <td class="propbody">{{ node.ant_type_as_string|lower }}</td>
+          <td>{% trans "Type" %}</td>
+          <td>{{ node.ant_type_as_string|lower }}</td>
         </tr>
         <tr>
-          <td class="proplabel">{% trans "Polarization" %}</td>
-          <td class="propbody">{{ node.ant_polarization_as_string|lower }}</td>
+          <td>{% trans "Polarization" %}</td>
+          <td>{{ node.ant_polarization_as_string|lower }}</td>
         </tr>
       {% endif %}
     </table>
 
     {% if node.profile %}
       {% heading 3 _("Image Generator Information") %}
-      <table border="0" class="layout details proptable">
+      <table border="0" class="layout details">
         <tr>
-          <td class="proplabel">{% trans "Router type" %}</td>
-          <td class="propbody">{{ node.profile.template.name|default:_("unknown") }}</td>
+          <td class="first_column_width">{% trans "Router type" %}</td>
+          <td>{{ node.profile.template.name|default:_("unknown") }}</td>
         </tr>
         <tr>
-          <td class="proplabel">{% trans "VPN enabled" %}</td>
-          <td class="propbody">{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+          <td>{% trans "VPN enabled" %}</td>
+          <td>{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
         </tr>
         <tr>
-          <td class="proplabel">{% trans "Captive portal enabled" %}</td>
-          <td class="propbody">{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+          <td>{% trans "Captive portal enabled" %}</td>
+          <td>{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
         </tr>
         {% if current_owner and node.installedpackage_set.all %}
           <tr>
-            <td class="proplabel">{% trans "Installed packages" %}</td>
-            <td class="propbody"><a href="{% url view_node_packages node.get_current_id %}">{% trans "show list" %}</a></td>
+            <td>{% trans "Installed packages" %}</td>
+            <td><a href="{% url view_node_packages node.get_current_id %}">{% trans "show list" %}</a></td>
           </tr>
         {% endif %}
       </table>
@@ -213,41 +209,41 @@
     
     {% if not node.is_down %}
       {% heading 3 _("Node Configuration") %}
-      <table border="0" class="layout details proptable">
+      <table border="0" class="layout details">
         {% if node.firmware_version %}
           <tr>
-            <td class="proplabel">{% trans "Firmware version" %}</td>
-            <td class="propbody">{{ node.firmware_version|default:_("unknown") }}</td>
+            <td>{% trans "Firmware version" %}</td>
+            <td>{{ node.firmware_version|default:_("unknown") }}</td>
           </tr>
         {% endif %}
         <tr>
-          <td class="proplabel">{% trans "BSSID" %}</td>
-          <td class="propbody">{{ node.bssid|default:_("unknown") }}</td>
+          <td class="first_column_width">{% trans "BSSID" %}</td>
+          <td>{{ node.bssid|default:_("unknown") }}</td>
         </tr>
         <tr>
-          <td class="proplabel">{% trans "ESSID" %}</td>
-          <td class="propbody">{{ node.essid|default:_("unknown") }}</td>
+          <td>{% trans "ESSID" %}</td>
+          <td>{{ node.essid|default:_("unknown") }}</td>
         </tr>
         {% if node.wifi_mac and current_owner %}
           <tr>
-            <td class="proplabel">{% trans "MAC" %}</td>
-            <td class="propbody">{{ node.wifi_mac|default:_("unknown") }}</td>
+            <td>{% trans "MAC" %}</td>
+            <td>{{ node.wifi_mac|default:_("unknown") }}</td>
           </tr>
         {% endif %}
         <tr>
-          <td class="proplabel">{% trans "Channel" %}</td>
-          <td class="propbody">{{ node.channel|default:_("unknown") }}</td>
+          <td>{% trans "Channel" %}</td>
+          <td>{{ node.channel|default:_("unknown") }}</td>
         </tr>
         {% if node.thresh_rts %}
           <tr>
-            <td class="proplabel">{% trans "RTS threshold" %}</td>
-            <td class="propbody">{{ node.thresh_rts|default:_("unknown") }} B {% if node.is_max_rts_threshold %}(off){% endif %}</td>
+            <td>{% trans "RTS threshold" %}</td>
+            <td>{{ node.thresh_rts|default:_("unknown") }} B {% if node.is_max_rts_threshold %}(off){% endif %}</td>
           </tr>
         {% endif %}
         {% if node.thresh_frag %}
           <tr>
-            <td class="proplabel">{% trans "Fragmentation threshold" %}</td>
-            <td class="propbody">{{ node.thresh_frag|default:_("unknown") }} B {% if node.is_max_frag_threshold %}(off){% endif %}</td>
+            <td>{% trans "Fragmentation threshold" %}</td>
+            <td>{{ node.thresh_frag|default:_("unknown") }} B {% if node.is_max_frag_threshold %}(off){% endif %}</td>
           </tr>
         {% endif %}
       </table>
@@ -255,7 +251,7 @@
   {% endif %}
 
 {% endif %}
-</div>
+
 {% heading 2 _("Subnets") "clear" %}
 <p>{% blocktrans %}A node announces subnets to the rest of the network so traffic for network equipment (like clients'
 computers) connected (wirelessly or directly) to the node can be routed from the network to the node for it to pass the

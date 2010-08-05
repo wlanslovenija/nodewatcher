@@ -38,15 +38,15 @@
 <form method="post" action="{% url renumber_node node.pk %}">
 {% csrf_token %}
 <div style='display:none'>{{ form.confirm_all_warnings }}</div>
-<table border="0" class="proptable">
+<table border="0" width="700">
   <tr>
-    <td class="proplabel"><b>{% trans "Current allocation" %}</b></td>
-    <td class="propbody"><b>{% trans "Renumber action" %}</b></td>
+    <td class="first_column_width"><b>{% trans "Current allocation" %}</b></td>
+    <td><b>{% trans "Renumber action" %}</b></td>
   </tr>
   {% for subnet in form.get_subnet_fields %}
   <tr>
-    <td class="proplabel">{{ subnet.model }}</td>
-    <td class="propbody">
+    <td valign="top">{{ subnet.model }}</td>
+    <td>
       {{ subnet }}
       <div class="prefix_len_{{ subnet.prefix }}">
         {% trans "New prefix length:" %}&nbsp;

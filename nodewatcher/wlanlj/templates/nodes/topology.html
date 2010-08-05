@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<img id="topology" src="{{ MEDIA_URL }}graphs/network_topology.png" alt="{% trans "Network Topology View" %}" /><br/>
+<img src="{{ MEDIA_URL }}graphs/network_topology.png" alt="{% trans "Network Topology View" %}" /><br/>
 <div class="legend">
 {% url network_map as network_map %}
 <p>{% blocktrans %}Network topology shows how are nodes in the network connected to each other. Each node can have multiple
@@ -59,20 +59,4 @@ link quality) is to 1.0 better it is.{% endblocktrans %}</p>
   <ul>
     <li class="first last"><a href="{{ MEDIA_URL }}graphs/network_topology.dot">{% trans "Dot File" %}</a></li>
   </ul>
-{% endblock %}
-
-{% block js %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/ddpowerzoomer.js"></script>
-<script type="text/javascript">
-/* <![CDATA[ */
-    $(document).ready(function() {    	
-    	$("#topology").addpowerzoom({
-		defaultpower: 2,
-		powerrange: [2,5],
-		largeimage: "{{ MEDIA_URL }}graphs/network_topology.png",
-		magnifiersize: [200,200] 
-	});
-    });
-/* ]]> */
-</script>
 {% endblock %}

@@ -28,19 +28,19 @@ info sticker. A PDF will then be generated that you can print out and include on
 {% endnotice %}
 <form action="{% url my_sticker %}" method="post">
 {% csrf_token %}
-<table border="0" class="proptable">
+<table border="0" width="700">
 
   <tr>
-    <td class="proplabel">{{ form.project.label }}</td>
-    <td class="propbody">{{ form.project }}</td>
+    <td>{{ form.project.label }}</td>
+    <td>{{ form.project }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.name.label }}</td>
-    <td class="propbody">{{ form.name }}</td>
+    <td>{{ form.name.label }}</td>
+    <td>{{ form.name }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.phone.label }}</td>
-    <td class="propbody">{{ form.phone }}</td>
+    <td>{{ form.phone.label }}</td>
+    <td>{{ form.phone }}</td>
   </tr>
 </table>
   <div class="buttons">

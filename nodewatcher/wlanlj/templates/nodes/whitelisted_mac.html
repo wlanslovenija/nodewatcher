@@ -46,26 +46,24 @@
   {% endfor %}
 </tbody>
 </table>
-
-<h3>{% trans "Add a new MAC address" %}</h3>
-<div class="notice">{% blocktrans %}Enter a MAC address (physical address of your computer's WiFi interface) to be whitelisted on all nodes,
+<p>{% blocktrans %}Enter a MAC address (physical address of your computer's WiFi interface) to be whitelisted on all nodes,
 so no splash screen confirmation will be needed when connecting with your computer to the network. Please note that after you
 enter an address it might take up to a full day for the address to be whitelisted by all nodes participating in the network, so
-be patient!{% endblocktrans %}</div>
+be patient!{% endblocktrans %}</p>
 <form action="{% url web.nodes.views.whitelisted_mac %}" method="post">
 {% csrf_token %}
-<table border="0" class="proptable">
+<table border="0" width="700">
   <tr>
-    <td class="proplabel">{{ form.mac.label }}</td>
-    <td class="propbody">{{ form.mac }}</td>
+    <td>{{ form.mac.label }}</td>
+    <td>{{ form.mac }}</td>
   </tr>
   <tr>
-    <td class="proplabel"></td>
-    <td class="propbody propdescription">MAC address should be in the format <tt>XX:XX:XX:XX:XX</tt> or <tt>XX-XX-XX-XX-XX-XX</tt>.</td>
+    <td></td>
+    <td class="small_text">MAC address should be in the format <tt>XX:XX:XX:XX:XX</tt> or <tt>XX-XX-XX-XX-XX-XX</tt>.</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.description.label }}</td>
-    <td class="propbody">{{ form.description }}</td>
+    <td>{{ form.description.label }}</td>
+    <td>{{ form.description }}</td>
   </tr>
 </table>
 <div class="buttons">

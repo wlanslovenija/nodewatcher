@@ -21,23 +21,23 @@
 {% blocktrans %}Do not forget that you must update the node's router configuration to reflect some subnet changes. You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}
 {% endnotice %}
 
-{% include "nodes/general_info.html" %}
+{% include "nodes/general_info_small.html" %}
 
 {% heading 2 _("Subnet Information") %}
 <form method="post" action="{% url edit_subnet node.pk subnet.id %}">
 {% csrf_token %}
-<table border="0" class="layout proptable">
+<table border="0" class="layout">
   <tr>
-    <td class="proplabel">{% trans "Subnet" %}</td>
-    <td class="propbody">{{ subnet }} [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</td>
+    <td class="first_column_width">{% trans "Subnet" %}</td>
+    <td>{{ subnet }} [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.description.label }}</td>
-    <td class="propbody">{{ form.description }}</td>
+    <td>{{ form.description.label }}</td>
+    <td>{{ form.description }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.dhcp.label }}</td>
-    <td class="propbody">{{ form.dhcp }}</td>
+    <td>{{ form.dhcp.label }}</td>
+    <td>{{ form.dhcp }}</td>
   </tr>
 </table>
 

@@ -21,37 +21,37 @@
 {% blocktrans %}A new subnet will be allocated from the IP pool for your node as soon as you press <i>Allocate</i> below. Do not forget that you must <b>update the node's router configuration</b> to reflect subnet allocation changes. You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}
 {% endnotice %}
 
-{% include "nodes/general_info.html" %}
+{% include "nodes/general_info_small.html" %}
 
 {% heading 2 _("Subnet Information") %}
 <form method="post" action="{% url allocate_subnet node.pk %}">
 {% csrf_token %}
-<table border="0" class="layout proptable">
+<table border="0" class="layout">
   {% if user.is_staff %}
   <tr>
-    <td class="proplabel">{{ form.network.label }}</td>
-    <td class="propbody">{{ form.network }}</td>
+    <td>{{ form.network.label }}</td>
+    <td>{{ form.network }}</td>
   </tr>
   <tr>
-    <td class="proplabel"></td>
-    <td class="propbody propdescription">{% trans "Leave blank for auto-allocation." %}</td>
+    <td></td>
+    <td class="small_text">{% trans "Leave blank for auto-allocation." %}</td>
   </tr>
   {% endif %}
   <tr>
-    <td class="proplabel">{{ form.pool.label }}</td>
-    <td class="propbody">{{ form.pool }}</td>
+    <td>{{ form.pool.label }}</td>
+    <td>{{ form.pool }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.prefix_len.label }}</td>
-    <td class="propbody"><select name="prefix_len" id="id_prefix_len"></select></td>
+    <td>{{ form.prefix_len.label }}</td>
+    <td><select name="prefix_len" id="id_prefix_len"></select></td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.description.label }}</td>
-    <td class="propbody">{{ form.description }}</td>
+    <td>{{ form.description.label }}</td>
+    <td>{{ form.description }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.dhcp.label }}</td>
-    <td class="propbody">{{ form.dhcp }}</td>
+    <td>{{ form.dhcp.label }}</td>
+    <td>{{ form.dhcp }}</td>
   </tr>
 </table>
   <div class="buttons">

@@ -42,30 +42,30 @@
 <form method="post" action="{% url generate_node node.pk %}">
 {% csrf_token %}
 {% heading 2 _("Image Generator Information") %}
-<table border="0" class="proptable">
+<table border="0" width="700">
   {% if user.is_staff %}
   <tr>
-    <td class="proplabel">{{ form.email_user.label }}</td>
-    <td class="propbody">{{ form.email_user }}</td>
+    <td>{{ form.email_user.label }}</td>
+    <td>{{ form.email_user }}</td>
   </tr>
   {% endif %}
   <tr>
-    <td class="proplabel">{% trans "Router type" %}</td>
-    <td class="propbody">{{ node.profile.template.name }}</td>
+    <td class="first_column_width">{% trans "Router type" %}</td>
+    <td>{{ node.profile.template.name }}</td>
   </tr>
   <tr>
-    <td class="proplabel">{% trans "Enable VPN" %}</td>
-    <td class="propbody">{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{% trans "Enable VPN" %}</td>
+    <td>{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
-    <td class="proplabel">{% trans "Enable captive portal" %}</td>
-    <td class="propbody">{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{% trans "Enable captive portal" %}</td>
+    <td>{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
-    <td class="proplabel">{{ form.config_only.label }}</td>
-    <td class="propbody">
+    <td valign="top">{{ form.config_only.label }}</td>
+    <td>
       {{ form.config_only }}<br/>
-      <span class="propdescription">{% blocktrans with documentation_links.custom_image as custom_image_url %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="{{ custom_image_url }}">custom node</a>.{% endblocktrans %}</span>
+      <span class="small_text">{% blocktrans with documentation_links.custom_image as custom_image_url %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="{{ custom_image_url }}">custom node</a>.{% endblocktrans %}</span>
     </td>
   </tr>
 </table>

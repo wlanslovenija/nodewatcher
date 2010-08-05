@@ -1,0 +1,480 @@
+/* compass watch Documents/Graphics/Design/wlan-lj/nodewatcher/ --css-dir ../../../../../workspace/nodewatcher/static/css -s compact --images-dir ../../../../../workspace/nodewatcher/static/css/images --relative-assets <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+/* line 14, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td { margin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family: inherit; vertical-align: baseline; }
+
+/* line 17, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+body { line-height: 1; color: black; background: white; }
+
+/* line 19, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+ol, ul { list-style: none; }
+
+/* line 21, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+table { border-collapse: separate; border-spacing: 0; vertical-align: middle; }
+
+/* line 23, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+caption, th, td { text-align: left; font-weight: normal; vertical-align: middle; }
+
+/* line 25, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q, blockquote { quotes: "" ""; }
+/* line 96, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after { content: ""; }
+
+/* line 27, ../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+a img { border: none; }
+
+@import url(bullets.css);
+/* line 32, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+body { margin: 0px; background: #f0f0f0 url('images/background.png?1280868160') repeat-y top center; color: #656565; font-family: Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif; font-size: 13px; font-size-adjust: none; font-style: normal; font-variant: normal; font-weight: normal; line-height: normal; }
+
+/* line 45, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+a { text-decoration: none; }
+/* line 64, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+a:link { color: #ff8905; }
+/* line 69, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+a:visited { color: #e16b00; }
+/* line 73, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+a:link:hover, a:visited:hover { text-decoration: underline; }
+/* line 76, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+a h1 :link, a h1 :visited, a h2 :link, a h2 :visited, a h3 :link, a h3 :visited, a h4 :link, a h4 :visited, a h5 :link, a h5 :visited, a h6 :link, a h6 :visited { color: inherit; }
+/* line 80, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+a .ext-link .icon { background: url(../extlink.gif) center center no-repeat; padding-left: 12px; }
+/* line 84, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+a .mail-link .icon { background: url(../envelope.png) center center no-repeat; padding-left: 14px; }
+
+@media screen { /* line 50, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+  a.ext-link .icon { background: url(../extlink.gif) center center no-repeat; padding-left: 12px; }
+  /* line 54, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+  a.mail-link .icon { background: url(../envelope.png) center center no-repeat; padding-left: 14px; } }
+
+/* line 60, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.anchor:link, .anchor:visited, .anchor:link:hover, .anchor:visited:hover { border: none; color: #ffcf4b; font-size: 80%; vertical-align: text-top; text-decoration: none; }
+
+/* line 68, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+* > .anchor:link, * > .anchor:visited { visibility: hidden; }
+
+/* line 73, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h1:hover .anchor, h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, h5:hover .anchor, h6:hover .anchor { visibility: visible; }
+
+/* line 77, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h1, h2, h3, h4 { font-weight: bold; letter-spacing: -0.018em; page-break-after: avoid; }
+
+/* line 82, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h1 { font-size: 1.445em; margin: .15em 0 0.5em 0; vertical-align: bottom; }
+
+/* line 83, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h2 { font-size: 1.19em; margin: .10em 0 0.4em 0; }
+
+/* line 84, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h3 { font-size: 1.063em; margin: .7em 0 0.2em 0; }
+
+/* line 85, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+hr { border: none; border-top: 1px solid #ccb; margin: 2em 0; }
+
+/* line 86, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+address { font-style: normal; }
+
+/* line 87, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+img { border: none; }
+
+/* line 89, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#header { margin: 0px auto; width: 700px; height: 130px; background: transparent url('images/header.png?1281039910') no-repeat bottom left; }
+/* line 94, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#header h1 { padding: 40px 0 0 10px; color: #ff8905; overflow: hidden; font-size: 2.125em; margin: 0; }
+/* line 95, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#header h2 { padding: 0 0 0 10px; color: #656565; margin: 0; }
+/* line 96, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#header h1 a, #header h1 a:hover, #header h2 a, #header h2 a:hover { text-decoration: none; color: inherit; }
+
+/* line 99, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#footer { padding: 30px 10px; font-size: 0.765em; text-align: center; color: #6f6f6f; }
+/* line 104, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#footer a { text-decoration: none; }
+/* line 64, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#footer a:link { color: #474747; }
+/* line 69, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#footer a:visited { color: #292929; }
+/* line 73, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#footer a:link:hover, #footer a:visited:hover { text-decoration: underline; }
+/* line 76, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#footer a h1 :link, #footer a h1 :visited, #footer a h2 :link, #footer a h2 :visited, #footer a h3 :link, #footer a h3 :visited, #footer a h4 :link, #footer a h4 :visited, #footer a h5 :link, #footer a h5 :visited, #footer a h6 :link, #footer a h6 :visited { color: inherit; }
+/* line 80, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#footer a .ext-link .icon { background: url(../extlink.gif) center center no-repeat; padding-left: 12px; }
+/* line 84, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#footer a .mail-link .icon { background: url(../envelope.png) center center no-repeat; padding-left: 14px; }
+
+/* line 107, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#main { background: white; margin: 0px auto; width: 700px; margin-top: 0px; min-height: 300px; border: 1px solid #ffcc95; border-width: 0 1px; }
+/* line 115, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#main h1 { clear: none; }
+
+/* line 118, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks { clear: both; text-align: center; }
+/* line 120, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks h3 { font-size: 1.02em; letter-spacing: normal; margin: 0; }
+/* line 121, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks ul { list-style: none; margin: 0; padding: 0 0 1em; }
+/* line 122, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks li { display: inline; font-size: 11px; line-height: 1.5; padding: 0 1em; white-space: nowrap; }
+/* line 129, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks li.last { border-right: none; }
+/* line 130, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks li :link, #altlinks #altlinks li :visited { background-repeat: no-repeat; color: #666; border: none; padding: 0 0 2px; }
+/* line 136, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#altlinks li a.rss { background-image: url('images/feed.png?1258488918'); padding-left: 20px; }
+
+/* line 139, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#tabs { float: right; }
+/* line 141, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#tabs li { display: inline; padding: 0 5px; white-space: nowrap; }
+/* line 146, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#tabs h2, #tabs hr { display: none; }
+/* line 147, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#tabs ul { list-style: none; margin: 0; text-align: right; }
+
+/* line 151, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.nav li { display: inline; padding: 0 .75em; white-space: nowrap; }
+/* line 156, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.nav h2, .nav hr { display: none; }
+/* line 157, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.nav ul { list-style: none; margin: 0; text-align: right; }
+
+/* line 160, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#metanav { position: absolute; top: 10px; overflow: hidden; width: 400px; margin: 0; padding: 0; border: 0; outline: 0; overflow: hidden; display: inline-block; }
+/* line 166, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#metanav ul { margin: 0 0 0 10px; font-size: 0.85em; padding: 0px; text-align: left; width: 100%; }
+/* line 172, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#metanav ul li { border-width: 0px; }
+/* line 56, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#metanav li { list-style-image: none; list-style-type: none; margin-left: 0px; white-space: nowrap; display: inline; float: left; background: transparent url('images/bulletgray.png?1280954537') no-repeat center left; padding-left: 9px; padding-right: 5px; }
+/* line 43, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#metanav li:first-child, #metanav li.first { background: none; padding-left: 0px; }
+/* line 46, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+#metanav li:last-child, #metanav li.last { padding-right: 0px; }
+
+/* line 178, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#ctxtnav { height: 1em; font-size: 0.977em; padding: 5px 0 8px 0; background-color: #ffcc95; font-weight: bold; text-align: center; }
+/* line 185, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#ctxtnav ul { padding: 0; display: inline; margin: 0; }
+/* line 189, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#ctxtnav ul li { padding: 0; color: #656565; }
+/* line 190, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#ctxtnav ul li :link, #ctxtnav ul li :visited { padding: 0 10px; color: #656565; }
+
+/* line 194, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing { margin-top: 0px; clear: both; border-bottom: 1px solid #cccccc; border-collapse: collapse; border-spacing: 0; width: 100%; }
+/* line 97, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing th { text-align: left; padding: 0 1em .1em 0; font-size: 12px; }
+/* line 102, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing th.asc a, table.listing th.desc a { font-weight: bold; background-position: 100% 50%; background-repeat: no-repeat; }
+/* line 103, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing th.asc a { background-image: url(../asc.png); }
+/* line 104, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing th.desc a { background-image: url(../desc.png); }
+/* line 105, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing td.center { text-align: center; }
+/* line 106, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing thead { background: #dadada; }
+/* line 107, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing thead th { border: 1px solid #c2c2c2; border-bottom-color: #cccccc; font-size: 11px; font-weight: bold; padding: 2px .5em; vertical-align: bottom; }
+/* line 114, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing thead th :link:hover, table.listing thead th :visited:hover { background-color: transparent; }
+/* line 115, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing thead th a { border: none; padding-right: 12px; }
+/* line 119, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody tr { border-top: 1px solid #cccccc; }
+/* line 120, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody tr.even { background-color: #f3f3f3; }
+/* line 121, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody tr.odd { background-color: #e9e9e9; }
+/* line 122, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody tr:hover { background: #dfdfdf; }
+/* line 123, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody tr.focus { background: #dfdfdf; }
+/* line 124, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody td, table.listing tbody th { border: 1px dotted #d6d6d6; padding: .3em .5em; vertical-align: top; }
+/* line 125, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tbody td, table.listing tbody td a:hover, table.listing tbody th a:hover { background-color: transparent; }
+/* line 127, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/_rapid.scss */
+table.listing tfoot td { background-color: #eeeeee; padding: 5px; text-align: center; border: 1px solid #cccccc; }
+/* line 197, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing tbody tr.section_title:hover, table.listing tbody tr.section_title:focus, table.listing tbody tr.section_title { background-color: #FFFFFF; }
+/* line 198, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing tbody tr.webclient { background-color: #EEFFD6; }
+/* line 199, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing tbody tr.webclient td.name { font-weight: bold; }
+/* line 202, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing tbody td.notice, table.listing tbody th.notice { padding: 5px; border: 1px solid #D7D7D7; background-color: #E1FFB8; color: #3D6744; text-align: center; }
+/* line 210, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing .section_title td { font-weight: bold; }
+/* line 212, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing .section_title td h3 { margin: 0; }
+/* line 215, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.listing tbody td.center { text-align: center; }
+
+/* line 220, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+input[type="text"], input[type="password"], input.textwidget { padding: 0.25em 0.5em; }
+
+/* line 221, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+input[type="text"], input[type="password"], input.textwidget, textarea { border: 1px solid #D7D7D7; }
+
+/* line 222, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+input[type=text]:focus, input[type="password"]:focus, input.textwidget:focus, textarea:focus { border: 1px solid #886; }
+
+/* line 226, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+input[type="button"]:hover, input[type="submit"]:hover, input[type="reset"]:hover { background: #E5E5E5 none repeat scroll 0% 0%; }
+
+/* line 232, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+input[type="button"], input[type="submit"], input[type="reset"] { background: #EEEEEE none repeat scroll 0% 0%; border: 1px solid #CCCCCC; color: #222222; padding: 0.1em 0.5em; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; }
+
+/* line 242, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content { padding: 15px 20px 20px 20px; clear: both; }
+/* line 246, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content abbr { cursor: help; border-bottom: 1px dotted __text__; font-size: 0.68em; text-transform: uppercase; }
+/* line 253, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content table.layout { width: 660px; }
+/* line 257, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable { width: 660px; margin: 3px 0 15px 0; clear: none; }
+/* line 261, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable td { padding: 5px; vertical-align: top; }
+/* line 262, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable td.proplabel { width: 198px; background: #f5f5f5; font-weight: bold; }
+/* line 267, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable td.propbody { width: 462.0px; }
+/* line 270, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable .propdescription { font-size: 0.722em; color: #838383; }
+/* line 274, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable.narrow { font-size: 1.275em; width: 360px; }
+/* line 277, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable.narrow td.proplabel { width: 108px; background: none; }
+/* line 278, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .proptable.narrow td.propbody { width: 252.0px; }
+/* line 282, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .small_text { font-size: 0.68em; color: #838383; }
+/* line 288, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content.nodes .node_details { clear: both; }
+/* line 292, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#content .buttons { text-align: right; }
+
+/* line 297, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h3.folding { cursor: pointer; margin: 20px 20px 10px 20px; background: transparent url('images/folding_show.png?1280691309') bottom left no-repeat; border-top: 1px solid #CCCCCC; padding-left: 20px; padding-top: 5px; }
+/* line 304, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h3.folding.closed { background: transparent url('images/folding_hide.png?1280691303') bottom left no-repeat; }
+/* line 305, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h3.folding:hover { background: transparent url('images/folding_show_hover.png?1280691298') bottom left no-repeat; }
+/* line 306, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+h3.folding.closed:hover { background: transparent url('images/folding_hide_hover.png?1280691284') bottom left no-repeat; }
+
+/* line 313, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.table_links { text-align: center; }
+
+/* line 315, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.nodelist table.listing td { font-size: 12px; }
+
+/* line 319, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.inner_header { background-color: #F2FBE4; font-weight: bold; }
+
+/* line 324, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.error { -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; width: 620px; margin: 10px; padding: 5px; border: 1px solid #CD2D1D; background-color: #FFEBE9; color: #930E00; text-align: center; }
+
+/* line 335, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.warning { -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; width: 620px; margin: 10px; padding: 5px; border: 1px solid #cdc71d; background-color: #fffee9; color: #938c00; text-align: center; }
+
+/* line 346, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.notice { -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; width: 620px; margin: 10px; padding: 5px; border: 1px solid #95DA3A; background-color: #E1FFB8; color: #3D6744; text-align: center; }
+
+/* line 357, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.embedded { float: right; }
+/* line 359, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.embedded #gmap { width: 300px; height: 250px; }
+/* line 364, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.embedded .actions { width: 300px; }
+
+/* line 372, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.gmap_wrapper #gmap { border: 1px solid #D7D7D7; width: 660px; height: 660px; }
+/* line 378, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.gmap_wrapper #gmap_statusbar { font-size: 0.68em; color: #838383; }
+
+/* line 385, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+#topology { max-width: 660px; }
+
+/* line 393, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphdesc { color: #666; font-size: 85%; text-align: center; clear: both; margin-bottom: 10px; margin-left: auto; margin-right: auto; width: 566px; }
+/* line 402, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphdesc ul { padding: 0; }
+/* line 404, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphdesc ul li { list-style: none; margin-left: 0; }
+
+/* line 408, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.details_title { clear: both; }
+
+/* line 412, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.smallnodeinfo { float: right; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; background-color: #F5F7F5; border: medium none; padding: 5px; margin-right: 5px; width: auto; }
+
+/* line 422, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.smallnodeinfo .first_column_width { width: 100px; }
+
+/* line 426, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.smallnodeinfo td { font-size: 60%; }
+
+/* line 430, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.summary { background: #ffd; border: 1px outset #996; margin-top: 1em; padding: .5em 1em; position: relative; }
+
+/* line 438, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.networksummary h2 { margin-top: 20px; }
+
+/* line 442, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.networksummary table.layout td.nodes { text-align: center; vertical-align: baseline; font-size: 2em; font-weight: bold; }
+
+/* line 449, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend { font-size: 90%; padding: 0px 10px; }
+/* line 452, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend dl { padding: 5px 2px 15px 2px; }
+/* line 453, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend dt { display: table-cell; white-space: nowrap; }
+/* line 454, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend dt:after { margin-left: 0.5em; content: '–'; white-space: nowrap; }
+/* line 455, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend dl dt img { vertical-align: middle; }
+/* line 456, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend dd { display: table-cell; padding-left: 0.5em; }
+/* line 457, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.legend dd.defintion_end { display: block; height: 0; }
+
+/* line 460, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.status_legend dt img { position: absolute; margin-left: -20px; margin-top: -0.5em; }
+
+/* line 466, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.status_legend dt { padding-left: 20px; padding-top: 0.25em; padding-bottom: 0.25em; }
+
+/* line 472, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.gmap_details { font-size: 80%; }
+
+/* line 476, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.optional_packages ul { padding: 0 0 0 0; }
+
+/* line 480, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.optional_packages ul li { list-style-type: none; }
+
+/* line 484, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphmenu { text-align: left; margin: 0 auto; width: 566px; }
+
+/* line 490, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphmenu .timespan { float: right; }
+
+/* line 494, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.dataTables_wrapper { clear: both; }
+/* line 496, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.dataTables_wrapper input { font-size: 0.68em; }
+
+/* line 499, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.dataTables_filter { width: 50%; float: right; text-align: right; color: #CCCCCC; }
+
+/* line 506, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.dataTables_info { width: 40%; float: left; padding: 5px; color: #CCCCCC; }
+
+/* line 513, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.sorting_asc { background: url('images/sort_asc.png?1280691717') no-repeat center right; cursor: pointer; }
+
+/* line 518, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.sorting_desc { background: url('images/sort_desc.png?1280691717') no-repeat center right; cursor: pointer; }
+
+/* line 523, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.sorting { background: url('images/sort_both.png?1280691717') no-repeat center right; cursor: pointer; }
+
+/* line 528, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.sorting_asc_disabled { background: url('images/sort_asc_disabled.png?1280691717') no-repeat center right; cursor: pointer; }
+
+/* line 533, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.sorting_desc_disabled { background: url('images/sort_desc_disabled.png?1280691717') no-repeat center right; cursor: pointer; }
+
+/* line 538, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.dataTables_empty { text-align: center; }
+
+/* line 543, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.subnet td.status, tr.subnet td.timestamp { text-align: center; }
+
+/* line 547, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.subnet .description { margin-left: 5px; font-size: 10px; color: #979797; }
+
+/* line 553, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.conflicting .identifier { color: red; font-weight: bold; }
+
+/* line 558, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.conflicting .conflict { color: red; font-size: 10px; }
+
+/* line 563, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.conflicting .conflict ul { margin: 0px; padding: 0px 10px; }
+
+/* line 568, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+tr.conflicting .conflict li { list-style-type: none; }
+
+/* line 573, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.warnings td { padding: 5px; vertical-align: top; }
+/* line 577, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.warnings .help, table.warnings .datetime { font-size: 10px; color: #938C00; }
+/* line 581, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+table.warnings .icon { width: 20px; }
+
+/* line 586, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphs { text-align: center; }
+/* line 587, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphs div.graph { text-align: center; clear: both; margin-bottom: 10px; }
+/* line 593, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphs .timespan { padding: 3px 0 20px 0; margin: 0 0 5px 0; background: white url('images/timespan.png?1280772880') no-repeat bottom center; width: 660px; border-bottom: solid white 6px; }
+/* line 599, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphs .timespan a { -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; color: #999999; padding: 2px 5px; margin-left: 4px; font-size: 90%; }
+/* line 606, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphs .timespan a:hover { background-color: #EEEEEE; text-decoration: none; }
+/* line 610, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.graphs .timespan a.selected, .graphs .timespan a.selected:hover { background-color: #CCCCCC; color: white; text-decoration: none; }
+
+/* line 618, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.details .first_column_width { width: 300px; }
+
+/* line 622, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.first_column_width { width: 200px; }
+
+/* line 626, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.no-top-margin { margin-top: 0px; }
+
+/* line 630, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.permalink { float: right; margin-top: 0.4em; }
+
+/**
+** Status colors
+**/
+/* line 639, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_up { color: #007B0F; }
+
+/* line 641, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_invalid { color: #F8C901; }
+
+/* line 643, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_awaitingrenumber { color: #5EA1EF; }
+
+/* line 645, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_new { color: #88BD32; }
+
+/* line 647, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_visible { color: #00ADD1; }
+
+/* line 649, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_down { color: #CB0000; }
+
+/* line 651, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_duped { color: #7E0097; }
+
+/* line 653, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.node_status_pending { color: #B1B1B1; }
+
+/* line 655, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.subnet_status_notannounced { color: #ff0000; }
+
+/* line 657, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.subnet_status_ok { color: #007B0F; }
+
+/* line 659, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.subnet_status_notallocated { color: #FFA82F; }
+
+/* line 661, ../../../../Documents/Graphics/Design/wlan-lj/nodewatcher/src/screen.scss */
+.subnet_status_collision { color: #ff0000; }

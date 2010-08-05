@@ -92,7 +92,7 @@ if getattr(settings, 'DEBUG', None) and not settings.MEDIA_URL.startswith('http'
   # Server static files with Django when running in debug mode and MEDIA_URL is local
   
   static_patterns = patterns('',
-    url(r'^(?P<path>(?:common|css|graphs|images|js|site|stickers)/.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    url(r'^(?P<path>(?:common|css|graphs|images|js|site|stickers|wlanlj|wlansi)/.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
   )
   
   media_url = settings.MEDIA_URL.lstrip('/')

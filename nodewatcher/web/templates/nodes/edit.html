@@ -21,79 +21,79 @@
 {% heading 2 _("General Information") %}
 <form method="post" action="{% url edit_node node.pk %}">
 {% csrf_token %}
-<table border="0" width="700">
+<table border="0" class="proptable">
   <tr class="dead_active">
-    <td class="first_column_width">{{ form.node_type.label }}</td>
-    <td>{{ form.node_type }}</td>
+    <td class="proplabel">{{ form.node_type.label }}</td>
+    <td class="propbody">{{ form.node_type }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">{% blocktrans %}You can mark node as dead by choosing <i>Dead node</i> node type. Consider using that instead of removing the node which has some history.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans %}You can mark node as dead by choosing <i>Dead node</i> node type. Consider using that instead of removing the node which has some history.{% endblocktrans %}</td>
   </tr>
   <tr>
-    <td>{{ form.project.label }}</td>
-    <td>{{ form.project }}</td>
+    <td class="proplabel">{{ form.project.label }}</td>
+    <td class="propbody">{{ form.project }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">{% blocktrans %}Project (pre)defines different aspects of the node (initial location, IP pools, splash screen, SSID, installed packages...).{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans %}Project (pre)defines different aspects of the node (initial location, IP pools, splash screen, SSID, installed packages...).{% endblocktrans %}</td>
   </tr>
   <tr>
-    <td>{{ form.owner.label }}</td>
-    <td>{{ form.owner }}</td>
+    <td class="proplabel">{{ form.owner.label }}</td>
+    <td class="propbody">{{ form.owner }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">{% blocktrans %}You can pass maintainership of the node to somebody else but be careful as you will lose maintainership over it yourself.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans %}You can pass maintainership of the node to somebody else but be careful as you will lose maintainership over it yourself.{% endblocktrans %}</td>
   </tr>
   <tr>
-    <td>{{ form.name.label }}</td>
-    <td>{{ form.name }}</td>
+    <td class="proplabel">{{ form.name.label }}</td>
+    <td class="propbody">{{ form.name }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">{% url view_node node.pk as permalink %}{% url nodes_list as nodes_list %}{% blocktrans %}Name should represent location of the node or a common name of the space (building, park...) where the node is. Please refer to <a href="{{ nodes_list }}" rel="external">existing nodes</a> for examples.<br />If you rename the node do not forget to update links containing node's name you maybe made elsewhere. This is why it is better to use [<a href="{{ permalink }}">permalink</a>] when linking to the node.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% url view_node node.pk as permalink %}{% url nodes_list as nodes_list %}{% blocktrans %}Name should represent location of the node or a common name of the space (building, park...) where the node is. Please refer to <a href="{{ nodes_list }}" rel="external">existing nodes</a> for examples.<br />If you rename the node do not forget to update links containing node's name you maybe made elsewhere. This is why it is better to use [<a href="{{ permalink }}">permalink</a>] when linking to the node.{% endblocktrans %}</td>
   </tr>
   <tr class="location_opts">
-    <td>{{ form.location.label }}</td>
-    <td>{{ form.location }}</td>
+    <td class="proplabel">{{ form.location.label }}</td>
+    <td class="propbody">{{ form.location }}</td>
   </tr>
   <tr class="location_opts">
-    <td></td>
-    <td class="small_text">{% trans "Should be an address where the node is located. Please do not enter generic parts of the address like <i>street</i> or <i>road</i>, but do enter <i>square</i> and other uncommon types." %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% trans "Should be an address where the node is located. Please do not enter generic parts of the address like <i>street</i> or <i>road</i>, but do enter <i>square</i> and other uncommon types." %}</td>
   </tr>
   <tr class="location_opts">
-    <td></td>
-    <td><div id="gmap" style="width:398px; height: 298px; margin: 2px;"></div></td>
+    <td class="proplabel"></td>
+    <td class="propbody"><div id="gmap" style="width:398px; height: 298px; margin: 2px;"></div></td>
   </tr>
   <tr class="location_opts">
-    <td></td>
-    <td class="small_text">{% trans "Use <i>Hybrid</i> view to position the node precisely (on the roof, balcony, window...)." %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% trans "Use <i>Hybrid</i> view to position the node precisely (on the roof, balcony, window...)." %}</td>
   </tr>
   <tr class="location_opts">
-    <td>{{ form.geo_lat.label }}</td>
-    <td>{{ form.geo_lat }}</td>
+    <td class="proplabel">{{ form.geo_lat.label }}</td>
+    <td class="propbody">{{ form.geo_lat }}</td>
   </tr>
   <tr class="location_opts">
-    <td>{{ form.geo_long.label }}</td>
-    <td>{{ form.geo_long }}</td>
+    <td class="proplabel">{{ form.geo_long.label }}</td>
+    <td class="propbody">{{ form.geo_long }}</td>
   </tr>
   <tr class="location_opts">
-    <td></td>
-    <td class="small_text">Click on the map or enter coordinates in <a href="{{ documentation_links.decimal_degrees }}" rel="external">decimal degrees</a> format.</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">Click on the map or enter coordinates in <a href="{{ documentation_links.decimal_degrees }}" rel="external">decimal degrees</a> format.</td>
   </tr>
   <tr class="dead_active">
-    <td>{{ form.url.label }}</td>
-    <td>{{ form.url }}</td>
+    <td class="proplabel">{{ form.url.label }}</td>
+    <td class="propbody">{{ form.url }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">{% trans "You may enter any URL that will be displayed on the node's page." %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% trans "You may enter any URL that will be displayed on the node's page." %}</td>
   </tr>
 </table>
 
 {% heading 3 _("Notes") %}
-<table border="0" width="700">
+<table border="0" class="proptable">
   <tr class="dead_active">
     <td>{{ form.notes }}</td>
   </tr>
@@ -109,28 +109,28 @@
 <div class="alive">
 {% endif %}
 {% heading 3 _("Node in the Network") %}
-<table border="0" width="700">
+<table border="0" class="proptable">
   <tr>
-    <td class="first_column_width">{{ form.ip.label }}</td>
-    <td>{{ node.ip }}<span class="alive"> [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</span></td>
+    <td  class="proplabel">{{ form.ip.label }}</td>
+    <td class="propbody">{{ node.ip }}<span class="alive"> [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</span></td>
   </tr>
   {% if user.is_staff %}
     <tr>
-      <td>{{ form.system_node.label }}</td>
-      <td>{{ form.system_node }}</td>
+      <td class="proplabel">{{ form.system_node.label }}</td>
+      <td class="propbody">{{ form.system_node }}</td>
     </tr>
     <tr>
-      <td>{{ form.border_router.label }}</td>
-      <td>{{ form.border_router }}</td>
+      <td class="proplabel">{{ form.border_router.label }}</td>
+      <td class="propbody">{{ form.border_router }}</td>
     </tr>
   {% endif %}
   <tr class="alive">
-    <td>{{ form.redundancy_req.label }}</td>
-    <td>{{ form.redundancy_req }}</td>
+    <td class="proplabel">{{ form.redundancy_req.label }}</td>
+    <td class="propbody">{{ form.redundancy_req }}</td>
   </tr>
   <tr class="alive">
-    <td></td>
-    <td class="small_text">{% blocktrans with documentation_links.vpn as vpn %}Warn if the node has no direct connection to a border gateway (this includes also <a href="{{ vpn }}" rel="external">VPN</a> servers). This is useful if the node is connected to the network in multiple ways and you want to be warned when a <a href="{{ vpn }}" rel="external">VPN</a> connection fails.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with documentation_links.vpn as vpn %}Warn if the node has no direct connection to a border gateway (this includes also <a href="{{ vpn }}" rel="external">VPN</a> servers). This is useful if the node is connected to the network in multiple ways and you want to be warned when a <a href="{{ vpn }}" rel="external">VPN</a> connection fails.{% endblocktrans %}</td>
   </tr>  
 </table>
 {% if not user.is_staff %}
@@ -141,42 +141,42 @@
 {% heading 2 _("Details") %}
 
 {% heading 3 _("Antenna Information") %}
-<table border="0" width="700">
+<table border="0" class="proptable">
   <tr>
-    <td class="first_column_width">{{ form.ant_external.label }}</td>
-    <td>{{ form.ant_external }}</td>
+    <td class="proplabel">{{ form.ant_external.label }}</td>
+    <td class="propbody">{{ form.ant_external }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">{% trans "Does your node have an external antenna and not just a default antenna which came with your node's router?" %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% trans "Does your node have an external antenna and not just a default antenna which came with your node's router?" %}</td>
   </tr>  
   <tr class="extantenna_opts">
-    <td>{{ form.ant_type.label }}</td>
-    <td>{{ form.ant_type }}</td>
+    <td class="proplabel">{{ form.ant_type.label }}</td>
+    <td class="propbody">{{ form.ant_type }}</td>
   </tr>
   <tr class="extantenna_opts">
-    <td></td>
-    <td class="small_text">{% blocktrans with documentation_links.antenna_type as antenna_type %}Please follow <a href="{{ antenna_type }}" rel="external">this link</a> to learn more about antenna types.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with documentation_links.antenna_type as antenna_type %}Please follow <a href="{{ antenna_type }}" rel="external">this link</a> to learn more about antenna types.{% endblocktrans %}</td>
   </tr>  
   <tr class="extantenna_opts">
-    <td>{{ form.ant_polarization.label }}</td>
+    <td class="proplabel">{{ form.ant_polarization.label }}</td>
     <td>{{ form.ant_polarization }}</td>
   </tr>
   <tr class="extantenna_opts">
-    <td></td>
-    <td class="small_text">{% blocktrans with documentation_links.antenna_polarization as antenna_polarization %}Please follow <a href="{{ antenna_polarization }}" rel="external">this link</a> to learn more about antenna polarization.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with documentation_links.antenna_polarization as antenna_polarization %}Please follow <a href="{{ antenna_polarization }}" rel="external">this link</a> to learn more about antenna polarization.{% endblocktrans %}</td>
   </tr>  
 </table>
 
 {% heading 3 _("Image Generator Options") %}
-<table border="0" width="700">
+<table border="0" class="proptable">
   <tr>
-    <td class="first_column_width">{{ form.template.label }}</td>
-    <td>{{ form.template }}</td>
+    <td class="proplabel">{{ form.template.label }}</td>
+    <td class="propbody">{{ form.template }}</td>
   </tr>
   <tr>
-    <td></td>
-    <td class="small_text">
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">
       {% blocktrans with network.contact_page as contact_page %}Select the router type you are using for your node.
       You can leave it unconfigured if you are using a custom firmware or hardware and you are not interested in automatic
       image building. Maybe use notes field above to describe node's software, hardware and configuration. If you would like
@@ -184,72 +184,72 @@
     </td>
   </tr>
   <tr class="imagegen_opts">
-    <td>{{ form.channel.label }}</td>
-    <td>{{ form.channel }}</td>
+    <td class="proplabel">{{ form.channel.label }}</td>
+    <td class="propbody">{{ form.channel }}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td></td>
-    <td class="small_text">{% trans "Wireless channel (frequency) to use. The node can connect only with other nodes on the same channel so for maximum connectivity leave it on the default channel. The drawback is lower throughput in the network." %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% trans "Wireless channel (frequency) to use. The node can connect only with other nodes on the same channel so for maximum connectivity leave it on the default channel. The drawback is lower throughput in the network." %}</td>
   </tr>
   <tr class="imagegen_opts extantenna_opts">
-    <td>{{ form.ant_conn.label }}</td>
-    <td>{{ form.ant_conn }}</td>
+    <td class="proplabel">{{ form.ant_conn.label }}</td>
+    <td class="propbody">{{ form.ant_conn }}</td>
   </tr>
   <tr class="imagegen_opts extantenna_opts">
-    <td></td>
-    <td class="small_text">{% blocktrans with documentation_links.diversity as diversity %}Default is what is recommended to use as it chooses the best option for your router. You can find more explanation <a href="{{ diversity }}" rel="external">here</a>.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with documentation_links.diversity as diversity %}Default is what is recommended to use as it chooses the best option for your router. You can find more explanation <a href="{{ diversity }}" rel="external">here</a>.{% endblocktrans %}</td>
   </tr>  
   <tr class="imagegen_opts">
-    <td>{{ form.use_vpn.label }}</td>
-    <td>{{ form.use_vpn }}</td>
+    <td class="proplabel">{{ form.use_vpn.label }}</td>
+    <td class="propbody">{{ form.use_vpn }}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td></td>
-    <td class="small_text">{% blocktrans with documentation_links.vpn as vpn %}<a href="{{ vpn }}" rel="external">VPN</a> is used to connect the node to the network also over your Internet connection. By enabling <a href="{{ vpn }}" rel="external">VPN</a> you can connect WAN port of the node's router to your Internet router and node will use it. You can safely leave this enabled even if you do not intend to share your Internet connection.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with documentation_links.vpn as vpn %}<a href="{{ vpn }}" rel="external">VPN</a> is used to connect the node to the network also over your Internet connection. By enabling <a href="{{ vpn }}" rel="external">VPN</a> you can connect WAN port of the node's router to your Internet router and node will use it. You can safely leave this enabled even if you do not intend to share your Internet connection.{% endblocktrans %}</td>
   </tr>
   <tr class="imagegen_opts vpn_opts">
-    <td>{{ form.tc_egress.label }}</td>
-    <td>{{ form.tc_egress }}</td>
+    <td class="proplabel">{{ form.tc_egress.label }}</td>
+    <td class="propbody">{{ form.tc_egress }}</td>
   </tr>
   <tr class="imagegen_opts vpn_opts">
-    <td>{{ form.tc_ingress.label }}</td>
-    <td>{{ form.tc_ingress }}</td>
+    <td class="proplabel">{{ form.tc_ingress.label }}</td>
+    <td class="propbody">{{ form.tc_ingress }}</td>
   </tr>
   <tr class="imagegen_opts vpn_opts">
-    <td></td>
-    <td class="small_text">{% blocktrans with documentation_links.vpn as vpn %}You can setup limiting for connections to <a href="{{ vpn }}" rel="external">VPN</a> servers and thus how much of your Internet connection the node can maximally consume. Set limits only if and when you notice problems with Internet connection sharing because of the node (use graphs on node's page to evaluate this). In general this is not needed as traffic is already limited by other factors (like wireless connections quality).{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with documentation_links.vpn as vpn %}You can setup limiting for connections to <a href="{{ vpn }}" rel="external">VPN</a> servers and thus how much of your Internet connection the node can maximally consume. Set limits only if and when you notice problems with Internet connection sharing because of the node (use graphs on node's page to evaluate this). In general this is not needed as traffic is already limited by other factors (like wireless connections quality).{% endblocktrans %}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td>{{ form.wan_dhcp.label }}</td>
-    <td>{{ form.wan_dhcp }}</td>
+    <td class="proplabel">{{ form.wan_dhcp.label }}</td>
+    <td class="propbody">{{ form.wan_dhcp }}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td></td>
-    <td class="small_text">When you connect WAN port of the node's router to your Internet router do you want it to be auto-configured? Even if you are not using WAN port leave it on the default, auto-configured.</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">When you connect WAN port of the node's router to your Internet router do you want it to be auto-configured? Even if you are not using WAN port leave it on the default, auto-configured.</td>
   </tr>
   <tr class="imagegen_opts static_opts">
-    <td>{{ form.wan_ip.label }}</td>
-    <td>{{ form.wan_ip }}</td>
+    <td class="proplabel">{{ form.wan_ip.label }}</td>
+    <td class="propbody">{{ form.wan_ip }}</td>
   </tr>
   <tr class="imagegen_opts static_opts">
-    <td>{{ form.wan_gw.label }}</td>
-    <td>{{ form.wan_gw }}</td>
+    <td class="proplabel">{{ form.wan_gw.label }}</td>
+    <td class="propbody">{{ form.wan_gw }}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td>{{ form.root_pass.label }}</td>
-    <td>{{ form.root_pass }}</td>
+    <td class="proplabel">{{ form.root_pass.label }}</td>
+    <td class="propbody">{{ form.root_pass }}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td></td>
-    <td class="small_text">{% trans "This password is used for remote maintenance access to the node. <b>Do not share it with anybody as it can compromise node's and network's security!</b>" %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% trans "This password is used for remote maintenance access to the node. <b>Do not share it with anybody as it can compromise node's and network's security!</b>" %}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td valign="top">{{ form.optional_packages.label }}</td>
-    <td class="optional_packages">{{ form.optional_packages }}</td>
+    <td class="proplabel">{{ form.optional_packages.label }}</td>
+    <td class="propbody optional_packages">{{ form.optional_packages }}</td>
   </tr>
   <tr class="imagegen_opts">
-    <td></td>
-    <td class="small_text">{% blocktrans with network.contact_page as contact_page %}You can install additional packages on the node's router and thus gain additional functionality. If you are missing some package you would like to use or would like to use your own package please <a href="{{ contact_page }}" rel="external">contact us</a> and we will try to add it.{% endblocktrans %}</td>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans with network.contact_page as contact_page %}You can install additional packages on the node's router and thus gain additional functionality. If you are missing some package you would like to use or would like to use your own package please <a href="{{ contact_page }}" rel="external">contact us</a> and we will try to add it.{% endblocktrans %}</td>
   </tr>
 </table>
 </div>

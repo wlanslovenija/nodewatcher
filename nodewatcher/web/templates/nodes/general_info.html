@@ -2,52 +2,52 @@
 {% load misc %}
 {% block tableheader %}
 {% heading 2 _("General Node Information") %}
-<table border="0" width="700">
+<table border="0" class="proptable">
 {% endblock %}
   <tr>
-    <td class="first_column_width">{% trans "Node name" %}</td>
-    <td>{{ node.name|default:_("unknown") }}</td>
+    <td class="proplabel">{% trans "Node name" %}</td>
+    <td class="propbody">{{ node.name|default:_("unknown") }}</td>
   </tr>
   {% if node.url %}
   <tr>
-    <td></td>
-    <td class="small_text"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></td>
+    <td class="proplabel"></td>
+    <td class="propbody"><div class="propdescription"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></div></td>
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Location" %}</td>
-    <td>{{ node.location|default:_("unknown") }}</td>
+    <td class="proplabel">{% trans "Location" %}</td>
+    <td class="propbody">{{ node.location|default:_("unknown") }}</td>
   </tr>
   <tr>
-    <td>{% trans "Project" %}</td>
+    <td class="proplabel">{% trans "Project" %}</td>
     <td>{{ node.project.name|default:_("unknown") }}</td>
   </tr>
   <tr>
-    <td>{% trans "Maintainer" %}</td>
+    <td class="proplabel">{% trans "Maintainer" %}</td>
     {% if node.owner %}
     {% if user.is_authenticated and node.owner.email %}
-    <td><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
+    <td class="propbody"><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
     {% else %}
-    <td>{{ node.owner.username }}</td>
+    <td class="propbody">{{ node.owner.username }}</td>
     {% endif %}
     {% else %}
-    <td>{% trans "unknown" %}</td>
+    <td class="propbody">{% trans "unknown" %}</td>
     {% endif %}
   </tr>
   <tr>
-    <td>{% trans "Node type" %}</td>
-    <td>{{ node.node_type_as_string|lower }}</td>
+    <td class="proplabel">{% trans "Node type" %}</td>
+    <td class="propbody">{{ node.node_type_as_string|lower }}</td>
   </tr>
   <tr>
-    <td>{% trans "Node status" %}</td>
-    <td class="node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
+    <td class="proplabel">{% trans "Node status" %}</td>
+    <td class="propbody node_status_{{ node.status_as_string }}">{{ node.status_as_string }}</td>
   </tr>
   <tr>
-    <td>{% trans "Last seen" %}</td>
+    <td class="proplabel">{% trans "Last seen" %}</td>
     {% if node.last_seen %}
-    <td>{{ node.last_seen|date }}</td>
+    <td class="propbody">{{ node.last_seen|date }}</td>
     {% else %}
-    <td>{% trans "never" %}</td>
+    <td class="propbody">{% trans "never" %}</td>
     {% endif %}
   </tr>
 </table>
