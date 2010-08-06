@@ -3,20 +3,20 @@
 <head>
     <title>{% block title %}{% endblock %} – {{ network.name }}{% if network.description %} – {{ network.description }}{% endif %}</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <link rel="shortcut icon" href="{{ MEDIA_URL }}site/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="{{ MEDIA_URL }}site/favicon.ico" type="image/x-icon" />
-    <script type="text/javascript" src="{{ MEDIA_URL }}site/jquery.js"></script>
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}wlanlj/site/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="{{ MEDIA_URL }}wlanlj/site/favicon.ico" type="image/x-icon" />
+    <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/site/jquery.js"></script>
     <!--[if lt IE 7]>
-    <script type="text/javascript" src="{{ MEDIA_URL }}common/js/ie_pre7_hacks.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/common/js/ie_pre7_hacks.js"></script>
     <![endif]-->
     <!--[if IE]>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/ie_hacks.js"></script>
     <![endif]-->
-    <!--link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/common.css" />
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}site/trac.css" /-->
+    <!--link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}wlanlj/site/common.css" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}wlanlj/site/trac.css" /-->
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/screen.css" media="screen, projection" />
     {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
-    <script type="text/javascript" src="{{ MEDIA_URL }}site/folding.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/site/folding.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
     {{ form.media }}
