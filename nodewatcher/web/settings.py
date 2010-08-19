@@ -143,7 +143,7 @@ RESET_PASSWORD_URL = 'http://wlan-lj.net/reset_password'
 PROFILE_CONFIGURATION_URL = 'http://wlan-lj.net/prefs'
 REGISTER_USER_URL = 'http://wlan-lj.net/register'
 AUTH_PROFILE_MODULE = 'account.useraccount'
- # We are using SSO with Trac so we have our own auth module, you should probably use something from Django (also to register users)
+# We are using SSO with Trac so we have our own auth module, you should probably use something from Django (also to register users)
 AUTHENTICATION_BACKENDS = (
   'web.account.auth.CryptBackend',
 )
