@@ -4,15 +4,21 @@
 
 {% block contenttype %}prefs{% endblock %}
 
-{% block content %}
+{% block ctxtnav %}
+{{ block.super }}
 {% url my_nodes as my_nodes %}{% url new_node as new_node %}{% url my_whitelist as my_whitelist %}{% url my_events as my_events %}{% url my_sticker as my_sticker %}
-<ul id="tabs">
+<div id="mynav" class="nav">
+<ul>
   <li{% if request.path|startswith:my_nodes %} class="active"{% endif %}><a href="{{ my_nodes }}">{% trans "My nodes" %}</a></li>
   <li{% if request.path|startswith:new_node %} class="active"{% endif %}><a href="{{ new_node }}">{% trans "New node" %}</a></li>
   <li{% if request.path|startswith:my_whitelist %} class="active"{% endif %}><a href="{{ my_whitelist }}">{% trans "MAC whitelist" %}</a></li>
   <li{% if request.path|startswith:my_events %} class="active"{% endif %}><a href="{{ my_events }}">{% trans "Events" %}</a></li>
   <li{% if request.path|startswith:my_sticker %} class="active"{% endif %}><a href="{{ my_sticker }}">{% trans "Info sticker" %}</a></li>
 </ul>
+</div>
+{% endblock %}
+{% block content %}
+
 <div id="tabcontent">
 {% block my_content %}{% endblock %}
 </div>

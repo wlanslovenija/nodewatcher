@@ -28,10 +28,9 @@
 <body>
 <div id="main">
 {% include "header.html" %}
-      <div id="ctxtnav" class="nav">
-        <h2>Context Navigation</h2>
 {% block ctxtnav %}
 {% spaceless %}
+<div id="ctxtnav" class="nav">
 <ul>
       <li class="first"><a href="{% url nodes_list %}">{% trans "Node List" %}</a></li>
       <li><a href="{% url network_statistics %}">{% trans "Network Statistics" %}</a></li>
@@ -40,10 +39,9 @@
       <li><a href="{% url network_topology %}">{% trans "Network Topology" %}</a></li>
       <li><a href="{% url network_map %}">{% trans "Node Map" %}</a></li>
 </ul>
+</div>
 {% endspaceless %}
 {% endblock %}
-        <hr />
-      </div>
 <div id="content" class="{% block contenttype %}nodes{% endblock %}">
 {% block permalink %}{% if permalink %}<div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>{% endif %}{% endblock %}
 {% block heading %}{% if heading %}{% heading 1 heading %}{% endif %}{% endblock %}

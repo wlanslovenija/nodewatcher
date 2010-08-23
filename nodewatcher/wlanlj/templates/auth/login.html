@@ -26,25 +26,20 @@
   {% endfor %}
 </p>
 {% endif %}
+<div>
 <input type="hidden" name="next" value="{{ next }}" />
-<table border="0" class="proptable">
-  <tr>
-    <td class="proplabel">{{ form.username.label_tag }}</td>
-    <td class="propbody">{{ form.username }}</td>
-  </tr>
-  <tr>
-    <td class="proplabel">{{ form.password.label_tag }}</td>
-    <td class="propbody">{{ form.password }}</td>
-  </tr>
-  {% if reset_password_url %}
-  <tr>
-    <td class="proplabel"></td>
-    <td class="propbody propdescription">
-      <a href="{{ reset_password_url }}">Forgot your password?</a>
-    </td>
-  </tr>
-  {% endif %}
-</table>
+{{ form.username.label_tag }}
+{{ form.username }}
+</div>
+<div>
+{{ form.password.label_tag }}
+{{ form.password }}
+{% if reset_password_url %}
+<p class="hint">
+  <a href="{{ reset_password_url }}">Forgot your password?</a>
+</p>
+{% endif %}
+</div>
 <div class="buttons"><input type="submit" value="{% trans "Login" %}" /></div>
 </form>
 {% endblock %}
