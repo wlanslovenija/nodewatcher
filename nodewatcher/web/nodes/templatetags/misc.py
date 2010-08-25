@@ -3,7 +3,9 @@
 import re
 
 from django import template
+from django.conf import settings
 from django.template import loader, defaultfilters
+from django.utils import safestring
 from django.utils import text
 
 register = template.Library()
@@ -13,6 +15,7 @@ HEADING_REPLACE = (
   (u'đ', u'd'),
   (u'Đ', u'D'),
 )
+DOCUMENTATION_LINKS = getattr(settings, 'DOCUMENTATION_LINKS', {})
 
 @register.filter
 def startswith(value, arg):
@@ -75,7 +78,7 @@ def setcontext(parser, token):
   args = list(token.split_contents())
   
   if len(args) != 3 or args[1] != "as":
-    raise TemplateSyntaxError("%r expected format is 'as name'" % args[0])
+    raise TemplateSyntaxError("'%s' tag expected format is 'as name'" % args[0])
   variable = args[2]
   
   parser.delete_first_token()
@@ -108,7 +111,7 @@ def notice(parser, token):
   args = list(token.split_contents())
 
   if len(args) > 3:
-    raise TemplateSyntaxError("'notice' tag requires at most two arguments.")
+    raise TemplateSyntaxError("'%s' tag requires at most two arguments" % args[0])
   classes = args[2] if len(args) > 2 else '""'
   notice_type = args[1] if len(args) > 1 else '""'
   
@@ -118,3 +121,44 @@ def notice(parser, token):
   classes = parser.compile_filter(classes)
   
   return NoticeNode(nodelist, notice_type, classes)
+
+class DoclinkNode(template.Node):
+  """
+  This class defines doclink renderer.
+  """
+  def __init__(self, tag, link, var_name):
+    self.tag = tag
+    self.link = link
+    self.var_name = var_name
+
+  def render(self, context):
+    html = loader.render_to_string(
+      'documentation_link.html', {
+        'url' : DOCUMENTATION_LINKS.get(self.tag),
+        'link' : self.link.resolve(context),
+      }, context).strip()
+    
+    if self.var_name:
+      context[self.var_name] = safestring.mark_safe(html)
+      return ''
+    else:
+      return html
+
+@register.tag
+def doclink(parser, token):
+  """
+  Renders documentation link.
+  """
+  args = list(token.split_contents())
+
+  if len(args) != 3 and len(args) != 5:
+    raise TemplateSyntaxError("'%s' tag takes two or four arguments" % args[0])
+  tag = args[1]
+  link = parser.compile_filter(args[2])
+  var_name = None
+  if len(args) == 5:
+    if args[3] != "as":
+      raise TemplateSyntaxError("'%s' tag expected third argument is 'as'" % args[0])
+    var_name = args[4]
+  
+  return DoclinkNode(tag, link, var_name)

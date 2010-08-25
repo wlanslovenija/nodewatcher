@@ -1,2 +1,5 @@
-{% load i18n %}{% load graphs %}{% show_graph %}
-<div class="graphdesc">{% blocktrans with documentation_links.solar as solar %}This graph represents power performance of the solar-powered node.<br />More about the values presented here and the node itself can be found <a href="{{ solar }}">here</a>.{% endblocktrans %}</div>
+{% load i18n %}{% load graphs %}{% load misc %}{% show_graph %}
+<div class="graphdesc">
+{% blocktrans %}This graph represents power performance of the solar-powered node.{% endblocktrans %}<br />
+{% if documentation_links.solar %}{% doclink solar _("here") as solar %}{% blocktrans %}More about the values presented here and the node itself can be found {{ solar }}.{% endblocktrans %}{% endif %}
+</div>

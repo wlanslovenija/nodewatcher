@@ -1,10 +1,9 @@
 # coding=utf-8
-# Development Django settings for nodewatcher project.
+# Development Django settings for your network nodewatcher.
 
 import os.path
 database_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'db.sqlite').replace('\\', '/')
 default_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates').replace('\\', '/')
-wlanlj_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'wlanlj', 'templates').replace('\\', '/')
 static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static').replace('\\', '/')
 
 DEBUG = True
@@ -35,15 +34,15 @@ DATABASES = {
 EMAIL_TO_CONSOLE = True
 
 EMAIL_HOST = 'localhost'
-EMAIL_SUBJECT_PREFIX = '[wlan-lj] '
-EMAIL_EVENTS_SENDER = 'events@wlan-lj.net'
-EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-lj.net'
+EMAIL_SUBJECT_PREFIX = '[nodewatcher] '
+EMAIL_EVENTS_SENDER = 'events@example.net'
+EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'
 
-NETWORK_NAME = 'wlan ljubljana'
-NETWORK_HOME = 'http://wlan-lj.net'
-NETWORK_CONTACT = 'open@wlan-lj.net'
-NETWORK_CONTACT_PAGE = 'http://wlan-lj.net/contact'
-NETWORK_DESCRIPTION = 'odprto brezžično omrežje Ljubljane'
+NETWORK_NAME = 'your network name'
+NETWORK_HOME = 'http://example.net'
+NETWORK_CONTACT = 'open@example.net'
+NETWORK_CONTACT_PAGE = 'http://example.net/contact'
+NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -68,7 +67,7 @@ MEDIA_ROOT = static_dir
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to always
 # use a trailing slash.
-# Examples: "http://media.lawrence.com/", "http://example.com/media/"
+# Examples: "http://media.lawrence.com/", "http://example.net/media/"
 MEDIA_URL = '/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
@@ -131,7 +130,6 @@ TEMPLATE_DIRS = (
   # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
   # Always use forward slashes, even on Windows.
   # Don't forget to use absolute paths, not relative paths.
-  #wlanlj_template_dir, # Remove this entry and define you own directory with templates to override default ones
   default_template_dir,
 )
 
@@ -139,11 +137,12 @@ DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/my/nodes'
 LOGIN_URL = '/auth/login'
-RESET_PASSWORD_URL = 'http://wlan-lj.net/reset_password'
-PROFILE_CONFIGURATION_URL = 'http://wlan-lj.net/prefs'
-REGISTER_USER_URL = 'http://wlan-lj.net/register'
+RESET_PASSWORD_URL = 'http://example.net/reset_password'
+PROFILE_CONFIGURATION_URL = 'http://example.net/prefs'
+REGISTER_USER_URL = 'http://example.net/register'
 AUTH_PROFILE_MODULE = 'account.useraccount'
 # We are using SSO with Trac so we have our own auth module, you should probably use something from Django (also to register users)
+# See http://docs.djangoproject.com/en/dev/topics/auth/
 AUTHENTICATION_BACKENDS = (
   'web.account.auth.CryptBackend',
 )
@@ -173,7 +172,7 @@ IMAGE_GENERATOR_ENABLED = False
 # If it is, image requests are not queued and message about that is issued to the user
 IMAGE_GENERATOR_SUSPENDED = False
 
-IMAGES_BINDIST_URL = 'http://bindist.wlan-lj.net/images/'
+IMAGES_BINDIST_URL = 'http://example.net/images/'
 
 # Graph configuration
 GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs').replace('\\', '/')
@@ -186,7 +185,7 @@ GRAPH_TIMESPANS = (
 
 # Monitor configuration
 MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/') # Absolute path to directory containing monitor.py file
-MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections
+MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
 MONITOR_GRAPH_WORKERS = 5
 MONITOR_POLL_INTERVAL = 300
 MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
@@ -205,15 +204,14 @@ STICKERS_TEMP_DIR = '/tmp/'
 STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers').replace('\\', '/')
 
 DOCUMENTATION_LINKS = {
-  'custom_image'    : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',
-  'known_issues'    : 'http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave',
-  'report_issue'    : 'http://wlan-lj.net/newticket',
-  'diversity'       : 'http://wlan-lj.net/wiki/Diversity',
-  'decimal_degrees' : 'http://en.wikipedia.org/wiki/Decimal_degrees',
-  'ip_address'      : 'http://wlan-lj.net/wiki/IPNaslov',
-  'solar'           : 'http://wlan-lj.net/wiki/Podrobnosti/Solar',
-  'antenna_type'    : 'http://wlan-lj.net/wiki/Antena',
-  'antenna_polarization' : 'http://wlan-lj.net/wiki/Antena#Polarizacija',
-  'vpn'             : 'http://wlan-lj.net/wiki/VPN',
+#  'custom_node'          : 'http://example.net/wiki/CustomNode',
+#  'known_issues'         : 'http://example.net/wiki/KnownIssues',
+#  'report_issue'         : 'http://example.net/newticket',
+  'diversity'            : 'http://en.wikipedia.org/wiki/Antenna_diversity',
+  'decimal_degrees'      : 'http://en.wikipedia.org/wiki/Decimal_degrees',
+  'ip_address'           : 'http://en.wikipedia.org/wiki/IP_address',
+#  'solar'                : 'http://example.net/wiki/Solar',
+  'antenna_type'         : 'http://en.wikipedia.org/wiki/Antenna_%28radio%29',
+  'antenna_polarization' : 'http://en.wikipedia.org/wiki/Antenna_%28radio%29#Polarization',
+  'vpn'                  : 'http://en.wikipedia.org/wiki/Virtual_private_network',
 }
-

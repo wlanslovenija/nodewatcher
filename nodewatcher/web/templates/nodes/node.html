@@ -389,7 +389,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
 {% heading 3 _("Columns:") %}
 <dl>
   <dt><b>Node</b></dt>
-  <dd>{% blocktrans with documentation_links.ip_address as ip_address %}the node and its primary <a href="{{ ip_address }}" rel="external">IP address</a>{% endblocktrans %}</dd>
+  <dd>{% doclink ip_address _("IP address") as ip_address %}{% blocktrans %}the node and its primary {{ ip_address }}{% endblocktrans %}</dd>
   <dd class="defintion_end"></dd>
   <dt><b>LQ</b></dt>
   <dd>{% blocktrans %}the ratio of packets that are successfully received from the node's neighbour{% endblocktrans %}</dd>

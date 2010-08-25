@@ -72,7 +72,7 @@
   </tr>
   <tr class="location_opts">
     <td class="proplabel"></td>
-    <td class="propbody propdescription">Click on the map or enter coordinates in <a href="{{ documentation_links.decimal_degrees }}" rel="external">decimal degrees</a> format.</td>
+    <td class="propbody propdescription">{% doclink decimal_degrees _("decimal degrees") as decimal_degrees %}{% blocktrans %}Click on the map or enter coordinates in {{ decimal_degrees }} format.{% endblocktrans %}</td>
   </tr>
   <tr>
     <td class="proplabel">{{ form.url.label }}</td>
@@ -105,8 +105,8 @@
   </tr>
   <tr>
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.ip_address as ip_address %}Select from which IP pool node is assigned its <a href="{{ ip_address }}" rel="external">IP address</a>. Non-default pools are used only for special nodes so default is probably what you want.{% endblocktrans %}</td>
-  </tr>  
+    <td class="propbody propdescription">{% doclink ip_address _("IP address") as ip_address %}{% blocktrans %}Select from which IP pool node is assigned its {{ ip_address }}. Non-default pools are used only for special nodes so default is probably what you want.{% endblocktrans %}</td>
+  </tr>
   {% if user.is_staff %}
     <tr>
       <td class="proplabel">{{ form.ip.label }}</td>
@@ -131,8 +131,8 @@
   </tr>
   <tr>
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.vpn as vpn %}Warn if the node has no direct connection to a border gateway (this includes also <a href="{{ vpn }}" rel="external">VPN</a> servers). This is useful if the node is connected to the network in multiple ways and you want to be warned when a <a href="{{ vpn }}" rel="external">VPN</a> connection fails.{% endblocktrans %}</td>
-  </tr>  
+    <td class="propbody propdescription">{% doclink vpn _("VPN") as vpn %}{% blocktrans %}Warn if the node has no direct connection to a border gateway (this includes also {{ vpn }} servers). This is useful if the node is connected to the network in multiple ways and you want to be warned when a {{ vpn }} connection fails.{% endblocktrans %}</td>
+  </tr>
 </table>
 
 {% heading 2 _("Details") %}
@@ -151,18 +151,22 @@
     <td class="proplabel">{{ form.ant_type.label }}</td>
     <td class="propbody">{{ form.ant_type }}</td>
   </tr>
+  {% if documentation_links.antenna_type %}
   <tr class="extantenna_opts">
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.antenna_type as antenna_type %}Please follow <a href="{{ antenna_type }}" rel="external">this link</a> to learn more about antenna types.{% endblocktrans %}</td>
-  </tr>  
+    <td class="propbody propdescription">{% doclink antenna_type _("this link") as antenna_type %}{% blocktrans %}Please follow {{ antenna_type }} to learn more about antenna types.{% endblocktrans %}</td>
+  </tr>
+  {% endif %}
   <tr class="extantenna_opts">
     <td class="proplabel">{{ form.ant_polarization.label }}</td>
     <td class="propbody">{{ form.ant_polarization }}</td>
   </tr>
+  {% if documentation_links.antenna_polarization %}
   <tr class="extantenna_opts">
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.antenna_polarization as antenna_polarization %}Please follow <a href="{{ antenna_polarization }}" rel="external">this link</a> to learn more about antenna polarization.{% endblocktrans %}</td>
-  </tr>  
+    <td class="propbody propdescription">{% doclink antenna_polarization _("this link") as antenna_polarization %}{% blocktrans %}Please follow {{ antenna_polarization }} to learn more about antenna polarization.{% endblocktrans %}</td>
+  </tr>
+  {% endif %}
 </table>
 
 {% heading 3 _("Image Generator Options") %}
@@ -194,15 +198,17 @@
   </tr>
   <tr class="imagegen_opts extantenna_opts">
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.diversity as diversity %}Default is what is recommended to use as it chooses the best option for your router. You can find more explanation <a href="{{ diversity }}" rel="external">here</a>.{% endblocktrans %}</td>
-  </tr>  
+    <td class="propbody propdescription">{% blocktrans %}Default is what is recommended to use as it chooses the best option for your router.{% endblocktrans %}
+      {% if documentation_links.diversity %}{% doclink diversity _("here") as diversity %}{% blocktrans %}You can find more explanation {{ diversity }}.{% endblocktrans %}{% endif %}
+    </td>
+  </tr>
   <tr class="imagegen_opts">
     <td class="proplabel">{{ form.use_vpn.label }}</td>
     <td>{{ form.use_vpn }}</td>
   </tr>
   <tr class="imagegen_opts">
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.vpn as vpn %}<a href="{{ vpn }}" rel="external">VPN</a> is used to connect the node to the network also over your Internet connection. By enabling <a href="{{ vpn }}" rel="external">VPN</a> you can connect WAN port of the node's router to your Internet router and node will use it. You can safely leave this enabled even if you do not intend to share your Internet connection.{% endblocktrans %}</td>
+    <td class="propbody propdescription">{% doclink vpn _("VPN") as vpn %}{% blocktrans %}{{ vpn }} is used to connect the node to the network also over your Internet connection. By enabling {{ vpn }} you can connect WAN port of the node's router to your Internet router and node will use it. You can safely leave this enabled even if you do not intend to share your Internet connection.{% endblocktrans %}</td>
   </tr>
   <tr class="imagegen_opts vpn_opts">
     <td class="proplabel">{{ form.tc_egress.label }}</td>
@@ -214,7 +220,7 @@
   </tr>
   <tr class="imagegen_opts vpn_opts">
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% blocktrans with documentation_links.vpn as vpn %}You can setup limiting for connections to <a href="{{ vpn }}" rel="external">VPN</a> servers and thus how much of your Internet connection the node can maximally consume. Set limits only if and when you notice problems with Internet connection sharing because of the node (use graphs on node's page to evaluate this). In general this is not needed as traffic is already limited by other factors (like wireless connections quality).{% endblocktrans %}</td>
+    <td class="propbody propdescription">{% doclink vpn _("VPN") as vpn %}{% blocktrans %}You can setup limiting for connections to {{ vpn }} servers and thus how much of your Internet connection the node can maximally consume. Set limits only if and when you notice problems with Internet connection sharing because of the node (use graphs on node's page to evaluate this). In general this is not needed as traffic is already limited by other factors (like wireless connections quality).{% endblocktrans %}</td>
   </tr>
   <tr class="imagegen_opts">
     <td class="proplabel">{{ form.wan_dhcp.label }}</td>

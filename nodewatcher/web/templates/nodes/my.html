@@ -113,7 +113,7 @@
   <dd>{% blocktrans %}the name of the node{% endblocktrans %}</dd>
   <dd class="defintion_end"></dd>
   <dt><b>IP</b></dt>
-  <dd>{% blocktrans with documentation_links.ip_address as ip_address %}primary <a href="{{ ip_address }}" rel="external">IP address</a> of the node{% endblocktrans %}</dd>
+  <dd>{% doclink ip_address _("IP address") as ip_address %}{% blocktrans %}primary {{ ip_address }} of the node{% endblocktrans %}</dd>
   <dd class="defintion_end"></dd>
   <dt><b>Last seen up</b></dt>
   <dd>{% blocktrans %}when was the node last seen connected to the network{% endblocktrans %}</dd>

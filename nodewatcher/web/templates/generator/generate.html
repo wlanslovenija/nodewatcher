@@ -22,9 +22,18 @@
 {% else %}
   {% if node.has_allocated_subnets %}
     {% if node.profile.template.experimental %}
-    <div class="warning">
-      {% blocktrans with documentation_links.known_issues as known_issues_url and documentation_links.report_issue as report_issue_url %}<b>WARNING:</b> The support for router type you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues. For further information please see <a href="{{ known_issues_url }}">known issues</a> page. If you find any bugs, please <a href="{{ report_issue_url }}">report them</a>. Also if you find the image to be working properly for a longer period of time, also <a href="{{ report_issue_url }}">report it</a> so it may be moved from its experimental status.{% endblocktrans %}
-    </div>
+      <div class="warning">
+        {% blocktrans %}<b>WARNING:</b> The support for router type you have chosen is marked as <b>experimental</b>! This may mean that it has not been extensively tested and might contain serious issues.{% endblocktrans %}
+        {% if documentation_links.known_issues %}
+          {% doclink known_issues _("known issues") as known_issues %}
+          {% blocktrans %}For further information please see {{ known_issues }} page.{% endblocktrans %}
+        {% endif %}
+        {% if documentation_links.report_issue %}
+          {% doclink report_issue _("report them") as report_issues %}
+          {% doclink report_issue _("report it") as report_issue %}
+          {% blocktrans %}If you find any bugs, please {{ report_issues }}. Also if you find the image to be working properly for a longer period of time, also {{ report_issue }} so it may be moved from its experimental status.{% endblocktrans %}
+        {% endif %}
+      </div>
     {% endif %}
     {% notice %}
       {% blocktrans %}After you press <i>Generate</i> below, your request will be queued for later processing. After the image is ready, you will be notified of its download location via e-mail.{% endblocktrans %}
@@ -65,7 +74,7 @@
     <td class="proplabel">{{ form.config_only.label }}</td>
     <td class="propbody">
       {{ form.config_only }}<br/>
-      <span class="propdescription">{% blocktrans with documentation_links.custom_image as custom_image_url %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a <a href="{{ custom_image_url }}">custom node</a>.{% endblocktrans %}</span>
+      <span class="propdescription">{% doclink custom_node _("custom node") custom_node %}{% blocktrans %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a {{ custom_node }}.{% endblocktrans %}</span>
     </td>
   </tr>
 </table>
