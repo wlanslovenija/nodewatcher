@@ -19,13 +19,13 @@ MANAGERS = ADMINS
 
 DATABASES = {
   'default' : {
-    'ENGINE'   : 'django.db.backends.postgresql_psycopg2',
-    'NAME'     : 'nodewatcher',
-    'USER'     : 'nodewatcher',
-    'PASSWORD' : '',
-    'HOST'     : '',
-    'PORT'     : ''
-  }
+    'ENGINE'   : 'django.db.backends.sqlite3', # 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+    'NAME'     : database_file, # Or path to database file if using sqlite3.
+    'USER'     : '',            # Not used with sqlite3.
+    'PASSWORD' : '',            # Not used with sqlite3.
+    'HOST'     : '',            # Set to empty string for localhost. Not used with sqlite3.
+    'PORT'     : '',            # Set to empty string for default. Not used with sqlite3.
+  },
 }
 
 # For local development it is better to send all e-mails to console
@@ -187,9 +187,8 @@ GRAPH_TIMESPANS = (
 MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/') # Absolute path to directory containing monitor.py file
 MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
 MONITOR_GRAPH_WORKERS = 5
-MONITOR_DISABLE_GRAPHS = True
 MONITOR_POLL_INTERVAL = 300
-MONITOR_OLSR_HOST = '10.254.128.33' # A host with OLSR txt-info plugin running
+MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
 MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
 MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')
 
