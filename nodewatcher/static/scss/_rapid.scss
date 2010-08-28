@@ -1,0 +1,136 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
+
+@import "bullets";
+@import "compass/utilities/general/reset";
+@import "compass/utilities/general/float";
+
+
+@mixin horizontal-inline-list-item($padding: 4px) {
+  @include no-bullet;
+  white-space: nowrap;
+  @include float-left;
+  padding: {
+    left: $padding;
+    right: $padding; };
+  &:first-child, &.first {
+    padding-left: 0px; }
+  &:last-child, &.last {
+    padding-right: 0px; } }
+
+// A list(ol,ul) that is layed out such that the elements are floated left and won't wrap.
+// This is not an inline list.
+@mixin horizontal-inline-list($padding: 4px) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  display: inline-block;
+  li {
+    @include horizontal-inline-list-item($padding); 
+  } 
+}
+
+
+@mixin horizontal-image-list-item($image) {
+  @include no-bullet;
+  white-space: nowrap; 
+  @include float-left;
+  background: transparent image-url($image) no-repeat center left;
+  padding: {
+    left: image-height($image) + 5px;
+    right: 5px; };
+  &:first-child, &.first {
+    background: none;  
+    padding-left: 0px; }
+  &:last-child, &.last {
+    padding-right: 0px; } }
+
+@mixin horizontal-image-list($image) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  display: inline-block;
+  li {
+    @include horizontal-image-list-item($image); 
+  } 
+}
+
+@mixin rapid-links($color, $visited_color = $color - 30) {
+  text-decoration: none;
+
+  &:link {
+    
+    color: $color;
+  }
+
+  &:visited {
+    color: $visited_color;
+  }
+
+  &:link:hover, &:visited:hover { text-decoration: underline; }
+
+  h1 :link, h1 :visited ,h2 :link, h2 :visited, h3 :link, h3 :visited,
+  h4 :link, h4 :visited, h5 :link, h5 :visited, h6 :link, h6 :visited {
+    color: inherit;
+  }
+
+ .ext-link .icon {
+  background: url(../extlink.gif) center center no-repeat;
+  padding-left: 12px;
+ }
+ .mail-link .icon {
+  background: url(../envelope.png) center center no-repeat;
+  padding-left: 14px;
+ }
+}
+
+@mixin rapid-table($font-color, $background-color, $border-color) {
+  margin-top: 0px;
+  clear: both;
+  border-bottom: 1px solid $border-color;
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  th {
+    text-align: left;
+    padding: 0 1em .1em 0;
+    font-size: 12px;
+    }
+  th.asc a, th.desc a { font-weight: bold; background-position: 100% 50%; background-repeat: no-repeat; }
+  th.asc a { background-image: url(../asc.png) }
+  th.desc a { background-image: url(../desc.png) }
+  td.center { text-align: center; }
+  thead { background: $background-color - 20;
+    th {
+      border: 1px solid $border-color - 10;
+      border-bottom-color: $border-color;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px .5em;
+      vertical-align: bottom;
+      :link:hover, :visited:hover {background-color: transparent;}
+      a { border: none; padding-right: 12px }
+    }
+  }
+  tbody { 
+    tr { border-top: 1px solid $border-color }
+    tr.even { background-color: $background-color + 5 }
+    tr.odd { background-color: $background-color - 5 }
+    tr:hover { background: $background-color - 15 }
+    tr.focus { background: $background-color - 15 }
+    td, th { border: 1px dotted $border-color + 10; padding: .3em .5em; vertical-align: top; }
+    td, td a:hover, th a:hover { background-color: transparent; }
+  }
+  tfoot td {
+    background-color: $background-color;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid $border-color;
+  }
+}
+
+
+

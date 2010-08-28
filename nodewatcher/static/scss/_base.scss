@@ -1,0 +1,655 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
+/* compass watch Documents/Graphics/Design/wlan-lj/nodewatcher/ --css-dir ../../../../../workspace/nodewatcher/static/css -s compact --images-dir ../../../../../workspace/nodewatcher/static/css/images --relative-assets
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "compass/reset";
+@import "compass/utilities/lists/horizontal-list";
+@import "compass/utilities/general/clearfix";
+@import "compass/utilities/links";
+@import "compass/utilities/lists/bullets";
+@import "compass/css3/border-radius";
+@import "blueprint/typography";
+@import "blueprint/form";
+@import "_rapid.scss";
+
+
+
+body {
+  margin: 0px;
+  background: #f0f0f0 image-url('background.png') repeat-y top center;
+  color: $font-color;
+  font-family:Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif;
+  font-size:13px;
+  font-size-adjust:none;
+  font-style:normal;
+  font-variant:normal;
+  font-weight:normal;
+  line-height:normal;
+}
+
+a {
+  @include rapid-links($link_color);
+}
+
+@media screen {
+  a.ext-link .icon {
+    background: url(../extlink.gif) center center no-repeat;
+    padding-left: 12px;
+  }
+  a.mail-link .icon {
+    background: url(../envelope.png) center center no-repeat;
+    padding-left: 14px;
+  }
+}
+
+.anchor:link, .anchor:visited, .anchor:link:hover, .anchor:visited:hover {
+  border: none;
+  color: $link_color+70;
+  font-size: 80%;
+  vertical-align: text-top;
+  text-decoration: none;
+}
+
+* > .anchor:link, * > .anchor:visited {
+  visibility: hidden;
+}
+
+h1:hover .anchor, h2:hover .anchor, h3:hover .anchor,
+h4:hover .anchor, h5:hover .anchor, h6:hover .anchor {
+  visibility: visible;
+}
+
+h1, h2, h3, h4 {
+ font-weight: bold;
+ letter-spacing: -0.018em;
+ page-break-after: avoid;
+} 
+h1 { font-size: $font-size * 1.7; margin: .15em 0 0.5em 0; vertical-align: bottom;}
+h2 { font-size: $font-size * 1.4; margin: .10em 0 0.4em 0; }
+h3 { font-size: $font-size * 1.25; margin: .7em 0 0.2em 0; }
+hr { border: none;  border-top: 1px solid #ccb; margin: 2em 0 }
+address { font-style: normal }
+img { border: none }
+
+#header {
+  margin: 0px auto;
+  width: $page_width;
+  height: image-height('header.png');
+  background: transparent image-url('header.png') no-repeat bottom left; 
+  h1 {padding: 40px 0 0 10px; color: $header_primary_color; overflow: hidden; font-size: $font-size * 2.5; margin: 0;}
+  h2 {padding: 0 0 0 10px; color: $header_secondary_color; margin: 0;}
+  h1, h2 {a, a:hover {text-decoration: none; color: inherit;}}
+}
+
+#footer {
+  padding: 30px 10px;
+  font-size: $font-size * 0.9;
+  text-align: center;
+  color: $font-color + 10;
+  a { @include rapid-links($font_color - 30); }
+}
+
+#main {
+  background: white;
+  margin: 0px auto;
+  width: $page_width;
+  margin-top: 0px;
+  min-height: 300px;
+  border: 1px solid $secondary_color;
+  border-width: 0 1px;
+  h1 { clear: none; }
+}
+
+#altlinks {
+  clear: both; text-align: center;
+  h3 { font-size: $font-size * 1.2; letter-spacing: normal; margin: 0 }
+  ul { list-style: none; margin: 0; padding: 0 0 1em }
+  li {
+    display: inline;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 0 1em;
+    white-space: nowrap;
+  }
+  li.last { border-right: none }
+  li :link, #altlinks li :visited {
+    background-repeat: no-repeat;
+    color: #666;
+    border: none;
+    padding: 0 0 2px;
+  }
+  li a.rss { background-image: image-url('feed.png'); padding-left: 20px }
+}
+
+
+
+.nav {
+ li {
+    display: inline;
+    padding: 0 .75em;
+    white-space: nowrap;
+   }
+  h2, hr { display: none }
+  ul { list-style: none; margin: 0; text-align: right }
+}
+
+#metanav {
+  position: absolute;
+  top: 10px;
+
+  overflow: hidden;
+  width: 400px;
+  ul {
+    margin: 0 0 0 10px;
+    font-size: $font-size;
+	  padding: 0px;
+    text-align: left;
+	  width: 100%;
+    li {border-width: 0px; color: $header_secondary_color;}
+    a {color: $header_primary_color;}
+  }
+  @include horizontal-image-list('bulletgray.png');
+  
+}
+
+#ctxtnav { 
+  height: 1em;
+  font-size: $font-size * 1.15;
+  padding: 5px 0 8px 0;
+  background-color: $secondary_color;
+  font-weight: bold;
+  text-align: center; 
+  ul {
+   padding: 0;
+   display: inline;
+   margin: 0;
+   li { padding: 0; color: $header_primary_color; }
+   li :link, li :visited { padding: 0 10px; color: $header_primary_color; }
+  }
+}
+
+#mynav {
+  height: 1em;
+  font-size: $font-size;
+  padding: 5px 0 8px 0;
+  background-color: $tertiary_color;
+  font-weight: bold;
+  text-align: center; 
+  ul {
+   padding: 0;
+   display: inline;
+   margin: 0;
+   li { padding: 0; color: $header_secondary_color; }
+   li :link, li :visited { padding: 0 10px; color: $header_secondary_color; }
+  }
+}
+
+table.listing {
+  @include rapid-table($font-color, #eee, #ccc);
+  tbody {
+    tr.section_title:hover, tr.section_title:focus, tr.section_title { background-color: #FFFFFF; } 
+    tr.webclient { background-color: #EEFFD6; }
+    tr.webclient td.name { font-weight: bold;}
+  }
+
+  tbody td.notice, tbody th.notice {
+    padding: 5px;
+    border: 1px solid #D7D7D7;
+    background-color: #E1FFB8;
+    color: #3D6744;
+    text-align: center;
+  }
+
+  .section_title td {
+    font-weight: bold;
+    h3 {margin: 0; }
+  }
+
+  tbody td.center {
+    text-align: center;
+  }
+}
+
+input[type="text"], input[type="password"], input.textwidget {padding:0.25em 0.5em;}
+input[type="text"], input[type="password"], input.textwidget, textarea {border:1px solid #D7D7D7;}
+input[type=text]:focus, input[type="password"]:focus, input.textwidget:focus, textarea:focus { border: 1px solid #886;}
+
+input[type="button"]:hover, 
+input[type="submit"]:hover, 
+input[type="reset"]:hover {
+    background: #E5E5E5 none repeat scroll 0% 0%;
+}
+
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  background: #EEEEEE none repeat scroll 0% 0%;
+  border:1px solid #CCCCCC;
+  color: #222222;
+  padding:0.1em 0.5em;   
+	@include border-radius($rounding);
+}
+
+
+
+#content {
+	padding: 15px $content_border 20px $content_border;
+  clear: both;
+
+  abbr {
+    cursor: help;
+    border-bottom: 1px dotted __text__;
+    font-size: $font-size * 0.8;
+    text-transform: uppercase;
+  }
+
+  table.layout {
+    width: $content_width;
+  }
+
+  .proptable {
+    width: $content_width;
+    margin: 3px 0 15px 0;
+    clear: none;
+    td {padding: 5px; vertical-align: top;}
+    td.proplabel {
+      width: $content_width * 0.3;
+      background: $background_color - 10;
+      font-weight: bold;
+    }
+    td.propbody {
+      width: $content_width * 0.7;
+    }
+    .propdescription {
+      font-size: $font-size * 0.85;
+      color: $font-color + 30;
+    }
+    &.narrow {
+      font-size: $font-size * 1.5;
+      width: $content_width - 300px;
+      td.proplabel {width: ($content_width - 300px) * 0.3; background: none; }
+      td.propbody {width: ($content_width - 300px) * 0.7;}
+    }
+
+  }  
+  .small_text {
+    font-size: $font-size * 0.8;
+    color: $font-color + 30;
+  }
+
+  &.nodes {
+    .node_details {clear: both;}
+
+  }
+
+  .buttons {
+    text-align: right;
+  }
+}
+
+h3.folding {
+	cursor: pointer;
+	margin: 20px 20px 10px 20px;
+	background: transparent image-url('folding_show.png') bottom left no-repeat;
+	border-top: 1px solid #CCCCCC;
+	padding-left: 20px;
+	padding-top: 5px;
+  &.closed {background: transparent image-url('folding_hide.png') bottom left no-repeat;}
+  &:hover {background: transparent image-url('folding_show_hover.png') bottom left no-repeat;}
+  &.closed:hover {background: transparent image-url('folding_hide_hover.png') bottom left no-repeat;}
+}
+
+
+
+
+
+.table_links {text-align: center;}
+
+.nodelist table.listing td {
+  font-size: 12px;
+}
+
+tr.inner_header {
+  background-color: #F2FBE4;
+  font-weight: bold;
+}
+
+.error {
+  @include border-radius($rounding);
+  width: $page-width - 80px;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #CD2D1D;
+  background-color: #FFEBE9;
+  color: #930E00;
+  text-align: center;
+}
+
+.warning {
+  @include border-radius($rounding);
+  width: $page-width - 80px;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #cdc71d;
+  background-color: #fffee9;
+  color: #938c00;
+  text-align: center;
+}
+
+.notice {
+  @include border-radius($rounding);
+  width: $page-width - 80px;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #95DA3A;
+  background-color: #E1FFB8;
+  color: #3D6744;
+  text-align: center;
+}
+
+.embedded {
+  float: right;
+  #gmap {
+    width: 300px;
+    height: 250px;
+
+  }
+  .actions {
+    width: 300px;
+
+  }
+}
+
+.gmap_wrapper {
+
+#gmap {
+  border: 1px solid #D7D7D7;
+  width: $content_width;
+  height: $content_width;
+}
+
+#gmap_statusbar {
+  font-size: $font-size * 0.8;
+  color: $font-color + 30;
+}
+
+}
+
+#topology {
+  max-width: $content_width;
+}
+
+
+
+
+
+.graphdesc {
+  color: #666;
+  font-size: 85%;
+  text-align: center;
+  clear: both;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 566px;
+  ul {
+    padding: 0;
+    li {list-style: none; margin-left: 0;}
+  }
+}
+
+.details_title {
+  clear: both;
+}
+
+table.smallnodeinfo {
+  float: right;
+  @include border-radius($rounding);
+  background-color:#F5F7F5;
+  border:medium none;
+  padding: 5px;
+  margin-right: 5px;
+  width: auto;
+}
+
+.smallnodeinfo .first_column_width {
+  width: 100px;
+}
+
+.smallnodeinfo td {
+  font-size: 60%;
+}
+
+.summary {
+  background: #ffd;
+  border: 1px outset #996;
+  margin-top: 1em;
+  padding: .5em 1em;
+  position: relative;
+}
+
+.networksummary h2 {
+  margin-top: 20px;
+}
+
+.networksummary table.layout td.nodes {
+  text-align: center;
+  vertical-align: baseline;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.legend {
+  font-size: 90%;
+  padding: 0px 10px;
+  dl {padding: 5px 2px 15px 2px;}
+  dt {display: table-cell; white-space: nowrap;}
+  dt:after { margin-left: 0.5em; content: '–'; white-space: nowrap; }
+  dl dt img { vertical-align: middle; }
+  dd { display: table-cell; padding-left: 0.5em; }
+  dd.defintion_end { display: block; height: 0; }
+}
+
+.status_legend dt img {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: -0.5em;
+}
+
+.status_legend dt {
+  padding-left: 20px;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+}
+
+.gmap_details {
+  font-size: 80%;
+}
+
+.optional_packages ul {
+  padding: 0 0 0 0;
+}
+
+.optional_packages ul li {
+  list-style-type: none;
+}
+
+.graphmenu {
+  text-align: left;
+  margin: 0 auto;
+  width: 566px;
+}
+
+.graphmenu .timespan{
+  float: right;
+}
+
+.dataTables_wrapper {
+  clear: both;
+  input {font-size: $font-size * 0.8;}
+}
+
+.dataTables_filter {
+  width: 50%;
+  float: right;
+  text-align: right;
+  color: #CCCCCC;
+}
+
+.dataTables_info {
+  width: 40%;
+  float: left;
+  padding: 5px;
+  color: #CCCCCC;
+}
+
+.sorting_asc {
+  background: image-url('sort_asc.png') no-repeat center right;
+  cursor: pointer;
+}
+
+.sorting_desc {
+  background: image-url('sort_desc.png') no-repeat center right;
+  cursor: pointer;
+}
+
+.sorting {
+  background: image-url('sort_both.png') no-repeat center right;
+  cursor: pointer;
+}
+
+.sorting_asc_disabled {
+  background: image-url('sort_asc_disabled.png') no-repeat center right;
+  cursor: pointer;
+}
+
+.sorting_desc_disabled {
+  background: image-url('sort_desc_disabled.png') no-repeat center right;
+  cursor: pointer;
+}
+
+.dataTables_empty {
+  text-align: center;
+}
+
+tr.subnet td.status,
+tr.subnet td.timestamp {
+  text-align: center;
+}
+
+tr.subnet .description {
+  margin-left: 5px;
+  font-size: 10px;
+  color: #979797;
+}
+
+tr.conflicting .identifier {
+  color: red;
+  font-weight: bold;
+}
+
+tr.conflicting .conflict {
+  color: red;
+  font-size: 10px;
+}
+
+tr.conflicting .conflict ul {
+  margin: 0px;
+  padding: 0px 10px;
+}
+
+tr.conflicting .conflict li {
+  list-style-type: none;
+}
+
+table.warnings {
+  td {
+    padding: 5px;
+    vertical-align: top;
+  }
+  .help, .datetime {
+    font-size: 10px;
+    color: #938C00;
+  }
+  .icon {
+    width: 20px;
+  }
+}
+
+.graphs {
+  div.graph {
+    text-align: center;
+    clear: both;
+    margin-bottom: 10px;
+  }
+  text-align: center;
+  .timespan {
+    padding: 3px 0 20px 0;
+    margin: 0 0 5px 0;
+    background: white image-url('timespan.png') no-repeat bottom center;
+    width: $content_width;
+    border-bottom: solid white 6px;
+    a {
+      @include border-radius($rounding);
+      color: #999999;
+      padding: 2px 5px;
+      margin-left: 4px;
+      font-size: 90%;
+    }
+    a:hover {
+      background-color: #EEEEEE;
+      text-decoration: none;
+    }
+    a.selected, a.selected:hover {
+      background-color: #CCCCCC;
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+.details .first_column_width {
+  width: 300px;
+}
+
+.first_column_width {
+  width: 200px;
+}
+
+.no-top-margin {
+  margin-top: 0px;
+}
+
+.permalink {
+  float: right;
+  margin-top: 0.4em;
+}
+
+/**
+** Status colors
+**/
+
+.node_status_up {color: #007B0F;}
+
+.node_status_invalid {color: #F8C901;}
+
+.node_status_awaitingrenumber {color: #5EA1EF;}
+
+.node_status_new {color: #88BD32;}
+
+.node_status_visible {color: #00ADD1;}
+
+.node_status_down {color: #CB0000;}
+
+.node_status_duped {color: #7E0097;}
+
+.node_status_pending {color: #B1B1B1;}
+
+.subnet_status_notannounced {color: #ff0000;}
+
+.subnet_status_ok {color: #007B0F;}
+
+.subnet_status_notallocated {color: #FFA82F;}
+
+.subnet_status_collision {color: #ff0000;}
+

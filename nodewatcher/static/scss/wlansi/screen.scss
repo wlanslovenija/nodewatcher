@@ -1,0 +1,55 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
+
+$font_size : 0.85em;
+$rounding : 3px;
+
+$primary_color : #68ae2c;
+$secondary_color : #aade7e;
+$tertiary_color : #9b9b9b; 
+
+$font_color : #656565;
+
+$background_color : #FFFFFF;
+
+$header_primary_color : $tertiary_color;
+$header_secondary_color : $background_color;
+
+$link_color : $primary_color;
+
+$page_width : image-width('header.png');
+$content_border : 20px;
+$content_width : $page_width - 2 * $content_border ;
+
+
+@import "../_base.scss"; 
+
+#metanav {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: auto;
+  text-align: right;
+
+}
+
+#header {
+  position: relative;
+  h1 span {display: none;}
+  h2 span {display: none;}
+  h1 a {
+    display:block;
+    position:absolute;
+    height:110px;
+    left:10px;
+    top: 10px;
+    width:110px;
+  }
+  h2 a {
+    display:block;
+    position:absolute;
+    height:70px;
+    left:100px;
+    width:300px;
+    top: 50px;
+  }
+}
