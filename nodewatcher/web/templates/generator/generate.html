@@ -67,10 +67,6 @@
     <td class="propbody">{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
   </tr>
   <tr>
-    <td class="proplabel">{% trans "Enable captive portal" %}</td>
-    <td class="propbody">{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-  </tr>
-  <tr>
     <td class="proplabel">{{ form.config_only.label }}</td>
     <td class="propbody">
       {{ form.config_only }}<br/>
