@@ -74,7 +74,7 @@
     <td class="proplabel">{{ form.config_only.label }}</td>
     <td class="propbody">
       {{ form.config_only }}<br/>
-      <span class="propdescription">{% doclink custom_node _("custom node") custom_node %}{% blocktrans %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a {{ custom_node }}.{% endblocktrans %}</span>
+      <span class="propdescription">{% doclink custom_node _("custom node") as custom_node %}{% blocktrans %}Check this option to generate <b>only</b> configuration files and not complete firmware image. Use those files as a starting point when you are setting up a {{ custom_node }}.{% endblocktrans %}</span>
     </td>
   </tr>
 </table>

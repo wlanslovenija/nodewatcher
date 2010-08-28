@@ -78,7 +78,7 @@ def setcontext(parser, token):
   args = list(token.split_contents())
   
   if len(args) != 3 or args[1] != "as":
-    raise TemplateSyntaxError("'%s' tag expected format is 'as name'" % args[0])
+    raise template.TemplateSyntaxError("'%s' tag expected format is 'as name'" % args[0])
   variable = args[2]
   
   parser.delete_first_token()
@@ -111,7 +111,7 @@ def notice(parser, token):
   args = list(token.split_contents())
 
   if len(args) > 3:
-    raise TemplateSyntaxError("'%s' tag requires at most two arguments" % args[0])
+    raise template.TemplateSyntaxError("'%s' tag requires at most two arguments" % args[0])
   classes = args[2] if len(args) > 2 else '""'
   notice_type = args[1] if len(args) > 1 else '""'
   
@@ -152,13 +152,13 @@ def doclink(parser, token):
   args = list(token.split_contents())
 
   if len(args) != 3 and len(args) != 5:
-    raise TemplateSyntaxError("'%s' tag takes two or four arguments" % args[0])
+    raise template.TemplateSyntaxError("'%s' tag takes two or four arguments" % args[0])
   tag = args[1]
   link = parser.compile_filter(args[2])
   var_name = None
   if len(args) == 5:
     if args[3] != "as":
-      raise TemplateSyntaxError("'%s' tag expected third argument is 'as'" % args[0])
+      raise template.TemplateSyntaxError("'%s' tag expected third argument is 'as'" % args[0])
     var_name = args[4]
   
   return DoclinkNode(tag, link, var_name)
