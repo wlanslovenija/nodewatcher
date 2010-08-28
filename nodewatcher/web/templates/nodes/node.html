@@ -198,10 +198,6 @@
           <td class="proplabel">{% trans "VPN enabled" %}</td>
           <td class="propbody">{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
         </tr>
-        <tr>
-          <td class="proplabel">{% trans "Captive portal enabled" %}</td>
-          <td class="propbody">{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-        </tr>
         {% if current_owner and node.installedpackage_set.all %}
           <tr>
             <td class="proplabel">{% trans "Installed packages" %}</td>

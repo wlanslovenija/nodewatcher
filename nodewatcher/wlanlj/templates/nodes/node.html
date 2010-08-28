@@ -194,10 +194,6 @@
           <td>{% trans "VPN enabled" %}</td>
           <td>{% if node.profile.use_vpn %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
         </tr>
-        <tr>
-          <td>{% trans "Captive portal enabled" %}</td>
-          <td>{% if node.profile.use_captive_portal %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
-        </tr>
         {% if current_owner and node.installedpackage_set.all %}
           <tr>
             <td>{% trans "Installed packages" %}</td>
