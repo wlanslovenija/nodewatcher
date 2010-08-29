@@ -107,6 +107,14 @@
     <td class="proplabel"></td>
     <td class="propbody propdescription">{% doclink ip_address _("IP address") as ip_address %}{% blocktrans %}Select from which IP pool node is assigned its {{ ip_address }}. Non-default pools are used only for special nodes so default is probably what you want.{% endblocktrans %}</td>
   </tr>
+  <tr>
+    <td class="proplabel">{{ form.prefix_len.label }}</td>
+    <td class="propbody">{{ form.prefix_len }}</td>
+  </tr>
+  <tr>
+    <td class="proplabel"></td>
+    <td class="propbody propdescription">{% blocktrans %}Select IP subnet size you would like to have allocated.{% endblocktrans %}</td>
+  </tr>
   {% if user.is_staff %}
     <tr>
       <td class="proplabel">{{ form.ip.label }}</td>
@@ -284,7 +292,9 @@
           "id" : {{ pool.id }},
           "subnet" : '{{ pool.ip_subnet }}',
           "description" : '{{ pool.description }}',
-          "prefix_len" : {{ pool.default_prefix_len }}
+          "def_prefix_len" : {{ pool.default_prefix_len }},
+          "min_prefix_len" : {{ pool.min_prefix_len }},
+          "max_prefix_len" : {{ pool.max_prefix_len }}
         }{% if not forloop.last %},{% endif %}
       {% endfor %}
       ]

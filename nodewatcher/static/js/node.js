@@ -147,6 +147,29 @@ function updatePoolsForProject() {
   pool.attr('value', pools[projectId]["default"]);
 }
 
+function updatePrefixLengthsForPool() {
+  if (!pools)
+    return;
+  
+  var projectId = $('#id_project').attr('value');
+  var poolId = $('#id_pool').attr('value');
+  var pool;
+  pool_list = pools[projectId]["list"];
+  for (var i = 0; i < pool_list.length; i++) {
+    if (pool_list[i].id == poolId) {
+      pool = pool_list[i];
+      break;
+    }
+  }
+  
+  var prefs = $('#id_prefix_len');
+  prefs.empty();
+  for (var i = pool.min_prefix_len; i <= pool.max_prefix_len; i++) {
+    prefs.append('<option value="' + i + '">/' + i + '</option>');
+  }
+  prefs.attr('value', '' + pool.def_prefix_len);
+}
+
 function generateRandomPassword(event) {
   event.preventDefault();
   var choices = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -194,6 +217,10 @@ $(document).ready(function () {
   $('#id_project').change(function(event) {
     updateMapForProject();
     updatePoolsForProject();
+    
+    if ($('#id_prefix_len').length) {
+      updatePrefixLengthsForPool();
+    }
     return true;
   });
   $('#id_wan_dhcp').change(function(event) { toggleAutoConfiguration(); return true; });
@@ -224,4 +251,13 @@ $(document).ready(function () {
   toggleExtAntenna();
   updatePoolsForProject();
   toggleDead();
+  
+  if ($('#id_prefix_len').length) {
+    $('#id_pool').change(function(event) {
+      updatePrefixLengthsForPool();
+      return true;
+    });
+    
+    updatePrefixLengthsForPool();
+  }
 });

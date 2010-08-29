@@ -50,6 +50,12 @@ class RegisterNodeForm(forms.Form):
     empty_label = None,
     label = _("IP pool")
   )
+  prefix_len = forms.TypedChoiceField(
+    choices = [(x, "/{0}".format(x)) for x in xrange(21, 33)],
+    initial = 27,
+    coerce = int,
+    label = _("Subnet size")
+  )
   node_type = forms.ChoiceField(
     choices = [
       (NodeType.Wireless, _("Wireless node")),
@@ -166,6 +172,7 @@ class RegisterNodeForm(forms.Form):
     node_type = int(self.cleaned_data.get('node_type'))
     project = self.cleaned_data.get('project')
     pool = self.cleaned_data.get('pool')
+    prefix_len = self.cleaned_data.get('prefix_len')
 
     if not name:
       return
@@ -190,6 +197,9 @@ class RegisterNodeForm(forms.Form):
     
     if not project.pools.filter(pk = pool.pk).count():
       raise forms.ValidationError(_("The specified IP allocation pool cannot be used with selected project!"))
+    
+    if prefix_len and not (pool.min_prefix_len <= prefix_len <= pool.max_prefix_len):
+      raise forms.ValidationError(_("The specified prefix length cannot be allocated from selected pool!"))
     
     if ip and not pool.reserve_subnet(ip, 32, check_only = True):
       raise forms.ValidationError(_("Specified IP is part of another allocation pool and cannot be manually allocated!"))
@@ -227,12 +237,15 @@ class RegisterNodeForm(forms.Form):
     ip = self.cleaned_data.get('ip')
     project = self.cleaned_data.get('project')
     pool = self.cleaned_data.get('pool')
+    prefix_len = self.cleaned_data.get('prefix_len')
+    if prefix_len == 0:
+      prefix_len = None
     subnet = None
 
     if not ip or not user.is_staff:
       # Assign a new IP address from the selected pool (if no IP address selected)
       node = Node()
-      fresh_subnet = pool.allocate_subnet()
+      fresh_subnet = pool.allocate_subnet(prefix_len)
       net = ipcalc.Network(fresh_subnet.network, fresh_subnet.cidr)
       node.ip = str(net.host_first())
       
