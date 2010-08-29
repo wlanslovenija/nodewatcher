@@ -1,6 +1,6 @@
 from django.conf import settings
-from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.template import RequestContext, Context, loader
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models, transaction
@@ -15,6 +15,8 @@ from web.account.models import UserAccount
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 from datetime import datetime
 from web.nodes import ipcalc
+from web.nodes import context_processors as nodes_context_processors
+from django.core import context_processors as core_context_processors
 from django.core.urlresolvers import reverse
 from web.nodes import decorators
 from web.account.util import generate_random_password
@@ -589,3 +591,15 @@ def package_list(request, node):
     context_instance = RequestContext(request)
   )
 
+def server_error(request, template_name='500.html'):
+  """
+  500 error handler with some request processors.
+
+  Templates: `500.html`
+  Context: None
+  """
+  t = loader.get_template(template_name) # You need to create a 500.html template.
+  context = {}
+  for proc in (core_context_processors.media, nodes_context_processors.global_values):
+    context.update(proc(request))
+  return HttpResponseServerError(t.render(Context(context)))
