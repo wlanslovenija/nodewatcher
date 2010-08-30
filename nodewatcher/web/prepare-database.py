@@ -124,5 +124,8 @@ else:
   transaction.commit()
   transaction.leave_transaction_management()
   connection.close()
+
+  # Additional syncdb for fixture overrides
+  ensure_success(subprocess.call([sys.executable, "-u", "manage.py", "syncdb", "--noinput"]))
   
   print ">>> Import completed."
