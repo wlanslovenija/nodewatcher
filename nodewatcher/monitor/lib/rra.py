@@ -4,6 +4,27 @@ import os
 import subprocess
 import re
 
+# Define export classes
+__all__ = [
+  'RRA',
+  'RRAIface',
+  'RRAClients',
+  'RRARTT',
+  'RRALinkQuality',
+  'RRASolar',
+  'RRALoadAverage',
+  'RRANumProc',
+  'RRAMemUsage',
+  'RRALocalTraffic',
+  'RRANodesByStatus',
+  'RRAWifiCells',
+  'RRAOlsrPeers',
+  'RRAPacketLoss',
+  'RRAWifiBitrate',
+  'RRAWifiSignalNoise',
+  'RRAWifiSNR'
+]
+
 # Models
 from web.nodes.models import StatsSolar
 from web.nodes import data_archive
@@ -33,6 +54,9 @@ class DataSource:
     self.name = name
     self.type = type
     self.heartbeat = heartbeat
+  
+  def is_counter(self):
+    return self.type == CounterDST
   
   def __str__(self):
     return "DS:%s:%s:%s:U:U" % (self.name, self.type, self.heartbeat)
@@ -876,7 +900,10 @@ class RRA:
     
     rrdtool.update(
       archive,
-      "N:" + ":".join(nvalues)
+      "{0}:{1}".format(
+        kwargs.get("timestamp", "N"),
+        ":".join(nvalues)
+      )
     )
 
     # Record data in database store if set

@@ -66,9 +66,10 @@ else:
   nodewatcher.COLLECT_SIMULATION_DATA = options.collect_sim
   wifi_utils.COLLECT_SIMULATION_DATA = options.collect_sim
 
-from lib.rra import RRA, RRAIface, RRAClients, RRARTT, RRALinkQuality, RRASolar, RRALoadAverage, RRANumProc, RRAMemUsage, RRALocalTraffic, RRANodesByStatus, RRAWifiCells, RRAOlsrPeers, RRAPacketLoss, RRAWifiBitrate, RRAWifiSignalNoise, RRAWifiSNR
+from lib.rra import *
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
+from lib.graphs import Grapher, RRA_CONF_MAP
 from lib import ipcalc
 from time import sleep
 from datetime import datetime, timedelta
@@ -83,22 +84,7 @@ import struct
 if Tweet.tweets_enabled():
   from lib import bitly
 
-RRA_CONF_MAP = {
-  GraphType.RTT             : RRARTT,
-  GraphType.LQ              : RRALinkQuality,
-  GraphType.Clients         : RRAClients,
-  GraphType.Traffic         : RRAIface,
-  GraphType.LoadAverage     : RRALoadAverage,
-  GraphType.NumProc         : RRANumProc,
-  GraphType.MemUsage        : RRAMemUsage,
-  GraphType.Solar           : RRASolar,
-  GraphType.WifiCells       : RRAWifiCells,
-  GraphType.OlsrPeers       : RRAOlsrPeers,
-  GraphType.PacketLoss      : RRAPacketLoss,
-  GraphType.WifiBitrate     : RRAWifiBitrate,
-  GraphType.WifiSignalNoise : RRAWifiSignalNoise,
-  GraphType.WifiSNR         : RRAWifiSNR
-}
+
 WORKER_POOL = None
 
 def safe_int_convert(integer):
@@ -158,40 +144,6 @@ def safe_dbm_convert(dbm):
     return dbm
   except:
     return None
-
-def add_graph(node, name, type, conf, title, filename, *values, **attrs):
-  """
-  A helper function for generating graphs.
-  """
-  if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
-    return
-  
-  # Get parent instance (toplevel by default)
-  parent = attrs.get('parent', None)
-  graph_image_name = '%s_%s.png' % (filename, node.pk)
-  graph_rra_name = '%s_%s.rrd' % (filename, node.pk)
-
-  try:
-    graph = GraphItem.objects.get(node = node, name = name, type = type, parent = parent)
-    if graph.graph != graph_image_name:
-      graph.graph = graph_image_name
-  except GraphItem.DoesNotExist:
-    graph = GraphItem(node = node, name = name, type = type, parent = parent)
-    graph.rra = graph_rra_name
-    graph.graph = graph_image_name
-  
-  rra = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
-  try:
-    RRA.update(node, conf, rra, *values, graph = graph.pk)
-  except:
-    logging.warning(format_exc())
-  
-  graph.title = title
-  graph.last_update = datetime.now()
-  graph.dead = False
-  graph.need_redraw = True
-  graph.save()
-  return graph
 
 @transaction.commit_on_success
 def check_events():
@@ -384,7 +336,9 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
     # case we must ignore processing of this node.
     return
   
+  grapher = Grapher(n)
   oldStatus = n.status
+  old_last_seen = n.last_seen
 
   # Determine node status
   if ping_results is not None:
@@ -392,7 +346,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
     n.rtt_min, n.rtt_avg, n.rtt_max, n.pkt_loss = ping_results
     
     # Add RTT graph
-    add_graph(n, '', GraphType.RTT, RRARTT, 'Latency', 'latency', n.rtt_avg, n.rtt_min, n.rtt_max)
+    grapher.add_graph(GraphType.RTT, 'Latency', 'latency', n.rtt_avg, n.rtt_min, n.rtt_max)
 
     # Add uptime credit
     if n.uptime_last:
@@ -405,7 +359,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
   # Measure packet loss with different packet sizes and generate a graph
   if ping_results is not None and varsize_results is not None:
     losses = [n.pkt_loss] + varsize_results
-    add_graph(n, '', GraphType.PacketLoss, RRAPacketLoss, 'Packet Loss', 'packetloss', *losses)
+    grapher.add_graph(GraphType.PacketLoss, 'Packet Loss', 'packetloss', *losses)
   
   if is_duped:
     n.status = NodeStatus.Duped
@@ -423,7 +377,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
     Event.create_event(n, EventCode.PacketDuplication, '', EventSource.Monitor)
   
   # Add olsr peer count graph
-  add_graph(n, '', GraphType.OlsrPeers, RRAOlsrPeers, 'Routing Peers', 'olsrpeers', n.peers)
+  grapher.add_graph(GraphType.OlsrPeers, 'Routing Peers', 'olsrpeers', n.peers)
 
   # Add LQ/ILQ graphs
   if n.peers > 0:
@@ -432,10 +386,10 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       lq_avg += float(peer.lq)
       ilq_avg += float(peer.ilq)
     
-    lq_graph = add_graph(n, '', GraphType.LQ, RRALinkQuality, 'Average Link Quality', 'lq', lq_avg / n.peers, ilq_avg / n.peers)
+    lq_graph = grapher.add_graph(GraphType.LQ, 'Average Link Quality', 'lq', lq_avg / n.peers, ilq_avg / n.peers)
 
     for peer in n.get_peers():
-      add_graph(n, peer.dst.ip, GraphType.LQ, RRALinkQuality, 'Link Quality to %s' % peer.dst, 'lq_peer_%s' % peer.dst.pk, peer.lq, peer.ilq, parent = lq_graph)
+      grapher.add_graph(GraphType.LQ, 'Link Quality to %s' % peer.dst, 'lq_peer_%s' % peer.dst.pk, peer.lq, peer.ilq, name = peer.dst.ip, parent = lq_graph)
 
   n.last_seen = datetime.now()
 
@@ -478,6 +432,10 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
 
       if oldUptime > n.uptime:
         Event.create_event(n, EventCode.UptimeReset, '', EventSource.Monitor, data = 'Old uptime: %s\n  New uptime: %s' % (oldUptime, n.uptime))
+        
+        # Setup reboot mode for further graphs as we now know the node has
+        # been rebooted
+        grapher.enable_reboot_mode(n.uptime, old_last_seen)
 
       if oldChannel != n.channel and oldChannel != 0:
         Event.create_event(n, EventCode.ChannelChanged, '', EventSource.Monitor, data = 'Old channel: %s\n  New channel %s' % (oldChannel, n.channel))
@@ -572,7 +530,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
 
       # Generate a graph for number of wifi cells
       if 'cells' in info['wifi']:
-        add_graph(n, '', GraphType.WifiCells, RRAWifiCells, 'Nearby Wifi Cells', 'wificells', safe_int_convert(info['wifi']['cells']) or 0)
+        grapher.add_graph(GraphType.WifiCells, 'Nearby Wifi Cells', 'wificells', safe_int_convert(info['wifi']['cells']) or 0)
 
       # Update node's MAC address on wifi iface
       if 'mac' in info['wifi']:
@@ -596,13 +554,13 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         noise = safe_dbm_convert(info['wifi']['noise'])
         snr = float(signal) - float(noise)
         
-        add_graph(n, '', GraphType.WifiBitrate, RRAWifiBitrate, 'Wifi Bitrate', 'wifibitrate', bitrate)
-        add_graph(n, '', GraphType.WifiSignalNoise, RRAWifiSignalNoise, 'Wifi Signal/Noise', 'wifisignalnoise', signal, noise)
-        add_graph(n, '', GraphType.WifiSNR, RRAWifiSNR, 'Wifi Signal/Noise Ratio', 'wifisnr', snr)
+        grapher.add_graph(GraphType.WifiBitrate, 'Wifi Bitrate', 'wifibitrate', bitrate)
+        grapher.add_graph(GraphType.WifiSignalNoise, 'Wifi Signal/Noise', 'wifisignalnoise', signal, noise)
+        grapher.add_graph(GraphType.WifiSNR, 'Wifi Signal/Noise Ratio', 'wifisnr', snr)
       
       # Generate a graph for number of clients
       if 'nds' in info:
-        add_graph(n, '', GraphType.Clients, RRAClients, 'Connected Clients', 'clients', n.clients)
+        grapher.add_graph(GraphType.Clients, 'Connected Clients', 'clients', n.clients)
 
       # Check for IP shortage
       wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
@@ -622,20 +580,20 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           except Profile.DoesNotExist:
             pass
           
-          add_graph(n, iid, GraphType.Traffic, RRAIface, 'Traffic - %s' % iid, 'traffic_%s' % iid, iface['up'], iface['down'])
+          grapher.add_graph(GraphType.Traffic, 'Traffic - %s' % iid, 'traffic_%s' % iid, iface['up'], iface['down'], name = iid)
       
       # Generate load average statistics
       if 'loadavg' in info['general']:
         n.loadavg_1min, n.loadavg_5min, n.loadavg_15min, n.numproc = safe_loadavg_convert(info['general']['loadavg'])
-        add_graph(n, '', GraphType.LoadAverage, RRALoadAverage, 'Load Average', 'loadavg', n.loadavg_1min, n.loadavg_5min, n.loadavg_15min)
-        add_graph(n, '', GraphType.NumProc, RRANumProc, 'Number of Processes', 'numproc', n.numproc)
+        grapher.add_graph(GraphType.LoadAverage, 'Load Average', 'loadavg', n.loadavg_1min, n.loadavg_5min, n.loadavg_15min)
+        grapher.add_graph(GraphType.NumProc, 'Number of Processes', 'numproc', n.numproc)
 
       # Generate free memory statistics
       if 'memfree' in info['general']:
         n.memfree = safe_int_convert(info['general']['memfree'])
         buffers = safe_int_convert(info['general'].get('buffers', 0))
         cached = safe_int_convert(info['general'].get('cached', 0))
-        add_graph(n, '', GraphType.MemUsage, RRAMemUsage, 'Memory Usage', 'memusage', n.memfree, buffers, cached)
+        grapher.add_graph(GraphType.MemUsage, 'Memory Usage', 'memusage', n.memfree, buffers, cached)
 
       # Generate solar statistics when available
       if 'solar' in info and all([x in info['solar'] for x in ('batvoltage', 'solvoltage', 'charge', 'state', 'load')]):
@@ -650,7 +608,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           if not value.strip():
             info['solar'][key] = None
         
-        add_graph(n, '', GraphType.Solar, RRASolar, 'Solar Monitor', 'solar',
+        grapher.add_graph(GraphType.Solar, 'Solar Monitor', 'solar',
           info['solar']['batvoltage'],
           info['solar']['solvoltage'],
           info['solar']['charge'],
