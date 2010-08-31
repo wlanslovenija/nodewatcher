@@ -841,7 +841,8 @@ class OpenWrtConfig(NodeConfig):
       f.write('Interface "{0}"\n'.format(name))
       f.write('{\n')
       f.write('  IPv4Multicast 255.255.255.255\n')
-      f.write('  IPv4Src {0}\n'.format(ip))
+      if ip is not None:
+        f.write('  IPv4Src {0}\n'.format(ip))
       f.write('  HelloInterval 5.0\n')
       f.write('  HelloValidityTime 40.0\n')
       f.write('  TcInterval 7.0\n')
