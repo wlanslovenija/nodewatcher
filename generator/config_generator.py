@@ -504,6 +504,12 @@ class OpenWrtConfig(NodeConfig):
       f = open(os.path.join(directory, 'dnsmasq.conf'), 'w')
       self.__generateDhcpServerConfig(f)
     
+    # Generate resolv.conf for router-only nodes
+    if not self.hasClientSubnet:
+      f = open(os.path.join(directory, 'resolv.conf'), 'w')
+      f.write('nameserver %s\n' % self.dns[0])
+      f.close()
+    
     # Create the captive portal configuration
     if self.captivePortal and self.dhcpServer and self.hasClientSubnet:
       self.__generateCaptivePortalConfig(os.path.join(directory, 'nodogsplash'))
@@ -803,6 +809,9 @@ class OpenWrtConfig(NodeConfig):
     f.write('TcRedundancy 2\n')
     f.write('MprCoverage 3\n')
     f.write('NatThreshold 0.75\n')
+    f.write('SmartGateway no\n')
+    f.write('MainIp {0}\n'.format(self.ip))
+    f.write('SrcIpRoutes yes\n')
     f.write('\n')
     
     # Setup txtinfo plugin when selected
@@ -828,10 +837,11 @@ class OpenWrtConfig(NodeConfig):
       self.addPackage('olsrd-mod-actions')
     
     # General interface configuration (static)
-    def interfaceConfiguration(name):
-      f.write('Interface "%s"\n' % name)
+    def interfaceConfiguration(name, ip):
+      f.write('Interface "{0}"\n'.format(name))
       f.write('{\n')
-      f.write('  Ip4Broadcast 255.255.255.255\n')
+      f.write('  IPv4Multicast 255.255.255.255\n')
+      f.write('  IPv4Src {0}\n'.format(ip))
       f.write('  HelloInterval 5.0\n')
       f.write('  HelloValidityTime 40.0\n')
       f.write('  TcInterval 7.0\n')
@@ -847,7 +857,7 @@ class OpenWrtConfig(NodeConfig):
     # Additional interface configuration
     for interface in self.interfaces:
       if interface['olsr']:
-        interfaceConfiguration(interface['name'])
+        interfaceConfiguration(interface['name'], interface['ip'])
     
     f.close()
   
