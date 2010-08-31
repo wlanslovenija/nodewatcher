@@ -803,7 +803,6 @@ class OpenWrtConfig(NodeConfig):
     f.write('LinkQualityLevel 2\n')
     f.write('LinkQualityAging 0.1\n')
     f.write('LinkQualityAlgorithm "etx_ff"\n')
-    f.write('LinkQualityDijkstraLimit 0 9.0\n')
     f.write('FIBMetric "flat"\n')
     f.write('Pollrate 0.025\n')
     f.write('TcRedundancy 2\n')
@@ -837,12 +836,10 @@ class OpenWrtConfig(NodeConfig):
       self.addPackage('olsrd-mod-actions')
     
     # General interface configuration (static)
-    def interfaceConfiguration(name, ip):
+    def interfaceConfiguration(name):
       f.write('Interface "{0}"\n'.format(name))
       f.write('{\n')
       f.write('  IPv4Multicast 255.255.255.255\n')
-      if ip is not None:
-        f.write('  IPv4Src {0}\n'.format(ip))
       f.write('  HelloInterval 5.0\n')
       f.write('  HelloValidityTime 40.0\n')
       f.write('  TcInterval 7.0\n')
@@ -858,7 +855,7 @@ class OpenWrtConfig(NodeConfig):
     # Additional interface configuration
     for interface in self.interfaces:
       if interface['olsr']:
-        interfaceConfiguration(interface['name'], interface['ip'])
+        interfaceConfiguration(interface['name'])
     
     f.close()
   
@@ -888,15 +885,6 @@ class OpenWrtConfig(NodeConfig):
     f.write('\toption proto static\n')
     f.write('\toption ipaddr 127.0.0.1\n')
     f.write('\toption netmask 255.0.0.0\n')
-    f.write('\n')
-
-    # Router ID
-    f.write('### Router ID\n')
-    f.write('config alias routerid\n')
-    f.write('\toption interface loopback\n')
-    f.write('\toption proto static\n')
-    f.write('\toption ipaddr %s\n' % self.ip)
-    f.write('\toption netmask 255.255.255.255\n')
     f.write('\n')
     
     # LAN configuration
