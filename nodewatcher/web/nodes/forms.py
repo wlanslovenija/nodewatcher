@@ -173,7 +173,10 @@ class RegisterNodeForm(forms.Form):
     project = self.cleaned_data.get('project')
     pool = self.cleaned_data.get('pool')
     prefix_len = self.cleaned_data.get('prefix_len')
-
+    
+    if prefix_len == 0:
+      prefix_len = None
+    
     if not name:
       return
 
@@ -201,8 +204,13 @@ class RegisterNodeForm(forms.Form):
     if prefix_len and not (pool.min_prefix_len <= prefix_len <= pool.max_prefix_len):
       raise forms.ValidationError(_("The specified prefix length cannot be allocated from selected pool!"))
     
-    if ip and not pool.reserve_subnet(ip, 32, check_only = True):
-      raise forms.ValidationError(_("Specified IP is part of another allocation pool and cannot be manually allocated!"))
+    if ip:
+      # Compute proper subnet IP otherwise checks will fail because of a misaligned address
+      net = ipcalc.Network(ip, prefix_len)
+      sub_ip = str(net.network())
+      
+      if not pool.reserve_subnet(sub_ip, prefix_len or 32, check_only = True):
+        raise forms.ValidationError(_("The node IP (%(subnet)s/%(cidr)s) you have manually entered cannot be allocated from the selected pool (%(pool)s)! This might be because the subnet is already in use by another node or is not a part of the selected pool.") % { 'subnet' : ip, 'cidr' : prefix_len or 32, 'pool' : str(pool) })
     
     if self.cleaned_data.get('template'):
       if not wan_dhcp and (not wan_ip or not wan_gw):
@@ -242,7 +250,7 @@ class RegisterNodeForm(forms.Form):
       prefix_len = None
     subnet = None
 
-    if not ip or not user.is_staff:
+    if not ip:
       # Assign a new IP address from the selected pool (if no IP address selected)
       node = Node()
       fresh_subnet = pool.allocate_subnet(prefix_len)
@@ -255,19 +263,26 @@ class RegisterNodeForm(forms.Form):
       subnet.allocated_at = datetime.now()
       subnet.status = SubnetStatus.NotAnnounced
     else:
-      # An IP has been entered, check if this node already exists
+      # When prefix is not available we should use /32
+      if prefix_len is None:
+        prefix_len = 32
+      
+      net = ipcalc.Network(ip, prefix_len)
+      sub_ip = str(net.network())
+      
+      # Check if this node already exists
       try:
-        node = Node.objects.get(ip = ip)
+        node = Node.objects.get(ip = str(net.host_first()))
       except Node.DoesNotExist:
-        node = Node(ip = ip)
+        node = Node(ip = str(net.host_first()))
       
       # Reserve existing IP in the pool
-      pool.reserve_subnet(ip, 32)
+      pool.reserve_subnet(sub_ip, prefix_len)
       try:
-        subnet = Subnet.objects.get(node = node, subnet = ip, cidr = 32)
+        subnet = Subnet.objects.get(node = node, subnet = sub_ip, cidr = prefix_len)
         subnet.status = SubnetStatus.AnnouncedOk
       except Subnet.DoesNotExist:
-        subnet = Subnet(node = node, subnet = ip, cidr = 32)
+        subnet = Subnet(node = node, subnet = sub_ip, cidr = prefix_len)
         subnet.status = SubnetStatus.NotAnnounced
       
       subnet.allocated = True

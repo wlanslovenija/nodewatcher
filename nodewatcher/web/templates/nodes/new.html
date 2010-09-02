@@ -115,15 +115,15 @@
     <td class="proplabel"></td>
     <td class="propbody propdescription">{% blocktrans %}Select IP subnet size you would like to have allocated.{% endblocktrans %}</td>
   </tr>
+  <tr>
+    <td class="proplabel">{{ form.ip.label }}</td>
+    <td class="propbody">{{ form.ip }}</td>
+  </tr>
+  <tr>
+    <td class="proplabel"></td>
+    <td class="propbody"><label onclick="toggleIpInput();">{{ form.assign_ip }} {{ form.assign_ip.label }}</label></td>
+  </tr>
   {% if user.is_staff %}
-    <tr>
-      <td class="proplabel">{{ form.ip.label }}</td>
-      <td class="propbody">{{ form.ip }}</td>
-    </tr>
-    <tr>
-      <td class="proplabel"></td>
-      <td class="propbody"><label onclick="toggleIpInput();">{{ form.assign_ip }} {{ form.assign_ip.label }}</label></td>
-    </tr>
     <tr>
       <td class="proplabel">{{ form.system_node.label }}</td>
       <td class="propbody">{{ form.system_node }}</td>
@@ -301,12 +301,11 @@
     }{% if not forloop.last %},{% endif %}
   {% endfor %}
   };
-{% if user.is_staff %}
+
   $(document).ready(function () {
     $('#id_assign_ip').change(function(event) { toggleIpInput(); return true; });
     toggleIpInput();
   });
-{% endif %}
 /* ]]> */
 </script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
