@@ -523,10 +523,11 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         n.captive_portal_status = True
       
       # Check for captive portal status change
-      if oldNdsStatus and not n.captive_portal_status:
-        Event.create_event(n, EventCode.CaptivePortalDown, '', EventSource.Monitor)
-      elif not oldNdsStatus and n.captive_portal_status:
-        Event.create_event(n, EventCode.CaptivePortalUp, '', EventSource.Monitor)
+      if n.has_client_subnet():
+        if oldNdsStatus and not n.captive_portal_status:
+          Event.create_event(n, EventCode.CaptivePortalDown, '', EventSource.Monitor)
+        elif not oldNdsStatus and n.captive_portal_status:
+          Event.create_event(n, EventCode.CaptivePortalUp, '', EventSource.Monitor)
 
       # Generate a graph for number of wifi cells
       if 'cells' in info['wifi']:
