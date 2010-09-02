@@ -417,7 +417,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         NodeWarning.create(n, WarningCode.BSSIDMismatch, EventSource.Monitor)
       
       try:
-        if n.essid != n.project.ssid:
+        if n.essid != n.configured_essid:
           NodeWarning.create(n, WarningCode.ESSIDMismatch, EventSource.Monitor)
       except Project.DoesNotExist:
         pass

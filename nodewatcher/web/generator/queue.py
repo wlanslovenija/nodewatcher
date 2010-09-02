@@ -48,7 +48,7 @@ def queue_generator_job(node, email_user, config_only = False):
     'vpn_password'    : profile.vpn_password,
     'vpn_mac'         : node.vpn_mac_conf,
     'project'         : node.project.name,
-    'ssid'            : node.project.ssid,
+    'ssid'            : node.configured_essid,
     'channel'         : node.profile.channel,
     'rx_ant'          : node.profile.antenna,
     'tx_ant'          : node.profile.antenna,

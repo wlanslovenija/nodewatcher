@@ -25,6 +25,8 @@ class Project(models.Model):
   pool = models.ForeignKey('Pool')
   channel = models.IntegerField()
   ssid = models.CharField(max_length = 50)
+  ssid_backbone = models.CharField(max_length = 50)
+  ssid_mobile = models.CharField(max_length = 50)
   captive_portal = models.BooleanField()
   sticker = models.CharField(max_length = 50)
   zone = models.ForeignKey(Zone, null = True)
@@ -385,10 +387,27 @@ class Node(models.Model):
     Is node configured to have a subnet for clients?
     """
     if not subnet:
-      subnets = self.subnet_set.filter(allocated = True, gen_iface_type = IfaceType.WiFi)
+      subnets = self.subnet_set.filter(allocated = True, gen_iface_type = IfaceType.WiFi, cidr__lte = 28)
       if subnets:
         subnet = subnets[0]
     return subnet and subnet.cidr <= 28 and subnet.gen_iface_type == IfaceType.WiFi
+  
+  @property
+  def configured_essid(self):
+    """
+    Returns the ESSID that this node should have configured.
+    """
+    essid = self.project.ssid
+    if not self.has_client_subnet():
+      # Node doesn't have a valid client subnet, so it is considered a
+      # backbone node and this should be reflected in its ESSID
+      essid = self.project.ssid_backbone
+    
+    if self.is_mobile_node():
+      # Mobile nodes have their own ESSID assigned
+      essid = self.project.ssid_mobile
+    
+    return essid
   
   def get_renumbered_ip(self):
     """
