@@ -53,7 +53,10 @@
         <select name="{{ subnet.prefix }}" id="id_{{ subnet.prefix }}"></select>
         {% if user.is_staff %}
         <br/>{% trans "Subnet (optional):" %}&nbsp;
-        {{ subnet.manual_ip }}
+        {{ subnet.manual_ip }}<br/>
+        <label onclick="toggleManualSubnetInput('{{ subnet.model.pk }}');">
+          <input type="checkbox" id="id_assign_manual_{{ subnet.model.pk }}" checked="checked" /> {% trans "Assign automatically from the IP pool" %}
+        </label>
         {% endif %}
       </div>
     </td>
@@ -89,10 +92,24 @@
     }
   }
   
+  function toggleManualSubnetInput(subnetId)
+  {
+    var manualSubnet = $('#id_manual_' + subnetId);
+    var checkbox = $('#id_assign_manual_' + subnetId); 
+    
+    if (checkbox.is(':checked')) {
+      manualSubnet.attr('value', '');
+      manualSubnet.attr('disabled', 'disabled');
+    } else {
+      manualSubnet.removeAttr('disabled');
+    }
+  }
+  
   $(document).ready(function () {
     $('.subnet').change(function(event) {
       var subnetId = $(this).attr('id').replace('id_subnet_', '');
       updatePrefixLensForPool(subnetId, $(this).attr('value'));
+      toggleManualSubnetInput(subnetId);
     }).change();
   });
 /* ]]> */

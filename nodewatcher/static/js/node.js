@@ -111,7 +111,7 @@ function toggleExtAntenna(dontToggleImageGenerator) {
 
 function toggleIpInput() {
   if ($('#id_assign_ip').is(':checked')) {
-    $('#id_ip').value = '';
+    $('#id_ip').attr('value', '');
     $('#id_ip').attr('disabled', 'disabled');
   }
   else {
