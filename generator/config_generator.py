@@ -102,7 +102,6 @@ class NodeConfig(object):
   interfaces = None
   services = None
   captivePortal = False
-  dhcpServer = False
   packages = None
   wan = None
   nodeType = "adhoc"
@@ -335,11 +334,8 @@ class NodeConfig(object):
     @param dhcp: Should this subnet be announced via DHCP
     @param olsr: Should this subnet be announced via OLSR
     """
-    if dhcp:
-      self.dhcpServer = True
-      
-      if cidr <= 28 and interface == self.wifiIface:
-        self.hasClientSubnet = True
+    if dhcp and cidr <= 28 and interface == self.wifiIface:
+      self.hasClientSubnet = True
     
     network = ipcalc.Network("%s/%s" % (subnet, cidr))
     subnet = { 'interface'   : interface,
@@ -499,19 +495,12 @@ class OpenWrtConfig(NodeConfig):
     if self.vpn:
       self.__generateVpnConfig(os.path.join(directory, 'openvpn'))
     
-    # Create the DHCP configuration
-    if self.dhcpServer and self.hasClientSubnet:
-      f = open(os.path.join(directory, 'dnsmasq.conf'), 'w')
-      self.__generateDhcpServerConfig(f)
-    
-    # Generate resolv.conf for router-only nodes
-    if not self.hasClientSubnet:
-      f = open(os.path.join(directory, 'resolv.conf'), 'w')
-      f.write('nameserver %s\n' % self.dns[0])
-      f.close()
+    # Create the dnsmasq configuration
+    f = open(os.path.join(directory, 'dnsmasq.conf'), 'w')
+    self.__generateDnsmasqConfig(f)
     
     # Create the captive portal configuration
-    if self.captivePortal and self.dhcpServer and self.hasClientSubnet:
+    if self.captivePortal and self.hasClientSubnet:
       self.__generateCaptivePortalConfig(os.path.join(directory, 'nodogsplash'))
     
     # Setup service symlinks
@@ -535,11 +524,10 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('pv', 'netprofscripts')
     self.addPackage('tc', 'kmod-sched')
     #self.addPackage('kmod-ipv6')
+    self.addPackage('dnsmasq')
     
     if self.hasClientSubnet:
-      self.addPackage('nullhttpd', 'dnsmasq')
-    else:
-      self.addPackage('-dnsmasq')
+      self.addPackage('nullhttpd')
       
       # Remove optional packages that should not be installed if this is a router-only
       # configuration (without a client subnet)
@@ -692,7 +680,7 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('kmod-ipt-ipopt', 'iptables-mod-ipopt')
     self.addPackage('libpthread', 'nodogsplash')
   
-  def __generateDhcpServerConfig(self, f):
+  def __generateDnsmasqConfig(self, f):
     f.write('domain-needed\n')
     f.write('bogus-priv\n')
     f.write('localise-queries\n')
@@ -701,28 +689,29 @@ class OpenWrtConfig(NodeConfig):
 
     for dns in self.dns:
       f.write('server=%s\n' % dns)
-
-    f.write('dhcp-authoritative\n')
-    f.write('dhcp-leasefile=/tmp/dhcp.leases\n')
-    f.write('\n')
     
-    for subnet in self.subnets:
-      if subnet['dhcp'] and subnet['cidr'] <= 28:
-        network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
-        offset = 1
-        if ipcalc.IP(self.ip) in network:
-          # First few IPs of primary subnet might be used for individual interfaces
-          offset += self.usedOlsrIps - 1
-	      
-        subnet['ntp'] = self.ntp[0]
-        subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
-        subnet['rangeEnd'] = str(network.host_last())
-        
-        f.write('# %(subnet)s/%(cidr)s\n' % subnet)
-        f.write('dhcp-range=%(interface)s,%(rangeStart)s,%(rangeEnd)s,%(mask)s,30m\n' % subnet)
-        f.write('dhcp-option=%(interface)s,3,%(firstIp)s\n' % subnet)
-        f.write('dhcp-option=%(interface)s,6,%(firstIp)s\n' % subnet)
-        f.write('dhcp-option=%(interface)s,42,%(ntp)s\n' % subnet)
+    if self.hasClientSubnet:
+      f.write('dhcp-authoritative\n')
+      f.write('dhcp-leasefile=/tmp/dhcp.leases\n')
+      f.write('\n')
+      
+      for subnet in self.subnets:
+        if subnet['dhcp'] and subnet['cidr'] <= 28:
+          network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
+          offset = 1
+          if ipcalc.IP(self.ip) in network:
+            # First few IPs of primary subnet might be used for individual interfaces
+            offset += self.usedOlsrIps - 1
+	        
+          subnet['ntp'] = self.ntp[0]
+          subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
+          subnet['rangeEnd'] = str(network.host_last())
+          
+          f.write('# %(subnet)s/%(cidr)s\n' % subnet)
+          f.write('dhcp-range=%(interface)s,%(rangeStart)s,%(rangeEnd)s,%(mask)s,30m\n' % subnet)
+          f.write('dhcp-option=%(interface)s,3,%(firstIp)s\n' % subnet)
+          f.write('dhcp-option=%(interface)s,6,%(firstIp)s\n' % subnet)
+          f.write('dhcp-option=%(interface)s,42,%(ntp)s\n' % subnet)
     
     f.close()
   
