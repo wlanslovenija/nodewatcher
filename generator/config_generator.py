@@ -528,7 +528,7 @@ class OpenWrtConfig(NodeConfig):
     
     if self.hasClientSubnet:
       self.addPackage('nullhttpd')
-      
+    else:
       # Remove optional packages that should not be installed if this is a router-only
       # configuration (without a client subnet)
       for package in clientOnlyPackages:
