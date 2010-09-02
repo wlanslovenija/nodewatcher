@@ -46,6 +46,8 @@ class DotTopologyPlotter:
 
     self.__output += '"%s" [label="%s",color="%s",style="filled"];\n' % (node.ip, name, color)
     for link in node.dst.all():
+      if not link.visible:
+        continue
       if linksEtx.get(link.src.ip, 0) > link.etx:
         pass
       elif (node.ip, link.src.ip) in self.__edges or (link.src.ip, node.ip) in self.__edges:

@@ -854,14 +854,6 @@ def check_network_status():
     
     # Archive topology information
     data_archive.record_topology_entry(snapshot_id, timestamp, n, links)
-  
-  # Add nodes to topology map and generate output
-  if not getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
-    # Only generate topology when graphing is not disabled
-    topology = DotTopologyPlotter()
-    for node in dbNodes.values():
-      topology.addNode(node)
-    topology.save(os.path.join(settings.GRAPH_DIR, 'network_topology.png'), os.path.join(settings.GRAPH_DIR, 'network_topology.dot'))
 
   # Update valid subnet status in the database
   for nodeIp, subnets in hna.iteritems():
@@ -956,6 +948,14 @@ def check_network_status():
   
   # Remove invisible links
   Link.objects.filter(visible = False).delete()
+  
+  # Add nodes to topology map and generate output
+  if not getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
+    # Only generate topology when graphing is not disabled
+    topology = DotTopologyPlotter()
+    for node in dbNodes.values():
+      topology.addNode(node)
+    topology.save(os.path.join(settings.GRAPH_DIR, 'network_topology.png'), os.path.join(settings.GRAPH_DIR, 'network_topology.dot'))
 
   # Ping the nodes to prepare information for later node processing
   varsize_results = {}
