@@ -78,7 +78,7 @@ class RegisterNodeForm(forms.Form):
     required = False
   )
   channel = forms.ChoiceField(
-    choices = [(0, _("Default"))] + [(x, x) for x in xrange(1, 11)],
+    choices = [(0, _("Default"))] + [(x, x) for x in xrange(1, 15)],
     initial = 0,
     label = _("Channel"),
     required = False
@@ -413,7 +413,7 @@ class UpdateNodeForm(forms.Form):
     required = False,
   )
   channel = forms.ChoiceField(
-    choices = [(x, x) for x in xrange(1, 11)],
+    choices = [(x, x) for x in xrange(1, 15)],
     label = _("Channel"),
     initial = 8,
     required = False,
