@@ -834,6 +834,7 @@ class GraphType:
   # Graph ordering by type (top to bottom)
   ordering = [
     GatewayTraffic,
+    Solar,
     Clients,
     Traffic,
     WifiSignalNoise,
