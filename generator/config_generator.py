@@ -778,7 +778,7 @@ class OpenWrtConfig(NodeConfig):
       f.write('{\n')
       
       for subnet in self.subnets:
-        if subnet['olsr'] and subnet['cidr'] < 29:
+        if subnet['olsr']:
           f.write('  %(subnet)s  %(mask)s\n' % subnet)
       
       f.write('}\n\n')
