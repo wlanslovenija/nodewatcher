@@ -1032,6 +1032,9 @@ class Pool(models.Model):
     @param prefix_len: Subnet prefix length
     @param check_only: Should only a check be performed and no actual allocation
     """
+    if prefix_len == 31:
+      return None
+    
     if not self.parent and (prefix_len < self.min_prefix_len or prefix_len > self.max_prefix_len):
       return None 
     
@@ -1190,6 +1193,9 @@ class Pool(models.Model):
       prefix_len = self.default_prefix_len
     
     if prefix_len < self.min_prefix_len or prefix_len > self.max_prefix_len:
+      return None
+    
+    if prefix_len == 31:
       return None
     
     pool = self.allocate_buddy(prefix_len)
