@@ -22,7 +22,8 @@ RRA_CONF_MAP = {
   GraphType.PacketLoss      : RRAPacketLoss,
   GraphType.WifiBitrate     : RRAWifiBitrate,
   GraphType.WifiSignalNoise : RRAWifiSignalNoise,
-  GraphType.WifiSNR         : RRAWifiSNR
+  GraphType.WifiSNR         : RRAWifiSNR,
+  GraphType.ETX             : RRAETX
 }
 
 class Grapher(object):
@@ -70,6 +71,9 @@ class Grapher(object):
     
     # Resolve graph configuration
     conf = RRA_CONF_MAP[type]
+    
+    # Resolve graph ordering
+    display_priority = GraphType.ordering.index(type)
 
     try:
       graph = GraphItem.objects.get(node = self.node, name = name, type = type, parent = parent)
@@ -104,6 +108,7 @@ class Grapher(object):
     graph.last_update = datetime.now()
     graph.dead = False
     graph.need_redraw = True
+    graph.display_priority = display_priority
     graph.save()
     return graph
 

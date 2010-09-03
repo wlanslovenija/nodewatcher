@@ -22,7 +22,8 @@ __all__ = [
   'RRAPacketLoss',
   'RRAWifiBitrate',
   'RRAWifiSignalNoise',
-  'RRAWifiSNR'
+  'RRAWifiSNR',
+  'RRAETX'
 ]
 
 # Models
@@ -412,6 +413,23 @@ class RRALinkQuality(RRAConfiguration):
     r'GPRINT:ilq:MAX:Maximum\:%8.2lf\n',
     '--lower-limit', '0',
     '--upper-limit', '1'
+  ]
+
+class RRAETX(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'etx',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE1:etx#33ADFF:ETX",
+    r'GPRINT:etx:LAST:  Current\:%8.2lf',
+    r'GPRINT:etx:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:etx:MAX:Maximum\:%8.2lf\n',
+    '--lower-limit', '0'
   ]
 
 class RRALoadAverage(RRAConfiguration):

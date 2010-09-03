@@ -303,7 +303,7 @@ class Node(models.Model):
     """
     Returns a list of traffic graph items.
     """
-    return self.graphitem_set.filter(parent = None).order_by('-type', 'name')
+    return self.graphitem_set.filter(parent = None).order_by('display_priority', 'name')
 
   def get_graph_timespans(self):
     """
@@ -826,10 +826,29 @@ class GraphType:
   WifiBitrate = 8
   WifiSignalNoise = 9
   WifiSNR = 6
-  # XXX this id-based ordering is bad
+  ETX = 11
 
   # Global graphs
   NodesByStatus = 1000
+  
+  # Graph ordering by type (top to bottom)
+  ordering = [
+    GatewayTraffic,
+    Clients,
+    Traffic,
+    WifiSignalNoise,
+    WifiBitrate,
+    WifiCells,
+    WifiSNR,
+    OlsrPeers,
+    PacketLoss,
+    LQ,
+    ETX,
+    RTT,
+    LoadAverage,
+    MemUsage,
+    NumProc
+  ]
 
   @staticmethod
   def as_string(type):
@@ -870,6 +889,8 @@ class GraphType:
       return "wifisignalnoise"
     elif type == GraphType.WifiSNR:
       return "wifisnr"
+    elif type == GraphType.ETX:
+      return "etx"
     else:
       return "unknown"
 
@@ -886,6 +907,7 @@ class GraphItemNP(object):
   title = None
   last_update = None
   dead = False
+  display_priority = 0
 
   def __init__(self, id, type, graph, title):
     """
@@ -915,7 +937,7 @@ class GraphItemNP(object):
     if not self.children:
       return []
 
-    return self.children.order_by('-type', 'name')
+    return self.children.order_by('display_priority', 'name')
 
   def type_as_string(self):
     """
@@ -938,6 +960,7 @@ class GraphItem(models.Model, GraphItemNP):
   dead = models.BooleanField(default = False, db_index = True)
   need_redraw = models.BooleanField(default = False, db_index = True)
   need_removal = models.BooleanField(default = False, db_index = True)
+  display_priority = models.IntegerField(default = 0)
   
   def get_archive_data(self, start = None, sort = False):
     """

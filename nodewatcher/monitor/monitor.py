@@ -379,17 +379,38 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
   # Add olsr peer count graph
   grapher.add_graph(GraphType.OlsrPeers, 'Routing Peers', 'olsrpeers', n.peers)
 
-  # Add LQ/ILQ graphs
+  # Add LQ/ILQ/ETX graphs
   if n.peers > 0:
-    lq_avg = ilq_avg = 0.0
+    etx_avg = lq_avg = ilq_avg = 0.0
     for peer in n.get_peers():
       lq_avg += float(peer.lq)
       ilq_avg += float(peer.ilq)
+      etx_avg += float(peer.etx)
     
     lq_graph = grapher.add_graph(GraphType.LQ, 'Average Link Quality', 'lq', lq_avg / n.peers, ilq_avg / n.peers)
+    etx_graph = grapher.add_graph(GraphType.ETX, 'Average ETX', 'etx', etx_avg / n.peers)
 
     for peer in n.get_peers():
-      grapher.add_graph(GraphType.LQ, 'Link Quality to %s' % peer.dst, 'lq_peer_%s' % peer.dst.pk, peer.lq, peer.ilq, name = peer.dst.ip, parent = lq_graph)
+      # Link quality
+      grapher.add_graph(
+        GraphType.LQ,
+        'Link Quality to {0}'.format(peer.dst),
+        'lq_peer_{0}'.format(peer.dst.pk),
+        peer.lq,
+        peer.ilq,
+        name = peer.dst.ip,
+        parent = lq_graph
+      )
+      
+      # ETX
+      grapher.add_graph(
+        GraphType.ETX,
+        'ETX to {0}'.format(peer.dst),
+        'etx_peer_{0}'.format(peer.dst.pk),
+        peer.etx,
+        name = peer.dst.ip,
+        parent = etx_graph
+      )
 
   n.last_seen = datetime.now()
 
