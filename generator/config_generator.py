@@ -690,28 +690,27 @@ class OpenWrtConfig(NodeConfig):
     for dns in self.dns:
       f.write('server=%s\n' % dns)
     
-    if self.hasClientSubnet:
-      f.write('dhcp-authoritative\n')
-      f.write('dhcp-leasefile=/tmp/dhcp.leases\n')
-      f.write('\n')
-      
-      for subnet in self.subnets:
-        if subnet['dhcp'] and subnet['cidr'] <= 28:
-          network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
-          offset = 1
-          if ipcalc.IP(self.ip) in network:
-            # First few IPs of primary subnet might be used for individual interfaces
-            offset += self.usedOlsrIps - 1
-	        
-          subnet['ntp'] = self.ntp[0]
-          subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
-          subnet['rangeEnd'] = str(network.host_last())
-          
-          f.write('# %(subnet)s/%(cidr)s\n' % subnet)
-          f.write('dhcp-range=%(interface)s,%(rangeStart)s,%(rangeEnd)s,%(mask)s,30m\n' % subnet)
-          f.write('dhcp-option=%(interface)s,3,%(firstIp)s\n' % subnet)
-          f.write('dhcp-option=%(interface)s,6,%(firstIp)s\n' % subnet)
-          f.write('dhcp-option=%(interface)s,42,%(ntp)s\n' % subnet)
+    f.write('dhcp-authoritative\n')
+    f.write('dhcp-leasefile=/tmp/dhcp.leases\n')
+    f.write('\n')
+    
+    for subnet in self.subnets:
+      if subnet['dhcp'] and subnet['cidr'] <= 28:
+        network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
+        offset = 1
+        if ipcalc.IP(self.ip) in network:
+          # First few IPs of primary subnet might be used for individual interfaces
+          offset += self.usedOlsrIps - 1
+        
+        subnet['ntp'] = self.ntp[0]
+        subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
+        subnet['rangeEnd'] = str(network.host_last())
+        
+        f.write('# %(subnet)s/%(cidr)s\n' % subnet)
+        f.write('dhcp-range=%(interface)s,%(rangeStart)s,%(rangeEnd)s,%(mask)s,30m\n' % subnet)
+        f.write('dhcp-option=%(interface)s,3,%(firstIp)s\n' % subnet)
+        f.write('dhcp-option=%(interface)s,6,%(firstIp)s\n' % subnet)
+        f.write('dhcp-option=%(interface)s,42,%(ntp)s\n' % subnet)
     
     f.close()
   
