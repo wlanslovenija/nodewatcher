@@ -457,7 +457,7 @@ class RRAETX(RRAConfiguration):
     r'GPRINT:etx:LAST:  Current\:%8.2lf',
     r'GPRINT:etx:AVERAGE:Average\:%8.2lf',
     r'GPRINT:etx:MAX:Maximum\:%8.2lf\n',
-    '--lower-limit', '0'
+    '--lower-limit', '1'
   ]
 
 class RRALoadAverage(RRAConfiguration):
