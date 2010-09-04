@@ -1,3 +1,4 @@
+import os.path
 from django.conf import settings
 from django.template import RequestContext, Context, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
@@ -88,6 +89,15 @@ def statistics(request):
   if others > 0:
     nodes_by_project.append({ 'name' : _("unknown"), 'count' : others, 'special' : True})
 
+  graphs = [
+    GraphItemNP(1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
+    GraphItemNP(2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
+    GraphItemNP(3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
+  ]
+  graphs = filter(lambda g: os.path.exists(os.path.join(settings.GRAPH_DIR, '%s_%s' % (g.get_timespans()[0], g.graph))), graphs)
+
+  peers_avg = Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num']
+
   return render_to_response('nodes/statistics.html',
     { 'node_count' : node_count,
       'nodes_by_status' : nodes_by_status,
@@ -97,15 +107,11 @@ def statistics(request):
       'nodes_dead' : Node.objects.filter(node_type = NodeType.Dead).count(),
       'subnet_count' : Subnet.objects.all().count(),
       'clients_online' : APClient.objects.all().count(),
-      'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'],
+      'clients_ever' : Node.objects.aggregate(num = models.Sum('clients_so_far'))['num'] or 0,
       'external_ant' : Node.objects.filter(ant_external = True).exclude(node_type__in = (NodeType.Test, NodeType.Dead)).count(),
       'template_usage' : templates_by_usage,
-      'peers_avg' : round(Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num'], 2),
-      'graphs' : [
-        GraphItemNP(1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
-        GraphItemNP(2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
-        GraphItemNP(3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
-      ],
+      'peers_avg' : 0 if peers_avg is None else round(peers_avg, 2),
+      'graphs' : graphs,
       'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS]
     },
     context_instance = RequestContext(request)
