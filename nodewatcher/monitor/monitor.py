@@ -191,7 +191,7 @@ def check_global_statistics():
   # Global client count
   client_count = len(APClient.objects.all())
   rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
-  RRA.update(None, RRAClients, rra, client_count, graph = -3)
+  RRA.update(None, RRAGlobalClients, rra, client_count, graph = -3)
 
 @transaction.commit_on_success
 def regenerate_graph(graph):
@@ -221,7 +221,7 @@ def regenerate_global_statistics_graphs():
   
   try:
     RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', rra_status)
-    RRA.graph(RRAClients, 'Global Connected Clients', 'global_client_count.png', rra_clients)
+    RRA.graph(RRAGlobalClients, 'Global Connected Clients', 'global_client_count.png', rra_clients)
     RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra_traffic) # This should be last as it can fail on installations for local development
   except:
     logging.warning("Unable to regenerate some global statistics graphs!")
@@ -255,7 +255,7 @@ def update_rrds():
     
     RRA.convert(RRALocalTraffic, rra_traffic, action = options.update_rrd_type, graph = -1)
     RRA.convert(RRANodesByStatus, rra_status, action = options.update_rrd_type, graph = -2)
-    RRA.convert(RRAClients, rra_clients, action = options.update_rrd_type, graph = -3)
+    RRA.convert(RRAGlobalClients, rra_clients, action = options.update_rrd_type, graph = -3)
   except:
     logging.warning(format_exc())
   
@@ -580,14 +580,39 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         grapher.add_graph(GraphType.WifiSignalNoise, 'WiFi Signal/Noise', 'wifisignalnoise', signal, noise)
         grapher.add_graph(GraphType.WifiSNR, 'WiFi Signal/Noise Ratio', 'wifisnr', snr)
       
-      # Generate a graph for number of clients
-      if 'nds' in info:
-        grapher.add_graph(GraphType.Clients, 'Connected Clients', 'clients', n.clients)
-
       # Check for IP shortage
-      wifiSubnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
-      if len(wifiSubnet) and n.clients > max(0, ipcalc.Network(wifiSubnet[0].subnet, wifiSubnet[0].cidr).size() - 4):
-        Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifiSubnet[0], n.clients))
+      wifi_subnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
+      if wifi_subnet and n.clients > max(0, ipcalc.Network(wifi_subnet[0].subnet, wifi_subnet[0].cidr).size() - 4):
+        Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifi_subnet[0], n.clients))
+      
+      # Fetch DHCP leases when available
+      lease_count = 0
+      if 'dhcp' in info:
+        per_subnet_counts = {}
+        
+        for cid, client in info['dhcp'].iteritems():
+          if not cid.startswith('client'):
+            continue
+          
+          # Determine which subnet this thing belongs to
+          client_subnet = n.subnet_set.ip_filter(ip_subnet__contains = client['ip'])
+          if client_subnet:
+            client_subnet = client_subnet[0]
+            per_subnet_counts[client_subnet] = per_subnet_counts.get(client_subnet, 0) + 1
+          else:
+            # TODO Subnet is not announced by this node - potential problem, but ignore for now
+            pass
+          
+          lease_count += 1
+        
+        # Check for IP shortage
+        for client_subnet, count in per_subnet_counts.iteritems():
+          if count > ipcalc.Network(client_subnet.subnet, client_subnet.cidr).size() - 4:
+            Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: {0}\n  Leases: {1}' % (client_subnet, count))
+      
+      # Generate a graph for number of clients
+      if 'nds' in info or lease_count > 0:
+        grapher.add_graph(GraphType.Clients, 'Connected Clients', 'clients', n.clients, lease_count)
       
       # Record interface traffic statistics for all interfaces
       for iid, iface in info['iface'].iteritems():

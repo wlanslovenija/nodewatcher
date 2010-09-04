@@ -23,7 +23,8 @@ __all__ = [
   'RRAWifiBitrate',
   'RRAWifiSignalNoise',
   'RRAWifiSNR',
-  'RRAETX'
+  'RRAETX',
+  'RRAGlobalClients'
 ]
 
 # Models
@@ -274,10 +275,37 @@ class RRAClients(RRAConfiguration):
       'clients',
       type = GaugeDST,
       heartbeat = interval * 2
+    ),
+    DataSource(
+      'leases',
+      type = GaugeDST,
+      heartbeat = interval * 2
     )
   ]
   graph = [
     "LINE2:clients#008310:Clients",
+    r'GPRINT:clients:LAST:  Current\:%8.2lf',
+    r'GPRINT:clients:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:clients:MAX:Maximum\:%8.2lf\n',
+    "LINE2:leases#007883:Leases",
+    r'GPRINT:leases:LAST:   Current\:%8.2lf',
+    r'GPRINT:leases:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:leases:MAX:Maximum\:%8.2lf\n',
+    '--units-exponent', '0',
+    '--lower-limit', '0'
+  ]
+
+class RRAGlobalClients(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'clients',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE1:clients#008310:Clients",
     r'GPRINT:clients:LAST:  Current\:%8.2lf',
     r'GPRINT:clients:AVERAGE:Average\:%8.2lf',
     r'GPRINT:clients:MAX:Maximum\:%8.2lf\n',
@@ -708,7 +736,7 @@ class RRA:
     # Make any transformations needed
     xml = ElementTree.parse(process.stdout)
     wanted_source_names = [source.name for source in conf.sources]
-    start_offset = 3
+    start_offset = 5 # version, step, seconds comment, lastupdate, timestamp comment
     changed = False
     
     if action == "refresh":
