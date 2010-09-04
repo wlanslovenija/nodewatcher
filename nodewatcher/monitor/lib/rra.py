@@ -609,7 +609,7 @@ class RRAWifiSNR(RRAConfiguration):
     )
   ]
   graph = [
-    "LINE2:snr#ff0000:SNR",
+    "LINE2:snr#ff0000:SNR [dB]",
     r'GPRINT:snr:LAST:Current\:%8.2lf',
     r'GPRINT:snr:AVERAGE:Average\:%8.2lf',
     r'GPRINT:snr:MAX:Maximum\:%8.2lf\n',
