@@ -822,8 +822,8 @@ def check_network_status():
     n.redundancy_link = False
     links = []
     
-    # Find old border peers
-    old_border_peers = set([p.dst for p in n.get_peers().filter(dst__border_router = True)])
+    # Find old VPN server peers
+    old_vpn_peers = set([p.dst for p in n.get_peers().filter(dst__vpn_server = True)])
 
     for peerIp, lq, ilq, etx, vtime in node.links:
       try:
@@ -847,30 +847,30 @@ def check_network_status():
         Event.create_event(l.dst, EventCode.AdjacencyEstablished, '', EventSource.Monitor,
                            data = 'Peer node: %s' % n, aggregate = False)
 
-      # Check if we have a peering with any border routers
-      if l.dst.border_router:
+      # Check if we have a peering with any VPN servers
+      if l.dst.vpn_server:
         n.redundancy_link = True
     
     if not n.is_invalid():
-      # Determine new border peers
-      new_border_peers = set([p.dst for p in n.get_peers().filter(visible = True, dst__border_router = True)])
+      # Determine new VPN server peers
+      new_vpn_peers = set([p.dst for p in n.get_peers().filter(visible = True, dst__vpn_server = True)])
       
-      if old_border_peers != new_border_peers:
-        for p in old_border_peers:
-          if p not in new_border_peers:
+      if old_vpn_peers != new_vpn_peers:
+        for p in old_vpn_peers:
+          if p not in new_vpn_peers:
             # Redundancy loss has ocurred
             Event.create_event(n, EventCode.RedundancyLoss, '', EventSource.Monitor,
-                               data = 'Border gateway: %s' % p)
+                               data = 'VPN server: %s' % p)
         
-        for p in new_border_peers:
-          if p not in old_border_peers:
+        for p in new_vpn_peers:
+          if p not in old_vpn_peers:
             # Redundancy restoration has ocurred
             Event.create_event(n, EventCode.RedundancyRestored, '', EventSource.Monitor,
-                               data = 'Border gateway: %s' % p)
+                               data = 'VPN server: %s' % p)
       
       # Issue a warning when node requires peering but has none
       if n.redundancy_req and not n.redundancy_link:
-        NodeWarning.create(n, WarningCode.NoBorderPeering, EventSource.Monitor)
+        NodeWarning.create(n, WarningCode.NoRedundancy, EventSource.Monitor)
     
     n.save()
     

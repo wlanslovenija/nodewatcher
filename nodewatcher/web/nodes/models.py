@@ -147,6 +147,7 @@ class Node(models.Model):
   # services such as VPN
   system_node = models.BooleanField(default = False)
   border_router = models.BooleanField(default = False)
+  vpn_server = models.BooleanField(default = False)
   node_type = models.IntegerField(default = NodeType.Wireless)
   redundancy_link = models.BooleanField(default = False)
   redundancy_req = models.BooleanField(default = False)
@@ -1333,9 +1334,9 @@ class EventCode:
     elif code == EventCode.ChannelChanged:
       return _("WiFi channel has changed")
     elif code == EventCode.RedundancyLoss:
-      return _("Redundant link to border gateway has gone down")
+      return _("Redundant link with VPN server has gone down")
     elif code == EventCode.RedundancyRestored:
-      return _("Redundant link to border gateway has been restored")
+      return _("Redundant link with VPN server has been restored")
     elif code == EventCode.VersionChange:
       return _("Firmware version has changed")
     elif code == EventCode.CaptivePortalDown:
@@ -1570,7 +1571,7 @@ class WarningCode:
   UnregisteredAnnounce = 3
   OwnNotAnnounced = 4
   TimeOutOfSync = 5
-  NoBorderPeering = 6
+  NoRedundancy = 6
   CaptivePortalDown = 7
   DnsDown = 8
   AnnounceConflict = 9
@@ -1605,8 +1606,8 @@ class WarningCode:
       return _("Node is not announcing its own allocated subnets!")
     elif code == WarningCode.TimeOutOfSync:
       return _("Node's local clock is more than 30 minutes out of sync!")
-    elif code == WarningCode.NoBorderPeering:
-      return _("Node requires direct border gateway peering (includes VPN servers) but has none!")
+    elif code == WarningCode.NoRedundancy:
+      return _("Node's redundant link with at least one VPN server is down!")
     elif code == WarningCode.CaptivePortalDown:
       return _("Captive portal daemon is down!")
     elif code == WarningCode.DnsDown:
@@ -1654,7 +1655,7 @@ class WarningCode:
       return _("Could be a temporary glitch but if it persists the node is probably not configured correctly or have not yet been flashed with new configuration.")
     elif code == WarningCode.TimeOutOfSync:
       return _("Clock can be out of sync just after the node boots up but if it persists it could signify a firmware bug.")
-    elif code == WarningCode.NoBorderPeering:
+    elif code == WarningCode.NoRedundancy:
       return _("Link to a VPN server has probably failed. If link does not reconnect soon please investigate node's Internet uplink.")
     elif code == WarningCode.CaptivePortalDown:
       return _("Could be a temporary glitch but if it persists it could signify a firmware bug.")

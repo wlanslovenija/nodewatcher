@@ -175,6 +175,7 @@ def node_edit(request, node):
       'project'             : node.project.id,
       'system_node'         : node.system_node,
       'border_router'       : node.border_router,
+      'vpn_server'          : node.vpn_server,
       'node_type'           : node.node_type,
       'notes'               : node.notes,
       'url'                 : node.url,

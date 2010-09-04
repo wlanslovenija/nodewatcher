@@ -132,6 +132,10 @@
       <td class="proplabel">{{ form.border_router.label }}</td>
       <td class="propbody">{{ form.border_router }}</td>
     </tr>
+    <tr>
+      <td class="proplabel">{{ form.vpn_server.label }}</td>
+      <td class="propbody">{{ form.vpn_server }}</td>
+    </tr>
   {% endif %}
   <tr>
     <td class="proplabel">{{ form.redundancy_req.label }}</td>
@@ -139,7 +143,7 @@
   </tr>
   <tr>
     <td class="proplabel"></td>
-    <td class="propbody propdescription">{% doclink vpn _("VPN") as vpn %}{% blocktrans %}Warn if the node has no direct connection to a border gateway (this includes also {{ vpn }} servers). This is useful if the node is connected to the network in multiple ways and you want to be warned when a {{ vpn }} connection fails.{% endblocktrans %}</td>
+    <td class="propbody propdescription">{% doclink vpn _("VPN") as vpn %}{% blocktrans %}Warn if the node has no direct connection to a {{ vpn }} server. This is useful if the node is connected to the network in multiple ways and you want to be warned when a {{ vpn }} connection fails.{% endblocktrans %}</td>
   </tr>
 </table>
 

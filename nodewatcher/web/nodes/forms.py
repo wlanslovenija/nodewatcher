@@ -68,8 +68,9 @@ class RegisterNodeForm(forms.Form):
   )
   
   # Special node properties (can only be set by staff)
-  system_node = forms.BooleanField(required = False)
-  border_router = forms.BooleanField(required = False)
+  system_node = forms.BooleanField(required = False, label = _("System node"))
+  border_router = forms.BooleanField(required = False, label = _("Border router"))
+  vpn_server = forms.BooleanField(required = False, label = _("VPN server"))
 
   # Image generator stuff
   template = forms.ModelChoiceField(
@@ -317,6 +318,7 @@ class RegisterNodeForm(forms.Form):
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
       node.border_router = self.cleaned_data.get('border_router')
+      node.vpn_server = self.cleaned_data.get('vpn_server')
     
     node.status = NodeStatus.New
     node.save()
@@ -403,8 +405,9 @@ class UpdateNodeForm(forms.Form):
   url = forms.URLField(max_length = 200, required = False, label = _("Home page URL"), widget = widgets.TextInput(attrs = {'size': '40'}))
 
   # Special node properties (can only be set by staff)
-  system_node = forms.BooleanField(required = False)
-  border_router = forms.BooleanField(required = False)
+  system_node = forms.BooleanField(required = False, label = _("System node"))
+  border_router = forms.BooleanField(required = False, label = _("Border router"))
+  vpn_server = forms.BooleanField(required = False, label = _("VPN server"))
 
   # Image generator stuff
   template = forms.ModelChoiceField(
@@ -593,6 +596,7 @@ class UpdateNodeForm(forms.Form):
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
       node.border_router = self.cleaned_data.get('border_router')
+      node.vpn_server = self.cleaned_data.get('vpn_server')
     
     node.save()
 
