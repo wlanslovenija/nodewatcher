@@ -214,4 +214,6 @@ DOCUMENTATION_LINKS = {
   'antenna_type'         : 'http://en.wikipedia.org/wiki/Antenna_%28radio%29',
   'antenna_polarization' : 'http://en.wikipedia.org/wiki/Antenna_%28radio%29#Polarization',
   'vpn'                  : 'http://en.wikipedia.org/wiki/Virtual_private_network',
+  'snr'                  : 'http://en.wikipedia.org/wiki/Signal-to-noise_ratio',
+  'bitrate'              : 'http://en.wikipedia.org/wiki/Bit_rate',
 }

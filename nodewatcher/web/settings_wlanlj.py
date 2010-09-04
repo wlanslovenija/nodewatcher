@@ -48,4 +48,6 @@ DOCUMENTATION_LINKS = {
   'antenna_type'         : 'http://wlan-lj.net/wiki/Antena',
   'antenna_polarization' : 'http://wlan-lj.net/wiki/Antena#Polarizacija',
   'vpn'                  : 'http://wlan-lj.net/wiki/VPN',
+  'snr'                  : 'http://en.wikipedia.org/wiki/Signal-to-noise_ratio',
+  'bitrate'              : 'http://en.wikipedia.org/wiki/Bit_rate',
 }

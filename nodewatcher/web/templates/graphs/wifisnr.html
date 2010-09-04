@@ -1,1 +1,4 @@
-{% load graphs %}{% show_graph %}
+{% load i18n %}{% load graphs %}{% load misc %}{% show_graph %}
+<div class="graphdesc">
+{% doclink snr _("signal-to-noise ratio") as snr %}{% blocktrans %}This graph represents {{ snr }} of the node's wireless interface.<br />Higher it is, better the transmission over the interface can be.{% endblocktrans %}
+</div>
