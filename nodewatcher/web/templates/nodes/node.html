@@ -137,11 +137,15 @@
   </tr>
   <tr>
     <td class="proplabel">{% trans "System node" %}</td>
-    <td class="propbody">{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td class="propbody">{{ node.system_node|yesno:_("yes,no") }}</td>
+  </tr>
+  <tr>
+    <td class="proplabel">{% trans "VPN server" %}</td>
+    <td class="propbody">{{ node.vpn_server|yesno:_("yes,no") }}</td>
   </tr>
   <tr>
     <td class="proplabel">{% trans "Border router" %}</td>
-    <td class="propbody">{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td class="propbody">{{ node.border_router|yesno:_("yes,no") }}</td>
   </tr>
 </table>
 

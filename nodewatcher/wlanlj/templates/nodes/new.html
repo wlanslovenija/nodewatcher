@@ -129,12 +129,14 @@
       <td>{{ form.system_node }}</td>
     </tr>
     <tr>
-      <td>{{ form.border_router.label }}</td>
-      <td>{{ form.border_router }}</td>
-    </tr>
-    <tr>
       <td>{{ form.vpn_server.label }}</td>
       <td>{{ form.vpn_server }}</td>
+    </tr>
+  {% endif %}
+  {% if user.is_staff or nonstaff_border_routers %}
+    <tr>
+      <td>{{ form.border_router.label }}</td>
+      <td>{{ form.border_router }}</td>
     </tr>
   {% endif %}
   <tr>

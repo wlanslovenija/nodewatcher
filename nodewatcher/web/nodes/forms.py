@@ -4,6 +4,7 @@ from django.db import transaction, models
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.core import validators as core_validators
+from django.conf import settings
 from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType, NodeNames
 from web.nodes import ipcalc
 from web.nodes.sticker import generate_sticker
@@ -317,8 +318,10 @@ class RegisterNodeForm(forms.Form):
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
-      node.border_router = self.cleaned_data.get('border_router')
       node.vpn_server = self.cleaned_data.get('vpn_server')
+    
+    if user.is_staff or getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False):
+      node.border_router = self.cleaned_data.get('border_router') 
     
     node.status = NodeStatus.New
     node.save()
@@ -595,8 +598,10 @@ class UpdateNodeForm(forms.Form):
 
     if user.is_staff:
       node.system_node = self.cleaned_data.get('system_node')
-      node.border_router = self.cleaned_data.get('border_router')
       node.vpn_server = self.cleaned_data.get('vpn_server')
+    
+    if user.is_staff or getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False):
+      node.border_router = self.cleaned_data.get('border_router')
     
     node.save()
 

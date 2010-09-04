@@ -120,12 +120,14 @@
       <td class="propbody">{{ form.system_node }}</td>
     </tr>
     <tr>
-      <td class="proplabel">{{ form.border_router.label }}</td>
-      <td class="propbody">{{ form.border_router }}</td>
-    </tr>
-    <tr>
       <td class="proplabel">{{ form.vpn_server.label }}</td>
       <td class="propbody">{{ form.vpn_server }}</td>
+    </tr>
+  {% endif %}
+  {% if user.is_staff or nonstaff_border_routers %}
+    <tr>
+      <td class="proplabel">{{ form.border_router.label }}</td>
+      <td class="propbody">{{ form.border_router }}</td>
     </tr>
   {% endif %}
   <tr class="alive">

@@ -203,6 +203,9 @@ STICKERS_ENABLED = False
 STICKERS_TEMP_DIR = '/tmp/'
 STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers').replace('\\', '/')
 
+# Are non-staff members allowed to mark a node as a border router
+NONSTAFF_BORDER_ROUTERS = False
+
 DOCUMENTATION_LINKS = {
 #  'custom_node'          : 'http://example.net/wiki/CustomNode',
 #  'known_issues'         : 'http://example.net/wiki/KnownIssues',

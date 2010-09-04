@@ -179,6 +179,9 @@ STICKERS_ENABLED = True
 STICKERS_TEMP_DIR = '/tmp/'
 STICKERS_DIR = '/var/www/nodes.wlan-lj.net/stickers'
 
+# Are non-staff members allowed to mark a node as a border router
+NONSTAFF_BORDER_ROUTERS = False
+
 DOCUMENTATION_LINKS = {
   'custom_node'          : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',
   'known_issues'         : 'http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave',

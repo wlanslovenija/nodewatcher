@@ -133,11 +133,15 @@
   </tr>
   <tr>
     <td>{% trans "System node" %}</td>
-    <td>{% if node.system_node %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{{ node.system_node|yesno:_("yes,no") }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "VPN server" %}</td>
+    <td>{{ node.vpn_server|yesno:_("yes,no") }}</td>
   </tr>
   <tr>
     <td>{% trans "Border router" %}</td>
-    <td>{% if node.border_router %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
+    <td>{{ node.border_router|yesno:_("yes,no") }}</td>
   </tr>
 </table>
 

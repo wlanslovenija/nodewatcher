@@ -137,6 +137,7 @@ def node_new(request):
     { 'form' : form,
       'mobile_node_type' : NodeType.Mobile,
       'dead_node_type' : NodeType.Dead,
+      'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
       'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
@@ -224,6 +225,7 @@ def node_edit(request, node):
       'node' : node,
       'mobile_node_type' : NodeType.Mobile,
       'dead_node_type' : NodeType.Dead,
+      'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
       'projects' : Project.objects.all().order_by("id") },
     context_instance = RequestContext(request)
   )
