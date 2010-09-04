@@ -657,6 +657,7 @@ class SubnetStatus:
   NotAnnounced = 2
   Hijacked = 3
   Subset = 4
+  Peering = 5
 
 class Subnet(models.Model):
   """
@@ -725,13 +726,35 @@ class Subnet(models.Model):
     """
     Returns true if this subnet is being currently announced.
     """
-    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.NotAllocated, SubnetStatus.Hijacked, SubnetStatus.Subset)
+    return self.status in (
+      SubnetStatus.AnnouncedOk,
+      SubnetStatus.NotAllocated,
+      SubnetStatus.Hijacked,
+      SubnetStatus.Subset,
+      SubnetStatus.Peering
+    )
   
   def is_properly_announced(self):
     """
     Returns true if this subnet is properly announced.
     """
-    return self.status in (SubnetStatus.AnnouncedOk, SubnetStatus.Subset)
+    return self.status in (
+      SubnetStatus.AnnouncedOk,
+      SubnetStatus.Subset,
+      SubnetStatus.Peering
+    )
+  
+  def is_from_known_pool(self):
+    """
+    Returns true if this subnet is part of a known allocation pool. This
+    does not mean that the subnet is allocated! Always returns False when
+    CIDR is zero (otherwise the default route would always be from some
+    pool).
+    """
+    if self.cidr == 0:
+      return False
+    
+    return Pool.objects.ip_filter(ip_subnet__contains = '{0}/{1}'.format(self.subnet, self.cidr)).count() > 0
   
   def get_conflicting_subnets(self):
     """
@@ -773,6 +796,8 @@ class Subnet(models.Model):
       return "collision"
     elif self.status == SubnetStatus.Subset:
       return "ok"
+    elif self.status == SubnetStatus.Peering:
+      return "peering"
     else:
       return "unknown"
   

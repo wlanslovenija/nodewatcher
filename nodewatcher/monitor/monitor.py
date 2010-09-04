@@ -930,9 +930,16 @@ def check_network_status():
                            data = 'Subnet: %s/%s\n  Allocated to: %s' % (s.subnet, s.cidr, origin.node))
       
       # Flag node entry with warnings flag for unregistered announces
-      if not s.is_properly_announced() and (not s.node.border_router or s.status == SubnetStatus.Hijacked):
-        NodeWarning.create(s.node, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
-        s.node.save()
+      if not s.is_properly_announced():
+        if s.node.border_router and not s.is_from_known_pool():
+          # TODO when we have peering announce registration this should first check if
+          #      the subnet is registered as a peering
+          s.status = SubnetStatus.Peering
+        
+        if not s.node.border_router or s.status == SubnetStatus.Hijacked or s.is_from_known_pool():
+          # Add a warning message for unregistered announced subnets
+          NodeWarning.create(s.node, WarningCode.UnregisteredAnnounce, EventSource.Monitor)
+          s.node.save()
       
       s.save()
       
