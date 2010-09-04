@@ -134,8 +134,6 @@ def parse_fping(data):
     line = line.split()
     hostIp = line[0]
     up = False
-    if not hostIp.startswith('10.'):
-      continue
     
     if "duplicate" in line:
       dupes[hostIp] = True
