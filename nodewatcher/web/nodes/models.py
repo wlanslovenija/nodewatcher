@@ -1710,7 +1710,7 @@ class WarningCode:
     elif code == WarningCode.McastRateMismatch:
       return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get in contact with network administrators to arrange a configuration option in the firmware for it.")
     elif code == WarningCode.IPShortage:
-      return _("There are more clients on this node that the IP allocation can handle. Renumber this node to a bigger pool or get in contact with network administrators to arrange it.")
+      return _("There are more clients on this node that an allocated subnet can handle. Renumber the subnet to a bigger subnet or get in the contact with network administrators to arrange it.")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("Please check monitor log for more information or inform network administrator to do so. There is a bug somewhere.")
     else:
