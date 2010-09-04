@@ -37,17 +37,14 @@ REGISTER_USER_URL = 'http://wlan-lj.net/register'
 
 IMAGES_BINDIST_URL = 'http://bindist.wlan-lj.net/images/'
 
-DOCUMENTATION_LINKS = {
+DOCUMENTATION_LINKS.update({
   'custom_node'          : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',
   'known_issues'         : 'http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave',
   'report_issue'         : 'http://wlan-lj.net/newticket',
   'diversity'            : 'http://wlan-lj.net/wiki/Diversity',
-  'decimal_degrees'      : 'http://en.wikipedia.org/wiki/Decimal_degrees',
   'ip_address'           : 'http://wlan-lj.net/wiki/IPNaslov',
   'solar'                : 'http://wlan-lj.net/wiki/Podrobnosti/Solar',
   'antenna_type'         : 'http://wlan-lj.net/wiki/Antena',
   'antenna_polarization' : 'http://wlan-lj.net/wiki/Antena#Polarizacija',
   'vpn'                  : 'http://wlan-lj.net/wiki/VPN',
-  'snr'                  : 'http://en.wikipedia.org/wiki/Signal-to-noise_ratio',
-  'bitrate'              : 'http://en.wikipedia.org/wiki/Bit_rate',
-}
+})

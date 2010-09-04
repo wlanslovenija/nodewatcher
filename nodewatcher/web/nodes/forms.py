@@ -157,7 +157,7 @@ class RegisterNodeForm(forms.Form):
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN gateway IP address"))
 
   # Other options
-  redundancy_req = forms.BooleanField(required = False, label = _("Require a direct connection to a border gateway"))
+  redundancy_req = forms.BooleanField(required = False, label = _("Require direct connection to a VPN server"))
 
   def clean(self):
     """
@@ -497,7 +497,7 @@ class UpdateNodeForm(forms.Form):
   wan_gw = forms.CharField(max_length = 40, required = False, label = _("WAN gateway IP address"))
 
   # Other options
-  redundancy_req = forms.BooleanField(required = False, label = _("Enable no direct peering with a border gateway warning"))
+  redundancy_req = forms.BooleanField(required = False, label = _("Require direct connection to a VPN server"))
 
   def __init__(self, node, *args, **kwargs):
     """
@@ -914,8 +914,8 @@ class EventSubscribeForm(forms.Form):
       (EventCode.PacketDuplication, _('Packet duplication detected')),
       (EventCode.IPShortage, _('IP shortage on WiFi subnet')),
       (EventCode.ChannelChanged, _('WiFi channel has changed')),
-      (EventCode.RedundancyLoss, _('Redundant link to border gateway has gone down')),
-      (EventCode.RedundancyRestored, _("Redundant link to border gateway has been restored")),
+      (EventCode.RedundancyLoss, _('Redundant link to VPN server has gone down')),
+      (EventCode.RedundancyRestored, _("Redundant link to VPN server has been restored")),
       (EventCode.VersionChange, _("Firmware version has changed")),
       (EventCode.CaptivePortalDown, _("Captive portal has failed")),
       (EventCode.CaptivePortalUp, _("Captive portal has been restored")),

@@ -1,4 +1,4 @@
 {% load i18n %}{% load graphs %}{% load misc %}{% show_graph %}
 <div class="graphdesc">
-{% doclink bitrate _("bitrate") as bitrate %}{% blocktrans %}This graph represents {{ bitrate }} of the node's wireless interface. It is an upper limit of real (transmission) bitrate (in practice lowered by noise and protocol(s) overhead).{% endblocktrans %}
+{% doclink bitrate _("bitrate") as bitrate %}{% blocktrans %}This graph represents {{ bitrate }} of the node's wireless interface. It is an upper limit of real (transmission) {{ bitrate }} (in practice lowered by noise and protocol(s) overhead).{% endblocktrans %}
 </div>
