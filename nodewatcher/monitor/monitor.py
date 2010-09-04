@@ -584,6 +584,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       wifi_subnet = n.subnet_set.filter(gen_iface_type = IfaceType.WiFi, allocated = True)
       if wifi_subnet and n.clients > max(0, ipcalc.Network(wifi_subnet[0].subnet, wifi_subnet[0].cidr).size() - 4):
         Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: %s\n  Clients: %s' % (wifi_subnet[0], n.clients))
+        NodeWarning.create(n, WarningCode.IPShortage, EventSource.Monitor)
       
       # Fetch DHCP leases when available
       lease_count = 0
@@ -609,6 +610,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         for client_subnet, count in per_subnet_counts.iteritems():
           if count > ipcalc.Network(client_subnet.subnet, client_subnet.cidr).size() - 4:
             Event.create_event(n, EventCode.IPShortage, '', EventSource.Monitor, data = 'Subnet: {0}\n  Leases: {1}' % (client_subnet, count))
+            NodeWarning.create(n, WarningCode.IPShortage, EventSource.Monitor)
       
       # Generate a graph for number of clients
       if 'nds' in info or lease_count > 0:

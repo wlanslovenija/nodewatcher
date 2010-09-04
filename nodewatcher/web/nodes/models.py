@@ -1609,6 +1609,7 @@ class WarningCode:
   VPNLimitMismatch = 16
   ChannelMismatch = 17
   McastRateMismatch = 18
+  IPShortage = 19
   
   Custom = 100
   NodewatcherInterpretFailed = 101
@@ -1657,6 +1658,8 @@ class WarningCode:
       return _("WiFi channel does not match node configuration!")
     elif code == WarningCode.McastRateMismatch:
       return _("WiFi multicast rate does not match node configuration!")
+    elif code == WarningCode.IPShortage:
+      return _("There is a shortage of client IPs on this node!")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("There was a problem while interpreting nodewatcher output from this node!")
     else:
@@ -1706,6 +1709,8 @@ class WarningCode:
       return _("The node will not connect with other nodes in the network because of this. It is probably a bug. Please report it.")
     elif code == WarningCode.McastRateMismatch:
       return _("If this is not intentional, it is a bug. Please report it. If it is intentional, please get in contact with network administrators to arrange a configuration option in the firmware for it.")
+    elif code == WarningCode.IPShortage:
+      return _("There are more clients on this node that the IP allocation can handle. Renumber this node to a bigger pool or get in contact with network administrators to arrange it.")
     elif code == WarningCode.NodewatcherInterpretFailed:
       return _("Please check monitor log for more information or inform network administrator to do so. There is a bug somewhere.")
     else:
