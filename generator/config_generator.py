@@ -91,7 +91,7 @@ class NodeConfig(object):
   wifiRxAnt = 1
   wifiAntDiv = 0
   portLayout = "wrt54gl"
-  password = "ljw"
+  password = None
   hostname = None
   ip = None
   subnets = None
@@ -559,6 +559,9 @@ class OpenWrtConfig(NodeConfig):
   def __generatePasswords(self):
     from random import choice
     import string
+    
+    if not self.password:
+      raise Exception("No password has been defined!")
 
     f = open(os.path.join(self.base, 'passwd'), 'w')
     salt = "".join([choice(string.letters + string.digits) for i in xrange(8)])
