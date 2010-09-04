@@ -552,7 +552,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
 
       # Generate a graph for number of wifi cells
       if 'cells' in info['wifi']:
-        grapher.add_graph(GraphType.WifiCells, 'Nearby Wifi Cells', 'wificells', safe_int_convert(info['wifi']['cells']) or 0)
+        grapher.add_graph(GraphType.WifiCells, 'Nearby WiFi Cells', 'wificells', safe_int_convert(info['wifi']['cells']) or 0)
 
       # Update node's MAC address on wifi iface
       if 'mac' in info['wifi']:
@@ -576,9 +576,9 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         noise = safe_dbm_convert(info['wifi']['noise'])
         snr = float(signal) - float(noise)
         
-        grapher.add_graph(GraphType.WifiBitrate, 'Wifi Bitrate', 'wifibitrate', bitrate)
-        grapher.add_graph(GraphType.WifiSignalNoise, 'Wifi Signal/Noise', 'wifisignalnoise', signal, noise)
-        grapher.add_graph(GraphType.WifiSNR, 'Wifi Signal/Noise Ratio', 'wifisnr', snr)
+        grapher.add_graph(GraphType.WifiBitrate, 'WiFi Bitrate', 'wifibitrate', bitrate)
+        grapher.add_graph(GraphType.WifiSignalNoise, 'WiFi Signal/Noise', 'wifisignalnoise', signal, noise)
+        grapher.add_graph(GraphType.WifiSNR, 'WiFi Signal/Noise Ratio', 'wifisnr', snr)
       
       # Generate a graph for number of clients
       if 'nds' in info:
