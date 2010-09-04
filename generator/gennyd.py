@@ -174,8 +174,9 @@ def generate_image(d):
       checksum = checksum.hexdigest()
       
       ext = os.path.splitext(file)[1]
+      router_name = d['router_name'].replace('-', '')
 
-      result = "%s-%s-%s%s-%s%s" % (d['hostname'], d['router_name'], version, ("-%s" % type if type else ""), filechecksum, ext)      
+      result = "%s-%s-%s%s-%s%s" % (d['hostname'], router_name, version, ("-%s" % type if type else "-all"), filechecksum, ext)      
       destination = os.path.join(DESTINATION, result)
       os.rename(source, destination)
       files.append({ 'name' : result, 'checksum' : checksum })
