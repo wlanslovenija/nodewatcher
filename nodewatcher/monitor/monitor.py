@@ -1221,6 +1221,8 @@ if __name__ == '__main__':
           pass
         else:
           regenerate_graphs()
+      except KeyboardInterrupt:
+        raise
       except:
         logging.warning(format_exc())
       
