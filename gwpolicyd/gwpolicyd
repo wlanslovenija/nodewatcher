@@ -5,7 +5,7 @@ import signal
 from optparse import OptionParser
 
 print "============================================================================"
-print "                    wlan ljubljana gateway policy daemon                    "
+print "                     nodewatcher gateway policy daemon                      "
 print "============================================================================"
 
 if os.getuid() != 0:
