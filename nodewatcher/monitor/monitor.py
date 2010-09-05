@@ -11,7 +11,7 @@ import sys, os
 from optparse import OptionParser
 
 print "============================================================================"
-print "                       nodewatcher monitoring daemon"
+print "                       nodewatcher monitoring daemon                        "
 print "============================================================================"
 
 parser = OptionParser()

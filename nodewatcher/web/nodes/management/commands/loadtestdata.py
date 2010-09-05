@@ -1,34 +1,51 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management import call_command
-from django.conf import settings
 import urllib
 import tarfile
+import optparse
 import os
 
-class Command(BaseCommand):
+from django.conf import settings
+from django.core import management
+from django.core.management import base as management_base
+
+# TODO: Change all prints to self.stdout.write for Django 1.3
+
+class Command(management_base.NoArgsCommand):
   """
-  Load test data command.
+  This class defines a command for manage.py which loads test (daily dump) data from nodes.wlan-lj.net into the current database.
   """
-  args = ""
-  help = "Loads test data from nodes.wlan-lj.net into the current database"
+
+  help = "Load test (daily dump) data from nodes.wlan-lj.net into the current database."
+  option_list = management_base.BaseCommand.option_list + (
+    optparse.make_option('--noinput', action='store_false', dest='interactive', default=True,
+      help='Tells Django to NOT prompt the user for input of any kind.'),
+  )
   
-  def handle(self, *args, **kwargs):
+  def handle_noargs(self, **options):
     """
-    Command handler.
+    Loads test (daily dump) data from nodes.wlan-lj.net into the current database.
     """
+
+    verbosity = int(options.get('verbosity', 1))    
+
     def report(count, size, all):
+      if verbosity < 1:
+          return
       if (count % 100 == 0):
         print "%.1f%% of %i bytes" % (100.0 * count * size / all, all)
     
-    print ">>> Retrieving dump data from the server..."
+    if verbosity >= 1:
+      print ">>> Retrieving test (daily dump) data from the server..."
     (filename, _) = urllib.urlretrieve("http://bindist.wlan-lj.net/data/dump.tar.bz2", reporthook = report)
+
     try:
       file = tarfile.open(filename)
-      print ">>> Uncompressing data..."
-      print "data.json"
+      if verbosity >= 1:
+        print ">>> Uncompressing data..."
+        print "data.json"
       file.extract("data.json")
       
-      print "static files"
+      if verbosity >= 1:
+        print "static files"
       static = file.getmembers()
       static.remove(file.getmember("data.json"))
       file.extractall(path = settings.MEDIA_ROOT, members = static)
@@ -37,5 +54,4 @@ class Command(BaseCommand):
       os.remove(filename)
     
     # Call database initialization command
-    call_command("preparedb", "data.json")
-
+    management.call_command("preparedb", "data.json", **options)
