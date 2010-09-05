@@ -15,9 +15,9 @@ from django.db import connection, transaction
 
 class Command(management_base.BaseCommand):
   """
-  This class defines a command for manage.py which prepares and initializes the database.
+  This class defines a command for manage.py which prepares
+  and initializes the database.
   """
-
   args = "[dump_file]"
   help = "Prepare and initialize the database. If optional dump_file is specified it is used to populate the database."
   requires_model_validation = False
@@ -30,7 +30,6 @@ class Command(management_base.BaseCommand):
     """
     Prepares and initializes the database.
     """
-
     verbosity = int(options.get('verbosity', 1))
     interactive = options.get('interactive', True)
     show_traceback = options.get('traceback', False)
@@ -57,7 +56,7 @@ class Command(management_base.BaseCommand):
     # recreate databases
     connection.close()
 
-	# TODO: manage.py script could be run somewhere else, with some other working directory
+    # TODO: manage.py script could be run somewhere else, with some other working directory
     if os.path.isfile('scripts/%s_init.sh' % db_backend):
       print "!!! NOTE: A setup script exists for your database. Be sure that it"
       print "!!! does what you want! You may have to edit the script and YOU"

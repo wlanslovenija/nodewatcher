@@ -11,9 +11,9 @@ from django.core.management import base as management_base
 
 class Command(management_base.NoArgsCommand):
   """
-  This class defines a command for manage.py which loads test (daily dump) data from nodes.wlan-lj.net into the current database.
+  This class defines a command for manage.py which loads test
+  (daily dump) data from nodes.wlan-lj.net into the current database.
   """
-
   help = "Load test (daily dump) data from nodes.wlan-lj.net into the current database."
   option_list = management_base.BaseCommand.option_list + (
     optparse.make_option('--noinput', action='store_false', dest='interactive', default=True,
@@ -24,7 +24,6 @@ class Command(management_base.NoArgsCommand):
     """
     Loads test (daily dump) data from nodes.wlan-lj.net into the current database.
     """
-
     verbosity = int(options.get('verbosity', 1))    
 
     def report(count, size, all):
@@ -55,3 +54,4 @@ class Command(management_base.NoArgsCommand):
     
     # Call database initialization command
     management.call_command("preparedb", "data.json", **options)
+
