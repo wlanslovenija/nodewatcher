@@ -96,6 +96,15 @@ def safe_int_convert(integer):
   except:
     return None
 
+def safe_float_convert(value, precision = 3):
+  """
+  A helper method for converting a string to a float.
+  """
+  try:
+    return round(float(value), precision)
+  except:
+    return None
+
 def safe_loadavg_convert(loadavg):
   """
   A helper method for converting a string to a loadavg tuple.
@@ -664,7 +673,17 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           states.get(info['solar']['state']),
           info['solar']['load']
         )
-
+      
+      # Generate statistics for environmental data
+      if 'environment' in info:
+        for key, value in info['environment'].iteritems():
+          if not key.startswith('sensor'):
+            continue
+          
+          temp = safe_float_convert(value['temp'])
+          serial = value['serial']
+          grapher.add_graph(GraphType.Temperature, 'Temperature ({0})'.format(serial), 'temp_{0}'.format(serial), temp, name = serial)
+      
       # Check for installed package versions (every hour)
       try:
         last_pkg_update = n.installedpackage_set.all()[0].last_update

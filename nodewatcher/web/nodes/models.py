@@ -853,6 +853,7 @@ class GraphType:
   WifiSignalNoise = 9
   WifiSNR = 6
   ETX = 11
+  Temperature = 12
 
   # Global graphs
   NodesByStatus = 1000
@@ -861,6 +862,7 @@ class GraphType:
   ordering = [
     GatewayTraffic,
     Solar,
+    Temperature,
     Clients,
     Traffic,
     WifiSignalNoise,
@@ -918,6 +920,8 @@ class GraphType:
       return "wifisnr"
     elif type == GraphType.ETX:
       return "etx"
+    elif type == GraphType.Temperature:
+      return "temperature"
     else:
       return "unknown"
 

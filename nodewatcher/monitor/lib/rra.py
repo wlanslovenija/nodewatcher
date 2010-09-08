@@ -1,3 +1,4 @@
+# coding=utf-8
 import rrdtool
 import time
 import os
@@ -24,7 +25,8 @@ __all__ = [
   'RRAWifiSignalNoise',
   'RRAWifiSNR',
   'RRAETX',
-  'RRAGlobalClients'
+  'RRAGlobalClients',
+  'RRATemperature'
 ]
 
 # Models
@@ -458,6 +460,22 @@ class RRAETX(RRAConfiguration):
     r'GPRINT:etx:AVERAGE:Average\:%8.2lf',
     r'GPRINT:etx:MAX:Maximum\:%8.2lf\n',
     '--lower-limit', '1'
+  ]
+
+class RRATemperature(RRAConfiguration):
+  interval = 300
+  sources = [
+    DataSource(
+      'temp',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    )
+  ]
+  graph = [
+    "LINE1:temp#33ADFF:Temperature [°C]",
+    r'GPRINT:temp:LAST:Current\:%8.2lf',
+    r'GPRINT:temp:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:temp:MAX:Maximum\:%8.2lf\n'
   ]
 
 class RRALoadAverage(RRAConfiguration):
