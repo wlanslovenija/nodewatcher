@@ -3,6 +3,7 @@ import os
 import random
 import sys
 import StringIO as string_io
+import subprocess
 
 from django.conf import settings
 from django.core import management
@@ -10,6 +11,10 @@ from django.core.management import base as management_base
 from django.core import serializers
 
 from web.nodes import ipcalc
+
+# TODO: Make temporary directory configurable
+
+# TODO: Maybe use Python libraries instead of external command invocations 
 
 # TODO: Change all prints to self.stdout.write for Django 1.3
 
@@ -48,6 +53,10 @@ class Command(management_base.BaseCommand):
     
     # Get JSON and sanitize the dump
     json.seek(0)
+    
+    def ensure_success(errcode):
+      if errcode != 0:
+        raise management_base.CommandError('Command failed to execute, aborting!')
     
     def object_transformator():
       """
@@ -92,7 +101,7 @@ class Command(management_base.BaseCommand):
     
     # Perform dump transformation
     tmp_dir = os.path.join("/tmp", ".__nodewatcher_dump_dir")
-    os.system("rm -rf {0}".format(tmp_dir))
+    ensure_success(subprocess.call(["rm", "-rf", tmp_dir]))
     os.mkdir(tmp_dir)
     
     out = open(os.path.join(tmp_dir, "data.json"), "w")
@@ -101,11 +110,11 @@ class Command(management_base.BaseCommand):
     json.close()
     
     # Copy graphs and remove .svn directories
-    os.system("cp -R {0} {1}".format(settings.GRAPH_DIR, tmp_dir))
-    os.system(r"find {0} -name .svn -type d -exec rm -rf '{{}}' \; 2>/dev/null".format(tmp_dir))
+    ensure_success(subprocess.call(["cp", "-R", settings.GRAPH_DIR, tmp_dir]))
+    subprocess.call(["find", tmp_dir, "-name", ".svn", "-type", "d", "-exec", "rm", "-rf", "{}", ";"])
     
     # Generate a tar.bz2 archive
     os.chdir(tmp_dir)
-    os.system("tar cfj {0} *".format(dest_archive))
-    os.system("rm -rf {0}".format(tmp_dir))
+    ensure_success(subprocess.call(["tar cfj {0} *".format(dest_archive)], shell = True))
+    ensure_success(subprocess.call(["rm", "-rf", tmp_dir]))
 
