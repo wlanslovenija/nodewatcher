@@ -679,10 +679,10 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         for key, value in info['environment'].iteritems():
           if not key.startswith('sensor'):
             continue
-          
-          temp = safe_float_convert(value['temp'])
-          serial = value['serial']
-          grapher.add_graph(GraphType.Temperature, 'Temperature ({0})'.format(serial), 'temp_{0}'.format(serial), temp, name = serial)
+          if 'temp' in value:
+            temp = safe_float_convert(value['temp'])
+            serial = value['serial']
+            grapher.add_graph(GraphType.Temperature, 'Temperature ({0})'.format(serial), 'temp_{0}'.format(serial), temp, name = serial)
       
       # Check for installed package versions (every hour)
       try:
