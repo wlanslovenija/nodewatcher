@@ -285,7 +285,7 @@ class RRAClients(RRAConfiguration):
     )
   ]
   graph = [
-    "LINE2:clients#008310:Clients",
+    "LINE2:clients#00d61a:Clients",
     r'GPRINT:clients:LAST:  Current\:%8.2lf',
     r'GPRINT:clients:AVERAGE:Average\:%8.2lf',
     r'GPRINT:clients:MAX:Maximum\:%8.2lf\n',
