@@ -89,12 +89,13 @@ def statistics(request):
   if others > 0:
     nodes_by_project.append({ 'name' : _("unknown"), 'count' : others, 'special' : True})
 
+  # XXX These graphs are currently hardcoded and should be removed on graph API refactor
   graphs = [
-    GraphItemNP(1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
-    GraphItemNP(2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
-    GraphItemNP(3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
+    GraphItemNP(-1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
+    GraphItemNP(-2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
+    GraphItemNP(-3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
   ]
-  graphs = filter(lambda g: os.path.exists(os.path.join(settings.GRAPH_DIR, '%s_%s' % (g.get_timespans()[0], g.graph))), graphs)
+  #graphs = filter(lambda g: os.path.exists(os.path.join(settings.GRAPH_DIR, '%s_%s' % (g.get_timespans()[0], g.graph))), graphs)
 
   peers_avg = Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num']
 
@@ -112,7 +113,7 @@ def statistics(request):
       'template_usage' : templates_by_usage,
       'peers_avg' : 0 if peers_avg is None else round(peers_avg, 2),
       'graphs' : graphs,
-      'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS]
+      'timespans' : settings.GRAPH_TIMESPAN_PREFIXES
     },
     context_instance = RequestContext(request)
   )
@@ -241,9 +242,12 @@ def node(request, node):
   """
   Displays node info.
   """
+  # Queue requests to redraw all graphs
+  node.redraw_graphs()
+  
   return render_to_response('nodes/node.html',
     { 'node' : node ,
-      'timespans' : [prefix for prefix, name in settings.GRAPH_TIMESPANS],
+      'timespans' : settings.GRAPH_TIMESPAN_PREFIXES,
       'current_owner' : node.is_current_owner(request) },
     context_instance = RequestContext(request)
   )

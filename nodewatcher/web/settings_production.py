@@ -6,6 +6,9 @@ from secrets import *
 
 # TODO Port to new style settings format
 
+import djcelery
+djcelery.setup_loader()
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -118,21 +121,24 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.sitemaps',
+    'djcelery',
     'web.nodes',
     'web.generator',
     'web.account',
     'web.dns',
     'web.policy',
+    'web.monitor',
 )
 
 # Graph configuration
 GRAPH_DIR = "/var/www/nodes.wlan-lj.net/graphs"
-GRAPH_TIMESPANS = (
-  ('day',   86400),
-  ('week',  604800),
-  ('month', 2678400),
-  ('year',  33053184)
-)
+GRAPH_TIMESPAN_PREFIXES = ('day', 'week', 'month', 'year')
+GRAPH_TIMESPANS = {
+  'day'   : 86400,
+  'week'  : 604800,
+  'month' : 2678400,
+  'year'  : 33053184
+}
 
 # Google maps
 # GOOGLE_MAPS_API_KEY is in secrets
@@ -147,7 +153,7 @@ STATIC_DOC_ROOT = "/var/www/nodes.wlan-lj.net"
 MONITOR_WORKDIR = '/home/monitor'
 MONITOR_WORKERS = 20
 MONITOR_GRAPH_WORKERS = 5
-MONITOR_POLL_INTERVAL = 240
+MONITOR_POLL_INTERVAL = 300
 MONITOR_OLSR_HOST = '127.0.0.1'
 MONITOR_USER = 'monitor'
 MONITOR_LOGFILE = '/var/log/wlanlj-monitor.log'
@@ -181,6 +187,15 @@ STICKERS_DIR = '/var/www/nodes.wlan-lj.net/stickers'
 
 # Are non-staff members allowed to mark a node as a border router
 NONSTAFF_BORDER_ROUTERS = False
+
+# Cache backend
+CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+
+# Celery
+CARROT_BACKEND = "ghettoq.taproot.MongoDB"
+BROKER_HOST = "localhost"
+BROKER_PORT = 27017
+BROKER_VHOST = "nodewatcher"
 
 DOCUMENTATION_LINKS = {
   'custom_node'          : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',

@@ -991,7 +991,7 @@ class RRA:
       data_archive.record_data(kwargs.get('graph'), datetime.now(), data)
   
   @staticmethod
-  def graph(conf, title, graph, archive, **kwargs):
+  def graph(conf, title, graph_id, archive, **kwargs):
     """
     Renders a graph from data points.
     """
@@ -1018,9 +1018,12 @@ class RRA:
     args.append('DEFAULT:0:DejaVu Sans Mono')
     args.append('--disable-rrdtool-tag')
 
-    for prefix, timespan in settings.GRAPH_TIMESPANS:
+    if kwargs.get('timespan'):
+      prefix = kwargs['timespan']
+      timespan = settings.GRAPH_TIMESPANS[prefix]
+      
       options = [
-        str(os.path.join(settings.GRAPH_DIR, "%s_%s" % (prefix, graph))),
+        os.path.join(settings.GRAPH_DIR, "{0}-{1}.png".format(graph_id, prefix)),
         '--width', '500',
         '--height', '120',
         '--start', str(end_time - timespan),
@@ -1029,4 +1032,16 @@ class RRA:
       ]
       
       rrdtool.graph(*(options + args))
+    else:
+      for prefix, timespan in settings.GRAPH_TIMESPANS:
+        options = [
+          str(os.path.join(settings.GRAPH_DIR, "%s_%s" % (prefix, graph_id))),
+          '--width', '500',
+          '--height', '120',
+          '--start', str(end_time - timespan),
+          '--end', str(end_time - 180),
+          '--title', title
+        ]
+        
+        rrdtool.graph(*(options + args))
 

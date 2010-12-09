@@ -1,13 +1,13 @@
 {% load i18n %}{% load misc %}
 <div class="graph">
-<img src="{{ MEDIA_URL }}graphs/{{ graph.get_timespans|first }}_{{ graph.graph }}" id="graph-{{ graph.title|anchorify }}" alt="{{ graph.title }}{% for child in graph.get_children %}, {{ child.title }}{% endfor %}" />
+<img src="{% url graph_image graph.id graph.get_timespans|first %}" id="graph-{{ graph.title|anchorify }}" alt="{{ graph.title }}{% for child in graph.get_children %}, {{ child.title }}{% endfor %}" />
 <div class="graphmenu">
 {% if graph.get_children %}
 <b>{% trans "Display:" %}</b>
 <select id="graph_child_select_{{ graph.id }}" onchange="graph_display_changed(); return false;">
-  <option value="{{ graph.graph }}" selected="selected">{{ graph.title }}</option>
+  <option value="{{ graph.id }}" selected="selected">{{ graph.title }}</option>
   {% for child in graph.get_children %}
-  <option value="{{ child.graph }}">{{ child.title }}</option>
+  <option value="{{ child.id }}">{{ child.title }}</option>
   {% endfor %}
 </select>
 {% endif %}

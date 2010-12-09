@@ -67,6 +67,9 @@ urlpatterns = patterns('',
   url(r'^node/(?P<node>[^/]+)/subnet/(?P<subnet_id>\d+)/deallocate$', 'web.nodes.views.node_deallocate_subnet', name = 'remove_subnet'),
   url(r'^node/(?P<node>[^/]+)/subnet/(?P<subnet_id>\d+)/edit$', 'web.nodes.views.node_edit_subnet', name = 'edit_subnet'),
   
+  # Graphs
+  url(r'^graphs/(?P<graph_id>-?\d+)/(?P<timespan>.+)$', 'web.monitor.views.graph_image', name = 'graph_image'),
+  
   # Feeds
   url(r'^feeds/whitelist$', 'web.nodes.views.whitelist'),
   url(r'^feeds/rss/events(?:/(?P<username>.+))?$', LatestEvents(), name = 'events_feed'),

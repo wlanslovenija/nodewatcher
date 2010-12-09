@@ -1,11 +1,13 @@
-from django.conf import settings
-from web.nodes.models import GraphItem, GraphType
-from lib.rra import *
 from datetime import datetime, timedelta
-from traceback import format_exc
 import logging
 import os
 import time
+import traceback
+
+from django.conf import settings
+
+from web.nodes.models import GraphItem, GraphType
+from web.monitor.rrd import *
 
 # Mapping of graph types to their respective rrd configurations
 RRA_CONF_MAP = {
@@ -103,7 +105,7 @@ class Grapher(object):
         graph = graph.pk
       )
     except:
-      logging.warning(format_exc())
+      logging.warning(traceback.format_exc())
     
     graph.title = title
     graph.last_update = datetime.now()
@@ -111,5 +113,6 @@ class Grapher(object):
     graph.need_redraw = True
     graph.display_priority = display_priority
     graph.save()
+    graph.notify_updated()
     return graph
 

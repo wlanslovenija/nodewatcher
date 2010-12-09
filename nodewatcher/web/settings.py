@@ -6,6 +6,9 @@ database_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'db.sql
 default_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates').replace('\\', '/')
 static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static').replace('\\', '/')
 
+import djcelery
+djcelery.setup_loader()
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -153,11 +156,13 @@ INSTALLED_APPS = (
   'django.contrib.sessions',
   'django.contrib.sites',
   'django.contrib.sitemaps',
+  'djcelery',
   'web.nodes',
   'web.generator',
   'web.account',
   'web.dns',
   'web.policy',
+  'web.monitor',
 )
 
 # External programs configuration
@@ -176,12 +181,13 @@ IMAGES_BINDIST_URL = 'http://example.net/images/'
 
 # Graph configuration
 GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs').replace('\\', '/')
-GRAPH_TIMESPANS = (
-  ('day',   86400),
-  ('week',  604800),
-  ('month', 2678400),
-  ('year',  33053184)
-)
+GRAPH_TIMESPAN_PREFIXES = ('day', 'week', 'month', 'year')
+GRAPH_TIMESPANS = {
+  'day'   : 86400,
+  'week'  : 604800,
+  'month' : 2678400,
+  'year'  : 33053184
+}
 
 # Monitor configuration
 MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/') # Absolute path to directory containing monitor.py file
@@ -205,6 +211,15 @@ STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers').replace('\\', '/')
 
 # Are non-staff members allowed to mark a node as a border router
 NONSTAFF_BORDER_ROUTERS = False
+
+# Cache backend
+CACHE_BACKEND = "memcached://127.0.0.1:11211/"
+
+# Celery
+CARROT_BACKEND = "ghettoq.taproot.MongoDB"
+BROKER_HOST = "localhost"
+BROKER_PORT = 27017
+BROKER_VHOST = "nodewatcher"
 
 DOCUMENTATION_LINKS = {
 #  'custom_node'          : 'http://example.net/wiki/CustomNode',

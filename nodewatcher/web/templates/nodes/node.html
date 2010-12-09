@@ -427,8 +427,8 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
   function graph_display_changed() {
     var subgraph = '';
     {% for graph in node.get_graphs %}
-    subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.graph|escapejs }}';
-    $('#graph-{{ graph.title|anchorify }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_' + subgraph);
+    subgraph = $('#graph_child_select_{{ graph.id }}').attr('value') || '{{ graph.id|escapejs }}';
+    $('#graph-{{ graph.title|anchorify }}').attr('src', '/graphs/' + subgraph + '/' + graph_timespan);
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');

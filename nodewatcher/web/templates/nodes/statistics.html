@@ -88,7 +88,7 @@
   var graph_timespan = '{{ timespans|first }}';
   function graph_display_changed() {
     {% for graph in graphs %}
-    $('#graph-{{ graph.title|anchorify }}').attr('src', '{{ MEDIA_URL|escapejs }}graphs/' + graph_timespan + '_{{ graph.graph }}' );
+    $('#graph-{{ graph.title|anchorify }}').attr('src', '/graphs/{{ graph.id }}/' + graph_timespan);
     {% endfor %}
     $('a[id|=timespan_id]').removeClass('selected');
     $('a#timespan_id-' + graph_timespan).addClass('selected');

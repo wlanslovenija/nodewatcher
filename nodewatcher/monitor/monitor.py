@@ -18,7 +18,6 @@ parser = OptionParser()
 parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "web" Python module')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
 parser.add_option('--olsr-host', dest = 'olsr_host', help = 'A host with OLSR txt-info plugin running (overrides settings file)')
-parser.add_option('--regenerate-graphs', dest = 'regenerate_graphs', help = 'Just regenerate graphs from RRAs and exit (only graphs that have the redraw flag set are regenerated)', action = 'store_true')
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
 parser.add_option('--update-rrds', dest = 'update_rrds', help = 'Update RRDs', action = 'store_true')
@@ -66,10 +65,10 @@ else:
   nodewatcher.COLLECT_SIMULATION_DATA = options.collect_sim
   wifi_utils.COLLECT_SIMULATION_DATA = options.collect_sim
 
-from lib.rra import *
+from web.monitor.rrd import *
+from web.monitor import graphs
 from lib.topology import DotTopologyPlotter
 from lib.local_stats import fetch_traffic_statistics
-from lib.graphs import Grapher, RRA_CONF_MAP
 from lib import ipcalc
 from time import sleep
 from datetime import datetime, timedelta
@@ -202,45 +201,12 @@ def check_global_statistics():
   rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
   RRA.update(None, RRAGlobalClients, rra, client_count, graph = -3)
 
-@transaction.commit_on_success
-def regenerate_graph(graph):
-  """
-  Regenerates a single graph.
-  """
-  pathArchive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', graph.rra))
-  pathImage = graph.graph
-  conf = RRA_CONF_MAP[graph.type]
-  
-  try:
-    RRA.graph(conf, str(graph.title), pathImage, pathArchive, end_time = int(time.mktime(graph.last_update.timetuple())), dead = graph.dead, last_update = graph.last_update)
-    
-    # Graph has been regenerated, mark it as such
-    graph.need_redraw = False
-    graph.save()
-  except:
-    pass
-
-def regenerate_global_statistics_graphs():
-  """
-  Regenerates global statistics graphs.
-  """
-  rra_traffic = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
-  rra_status = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_nodes_by_status.rrd')
-  rra_clients = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
-  
-  try:
-    RRA.graph(RRANodesByStatus, 'Nodes By Status', 'global_nodes_by_status.png', rra_status)
-    RRA.graph(RRAGlobalClients, 'Global Connected Clients', 'global_client_count.png', rra_clients)
-    RRA.graph(RRALocalTraffic, 'replicator - Traffic', 'global_replicator_traffic.png', rra_traffic) # This should be last as it can fail on installations for local development
-  except:
-    logging.warning("Unable to regenerate some global statistics graphs!")
-
 def update_rrd(item):
   """
   Updates a single RRD.
   """
   archive = str(os.path.join(settings.MONITOR_WORKDIR, 'rra', item.rra))
-  conf = RRA_CONF_MAP[item.type]
+  conf = graphs.RRA_CONF_MAP[item.type]
   
   # Update the RRD
   RRA.convert(conf, archive, action = options.update_rrd_type, graph = item.pk)
@@ -265,24 +231,6 @@ def update_rrds():
     RRA.convert(RRALocalTraffic, rra_traffic, action = options.update_rrd_type, graph = -1)
     RRA.convert(RRANodesByStatus, rra_status, action = options.update_rrd_type, graph = -2)
     RRA.convert(RRAGlobalClients, rra_clients, action = options.update_rrd_type, graph = -3)
-  except:
-    logging.warning(format_exc())
-  
-  pool.close()
-  pool.join()
-
-def regenerate_graphs():
-  """
-  Regenerates all graphs from RRAs.
-  """
-  # We must close the database connection before we fork the worker pool, otherwise
-  # resources will be shared and problems will arise!
-  connection.close()
-  pool = multiprocessing.Pool(processes = settings.MONITOR_GRAPH_WORKERS)
-  
-  try:
-    pool.map(regenerate_graph, GraphItem.objects.filter(need_redraw = True)[:])
-    pool.apply(regenerate_global_statistics_graphs)
   except:
     logging.warning(format_exc())
   
@@ -345,7 +293,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
     # case we must ignore processing of this node.
     return
   
-  grapher = Grapher(n)
+  grapher = graphs.Grapher(n)
   oldStatus = n.status
   old_last_seen = n.last_seen
 
@@ -1138,14 +1086,6 @@ if __name__ == '__main__':
     print "ERROR: Failed to find graphviz binary! Check that it is installed properly."
     exit(1)
 
-  # Check if we should just regenerate the graphs
-  if options.regenerate_graphs:
-    # Regenerate all graphs that need redrawing
-    print ">>> Regenerating graphs from RRAs..."
-    regenerate_graphs()
-    print ">>> Graph generation completed."
-    exit(0)
-  
   # Check if we should just update RRDs
   if options.update_rrds:
     print ">>> Updating RRDs..."
@@ -1162,7 +1102,7 @@ if __name__ == '__main__':
       exit(1)
     
     try:
-      conf = RRA_CONF_MAP[int(options.rp_graph)]
+      conf = graphs.RRA_CONF_MAP[int(options.rp_graph)]
     except (ValueError, KeyError):
       print "ERROR: Invalid graph type specified."
       exit(1)
@@ -1230,23 +1170,24 @@ if __name__ == '__main__':
   try:
     while True:
       # Perform all processing
+      ts_start = time.time()
       try:
         check_network_status()
         check_dead_graphs()
         check_global_statistics()
         check_events()
-        
-        if getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
-          pass
-        else:
-          regenerate_graphs()
       except KeyboardInterrupt:
         raise
       except:
         logging.warning(format_exc())
       
       # Go to sleep for a while
-      sleep(settings.MONITOR_POLL_INTERVAL)
+      ts_delta = time.time() - ts_start
+      if ts_delta > settings.MONITOR_POLL_INTERVAL // 2:
+        logging.warning("Processing took more than half of monitor poll interval ({0} sec)!".format(round(ts_delta, 2)))
+        ts_delta = settings.MONITOR_POLL_INTERVAL // 2
+      
+      sleep(settings.MONITOR_POLL_INTERVAL - ts_delta)
   except:
     logging.warning("Terminating workers...")
     WORKER_POOL.terminate()

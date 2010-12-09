@@ -1,19 +1,22 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
-from django.core.mail import send_mail
-from django.template import loader, Context
+from datetime import datetime, timedelta
+import uuid
+
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.mail import send_mail
+from django.db import models
+from django.template import loader, Context
+from django.utils.translation import ugettext as _
+
+from web.dns.models import Zone, Record
+from web.generator.types import IfaceType
 from web.nodes.locker import require_lock, model_lock
 from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
-from web.generator.types import IfaceType
-from web.dns.models import Zone, Record
-from datetime import datetime, timedelta
-import uuid
 
 class Project(models.Model):
   """
@@ -306,13 +309,20 @@ class Node(models.Model):
     """
     return self.graphitem_set.filter(parent = None).order_by('display_priority', 'name')
 
+  def redraw_graphs(self):
+    """
+    Queues deferred requests for redrawing graphs.
+    """
+    for graph in self.get_graphs():
+      graph.redraw()
+
   def get_graph_timespans(self):
     """
     Returns a list of available graph image prefixes for different time
     periods for this node. At the moment only return a global list of
     prefixes.
     """
-    return [prefix for  prefix, _ in settings.GRAPH_TIMESPANS]
+    return settings.GRAPH_TIMESPAN_PREFIXES
 
   def is_down(self):
     """
@@ -959,7 +969,7 @@ class GraphItemNP(object):
     Returns a list of graph image prefixes for different time
     periods.
     """
-    return [prefix for prefix, _ in settings.GRAPH_TIMESPANS]
+    return [prefix for prefix, _ in settings.GRAPH_TIMESPANS.iteritems()]
 
   def get_children(self):
     """
@@ -1002,6 +1012,34 @@ class GraphItem(models.Model, GraphItemNP):
     @param sort: Set to true to sort by timestamp
     """
     return data_archive.fetch_data(self.pk, start = start, sort = sort)
+  
+  def redraw(self, timespan = None, children = False):
+    """
+    Queues a deferred request for graph redrawing.
+    
+    @param timespan: Optional timespan identifier to limit drawing to
+    @param children: Should children also be requested
+    """
+    from web.monitor import tasks as monitor_tasks
+    
+    if timespan is not None:
+      monitor_tasks.defer_draw_graph(self.id, timespan)
+    else:
+      for timespan in settings.GRAPH_TIMESPANS:
+        monitor_tasks.defer_draw_graph(self.id, timespan)
+    
+    # Cascade to children when requested
+    if children:
+      for child in self.children.all():
+        child.redraw(timespan)
+  
+  def notify_updated(self):
+    """
+    Should be called when graph item has changed and requires a
+    redraw to signal other parts.
+    """
+    for timespan in settings.GRAPH_TIMESPANS:
+      cache.delete('nodewatcher.graphs.drawn.{0}.{1}'.format(self.id, timespan))
 
 class WhitelistItem(models.Model):
   """
