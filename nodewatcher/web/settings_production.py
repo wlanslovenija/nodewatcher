@@ -197,6 +197,12 @@ BROKER_HOST = "localhost"
 BROKER_PORT = 27017
 BROKER_VHOST = "nodewatcher"
 
+# Enabling the on-demand graph generation requires a working Celery broker
+# configuration and a celeryd daemon running in the background to dispatch
+# tasks that generate graphs. Simply enabling this option without proper
+# configuration/setup will not work.
+ENABLE_GRAPH_DISPLAY = True
+
 DOCUMENTATION_LINKS = {
   'custom_node'          : 'http://wlan-lj.net/wiki/Podrobnosti/PoMeri',
   'known_issues'         : 'http://wlan-lj.net/wiki/Podrobnosti/ZnaneTezave',

@@ -13,13 +13,18 @@ def graph_image(request, graph_id, timespan):
   """
   Serves the graph image, requesting graph redraw when necessary.
   """
-  result = cache.get('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan))
-  if not result:
+  if timespan not in settings.GRAPH_TIMESPANS:
+    raise Http404
+  
+  graph_file = os.path.join(settings.GRAPH_DIR, '{0}-{1}.png'.format(graph_id, timespan))
+  if not settings.ENABLE_GRAPH_DISPLAY:
+    # When graph display is disabled, we show some default image
+    graph_file = os.path.join(settings.GRAPH_DIR, 'graphs-disabled.png')
+  elif not cache.get('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan)):
     # First ensure that the graph is actually drawn
     monitor_tasks.draw_graph.delay(graph_id, timespan).get()
   
   # Send the proper file
-  graph_file = os.path.join(settings.GRAPH_DIR, '{0}-{1}.png'.format(graph_id, timespan))
   if settings.DEBUG:
     return serve(request, graph_file, '/')
   else:
