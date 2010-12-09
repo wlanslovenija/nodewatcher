@@ -50,7 +50,7 @@ def draw_graph(graph_id, timespan):
         archive_path,
         end_time = int(time.mktime(graph.last_update.timetuple())),
         dead = graph.dead,
-        last_updated = graph.last_update,
+        last_update = graph.last_update,
         timespan = timespan
       )
     else:
