@@ -196,6 +196,7 @@ CARROT_BACKEND = "ghettoq.taproot.MongoDB"
 BROKER_HOST = "localhost"
 BROKER_PORT = 27017
 BROKER_VHOST = "nodewatcher"
+CELERY_IGNORE_RESULT = True
 
 # Enabling the on-demand graph generation requires a working Celery broker
 # configuration and a celeryd daemon running in the background to dispatch
