@@ -1,5 +1,7 @@
 import os
 
+from celery.exceptions import TimeoutError
+
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse, Http404
@@ -22,7 +24,10 @@ def graph_image(request, graph_id, timespan):
     graph_file = os.path.join(settings.GRAPH_DIR, 'graphs-disabled.png')
   elif not cache.get('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan)):
     # First ensure that the graph is actually drawn
-    monitor_tasks.draw_graph.delay(graph_id, timespan).get()
+    try:
+      monitor_tasks.draw_graph.delay(graph_id, timespan).get(timeout = 3)
+    except TimeoutError:
+      pass
   
   # Send the proper file
   if settings.DEBUG:
