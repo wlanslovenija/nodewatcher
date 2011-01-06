@@ -35,6 +35,6 @@ def graph_image(request, graph_id, timespan):
   else:
     response = HttpResponse()
     response['X-Sendfile'] = graph_file 
-    response['Content-Type'] = ''
+    response['Content-Type'] = 'image/png'
     return response
 
