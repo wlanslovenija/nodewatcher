@@ -520,14 +520,14 @@ class OpenWrtConfig(NodeConfig):
     self.addPackage('ip', 'olsrd', 'ntpclient', 'wireless-tools', 'kmod-softdog', 'hotplug2', 'cronscripts')
     self.addPackage('kmod-ipt-conntrack', 'iptables-mod-conntrack')
     self.addPackage('kmod-ipt-nat', 'iptables-mod-nat')
-    self.addPackage('nodewatcher', 'nodeupgrade')
+    self.addPackage('nodewatcher-core', 'nodewatcher-watchdog', 'nodeupgrade')
     self.addPackage('pv', 'netprofscripts')
     self.addPackage('tc', 'kmod-sched')
     #self.addPackage('kmod-ipv6')
     self.addPackage('dnsmasq')
     
     if self.hasClientSubnet:
-      self.addPackage('nullhttpd')
+      self.addPackage('nullhttpd', 'nodewatcher-clients')
     else:
       # Remove optional packages that should not be installed if this is a router-only
       # configuration (without a client subnet)
