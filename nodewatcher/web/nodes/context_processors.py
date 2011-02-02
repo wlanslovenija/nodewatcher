@@ -39,5 +39,6 @@ def global_values(request):
     'profile_configuration_url' : getattr(settings, 'PROFILE_CONFIGURATION_URL', None),
     'register_user_url'         : getattr(settings, 'REGISTER_USER_URL', None),
     'images_bindist_url'        : getattr(settings, 'IMAGES_BINDIST_URL', None),
-    'documentation_links'       : getattr(settings, 'DOCUMENTATION_LINKS', {})
+    'documentation_links'       : getattr(settings, 'DOCUMENTATION_LINKS', {}),
+    'stickers_enabled'          : getattr(settings, 'STICKERS_ENABLED', False),
   }

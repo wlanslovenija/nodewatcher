@@ -11,7 +11,9 @@
   <li{% if request.path|startswith:new_node %} class="active"{% endif %}><a href="{{ new_node }}">{% trans "New node" %}</a></li>
   <li{% if request.path|startswith:my_whitelist %} class="active"{% endif %}><a href="{{ my_whitelist }}">{% trans "MAC whitelist" %}</a></li>
   <li{% if request.path|startswith:my_events %} class="active"{% endif %}><a href="{{ my_events }}">{% trans "Events" %}</a></li>
+{% if stickers_enabled %}
   <li{% if request.path|startswith:my_sticker %} class="active"{% endif %}><a href="{{ my_sticker }}">{% trans "Info sticker" %}</a></li>
+{% endif %}
 </ul>
 <div id="tabcontent">
 {% block my_content %}{% endblock %}
