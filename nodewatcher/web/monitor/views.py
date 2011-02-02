@@ -25,7 +25,7 @@ def graph_image(request, graph_id, timespan):
   elif not cache.get('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan)):
     # First ensure that the graph is actually drawn
     try:
-      monitor_tasks.draw_graph.delay(graph_id, timespan).get(timeout = 3)
+      monitor_tasks.draw_graph.delay(graph_id, timespan).get(timeout = 1)
     except TimeoutError:
       pass
   

@@ -313,8 +313,15 @@ class Node(models.Model):
     """
     Queues deferred requests for redrawing graphs.
     """
-    for graph in self.get_graphs():
-      graph.redraw()
+    from web.monitor import tasks as monitor_tasks
+    
+    publisher = monitor_tasks.get_publisher()
+    try:
+      for graph in self.get_graphs():
+        graph.redraw(children = True, publisher = publisher)
+    finally:
+      publisher.close()
+      publisher.connection.close()
 
   def get_graph_timespans(self):
     """
@@ -1013,25 +1020,26 @@ class GraphItem(models.Model, GraphItemNP):
     """
     return data_archive.fetch_data(self.pk, start = start, sort = sort)
   
-  def redraw(self, timespan = None, children = False):
+  def redraw(self, timespan = None, children = False, publisher = None):
     """
     Queues a deferred request for graph redrawing.
     
     @param timespan: Optional timespan identifier to limit drawing to
     @param children: Should children also be requested
+    @param publisher: Celery publisher to use for task dispatch
     """
     from web.monitor import tasks as monitor_tasks
     
     if timespan is not None:
-      monitor_tasks.defer_draw_graph(self.id, timespan)
+      monitor_tasks.defer_draw_graph(self.id, timespan, publisher)
     else:
-      for timespan in settings.GRAPH_TIMESPANS:
-        monitor_tasks.defer_draw_graph(self.id, timespan)
+      for ts in settings.GRAPH_TIMESPANS:
+        monitor_tasks.defer_draw_graph(self.id, ts, publisher)
     
     # Cascade to children when requested
     if children:
       for child in self.children.all():
-        child.redraw(timespan)
+        child.redraw(timespan, publisher = publisher)
   
   def notify_updated(self):
     """

@@ -192,10 +192,11 @@ NONSTAFF_BORDER_ROUTERS = False
 CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 
 # Celery
-CARROT_BACKEND = "ghettoq.taproot.MongoDB"
+BROKER_BACKEND = "mongodb"
 BROKER_HOST = "localhost"
 BROKER_PORT = 27017
 BROKER_VHOST = "nodewatcher"
+CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
 
 # Enabling the on-demand graph generation requires a working Celery broker

@@ -70,14 +70,21 @@ def draw_graph(graph_id, timespan):
   cache.set('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan), result)
   return result
 
-def defer_draw_graph(graph_id, timespan):
+def defer_draw_graph(graph_id, timespan, publisher = None):
   """
   Makes a deferred call for drawing a graph, but checking the cache
   first to see if an actual call is needed.
   
   @param graph_id: Graph primary key
   @param timespan: Timespan to draw the graph for
+  @param publisher: Celery publisher to use for dispatching tasks
   """
   if not cache.get('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan)):
-    return draw_graph.delay(graph_id, timespan)
+    return draw_graph.apply_async(args = [graph_id, timespan], publisher = publisher)
+
+def get_publisher():
+  """
+  Returns the Celery publisher.
+  """
+  return draw_graph.get_publisher()
 
