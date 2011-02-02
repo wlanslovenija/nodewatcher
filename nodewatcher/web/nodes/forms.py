@@ -945,12 +945,29 @@ class EventSubscribeForm(forms.Form):
     """
     if not self.request.user.email:
       raise forms.ValidationError(_("Specified user does not have an e-mail configured!"))
-
+    
+    try:
+      filter_type = int(self.cleaned_data.get('type'))
+      filter_node = self.cleaned_data.get('node') if filter_type == SubscriptionType.SingleNode else None
+      filter_code = int(self.cleaned_data.get('code')) or None
+      
+      EventSubscription.objects.get(
+        user = self.request.user,
+        type = filter_type,
+        node = filter_node,
+        code = filter_code
+      )
+      
+      # If we are here, a duplicate event subscription exists
+      raise forms.ValidationError(_("Specified event subscription filter already exists!"))
+    except EventSubscription.DoesNotExist:
+      pass
+    
     return self.cleaned_data
 
   def save(self, user):
     """
-    Saves whitelist entry.
+    Saves event subscription entry.
     """
     s = EventSubscription(user = user)
     s.type = int(self.cleaned_data.get('type'))

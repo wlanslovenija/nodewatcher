@@ -545,7 +545,6 @@ def node_events(request, node):
     context_instance = RequestContext(request)
   )
 
-
 @login_required
 def event_list(request):
   """
@@ -616,3 +615,4 @@ def server_error(request, template_name='500.html'):
   for proc in (core_context_processors.media, nodes_context_processors.global_values):
     context.update(proc(request))
   return HttpResponseServerError(t.render(Context(context)))
+
