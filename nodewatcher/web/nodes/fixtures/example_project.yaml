@@ -1,0 +1,72 @@
+#
+# An example project with IP pool 10.42.0.0/16 and a DNS zone
+# of example.wlan.
+#
+
+# IP allocation pool
+- model: nodes.Pool
+  pk: 1
+  fields:
+    family: 4
+    network: 10.42.0.0
+    cidr: 16
+    ip_subnet: 10.42.0.0/16
+    description: Example IP pool
+    default_prefix_len: 27
+    min_prefix_len: 24
+    max_prefix_len: 28
+
+# DNS zone
+- model: dns.Zone
+  pk: example.wlan
+  fields:
+    owner: 1
+    active: True
+    primary_ns: ns1.example.wlan.
+    resp_person: dns.example.wlan.
+    serial: 1
+    refresh: 10800
+    retry: 3600
+    expire: 604800
+    minimum: 38400
+
+# DNS records
+- model: dns.Record
+  pk: 1
+  fields:
+    zone: example.wlan
+    name: "@"
+    ttl: 38400
+    type: SOA
+    data: example.wlan.
+    mx_priority: 0
+
+- model: dns.Record
+  pk: 2
+  fields:
+    zone: example.wlan
+    name: "@"
+    ttl: 38400
+    type: NS
+    data: ns1.example.wlan.
+    mx_priority: 0
+
+# Project
+- model: nodes.Project
+  pk: 1
+  fields:
+    name: Example
+    description: Example project
+    pool: 1
+    channel: 8
+    ssid: open.example.net
+    ssid_backbone: backbone.example.net
+    ssid_mobile: mobile.example.net
+    captive_portal: True
+    sticker: example.tex
+    zone: example.wlan
+    pools: [1]
+    geo_lat: 46.05
+    geo_long: 14.5
+    geo_zoom: 13
+
