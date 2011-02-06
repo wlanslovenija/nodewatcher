@@ -41,4 +41,7 @@ def global_values(request):
     'images_bindist_url'        : getattr(settings, 'IMAGES_BINDIST_URL', None),
     'documentation_links'       : getattr(settings, 'DOCUMENTATION_LINKS', {}),
     'stickers_enabled'          : getattr(settings, 'STICKERS_ENABLED', False),
+    'generator_enabled'         : getattr(settings, 'IMAGE_GENERATOR_ENABLED', False) or \
+                                  getattr(settings, 'DEBUG', False)
   }
+

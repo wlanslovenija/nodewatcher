@@ -178,6 +178,7 @@
   {% endif %}
 </table>
 
+{% if generator_enabled %}
 {% heading 3 _("Image Generator Options") %}
 <table border="0" width="700">
   <tr>
@@ -264,6 +265,7 @@
     <td class="small_text">{% blocktrans with network.contact_page as contact_page %}You can install additional packages on the node's router and thus gain additional functionality. If you are missing some package you would like to use or would like to use your own package please <a href="{{ contact_page }}" rel="external">contact us</a> and we will try to add it.{% endblocktrans %}</td>
   </tr>
 </table>
+{% endif %}
 </div>
 
 <div class="buttons dead_active"><input type="submit" value="{% trans "Update" %}" />

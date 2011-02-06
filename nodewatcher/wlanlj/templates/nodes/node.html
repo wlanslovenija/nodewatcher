@@ -68,7 +68,7 @@
   <ul>
     <li><a href="{% url edit_node node.get_current_id %}">{% trans "Edit node" %}</a></li>
     {% if not node.is_dead %}
-      {% if node.profile %}
+      {% if generator_enabled and node.profile %}
         <li><a href="{% url generate_node node.get_current_id %}">{% trans "Generate image" %}</a></li>
       {% endif %}
       <li><a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a></li>

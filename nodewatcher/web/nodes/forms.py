@@ -85,7 +85,7 @@ class RegisterNodeForm(forms.Form):
     label = _("Channel"),
     required = False
   )
-  root_pass = forms.CharField(required = True,
+  root_pass = forms.CharField(required = False,
     validators = [core_validators.MinLengthValidator(4)],
     initial = generate_random_password(8),
     label = _("Root password"),
@@ -175,6 +175,7 @@ class RegisterNodeForm(forms.Form):
     project = self.cleaned_data.get('project')
     pool = self.cleaned_data.get('pool')
     prefix_len = self.cleaned_data.get('prefix_len')
+    root_pass = self.cleaned_data.get('root_pass')
     
     if prefix_len == 0:
       prefix_len = None
@@ -215,6 +216,9 @@ class RegisterNodeForm(forms.Form):
         raise forms.ValidationError(_("The node IP (%(subnet)s/%(cidr)s) you have manually entered cannot be allocated from the selected pool (%(pool)s)! This might be because the subnet is already in use by another node or is not a part of the selected pool.") % { 'subnet' : ip, 'cidr' : prefix_len or 32, 'pool' : str(pool) })
     
     if self.cleaned_data.get('template'):
+      if not root_pass:
+        raise forms.ValidationError(_("Root password is required!"))
+      
       if not wan_dhcp and (not wan_ip or not wan_gw):
         raise forms.ValidationError(_("IP and gateway are required for static WAN configuration!"))
 
@@ -424,7 +428,7 @@ class UpdateNodeForm(forms.Form):
     initial = 8,
     required = False,
   )
-  root_pass = forms.CharField(required = True,
+  root_pass = forms.CharField(required = False,
     validators = [core_validators.MinLengthValidator(4)],
     initial = generate_random_password(8),
     label = _("Root password"),
@@ -523,6 +527,7 @@ class UpdateNodeForm(forms.Form):
     location = self.cleaned_data.get('location')
     node_type = int(self.cleaned_data.get('node_type'))
     project = self.cleaned_data.get('project')
+    root_pass = self.cleaned_data.get('root_pass')
 
     if not name:
       return
@@ -547,6 +552,9 @@ class UpdateNodeForm(forms.Form):
       raise forms.ValidationError(_("The IP address you have entered is invalid!"))
     
     if self.cleaned_data.get('template'):
+      if not root_pass:
+        raise forms.ValidationError(_("Root password is required!"))
+      
       if not wan_dhcp and (not wan_ip or not wan_gw):
         raise forms.ValidationError(_("IP and gateway are required for static WAN configuration!"))
 
@@ -679,7 +687,7 @@ class UpdateNodeForm(forms.Form):
 
       set_and_check(optional_packages = self.cleaned_data.get('optional_packages'))
       profile.save()
-    elif profile:
+    elif profile and (settings.IMAGE_GENERATOR_ENABLED or settings.DEBUG):
       profile.delete()
     
     # Registers node name
