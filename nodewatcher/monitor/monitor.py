@@ -663,8 +663,9 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       try:
         missing_packages = []
         for package in n.profile.optional_packages.all():
-          if n.installedpackage_set.filter(name = package.name).count() == 0:
-            missing_packages.append(package.name)
+          for pname in package.name.split():
+            if n.installedpackage_set.filter(name = pname).count() == 0:
+              missing_packages.append(pname)
         
         if missing_packages:
           NodeWarning.create(n, WarningCode.OptPackageNotFound, EventSource.Monitor, details = ("Packages missing: %s" % ", ".join(missing_packages)))
