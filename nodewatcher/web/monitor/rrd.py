@@ -422,12 +422,12 @@ class RRALinkQuality(RRAConfiguration):
   interval = 300
   sources = [
     DataSource(
-      'lq',
+      'ilq',
       type = GaugeDST,
       heartbeat = interval * 2
     ),
     DataSource(
-      'ilq',
+      'lq',
       type = GaugeDST,
       heartbeat = interval * 2
     )
@@ -735,7 +735,7 @@ class RRA:
   A wrapper class for managing round-robin archives via RRDTool.
   """
   @staticmethod
-  def convert(conf, archive, action = "refresh", graph = None):
+  def convert(conf, archive, action = "refresh", opts = "", graph = None):
     """
     Converts 
     """
@@ -874,6 +874,33 @@ class RRA:
             else:
               # Comment
               timestamp = datetime.fromtimestamp(int(item.text.split("/")[1].strip()))
+    elif action == "switch_sources":
+      # Switches two data sources
+      try:
+        ar_name, ds1, ds2 = opts.split(',')
+      except ValueError:
+        print "ERROR: Invalid RRD update options for action switch_sources!"
+        print "USAGE: <archive_class>,<ds1>,<ds2>"
+        return
+      
+      if conf.__name__ != ar_name:
+        return
+      
+      num_switched = 0
+      for ds in xml.findall('/ds/name'):
+        if ds.text.strip() == ds1:
+          ds.text = ds2
+          num_switched += 1
+        elif ds.text.strip() == ds2:
+          ds.text = ds1
+          num_switched += 1
+
+      if num_switched != 2:
+        print "ERROR: Unable to switch names for '{0}'!".format(os.path.basename(archive))
+        return
+      
+      print "INFO: Switching '{0}' and '{1}' in '{2}'.".format(ds1, ds2, os.path.basename(archive))
+      changed = True
     else:
       print "ERROR: Invalid RRD convert action '%s'!" % action
       return

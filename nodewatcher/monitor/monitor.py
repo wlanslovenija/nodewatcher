@@ -21,7 +21,8 @@ parser.add_option('--olsr-host', dest = 'olsr_host', help = 'A host with OLSR tx
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
 parser.add_option('--collect-simulation', dest = 'collect_sim', help = 'Collect simulation data', action = 'store_true')
 parser.add_option('--update-rrds', dest = 'update_rrds', help = 'Update RRDs', action = 'store_true')
-parser.add_option('--update-rrd-type', dest = 'update_rrd_type', help = 'Update RRD type (refresh, archive)', default = 'refresh')
+parser.add_option('--update-rrd-type', dest = 'update_rrd_type', help = 'Update RRD type (refresh, archive, switch_sources)', default = 'refresh')
+parser.add_option('--update-rrd-opts', dest = 'update_rrd_opts', help = 'Update RRD options', default = '')
 parser.add_option('--reverse-populate', dest = 'reverse_populate', help = 'Reverse populate RRD with data from a database', action = 'store_true')
 parser.add_option('--reverse-populate-node', dest = 'rp_node', help = 'Node to populate data for')
 parser.add_option('--reverse-populate-graph', dest = 'rp_graph', help = 'Graph type to populate data for')
@@ -209,7 +210,7 @@ def update_rrd(item):
   conf = graphs.RRA_CONF_MAP[item.type]
   
   # Update the RRD
-  RRA.convert(conf, archive, action = options.update_rrd_type, graph = item.pk)
+  RRA.convert(conf, archive, action = options.update_rrd_type, opts = options.update_rrd_opts, graph = item.pk)
 
 def update_rrds():
   """
@@ -344,7 +345,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       ilq_avg += float(peer.ilq)
       etx_avg += float(peer.etx)
     
-    lq_graph = grapher.add_graph(GraphType.LQ, 'Average Link Quality', 'lq', lq_avg / n.peers, ilq_avg / n.peers)
+    lq_graph = grapher.add_graph(GraphType.LQ, 'Average Link Quality', 'lq', ilq_avg / n.peers, lq_avg / n.peers)
     etx_graph = grapher.add_graph(GraphType.ETX, 'Average ETX', 'etx', etx_avg / n.peers)
 
     for peer in n.get_peers():
@@ -353,8 +354,8 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         GraphType.LQ,
         'Link Quality to {0}'.format(peer.dst),
         'lq_peer_{0}'.format(peer.dst.pk),
-        peer.lq,
         peer.ilq,
+        peer.lq,
         name = peer.dst.ip,
         parent = lq_graph
       )

@@ -69,9 +69,9 @@ def parse_tables(data):
     
     if currentTable == 'Topology':
       try:
-        srcIp, dstIp, LQ, ILQ, ETX, vtime = line.split('\t')
+        dstIp, srcIp, LQ, ILQ, ETX, vtime = line.split('\t')
       except ValueError:
-        srcIp, dstIp, LQ, ILQ, ETX = line.split('\t')
+        dstIp, srcIp, LQ, ILQ, ETX = line.split('\t')
         vtime = 0.0
 
       try:
