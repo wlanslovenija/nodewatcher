@@ -1,0 +1,10 @@
+syntax: glob
+.*
+*.log
+*.sqlite
+*.sqlite-journal
+*.pyc
+*.rrd
+syntax: regexp
+^nodewatcher/web/secrets\.py$
+^nodewatcher/web/.*\.(xml|json)$
