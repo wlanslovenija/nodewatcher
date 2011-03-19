@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CONFIGURATION
-OPENWRT="../openwrt-200901"
+OPENWRT="../../openwrt-200901"
 GENERATORS=(
   "config-broadcom-2.4 brcm24 brcm-2.4"
   "config-fonera atheros atheros"
