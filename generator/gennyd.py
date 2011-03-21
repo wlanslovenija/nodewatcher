@@ -5,10 +5,37 @@
 # Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
 #
 
-# Setup import paths, since we are using Django models
+# First parse options (this must be done here since they contain import paths
+# that must be parsed before Django models can be imported)
 import sys, os
-sys.path.append('/var/www/django')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'web.settings_production'
+from optparse import OptionParser
+
+print "============================================================================"
+print "                    nodewatcher firmware generator daemon                   "
+print "============================================================================"
+
+parser = OptionParser()
+parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "web" Python module')
+parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
+parser.add_option('--destination', dest = 'destination', help = 'Firmware destination directory')
+options, args = parser.parse_args()
+
+if not options.path:
+  print "ERROR: Path specification is required!\n"
+  parser.print_help()
+  exit(1)
+elif not options.settings:
+  print "ERROR: Settings specification is required!\n"
+  parser.print_help()
+  exit(1)
+elif not options.destination:
+  print "ERROR: Firmware destination directory is required!\n"
+  parser.print_help()
+  exit(1)
+
+# Setup import paths, since we are using Django models
+sys.path.append(options.path)
+os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Django stuff
 from django.core.mail import send_mail
@@ -28,8 +55,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from base64 import urlsafe_b64encode
 from glob import glob
 
-WORKDIR = "/home/generator"
-DESTINATION = "/var/www/packages.wlan-lj.net/images"
+WORKDIR = os.path.dirname(__file__)
+DESTINATION = options.destination
 IMAGEBUILDERS = (
   "imagebuilder.atheros",
   "imagebuilder.brcm24",
@@ -208,16 +235,20 @@ def generate_image(d):
 logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(levelname)-8s %(message)s',
                     datefmt = '%a, %d %b %Y %H:%M:%S',
-                    filename = '/var/log/wlanlj-gennyd.log',
+                    filename = os.path.join(WORKDIR, 'wlanlj-gennyd.log'),
                     filemode = 'a')
 
 # Change ownership for the build directory
 os.system("chown -R generator:generator build")
 
 # Drop user privileges
-info = pwd.getpwnam('generator')
-os.setgid(info.pw_gid)
-os.setuid(info.pw_uid)
+try:
+  info = pwd.getpwnam('generator')
+  os.setgid(info.pw_gid)
+  os.setuid(info.pw_uid)
+except:
+  print "ERROR: Unable to change to 'generator' user!"
+  exit(1)
 
 logging.info("wlan ljubljana Image Generator Daemon v0.1 starting up...")
 
