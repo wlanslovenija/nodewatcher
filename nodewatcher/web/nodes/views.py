@@ -92,10 +92,8 @@ def statistics(request):
   # XXX These graphs are currently hardcoded and should be removed on graph API refactor
   graphs = [
     GraphItemNP(-1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
-    GraphItemNP(-2, GraphType.Clients, "global_client_count.png", "Global Client Count"),
-    GraphItemNP(-3, GraphType.GatewayTraffic, "global_replicator_traffic.png", "replicator - Traffic")
+    GraphItemNP(-2, GraphType.Clients, "global_client_count.png", "Global Client Count")
   ]
-  #graphs = filter(lambda g: os.path.exists(os.path.join(settings.GRAPH_DIR, '%s_%s' % (g.get_timespans()[0], g.graph))), graphs)
 
   peers_avg = Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num']
 

@@ -864,7 +864,6 @@ class GraphType:
   NumProc = -1
   WifiCells = 7
   OlsrPeers = 5
-  GatewayTraffic = 40
   PacketLoss = 4
   WifiBitrate = 8
   WifiSignalNoise = 9
@@ -877,7 +876,6 @@ class GraphType:
   
   # Graph ordering by type (top to bottom)
   ordering = [
-    GatewayTraffic,
     Solar,
     Temperature,
     Clients,
@@ -923,8 +921,6 @@ class GraphType:
       return "wificells"
     elif type == GraphType.OlsrPeers:
       return "olsrpeers"
-    elif type == GraphType.GatewayTraffic:
-      return "gwtraffic"
     elif type == GraphType.NodesByStatus:
       return "nodesbystatus"
     elif type == GraphType.PacketLoss:

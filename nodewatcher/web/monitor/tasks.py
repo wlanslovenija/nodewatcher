@@ -15,7 +15,6 @@ from web.monitor import rrd, graphs
 GLOBAL_GRAPHS = {
   -1 : (rrd.RRANodesByStatus, 'Nodes By Status',          'global_nodes_by_status.rrd'),
   -2 : (rrd.RRAGlobalClients, 'Global Connected Clients', 'global_client_count.rrd'),
-  -3 : (rrd.RRALocalTraffic,  'replicator - Traffic',     'global_replicator_traffic.rrd'),
 }
 
 @celery_task()

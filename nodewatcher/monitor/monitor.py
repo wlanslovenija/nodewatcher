@@ -69,7 +69,6 @@ else:
 from web.monitor.rrd import *
 from web.monitor import graphs
 from lib.topology import DotTopologyPlotter
-from lib.local_stats import fetch_traffic_statistics
 from lib import ipcalc
 from time import sleep
 from datetime import datetime, timedelta
@@ -169,18 +168,6 @@ def check_global_statistics():
   """
   transaction.set_dirty()
 
-  try:
-    stats = fetch_traffic_statistics()
-    rra = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
-    RRA.update(None, RRALocalTraffic, rra,
-      stats['statistics:to-inet'],
-      stats['statistics:from-inet'],
-      stats['statistics:internal'],
-      graph = -1
-    )
-  except:
-    logging.warning("Unable to process local server traffic information, skipping!")
-
   # Nodes by status
   nbs = {}
   for s in Node.objects.exclude(node_type = NodeType.Test).values('status').annotate(count = models.Count('ip')):
@@ -225,11 +212,9 @@ def update_rrds():
     pool.map(update_rrd, GraphItem.objects.all()[:])
     
     # Don't forget the global graphs
-    rra_traffic = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_replicator_traffic.rrd')
     rra_status = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_nodes_by_status.rrd')
     rra_clients = os.path.join(settings.MONITOR_WORKDIR, 'rra', 'global_client_count.rrd')
     
-    RRA.convert(RRALocalTraffic, rra_traffic, action = options.update_rrd_type, graph = -1)
     RRA.convert(RRANodesByStatus, rra_status, action = options.update_rrd_type, graph = -2)
     RRA.convert(RRAGlobalClients, rra_clients, action = options.update_rrd_type, graph = -3)
   except:
@@ -371,9 +356,30 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       )
 
   n.last_seen = datetime.now()
-
-  # Check if we have fetched nodewatcher data
+  
+  # Attempt to fetch data from nodewatcher
   info = nodewatcher.fetch_node_info(node_ip)
+  
+  # XXX This is an ugly hack for server-type nodes, but it will be fixed by modularization
+  #     rewrite anyway, so no need to make it nice
+  if n.node_type == NodeType.Server and info is not None and 'iface' in info:
+    try:
+      # Record interface traffic statistics for all interfaces
+      for iid, iface in info['iface'].iteritems():
+        grapher.add_graph(
+          GraphType.Traffic,
+          'Traffic - {0}'.format(iid),
+          'traffic_{0}'.format(iid),
+          iface['up'],
+          iface['down'],
+          name = iid
+        )
+    except:
+      pass
+    
+    info = None
+  
+  # Check if we have fetched nodewatcher data
   if info is not None and 'general' in info:
     try:
       oldUptime = n.uptime or 0
