@@ -9,3 +9,5 @@ syntax: regexp
 ^nodewatcher/web/secrets\.py$
 ^nodewatcher/web/.*\.(xml|json)$
 ^nodewatcher/static/graphs/.*$
+^nodewatcher/monitor/simulator/data/.*$
+^generator/build/.*$
