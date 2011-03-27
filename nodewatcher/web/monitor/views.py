@@ -18,10 +18,10 @@ def graph_image(request, graph_id, timespan):
   if timespan not in settings.GRAPH_TIMESPANS:
     raise Http404
   
-  graph_file = os.path.join(settings.GRAPH_DIR, '{0}-{1}.png'.format(graph_id, timespan))
+  graph_file = '{0}-{1}.png'.format(graph_id, timespan)
   if not settings.ENABLE_GRAPH_DISPLAY:
     # When graph display is disabled, we show some default image
-    graph_file = os.path.join(settings.GRAPH_DIR, 'graphs-disabled.png')
+    graph_file = 'graphs-disabled.png'
   elif not cache.get('nodewatcher.graphs.drawn.{0}.{1}'.format(graph_id, timespan)):
     # First ensure that the graph is actually drawn
     try:
@@ -31,10 +31,11 @@ def graph_image(request, graph_id, timespan):
   
   # Send the proper file
   if settings.DEBUG:
-    return serve(request, graph_file, '/')
+    return serve(request, os.path.join(settings.GRAPH_DIR, graph_file), '/')
   else:
     response = HttpResponse()
-    response['X-Sendfile'] = graph_file 
+    response['X-Sendfile'] = os.path.join(settings.GRAPH_DIR, graph_file)
+    response['X-Accel-Redirect'] = '/_graphs/{0}'.format(graph_file)
     response['Content-Type'] = 'image/png'
     return response
 
