@@ -55,7 +55,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from base64 import urlsafe_b64encode
 from glob import glob
 
-WORKDIR = os.path.dirname(__file__)
+WORKDIR = os.getcwd()
 DESTINATION = options.destination
 IMAGEBUILDERS = (
   "imagebuilder.atheros",
@@ -235,19 +235,19 @@ def generate_image(d):
 logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(levelname)-8s %(message)s',
                     datefmt = '%a, %d %b %Y %H:%M:%S',
-                    filename = os.path.join(WORKDIR, 'wlanlj-gennyd.log'),
+                    filename = os.path.join(WORKDIR, 'generator.log'),
                     filemode = 'a')
 
 # Change ownership for the build directory
-os.system("chown -R generator:generator build")
+os.system("chown -R {0}:{0} build".format(settings.IMAGE_GENERATOR_USER))
 
 # Drop user privileges
 try:
-  info = pwd.getpwnam('generator')
+  info = pwd.getpwnam(settings.IMAGE_GENERATOR_USER)
   os.setgid(info.pw_gid)
   os.setuid(info.pw_uid)
 except:
-  print "ERROR: Unable to change to 'generator' user!"
+  print "ERROR: Unable to change to '{0}' user!".format(settings.IMAGE_GENERATOR_USER)
   exit(1)
 
 logging.info("wlan ljubljana Image Generator Daemon v0.1 starting up...")

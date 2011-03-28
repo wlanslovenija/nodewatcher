@@ -176,6 +176,7 @@ IMAGE_GENERATOR_ENABLED = False
 # Is image generator temporary suspended (like because firmware image it would produce contains errors)?
 # If it is, image requests are not queued and message about that is issued to the user
 IMAGE_GENERATOR_SUSPENDED = False
+IMAGE_GENERATOR_USER = 'nw-generator'
 
 IMAGES_BINDIST_URL = 'http://example.net/images/'
 
