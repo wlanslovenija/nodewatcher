@@ -10,12 +10,6 @@
 - model: sites.Site
   pk: 2
   fields:
-    domain: nodes.wlan-lj.net
-    name: wlan ljubljana
-
-- model: sites.Site
-  pk: 3
-  fields:
     domain: nodes.wlan-si.net
     name: wlan slovenija
 
