@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 class HttpsSitemap(Sitemap):
   http_match = re.compile(r"^http://")
 
-  def get_urls(self, page=1):
-    urls = super(HttpsSitemap, self).get_urls(page)
+  def get_urls(self, *args, **kwargs):
+    urls = super(HttpsSitemap, self).get_urls(*args, **kwargs)
     if getattr(settings, 'SITEMAPS_USE_HTTPS', None):
       for url in urls:
         url['location'] = self.http_match.sub("https://", url['location'])
