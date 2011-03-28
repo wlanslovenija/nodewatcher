@@ -1047,18 +1047,6 @@ if __name__ == '__main__':
                       filename = settings.MONITOR_LOGFILE,
                       filemode = 'a')
   
-  try:
-    info = getpwnam(settings.MONITOR_USER)
-    
-    # Change ownership of RRA directory
-    os.chown(os.path.join(settings.MONITOR_WORKDIR, 'rra'), info.pw_uid, info.pw_gid)
-    
-    # Drop user privileges
-    #os.setgid(info.pw_gid)
-    #os.setuid(info.pw_uid)
-  except:
-    logging.warning("Failed to chown monitor RRA storage directory!")
-  
   # Autodetect fping location
   FPING_LOCATIONS = [
     getattr(settings, 'FPING_BIN', None),
