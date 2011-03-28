@@ -21,24 +21,24 @@ MANAGERS = ADMINS
 DATABASES = {
   'default' : {
     'ENGINE'   : 'django.db.backends.postgresql_psycopg2',
-    'NAME'     : 'wlanlj',
-    'USER'     : 'wlanlj',
+    'NAME'     : 'wlansi',
+    'USER'     : 'wlansi_nw',
     'PASSWORD' : DB_PASSWORD,
-    'HOST'     : '',
+    'HOST'     : 'dbpgsql',
     'PORT'     : '',
   }
 }
 
-EMAIL_HOST = 'mail.transwarp.si'
-EMAIL_SUBJECT_PREFIX = '[wlan-lj] '
-EMAIL_EVENTS_SENDER = 'events@wlan-lj.net'
-EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-lj.net'
+EMAIL_HOST = 'mail'
+EMAIL_SUBJECT_PREFIX = '[wlan-si] '
+EMAIL_EVENTS_SENDER = 'events@wlan-si.net'
+EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-si.net'
 
-NETWORK_NAME = 'wlan ljubljana'
-NETWORK_HOME = 'http://wlan-lj.net'
-NETWORK_CONTACT = 'open@wlan-lj.net'
-NETWORK_CONTACT_PAGE = 'http://wlan-lj.net/contact'
-NETWORK_DESCRIPTION = 'odprto brezžično omrežje Ljubljane'
+NETWORK_NAME = 'wlan slovenia'
+NETWORK_HOME = 'http://wlan-si.net'
+NETWORK_CONTACT = 'open@wlan-si.net'
+NETWORK_CONTACT_PAGE = 'http://wlan-si.net/contact'
+NETWORK_DESCRIPTION = 'odprto brezžično omrežje Slovenije'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -100,16 +100,16 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'web.urls'
 
 TEMPLATE_DIRS = (
-    '/var/www/django/wlanlj/templates',
-    '/var/www/django/web/templates',
+    '/srv/nodewatcher/nodewatcher/wlanlj/templates',
+    '/srv/nodewatcher/nodewatcher/web/templates',
 )
 
 DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/my/nodes'
 LOGIN_URL = '/auth/login'
-RESET_PASSWORD_URL = 'http://wlan-lj.net/reset_password'
-PROFILE_CONFIGURATION_URL = 'http://wlan-lj.net/prefs'
+RESET_PASSWORD_URL = 'http://wlan-si.net/reset_password'
+PROFILE_CONFIGURATION_URL = 'http://wlan-si.net/prefs'
 AUTH_PROFILE_MODULE = 'account.useraccount'
 AUTHENTICATION_BACKENDS = (
     'web.account.auth.CryptBackend',
@@ -131,7 +131,7 @@ INSTALLED_APPS = (
 )
 
 # Graph configuration
-GRAPH_DIR = "/var/www/nodes.wlan-lj.net/graphs"
+GRAPH_DIR = "/srv/nodewatcher/nodewatcher/static/graphs"
 GRAPH_TIMESPAN_PREFIXES = ('day', 'week', 'month', 'year')
 GRAPH_TIMESPANS = {
   'day'   : 86400,
@@ -147,16 +147,16 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.5
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15
 
-STATIC_DOC_ROOT = "/var/www/nodes.wlan-lj.net"
+STATIC_DOC_ROOT = "/srv/nodewatcher/nodewatcher/static"
 
 # Monitor configuration
-MONITOR_WORKDIR = '/home/monitor'
+MONITOR_WORKDIR = '/srv/nodewatcher/nodewatcher/monitor'
 MONITOR_WORKERS = 20
 MONITOR_GRAPH_WORKERS = 5
 MONITOR_POLL_INTERVAL = 300
 MONITOR_OLSR_HOST = '127.0.0.1'
-MONITOR_USER = 'monitor'
-MONITOR_LOGFILE = '/var/log/wlanlj-monitor.log'
+MONITOR_USER = 'nw-monitor'
+MONITOR_LOGFILE = '/srv/nodewatcher/nodewatcher/monitor/monitor.log'
 
 # Data archive configuration
 DATA_ARCHIVE_ENABLED = True
@@ -178,12 +178,13 @@ USE_HTTPS = True
 # Is generator enabled or not. If set to False the pybeanstalk dependency is not needed.
 IMAGE_GENERATOR_ENABLED = True
 IMAGE_GENERATOR_SUSPENDED = False
-IMAGES_BINDIST_URL = 'http://bindist.wlan-lj.net/images/'
+IMAGE_GENERATOR_USER = 'nw-generator'
+IMAGES_BINDIST_URL = 'http://bindist.wlan-si.net/images/'
 
 # Stickers
 STICKERS_ENABLED = True
 STICKERS_TEMP_DIR = '/tmp/'
-STICKERS_DIR = '/var/www/nodes.wlan-lj.net/stickers'
+STICKERS_DIR = '/srv/nodewatcher/nodewatcher/static/stickers'
 
 # Are non-staff members allowed to mark a node as a border router
 NONSTAFF_BORDER_ROUTERS = False
