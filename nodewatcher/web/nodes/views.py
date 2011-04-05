@@ -91,8 +91,8 @@ def statistics(request):
 
   # XXX These graphs are currently hardcoded and should be removed on graph API refactor
   graphs = [
-    GraphItemNP(-1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
-    GraphItemNP(-2, GraphType.Clients, "global_client_count.png", "Global Client Count")
+    GraphItemNP.static(-1, GraphType.NodesByStatus, "global_nodes_by_status.png", "Nodes By Status"),
+    GraphItemNP.static(-2, GraphType.Clients, "global_client_count.png", "Global Client Count")
   ]
 
   peers_avg = Node.objects.filter(peers__gt = 0).aggregate(num = models.Avg('peers'))['num']

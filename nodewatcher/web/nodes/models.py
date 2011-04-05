@@ -953,20 +953,26 @@ class GraphItemNP(object):
   dead = False
   display_priority = 0
 
-  def __init__(self, id, type, graph, title):
+  def __init__(self, *args, **kwargs):
     """
     Class constructor.
-    
-    @param id: Unique identifier
-    @param type: Graph type
-    @param graph: Graph image filename
-    @param title: Graph title
     """
-    self.id = id
-    self.type = type
-    self.graph = graph
-    self.title = title
-
+    super(GraphItemNP, self).__init__()
+  
+  @staticmethod
+  def static(id, type, graph, title):
+    """
+    A helper method for creating new non-persistent graph items. This
+    can't be in the constructor due to multiple inheritance issues with
+    calling super.
+    """
+    item = GraphItemNP()
+    item.id = id
+    item.type = type
+    item.graph = graph
+    item.title = title
+    return item
+  
   def get_timespans(self):
     """
     Returns a list of graph image prefixes for different time
@@ -1005,6 +1011,12 @@ class GraphItem(models.Model, GraphItemNP):
   need_redraw = models.BooleanField(default = False, db_index = True)
   need_removal = models.BooleanField(default = False, db_index = True)
   display_priority = models.IntegerField(default = 0)
+  
+  def __init__(self, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    super(GraphItem, self).__init__(*args, **kwargs)
   
   def get_archive_data(self, start = None, sort = False):
     """
