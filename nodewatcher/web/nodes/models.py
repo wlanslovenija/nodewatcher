@@ -83,6 +83,7 @@ class PolarizationType:
   Horizontal = 1
   Vertical = 2
   Circular = 3
+  Dual = 4
 
 class NodeStatus:
   """
@@ -563,6 +564,8 @@ class Node(models.Model):
       return _("Vertical")
     elif self.ant_polarization == PolarizationType.Circular:
       return _("Circular")
+    elif self.ant_polarization == PolarizationType.Dual:
+      return _("Horizontal and Vertical")
     else:
       return _("unknown")
 

@@ -124,6 +124,7 @@ class RegisterNodeForm(forms.Form):
       (PolarizationType.Unknown, _("unknown")),
       (PolarizationType.Horizontal, _("Horizontal")),
       (PolarizationType.Vertical, _("Vertical")),
+      (PolarizationType.Dual, _("Horizontal and Vertical")),
       (PolarizationType.Circular, _("Circular"))
     ],
     required = False,
@@ -468,6 +469,7 @@ class UpdateNodeForm(forms.Form):
       (PolarizationType.Unknown, _("Unknown")),
       (PolarizationType.Horizontal, _("Horizontal")),
       (PolarizationType.Vertical, _("Vertical")),
+      (PolarizationType.Dual, _("Horizontal and Vertical")),
       (PolarizationType.Circular, _("Circular"))
     ],
     required = False,
