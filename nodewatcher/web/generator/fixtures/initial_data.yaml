@@ -309,7 +309,7 @@
 #
 # Optional packages
 #
-- fields: {description: package for solar powered nodes, fancy_name: solar, name: solar}
+- fields: {description: package for solar powered nodes, fancy_name: solar, name: 'solar nodewatcher-solar'}
   model: generator.optionalpackage
   pk: 1
 - fields: {description: USB support, fancy_name: kmod-usb-core, name: kmod-usb-core}
@@ -339,7 +339,7 @@
 - model: generator.OptionalPackage
   pk: 10
   fields:
-    name: digitemp
+    name: 'digitemp nodewatcher-digitemp'
     fancy_name: digitemp
     description: read data from 1-wire devices
 
