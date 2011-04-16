@@ -163,6 +163,7 @@ INSTALLED_APPS = (
   'web.dns',
   'web.policy',
   'web.monitor',
+  'web.registry',
 )
 
 # External programs configuration
