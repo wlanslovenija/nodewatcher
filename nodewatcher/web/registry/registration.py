@@ -38,7 +38,9 @@ def register_choice(choices_id, enum, text):
   """
   Registers a new choice.
   """
-  registry_state.CHOICES_REGISTRY.setdefault(choices_id, LazyChoiceList())._list.append(
-    (enum, text)
-  )
+  choices = registry_state.CHOICES_REGISTRY.setdefault(choices_id, LazyChoiceList())._list
+  if any([x == enum for x, _ in choices]):
+    return
+  
+  choices.append((enum, text))
 
