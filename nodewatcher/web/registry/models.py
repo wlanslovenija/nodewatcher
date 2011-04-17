@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models import signals as model_signals
+from django.utils import datastructures
 
 from registry import state as registry_state
 
@@ -56,8 +57,9 @@ def prepare_config_item(sender, **kwargs):
   if not issubclass(sender, RegistryItem):
     return
   
-  registry_state.ITEM_LIST.append(sender)
-  registry_state.ITEM_LIST.sort(key = lambda x: (x.RegistryMeta.form_order, x.RegistryMeta.registry_name))
+  items = registry_state.ITEM_LIST 
+  items.setdefault((sender.RegistryMeta.form_order, sender.RegistryMeta.registry_name), []).append(sender)
+  registry_state.ITEM_LIST = datastructures.SortedDict(sorted(items.items(), key = lambda x: x[0]))
   
   # Only record the top-level item in the registry as there could be multiple
   # specializations that define their own limits

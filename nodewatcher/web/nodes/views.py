@@ -1,26 +1,30 @@
-import os.path
-from django.conf import settings
-from django.template import RequestContext, Context, loader
-from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response, get_object_or_404
-from django.db import models, transaction
-from django.forms import forms
-from django.utils.translation import ugettext as _
-from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
-from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
-from web.nodes.common import ValidationWarning
-from web.nodes.util import queryset_by_ip
-from web.generator.models import Profile
-from web.account.models import UserAccount
-from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 from datetime import datetime
-from web.nodes import ipcalc
-from web.nodes import context_processors as nodes_context_processors
+import os.path
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core import context_processors as core_context_processors
 from django.core.urlresolvers import reverse
-from web.nodes import decorators
+from django.db import models, transaction
+from django.forms import forms
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext, Context, loader
+from django.utils.translation import ugettext as _
+
+from web.account.models import UserAccount
 from web.account.util import generate_random_password
+from web.generator.models import Profile
+from web.nodes import ipcalc
+from web.nodes import context_processors as nodes_context_processors
+from web.nodes import decorators
+from web.nodes.common import ValidationWarning
+from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
+from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
+from web.nodes.util import queryset_by_ip
+from web.policy.models import Policy, PolicyFamily, TrafficControlClass
+
+from registry import forms as registry_forms
 
 def nodes(request):
   """
@@ -231,7 +235,8 @@ def node_edit(request, node):
       'mobile_node_type' : NodeType.Mobile,
       'dead_node_type' : NodeType.Dead,
       'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
-      'projects' : Project.objects.all().order_by("id") },
+      'projects' : Project.objects.all().order_by("id"),
+      'registry_forms' : registry_forms.prepare_forms_for_node(node) },
     context_instance = RequestContext(request)
   )
 

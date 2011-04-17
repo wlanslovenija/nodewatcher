@@ -265,6 +265,22 @@
     <td class="small_text">{% blocktrans with network.contact_page as contact_page %}You can install additional packages on the node's router and thus gain additional functionality. If you are missing some package you would like to use or would like to use your own package please <a href="{{ contact_page }}" rel="external">contact us</a> and we will try to add it.{% endblocktrans %}</td>
   </tr>
 </table>
+
+
+{% for descriptor in registry_forms %}
+{% heading 3 descriptor.name %}
+  {% for form in descriptor.forms %}
+    {% if form.selected %}
+    <div>
+    {% else %}
+    <div style="display: none;" id="{{ form.">
+    {% endif %}
+    <table border="0" width="700">
+      {{ form.as_table }}
+    </table>
+    </div>
+  {% endfor %}
+{% endfor %}
 {% endif %}
 </div>
 
