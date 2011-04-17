@@ -17,20 +17,13 @@ class RegistryResolver(object):
     self._node = node
     self._path = path
   
-  def __getattr__(self, key):
-    """
-    Constructs hierarchical names by simulating attribute access.
-    """
-    key = key if self._path is None else "{0}.{1}".format(self._path, key)
-    return RegistryResolver(self._node, key)
-  
-  def __call__(self, create = None):
+  def by_path(self, path, create = None):
     """
     Resolves the registry hierarchy.
     """
-    if self._path in registry_state.ITEM_REGISTRY:
+    if path in registry_state.ITEM_REGISTRY:
       # Determine which class the node is using for configuration
-      top_level = registry_state.ITEM_REGISTRY[self._path]
+      top_level = registry_state.ITEM_REGISTRY[path]
       cfg = getattr(self._node, "config_{0}_{1}".format(top_level._meta.app_label, top_level._meta.module_name))
       
       try:
@@ -42,13 +35,26 @@ class RegistryResolver(object):
       except (IndexError, top_level.DoesNotExist):
         if create is not None:
           if not issubclass(create, top_level):
-            raise TypeError, "Not a valid registry item class for '{0}'!".format(self._path)
+            raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
           
           return create(node = self._node)
         else:
           return None
     else:
       raise UnknownRegistryIdentifier
+  
+  def __getattr__(self, key):
+    """
+    Constructs hierarchical names by simulating attribute access.
+    """
+    key = key if self._path is None else "{0}.{1}".format(self._path, key)
+    return RegistryResolver(self._node, key)
+  
+  def __call__(self, create = None):
+    """
+    Resolves the registry hierarchy.
+    """
+    return self.by_path(self._path, create = create)
 
 class Registry(object):
   """
