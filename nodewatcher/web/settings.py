@@ -164,6 +164,7 @@ INSTALLED_APPS = (
   'web.policy',
   'web.monitor',
   'web.registry',
+  'web.core',
 )
 
 # External programs configuration

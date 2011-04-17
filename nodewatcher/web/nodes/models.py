@@ -17,6 +17,7 @@ from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
+from web.registry import access as registry
 
 class Project(models.Model):
   """
@@ -212,6 +213,9 @@ class Node(models.Model):
   thresh_frag = models.IntegerField(null = True)
   loss_count = models.IntegerField(null = True)
   wifi_error_count = models.IntegerField(null = True)
+  
+  # Configuration registry
+  config = registry.Registry()
   
   def reset(self):
     """
