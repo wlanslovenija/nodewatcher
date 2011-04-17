@@ -44,9 +44,6 @@ class VpnServerConfig(registry_models.RegistryItem):
     registry_name = _("VPN Server")
     multiple = True
 
-# TODO these registrations should be moved to core modules that implement them
-registration.register_choice("core.vpn.server#protocol", "openvpn", _("OpenVPN"))
-
 class VpnServerConfigForm(forms.ModelForm):
   """
   VPN server configuration form.
