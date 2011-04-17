@@ -32,6 +32,15 @@ class RegistryItem(models.Model):
     
     return form
   
+  def cast(self):
+    """
+    Casts this registry item into the proper downwards type.
+    """
+    if self.cls_id == self._meta.module_name:
+      return self
+    
+    return getattr(self, self.cls_id)
+  
   def save(self, *args, **kwargs):
     """
     Sets up and saves the configuration item.

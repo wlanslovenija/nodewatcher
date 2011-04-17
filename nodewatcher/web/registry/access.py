@@ -17,7 +17,7 @@ class RegistryResolver(object):
     self._node = node
     self._path = path
   
-  def by_path(self, path, create = None):
+  def by_path(self, path, create = None, queryset = False):
     """
     Resolves the registry hierarchy.
     """
@@ -28,21 +28,19 @@ class RegistryResolver(object):
       
       if getattr(top_level.RegistryMeta, 'multiple', False):
         # Model supports multiple configuration options of this type
-        def model_resolver(obj):
-          if obj.cls_id == top_level._meta.module_name:
-            return obj
-          else:
-            return getattr(obj, obj.cls_id)
-        
-        return map(model_resolver, cfg.all())
+        if create is not None:
+          if not issubclass(create, top_level):
+            raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
+          
+          return create(node = self._node)
+        elif queryset:
+          return cfg.all()
+        else:
+          return map(lambda x: x.cast(), cfg.all())
       else:
         # Only a single configuration option is supported
         try:
-          item = cfg.all()[0]
-          if item.cls_id == top_level._meta.module_name:
-            return item
-          else:
-            return getattr(item, item.cls_id)
+          return cfg.all()[0].cast()
         except (IndexError, top_level.DoesNotExist):
           if create is not None:
             if not issubclass(create, top_level):
@@ -61,11 +59,11 @@ class RegistryResolver(object):
     key = key if self._path is None else "{0}.{1}".format(self._path, key)
     return RegistryResolver(self._node, key)
   
-  def __call__(self, create = None):
+  def __call__(self, **kwargs):
     """
     Resolves the registry hierarchy.
     """
-    return self.by_path(self._path, create = create)
+    return self.by_path(self._path, **kwargs)
 
 class Registry(object):
   """
