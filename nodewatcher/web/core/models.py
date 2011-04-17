@@ -2,9 +2,9 @@ from django import forms
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from web.registry import models as registry_models
-from web.registry import forms as registry_forms
-from web.registry import registration
+from registry import models as registry_models
+from registry import forms as registry_forms
+from registry import registration
 
 class GeneralConfig(registry_models.RegistryItem):
   """
@@ -14,15 +14,12 @@ class GeneralConfig(registry_models.RegistryItem):
   model = models.CharField(max_length = 20) # TODO fkey to router models
   platform = models.CharField(max_length = 20, choices = registration.get_registered_choices("core.general#platform"))
   version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
+  timezone = models.CharField(max_length = 30)
   
   class RegistryMeta:
     form_order = 1
     registry_id = "core.general"
     registry_name = _("General Configuration")
-
-# TODO these registrations should be moved to core modules that implement them
-registration.register_choice("core.general#platform", "openwrt", _("OpenWRT"))
-registration.register_choice("core.general#platform", "ubnt", _("Ubiquiti AirOS"))
 
 class GeneralConfigForm(forms.ModelForm):
   """
