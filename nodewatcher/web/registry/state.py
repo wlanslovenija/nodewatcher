@@ -3,3 +3,6 @@
 ITEM_REGISTRY = {}
 ITEM_LIST = []
 
+# A registry of choices
+CHOICES_REGISTRY = {}
+

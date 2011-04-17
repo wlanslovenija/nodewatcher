@@ -26,20 +26,31 @@ class RegistryResolver(object):
       top_level = registry_state.ITEM_REGISTRY[path]
       cfg = getattr(self._node, "config_{0}_{1}".format(top_level._meta.app_label, top_level._meta.module_name))
       
-      try:
-        item = cfg.all()[0]
-        if item.cls_id == top_level._meta.module_name:
-          return item
-        else:
-          return getattr(item, item.cls_id)
-      except (IndexError, top_level.DoesNotExist):
-        if create is not None:
-          if not issubclass(create, top_level):
-            raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
-          
-          return create(node = self._node)
-        else:
-          return None
+      if getattr(top_level.RegistryMeta, 'multiple', False):
+        # Model supports multiple configuration options of this type
+        def model_resolver(obj):
+          if obj.cls_id == top_level._meta.module_name:
+            return obj
+          else:
+            return getattr(obj, obj.cls_id)
+        
+        return map(model_resolver, cfg.all())
+      else:
+        # Only a single configuration option is supported
+        try:
+          item = cfg.all()[0]
+          if item.cls_id == top_level._meta.module_name:
+            return item
+          else:
+            return getattr(item, item.cls_id)
+        except (IndexError, top_level.DoesNotExist):
+          if create is not None:
+            if not issubclass(create, top_level):
+              raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
+            
+            return create(node = self._node)
+          else:
+            return None
     else:
       raise UnknownRegistryIdentifier
   

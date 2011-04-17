@@ -64,15 +64,3 @@ def prepare_config_item(sender, **kwargs):
 
 model_signals.class_prepared.connect(prepare_config_item)
 
-def register_form_for_item(item, form_class):
-  """
-  Registers a form for use with the specified registry item.
-  
-  @param item: Registry item class
-  @param form_class: Form class
-  """
-  if not hasattr(item, '_forms'):
-    item._forms = {}
-  
-  item._forms[item] = form_class
-
