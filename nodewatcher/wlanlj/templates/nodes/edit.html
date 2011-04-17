@@ -269,6 +269,7 @@
 
 {% for descriptor in registry_forms %}
 {% heading 3 descriptor.name %}
+  {{ descriptor.meta.item }}
   {% for form in descriptor.forms %}
     {% if form.selected %}
     <div>

@@ -1,4 +1,20 @@
+from django import forms
+
 from registry import state as registry_state
+
+class RegistryMetaForm(forms.Form):
+  def __init__(self, items, selected_item, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    super(RegistryMetaForm, self).__init__(*args, **kwargs)
+    
+    self.fields['item'] = forms.TypedChoiceField(
+      choices = [(item._meta.module_name, item.RegistryMeta.registry_name) for item in items],
+      coerce = str,
+      initial = selected_item,
+      widget = forms.Select if len(items) > 1 else forms.HiddenInput
+    )
 
 def prepare_forms_for_node(node = None):
   """
@@ -7,8 +23,7 @@ def prepare_forms_for_node(node = None):
   """
   forms = []
   for _, items in registry_state.ITEM_LIST.iteritems():
-    meta = None
-    has_selected = False
+    selected_item = None
     item_forms = []
     for item_cls in items:
       # Attempt to retrieve the existing configuration for this node when set
@@ -33,7 +48,7 @@ def prepare_forms_for_node(node = None):
             
             form = form_cls(instance = mdl, prefix = item_cls._meta.module_name)
             selected_form = True
-            has_selected = True
+            selected_item = item_cls._meta.module_name
           except form_cls.DoesNotExist:
             # This object doesn't have this item configured, so we simply use an
             # empty form for it
@@ -52,17 +67,18 @@ def prepare_forms_for_node(node = None):
       continue
     
     # Ensure that at least one form is selected (the default one)
-    if not has_selected:
+    if not selected_item:
       item_forms[0].selected = True
-    
-    # TODO meta form should include a form with a combo selector for potential
-    #      subclasses if there is more than one
+      selected_item = items[0]._meta.module_name
     
     forms.append({
-      'name' : item_cls.RegistryMeta.registry_name,
-      'meta' : meta,
+      'name' : items[0].RegistryMeta.registry_name,
+      'meta' : RegistryMetaForm(items, selected_item, prefix = items[0].RegistryMeta.registry_id),
       'forms' : item_forms
     })
   
   return forms
+
+def save_forms_for_node(node = None):
+  pass
 
