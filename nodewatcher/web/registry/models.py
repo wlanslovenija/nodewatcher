@@ -46,8 +46,16 @@ class RegistryItem(models.Model):
     """
     Sets up and saves the configuration item.
     """
+    # Set class identifier
     self.cls_id = self._meta.module_name
     super(RegistryItem, self).save(*args, **kwargs)
+    
+    # If only one configuration instance should be allowed, we
+    # should delete existing ones
+    if not getattr(self.RegistryMeta, 'multiple', False) and self.node:
+      top_level = registry_state.ITEM_REGISTRY[self.RegistryMeta.registry_id]
+      cfg = getattr(self.node, "config_{0}_{1}".format(top_level._meta.app_label, top_level._meta.module_name))
+      cfg.exclude(pk = self.pk).delete()
 
 def prepare_config_item(sender, **kwargs):
   """
@@ -58,7 +66,7 @@ def prepare_config_item(sender, **kwargs):
     return
   
   items = registry_state.ITEM_LIST 
-  items.setdefault((sender.RegistryMeta.form_order, sender.RegistryMeta.registry_name), []).append(sender)
+  items.setdefault((sender.RegistryMeta.form_order, sender.RegistryMeta.registry_id), []).append(sender)
   registry_state.ITEM_LIST = datastructures.SortedDict(sorted(items.items(), key = lambda x: x[0]))
   
   # Only record the top-level item in the registry as there could be multiple

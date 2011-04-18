@@ -161,16 +161,24 @@ def node_edit(request, node):
     raise Http404
   
   if request.method == 'POST':
-    form = UpdateNodeForm(node, request.POST)
-    if form.is_valid() and form.save(node, request.user):
-      if form.requires_firmware_update:
-        return render_to_response('nodes/firmware_update_needed.html', {
-            'node' : node
-          },
-          context_instance = RequestContext(request)
-        )
-      else:
-        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
+    try:
+      sid = transaction.savepoint()
+      form = UpdateNodeForm(node, request.POST)
+      if form.is_valid() and form.save(node, request.user):
+        has_errors, dynamic_forms = registry_forms.prepare_forms_for_node(node, data = request.POST, save = True)
+        if has_errors:
+          transaction.savepoint_rollback(sid)
+        elif form.requires_firmware_update:
+          return render_to_response('nodes/firmware_update_needed.html', {
+              'node' : node
+            },
+            context_instance = RequestContext(request)
+          )
+        else:
+          return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
+    except:
+      transaction.savepoint_rollback(sid)
+      raise
   else:
     p = {
       'name'                : node.name,
@@ -228,6 +236,7 @@ def node_edit(request, node):
       })
 
     form = UpdateNodeForm(node, initial = p)
+    dynamic_forms = registry_forms.prepare_forms_for_node(node)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,
@@ -236,7 +245,7 @@ def node_edit(request, node):
       'dead_node_type' : NodeType.Dead,
       'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
       'projects' : Project.objects.all().order_by("id"),
-      'registry_forms' : registry_forms.prepare_forms_for_node(node) },
+      'registry_forms' : dynamic_forms },
     context_instance = RequestContext(request)
   )
 

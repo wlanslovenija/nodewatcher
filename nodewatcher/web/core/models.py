@@ -19,7 +19,8 @@ class GeneralConfig(registry_models.RegistryItem):
   class RegistryMeta:
     form_order = 1
     registry_id = "core.general"
-    registry_name = _("General Configuration")
+    registry_section = _("General Configuration")
+    registry_name = _("Basic Configuration")
 
 class GeneralConfigForm(forms.ModelForm):
   """
@@ -29,6 +30,19 @@ class GeneralConfigForm(forms.ModelForm):
     model = GeneralConfig
 
 registration.register_form_for_item(GeneralConfig, GeneralConfigForm)
+
+# XXX this is just for testing selections
+class ExtendedGeneralConfig(GeneralConfig):
+  password = models.CharField(max_length = 30)
+  
+  class RegistryMeta(GeneralConfig.RegistryMeta):
+    registry_name = _("Extended Configuration")
+
+class ExtendedGeneralConfigForm(forms.ModelForm):
+  class Meta:
+    model = ExtendedGeneralConfig
+
+registration.register_form_for_item(ExtendedGeneralConfig, ExtendedGeneralConfigForm)
 
 class VpnServerConfig(registry_models.RegistryItem):
   """
