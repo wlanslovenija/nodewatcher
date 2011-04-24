@@ -108,6 +108,21 @@ registry = {
     $('.regact_remover').click(function() {
       registry.remove($(this).attr('id'));
     });
+    $('.regact_item_chooser').change(function() {
+      var item_subclass = $(this).val();
+      var item_class = $(this).attr('id').replace(/id_reg_/, '').replace(/-item/, '');
+      var target = $("#reg_" + item_class + "_" + item_subclass);
+      
+      // Copy shared fields when changing classes
+      $('.config_selected.regsct_reg_' + item_class + ' [name]').each(function(_) {
+        var field = $(this).attr('name').replace(/^.*?-/, '');
+        var value = $(this).val();
+        target.find('[name="reg_' + item_class + '_' + item_subclass + '-' + field + '"]').val(value);
+      });
+      
+      $('.config_selected.regsct_reg_' + item_class).removeClass('config_selected').css('display', 'none');
+      target.css('display', '').addClass('config_selected');
+    });
   },
   
   error: function(msg)

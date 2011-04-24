@@ -18,7 +18,7 @@ class RegistryMetaForm(forms.Form):
       choices = [(item._meta.module_name, item.RegistryMeta.registry_name) for item in items],
       coerce = str,
       initial = selected_item,
-      widget = forms.Select(attrs = { 'class' : 'config_selector' }) if len(items) > 1 else forms.HiddenInput
+      widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' }) if len(items) > 1 else forms.HiddenInput
     )
 
 class RegistrySetMetaForm(forms.Form):
@@ -53,9 +53,10 @@ def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, 
           # The model exists, but it is not the same as the one for which we are
           # generating a form so we must perform field copying to a new instance
           merge_mdl = item_cls(node = node)
-          for field in item_mdl._meta.get_all_field_names():
-            if hasattr(merge_mdl, field):
-              setattr(merge_mdl, field, getattr(item_mdl, field))
+          item_fields = set(item_mdl._meta.get_all_field_names())
+          merge_fields = set(merge_mdl._meta.get_all_field_names())
+          for field in item_fields.intersection(merge_fields):
+            setattr(merge_mdl, field, getattr(item_mdl, field))
           item_mdl = merge_mdl
         else:
           selected_form = True
