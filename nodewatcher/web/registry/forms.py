@@ -56,7 +56,11 @@ def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, 
           item_fields = set(item_mdl._meta.get_all_field_names())
           merge_fields = set(merge_mdl._meta.get_all_field_names())
           for field in item_fields.intersection(merge_fields):
-            setattr(merge_mdl, field, getattr(item_mdl, field))
+            try:
+              if getattr(item_mdl, field, None) is not None:
+                setattr(merge_mdl, field, getattr(item_mdl, field))
+            except ValueError:
+              pass
           item_mdl = merge_mdl
         else:
           selected_form = True
@@ -114,9 +118,12 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           # We are generating forms for display purpuses, only include forms for
           # existing models
           for idx, item_mdl in enumerate(node.config.by_path(cls_meta.registry_id)):
-            validation_errors, item_forms, meta_form = generate_forms_for_item_cls(
+            has_errors, item_forms, meta_form = generate_forms_for_item_cls(
               node, item_mdl, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx
             )
+            if has_errors:
+              validation_errors = True
+            
             subforms.append({
               'prefix'  : base_prefix + '_mu_' + str(idx),
               'meta'    : meta_form,
@@ -135,9 +142,12 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
             validation_errors = True
           
           for idx in xrange(submeta.cleaned_data['form_count']):
-            validation_errors, item_forms, meta_form = generate_forms_for_item_cls(
+            has_errors, item_forms, meta_form = generate_forms_for_item_cls(
               node, None, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx
             )
+            if has_errors:
+              validation_errors = True
+            
             subforms.append({
               'prefix'  : base_prefix + '_mu_' + str(idx),
               'meta'    : meta_form,
@@ -145,7 +155,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
             })
         
         # Generate an extra subform for new objects (this is never saved)
-        _, item_forms, meta_form = generate_forms_for_item_cls(node, None, cls_meta, data, items, False, base_prefix + '_stub', 'stub')
+        _, item_forms, meta_form = generate_forms_for_item_cls(node, None, cls_meta, None, items, False, base_prefix + '_stub', 'stub')
         subforms.append({
           'prefix'  : base_prefix + '_stub',
           'meta'    : meta_form,
@@ -155,9 +165,11 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
       else:
         # Only a single item can be selected for this form
         mdl = node.config.by_path(cls_meta.registry_id)
-        validation_errors, item_forms, meta_form = generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, base_prefix)
+        has_errors, item_forms, meta_form = generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, base_prefix)
         if not item_forms:
           continue
+        if has_errors:
+          validation_errors = True
         
         submeta = None
         subforms.append({
@@ -188,7 +200,6 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
         cgm.generate_config(node, only_validate = True)
       except cgm_base.ValidationError, e:
         validation_errors = True
-        print "validation errors in cgm"
         # TODO Handle validation errors
         raise
     
