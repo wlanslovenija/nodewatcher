@@ -21,10 +21,11 @@
     {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
     <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/site/folding.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/csrf.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
     {{ form.media }}
     {% block js %}{% endblock %}
-	<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.init.js"></script>
+	  <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.init.js"></script>
     {% block rss %}{% endblock %}
 </head>
 
