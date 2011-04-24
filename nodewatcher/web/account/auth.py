@@ -8,6 +8,9 @@ if crypt('', '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/') != '$1$DIF16...$Xzh7aN9GPHrZP
   crypt = unix_md5_crypt
 
 class CryptBackend:
+  supports_anonymous_user = False
+  supports_object_permissions = False
+  
   def authenticate(self, username = None, password = None):
     """
     Authenticate against the database using OpenBSD's blowfish crypt
