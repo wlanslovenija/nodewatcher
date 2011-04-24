@@ -2,6 +2,7 @@ import inspect
 
 from registry.rules.engine import * 
 
+# Exports
 __all__ = [
   'rule',
   'value',
@@ -13,6 +14,11 @@ __all__ = [
 ]
 
 def rule(condition, *args):
+  """
+  The rule predicate is used to define rules.
+  
+  @param condition: Lazy expression that represents a condition
+  """
   if not isinstance(condition, (LazyValue, RuleModifier)):
     raise CompilationError("Rule conditions must be lazy values or rule modifiers!")
   
@@ -24,6 +30,9 @@ def rule(condition, *args):
     if not isinstance(x, (Action, Rule)):
       raise CompilationError("Rule actions must be Action or Rule instances!")
     
+    # Since the rule predicate calls can be nested we must ensure that only top-level
+    # rules remain in the context list; this is especially a problem since rule predicates
+    # are first executed in sublevels by the Python interpreter
     if isinstance(x, Rule):
       ctx._rules.remove(x)
   
@@ -32,7 +41,14 @@ def rule(condition, *args):
   return new_rule
 
 def assign(location, index = 0, **kwargs):
+  """
+  Action that assigns a dictionary of values to a specific location.
+  
+  @param location: Registry location
+  @param index: Optional array index
+  """
   # TODO location validation
+  # TODO registry metadata validation (if index > 0, must be multiple)
   def action_assign(context):
     values = []
     for field, value in kwargs.iteritems():
@@ -43,14 +59,26 @@ def assign(location, index = 0, **kwargs):
   return Action(action_assign)
 
 def clear_config(location):
+  """
+  Action that clears all config items for a specific location.
+  
+  @param location: Registry location
+  """
   # TODO location validation
+  # TODO registry metadata validation (must be multiple)
   def action_clear_config(context):
     context.results.append('registry.clear_config("{0}");'.format(location))
   
   return Action(action_clear_config)
 
 def append(location, **kwargs):
+  """
+  Action that appends a config item to a specific location.
+  
+  @param location: Registry location
+  """
   # TODO location validation
+  # TODO registry metadata validation (must be multiple)
   def action_append(context):
     values = []
     for field, value in kwargs.iteritems():
@@ -61,9 +89,20 @@ def append(location, **kwargs):
   return Action(action_append)
 
 def count(value):
+  """
+  Lazy value that returns the number of elements of another lazy expression.
+  
+  @param value: Lazy expression
+  """
+  # TODO value must be LazyValue instance
   return LazyValue(lambda context: len(value(context)))
 
 def value(location):
+  """
+  Lazy value that returns the result of a registry query.
+  
+  @param location: Registry location (may contain attributes)
+  """
   def location_resolver(context):
     path, attribute = location.split('#') if '#' in location else (location, None)
     obj = context.node.config.by_path(path)
@@ -84,6 +123,12 @@ def value(location):
   return LazyValue(location_resolver)
 
 def changed(location):
+  """
+  A rule modifier predicate that will evaluate to True whenever a specific
+  registry location has changed between rule evaluations.
+  
+  @param location: Registry location (may contain attributes)
+  """
   return RuleModifier(
     lambda rule: setattr(rule, 'always_evaluate', True),
     lambda context: context.has_value_changed(location, value(location)(context))
