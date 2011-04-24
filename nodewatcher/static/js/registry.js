@@ -1,18 +1,41 @@
-registry = {
+var registry = {
   // Node identifier that needs to be set
   node_id: '',
   
+  /**
+   * Properly formats dotted registry identifiers.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   * @return: Identifier formatted for CSS class name 
+   */
   convert_class_name: function(reg_class)
   {
     return reg_class.replace(/\./g, '_');
   },
   
+  /**
+   * Selects all configuration field variants for some specific registry
+   * item class and field name.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   * @param field: Field name
+   * @param index: Index (needed for classes with multiple items)
+   * @return: All fields fitting the above criteria
+   */
   field_id_to_fields: function(reg_class, field, index)
   {
     reg_class = reg_class + '_' + field + '_' + index;
     return $('#registry_forms .regfld_' + reg_class);
   },
   
+  /**
+   * Assigns values to some specific registry item class. The index must
+   * already exist.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   * @param index: Index (needed for classes with multiple items)
+   * @param values: A map of key-value items
+   */
   assign: function(reg_class, index, values)
   {
     reg_class = registry.convert_class_name(reg_class);
@@ -21,11 +44,24 @@ registry = {
     });
   },
   
+  /**
+   * A helper method for returning the counter element for classes with
+   * multiple items.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   */
   get_counter: function(reg_class)
   {
     return $('#id_reg_' + reg_class + '_sm-form_count')
   },
   
+  /**
+   * Appends a new registry item to the end of a registry item class that supports
+   * multiple items.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   * @param values: A map of key-value items
+   */
   append: function(reg_class, values)
   {
     reg_class = registry.convert_class_name(reg_class);
@@ -59,6 +95,12 @@ registry = {
     registry.assign(reg_class, idx, values);
   },
   
+  /**
+   * Removes the last registry item of a registry item class that supports
+   * multiple items.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   */
   remove: function(reg_class)
   {
     reg_class = registry.convert_class_name(reg_class);
@@ -71,6 +113,12 @@ registry = {
     counter.val(idx);
   },
   
+  /**
+   * Removes all registry items of a registry item class that supports
+   * multiple items.
+   *
+   * @param reg_class: Registry identifier (like "core.general")
+   */
   clear_config: function(reg_class)
   {
     reg_class = registry.convert_class_name(reg_class);
@@ -84,6 +132,12 @@ registry = {
     counter.val(0);
   },
   
+  /**
+   * Performs server-side rule evaluation based on current values of all
+   * entered registry items and executes any sent changes. Server returns
+   * changes as a set of Javascript instructions that manipulate the registry
+   * object. 
+   */
   reevaluate_rules: function()
   {
     if (!registry.node_id)
@@ -99,6 +153,9 @@ registry = {
     });
   },
   
+  /**
+   * Initializes the client-side registry functions.
+   */
   register_action_fields: function()
   {
     $('.regact_selector').change(registry.reevaluate_rules);
@@ -125,6 +182,12 @@ registry = {
     });
   },
   
+  /**
+   * Error handler invoked by the server when something goes wrong with
+   * rule evaluation.
+   *
+   * @param msg: Error message
+   */
   error: function(msg)
   {
     // TODO error reports while doing rule evaluation
@@ -132,6 +195,7 @@ registry = {
   },
 };
 
+// Initialize registry functions
 $(document).ready(function () {
   registry.register_action_fields();
 });
