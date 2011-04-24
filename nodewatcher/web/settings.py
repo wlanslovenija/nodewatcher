@@ -232,6 +232,9 @@ CELERY_IGNORE_RESULT = True
 # configuration/setup will not work.
 ENABLE_GRAPH_DISPLAY = False
 
+# Registry
+REGISTRY_RULES_MODULE = 'web.rules'
+
 DOCUMENTATION_LINKS = {
 #  'custom_node'          : 'http://example.net/wiki/CustomNode',
 #  'known_issues'         : 'http://example.net/wiki/KnownIssues',

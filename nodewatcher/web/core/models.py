@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from registry import models as registry_models
+from registry import fields as registry_fields
 from registry import forms as registry_forms
 from registry import registration
 
@@ -11,8 +12,9 @@ class GeneralConfig(registry_models.RegistryItem):
   General node configuration containing basic parameters about the
   router type and the platform used.
   """
+  project = registry_fields.ModelSelectorKeyField("nodes.Project")
   model = models.CharField(max_length = 20) # TODO fkey to router models
-  platform = models.CharField(max_length = 20, choices = registration.get_registered_choices("core.general#platform"))
+  platform = registry_fields.SelectorKeyField("core.general#platform")
   version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
   timezone = models.CharField(max_length = 30)
   
@@ -48,13 +50,14 @@ class VpnServerConfig(registry_models.RegistryItem):
   """
   Provides a VPN server specification that the nodes can use.
   """
-  protocol = models.CharField(max_length = 20, choices = registration.get_registered_choices("core.vpn.server#protocol"))
+  protocol = registry_fields.SelectorKeyField("core.vpn.server#protocol")
   hostname = models.CharField(max_length = 100)
   port = models.IntegerField()
   
   class RegistryMeta:
     form_order = 2
     registry_id = "core.vpn.server"
+    registry_section = _("VPN Servers")
     registry_name = _("VPN Server")
     multiple = True
 

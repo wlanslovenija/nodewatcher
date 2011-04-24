@@ -266,37 +266,49 @@
   </tr>
 </table>
 
-
+<div id="registry_forms">
 {% for descriptor in registry_forms %}
 {% heading 3 descriptor.name %}
-  {{ descriptor.meta.item }}
-  {% for form in descriptor.forms %}
-    {% if form.selected %}
-    <div id="config-{{ form.prefix }}" class="config_selected configsct_{{ descriptor.registry_id }}">
-    {{ form.errors }}
+  {% if descriptor.multiple %}
+  <input type="button" value="{% trans 'Add' %}" id="{{ descriptor.id }}" class="regact_adder">
+  <input type="button" value="{% trans 'Remove Last' %}" id="{{ descriptor.id }}" class="regact_remover">
+  {{ descriptor.submeta }}
+  <div id="{{ descriptor.prefix }}_mu_container">
+  {% endif %}
+  
+  {% for subform in descriptor.subforms %}
+    {% if subform.stub %}
+    <div id="{{ subform.prefix }}_container" style="display: none;">
     {% else %}
-    <div style="display: none;" id="config-{{ form.prefix }}" class="configsct_{{ descriptor.registry_id }}">
+    <div id="{{ subform.prefix }}_container" class="reg_cfg_item">
     {% endif %}
-    <table border="0" width="700">
-      {{ form.as_table }}
-    </table>
+    
+    {{ subform.meta.item }}
+    {% for form in subform.forms %}
+      {% if form.selected %}
+      <div id="{{ form.prefix }}" class="config_selected configsct_{{ descriptor.prefix }}">
+      {{ form.errors }}
+      {% else %}
+      <div  id="{{ form.prefix }}" style="display: none;" class="configsct_{{ descriptor.prefix }}">
+      {% endif %}
+      <table border="0" width="700">
+        {{ form.as_table }}
+      </table>
+      </div>
+    {% endfor %}
+    
     </div>
   {% endfor %}
-{% endfor %}
-{% endif %}
-<script type="text/javascript">
-  function updateConfigSelector(target)
-  {
-    var value = $(target).attr('value');
-    var cls = $(target).attr('id').replace('id_', '').replace('-item', '');
-    $('.config_selected.configsct_' + cls).css('display', 'none').removeClass('config_selected');
-    $('#config-' + value).css('display', '').addClass('config_selected');
-  }
   
-  $(document).ready(function () {
-    $('.config_selector').change(function(event) { updateConfigSelector(event.target); });
-    $('.config_selector').each(function() { updateConfigSelector($(this)); });
-  });
+  {% if descriptor.multiple %}
+  </div>
+  {% endif %}
+{% endfor %}
+</div>
+{% endif %}
+<script type="text/javascript"  src="{{ MEDIA_URL }}js/registry.js"></script>
+<script type="text/javascript">
+  registry.node_id = "{{ node.pk }}";
 </script>
 </div>
 

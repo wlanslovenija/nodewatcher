@@ -1,5 +1,5 @@
 from django import forms
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db import models
 from django.db.models import signals as model_signals
 from django.utils import datastructures
@@ -15,6 +15,7 @@ class RegistryItem(models.Model):
   
   class Meta:
     abstract = True
+    ordering = ['id']
   
   @classmethod
   def get_form(cls):

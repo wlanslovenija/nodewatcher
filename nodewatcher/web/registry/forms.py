@@ -1,9 +1,11 @@
 from django import forms
 from django.db import transaction
+from django.forms.formsets import formset_factory
 
 from core import cgm
 from core.cgm import base as cgm_base
 from registry import state as registry_state
+from registry import rules as registry_rules
 
 class RegistryMetaForm(forms.Form):
   def __init__(self, items, selected_item = None, *args, **kwargs):
@@ -19,7 +21,78 @@ class RegistryMetaForm(forms.Form):
       widget = forms.Select(attrs = { 'class' : 'config_selector' }) if len(items) > 1 else forms.HiddenInput
     )
 
-def prepare_forms_for_node(node = None, data = None, save = False):
+class RegistrySetMetaForm(forms.Form):
+  form_count = forms.IntegerField(
+    min_value = 0,
+    max_value = 10,
+    widget = forms.HiddenInput
+  )
+
+def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, idx = 0):
+  """
+  A helper function for generating forms.
+  """
+  selected_item = None
+  item_forms = []
+  validation_errors = False
+  
+  if save:
+    meta_form = RegistryMetaForm(items, data = data, prefix = prefix)
+    if not meta_form.is_valid():
+      validation_errors = True
+  
+  for item_cls in items:
+    # Attempt to retrieve the existing configuration for this node when set
+    form_cls = item_cls.get_form()
+    selected_form = False
+    item_mdl = mdl
+    
+    if node is not None:
+      if item_mdl is not None:
+        if item_mdl.cls_id != item_cls._meta.module_name:
+          # The model exists, but it is not the same as the one for which we are
+          # generating a form so we must perform field copying to a new instance
+          merge_mdl = item_cls(node = node)
+          for field in item_mdl._meta.get_all_field_names():
+            if hasattr(merge_mdl, field):
+              setattr(merge_mdl, field, getattr(item_mdl, field))
+          item_mdl = merge_mdl
+        else:
+          selected_form = True
+          selected_item = item_cls._meta.module_name
+      else:
+        # This object doesn't have this item configured, so we simply use an
+        # empty form for it
+        item_mdl = item_cls(node = node)
+    else:
+      item_mdl = item_cls(node = node)
+    
+    form = form_cls(data, instance = item_mdl, prefix = prefix + '_' + item_cls._meta.module_name)
+    if save and item_cls._meta.module_name == meta_form.cleaned_data['item']:
+      if form.is_valid():
+        form.save()
+      else:
+        validation_errors = True
+    
+    # Augment form fields with classes so they are easily locatable using the client-side API
+    for name, field in form.fields.iteritems():
+      widget_class = cls_meta.registry_id.replace('.', '_') + '_' + name + '_' + str(idx)
+      field.widget.attrs['class'] = field.widget.attrs.get('class', '') + " regfld_" + widget_class
+    
+    form.selected = selected_form
+    item_forms.append(form)
+  
+  # Ensure that at least one form is selected
+  if not selected_item:
+    item_forms[0].selected = True
+    selected_item = items[0]._meta.module_name
+  
+  if not save:
+    meta_form = RegistryMetaForm(items, selected_item, data = data, prefix = prefix)
+  
+  return validation_errors, item_forms, meta_form
+
+def prepare_forms_for_node(node = None, data = None, save = False, only_rules = False):
   """
   Prepares a list of configuration forms for use on a node's
   configuration page.
@@ -30,79 +103,83 @@ def prepare_forms_for_node(node = None, data = None, save = False):
     forms = []
     
     for _, items in registry_state.ITEM_LIST.iteritems():
-      selected_item = None
-      item_forms = []
+      cls_meta = items[0].RegistryMeta
+      base_prefix = "reg_" + cls_meta.registry_id.replace('.', '_')
+      subforms = []
       
-      # XXX just until we have multiples implemented
-      if getattr(items[0].RegistryMeta, 'multiple', False):
-        continue
-      
-      if save:
-        meta_form = RegistryMetaForm(items, data = data, prefix = items[0].RegistryMeta.registry_id.replace('.', '_'))
-        if not meta_form.is_valid():
-          validation_errors = True
-          break
-      
-      for item_cls in items:
-        # Attempt to retrieve the existing configuration for this node when set
-        form_cls = item_cls.get_form()
-        selected_form = False
-        
-        if not getattr(item_cls.RegistryMeta, 'multiple', False):
-          # Single configuration option
-          if node is not None:
-            try:
-              mdl = node.config.by_path(item_cls.RegistryMeta.registry_id)
-              
-              if mdl.cls_id != item_cls._meta.module_name:
-                # The model exist, but it is not the same as the one for which we are
-                # generating a form so we must perform field copying to a new instance
-                merge_mdl = item_cls(node = node)
-                for field in mdl._meta.get_all_field_names():
-                  if hasattr(merge_mdl, field):
-                    setattr(merge_mdl, field, getattr(mdl, field))
-                mdl = merge_mdl
-              else:
-                selected_form = True
-                selected_item = item_cls._meta.module_name
-            except item_cls.DoesNotExist:
-              # This object doesn't have this item configured, so we simply use an
-              # empty form for it
-              mdl = item_cls(node = node)
-          else:
-            mdl = item_cls(node = node)
+      mdl = node.config.by_path(cls_meta.registry_id)
+      if getattr(cls_meta, 'multiple', False):
+        if not save:
+          # We are generating forms for display purpuses, only include forms for
+          # existing models
+          for idx, item_mdl in enumerate(node.config.by_path(cls_meta.registry_id)):
+            validation_errors, item_forms, meta_form = generate_forms_for_item_cls(
+              node, item_mdl, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx
+            )
+            subforms.append({
+              'prefix'  : base_prefix + '_mu_' + str(idx),
+              'meta'    : meta_form,
+              'forms'   : item_forms
+            })
           
-          form = form_cls(data, instance = mdl, prefix = item_cls._meta.module_name)
-          if save and item_cls._meta.module_name == meta_form.cleaned_data['item']:
-            if form.is_valid():
-              form.save()
-            else:
-              validation_errors = True
+          submeta = RegistrySetMetaForm(data, prefix = base_prefix + '_sm', initial = {
+            'form_count' : len(subforms)
+          })
         else:
-          # Multiple possible configuration instances
-          # TODO
+          # We are saving so some forms might have been added and others might have been removed,
+          # so we generate forms; delete all items as they will be added again
+          node.config.by_path(cls_meta.registry_id, queryset = True).delete()
+          submeta = RegistrySetMetaForm(data, prefix = base_prefix + '_sm')
+          if not submeta.is_valid():
+            validation_errors = True
+          
+          for idx in xrange(submeta.cleaned_data['form_count']):
+            validation_errors, item_forms, meta_form = generate_forms_for_item_cls(
+              node, None, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx
+            )
+            subforms.append({
+              'prefix'  : base_prefix + '_mu_' + str(idx),
+              'meta'    : meta_form,
+              'forms'   : item_forms
+            })
+        
+        # Generate an extra subform for new objects (this is never saved)
+        _, item_forms, meta_form = generate_forms_for_item_cls(node, None, cls_meta, data, items, False, base_prefix + '_stub', 'stub')
+        subforms.append({
+          'prefix'  : base_prefix + '_stub',
+          'meta'    : meta_form,
+          'forms'   : item_forms,
+          'stub'    : True
+        })
+      else:
+        # Only a single item can be selected for this form
+        mdl = node.config.by_path(cls_meta.registry_id)
+        validation_errors, item_forms, meta_form = generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, base_prefix)
+        if not item_forms:
           continue
         
-        form.selected = selected_form
-        item_forms.append(form)
-      
-      if not item_forms:
-        continue
-      
-      # Ensure that at least one form is selected
-      if not selected_item:
-        item_forms[0].selected = True
-        selected_item = items[0]._meta.module_name
-      
-      if not save:
-        meta_form = RegistryMetaForm(items, selected_item, data = data, prefix = items[0].RegistryMeta.registry_id.replace('.', '_'))
+        submeta = None
+        subforms.append({
+          'prefix'  : base_prefix,
+          'meta'    : meta_form,
+          'forms'   : item_forms
+        })
       
       forms.append({
-        'name' : items[0].RegistryMeta.registry_section,
-        'meta' : meta_form,
-        'forms' : item_forms,
-        'registry_id' : items[0].RegistryMeta.registry_id.replace('.', '_')
+        'name'        : cls_meta.registry_section,
+        'id'          : cls_meta.registry_id,
+        'multiple'    : getattr(cls_meta, 'multiple', False),
+        'subforms'    : subforms,
+        'submeta'     : submeta,
+        'prefix'      : base_prefix
       })
+    
+    if only_rules:
+      # If only rule validation is requested, we should evaluate rules and then rollback
+      # the savepoint in any case; all validation errors are ignored
+      actions = registry_rules.evaluate(node)
+      transaction.savepoint_rollback(sid)
+      return actions
     
     if save and node and not validation_errors:
       # When save is enabled, we must perform node configuration validation
@@ -110,10 +187,14 @@ def prepare_forms_for_node(node = None, data = None, save = False):
         cgm.generate_config(node, only_validate = True)
       except cgm_base.ValidationError, e:
         validation_errors = True
+        print "validation errors in cgm"
         # TODO Handle validation errors
         raise
     
-    transaction.savepoint_commit(sid)
+    if not validation_errors:
+      transaction.savepoint_commit(sid)
+    else:
+      transaction.savepoint_rollback(sid)
   except cgm_base.ValidationError:
     transaction.savepoint_rollback(sid)
   except:
