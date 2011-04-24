@@ -1,5 +1,6 @@
 import inspect
 
+from registry import access as registry_access
 from registry.rules.engine import * 
 
 # Exports
@@ -47,8 +48,13 @@ def assign(location, index = 0, **kwargs):
   @param location: Registry location
   @param index: Optional array index
   """
-  # TODO location validation
-  # TODO registry metadata validation (if index > 0, must be multiple)
+  try:
+    tlc = registry_access.get_class_by_path(location)
+    if not getattr(tlc.RegistryMeta, 'multiple', False) and index > 0:
+      raise CompilationError("Attempted to use assign predicate with index > 0 on singular registry item '{0}'!".format(location)) 
+  except registry_access.UnknownRegistryIdentifier:
+    raise CompilationError("Registry location '{0}' is invalid!".format(location))
+  
   def action_assign(context):
     values = []
     for field, value in kwargs.iteritems():
@@ -64,8 +70,13 @@ def clear_config(location):
   
   @param location: Registry location
   """
-  # TODO location validation
-  # TODO registry metadata validation (must be multiple)
+  try:
+    tlc = registry_access.get_class_by_path(location)
+    if not getattr(tlc.RegistryMeta, 'multiple', False):
+      raise CompilationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(location)) 
+  except registry_access.UnknownRegistryIdentifier:
+    raise CompilationError("Registry location '{0}' is invalid!".format(location))
+  
   def action_clear_config(context):
     context.results.append('registry.clear_config("{0}");'.format(location))
   
@@ -77,8 +88,13 @@ def append(location, **kwargs):
   
   @param location: Registry location
   """
-  # TODO location validation
-  # TODO registry metadata validation (must be multiple)
+  try:
+    tlc = registry_access.get_class_by_path(location)
+    if not getattr(tlc.RegistryMeta, 'multiple', False):
+      raise CompilationError("Attempted to use append predicate on singular registry item '{0}'!".format(location)) 
+  except registry_access.UnknownRegistryIdentifier:
+    raise CompilationError("Registry location '{0}' is invalid!".format(location))
+  
   def action_append(context):
     values = []
     for field, value in kwargs.iteritems():
@@ -94,7 +110,9 @@ def count(value):
   
   @param value: Lazy expression
   """
-  # TODO value must be LazyValue instance
+  if not isinstance(value, LazyValue):
+    raise CompilationError("Count predicate argument must be a lazy value!")
+  
   return LazyValue(lambda context: len(value(context)))
 
 def value(location):

@@ -72,3 +72,14 @@ class Registry(object):
   def __get__(self, instance, owner):
     return RegistryResolver(instance)
 
+def get_class_by_path(path):
+  """
+  Returns a top-level registry item class for a specific path.
+  
+  @param path: Registry path
+  """
+  try:
+    return registry_state.ITEM_REGISTRY[path]
+  except KeyError:
+    raise UnknownRegistryIdentifier
+

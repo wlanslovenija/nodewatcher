@@ -1,4 +1,4 @@
-var registry = {
+registry = {
   // Node identifier that needs to be set
   node_id: '',
   
@@ -89,7 +89,7 @@ var registry = {
     if (!registry.node_id)
       return;
     
-    // TODO some progress notification thingie
+    // TODO some progress notification thingie in the foreground
     var forms = $('#registry_forms *').serialize();
     $.ajax({
       url: "/registry/evaluate_forms/" + registry.node_id,
@@ -108,6 +108,12 @@ var registry = {
     $('.regact_remover').click(function() {
       registry.remove($(this).attr('id'));
     });
+  },
+  
+  error: function(msg)
+  {
+    // TODO error reports while doing rule evaluation
+    alert("ERROR IN RULES ENGINE:\n" + msg);
   },
 };
 

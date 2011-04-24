@@ -12,7 +12,11 @@ def evaluate(node):
   
   @param node: Node to evaluate the rules for
   """
-  rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
-  rules.ctx.run(node)
+  try:
+    rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
+    rules.ctx.run(node)
+  except Exception, e:
+    return ['registry.error("{0}");'.format(e.args[0])]
+  
   return rules.ctx.results
 
