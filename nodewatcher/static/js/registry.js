@@ -2,6 +2,9 @@ var registry = {
   // Node identifier that needs to be set
   node_id: '',
   
+  // Current evaluation state
+  eval_state: {},
+  
   /**
    * Properly formats dotted registry identifiers.
    *
@@ -145,6 +148,7 @@ var registry = {
     
     // TODO some progress notification thingie in the foreground
     var forms = $('#registry_forms *').serialize();
+    forms += '&STATE=' + encodeURI(JSON.stringify(registry.eval_state));
     $.ajax({
       url: "/registry/evaluate_forms/" + registry.node_id,
       dataType: "script",
@@ -192,6 +196,15 @@ var registry = {
   {
     // TODO error reports while doing rule evaluation
     alert("ERROR IN RULES ENGINE:\n" + msg);
+  },
+  
+  /**
+   * Updates the evaluation state that needs to be stored between invocations
+   * for proper change handling.
+   */
+  state: function(new_state)
+  {
+    registry.eval_state = new_state
   },
 };
 

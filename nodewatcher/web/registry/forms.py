@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.db import transaction
 from django.forms.formsets import formset_factory
@@ -190,7 +192,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
     if only_rules:
       # If only rule validation is requested, we should evaluate rules and then rollback
       # the savepoint in any case; all validation errors are ignored
-      actions = registry_rules.evaluate(node)
+      actions = registry_rules.evaluate(node, json.loads(data['STATE']))
       transaction.savepoint_rollback(sid)
       return actions
     

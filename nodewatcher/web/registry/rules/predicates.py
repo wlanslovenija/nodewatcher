@@ -1,4 +1,5 @@
 import inspect
+import json
 
 from registry import access as registry_access
 from registry.rules.engine import * 
@@ -56,11 +57,7 @@ def assign(location, index = 0, **kwargs):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_assign(context):
-    values = []
-    for field, value in kwargs.iteritems():
-      values.append('{0}: "{1}"'.format(field, str(value).replace('\\', '\\\\')))
-    values = ",".join(values)
-    context.results.append('registry.assign("{0}", {1}, {{ {2} }});'.format(location, index, values))
+    context.results.append('registry.assign("{0}", {1}, {2});'.format(location, index, json.dumps(kwargs)))
   
   return Action(action_assign)
 
@@ -96,11 +93,7 @@ def append(location, **kwargs):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_append(context):
-    values = []
-    for field, value in kwargs.iteritems():
-      values.append('{0}: "{1}"'.format(field, str(value).replace('\\', '\\\\')))
-    values = ",".join(values)
-    context.results.append('registry.append("{0}", {{ {1} }});'.format(location, values))
+    context.results.append('registry.append("{0}", {1});'.format(location, json.dumps(kwargs)))
   
   return Action(action_append)
 

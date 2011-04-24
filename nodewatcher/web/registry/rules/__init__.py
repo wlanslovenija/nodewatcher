@@ -6,15 +6,16 @@ __all__ = [
   'evaluate'
 ]
 
-def evaluate(node):
+def evaluate(node, state):
   """
   Evaluates the rules.
   
   @param node: Node to evaluate the rules for
+  @param state: Current evaluation state
   """
   try:
     rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
-    rules.ctx.run(node)
+    rules.ctx.run(node, state)
   except Exception, e:
     return ['registry.error("{0}");'.format(e.args[0])]
   

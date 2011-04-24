@@ -1,4 +1,5 @@
 import copy
+import json
 
 # Exports
 __all__ = [
@@ -172,25 +173,25 @@ class EngineContext(object):
     
     @param state: Old state dictionary
     """
-    self.state = state or {}
-    self.new_state = copy.deepcopy(self.state)
     self._levels = []
     self._rules = []
   
-  def run(self, node):
+  def run(self, node, state):
     """
     Evaluates rules on a specific node object.
     
     @param node: Node object to evaluate the rules on
     """
     self.node = node
+    self.state = state or {}
+    self.new_state = copy.deepcopy(self.state)
     self.results = []
     for idx, rule in enumerate(self._rules):
       self.enter_sublevel("rule" + str(idx))
       rule(self)
       self.leave_sublevel()
     
-    # TODO encode self.new_state in self.results
+    self.results.append('registry.state({0});'.format(json.dumps(self.new_state)));
   
   def enter_sublevel(self, name):
     """
