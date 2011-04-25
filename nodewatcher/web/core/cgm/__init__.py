@@ -12,7 +12,10 @@ def generate_config(node, only_validate = False):
   @param only_validate: True if only validation should be performed
   """
   # Determine the destination platform
-  platform = cgm_base.get_platform(node.config.core.general().platform)
+  try:
+    platform = cgm_base.get_platform(node.config.core.general().platform)
+  except AttributeError:
+    raise cgm_base.ValidationError
   
   cfg = platform.generate(node)
   if not only_validate:
