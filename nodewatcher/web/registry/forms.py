@@ -51,7 +51,7 @@ def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, 
     
     if node is not None:
       if item_mdl is not None:
-        if item_mdl.cls_id != item_cls._meta.module_name:
+        if item_mdl.__class__ != item_cls:
           # The model exists, but it is not the same as the one for which we are
           # generating a form so we must perform field copying to a new instance
           merge_mdl = item_cls(node = node)
