@@ -116,6 +116,20 @@ def value(location):
   """
   def location_resolver(context):
     path, attribute = location.split('#') if '#' in location else (location, None)
+    
+    # First check the partial configuration store
+    if path in context.partial_config and attribute is not None:
+      obj = context.partial_config[path]
+      if len(obj) > 1:
+        raise EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
+      
+      attrs = attribute.split('.')
+      try:
+        obj = obj[0][attrs[0]]
+        return reduce(getattr, attrs[1:], obj)
+      except KeyError:
+        return None
+    
     obj = context.node.config.by_path(path)
     
     if obj is None:

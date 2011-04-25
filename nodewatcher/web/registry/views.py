@@ -16,7 +16,6 @@ def evaluate_forms(request, node):
   actions = registry_forms.prepare_forms_for_node(
     node,
     request.POST,
-    save = True,
     only_rules = True
   )
   

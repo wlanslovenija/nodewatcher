@@ -30,7 +30,7 @@ class RegistrySetMetaForm(forms.Form):
     widget = forms.HiddenInput
   )
 
-def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, idx = 0):
+def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, idx, partial_config = None):
   """
   A helper function for generating forms.
   """
@@ -38,7 +38,7 @@ def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, 
   item_forms = []
   validation_errors = False
   
-  if save:
+  if save or partial_config is not None:
     meta_form = RegistryMetaForm(items, data = data, prefix = prefix)
     if not meta_form.is_valid():
       validation_errors = True
@@ -75,11 +75,24 @@ def generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, prefix, 
       item_mdl = item_cls(node = node)
     
     form = form_cls(data, instance = item_mdl, prefix = prefix + '_' + item_cls._meta.module_name)
-    if save and item_cls._meta.module_name == meta_form.cleaned_data['item']:
-      if form.is_valid():
-        form.save()
-      else:
-        validation_errors = True
+    if (save or partial_config is not None) and item_cls._meta.module_name == meta_form.cleaned_data['item']:
+      if save:
+        # We are saving a form, perform validation and save it
+        if form.is_valid():
+          form.save()
+        else:
+          validation_errors = True
+      elif partial_config is not None:
+        # We are only interested in all the current values even if they might be incomplete
+        # and/or invalid, so we can't do full form validation
+        form._errors = {}
+        form.cleaned_data = {}
+        form._clean_fields()
+        config = {}
+        partial_config.setdefault(cls_meta.registry_id, []).append(config)
+        
+        for field, value in form.cleaned_data.iteritems():
+          config[field] = value
     
     # Augment form fields with classes so they are easily locatable using the client-side API
     for name, field in form.fields.iteritems():
@@ -108,6 +121,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
     sid = transaction.savepoint()
     validation_errors = False
     forms = []
+    partial_config = {} if only_rules else None
     
     for _, items in registry_state.ITEM_LIST.iteritems():
       cls_meta = items[0].RegistryMeta
@@ -121,7 +135,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           # existing models
           for idx, item_mdl in enumerate(node.config.by_path(cls_meta.registry_id)):
             has_errors, item_forms, meta_form = generate_forms_for_item_cls(
-              node, item_mdl, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx
+              node, item_mdl, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx, partial_config
             )
             if has_errors:
               validation_errors = True
@@ -145,7 +159,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           
           for idx in xrange(submeta.cleaned_data['form_count']):
             has_errors, item_forms, meta_form = generate_forms_for_item_cls(
-              node, None, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx
+              node, None, cls_meta, data, items, save, base_prefix + '_mu_' + str(idx), idx, partial_config
             )
             if has_errors:
               validation_errors = True
@@ -167,7 +181,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
       else:
         # Only a single item can be selected for this form
         mdl = node.config.by_path(cls_meta.registry_id)
-        has_errors, item_forms, meta_form = generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, base_prefix)
+        has_errors, item_forms, meta_form = generate_forms_for_item_cls(node, mdl, cls_meta, data, items, save, base_prefix, 0, partial_config)
         if not item_forms:
           continue
         if has_errors:
@@ -192,7 +206,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
     if only_rules:
       # If only rule validation is requested, we should evaluate rules and then rollback
       # the savepoint in any case; all validation errors are ignored
-      actions = registry_rules.evaluate(node, json.loads(data['STATE']))
+      actions = registry_rules.evaluate(node, json.loads(data['STATE']), partial_config)
       transaction.savepoint_rollback(sid)
       return actions
     
