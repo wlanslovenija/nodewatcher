@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db import models
 from django.db.models import signals as model_signals
@@ -11,7 +12,7 @@ class RegistryItem(models.Model):
   An abstract registry configuration item.
   """
   node = models.ForeignKey('nodes.Node', null = True, editable = False, related_name = 'config_%(app_label)s_%(class)s')
-  cls_id = models.CharField(max_length = 200, editable = False)
+  content_type = models.ForeignKey(ContentType, editable = False)
   
   class Meta:
     abstract = True
@@ -38,17 +39,18 @@ class RegistryItem(models.Model):
     """
     Casts this registry item into the proper downwards type.
     """
-    if self.cls_id == self._meta.module_name:
+    mdl = self.content_type.model_class()
+    if mdl == self.__class__:
       return self
     
-    return getattr(self, self.cls_id)
+    return mdl.objects.get(pk = self.pk)
   
   def save(self, *args, **kwargs):
     """
     Sets up and saves the configuration item.
     """
     # Set class identifier
-    self.cls_id = self._meta.module_name
+    self.content_type = ContentType.objects.get_for_model(self.__class__)
     super(RegistryItem, self).save(*args, **kwargs)
     
     # If only one configuration instance should be allowed, we
