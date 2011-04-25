@@ -69,7 +69,8 @@ def prepare_config_item(sender, **kwargs):
     return
   
   items = registry_state.ITEM_LIST 
-  items.setdefault((sender.RegistryMeta.form_order, sender.RegistryMeta.registry_id), []).append(sender)
+  item_dict = items.setdefault((sender.RegistryMeta.form_order, sender.RegistryMeta.registry_id), {})
+  item_dict[sender._meta.module_name] = sender
   registry_state.ITEM_LIST = datastructures.SortedDict(sorted(items.items(), key = lambda x: x[0]))
   
   # Only record the top-level item in the registry as there could be multiple

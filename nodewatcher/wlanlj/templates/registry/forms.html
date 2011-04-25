@@ -1,0 +1,32 @@
+{% load misc %}
+{% load i18n %}
+
+{% for descriptor in registry_forms %}
+{% heading 3 descriptor.name %}
+  {% if descriptor.multiple %}
+  <input type="button" value="{% trans 'Add' %}" id="{{ descriptor.id }}" class="regact_adder">
+  <input type="button" value="{% trans 'Remove Last' %}" id="{{ descriptor.id }}" class="regact_remover">
+  {{ descriptor.submeta }}
+  <div id="{{ descriptor.prefix }}_mu_container">
+  {% endif %}
+  
+  {% for subform in descriptor.subforms %}
+    <div id="{{ subform.prefix }}_container">
+      {{ subform.meta.item }}
+      {{ subform.meta.prev_item }}
+      {{ subform.form.errors }}
+      <table border="0" width="700">
+        {{ subform.form.as_table }}
+      </table>
+    </div>
+  {% endfor %}
+  
+  {% if descriptor.multiple %}
+  </div>
+  {% endif %}
+{% endfor %}
+
+<script type="text/javascript"  src="{{ MEDIA_URL }}js/registry.js"></script>
+<script type="text/javascript">
+  registry.node_id = "{{ node.pk }}";
+</script>

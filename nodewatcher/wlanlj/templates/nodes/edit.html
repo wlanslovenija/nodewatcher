@@ -267,49 +267,9 @@
 </table>
 
 <div id="registry_forms">
-{% for descriptor in registry_forms %}
-{% heading 3 descriptor.name %}
-  {% if descriptor.multiple %}
-  <input type="button" value="{% trans 'Add' %}" id="{{ descriptor.id }}" class="regact_adder">
-  <input type="button" value="{% trans 'Remove Last' %}" id="{{ descriptor.id }}" class="regact_remover">
-  {{ descriptor.submeta }}
-  <div id="{{ descriptor.prefix }}_mu_container">
-  {% endif %}
-  
-  {% for subform in descriptor.subforms %}
-    {% if subform.stub %}
-    <div id="{{ subform.prefix }}_container" style="display: none;">
-    {% else %}
-    <div id="{{ subform.prefix }}_container" class="reg_cfg_item">
-    {% endif %}
-    
-    {{ subform.meta.item }}
-    {% for form in subform.forms %}
-      {% if form.selected %}
-      <div id="{{ form.prefix }}" class="config_selected regsct_{{ subform.prefix }}">
-      {{ form.errors }}
-      {% else %}
-      <div id="{{ form.prefix }}" style="display: none;" class="regsct_{{ subform.prefix }}">
-      {% endif %}
-      <table border="0" width="700">
-        {{ form.as_table }}
-      </table>
-      </div>
-    {% endfor %}
-    
-    </div>
-  {% endfor %}
-  
-  {% if descriptor.multiple %}
-  </div>
-  {% endif %}
-{% endfor %}
+  {% include "registry/forms.html" %}
 </div>
 {% endif %}
-<script type="text/javascript"  src="{{ MEDIA_URL }}js/registry.js"></script>
-<script type="text/javascript">
-  registry.node_id = "{{ node.pk }}";
-</script>
 </div>
 
 <div class="buttons dead_active"><input type="submit" value="{% trans "Update" %}" />
