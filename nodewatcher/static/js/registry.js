@@ -2,30 +2,39 @@ var registry = {
   // Node identifier that needs to be set
   node_id: '',
   
-  // Current evaluation state
-  eval_state: {},
-  
   /**
    * Performs server-side rule evaluation based on current values of all
    * entered registry items and executes any sent changes. Server returns
    * changes as a set of Javascript instructions that manipulate the registry
    * object. 
    */
-  reevaluate_rules: function()
+  reevaluate_rules: function(actions)
   {
     if (!registry.node_id)
       return;
     
+    // Prepare form in serialized form (pun intended)
     var forms = $('#registry_forms *').serialize();
-    forms += '&STATE=' + encodeURI(JSON.stringify(registry.eval_state));
+    forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
+    
+    // Disable the form and display a nifty dialog
+    $('#registry_forms *').attr('disabled', 'disabled');
+    $('#reg_loading_dialog').dialog('open');
+    
     $.ajax({
       url: "/registry/evaluate_forms/" + registry.node_id,
       dataType: "html",
       data: forms,
       type: "POST",
+      timeout: 10000,
       success: function(data) {
+        $('#reg_loading_dialog').dialog('close');
         $('#registry_forms').html(data);
-      }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        // TODO handle errors, give the option to retry
+        alert('errrror! ' + textStatus + ' ' + errorThrown);
+      },
     });
   },
   
@@ -34,15 +43,25 @@ var registry = {
    */
   register_action_fields: function()
   {
-    $('.regact_item_chooser').change(function() {
-      registry.reevaluate_rules();
+    // Initialize the dialog widget
+    $('#reg_loading_dialog').dialog({
+      autoOpen: false,
+      resizable: false,
+      closeOnEscape: false
     });
-    //$('.regact_selector').change(registry.reevaluate_rules);
+    
+    // Bind event handlers
+    $('.regact_item_chooser').change(function() {
+      registry.reevaluate_rules({});
+    });
+    $('.regact_selector').change(function() {
+      registry.reevaluate_rules({});
+    });
     $('.regact_adder').click(function() {
-      // TODO
+      registry.reevaluate_rules({ 'append' : $(this).attr('id') })
     });
     $('.regact_remover').click(function() {
-      // TODO
+      registry.reevaluate_rules({ 'remove_last' : $(this).attr('id') })
     });
   },
   
@@ -52,7 +71,7 @@ var registry = {
    */
   state: function(new_state)
   {
-    registry.eval_state = new_state
+    $('#reg_eval_state').val(new_state);
   },
 };
 

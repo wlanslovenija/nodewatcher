@@ -188,13 +188,13 @@ class EngineContext(object):
     self.state = state or {}
     self.new_state = copy.deepcopy(self.state)
     self.partial_config = partial_config
-    self.results = []
+    self.results = {}
     for idx, rule in enumerate(self._rules):
       self.enter_sublevel("rule" + str(idx))
       rule(self)
       self.leave_sublevel()
     
-    self.results.append('registry.state({0});'.format(json.dumps(self.new_state)));
+    self.results['STATE'] = self.new_state
   
   def enter_sublevel(self, name):
     """

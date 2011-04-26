@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import os.path
 
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.forms import forms
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, loader
+from django.utils import safestring
 from django.utils.translation import ugettext as _
 
 from web.account.models import UserAccount
@@ -160,12 +162,22 @@ def node_edit(request, node):
   if not node.is_current_owner(request):
     raise Http404
   
+  # TODO heavy cleanup needed
   if request.method == 'POST':
     try:
       sid = transaction.savepoint()
       form = UpdateNodeForm(node, request.POST)
+      
+      actions = registry_forms.prepare_forms_for_node(node, data = request.POST, only_rules = True)
+      eval_state = actions['STATE']
+      
       if form.is_valid() and form.save(node, request.user):
-        has_errors, dynamic_forms = registry_forms.prepare_forms_for_node(node, data = request.POST, save = True)
+        has_errors, dynamic_forms = registry_forms.prepare_forms_for_node(
+          node,
+          data = request.POST,
+          save = True,
+          actions = actions
+        )
         if has_errors:
           transaction.savepoint_rollback(sid)
         elif form.requires_firmware_update:
@@ -236,7 +248,7 @@ def node_edit(request, node):
       })
 
     form = UpdateNodeForm(node, initial = p)
-    dynamic_forms = registry_forms.prepare_forms_for_node(node)
+    dynamic_forms, eval_state = registry_forms.prepare_forms_for_node(node, also_rules = True)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,
@@ -245,7 +257,8 @@ def node_edit(request, node):
       'dead_node_type' : NodeType.Dead,
       'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
       'projects' : Project.objects.all().order_by("id"),
-      'registry_forms' : dynamic_forms },
+      'registry_forms' : dynamic_forms,
+      'eval_state' : safestring.mark_safe(json.dumps(eval_state)) },
     context_instance = RequestContext(request)
   )
 

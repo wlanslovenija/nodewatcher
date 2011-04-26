@@ -26,7 +26,16 @@
   {% endif %}
 {% endfor %}
 
+<div id="reg_loading_dialog" title="{% trans "Please Wait" %}" style="display: none;">
+  <br/>
+	<p style="text-align: center;">
+	  {% trans "Updating form fields..." %}
+	</p>
+</div>
+
+<input type="hidden" name="STATE" id="reg_eval_state" value='{{ eval_state }}' />
 <script type="text/javascript"  src="{{ MEDIA_URL }}js/registry.js"></script>
 <script type="text/javascript">
   registry.node_id = "{{ node.pk }}";
 </script>
+

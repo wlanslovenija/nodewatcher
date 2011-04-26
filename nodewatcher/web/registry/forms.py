@@ -114,13 +114,14 @@ def generate_form_for_class(node, items, prefix, data, index, instance = None, v
   
   return form, meta_form, validation_errors
 
-def prepare_forms_for_node(node = None, data = None, save = False, only_rules = False):
+def prepare_forms_for_node(node = None, data = None, save = False, only_rules = False, also_rules = False, actions = None):
   """
   Prepares a list of configuration forms for use on a node's
   configuration page.
   """
   # Transform data into a mutable dictionary in case an immutable one is passed
   data = copy.copy(data)
+  actions = actions if actions is not None else {}
   
   try:
     sid = transaction.savepoint()
@@ -193,6 +194,54 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
               'meta'    : meta_form,
               'form'    : form 
             })
+          
+          # Check for any append/clear_config actions and execute them
+          meta_modified = False
+          index += 1
+          for action in actions.get(cls_meta.registry_id, []):
+            if action[0] == 'clear_config':
+              index = 0
+              subforms = []
+              meta_modified = True
+            elif action[0] == 'append':
+              form_prefix = base_prefix + '_mu_' + str(index)
+              if action[1] in items:
+                mdl = items[action[1]](node = node, **action[2])
+              else:
+                mdl = items.values()[0](node = node, **action[2])
+              
+              form, meta_form, has_errors = generate_form_for_class(
+                node,
+                items,
+                form_prefix,
+                None,
+                index,
+                instance = mdl,
+                validate = True
+              )
+              index += 1
+              meta_modified = True
+              
+              subforms.append({
+                'prefix'  : form_prefix,
+                'meta'    : meta_form,
+                'form'    : form 
+              })
+            elif action[0] == 'remove_last':
+              index -= 1
+              subforms.pop()
+              meta_modified = True
+          
+          if meta_modified:
+            # If a form has been modified we cannot simply save, so we fake a validation
+            # error so the user will be displayed the updated forms
+            validation_errors = True
+            
+            # Update the submeta form with new count
+            submeta = RegistrySetMetaForm(
+              prefix = base_prefix + '_sm',
+              initial = { 'form_count' : index }
+            ) 
       else:
         # This item class only supports a single object to be selected
         if not save and not only_rules:
@@ -240,6 +289,8 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
       actions = registry_rules.evaluate(node, json.loads(data['STATE']), partial_config)
       transaction.savepoint_rollback(sid)
       return actions
+    elif also_rules:
+      actions = registry_rules.evaluate(node, {}, {})
     
     if save and node is not None and not validation_errors:
       # When save is enabled, we must perform node configuration validation
@@ -259,6 +310,10 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
   except:
     transaction.savepoint_rollback(sid)
     raise
+  
+  # Also return (initial) evaluation state when requested
+  if also_rules:
+    return forms, actions["STATE"]
   
   return forms if not save else (validation_errors, forms)
 

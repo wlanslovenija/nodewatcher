@@ -1,5 +1,4 @@
 import inspect
-import json
 
 from registry import access as registry_access
 from registry.rules.engine import * 
@@ -57,7 +56,8 @@ def assign(location, index = 0, **kwargs):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_assign(context):
-    context.results.append('registry.assign("{0}", {1}, {2});'.format(location, index, json.dumps(kwargs)))
+    # TODO should also apply to context.node so it will be visible to other conditions
+    context.results.setdefault(location, []).append(('assign', index, kwargs))
   
   return Action(action_assign)
 
@@ -75,7 +75,8 @@ def clear_config(location):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_clear_config(context):
-    context.results.append('registry.clear_config("{0}");'.format(location))
+    # TODO should also apply to context.node so it will be visible to other conditions
+    context.results.setdefault(location, []).append(('clear_config',))
   
   return Action(action_clear_config)
 
@@ -85,6 +86,12 @@ def append(location, **kwargs):
   
   @param location: Registry location
   """
+  if '[' in location:
+    location, cls_name = location.split('[')
+    cls_name = cls_name[:-1].lower()
+  else:
+    cls_name = None
+  
   try:
     tlc = registry_access.get_class_by_path(location)
     if not getattr(tlc.RegistryMeta, 'multiple', False):
@@ -93,7 +100,8 @@ def append(location, **kwargs):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_append(context):
-    context.results.append('registry.append("{0}", {1});'.format(location, json.dumps(kwargs)))
+    # TODO should also apply to context.node so it will be visible to other conditions
+    context.results.setdefault(location, []).append(('append', cls_name, kwargs))
   
   return Action(action_append)
 

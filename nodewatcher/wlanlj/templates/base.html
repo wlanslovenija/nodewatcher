@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ MEDIA_URL }}wlanlj/common/css/trac.css" type="text/css" />
     <link rel="stylesheet" href="{{ MEDIA_URL }}wlanlj/common/css/report.css" type="text/css" />
     <link rel="stylesheet" href="{{ MEDIA_URL }}wlanlj/common/css/prefs.css" type="text/css" />
-    <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/site/jquery.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.4.4.min.js"></script>
     <!--[if lt IE 7]>
     <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/common/js/ie_pre7_hacks.js"></script>
     <![endif]-->
@@ -18,11 +18,13 @@
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}wlanlj/site/common.css" />
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}wlanlj/site/trac.css" />
     <link rel='stylesheet' type='text/css' href='{{ MEDIA_URL }}wlanlj/css/style.css' />
+    <link rel='stylesheet' type='text/css' href="{{ MEDIA_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.12.custom.css" />
     {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
     <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/site/folding.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/csrf.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.12.custom.min.js"></script>
     {{ form.media }}
     {% block js %}{% endblock %}
 	  <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.init.js"></script>
