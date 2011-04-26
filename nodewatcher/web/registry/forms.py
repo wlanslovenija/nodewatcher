@@ -5,10 +5,10 @@ from django import forms
 from django.core import exceptions
 from django.db import transaction
 
-from core import cgm
-from core.cgm import base as cgm_base
+from registry import cgm
 from registry import state as registry_state
 from registry import rules as registry_rules
+from registry.cgm import base as cgm_base
 
 class RegistryMetaForm(forms.Form):
   def __init__(self, items, selected_item = None, *args, **kwargs):

@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 
-from core.cgm import base as cgm_base
+from registry.cgm import base as cgm_base
 
 class UCISection(object):
   """

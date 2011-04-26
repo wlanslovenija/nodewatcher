@@ -46,6 +46,12 @@ class ExtendedGeneralConfigForm(forms.ModelForm):
 
 registration.register_form_for_item(ExtendedGeneralConfig, ExtendedGeneralConfigForm)
 
+class DoublyExtendedGeneralConfig(ExtendedGeneralConfig):
+  krneki = models.CharField(max_length = 30)
+  
+  class RegistryMeta(ExtendedGeneralConfig.RegistryMeta):
+    registry_name = _("Doubly Extended Configuration")
+
 class VpnServerConfig(registry_models.RegistryItem):
   """
   Provides a VPN server specification that the nodes can use.
