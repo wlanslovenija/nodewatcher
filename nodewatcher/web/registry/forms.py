@@ -41,7 +41,8 @@ class RegistrySetMetaForm(forms.Form):
     widget = forms.HiddenInput
   )
 
-def generate_form_for_class(node, items, prefix, data, index, instance = None, validate = False, partial = None):
+def generate_form_for_class(node, items, prefix, data, index, instance = None, validate = False, partial = None,
+                            current_config = None):
   """
   A helper function for generating a form for a specific registry item class.
   """
@@ -90,6 +91,17 @@ def generate_form_for_class(node, items, prefix, data, index, instance = None, v
     instance = instance,
     prefix = prefix + '_' + selected_item._meta.module_name
   )
+  
+  # Enable forms to modify themselves accoording to current context
+  if hasattr(form, 'modify_to_context') and partial is None:
+    if current_config is not None:
+      item = current_config[selected_item.RegistryMeta.registry_id][index]
+    else:
+      item = instance
+      current_config = node.config.to_partial()
+    
+    form.modify_to_context(item, current_config)
+  
   if validate:
     if partial is None:
       # Perform a full validation and save the form
@@ -103,22 +115,33 @@ def generate_form_for_class(node, items, prefix, data, index, instance = None, v
       form.cleaned_data = {}
       form._errors = {}
       form._clean_fields()
-      config = {}
+      config = selected_item()
       partial.setdefault(selected_item.RegistryMeta.registry_id, []).append(config)
       
       for field, value in form.cleaned_data.iteritems():
-        config[field] = value
+        setattr(config, field, value)
   
   # Generate a new meta form, since the previous item has now changed
   meta_form = RegistryMetaForm(items, selected_item, prefix = prefix)
-  
   return form, meta_form, validation_errors
 
-def prepare_forms_for_node(node = None, data = None, save = False, only_rules = False, also_rules = False, actions = None):
+def prepare_forms_for_node(node = None, data = None, save = False, only_rules = False, also_rules = False, actions = None,
+                           current_config = None):
   """
   Prepares a list of configuration forms for use on a node's
   configuration page.
+  
+  @param node: Node instance for which to generate forms
+  @param data: User-supplied POST data
+  @param save: Are we performing a save or rendering an initial form
+  @param only_rules: Should only rules be evaluated and a partial config generated
+  @param also_rules: Should rules be evaluated (use only for initial state)
+  @param actions: A list of actions that can modify forms
+  @param current_config: An existing partial config dictionary
   """
+  if save and only_rules:
+    raise ValueError("You cannot use save and only_rules at the same time!")
+  
   # Transform data into a mutable dictionary in case an immutable one is passed
   data = copy.copy(data)
   actions = actions if actions is not None else {}
@@ -147,7 +170,8 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
               form_prefix,
               None,
               index,
-              instance = mdl
+              instance = mdl,
+              current_config = current_config
             )
             
             subforms.append({
@@ -172,7 +196,10 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           if not submeta.is_valid():
             raise exceptions.SuspiciousOperation
           
+          # TODO implement 'assign' action (its order is not relevant)
+          
           # Generate the right amount of forms
+          index = 0
           for index in xrange(submeta.cleaned_data['form_count']):
             form_prefix = base_prefix + '_mu_' + str(index)
             form, meta_form, has_errors = generate_form_for_class(
@@ -182,7 +209,8 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
               data,
               index,
               validate = True,
-              partial = partial_config
+              partial = partial_config,
+              current_config = current_config
             )
             
             # Check for validation errors, so we don't commit in case of errors
@@ -198,6 +226,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           # Check for any append/clear_config actions and execute them
           meta_modified = False
           index += 1
+          # TODO maybe these actions should be abstracted
           for action in actions.get(cls_meta.registry_id, []):
             if action[0] == 'clear_config':
               index = 0
@@ -205,10 +234,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
               meta_modified = True
             elif action[0] == 'append':
               form_prefix = base_prefix + '_mu_' + str(index)
-              if action[1] in items:
-                mdl = items[action[1]](node = node, **action[2])
-              else:
-                mdl = items.values()[0](node = node, **action[2])
+              mdl = action[1](node = node, **action[2])
               
               form, meta_form, has_errors = generate_form_for_class(
                 node,
@@ -217,7 +243,8 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
                 None,
                 index,
                 instance = mdl,
-                validate = True
+                validate = True,
+                current_config = current_config
               )
               index += 1
               meta_modified = True
@@ -227,7 +254,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
                 'meta'    : meta_form,
                 'form'    : form 
               })
-            elif action[0] == 'remove_last':
+            elif action[0] == 'remove_last' and index > 0:
               index -= 1
               subforms.pop()
               meta_modified = True
@@ -259,7 +286,8 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           0,
           instance = mdl,
           validate = save or only_rules,
-          partial = partial_config
+          partial = partial_config,
+          current_config = current_config
         )
         
         # Check for validation errors, so we don't commit in case of errors
@@ -281,14 +309,13 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
         'submeta'     : submeta,
         'prefix'      : base_prefix
       })
-
     
     if only_rules:
       # If only rule validation is requested, we should evaluate rules and then rollback
       # the savepoint in any case; all validation errors are ignored
       actions = registry_rules.evaluate(node, json.loads(data['STATE']), partial_config)
       transaction.savepoint_rollback(sid)
-      return actions
+      return actions, partial_config
     elif also_rules:
       actions = registry_rules.evaluate(node, {}, {})
     

@@ -168,7 +168,7 @@ def node_edit(request, node):
       sid = transaction.savepoint()
       form = UpdateNodeForm(node, request.POST)
       
-      actions = registry_forms.prepare_forms_for_node(node, data = request.POST, only_rules = True)
+      actions, partial_config = registry_forms.prepare_forms_for_node(node, data = request.POST, only_rules = True)
       eval_state = actions['STATE']
       
       if form.is_valid() and form.save(node, request.user):
@@ -176,7 +176,8 @@ def node_edit(request, node):
           node,
           data = request.POST,
           save = True,
-          actions = actions
+          actions = actions,
+          current_config = partial_config
         )
         if has_errors:
           transaction.savepoint_rollback(sid)

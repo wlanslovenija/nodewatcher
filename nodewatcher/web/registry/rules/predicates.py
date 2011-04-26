@@ -56,7 +56,13 @@ def assign(location, index = 0, **kwargs):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_assign(context):
-    # TODO should also apply to context.node so it will be visible to other conditions
+    try:
+      mdl = context.partial_config[location][index]
+      for key, value in kwargs.iteritems():
+        setattr(mdl, key, value)
+    except (KeyError, IndexError):
+      pass
+    
     context.results.setdefault(location, []).append(('assign', index, kwargs))
   
   return Action(action_assign)
@@ -75,7 +81,7 @@ def clear_config(location):
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
   def action_clear_config(context):
-    # TODO should also apply to context.node so it will be visible to other conditions
+    context.partial_config[location] = []
     context.results.setdefault(location, []).append(('clear_config',))
   
   return Action(action_clear_config)
@@ -95,13 +101,27 @@ def append(location, **kwargs):
   try:
     tlc = registry_access.get_class_by_path(location)
     if not getattr(tlc.RegistryMeta, 'multiple', False):
-      raise CompilationError("Attempted to use append predicate on singular registry item '{0}'!".format(location)) 
+      raise CompilationError("Attempted to use append predicate on singular registry item '{0}'!".format(location))
+    if cls_name is None:
+      cls_name = tlc._meta.module_name 
   except registry_access.UnknownRegistryIdentifier:
     raise CompilationError("Registry location '{0}' is invalid!".format(location))
   
+  # Resolve class name into the actual class
+  cls = registry_access.get_model_class_by_name(cls_name)
+  if not issubclass(cls, tlc):
+    raise CompilationError("Class '{0}' is not registered for '{1}'!".format(cls_name, location))
+  
   def action_append(context):
-    # TODO should also apply to context.node so it will be visible to other conditions
-    context.results.setdefault(location, []).append(('append', cls_name, kwargs))
+    try:
+      mdl = cls()
+      for key, value in kwargs.iteritems():
+        setattr(mdl, key, value)
+      context.partial_config[location].append(mdl)
+    except KeyError:
+      pass
+    
+    context.results.setdefault(location, []).append(('append', cls, kwargs))
   
   return Action(action_append)
 
@@ -131,10 +151,8 @@ def value(location):
       if len(obj) > 1:
         raise EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
       
-      attrs = attribute.split('.')
       try:
-        obj = obj[0][attrs[0]]
-        return reduce(getattr, attrs[1:], obj)
+        return reduce(getattr, attribute.split('.'), obj[0])
       except KeyError:
         return None
     

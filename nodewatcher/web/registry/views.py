@@ -23,7 +23,7 @@ def evaluate_forms(request, node):
     sid = transaction.savepoint()
     
     # First perform partial validation and rule evaluation
-    actions = registry_forms.prepare_forms_for_node(
+    actions, partial_config = registry_forms.prepare_forms_for_node(
       node,
       request.POST,
       only_rules = True
@@ -44,7 +44,8 @@ def evaluate_forms(request, node):
       node,
       request.POST,
       save = True,
-      actions = actions
+      actions = actions,
+      current_config = partial_config
     )
   finally:
     transaction.savepoint_rollback(sid)

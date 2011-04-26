@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+
 from registry import state as registry_state
 
 class UnknownRegistryIdentifier(Exception):
@@ -17,6 +19,16 @@ class RegistryResolver(object):
     self._node = node
     self._path = path
   
+  def to_partial(self):
+    """
+    Formats the node's registry hierarchy to partial config format.
+    """
+    partial = {}
+    for path, _ in registry_state.ITEM_REGISTRY.iteritems():
+      partial[path] = [x.cast() for x in self.by_path(path, queryset = True)]
+    
+    return partial
+  
   def by_path(self, path, create = None, queryset = False):
     """
     Resolves the registry hierarchy.
@@ -25,6 +37,8 @@ class RegistryResolver(object):
       # Determine which class the node is using for configuration
       top_level = registry_state.ITEM_REGISTRY[path]
       cfg = getattr(self._node, "config_{0}_{1}".format(top_level._meta.app_label, top_level._meta.module_name))
+      if queryset:
+        return cfg.all()
       
       if getattr(top_level.RegistryMeta, 'multiple', False):
         # Model supports multiple configuration options of this type
@@ -33,8 +47,6 @@ class RegistryResolver(object):
             raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
           
           return create(node = self._node)
-        elif queryset:
-          return cfg.all()
         else:
           return map(lambda x: x.cast(), cfg.all())
       else:
@@ -82,4 +94,12 @@ def get_class_by_path(path):
     return registry_state.ITEM_REGISTRY[path]
   except KeyError:
     raise UnknownRegistryIdentifier
+
+def get_model_class_by_name(name):
+  """
+  Returns the model class identified by its name.
+  
+  @param name: Model class name
+  """
+  return ContentType.objects.get(model = name).model_class()
 

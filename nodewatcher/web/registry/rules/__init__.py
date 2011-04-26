@@ -17,11 +17,7 @@ def evaluate(node, state, partial_config = None):
   if partial_config is None:
     partial_config = {}
   
-  try:
-    rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
-    rules.ctx.run(node, state, partial_config)
-  except Exception, e:
-    return ['registry.error("{0}");'.format(e.args[0])]
-  
+  rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
+  rules.ctx.run(node, state, partial_config)
   return rules.ctx.results
 
