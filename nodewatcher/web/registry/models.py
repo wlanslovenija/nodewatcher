@@ -89,6 +89,10 @@ def prepare_config_item(sender, **kwargs):
   if not issubclass(sender, RegistryItem):
     return
   
+  # Sanity check for object names
+  if '_' in sender._meta.object_name:
+    raise ImproperlyConfigured("Registry items must not have underscores in class names!")
+  
   items = registry_state.ITEM_LIST 
   item_dict = items.setdefault((sender.RegistryMeta.form_order, sender.RegistryMeta.registry_id), {})
   item_dict[sender._meta.module_name] = sender

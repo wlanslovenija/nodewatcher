@@ -24,7 +24,14 @@ class RegistryQuerySet(models.query.QuerySet):
       else:
         field = condition
       
-      dst_model, dst_field = registry_state.FLAT_LOOKUP_PROXIES.get(field, None)
+      dst_model, dst_field = registry_state.FLAT_LOOKUP_PROXIES.get(field, (None, None))
+      if dst_model is None and '_' in field:
+        dst_model, dst_field = field.split('_', 1)
+        try:
+          dst_model = registry_access.get_model_class_by_name(dst_model)
+        except:
+          dst_model = None
+      
       if dst_model is not None:
         dst_field = dst_model.lookup_path() + '__' + dst_field
         del kwargs[condition]
