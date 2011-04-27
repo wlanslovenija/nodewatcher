@@ -115,15 +115,19 @@ def prepare_config_item(sender, **kwargs):
   if lookup_proxies is not None:
     for field in lookup_proxies:
       if isinstance(field, (tuple, list)):
-        src_field, dst_field = field
+        src_field, dst_fields = field
       else:
-        src_field = dst_field = field
+        src_field = dst_fields = field
       
-      # Ignore registrations of existing proxies
-      if dst_field in registry_state.FLAT_LOOKUP_PROXIES:
-        continue
+      if not isinstance(dst_fields, (tuple, list)):
+        dst_fields = (dst_fields,)
       
-      registry_state.FLAT_LOOKUP_PROXIES[dst_field] = sender, src_field
+      for dst_field in dst_fields:
+        # Ignore registrations of existing proxies
+        if dst_field in registry_state.FLAT_LOOKUP_PROXIES:
+          continue
+        
+        registry_state.FLAT_LOOKUP_PROXIES[dst_field] = sender, src_field
 
 model_signals.class_prepared.connect(prepare_config_item)
 
