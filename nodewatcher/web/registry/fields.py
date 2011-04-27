@@ -7,12 +7,12 @@ from registry import registration
 from registry import models as registry_models
 
 class SelectorKeyField(models.CharField):
-  def __init__(self, enum_id, *args, **kwargs):
+  def __init__(self, regpoint, enum_id, *args, **kwargs):
     """
     Class constructor.
     """
     kwargs['max_length'] = 50
-    kwargs['choices'] = registration.get_registered_choices(enum_id)
+    kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id)
     super(SelectorKeyField, self).__init__(*args, **kwargs)
   
   def formfield(self, **kwargs):

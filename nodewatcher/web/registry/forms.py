@@ -6,8 +6,8 @@ from django.core import exceptions
 from django.db import transaction
 
 from registry import cgm
-from registry import state as registry_state
 from registry import rules as registry_rules
+from registry import registration
 from registry.cgm import base as cgm_base
 
 class RegistryMetaForm(forms.Form):
@@ -41,7 +41,7 @@ class RegistrySetMetaForm(forms.Form):
     widget = forms.HiddenInput
   )
 
-def generate_form_for_class(node, items, prefix, data, index, instance = None, validate = False, partial = None,
+def generate_form_for_class(regpoint, root, items, prefix, data, index, instance = None, validate = False, partial = None,
                             current_config = None):
   """
   A helper function for generating a form for a specific registry item class.
@@ -83,7 +83,7 @@ def generate_form_for_class(node, items, prefix, data, index, instance = None, v
   
   # When there is no instance, we should create one so we will be able to save somewhere
   if validate and partial is None and instance is None:
-    instance = selected_item(node = node)
+    instance = selected_item(root = root)
   
   # Now generate a form for the selected item
   form = selected_item.get_form()(
@@ -98,7 +98,7 @@ def generate_form_for_class(node, items, prefix, data, index, instance = None, v
       item = current_config[selected_item.RegistryMeta.registry_id][index]
     else:
       item = instance
-      current_config = node.config.to_partial()
+      current_config = regpoint.get_accessor(root).to_partial()
     
     form.modify_to_context(item, current_config)
   
@@ -125,13 +125,14 @@ def generate_form_for_class(node, items, prefix, data, index, instance = None, v
   meta_form = RegistryMetaForm(items, selected_item, prefix = prefix)
   return form, meta_form, validation_errors
 
-def prepare_forms_for_node(node = None, data = None, save = False, only_rules = False, also_rules = False, actions = None,
-                           current_config = None):
+def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = False, only_rules = False, also_rules = False, actions = None,
+                                    current_config = None):
   """
-  Prepares a list of configuration forms for use on a node's
+  Prepares a list of configuration forms for use on a regpoint root's
   configuration page.
   
-  @param node: Node instance for which to generate forms
+  @param regpoint: Registration point name or instance
+  @param root: Registration point root instance for which to generate forms
   @param data: User-supplied POST data
   @param save: Are we performing a save or rendering an initial form
   @param only_rules: Should only rules be evaluated and a partial config generated
@@ -141,6 +142,9 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
   """
   if save and only_rules:
     raise ValueError("You cannot use save and only_rules at the same time!")
+  
+  if isinstance(regpoint, basestring):
+    regpoint = registration.point(regpoint)
   
   # Transform data into a mutable dictionary in case an immutable one is passed
   data = copy.copy(data)
@@ -152,7 +156,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
     forms = []
     partial_config = {} if only_rules else None
     
-    for _, items in registry_state.ITEM_LIST.iteritems():
+    for _, items in regpoint.item_list.iteritems():
       cls_meta = items.values()[0].RegistryMeta
       base_prefix = "reg_" + cls_meta.registry_id.replace('.', '_')
       subforms = []
@@ -162,10 +166,11 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
         if not save and not only_rules:
           # We are generating forms for first-time display purpuses, only include forms for
           # existing models
-          for index, mdl in enumerate(node.config.by_path(cls_meta.registry_id)):
+          for index, mdl in enumerate(regpoint.get_accessor(root).by_path(cls_meta.registry_id)):
             form_prefix = base_prefix + '_mu_' + str(index)
             form, meta_form, has_errors = generate_form_for_class(
-              node,
+              regpoint,
+              root,
               items,
               form_prefix,
               None,
@@ -188,7 +193,7 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           )
         else:
           # We are saving or preparing to evaluate rules, so we regenerate all items
-          node.config.by_path(cls_meta.registry_id, queryset = True).delete()
+          regpoint.get_accessor(root).by_path(cls_meta.registry_id, queryset = True).delete()
           submeta = RegistrySetMetaForm(
             data,
             prefix = base_prefix + '_sm'
@@ -203,7 +208,8 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
           for index in xrange(submeta.cleaned_data['form_count']):
             form_prefix = base_prefix + '_mu_' + str(index)
             form, meta_form, has_errors = generate_form_for_class(
-              node,
+              regpoint,
+              root,
               items,
               form_prefix,
               data,
@@ -234,10 +240,12 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
               meta_modified = True
             elif action[0] == 'append':
               form_prefix = base_prefix + '_mu_' + str(index)
-              mdl = action[1](node = node, **action[2])
+              mdl = action[1] if action[1] is not None else items.values()[0].top_model()
+              mdl = mdl(root = root, **action[2])
               
               form, meta_form, has_errors = generate_form_for_class(
-                node,
+                regpoint,
+                root,
                 items,
                 form_prefix,
                 None,
@@ -272,14 +280,15 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
       else:
         # This item class only supports a single object to be selected
         if not save and not only_rules:
-          mdl = node.config.by_path(cls_meta.registry_id)
+          mdl = regpoint.get_accessor(root).by_path(cls_meta.registry_id)
         else:
-          node.config.by_path(cls_meta.registry_id, queryset = True).delete()
+          regpoint.get_accessor(root).by_path(cls_meta.registry_id, queryset = True).delete()
           mdl = None
         
         form_prefix = base_prefix + '_mu_0'
         form, meta_form, has_errors = generate_form_for_class(
-          node,
+          regpoint,
+          root,
           items,
           form_prefix,
           data,
@@ -313,16 +322,19 @@ def prepare_forms_for_node(node = None, data = None, save = False, only_rules = 
     if only_rules:
       # If only rule validation is requested, we should evaluate rules and then rollback
       # the savepoint in any case; all validation errors are ignored
-      actions = registry_rules.evaluate(node, json.loads(data['STATE']), partial_config)
+      actions = registry_rules.evaluate(regpoint, root, json.loads(data['STATE']), partial_config)
       transaction.savepoint_rollback(sid)
       return actions, partial_config
     elif also_rules:
-      actions = registry_rules.evaluate(node, {}, {})
+      actions = registry_rules.evaluate(regpoint, root, {}, {})
     
-    if save and node is not None and not validation_errors:
+    # XXX this should be somewhere else as it is only for nodes! something like
+    #     pre-save additional validation (registration?)
+    if save and root is not None and not validation_errors:
       # When save is enabled, we must perform node configuration validation
       try:
-        cgm.generate_config(node, only_validate = True)
+        # XXX root -> node
+        cgm.generate_config(root, only_validate = True)
       except cgm_base.ValidationError, e:
         validation_errors = True
         # TODO Handle validation errors

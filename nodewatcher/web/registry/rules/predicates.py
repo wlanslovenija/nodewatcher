@@ -48,14 +48,14 @@ def assign(location, index = 0, **kwargs):
   @param location: Registry location
   @param index: Optional array index
   """
-  try:
-    tlc = registry_access.get_class_by_path(location)
-    if not getattr(tlc.RegistryMeta, 'multiple', False) and index > 0:
-      raise CompilationError("Attempted to use assign predicate with index > 0 on singular registry item '{0}'!".format(location)) 
-  except registry_access.UnknownRegistryIdentifier:
-    raise CompilationError("Registry location '{0}' is invalid!".format(location))
-  
   def action_assign(context):
+    try:
+      tlc = context.regpoint.get_top_level_class(location)
+      if not getattr(tlc.RegistryMeta, 'multiple', False) and index > 0:
+        raise EvaluationError("Attempted to use assign predicate with index > 0 on singular registry item '{0}'!".format(location)) 
+    except registry_access.UnknownRegistryIdentifier:
+      raise EvaluationError("Registry location '{0}' is invalid!".format(location))
+    
     try:
       mdl = context.partial_config[location][index]
       for key, value in kwargs.iteritems():
@@ -73,14 +73,14 @@ def clear_config(location):
   
   @param location: Registry location
   """
-  try:
-    tlc = registry_access.get_class_by_path(location)
-    if not getattr(tlc.RegistryMeta, 'multiple', False):
-      raise CompilationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(location)) 
-  except registry_access.UnknownRegistryIdentifier:
-    raise CompilationError("Registry location '{0}' is invalid!".format(location))
-  
   def action_clear_config(context):
+    try:
+      tlc = context.regpoint.get_top_level_class(location)
+      if not getattr(tlc.RegistryMeta, 'multiple', False):
+        raise EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(location)) 
+    except registry_access.UnknownRegistryIdentifier:
+      raise EvaluationError("Registry location '{0}' is invalid!".format(location))
+    
     context.partial_config[location] = []
     context.results.setdefault(location, []).append(('clear_config',))
   
@@ -92,27 +92,28 @@ def append(location, **kwargs):
   
   @param location: Registry location
   """
-  if '[' in location:
-    location, cls_name = location.split('[')
-    cls_name = cls_name[:-1].lower()
-  else:
-    cls_name = None
-  
-  try:
-    tlc = registry_access.get_class_by_path(location)
-    if not getattr(tlc.RegistryMeta, 'multiple', False):
-      raise CompilationError("Attempted to use append predicate on singular registry item '{0}'!".format(location))
-    if cls_name is None:
-      cls_name = tlc._meta.module_name 
-  except registry_access.UnknownRegistryIdentifier:
-    raise CompilationError("Registry location '{0}' is invalid!".format(location))
-  
-  # Resolve class name into the actual class
-  cls = registry_access.get_model_class_by_name(cls_name)
-  if not issubclass(cls, tlc):
-    raise CompilationError("Class '{0}' is not registered for '{1}'!".format(cls_name, location))
-  
   def action_append(context):
+    if '[' in location:
+      loc, cls_name = location.split('[')
+      cls_name = cls_name[:-1].lower()
+    else:
+      loc = location
+      cls_name = None
+    
+    try:
+      tlc = context.regpoint.get_top_level_class(loc)
+      if not getattr(tlc.RegistryMeta, 'multiple', False):
+        raise EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(loc))
+      if cls_name is None:
+        cls_name = tlc._meta.module_name 
+    except registry_access.UnknownRegistryIdentifier:
+      raise EvaluationError("Registry location '{0}' is invalid!".format(loc))
+    
+    # Resolve class name into the actual class
+    cls = registry_access.get_model_class_by_name(cls_name)
+    if not issubclass(cls, tlc):
+      raise EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, loc))
+    
     try:
       mdl = cls()
       for key, value in kwargs.iteritems():
@@ -153,10 +154,10 @@ def value(location):
       
       try:
         return reduce(getattr, attribute.split('.'), obj[0])
-      except KeyError:
+      except:
         return None
     
-    obj = context.node.config.by_path(path)
+    obj = context.regpoint.get_accessor(context.root).by_path(path)
     
     if obj is None:
       return [] if attribute is None else None
@@ -166,7 +167,7 @@ def value(location):
       
       try:
         return reduce(getattr, attribute.split('.'), obj)
-      except AttributeError:
+      except:
         return None
     else:
       return obj

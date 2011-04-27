@@ -176,15 +176,17 @@ class EngineContext(object):
     self._levels = []
     self._rules = []
   
-  def run(self, node, state, partial_config):
+  def run(self, regpoint, root, state, partial_config):
     """
-    Evaluates rules on a specific node object.
+    Evaluates rules on a specific regpoint root object.
     
-    @param node: Node object to evaluate the rules on
+    @param regpoint: Registration point instance
+    @param root: Regpoint root object to evaluate the rules on
     @param state: Current evaluation state
     @param partial_config: Optional partial updated configuration
     """
-    self.node = node
+    self.regpoint = regpoint
+    self.root = root
     self.state = state or {}
     self.new_state = copy.deepcopy(self.state)
     self.partial_config = partial_config

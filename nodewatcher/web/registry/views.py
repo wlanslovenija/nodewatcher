@@ -3,28 +3,31 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import safestring
 
 from registry import forms as registry_forms
-from web.nodes import decorators
+from registry import registration
 
 @login_required
-@decorators.node_argument
-def evaluate_forms(request, node):
+def evaluate_forms(request, regpoint_id, root_id):
   """
   This view gets called via an AJAX request to evaluate rules.
   """
   if request.method != 'POST':
     return HttpResponse('')
   
+  regpoint = registration.point(regpoint_id)
+  root = get_object_or_404(regpoint.model, pk = root_id)
+  
   try:
     sid = transaction.savepoint()
     
     # First perform partial validation and rule evaluation
-    actions, partial_config = registry_forms.prepare_forms_for_node(
-      node,
+    actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
+      regpoint,
+      root,
       request.POST,
       only_rules = True
     )
@@ -40,8 +43,9 @@ def evaluate_forms(request, node):
       pass
     
     # Apply rules and fully validate processed forms
-    _, forms = registry_forms.prepare_forms_for_node(
-      node,
+    _, forms = registry_forms.prepare_forms_for_regpoint_root(
+      regpoint,
+      root,
       request.POST,
       save = True,
       actions = actions,
@@ -56,7 +60,8 @@ def evaluate_forms(request, node):
     {
       'registry_forms' : forms,
       'eval_state' : safestring.mark_safe(json.dumps(actions["STATE"])),
-      'node' : node
+      'registry_root' : root,
+      'registry_regpoint' : regpoint_id
     },
     context_instance = RequestContext(request)
   )

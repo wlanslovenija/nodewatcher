@@ -1,6 +1,5 @@
 from django.db import models, connection
 
-from registry import state as registry_state
 from registry import access as registry_access
 
 # Quote name
@@ -24,7 +23,7 @@ class RegistryQuerySet(models.query.QuerySet):
       else:
         field = condition
       
-      dst_model, dst_field = registry_state.FLAT_LOOKUP_PROXIES.get(field, (None, None))
+      dst_model, dst_field = self.regpoint.flat_lookup_proxies.get(field, (None, None))
       if dst_model is None and '_' in field:
         dst_model, dst_field = field.split('_', 1)
         try:
@@ -57,7 +56,7 @@ class RegistryQuerySet(models.query.QuerySet):
       # Join with top-level item
       top_model = dst_model.top_model()
       clone.query.join(
-        (self.model._meta.db_table, top_model._meta.db_table, self.model._meta.pk.column, 'node_id'),
+        (self.model._meta.db_table, top_model._meta.db_table, self.model._meta.pk.column, 'root_id'),
         promote = True
       )
       
@@ -74,8 +73,19 @@ class RegistryLookupManager(models.Manager):
   """
   A manager for doing lookups over the registry models.
   """
+  def __init__(self, regpoint):
+    """
+    Class constructor.
+    
+    @param regpoint: Registration point instance
+    """
+    self.regpoint = regpoint
+    super(RegistryLookupManager, self).__init__()
+  
   def get_query_set(self):
-    return RegistryQuerySet(self.model)
+    qs = RegistryQuerySet(self.model)
+    qs.regpoint = self.regpoint
+    return qs
   
   def registry_fields(self, **kwargs):
     return self.get_query_set().registry_fields(**kwargs)

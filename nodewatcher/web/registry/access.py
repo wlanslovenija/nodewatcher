@@ -1,7 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
 
-from registry import state as registry_state
-
 class UnknownRegistryIdentifier(Exception):
   pass
 
@@ -9,22 +7,24 @@ class RegistryResolver(object):
   """
   Resolves registry identifiers in a hierarchical manner.
   """
-  def __init__(self, node, path = None):
+  def __init__(self, regpoint, root, path = None):
     """
     Class constructor.
     
-    @param node: Node instance
+    @param regpoint: Registration point
+    @param root: Root model instance
     @param path: Current path in the hierarhcy
     """
-    self._node = node
+    self._regpoint = regpoint
+    self._root = root
     self._path = path
   
   def to_partial(self):
     """
-    Formats the node's registry hierarchy to partial config format.
+    Formats the root's registry hierarchy to partial config format.
     """
     partial = {}
-    for path, _ in registry_state.ITEM_REGISTRY.iteritems():
+    for path, _ in self._regpoint.item_registry.iteritems():
       partial[path] = [x.cast() for x in self.by_path(path, queryset = True)]
     
     return partial
@@ -33,10 +33,9 @@ class RegistryResolver(object):
     """
     Resolves the registry hierarchy.
     """
-    if path in registry_state.ITEM_REGISTRY:
-      # Determine which class the node is using for configuration
-      top_level = registry_state.ITEM_REGISTRY[path]
-      cfg = getattr(self._node, "config_{0}_{1}".format(top_level._meta.app_label, top_level._meta.module_name))
+    if path in self._regpoint.item_registry:
+      # Determine which class the root is using for configuration
+      cfg, top_level = self._regpoint.get_top_level_queryset(self._root, path)
       if queryset:
         return cfg.all()
       
@@ -46,7 +45,7 @@ class RegistryResolver(object):
           if not issubclass(create, top_level):
             raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
           
-          return create(node = self._node)
+          return create(root = self._root)
         else:
           return map(lambda x: x.cast(), cfg.all())
       else:
@@ -58,7 +57,7 @@ class RegistryResolver(object):
             if not issubclass(create, top_level):
               raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
             
-            return create(node = self._node)
+            return create(root = self._root)
           else:
             return None
     else:
@@ -69,7 +68,7 @@ class RegistryResolver(object):
     Constructs hierarchical names by simulating attribute access.
     """
     key = key if self._path is None else "{0}.{1}".format(self._path, key)
-    return RegistryResolver(self._node, key)
+    return RegistryResolver(self._regpoint, self._root, key)
   
   def __call__(self, **kwargs):
     """
@@ -77,23 +76,15 @@ class RegistryResolver(object):
     """
     return self.by_path(self._path, **kwargs)
 
-class Registry(object):
+class RegistryAccessor(object):
   """
-  A convenience class for accessing the registry via Node models.
+  A convenience class for accessing the registry via root models.
   """
-  def __get__(self, instance, owner):
-    return RegistryResolver(instance)
-
-def get_class_by_path(path):
-  """
-  Returns a top-level registry item class for a specific path.
+  def __init__(self, regpoint):
+    self.regpoint = regpoint
   
-  @param path: Registry path
-  """
-  try:
-    return registry_state.ITEM_REGISTRY[path]
-  except KeyError:
-    raise UnknownRegistryIdentifier
+  def __get__(self, instance, owner):
+    return RegistryResolver(self.regpoint, instance)
 
 # Cache for class resolutions
 CTYPE_CACHE = {}

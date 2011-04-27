@@ -12,5 +12,5 @@ def openvpn(node, cfg):
   pass
 
 # Add OpenVPN to list of supported VPN solutions
-registration.register_choice("core.vpn.server#protocol", "openvpn", _("OpenVPN"))
+registration.point("node.config").register_choice("core.vpn.server#protocol", "openvpn", _("OpenVPN"))
 

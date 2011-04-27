@@ -2,19 +2,18 @@ from django import forms
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from registry import models as registry_models
 from registry import fields as registry_fields
 from registry import forms as registry_forms
 from registry import registration
 
-class GeneralConfig(registry_models.RegistryItem):
+class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   """
   General node configuration containing basic parameters about the
   router type and the platform used.
   """
   project = registry_fields.ModelSelectorKeyField("nodes.Project")
-  model = models.CharField(max_length = 20) # TODO fkey to router models
-  platform = registry_fields.SelectorKeyField("core.general#platform")
+  model = models.CharField(max_length = 20)
+  platform = registry_fields.SelectorKeyField("node.config", "core.general#platform")
   version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
   timezone = models.CharField(max_length = 30)
   
@@ -32,6 +31,7 @@ class GeneralConfigForm(forms.ModelForm):
   class Meta:
     model = GeneralConfig
 
+registration.point("node.config").register_item(GeneralConfig)
 registration.register_form_for_item(GeneralConfig, GeneralConfigForm)
 
 # XXX this is just for testing selections
@@ -45,6 +45,7 @@ class ExtendedGeneralConfigForm(forms.ModelForm):
   class Meta:
     model = ExtendedGeneralConfig
 
+registration.point("node.config").register_item(ExtendedGeneralConfig)
 registration.register_form_for_item(ExtendedGeneralConfig, ExtendedGeneralConfigForm)
 
 class DoublyExtendedGeneralConfig(ExtendedGeneralConfig):
@@ -53,11 +54,13 @@ class DoublyExtendedGeneralConfig(ExtendedGeneralConfig):
   class RegistryMeta(ExtendedGeneralConfig.RegistryMeta):
     registry_name = _("Doubly Extended Configuration")
 
-class VpnServerConfig(registry_models.RegistryItem):
+registration.point("node.config").register_item(DoublyExtendedGeneralConfig)
+
+class VpnServerConfig(registration.bases.NodeConfigRegistryItem):
   """
   Provides a VPN server specification that the nodes can use.
   """
-  protocol = registry_fields.SelectorKeyField("core.vpn.server#protocol")
+  protocol = registry_fields.SelectorKeyField("node.config", "core.vpn.server#protocol")
   hostname = models.CharField(max_length = 100)
   port = models.IntegerField()
   
@@ -77,5 +80,6 @@ class VpnServerConfigForm(forms.ModelForm):
   class Meta:
     model = VpnServerConfig
 
+registration.point("node.config").register_item(VpnServerConfig)
 registration.register_form_for_item(VpnServerConfig, VpnServerConfigForm)
 

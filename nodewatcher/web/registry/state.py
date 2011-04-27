@@ -1,12 +1,11 @@
 from django.utils import datastructures
 
-# A registry of all possible items
-ITEM_REGISTRY = {}
-ITEM_LIST = datastructures.SortedDict()
+# A dictionary containing all the registration points
+points = {}
 
-# A registry of choices
-CHOICES_REGISTRY = {}
+# Base class registration
+class BaseClassContainer(object):
+  pass
 
-# A registry of flat proxy fields for node objects
-FLAT_LOOKUP_PROXIES = {}
+bases = BaseClassContainer()
 

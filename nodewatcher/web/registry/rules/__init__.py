@@ -6,11 +6,12 @@ __all__ = [
   'evaluate'
 ]
 
-def evaluate(node, state, partial_config = None):
+def evaluate(regpoint, root, state, partial_config = None):
   """
   Evaluates the rules.
   
-  @param node: Node to evaluate the rules for
+  @param regpoint: Registration point instance
+  @param root: Regpoint root instance to evaluate the rules for
   @param state: Current evaluation state
   @param partial_config: Optional partial updated configuration
   """
@@ -18,6 +19,6 @@ def evaluate(node, state, partial_config = None):
     partial_config = {}
   
   rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
-  rules.ctx.run(node, state, partial_config)
+  rules.ctx.run(regpoint, root, state, partial_config)
   return rules.ctx.results
 

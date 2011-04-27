@@ -19,6 +19,7 @@ from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
 from web.registry import access as registry_access
 from web.registry import lookup as registry_lookup
+from web.registry import registration
 
 class Project(models.Model):
   """
@@ -214,10 +215,6 @@ class Node(models.Model):
   thresh_frag = models.IntegerField(null = True)
   loss_count = models.IntegerField(null = True)
   wifi_error_count = models.IntegerField(null = True)
-  
-  # Configuration registry
-  config = registry_access.Registry()
-  objects = registry_lookup.RegistryLookupManager()
   
   def reset(self):
     """
@@ -640,6 +637,9 @@ class Node(models.Model):
       return "unknown (%s)" % self.ip
 
     return "%s (%s)" % (self.name, self.ip)
+
+registration.create_point(Node, "config")
+registration.create_point(Node, "monitoring")
 
 class Link(models.Model):
   """

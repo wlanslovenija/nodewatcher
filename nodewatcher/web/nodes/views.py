@@ -168,11 +168,17 @@ def node_edit(request, node):
       sid = transaction.savepoint()
       form = UpdateNodeForm(node, request.POST)
       
-      actions, partial_config = registry_forms.prepare_forms_for_node(node, data = request.POST, only_rules = True)
+      actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
+        "node.config",
+        node,
+        data = request.POST,
+        only_rules = True
+      )
       eval_state = actions['STATE']
       
       if form.is_valid() and form.save(node, request.user):
-        has_errors, dynamic_forms = registry_forms.prepare_forms_for_node(
+        has_errors, dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
+          "node.config",
           node,
           data = request.POST,
           save = True,
@@ -249,7 +255,7 @@ def node_edit(request, node):
       })
 
     form = UpdateNodeForm(node, initial = p)
-    dynamic_forms, eval_state = registry_forms.prepare_forms_for_node(node, also_rules = True)
+    dynamic_forms, eval_state = registry_forms.prepare_forms_for_regpoint_root("node.config", node, also_rules = True)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,
@@ -259,6 +265,8 @@ def node_edit(request, node):
       'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
       'projects' : Project.objects.all().order_by("id"),
       'registry_forms' : dynamic_forms,
+      'registry_root' : node,
+      'registry_regpoint' : 'node.config',
       'eval_state' : safestring.mark_safe(json.dumps(eval_state)) },
     context_instance = RequestContext(request)
   )

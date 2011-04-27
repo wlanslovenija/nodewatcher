@@ -1,6 +1,9 @@
 var registry = {
-  // Node identifier that needs to be set
-  node_id: '',
+  // Regpoint identifier that needs to be set
+  regpoint_id: '',
+  
+  // Regpoint root identifier that needs to be set
+  root_id: '',
   
   /**
    * Performs server-side rule evaluation based on current values of all
@@ -10,7 +13,7 @@ var registry = {
    */
   reevaluate_rules: function(actions)
   {
-    if (!registry.node_id)
+    if (!registry.root_id)
       return;
     
     // Prepare form in serialized form (pun intended)
@@ -22,7 +25,7 @@ var registry = {
     $('#reg_loading_dialog').dialog('open');
     
     $.ajax({
-      url: "/registry/evaluate_forms/" + registry.node_id,
+      url: "/registry/evaluate_forms/" + registry.regpoint_id + "/" + registry.root_id,
       dataType: "html",
       data: forms,
       type: "POST",
