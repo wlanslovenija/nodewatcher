@@ -116,10 +116,10 @@ def prepare_config_item(sender, **kwargs):
         src_field = dst_field = field
       
       # Ignore registrations of existing proxies
-      if src_field in registry_state.FLAT_LOOKUP_PROXIES:
+      if dst_field in registry_state.FLAT_LOOKUP_PROXIES:
         continue
       
-      registry_state.FLAT_LOOKUP_PROXIES[src_field] = sender, dst_field
+      registry_state.FLAT_LOOKUP_PROXIES[dst_field] = sender, src_field
 
 model_signals.class_prepared.connect(prepare_config_item)
 

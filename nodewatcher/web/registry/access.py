@@ -95,11 +95,21 @@ def get_class_by_path(path):
   except KeyError:
     raise UnknownRegistryIdentifier
 
+# Cache for class resolutions
+CTYPE_CACHE = {}
+
 def get_model_class_by_name(name):
   """
   Returns the model class identified by its name.
   
   @param name: Model class name
   """
-  return ContentType.objects.get(model = name).model_class()
+  name = name.lower()
+  try:
+    ctype = CTYPE_CACHE[name]
+  except KeyError:
+    ctype = ContentType.objects.get(model = name).model_class()
+    CTYPE_CACHE[name] = ctype
+  
+  return ctype
 

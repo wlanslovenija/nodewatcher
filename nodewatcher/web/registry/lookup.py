@@ -1,6 +1,7 @@
 from django.db import models, connection
 
 from registry import state as registry_state
+from registry import access as registry_access
 
 # Quote name
 qn = connection.ops.quote_name
@@ -39,7 +40,10 @@ class RegistryQuerySet(models.query.QuerySet):
     """
     clone = self._clone()
     
-    for field, (dst_model, dst_field) in kwargs.iteritems():
+    for field, dst in kwargs.iteritems():
+      dst_model, dst_field = dst.split('.')
+      dst_model = registry_access.get_model_class_by_name(dst_model)
+      
       clone = clone.extra(select = { field : "%s.%s" % (qn(dst_model._meta.db_table), qn(dst_field)) })
       clone.query.get_initial_alias()
       
@@ -65,4 +69,8 @@ class RegistryLookupManager(models.Manager):
   """
   def get_query_set(self):
     return RegistryQuerySet(self.model)
+  
+  def registry_fields(self, **kwargs):
+    return self.get_query_set().registry_fields(**kwargs)
+
 
