@@ -23,6 +23,7 @@ class GeneralConfig(registry_models.RegistryItem):
     registry_id = "core.general"
     registry_section = _("General Configuration")
     registry_name = _("Basic Configuration")
+    lookup_proxies = ['platform', 'version']
 
 class GeneralConfigForm(forms.ModelForm):
   """

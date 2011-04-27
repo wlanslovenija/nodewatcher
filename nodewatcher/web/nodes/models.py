@@ -17,7 +17,8 @@ from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
-from web.registry import access as registry
+from web.registry import access as registry_access
+from web.registry import lookup as registry_lookup
 
 class Project(models.Model):
   """
@@ -215,7 +216,8 @@ class Node(models.Model):
   wifi_error_count = models.IntegerField(null = True)
   
   # Configuration registry
-  config = registry.Registry()
+  config = registry_access.Registry()
+  objects = registry_lookup.RegistryLookupManager()
   
   def reset(self):
     """

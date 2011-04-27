@@ -35,6 +35,27 @@ class RegistryItem(models.Model):
     
     return form
   
+  @classmethod
+  def lookup_path(cls):
+    """
+    Returns a query filter "path" that can be used for performing node lookups with
+    fields that are part of some registry object.
+    """
+    if cls.__base__ == RegistryItem:
+      return 'config_' + cls._meta.app_label + '_' + cls._meta.module_name
+    else:
+      return lookup_path(cls.__base__) + '__' + cls._meta.module_name
+  
+  @classmethod
+  def top_model(cls):
+    """
+    Returns the top-level model for this registry item.
+    """
+    if cls.__base__ == RegistryItem:
+      return cls
+    else:
+      return cls.__base__.top_model()
+  
   def cast(self):
     """
     Casts this registry item into the proper downwards type.
@@ -84,6 +105,21 @@ def prepare_config_item(sender, **kwargs):
       ))
     
     registry_state.ITEM_REGISTRY[registry_id] = sender
+  
+  # Register proxy fields for node lookup
+  lookup_proxies = getattr(sender.RegistryMeta, 'lookup_proxies', None)
+  if lookup_proxies is not None:
+    for field in lookup_proxies:
+      if isinstance(field, (tuple, list)):
+        src_field, dst_field = field
+      else:
+        src_field = dst_field = field
+      
+      # Ignore registrations of existing proxies
+      if src_field in registry_state.FLAT_LOOKUP_PROXIES:
+        continue
+      
+      registry_state.FLAT_LOOKUP_PROXIES[src_field] = sender, dst_field
 
 model_signals.class_prepared.connect(prepare_config_item)
 
