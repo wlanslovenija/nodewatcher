@@ -234,7 +234,9 @@ CELERY_IGNORE_RESULT = True
 ENABLE_GRAPH_DISPLAY = False
 
 # Registry
-REGISTRY_RULES_MODULE = 'web.rules'
+REGISTRY_RULES_MODULES = {
+  'node.config' : 'web.rules'
+}
 
 DOCUMENTATION_LINKS = {
 #  'custom_node'          : 'http://example.net/wiki/CustomNode',

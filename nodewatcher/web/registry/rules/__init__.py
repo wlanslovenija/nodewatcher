@@ -18,7 +18,11 @@ def evaluate(regpoint, root, state, partial_config = None):
   if partial_config is None:
     partial_config = {}
   
-  rules = importlib.import_module(settings.REGISTRY_RULES_MODULE)
-  rules.ctx.run(regpoint, root, state, partial_config)
-  return rules.ctx.results
+  rules_module = settings.REGISTRY_RULES_MODULES.get(regpoint.name, None)
+  if rules_module is not None:
+    rules = importlib.import_module(rules_module)
+    rules.ctx.run(regpoint, root, state, partial_config)
+    return rules.ctx.results
+  
+  return { 'STATE' : {} }
 

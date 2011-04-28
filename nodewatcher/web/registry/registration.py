@@ -35,6 +35,7 @@ class RegistrationPoint(object):
     """
     self.model = model
     self.namespace = namespace
+    self.name = "%s.%s" % (model._meta.module_name, namespace)
     self.item_registry = {}
     self.item_list = datastructures.SortedDict()
     self.choices_registry = {}
