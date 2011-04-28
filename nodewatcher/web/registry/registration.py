@@ -154,8 +154,11 @@ def create_point(model, namespace):
     registry_state.points[point_id] = point
     
     # Augment the model with a custom manager and a custom accessor
-    model.add_to_class("%s_objects" % namespace, registry_lookup.RegistryLookupManager(point))
     model.add_to_class(namespace, registry_access.RegistryAccessor(point))
+    if not isinstance(model.objects, registry_lookup.RegistryLookupManager):
+      del model.objects
+      model.add_to_class('objects', registry_lookup.RegistryLookupManager(point))
+      model._default_manager = model.objects
     
     # Create a new top-level class
     class Meta(registry_models.RegistryItemBase.Meta):

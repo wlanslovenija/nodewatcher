@@ -9,6 +9,20 @@ class RegistryQuerySet(models.query.QuerySet):
   """
   An augmented query set that enables lookups of values from the registry.
   """
+  def regpoint(self, name):
+    """
+    Switches to a different regpoint that determines the short attribute
+    name.
+    """
+    from registry import registration
+    clone = self._clone()
+    try:
+      name = "{0}.{1}".format(self.model._meta.module_name, name)
+      clone._regpoint = registration.point(name)
+      return clone
+    except KeyError:
+      raise ValueError("Registration point '{0}' does not exist!".format(name))
+  
   def filter(self, **kwargs):
     """
     An augmented filter that enables filtering by virtual aliases for
@@ -23,7 +37,7 @@ class RegistryQuerySet(models.query.QuerySet):
       else:
         field = condition
       
-      dst_model, dst_field = self.regpoint.flat_lookup_proxies.get(field, (None, None))
+      dst_model, dst_field = self._regpoint.flat_lookup_proxies.get(field, (None, None))
       if dst_model is None and '_' in field:
         dst_model, dst_field = field.split('_', 1)
         try:
@@ -79,13 +93,16 @@ class RegistryLookupManager(models.Manager):
     
     @param regpoint: Registration point instance
     """
-    self.regpoint = regpoint
+    self._regpoint = regpoint
     super(RegistryLookupManager, self).__init__()
   
   def get_query_set(self):
     qs = RegistryQuerySet(self.model)
-    qs.regpoint = self.regpoint
+    qs._regpoint = self._regpoint
     return qs
+  
+  def regpoint(self, name):
+    return self.get_query_set().regpoint(name)
   
   def registry_fields(self, **kwargs):
     return self.get_query_set().registry_fields(**kwargs)
