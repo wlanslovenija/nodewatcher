@@ -1,3 +1,4 @@
+from django.contrib.gis.db import models as gis_models
 from django.db import models, connection
 
 from registry import access as registry_access
@@ -5,7 +6,7 @@ from registry import access as registry_access
 # Quote name
 qn = connection.ops.quote_name
 
-class RegistryQuerySet(models.query.QuerySet):
+class RegistryQuerySet(gis_models.query.GeoQuerySet):
   """
   An augmented query set that enables lookups of values from the registry.
   """
@@ -83,7 +84,7 @@ class RegistryQuerySet(models.query.QuerySet):
     
     return clone
 
-class RegistryLookupManager(models.Manager):
+class RegistryLookupManager(gis_models.GeoManager):
   """
   A manager for doing lookups over the registry models.
   """
@@ -97,7 +98,7 @@ class RegistryLookupManager(models.Manager):
     super(RegistryLookupManager, self).__init__()
   
   def get_query_set(self):
-    qs = RegistryQuerySet(self.model)
+    qs = RegistryQuerySet(self.model, using = self._db)
     qs._regpoint = self._regpoint
     return qs
   

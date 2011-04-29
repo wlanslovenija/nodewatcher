@@ -22,12 +22,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
   'default' : {
-    'ENGINE'   : 'django.db.backends.sqlite3', # 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-    'NAME'     : database_file, # Or path to database file if using sqlite3.
-    'USER'     : '',            # Not used with sqlite3.
-    'PASSWORD' : '',            # Not used with sqlite3.
-    'HOST'     : '',            # Set to empty string for localhost. Not used with sqlite3.
-    'PORT'     : '',            # Set to empty string for default. Not used with sqlite3.
+    'ENGINE'   : 'django.contrib.gis.db.backends.postgis',
+    'NAME'     : 'nodewatcher',
+    'USER'     : 'nodewatcher',
+    'PASSWORD' : '',
+    'HOST'     : '',            # Set to empty string for localhost.
+    'PORT'     : '',            # Set to empty string for default.
   },
 }
 
@@ -156,6 +156,7 @@ INSTALLED_APPS = (
   'django.contrib.sessions',
   'django.contrib.sites',
   'django.contrib.sitemaps',
+  'django.contrib.gis',
   'djcelery',
   'web.nodes',
   'web.generator',

@@ -17,3 +17,7 @@ dropuser -U postgres nodewatcher || true
 createuser -U postgres -S -D -R nodewatcher || true
 createdb -U postgres -E UNICODE -T template0 -O nodewatcher nodewatcher
 psql -U postgres nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
+createlang -U postgres plpgsql nodewatcher
+psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/postgis.sql
+psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis_comments.sql
+psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/spatial_ref_sys.sql
