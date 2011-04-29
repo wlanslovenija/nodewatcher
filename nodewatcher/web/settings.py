@@ -166,6 +166,7 @@ INSTALLED_APPS = (
   'web.registry',
   'web.core',
   'web.core.cgm',
+  'web.core.cgm.packages.solar',
 )
 
 # External programs configuration

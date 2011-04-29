@@ -11,7 +11,7 @@ from registry import registration
 from registry.cgm import base as cgm_base
 
 class RegistryMetaForm(forms.Form):
-  def __init__(self, items, selected_item = None, *args, **kwargs):
+  def __init__(self, items, selected_item = None, force_selector_widget = False, *args, **kwargs):
     """
     Class constructor.
     """
@@ -25,7 +25,7 @@ class RegistryMetaForm(forms.Form):
       choices = [(name, item.RegistryMeta.registry_name) for name, item in items.iteritems()],
       coerce = str,
       initial = selected_item,
-      widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' }) if len(items) > 1 else forms.HiddenInput
+      widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' }) if len(items) > 1 or force_selector_widget else forms.HiddenInput
     )
     self.fields['prev_item'] = forms.TypedChoiceField(
       choices = [(name, item.RegistryMeta.registry_name) for name, item in items.iteritems()],
@@ -42,7 +42,7 @@ class RegistrySetMetaForm(forms.Form):
   )
 
 def generate_form_for_class(regpoint, root, items, prefix, data, index, instance = None, validate = False, partial = None,
-                            current_config = None):
+                            current_config = None, force_selector_widget = False):
   """
   A helper function for generating a form for a specific registry item class.
   """
@@ -51,7 +51,9 @@ def generate_form_for_class(regpoint, root, items, prefix, data, index, instance
   previous_item = None
   
   # Parse a form that holds the item selector
-  meta_form = RegistryMetaForm(items, selected_item, data = data, prefix = prefix)
+  meta_form = RegistryMetaForm(items, selected_item, data = data, prefix = prefix,
+    force_selector_widget = force_selector_widget
+  )
   if validate:
     if not meta_form.is_valid():
       validation_errors = True
@@ -122,7 +124,9 @@ def generate_form_for_class(regpoint, root, items, prefix, data, index, instance
         setattr(config, field, value)
   
   # Generate a new meta form, since the previous item has now changed
-  meta_form = RegistryMetaForm(items, selected_item, prefix = prefix)
+  meta_form = RegistryMetaForm(items, selected_item, prefix = prefix,
+    force_selector_widget = force_selector_widget
+  )
   return form, meta_form, validation_errors
 
 def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = False, only_rules = False, also_rules = False, actions = None,
@@ -157,9 +161,22 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
     partial_config = {} if only_rules else None
     
     for _, items in regpoint.item_list.iteritems():
-      cls_meta = items.values()[0].RegistryMeta
+      items = copy.deepcopy(items)
+      item_cls = items.values()[0].top_model()
+      cls_meta = item_cls.RegistryMeta
       base_prefix = "reg_" + cls_meta.registry_id.replace('.', '_')
       subforms = []
+      force_selector_widget = False
+      
+      if getattr(cls_meta, 'hidden', False):
+        # The top-level item should be hidden
+        del items[item_cls._meta.module_name]
+        force_selector_widget = True
+        
+        # When there is only the top-level item and it should be hidden, we don't
+        # render this whole item class section
+        if not items:
+          continue
       
       if getattr(cls_meta, 'multiple', False):
         # This is an item class that supports multiple objects of the same class
@@ -176,7 +193,8 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
               None,
               index,
               instance = mdl,
-              current_config = current_config
+              current_config = current_config,
+              force_selector_widget = force_selector_widget
             )
             
             subforms.append({
@@ -204,7 +222,6 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
           # TODO implement 'assign' action (its order is not relevant)
           
           # Generate the right amount of forms
-          index = 0
           for index in xrange(submeta.cleaned_data['form_count']):
             form_prefix = base_prefix + '_mu_' + str(index)
             form, meta_form, has_errors = generate_form_for_class(
@@ -216,7 +233,8 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
               index,
               validate = True,
               partial = partial_config,
-              current_config = current_config
+              current_config = current_config,
+              force_selector_widget = force_selector_widget
             )
             
             # Check for validation errors, so we don't commit in case of errors
@@ -231,7 +249,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
           
           # Check for any append/clear_config actions and execute them
           meta_modified = False
-          index += 1
+          index = len(subforms)
           # TODO maybe these actions should be abstracted
           for action in actions.get(cls_meta.registry_id, []):
             if action[0] == 'clear_config':
@@ -240,7 +258,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
               meta_modified = True
             elif action[0] == 'append':
               form_prefix = base_prefix + '_mu_' + str(index)
-              mdl = action[1] if action[1] is not None else items.values()[0].top_model()
+              mdl = action[1] if action[1] is not None else items.values()[0]
               mdl = mdl(root = root, **action[2])
               
               form, meta_form, has_errors = generate_form_for_class(
@@ -252,7 +270,8 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
                 index,
                 instance = mdl,
                 validate = True,
-                current_config = current_config
+                current_config = current_config,
+                force_selector_widget = force_selector_widget
               )
               index += 1
               meta_modified = True
@@ -262,7 +281,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
                 'meta'    : meta_form,
                 'form'    : form 
               })
-            elif action[0] == 'remove_last' and index > 0:
+            elif action[0] == 'remove_last' and len(subforms) > 0:
               index -= 1
               subforms.pop()
               meta_modified = True
@@ -275,7 +294,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
             # Update the submeta form with new count
             submeta = RegistrySetMetaForm(
               prefix = base_prefix + '_sm',
-              initial = { 'form_count' : index }
+              initial = { 'form_count' : len(subforms) }
             ) 
       else:
         # This item class only supports a single object to be selected

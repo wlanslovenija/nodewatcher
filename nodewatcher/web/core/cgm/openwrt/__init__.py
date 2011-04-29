@@ -152,6 +152,10 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 
   def build(self):
     raise NotImplementedError
+  
+  def install_optional_package(self, name):
+    # TODO
+    pass
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 

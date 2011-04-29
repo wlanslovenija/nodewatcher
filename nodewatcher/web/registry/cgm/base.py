@@ -25,6 +25,7 @@ class PlatformBase(object):
     Class constructor.
     """
     self._modules = []
+    self._packages = []
   
   def generate(self, node):
     """
@@ -36,12 +37,20 @@ class PlatformBase(object):
     for _, module in sorted(self._modules):
       module(node, cfg)
     
+    # Process packages
+    for name, cfgclass, package in self._packages:
+      package(node, node.config.core.packages(onlyclass = cfgclass), cfg)
+      self.install_optional_package(name)
+    
     return cfg
   
   def format(self, cfg):
     raise NotImplementedError
 
   def build(self):
+    raise NotImplementedError
+  
+  def install_optional_package(self, name):
     raise NotImplementedError
   
   def defer_format_build(self, node, cfg):
@@ -58,7 +67,23 @@ class PlatformBase(object):
     @param order: Call order
     @param module: Module implementation function
     """
+    if [x for x in self._modules if x[1] == module]:
+      return
+    
     self._modules.append((order, module))
+  
+  def register_package(self, name, config, package):
+    """
+    Registers a new platform package.
+    
+    @param name: Platform-dependent package name
+    @param config: Configuration class
+    @param package: Package implementation function
+    """
+    if [x for x in self._packages if x[2] == package]:
+      return
+    
+    self._packages.append((name, config, package))
 
 def register_platform(enum, text, platform):
   """
@@ -92,6 +117,15 @@ def register_platform_module(platform, order):
   def wrapper(f):
     get_platform(platform).register_module(order, f)
     return f
+  
+  return wrapper
+
+def register_platform_package(platform, name, cfgclass):
+  """
+  Registers a new platform package.
+  """
+  def wrapper(f):
+    get_platform(platform).register_package(name, cfgclass, f)
   
   return wrapper
 

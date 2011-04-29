@@ -29,13 +29,15 @@ class RegistryResolver(object):
     
     return partial
   
-  def by_path(self, path, create = None, queryset = False):
+  def by_path(self, path, create = None, queryset = False, onlyclass = None):
     """
     Resolves the registry hierarchy.
     """
     if path in self._regpoint.item_registry:
       # Determine which class the root is using for configuration
       cfg, top_level = self._regpoint.get_top_level_queryset(self._root, path)
+      if onlyclass is not None:
+        cfg.filter(content_type = ContentType.objects.get_for_model(onlyclass))
       if queryset:
         return cfg.all()
       

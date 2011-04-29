@@ -1,5 +1,6 @@
 import collections
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils import datastructures
 
@@ -38,6 +39,7 @@ class RegistrationPoint(object):
     self.name = "%s.%s" % (model._meta.module_name, namespace)
     self.item_registry = {}
     self.item_list = datastructures.SortedDict()
+    self.item_classes = {}
     self.choices_registry = {}
     self.flat_lookup_proxies = {}
   
@@ -51,6 +53,12 @@ class RegistrationPoint(object):
     # Sanity check for object names
     if '_' in item._meta.object_name:
       raise ImproperlyConfigured("Registry items must not have underscores in class names!")
+    
+    # Avoid registering the same class multiple times
+    if item in self.item_classes:
+      return
+    else:
+      self.item_classes[item] = True
     
     # Insert into item list
     items = self.item_list

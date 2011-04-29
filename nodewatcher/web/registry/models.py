@@ -20,8 +20,7 @@ class RegistryItemBase(models.Model):
     """
     Returns the form used for this model.
     """
-    if hasattr(cls, '_forms'):
-      form = cls._forms.get(cls)
+    form = cls._forms.get(cls, None) if hasattr(cls, '_forms') else None
     
     if form is None:
       class DefaultRegistryItemForm(forms.ModelForm):
