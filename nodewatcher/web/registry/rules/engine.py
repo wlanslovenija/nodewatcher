@@ -85,13 +85,15 @@ class LazyValue(LazyObject):
   """
   An abstract lazy value that can be used for building lazy expressions.
   """ 
-  def __init__(self, op):
+  def __init__(self, op, identifier = None):
     """
     Class constructor.
     
     @param op: A callable operation
+    @param identifier: Optional identifier
     """
     self.op = op
+    self.identifier = identifier
   
   def __lt__(self, other):
     other = other(context) if isinstance(other, LazyValue) else other
@@ -122,6 +124,9 @@ class LazyValue(LazyObject):
     Evaluates the value.
     """
     return self.op(context)
+  
+  def __str__(self):
+    return self.identifier or "<LazyValue>"
 
 class RuleModifier(LazyObject):
   """
@@ -245,6 +250,7 @@ class EngineContext(object):
     @param location: Registry location
     @param value: New registry value
     """
+    location = str(location)
     old_value = self.state.get(location)
     if old_value is None:
       return True

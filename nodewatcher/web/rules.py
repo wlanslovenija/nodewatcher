@@ -2,16 +2,19 @@ from registry.rules.scope import *
 
 # Alias definitions
 project          = "core.general#project.name"
-supported_radios = "core.general#equipment.supported_radios"
+platform         = "core.general#platform"
+model            = "core.general#model"
 radios           = "core.radio"
 vpn              = "core.vpn.server"
 
+router_model     = router_model(platform, model)
+
 # Defaults
-#rule(changed(supported_radios),
+#rule(changed(router_model.supported_radios),
 #  clear_config(radios)
 #)
 
-#rule(value(supported_radios) >= 1,
+#rule(router_model.supported_radios >= 1,
 #  append(radios,
 #    role = "endusers",
 #    essid = "open.wlan-si.net",
@@ -19,7 +22,7 @@ vpn              = "core.vpn.server"
 #  )
 #)
 
-#rule(value(supported_radios) >= 2,
+#rule(router_model.supported_radios >= 2,
 #  append(radios,
 #    role = "mesh",
 #    essid = "backbone.wlan-si.net",
@@ -30,10 +33,10 @@ vpn              = "core.vpn.server"
 # Per-project rules
 rule(value(project) == "Ljubljana",
   # Override defaults, we want wlan-lj.net
-#  rule(value(supported_radios) >= 1,
+#  rule(router_model.supported_radios >= 1,
 #    assign(radios, 0, essid = "open.wlan-lj.net")
 #  ),
-#  rule(value(supported_radios) >= 2,
+#  rule(router_model.supported_radios >= 2,
 #    assign(radios, 1, essid = "backbone.wlan-lj.net")
 #  ),
   clear_config(vpn),

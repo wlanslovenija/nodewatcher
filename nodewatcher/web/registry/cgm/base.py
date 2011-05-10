@@ -131,6 +131,14 @@ class PlatformBase(object):
     registration.point("node.config").register_choice("core.general#model", model, properties['name'],
       limited_to = ("core.general#platform", self.platform_name)
     )
+  
+  def get_router_model(self, model):
+    """
+    Returns a router model descriptor.
+    
+    @param model: Unique model identifier
+    """
+    return self._router_models[model]
 
 def register_platform(enum, text, platform):
   """

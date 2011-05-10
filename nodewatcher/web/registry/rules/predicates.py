@@ -1,12 +1,15 @@
+import hashlib
 import inspect
 
 from registry import access as registry_access
-from registry.rules.engine import * 
+from registry.rules.engine import *
+from registry.cgm import base as cgm_base 
 
 # Exports
 __all__ = [
   'rule',
   'value',
+  'router_model',
   'count',
   'changed',
   'assign',
@@ -137,12 +140,45 @@ def count(value):
   
   return LazyValue(lambda context: len(value(context)))
 
+def router_model(platform, model):
+  """
+  Lazy value that returns the router model descriptor for the specified
+  router.
+  
+  @param platform: Location of a platform identifier
+  @param model: Location of a model identifier
+  """
+  class LazyRouterModel(LazyObject):
+    def __init__(self, platform, model):
+      self.__dict__['platform'] = platform
+      self.__dict__['model'] = model
+    
+    def __call__(self, context):
+      pass
+    
+    def __getattr__(self, key):
+      def resolve_attribute(context):
+        try:
+          return getattr(cgm_base.get_platform(value(self.platform)(context)).get_router_model(value(self.model)(context)), key, None)
+        except KeyError:
+          return None
+      
+      return LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.model).hexdigest() + '-' + key)
+    
+    def __setattr__(self, key, value):
+      raise AttributeError
+  
+  return LazyRouterModel(platform, model)
+
 def value(location):
   """
   Lazy value that returns the result of a registry query.
   
-  @param location: Registry location (may contain attributes)
+  @param location: Registry location or LazyValue
   """
+  if isinstance(location, LazyValue):
+    return location
+  
   def location_resolver(context):
     path, attribute = location.split('#') if '#' in location else (location, None)
     
@@ -179,7 +215,7 @@ def changed(location):
   A rule modifier predicate that will evaluate to True whenever a specific
   registry location has changed between rule evaluations.
   
-  @param location: Registry location (may contain attributes)
+  @param location: Registry location or LazyValue
   """
   return RuleModifier(
     lambda rule: setattr(rule, 'always_evaluate', True),

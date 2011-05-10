@@ -136,7 +136,7 @@ class RegistrationPoint(object):
     try:
       return self.item_registry[registry_id]
     except KeyError:
-      raise UnknownRegistryIdentifier
+      raise registry_access.UnknownRegistryIdentifier
   
   def get_accessor(self, root):
     """
