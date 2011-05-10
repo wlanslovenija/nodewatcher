@@ -94,15 +94,26 @@ def generate_form_for_class(regpoint, root, items, prefix, data, index, instance
     prefix = prefix + '_' + selected_item._meta.module_name
   )
   
-  # Enable forms to modify themselves accoording to current context
-  if hasattr(form, 'modify_to_context') and partial is None:
+  def modify_to_context(obj):
+    if not hasattr(obj, 'modify_to_context'):
+      return
+    
     if current_config is not None:
       item = current_config[selected_item.RegistryMeta.registry_id][index]
+      cfg = current_config
     else:
       item = instance
-      current_config = regpoint.get_accessor(root).to_partial()
+      cfg = regpoint.get_accessor(root).to_partial()
     
-    form.modify_to_context(item, current_config)
+    obj.modify_to_context(item, cfg)
+  
+  if partial is None:
+    # Enable forms to modify themselves accoording to current context
+    modify_to_context(form)
+  
+    # Enable form fields to modify themselves accoording to current context
+    for name, field in form.fields.iteritems():
+      modify_to_context(field)
   
   if validate:
     if partial is None:

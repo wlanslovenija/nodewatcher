@@ -29,6 +29,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
     An augmented filter that enables filtering by virtual aliases for
     registry fields via joins.
     """
+    if not hasattr(self, "_regpoint"):
+      return super(RegistryQuerySet, self).filter(**kwargs)
+    
     clone = self._clone()
     
     # Resolve fields from kwargs that are virtual aliases for registry fields
@@ -88,7 +91,7 @@ class RegistryLookupManager(gis_models.GeoManager):
   """
   A manager for doing lookups over the registry models.
   """
-  def __init__(self, regpoint):
+  def __init__(self, regpoint = None):
     """
     Class constructor.
     
@@ -99,7 +102,8 @@ class RegistryLookupManager(gis_models.GeoManager):
   
   def get_query_set(self):
     qs = RegistryQuerySet(self.model, using = self._db)
-    qs._regpoint = self._regpoint
+    if self._regpoint is not None:
+      qs._regpoint = self._regpoint
     return qs
   
   def regpoint(self, name):

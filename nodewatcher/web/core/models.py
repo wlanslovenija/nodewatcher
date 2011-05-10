@@ -12,8 +12,8 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   router type and the platform used.
   """
   project = registry_fields.ModelSelectorKeyField("nodes.Project")
-  model = models.CharField(max_length = 20)
   platform = registry_fields.SelectorKeyField("node.config", "core.general#platform")
+  model = registry_fields.SelectorKeyField("node.config", "core.general#model") # TODO limit choices to platform
   version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
   timezone = models.CharField(max_length = 30)
   

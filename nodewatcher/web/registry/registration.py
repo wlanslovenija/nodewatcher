@@ -15,6 +15,7 @@ class LazyChoiceList(collections.Sequence):
   def __init__(self):
     super(LazyChoiceList, self).__init__()
     self._list = []
+    self._dependent_choices = []
   
   def __len__(self):
     return len(self._list)
@@ -24,6 +25,16 @@ class LazyChoiceList(collections.Sequence):
   
   def __nonzero__(self):
     return True
+  
+  def subset_choices(self, condition):
+    return [choice for limited_to, choice in self._dependent_choices if limited_to is None or condition(*limited_to)]
+  
+  def add_choice(self, choice, limited_to):
+    if any([x == enum for x, _ in self._list]):
+      return
+    
+    self._list.append(choice)
+    self._dependent_choices.append((limited_to, choice))
 
 class RegistrationPoint(object):
   """
@@ -140,15 +151,11 @@ class RegistrationPoint(object):
     """
     return self.choices_registry.setdefault(choices_id, LazyChoiceList())
   
-  def register_choice(self, choices_id, enum, text):
+  def register_choice(self, choices_id, enum, text, limited_to = None):
     """
     Registers a new choice/enumeration.
     """
-    choices = self.choices_registry.setdefault(choices_id, LazyChoiceList())._list
-    if any([x == enum for x, _ in choices]):
-      return
-    
-    choices.append((enum, text))
+    self.get_registered_choices(choices_id).add_choice((enum, text), limited_to)
 
 def create_point(model, namespace):
   """

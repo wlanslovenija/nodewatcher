@@ -163,3 +163,6 @@ cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 import core.cgm.openwrt.general
 import core.cgm.openwrt.vpn
 
+# Load all model-specific modules
+import core.cgm.openwrt.fon2100
+
