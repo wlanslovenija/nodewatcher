@@ -182,6 +182,7 @@ def register_platform_package(platform, name, cfgclass):
   """
   def wrapper(f):
     get_platform(platform).register_package(name, cfgclass, f)
+    return f
   
   return wrapper
 

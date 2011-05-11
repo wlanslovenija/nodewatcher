@@ -5,10 +5,16 @@ from django import forms
 from django.core import exceptions
 from django.db import transaction
 
-from registry import cgm
 from registry import rules as registry_rules
 from registry import registration
 from registry.cgm import base as cgm_base
+
+class RegistryValidationError(Exception):
+  """
+  This exception can be raised by registry point validation hooks to
+  notify the API that validation has failed.
+  """
+  pass
 
 class RegistryMetaForm(forms.Form):
   def __init__(self, items, selected_item = None, force_selector_widget = False, *args, **kwargs):
@@ -358,23 +364,21 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
     elif also_rules:
       actions = registry_rules.evaluate(regpoint, root, {}, {})
     
-    # XXX this should be somewhere else as it is only for nodes! something like
-    #     pre-save additional validation (registration?)
+    # Execute any validation hooks when saving and there are no validation errors
     if save and root is not None and not validation_errors:
-      # When save is enabled, we must perform node configuration validation
-      try:
-        # XXX root -> node
-        cgm.generate_config(root, only_validate = True)
-      except cgm_base.ValidationError, e:
-        validation_errors = True
-        # TODO Handle validation errors
-        raise
+      for hook in regpoint.validation_hooks:
+        try:
+          hook(root)
+        except RegistryValidationError, e:
+          validation_errors = True
+          # TODO Handle validation errors
+          raise
     
     if not validation_errors:
       transaction.savepoint_commit(sid)
     else:
       transaction.savepoint_rollback(sid)
-  except cgm_base.ValidationError:
+  except RegistryValidationError:
     transaction.savepoint_rollback(sid)
   except:
     transaction.savepoint_rollback(sid)

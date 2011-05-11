@@ -53,6 +53,7 @@ class RegistrationPoint(object):
     self.item_classes = {}
     self.choices_registry = {}
     self.flat_lookup_proxies = {}
+    self.validation_hooks = []
   
   def register_item(self, item):
     """
@@ -214,4 +215,15 @@ def register_form_for_item(item, form_class):
     item._forms = {}
   
   item._forms[item] = form_class
+
+def register_validation_hook(regpoint):
+  """
+  A decorator that registers a new validation hook that gets applied after
+  form validation for this registration point is completed.
+  """
+  def wrapper(f):
+    point(regpoint).validation_hooks.append(f)
+    return f
+  
+  return wrapper
 
