@@ -61,10 +61,10 @@ var registry = {
       registry.reevaluate_rules({});
     });
     $('.regact_adder').click(function() {
-      registry.reevaluate_rules({ 'append' : $(this).attr('id') })
+      registry.reevaluate_rules({ 'append' : $(this).attr('name') })
     });
     $('.regact_remover').click(function() {
-      registry.reevaluate_rules({ 'remove_last' : $(this).attr('id') })
+      registry.reevaluate_rules({ 'remove_last' : $(this).attr('name') })
     });
   },
   

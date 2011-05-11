@@ -34,11 +34,11 @@ def evaluate_forms(request, regpoint_id, root_id):
     
     # Merge in client actions when available
     try:
-      for action, cls_id in json.loads(request.POST['ACTIONS']).iteritems():
+      for action, prefix in json.loads(request.POST['ACTIONS']).iteritems():
         if action == 'append':
-          actions.setdefault(cls_id, []).insert(0, ('append', None, {}))
+          actions.setdefault(prefix, []).insert(0, ('append', None, {}))
         elif action == 'remove_last':
-          actions.setdefault(cls_id, []).insert(0, ('remove_last',))
+          actions.setdefault(prefix, []).insert(0, ('remove_last',))
     except AttributeError:
       pass
     

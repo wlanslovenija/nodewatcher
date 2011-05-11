@@ -105,7 +105,10 @@ def generate_form_for_class(regpoint, root, items, prefix, data, index, instance
       return
     
     if current_config is not None:
-      item = current_config[selected_item.RegistryMeta.registry_id][index]
+      try:
+        item = current_config[selected_item.RegistryMeta.registry_id][index]
+      except IndexError:
+        item = instance
       cfg = current_config
     else:
       item = instance
@@ -268,7 +271,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
           meta_modified = False
           index = len(subforms)
           # TODO maybe these actions should be abstracted
-          for action in actions.get(cls_meta.registry_id, []):
+          for action in actions.get(base_prefix, []):
             if action[0] == 'clear_config':
               index = 0
               subforms = []
