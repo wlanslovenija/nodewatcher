@@ -1,0 +1,20 @@
+{% load misc %}
+{% load i18n %}
+
+{% for descriptor in registry_forms %}
+{% heading 3 descriptor.name %}
+  {% if descriptor.multiple %}
+  <input type="button" value="{% trans 'Add' %}" name="{{ descriptor.prefix }}" class="regact_adder">
+  <input type="button" value="{% trans 'Remove Last' %}" name="{{ descriptor.prefix }}" class="regact_remover">
+  {{ descriptor.submeta }}
+  <div id="{{ descriptor.prefix }}_mu_container">
+  {% endif %}
+  
+  {% for subform in descriptor.subforms %}
+    {{ subform }}
+  {% endfor %}
+  
+  {% if descriptor.multiple %}
+  </div>
+  {% endif %}
+{% endfor %}

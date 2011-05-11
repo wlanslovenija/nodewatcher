@@ -1,7 +1,7 @@
 import copy
 import json
 
-from django import forms
+from django import forms, template
 from django.core import exceptions
 from django.db import transaction
 
@@ -79,7 +79,7 @@ class AppendFormAction(RegistryFormAction):
     mdl = self.item_cls if self.item_cls is not None else self.context.default_item_cls
     mdl = mdl(root = self.context.root, **self.attributes)
     
-    form, meta_form = generate_form_for_class(
+    self.context.subforms.append(generate_form_for_class(
       self.context,
       form_prefix,
       None,
@@ -88,13 +88,8 @@ class AppendFormAction(RegistryFormAction):
       validate = True,
       current_config = self.context.current_config,
       force_selector_widget = self.context.force_selector_widget
-    )
+    ))
     
-    self.context.subforms.append({
-      'prefix'  : form_prefix,
-      'meta'    : meta_form,
-      'form'    : form 
-    })
     return True
 
 class AssignToFormAction(RegistryFormAction):
@@ -117,6 +112,53 @@ class AssignToFormAction(RegistryFormAction):
     """
     # TODO
     pass
+
+class BasicRegistryRenderItem(object):
+  """
+  A simple registry reneder item that includes a form with fields and
+  an item class selector when needed.
+  """
+  template = 'registry/basic_render_item.html'
+  
+  def __init__(self, form, meta_form, **kwargs):
+    """
+    Class constructor.
+    
+    @param form: Form containing the fields
+    @param meta_form: Form containing selected item metadata
+    """
+    self.form = form
+    self.meta_form = meta_form
+    self.args = kwargs
+  
+  def __unicode__(self):
+    """
+    Renders this item.
+    """
+    t = template.loader.get_template(self.template)
+    args = {
+      'form' : self.form,
+      'meta' : self.meta_form
+    }
+    args.update(self.args)
+    return t.render(template.Context(args))
+
+class NestedRegistryRenderItem(BasicRegistryRenderItem):
+  """
+  A registry renderer item that augments the basic form with support for
+  nested forms.
+  """
+  template = 'registry/nested_render_item.html'
+  
+  def __init__(self, form, meta_form, children):
+    """
+    Class constructor.
+    
+    @param form: Form containing the fields
+    @param meta_form: Form containing selected item metadata
+    @param children: A list of child forms
+    """
+    super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms = children)
 
 class RegistryMetaForm(forms.Form):
   def __init__(self, items, selected_item = None, force_selector_widget = False, *args, **kwargs):
@@ -195,10 +237,11 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     instance = selected_item(root = context.root)
   
   # Now generate a form for the selected item
+  form_prefix = prefix + '_' + selected_item._meta.module_name
   form = selected_item.get_form()(
     data,
     instance = instance,
-    prefix = prefix + '_' + selected_item._meta.module_name
+    prefix = form_prefix
   )
   
   def modify_to_context(obj):
@@ -248,7 +291,29 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   meta_form = RegistryMetaForm(context.items, selected_item, prefix = prefix,
     force_selector_widget = force_selector_widget
   )
-  return form, meta_form
+  
+  # Pack forms into a proper abstract representation
+  if hasattr(selected_item, '_has_registry_subitems'):
+    sub_context = RegistryFormContext(
+      regpoint = context.regpoint,
+      root = context.root,
+      data = context.data,
+      save = context.save,
+      only_rules = context.only_rules,
+      also_rules = context.also_rules,
+      actions = context.actions,
+      current_config = context.current_config,
+      partial_config = context.partial_config,
+      hierarchy_prefix = form_prefix,
+      validation_errors = False
+    )
+    
+    raise NotImplementedError
+    #forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context))
+  else:
+    forms = BasicRegistryRenderItem(form, meta_form)
+  
+  return forms
 
 class RegistryFormContext(object):
   """
@@ -265,10 +330,12 @@ class RegistryFormContext(object):
   partial_config = None
   validation_errors = False
   subforms = None
+  hierarchy_prefix = None
   base_prefix = None
   default_item_cls = None
   force_selector_widget = False
   items = None
+  item_actions = None
   
   def __init__(self, **kwargs):
     """
@@ -285,7 +352,12 @@ def prepare_forms(context):
     context.items = copy.deepcopy(items)
     item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
-    context.base_prefix = "reg_" + cls_meta.registry_id.replace('.', '_')
+
+    if context.hierarchy_prefix is not None:
+      context.base_prefix = context.hierarchy_prefix + '_' + cls_meta.registry_id.replace('.', '_')
+    else:
+      context.base_prefix = "reg_" + cls_meta.registry_id.replace('.', '_')
+    
     context.subforms = []
     context.force_selector_widget = False
     
@@ -308,7 +380,7 @@ def prepare_forms(context):
         # existing models
         for index, mdl in enumerate(context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)):
           form_prefix = context.base_prefix + '_mu_' + str(index)
-          form, meta_form = generate_form_for_class(
+          context.subforms.append(generate_form_for_class(
             context,
             form_prefix,
             None,
@@ -316,13 +388,7 @@ def prepare_forms(context):
             instance = mdl,
             current_config = context.current_config,
             force_selector_widget = context.force_selector_widget
-          )
-          
-          context.subforms.append({
-            'prefix'  : form_prefix,
-            'meta'    : meta_form,
-            'form'    : form 
-          })
+          ))
         
         # Create the form that contains metadata for this formset
         submeta = RegistrySetMetaForm(
@@ -341,13 +407,13 @@ def prepare_forms(context):
           raise exceptions.SuspiciousOperation
         
         # TODO implement 'assign' action (its order is not relevant)
-        item_actions = context.actions.get(context.base_prefix, []) + context.actions.get(cls_meta.registry_id, [])
+        context.item_actions = context.actions.get(context.base_prefix, []) + context.actions.get(cls_meta.registry_id, [])
         meta_modified = False
         
         # Generate the right amount of forms
         for index in xrange(submeta.cleaned_data['form_count']):
           form_prefix = context.base_prefix + '_mu_' + str(index)
-          form, meta_form = generate_form_for_class(
+          context.subforms.append(generate_form_for_class(
             context,
             form_prefix,
             context.data,
@@ -356,16 +422,10 @@ def prepare_forms(context):
             partial = context.partial_config,
             current_config = context.current_config,
             force_selector_widget = context.force_selector_widget
-          )
-          
-          context.subforms.append({
-            'prefix'  : form_prefix,
-            'meta'    : meta_form,
-            'form'    : form 
-          })
+          ))
         
         # Check for any actions and execute them
-        for action in item_actions:
+        for action in context.item_actions:
           action.context = context
           if action.modify_forms_after():
             meta_modified = True
@@ -389,7 +449,7 @@ def prepare_forms(context):
         mdl = None
       
       form_prefix = context.base_prefix + '_mu_0'
-      form, meta_form = generate_form_for_class(
+      context.subforms.append(generate_form_for_class(
         context,
         form_prefix,
         context.data,
@@ -398,14 +458,9 @@ def prepare_forms(context):
         validate = context.save or context.only_rules,
         partial = context.partial_config,
         current_config = context.current_config
-      )
+      ))
       
       submeta = None
-      context.subforms.append({
-        'prefix'  : form_prefix,
-        'meta'    : meta_form,
-        'form'    : form
-      })
     
     forms.append({
       'name'        : cls_meta.registry_section,
