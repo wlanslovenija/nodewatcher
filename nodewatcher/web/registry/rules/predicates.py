@@ -2,6 +2,7 @@ import hashlib
 import inspect
 
 from registry import access as registry_access
+from registry import forms as registry_forms
 from registry.rules.engine import *
 from registry.cgm import base as cgm_base 
 
@@ -66,7 +67,7 @@ def assign(location, index = 0, **kwargs):
     except (KeyError, IndexError):
       pass
     
-    context.results.setdefault(location, []).append(('assign', index, kwargs))
+    context.results.setdefault(location, []).append(registry_forms.AssignToFormAction(index, kwargs))
   
   return Action(action_assign)
 
@@ -85,7 +86,7 @@ def clear_config(location):
       raise EvaluationError("Registry location '{0}' is invalid!".format(location))
     
     context.partial_config[location] = []
-    context.results.setdefault(location, []).append(('clear_config',))
+    context.results.setdefault(location, []).append(registry_forms.ClearFormsAction())
   
   return Action(action_clear_config)
 
@@ -125,7 +126,7 @@ def append(location, **kwargs):
     except KeyError:
       pass
     
-    context.results.setdefault(location, []).append(('append', cls, kwargs))
+    context.results.setdefault(location, []).append(registry_forms.AppendFormAction(cls, kwargs))
   
   return Action(action_append)
 
