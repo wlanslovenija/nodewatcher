@@ -2,26 +2,30 @@ import collections
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.utils import datastructures
+from django.utils import datastructures as django_datastructures
 
 from registry import state as registry_state
 from registry import models as registry_models
 from registry import lookup as registry_lookup
-from registry import access as registry_access 
+from registry import access as registry_access
+from web.utils import datastructures as nw_datastructures
 
 bases = registry_state.bases
 
 class LazyChoiceList(collections.Sequence):
   def __init__(self):
     super(LazyChoiceList, self).__init__()
-    self._list = []
-    self._dependent_choices = []
+    self._list = nw_datastructures.OrderedSet()
+    self._dependent_choices = nw_datastructures.OrderedSet()
   
   def __len__(self):
     return len(self._list)
-
+  
+  def __iter__(self):
+    return self._list.__iter__()
+  
   def __getitem__(self, index):
-    return self._list[index]
+    return list(self._list)[index]
   
   def __nonzero__(self):
     return True
@@ -30,11 +34,8 @@ class LazyChoiceList(collections.Sequence):
     return [choice for limited_to, choice in self._dependent_choices if limited_to is None or condition(*limited_to)]
   
   def add_choice(self, choice, limited_to):
-    if any([x == choice[0] for x, _ in self._list]):
-      return
-    
-    self._list.append(choice)
-    self._dependent_choices.append((limited_to, choice))
+    self._dependent_choices.add((limited_to, choice))
+    self._list.add(choice)
 
 class RegistrationPoint(object):
   """
@@ -49,7 +50,7 @@ class RegistrationPoint(object):
     self.namespace = namespace
     self.name = "%s.%s" % (model._meta.module_name, namespace)
     self.item_registry = {}
-    self.item_list = datastructures.SortedDict()
+    self.item_list = django_datastructures.SortedDict()
     self.item_classes = {}
     self.choices_registry = {}
     self.flat_lookup_proxies = {}
@@ -80,7 +81,7 @@ class RegistrationPoint(object):
       {}
     )
     item_dict[item._meta.module_name] = item
-    self.item_list = datastructures.SortedDict(sorted(items.items(), key = lambda x: x[0]))
+    self.item_list = django_datastructures.SortedDict(sorted(items.items(), key = lambda x: x[0]))
     
     # Only record the top-level item in the registry as there could be multiple
     # specializations that define their own limits
