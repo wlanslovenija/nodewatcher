@@ -42,7 +42,7 @@ class EthernetInterfaceConfig(CgmInterfaceConfig):
   """
   An ethernet interface.
   """
-  port = registry_fields.SelectorKeyField("node.config", "core.interfaces#ethernet_port")
+  eth_port = registry_fields.SelectorKeyField("node.config", "core.interfaces#eth_port")
   
   class RegistryMeta(CgmInterfaceConfig.RegistryMeta):
     registry_name = _("Ethernet Interface")
@@ -53,6 +53,10 @@ class WifiInterfaceConfig(CgmInterfaceConfig):
   """
   A wireless interface.
   """
+  protocol = models.CharField(max_length = 50) # TODO should be a registered choice (router-dep)
+  channel = models.IntegerField(default = 8) # TODO should be a registered choice (proto-dep)
+  bitrate = models.IntegerField(default = 11) # TODO should be a registered choice (proto-dep)
+  
   class RegistryMeta(CgmInterfaceConfig.RegistryMeta):
     registry_name = _("Wireless Radio")
 
@@ -102,3 +106,19 @@ class PPPoENetworkConfig(CgmNetworkConfig):
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
 class WifiNetworkConfig(CgmNetworkConfig):
+  """
+  Configuration for a WiFi network.
+  """
+  role = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#role")
+  essid = models.CharField(max_length = 50)
+  bssid = models.CharField(max_length = 50) # TODO should be a validated mac address
+  
+  class RegistryMeta(CgmNetworkConfig.RegistryMeta):
+    registry_name = _("WiFi Network")
+
+registration.point("node.config").register_choice("core.interfaces.network#role", "mesh", _("Mesh"))
+registration.point("node.config").register_choice("core.interfaces.network#role", "endusers", _("Endusers"))
+registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-ap", _("Backbone-AP"))
+registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-sta", _("Backbone-STA"))
+registration.point("node.config").register_subitem(WifiInterfaceConfig, WifiNetworkConfig)
+

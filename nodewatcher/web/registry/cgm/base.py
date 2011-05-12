@@ -14,6 +14,7 @@ class RouterModel(object):
     'name',
     'architecture',
     'supported_radios',
+    'supported_ports',
   )
   
   def __init__(self, **kwargs):
@@ -131,6 +132,12 @@ class PlatformBase(object):
     registration.point("node.config").register_choice("core.general#model", model, properties['name'],
       limited_to = ("core.general#platform", self.platform_name)
     )
+    
+    # Register a new choice for available router ports
+    for port_id, port_name in properties['supported_ports']:
+      registration.point("node.config").register_choice("core.interfaces#eth_port", port_id, port_name,
+        limited_to = ("core.general#model", model)
+      )
   
   def get_router_model(self, model):
     """
