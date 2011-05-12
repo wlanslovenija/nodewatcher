@@ -86,7 +86,6 @@ class AppendFormAction(RegistryFormAction):
       len(self.context.subforms),
       instance = mdl,
       validate = True,
-      current_config = self.context.current_config,
       force_selector_widget = self.context.force_selector_widget
     ))
     
@@ -192,7 +191,7 @@ class RegistrySetMetaForm(forms.Form):
   )
 
 def generate_form_for_class(context, prefix, data, index, instance = None, validate = False, partial = None,
-                            current_config = None, force_selector_widget = False):
+                            force_selector_widget = False):
   """
   A helper function for generating a form for a specific registry item class.
   """
@@ -235,6 +234,12 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   # When there is no instance, we should create one so we will be able to save somewhere
   if validate and partial is None and instance is None:
     instance = selected_item(root = context.root)
+    if context.hierarchy_parent_cls is not None:
+      setattr(
+        instance,
+        selected_item._registry_parents[context.hierarchy_parent_cls].name,
+        context.hierarchy_parent_obj
+      )
   
   # Now generate a form for the selected item
   form_prefix = prefix + '_' + selected_item._meta.module_name
@@ -248,12 +253,13 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     if not hasattr(obj, 'modify_to_context'):
       return
     
-    if current_config is not None:
+    if context.current_config is not None:
       try:
-        item = current_config[selected_item.RegistryMeta.registry_id][index]
-      except IndexError:
+        # TODO how to reference these things in hierarchy?? index is invalid then :P
+        item = context.current_config[selected_item.RegistryMeta.registry_id][index]
+      except (IndexError, KeyError):
         item = instance
-      cfg = current_config
+      cfg = context.current_config
     else:
       item = instance
       cfg = context.regpoint.get_accessor(context.root).to_partial()
@@ -268,6 +274,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     for name, field in form.fields.iteritems():
       modify_to_context(field)
   
+  config = None
   if validate:
     if partial is None:
       # Perform a full validation and save the form
@@ -282,6 +289,23 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       form._errors = {}
       form._clean_fields()
       config = selected_item()
+      config._registry_virtual_model = True
+      if context.hierarchy_parent_partial is not None:
+        setattr(
+          config,
+          selected_item._registry_parents[context.hierarchy_parent_cls].name,
+          context.hierarchy_parent_partial
+        )
+        
+        # Create a virtual reverse relation in the parent object
+        virtual_relation = getattr(context.hierarchy_parent_partial, '_registry_virtual_relation', {})
+        desc = getattr(
+          context.hierarchy_parent_partial.__class__,
+          selected_item._registry_parents[context.hierarchy_parent_cls].rel.related_name
+        )
+        virtual_relation.setdefault(desc, []).append(config)
+        context.hierarchy_parent_partial._registry_virtual_relation = virtual_relation
+      
       partial.setdefault(selected_item.RegistryMeta.registry_id, []).append(config)
       
       for field, value in form.cleaned_data.iteritems():
@@ -293,7 +317,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   )
   
   # Pack forms into a proper abstract representation
-  if hasattr(selected_item, '_has_registry_subitems'):
+  if hasattr(selected_item, '_registry_has_children'):
     sub_context = RegistryFormContext(
       regpoint = context.regpoint,
       root = context.root,
@@ -305,11 +329,17 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       current_config = context.current_config,
       partial_config = context.partial_config,
       hierarchy_prefix = form_prefix,
+      hierarchy_parent_cls = selected_item,
+      hierarchy_parent_obj = instance,
+      hierarchy_parent_partial = config,
       validation_errors = False
     )
     
-    raise NotImplementedError
-    #forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context))
+    forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context))
+    
+    # Validation errors flag must propagate upwards
+    if sub_context.validation_errors:
+      context.validation_errors = True
   else:
     forms = BasicRegistryRenderItem(form, meta_form)
   
@@ -330,6 +360,9 @@ class RegistryFormContext(object):
   partial_config = None
   validation_errors = False
   subforms = None
+  hierarchy_parent_cls = None
+  hierarchy_parent_obj = None
+  hierarchy_parent_partial = None
   hierarchy_prefix = None
   base_prefix = None
   default_item_cls = None
@@ -352,6 +385,10 @@ def prepare_forms(context):
     context.items = copy.deepcopy(items)
     item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
+    
+    # Skip items that are not child items
+    if context.hierarchy_parent_cls not in getattr(item_cls, '_registry_parents', [None]):
+      continue
 
     if context.hierarchy_prefix is not None:
       context.base_prefix = context.hierarchy_prefix + '_' + cls_meta.registry_id.replace('.', '_')
@@ -371,6 +408,15 @@ def prepare_forms(context):
       if not context.items:
         continue
     
+    # Remove all items that should not be available for this parent
+    if context.hierarchy_parent_cls is not None:
+      for key, value in context.items.items():
+        if value not in context.hierarchy_parent_cls._registry_allowed_children:
+          del context.items[key]
+      
+      if not context.items:
+        continue
+    
     context.default_item_cls = context.items.values()[0]
     
     if getattr(cls_meta, 'multiple', False):
@@ -378,15 +424,22 @@ def prepare_forms(context):
       if not context.save and not context.only_rules:
         # We are generating forms for first-time display purpuses, only include forms for
         # existing models
-        for index, mdl in enumerate(context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)):
+        if context.hierarchy_parent_cls is not None:
+          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+          existing_models = existing_models.filter(
+            **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+          )
+        else:
+          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
+        
+        for index, mdl in enumerate(existing_models):
           form_prefix = context.base_prefix + '_mu_' + str(index)
           context.subforms.append(generate_form_for_class(
             context,
             form_prefix,
             None,
             index,
-            instance = mdl,
-            current_config = context.current_config,
+            instance = mdl.cast(),
             force_selector_widget = context.force_selector_widget
           ))
         
@@ -398,20 +451,34 @@ def prepare_forms(context):
         )
       else:
         # We are saving or preparing to evaluate rules, so we regenerate all items
-        context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True).delete()
+        if context.hierarchy_parent_cls is not None:
+          qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+          qs = qs.filter(
+            **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+          )
+          qs.delete()
+        else:
+          context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True).delete()
+        
         submeta = RegistrySetMetaForm(
           context.data,
           prefix = context.base_prefix + '_sm'
         )
-        if not submeta.is_valid():
-          raise exceptions.SuspiciousOperation
+        form_count = 0
+        if submeta.is_valid():
+          form_count = submeta.cleaned_data['form_count']
+        else:
+          submeta = RegistrySetMetaForm(
+            prefix = context.base_prefix + '_sm',
+            initial = { 'form_count' : 0 }
+          )
         
         # TODO implement 'assign' action (its order is not relevant)
         context.item_actions = context.actions.get(context.base_prefix, []) + context.actions.get(cls_meta.registry_id, [])
         meta_modified = False
         
         # Generate the right amount of forms
-        for index in xrange(submeta.cleaned_data['form_count']):
+        for index in xrange(form_count):
           form_prefix = context.base_prefix + '_mu_' + str(index)
           context.subforms.append(generate_form_for_class(
             context,
@@ -420,7 +487,6 @@ def prepare_forms(context):
             index,
             validate = True,
             partial = context.partial_config,
-            current_config = context.current_config,
             force_selector_widget = context.force_selector_widget
           ))
         
@@ -439,13 +505,22 @@ def prepare_forms(context):
           submeta = RegistrySetMetaForm(
             prefix = context.base_prefix + '_sm',
             initial = { 'form_count' : len(context.subforms) }
-          ) 
+          )
     else:
       # This item class only supports a single object to be selected
+      qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+      if context.hierarchy_parent_cls is not None:
+        qs = qs.filter(
+          **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+        )
+      
       if not context.save and not context.only_rules:
-        mdl = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
+        try:
+          mdl = qs.all()[0].cast()
+        except IndexError:
+          mdl = None
       else:
-        context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True).delete()
+        qs.delete()
         mdl = None
       
       form_prefix = context.base_prefix + '_mu_0'
@@ -456,8 +531,7 @@ def prepare_forms(context):
         0,
         instance = mdl,
         validate = context.save or context.only_rules,
-        partial = context.partial_config,
-        current_config = context.current_config
+        partial = context.partial_config
       ))
       
       submeta = None

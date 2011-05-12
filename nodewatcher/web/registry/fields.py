@@ -47,3 +47,31 @@ class ModelSelectorKeyField(models.ForeignKey):
     defaults.update(kwargs) 
     return super(ModelSelectorKeyField, self).formfield(**defaults)
 
+class IntraRegistryRelatedObjectDescriptor(models.fields.related.ForeignRelatedObjectsDescriptor):
+  """
+  """
+  def __init__(self, *args, **kwargs):
+    super(IntraRegistryRelatedObjectDescriptor, self).__init__(*args, **kwargs)
+  
+  def __get__(self, instance, instance_type = None):
+    if not hasattr(instance, '_registry_virtual_model'):
+      return super(IntraRegistryRelatedObjectDescriptor, self).__get__(instance, instance_type)
+    elif instance is None:
+      return self
+    else:
+      return getattr(instance, '_registry_virtual_relation', {}).get(self, [])
+  
+  def __set__(self, instance, value):
+    if not hasattr(instance, '_registry_virtual_model'):
+      super(IntraRegistryRelatedObjectDescriptor, self).__set__(instance, value)
+    else:
+      instance._registry_virtual_relation[self] = value
+
+class IntraRegistryForeignKey(models.ForeignKey):
+  def __init__(self, *args, **kwargs):
+    super(IntraRegistryForeignKey, self).__init__(*args, **kwargs)
+  
+  def contribute_to_related_class(self, cls, related):
+    super(IntraRegistryForeignKey, self).contribute_to_related_class(cls, related)
+    setattr(cls, related.get_accessor_name(), IntraRegistryRelatedObjectDescriptor(related))
+

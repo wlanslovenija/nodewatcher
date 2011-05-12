@@ -30,7 +30,7 @@ class LazyChoiceList(collections.Sequence):
     return [choice for limited_to, choice in self._dependent_choices if limited_to is None or condition(*limited_to)]
   
   def add_choice(self, choice, limited_to):
-    if any([x == enum for x, _ in self._list]):
+    if any([x == choice[0] for x, _ in self._list]):
       return
     
     self._list.append(choice)
@@ -55,9 +55,10 @@ class RegistrationPoint(object):
     self.flat_lookup_proxies = {}
     self.validation_hooks = []
   
-  def register_item(self, item):
+  def _register_item(self, item):
     """
-    Registers a new item to this registration point.
+    Common functions for registering an item for both simple items and hierarchical
+    ones.
     """
     if not issubclass(item, self.item_base):
       raise TypeError("Not a valid registry item class!")
@@ -68,7 +69,7 @@ class RegistrationPoint(object):
     
     # Avoid registering the same class multiple times
     if item in self.item_classes:
-      return
+      return False
     else:
       self.item_classes[item] = True
     
@@ -93,6 +94,18 @@ class RegistrationPoint(object):
       
       self.item_registry[registry_id] = item
     
+    # Include registration point in item class
+    item._registry_regpoint = self
+    
+    return True
+  
+  def register_item(self, item):
+    """
+    Registers a new item to this registration point.
+    """
+    if not self._register_item(item):
+      return
+    
     # Register proxy fields for performing registry lookups
     lookup_proxies = getattr(item.RegistryMeta, 'lookup_proxies', None)
     if lookup_proxies is not None:
@@ -111,9 +124,34 @@ class RegistrationPoint(object):
             continue
           
           self.flat_lookup_proxies[dst_field] = item, src_field
+  
+  def register_subitem(self, parent, child):
+    """
+    Registers a registry item in a hierarchical relationship.
+    """
+    from registry import fields as registry_fields
     
-    # Include registration point in item class
-    item._registry_regpoint = self
+    # Verify parent registration
+    if parent not in self.item_classes:
+      raise ImproperlyConfigured("Parent class '{0}' is not yet registered!".format(parent._meta.object_name))
+    
+    self._register_item(child)
+    
+    # Augment the item with hierarchy information, discover foreign keys
+    for field in child._meta.fields:
+      if isinstance(field, registry_fields.IntraRegistryForeignKey) and issubclass(parent, field.rel.to):
+        parent._registry_has_children = True
+        parent._registry_allowed_children = parent.__dict__.get('_registry_allowed_children', set())
+        parent._registry_allowed_children.add(child)
+        
+        if hasattr(child, '_registry_parents'):
+          child._registry_parents[parent] = field
+        else:
+          child._registry_parents = { parent : field }
+        
+        break
+    else:
+      raise ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
   
   def get_top_level_queryset(self, root, registry_id):
     """
