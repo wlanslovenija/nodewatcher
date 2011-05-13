@@ -249,21 +249,28 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     prefix = form_prefix
   )
   
+  # Discover the current item model in the partially validated config hierarchy
+  current_config_item = None
+  if context.current_config is not None:
+    try:
+      if context.hierarchy_parent_current is not None:
+        item = getattr(
+          context.hierarchy_parent_current,
+          selected_item._registry_parents[context.hierarchy_parent_cls].rel.related_name
+        )[index]
+      else:
+        current_config_item = context.current_config[selected_item.RegistryMeta.registry_id][index]
+    except (IndexError, KeyError):
+      current_config_item = None
+  else:
+    current_config_item = None
+  
   def modify_to_context(obj):
     if not hasattr(obj, 'modify_to_context'):
       return
     
-    if context.current_config is not None:
-      try:
-        # TODO how to reference these things in hierarchy?? index is invalid then :P
-        item = context.current_config[selected_item.RegistryMeta.registry_id][index]
-      except (IndexError, KeyError):
-        item = instance
-      cfg = context.current_config
-    else:
-      item = instance
-      cfg = context.regpoint.get_accessor(context.root).to_partial()
-    
+    item = current_config_item or instance
+    cfg = context.current_config or context.regpoint.get_accessor(context.root).to_partial()
     obj.modify_to_context(item, cfg)
   
   if partial is None:
@@ -337,6 +344,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       hierarchy_parent_cls = selected_item,
       hierarchy_parent_obj = instance,
       hierarchy_parent_partial = config,
+      hierarchy_parent_current = current_config_item,
       validation_errors = False
     )
     
@@ -368,6 +376,7 @@ class RegistryFormContext(object):
   hierarchy_parent_cls = None
   hierarchy_parent_obj = None
   hierarchy_parent_partial = None
+  hierarchy_parent_current = None
   hierarchy_prefix = None
   base_prefix = None
   default_item_cls = None
