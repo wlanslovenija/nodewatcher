@@ -13,7 +13,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   """
   project = registry_fields.ModelSelectorKeyField("nodes.Project")
   platform = registry_fields.SelectorKeyField("node.config", "core.general#platform")
-  model = registry_fields.SelectorKeyField("node.config", "core.general#model")
+  router = registry_fields.SelectorKeyField("node.config", "core.general#router")
   version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
   timezone = models.CharField(max_length = 30)
   

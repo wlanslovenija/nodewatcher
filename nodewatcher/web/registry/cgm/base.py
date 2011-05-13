@@ -27,7 +27,7 @@ class PlatformBase(object):
     """
     self._modules = []
     self._packages = []
-    self._router_models = {}
+    self._routers = {}
   
   def generate(self, node):
     """
@@ -36,8 +36,8 @@ class PlatformBase(object):
     cfg = self.config_class()
     
     # Execute the module chain in order
-    for _, module, router_model in sorted(self._modules):
-      if router_model is None or router_model == node.config.core.general().model:
+    for _, module, router in sorted(self._modules):
+      if router is None or router == node.config.core.general().router:
         module(node, cfg)
     
     # Process packages
@@ -63,18 +63,18 @@ class PlatformBase(object):
     #      get routed to the workers for generating graphs!
     pass
   
-  def register_module(self, order, module, router_model = None):
+  def register_module(self, order, module, router = None):
     """
     Registers a new platform module.
     
     @param order: Call order
     @param module: Module implementation function
-    @param router_model: Optional router model
+    @param router: Optional router identifier
     """
     if [x for x in self._modules if x[1] == module]:
       return
     
-    self._modules.append((order, module, router_model))
+    self._modules.append((order, module, router))
   
   def register_package(self, name, config, package):
     """
@@ -89,25 +89,25 @@ class PlatformBase(object):
     
     self._packages.append((name, config, package))
   
-  def register_router_model(self, model):
+  def register_router(self, router):
     """
-    Registers a new router model.
+    Registers a new router with this platform.
     
-    @param model: A subclass of RouterModelBase
+    @param router: A subclass of RouterBase
     """
-    if not issubclass(model, cgm_routers.RouterModelBase):
-      raise TypeError("Model descriptor must be a subclass of RouterModelBase!")
+    if not issubclass(router, cgm_routers.RouterBase):
+      raise TypeError("Router descriptor must be a subclass of RouterBase!")
     
-    self._router_models[model.identifier] = model
-    model.register(self)
+    self._routers[router.identifier] = router
+    router.register(self)
   
-  def get_router_model(self, model):
+  def get_router(self, router):
     """
-    Returns a router model descriptor.
+    Returns a router descriptor.
     
-    @param model: Unique model identifier
+    @param router: Unique router identifier
     """
-    return self._router_models[model]
+    return self._routers[router]
 
 def register_platform(enum, text, platform):
   """
@@ -135,12 +135,12 @@ def get_platform(platform):
   except KeyError:
     raise KeyError, "Platform '{0}' does not exist!".format(platform)
 
-def register_platform_module(platform, order, router_model = None):
+def register_platform_module(platform, order, router = None):
   """
   Registers a new platform module.
   """
   def wrapper(f):
-    get_platform(platform).register_module(order, f, router_model = router_model)
+    get_platform(platform).register_module(order, f, router = router)
     return f
   
   return wrapper
@@ -155,9 +155,9 @@ def register_platform_package(platform, name, cfgclass):
   
   return wrapper
 
-def register_router_model(platform, model):
+def register_router(platform, router):
   """
-  Registers a new router model.
+  Registers a new router.
   """
-  get_platform(platform).register_router_model(model)
+  get_platform(platform).register_router(router)
 

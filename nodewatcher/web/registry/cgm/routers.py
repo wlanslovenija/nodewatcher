@@ -53,15 +53,15 @@ REQUIRED_ROUTER_ATTRIBUTES = set([
   'ports',
 ])
 
-class RouterModelMeta(type):
+class RouterMeta(type):
   """
-  Type for router models.
+  Type for router descriptors.
   """
   def __new__(cls, name, bases, attrs):
     """
-    Creates a new RouterModelBase class.
+    Creates a new RouterBase class.
     """
-    if name != 'RouterModelBase':
+    if name != 'RouterBase':
       # Validate the presence of all attributes
       required_attrs = copy.deepcopy(REQUIRED_ROUTER_ATTRIBUTES)
       for attr in attrs:
@@ -91,11 +91,11 @@ class RouterModelMeta(type):
     
     return type.__new__(cls, name, bases, attrs)
 
-class RouterModelBase(object):
+class RouterBase(object):
   """
   An abstract router hardware descriptor.
   """
-  __metaclass__ = RouterModelMeta
+  __metaclass__ = RouterMeta
   
   @classmethod
   def register(cls, platform):
@@ -103,20 +103,20 @@ class RouterModelBase(object):
     Performs router model registration.
     """
     # Register a new choice in the configuration registry
-    registration.point("node.config").register_choice("core.general#model", cls.identifier, cls.name,
+    registration.point("node.config").register_choice("core.general#router", cls.identifier, cls.name,
       limited_to = ("core.general#platform", platform.name)
     )
     
     # Register a new choice for available router ports
     for port in cls.ports:
       registration.point("node.config").register_choice("core.interfaces#eth_port", port.identifier, port.description,
-        limited_to = ("core.general#model", cls.identifier)
+        limited_to = ("core.general#router", cls.identifier)
       )
     
     # Register a new choice for available router radios
     for radio in cls.radios:
       registration.point("node.config").register_choice("core.interfaces#wifi_radio", radio.identifier, radio.description,
-        limited_to = ("core.general#model", cls.identifier)
+        limited_to = ("core.general#router", cls.identifier)
       )
   
   def __init__(self):

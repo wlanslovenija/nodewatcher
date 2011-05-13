@@ -10,7 +10,7 @@ from registry.cgm import base as cgm_base
 __all__ = [
   'rule',
   'value',
-  'router_model',
+  'router_descriptor',
   'count',
   'changed',
   'assign',
@@ -141,18 +141,18 @@ def count(value):
   
   return LazyValue(lambda context: len(value(context)))
 
-def router_model(platform, model):
+def router_descriptor(platform, router):
   """
-  Lazy value that returns the router model descriptor for the specified
+  Lazy value that returns the router descriptor for the specified
   router.
   
   @param platform: Location of a platform identifier
-  @param model: Location of a model identifier
+  @param router: Location of a router identifier
   """
   class LazyRouterModel(LazyObject):
     def __init__(self, platform, model):
       self.__dict__['platform'] = platform
-      self.__dict__['model'] = model
+      self.__dict__['router'] = model
     
     def __call__(self, context):
       pass
@@ -160,16 +160,16 @@ def router_model(platform, model):
     def __getattr__(self, key):
       def resolve_attribute(context):
         try:
-          return getattr(cgm_base.get_platform(value(self.platform)(context)).get_router_model(value(self.model)(context)), key, None)
+          return getattr(cgm_base.get_platform(value(self.platform)(context)).get_router(value(self.router)(context)), key, None)
         except KeyError:
           return None
       
-      return LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.model).hexdigest() + '-' + key)
+      return LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.router).hexdigest() + '-' + key)
     
     def __setattr__(self, key, value):
       raise AttributeError
   
-  return LazyRouterModel(platform, model)
+  return LazyRouterModel(platform, router)
 
 def value(location):
   """
