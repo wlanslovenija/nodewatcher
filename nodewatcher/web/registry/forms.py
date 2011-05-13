@@ -279,7 +279,12 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     if partial is None:
       # Perform a full validation and save the form
       if form.is_valid():
-        form.save()
+        # Avoid an integrity error when the parent model has failed validation and had not
+        # been saved; when this happens the parent does not have an id and saving a child will fail
+        if context.hierarchy_parent_obj is not None and not context.hierarchy_parent_obj.pk:
+          context.validation_errors = True
+        else:
+          form.save()
       else:
         context.validation_errors = True
     else:
