@@ -1,42 +1,11 @@
 from registry import registration
+from registry.cgm import routers as cgm_routers
 
 # Registered platform modules
 PLATFORM_REGISTRY = {}
 
 class ValidationError(Exception):
   pass
-
-class RouterModel(object):
-  """
-  A class that contains router model metadata.
-  """
-  FIELDS = (
-    'name',
-    'architecture',
-    'supported_radios',
-    'supported_ports',
-  )
-  
-  def __init__(self, **kwargs):
-    """
-    Class constructor.
-    """
-    required = set(self.FIELDS)
-    for key, value in kwargs.iteritems():
-      setattr(self, key, value)
-      required.remove(key)
-    
-    if len(required):
-      raise AttributeError("The following fields are required: {0}".format(",".join(required)))
-  
-  def __setattr__(self, key, value):
-    """
-    Only allow setting already defined attributes.
-    """
-    if key not in self.FIELDS:
-      raise AttributeError("Field '{0}' is not a valid router model attribute!".format(key))
-    
-    object.__setattr__(self, key, value)
 
 class PlatformConfiguration(object):
   """
@@ -120,24 +89,17 @@ class PlatformBase(object):
     
     self._packages.append((name, config, package))
   
-  def register_router_model(self, model, **properties):
+  def register_router_model(self, model):
     """
     Registers a new router model.
     
-    @param model: Unique model identifier
+    @param model: A subclass of RouterModelBase
     """
-    self._router_models[model] = RouterModel(**properties)
+    if not issubclass(model, cgm_routers.RouterModelBase):
+      raise TypeError("Model descriptor must be a subclass of RouterModelBase!")
     
-    # Register a new choice in the configuration registry
-    registration.point("node.config").register_choice("core.general#model", model, properties['name'],
-      limited_to = ("core.general#platform", self.platform_name)
-    )
-    
-    # Register a new choice for available router ports
-    for port_id, port_name in properties['supported_ports']:
-      registration.point("node.config").register_choice("core.interfaces#eth_port", port_id, port_name,
-        limited_to = ("core.general#model", model)
-      )
+    self._router_models[model.identifier] = model
+    model.register(self)
   
   def get_router_model(self, model):
     """
@@ -159,7 +121,7 @@ def register_platform(enum, text, platform):
     raise ValueError, "Platform '{0}' is already registered!".format(enum)
   
   PLATFORM_REGISTRY[enum] = platform
-  platform.platform_name = enum
+  platform.name = enum
   
   # Register the choice in configuration registry
   registration.point("node.config").register_choice("core.general#platform", enum, text)
@@ -193,9 +155,9 @@ def register_platform_package(platform, name, cfgclass):
   
   return wrapper
 
-def register_router_model(platform, model, **properties):
+def register_router_model(platform, model):
   """
   Registers a new router model.
   """
-  get_platform(platform).register_router_model(model, **properties)
+  get_platform(platform).register_router_model(model)
 

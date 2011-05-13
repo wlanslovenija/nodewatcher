@@ -53,6 +53,7 @@ class WifiInterfaceConfig(CgmInterfaceConfig):
   """
   A wireless interface.
   """
+  wifi_radio = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_radio")
   protocol = models.CharField(max_length = 50) # TODO should be a registered choice (router-dep)
   channel = models.IntegerField(default = 8) # TODO should be a registered choice (proto-dep)
   bitrate = models.IntegerField(default = 11) # TODO should be a registered choice (proto-dep)
