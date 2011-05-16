@@ -14,10 +14,14 @@ class Fonera(cgm_routers.RouterBase):
   ports = [
     cgm_routers.EthernetPort("eth0", "Ethernet0")
   ]
+  
+  @cgm_routers.register_module()
+  def network(node, cfg):
+    """
+    Network configuration CGM for FON-2100.
+    """
+    pass
 
 # Register the FON-2100 router
 cgm_base.register_router("openwrt", Fonera)
-
-# Register all special submodules for this router
-# import core.cgm.openwrt.fon2100.fubar
 

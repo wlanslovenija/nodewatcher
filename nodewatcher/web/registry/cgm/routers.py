@@ -1,4 +1,5 @@
 import copy
+import inspect
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -61,12 +62,22 @@ class RouterMeta(type):
     """
     Creates a new RouterBase class.
     """
+    new_class = type.__new__(cls, name, bases, attrs)
+    
     if name != 'RouterBase':
       # Validate the presence of all attributes
       required_attrs = copy.deepcopy(REQUIRED_ROUTER_ATTRIBUTES)
       for attr in attrs:
         if attr.startswith('_'):
           continue
+        
+        if isinstance(attrs[attr], staticmethod):
+          function = getattr(new_class, attr)
+          if not getattr(function, 'cgm_module', False):
+            raise ImproperlyConfigured("Function '{0}' is not marked as a CGM module! Only such functions are allowed in router descriptors!".format(attr))
+          else:
+            continue
+        
         if attr not in required_attrs:
           raise ImproperlyConfigured("Attribute '{0}' is not a valid router model attribute!".format(attr))
         
@@ -89,7 +100,7 @@ class RouterMeta(type):
       if len([x for x in attrs['radios'] if not isinstance(x, RouterRadio)]):
         raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
     
-    return type.__new__(cls, name, bases, attrs)
+    return new_class
 
 class RouterBase(object):
   """
@@ -118,6 +129,15 @@ class RouterBase(object):
       registration.point("node.config").register_choice("core.interfaces#wifi_radio", radio.identifier, radio.description,
         limited_to = ("core.general#router", cls.identifier)
       )
+    
+    # Register CGM methods
+    for _, function in inspect.getmembers(cls, inspect.isfunction):
+      if function.cgm_module_platform is None or function.cgm_module_platform == platform.name:
+        platform.register_module(
+          function.cgm_module_order,
+          function,
+          cls.identifier
+        )
   
   def __init__(self):
     """
@@ -130,4 +150,16 @@ class RouterBase(object):
     Prevent modification of router model descriptors.
     """
     raise AttributeError("Router model descriptors are immutable!")
+
+def register_module(platform = None, order = 1):
+  """
+  Marks a method to be registered as a CGM upon router registration.
+  """
+  def wrapper(f):
+    f.cgm_module = True
+    f.cgm_module_order = order
+    f.cgm_module_platform = platform
+    return staticmethod(f)
+  
+  return wrapper
 
