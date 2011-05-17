@@ -39,7 +39,7 @@ class SelectorKeyField(models.CharField):
       
       slf.choices = BLANK_CHOICE_DASH + slf._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
     
-    field.__class__.modify_to_context = modify_to_context
+    field.modify_to_context = modify_to_context.__get__(field, field.__class__)
     return field
 
 class ModelSelectorKeyField(models.ForeignKey):
