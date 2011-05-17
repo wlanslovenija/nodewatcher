@@ -254,7 +254,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   if context.current_config is not None:
     try:
       if context.hierarchy_parent_current is not None:
-        item = getattr(
+        current_config_item = getattr(
           context.hierarchy_parent_current,
           selected_item._registry_parents[context.hierarchy_parent_cls].rel.related_name
         )[index]
