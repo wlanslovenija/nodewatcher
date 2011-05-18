@@ -6,6 +6,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms import widgets
 from django.forms import fields as form_fields
 from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from registry import registration
@@ -16,12 +17,12 @@ class SelectorFormField(form_fields.TypedChoiceField):
   An augmented TypedChoiceField that gets updated by client-side AJAX on every
   change and can handle dependent choices.
   """
-  def __init__(self, *args, **kwargs):
+  def __init__(self, rp_choices = None, *args, **kwargs):
     """
     Class constructor.
     """
     kwargs['widget'] = widgets.Select(attrs = { 'class' : 'regact_selector' })
-    self._rp_choices = kwargs.get('rp_choices', None)
+    self._rp_choices = rp_choices
     super(SelectorFormField, self).__init__(*args, **kwargs)
   
   def modify_to_context(self, item, cfg):
@@ -33,7 +34,10 @@ class SelectorFormField(form_fields.TypedChoiceField):
     
     def resolve_path(loc):
       path, attribute = loc.split('#')
-      return reduce(getattr, attribute.split('.'), cfg[path][0])
+      try:
+        return reduce(getattr, attribute.split('.'), cfg[path][0])
+      except (KeyError, IndexError):
+        return None
     
     self.choices = BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
 
@@ -48,19 +52,36 @@ class SelectorKeyField(models.CharField):
     Class constructor.
     """
     kwargs['max_length'] = 50
-    self._choices = kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id)
+    self._rp_choices = kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id)
     super(SelectorKeyField, self).__init__(*args, **kwargs)
   
   def formfield(self, **kwargs):
     """
     Returns an augmented form field.
     """
+    # XXX This code duplication from models.Field is due to the annoying Django bug #9245
     defaults = {
-      'form_class' : SelectorFormField,
-      'rp_choices' : self._choices
+      'required' : not self.blank,
+      'label' : capfirst(self.verbose_name),
+      'help_text' : self.help_text,
+      'rp_choices' : self._rp_choices
     }
-    defaults.update(kwargs) 
-    return super(SelectorKeyField, self).formfield(**defaults)
+    
+    if self.has_default():
+      if callable(self.default):
+        defaults['initial'] = self.default
+        defaults['show_hidden_initial'] = True
+      else:
+        defaults['initial'] = self.get_default()
+    
+    include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
+    defaults['choices'] = self.get_choices(include_blank = include_blank)
+    defaults['coerce'] = self.to_python
+    if self.null:
+      defaults['empty_value'] = None
+    
+    defaults.update(kwargs)
+    return SelectorFormField(**defaults) 
 
 class ModelSelectorKeyField(models.ForeignKey):
   """
