@@ -42,13 +42,13 @@ class RegistrationPoint(object):
   Registration point is a state holder for registry operations. There can be
   multiple registration points, each rooted at its own model.
   """
-  def __init__(self, model, namespace):
+  def __init__(self, model, namespace, point_id):
     """
     Class constructor.
     """
     self.model = model
     self.namespace = namespace
-    self.name = "%s.%s" % (model._meta.module_name, namespace)
+    self.name = point_id
     self.item_registry = {}
     self.item_list = django_datastructures.SortedDict()
     self.item_classes = {}
@@ -204,23 +204,25 @@ def create_point(model, namespace):
   @param model: Root model
   @param namespace: Registration point namespace
   """
-  point_id = "%s.%s" % (model._meta.module_name, namespace)
+  # Properly handle deferred root model names
+  try:
+    app_label, model_name = model.split(".")
+  except ValueError:
+    raise ValueError("Deferred root model names must be of the form app_label.model_name!")
+  except AttributeError:
+    app_label = model._meta.app_label
+    model_name = model._meta.object_name
+  
+  point_id = "%s.%s" % (model_name.lower(), namespace)
   if point_id not in registry_state.points:
-    point = RegistrationPoint(model, namespace)
+    point = RegistrationPoint(model, namespace, point_id)
     registry_state.points[point_id] = point
-    
-    # Augment the model with a custom manager and a custom accessor
-    model.add_to_class(namespace, registry_access.RegistryAccessor(point))
-    if not isinstance(model.objects, registry_lookup.RegistryLookupManager):
-      del model.objects
-      model.add_to_class('objects', registry_lookup.RegistryLookupManager(point))
-      model._default_manager = model.objects
     
     # Create a new top-level class
     class Meta(registry_models.RegistryItemBase.Meta):
       abstract = True
     
-    base_name = "{0}{1}RegistryItem".format(model._meta.object_name, namespace.capitalize())
+    base_name = "{0}{1}RegistryItem".format(model_name, namespace.capitalize())
     item_base = type(
       base_name,
       (registry_models.RegistryItemBase,),
@@ -234,6 +236,32 @@ def create_point(model, namespace):
     )
     point.item_base = item_base
     setattr(bases, base_name, item_base)
+    
+    def augment_root_model(model):
+      # Augment the model with a custom manager and a custom accessor
+      model.add_to_class(namespace, registry_access.RegistryAccessor(point))
+      if not isinstance(model.objects, registry_lookup.RegistryLookupManager):
+        del model.objects
+        model.add_to_class('objects', registry_lookup.RegistryLookupManager(point))
+        model._default_manager = model.objects
+    
+    # Try to load the model; if it is already loaded this will work, but if
+    # not, we will need to defer part of object creation
+    model = models.get_model(app_label, model_name, False)
+    if model:
+      augment_root_model(model)
+    else:
+      registry_state.deferred_roots[app_label, model_name] = augment_root_model
+
+def handle_deferred_root(sender, **kwargs):
+  """
+  Finalizes any deferred root registrations.
+  """
+  key = (sender._meta.app_label, sender._meta.object_name)
+  if key in registry_state.deferred_roots:
+    registry_state.deferred_roots.pop(key, lambda x: None)(sender)
+
+models.signals.class_prepared.connect(handle_deferred_root)
 
 def point(name):
   """

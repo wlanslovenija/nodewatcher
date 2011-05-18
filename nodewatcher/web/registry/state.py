@@ -9,3 +9,6 @@ class BaseClassContainer(object):
 
 bases = BaseClassContainer()
 
+# Deferred root registrations
+deferred_roots = {}
+
