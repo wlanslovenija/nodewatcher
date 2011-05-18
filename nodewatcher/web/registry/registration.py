@@ -244,6 +244,9 @@ def create_point(model, namespace):
         del model.objects
         model.add_to_class('objects', registry_lookup.RegistryLookupManager(point))
         model._default_manager = model.objects
+      
+      # Update the model attribute in regpoint instance
+      point.model = model
     
     # Try to load the model; if it is already loaded this will work, but if
     # not, we will need to defer part of object creation
@@ -251,7 +254,7 @@ def create_point(model, namespace):
     if model:
       augment_root_model(model)
     else:
-      registry_state.deferred_roots[app_label, model_name] = augment_root_model
+      registry_state.deferred_roots.setdefault((app_label, model_name), []).append(augment_root_model)
 
 def handle_deferred_root(sender, **kwargs):
   """
@@ -259,7 +262,8 @@ def handle_deferred_root(sender, **kwargs):
   """
   key = (sender._meta.app_label, sender._meta.object_name)
   if key in registry_state.deferred_roots:
-    registry_state.deferred_roots.pop(key, lambda x: None)(sender)
+    for callback in registry_state.deferred_roots.pop(key, []):
+      callback(sender)
 
 models.signals.class_prepared.connect(handle_deferred_root)
 
