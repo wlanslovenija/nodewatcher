@@ -21,3 +21,6 @@ createlang -U postgres plpgsql nodewatcher
 psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/postgis.sql
 psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis_comments.sql
 psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/spatial_ref_sys.sql
+psql -U postgres -d nodewatcher -c "ALTER TABLE geometry_columns OWNER TO nodewatcher;"
+psql -U postgres -d nodewatcher -c "ALTER VIEW geography_columns OWNER TO nodewatcher;"
+psql -U postgres -d nodewatcher -c "ALTER TABLE spatial_ref_sys OWNER TO nodewatcher;"
