@@ -1,13 +1,41 @@
-import types
+import re
 
 from django.core import exceptions
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms import widgets
+from django.forms import fields as form_fields
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from registry import registration
 from registry import models as registry_models
+
+class SelectorFormField(form_fields.TypedChoiceField):
+  """
+  An augmented TypedChoiceField that gets updated by client-side AJAX on every
+  change and can handle dependent choices.
+  """
+  def __init__(self, *args, **kwargs):
+    """
+    Class constructor.
+    """
+    kwargs['widget'] = widgets.Select(attrs = { 'class' : 'regact_selector' })
+    self._rp_choices = kwargs.get('rp_choices', None)
+    super(SelectorFormField, self).__init__(*args, **kwargs)
+  
+  def modify_to_context(self, item, cfg):
+    """
+    Adapts the field to current registry context.
+    """
+    if self._rp_choices is None:
+      return
+    
+    def resolve_path(loc):
+      path, attribute = loc.split('#')
+      return reduce(getattr, attribute.split('.'), cfg[path][0])
+    
+    self.choices = BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
 
 class SelectorKeyField(models.CharField):
   """
@@ -27,20 +55,12 @@ class SelectorKeyField(models.CharField):
     """
     Returns an augmented form field.
     """
-    defaults = { 'widget' : widgets.Select(attrs = { 'class' : 'regact_selector' }) }
+    defaults = {
+      'form_class' : SelectorFormField,
+      'rp_choices' : self._choices
+    }
     defaults.update(kwargs) 
-    field = super(SelectorKeyField, self).formfield(**defaults)
-    field._rp_choices = self._choices
-    
-    def modify_to_context(slf, item, cfg):
-      def resolve_path(loc):
-        path, attribute = loc.split('#')
-        return reduce(getattr, attribute.split('.'), cfg[path][0])
-      
-      slf.choices = BLANK_CHOICE_DASH + slf._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
-    
-    field.modify_to_context = modify_to_context.__get__(field, field.__class__)
-    return field
+    return super(SelectorKeyField, self).formfield(**defaults)
 
 class ModelSelectorKeyField(models.ForeignKey):
   """
@@ -113,4 +133,29 @@ class IntraRegistryForeignKey(models.ForeignKey):
     """
     super(IntraRegistryForeignKey, self).contribute_to_related_class(cls, related)
     setattr(cls, related.get_accessor_name(), IntraRegistryRelatedObjectDescriptor(related))
+
+MAC_RE = r'^([0-9a-fA-F]{2}([:-]?|$)){6}$'
+mac_re = re.compile(MAC_RE)
+
+class MACAddressFormField(form_fields.RegexField):
+  default_error_messages = {
+    'invalid': _(u'Enter a valid MAC address.'),
+  }
+
+  def __init__(self, *args, **kwargs):
+    super(MACAddressFormField, self).__init__(mac_re, *args, **kwargs)
+
+class MACAddressField(models.Field):
+  empty_strings_allowed = False
+  def __init__(self, *args, **kwargs):
+    kwargs['max_length'] = 17
+    super(MACAddressField, self).__init__(*args, **kwargs)
+
+  def get_internal_type(self):
+    return "CharField"
+
+  def formfield(self, **kwargs):
+    defaults = { 'form_class': MACAddressFormField }
+    defaults.update(kwargs)
+    return super(MACAddressField, self).formfield(**defaults)
 
