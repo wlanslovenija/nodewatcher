@@ -17,12 +17,7 @@ from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
-from web.registry import access as registry_access
-from web.registry import lookup as registry_lookup
 from web.registry import registration
-from web.registry import forms as registry_forms
-from web.registry import cgm
-from web.registry.cgm import base as cgm_base
 
 class Project(models.Model):
   """
@@ -640,19 +635,6 @@ class Node(models.Model):
       return "unknown (%s)" % self.ip
 
     return "%s (%s)" % (self.name, self.ip)
-
-registration.create_point(Node, "config")
-registration.create_point(Node, "monitoring")
-
-@registration.register_validation_hook("node.config")
-def node_cgm_validation(node):
-  """
-  Performs validation of node configuration via CGM.
-  """
-  try:
-    cgm.generate_config(node, only_validate = True)
-  except cgm_base.ValidationError, e:
-    raise registry_forms.RegistryValidationError(e.args[0])
 
 class Link(models.Model):
   """

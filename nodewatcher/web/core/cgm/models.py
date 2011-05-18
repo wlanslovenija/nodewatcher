@@ -2,9 +2,31 @@ from django import forms
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from core import models as core_models
 from registry import fields as registry_fields
 from registry import forms as registry_forms
 from registry import registration
+
+from nodes import models as nodes_models
+
+class CgmGeneralConfig(core_models.GeneralConfig):
+  """
+  Extended general configuration that contains CGM-related options.
+  """
+  password = models.CharField(max_length = 30)
+  platform = registry_fields.SelectorKeyField("node.config", "core.general#platform")
+  router = registry_fields.SelectorKeyField("node.config", "core.general#router")
+  version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
+  
+  class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
+    registry_name = _("CGM Configuration")
+
+class CgmGeneralConfigForm(forms.ModelForm):
+  class Meta:
+    model = CgmGeneralConfig
+
+registration.point("node.config").register_item(CgmGeneralConfig)
+registration.register_form_for_item(CgmGeneralConfig, CgmGeneralConfigForm)
 
 class CgmPackageConfig(registration.bases.NodeConfigRegistryItem):
   """
@@ -94,6 +116,54 @@ registration.point("node.config").register_choice("core.interfaces.network#famil
 registration.point("node.config").register_choice("core.interfaces.network#family", "ipv6", _("IPv6"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 
+class AllocatedNetworkConfig(CgmNetworkConfig):
+  """
+  IP configuration that gets allocated from a pool.
+  """
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  pool = registry_fields.ModelSelectorKeyField(nodes_models.Pool, limit_choices_to = { 'parent' : None })
+  cidr = models.IntegerField(default = 27)
+  usage = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#usage")
+  
+  class RegistryMeta(CgmNetworkConfig.RegistryMeta):
+    registry_name = _("Allocated Network")
+
+class AllocatedNetworkConfigForm(forms.ModelForm):
+  """
+  General configuration form.
+  """
+  class Meta:
+    model = AllocatedNetworkConfig
+  
+  def modify_to_context(self, item, cfg):
+    """
+    Dynamically modifies the form.
+    """
+    # Only display pools that are available to the selected project
+    qs = self.fields['pool'].queryset
+    qs = qs.filter(projects = cfg['core.general'][0].project)
+    # TODO pools should use registered family identifiers
+    qs = qs.filter(family = 4 if item.family == "ipv4" else 6)
+    self.fields['pool'].queryset = qs
+    
+    # Only display CIDR range that is available for the selected pool
+    try:
+      pool = item.pool
+      self.fields['cidr'] = registry_fields.SelectorFormField(
+        choices = [(plen, "/%s" % plen) for plen in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)],
+        initial = pool.default_prefix_len,
+        coerce = int,
+        empty_value = None
+      )
+    except nodes_models.Pool.DoesNotExist:
+      self.fields['cidr'] = registry_fields.SelectorFormField()
+
+registration.point("node.config").register_choice("core.interfaces.network#usage", "auto", _("Routing and Clients"))
+registration.point("node.config").register_choice("core.interfaces.network#usage", "routing", _("Routing Loopback"))
+registration.point("node.config").register_choice("core.interfaces.network#usage", "clients", _("Clients"))
+registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
+registration.register_form_for_item(AllocatedNetworkConfig, AllocatedNetworkConfigForm)
+
 class PPPoENetworkConfig(CgmNetworkConfig):
   """
   Configuration for a WAN PPPoE uplink.
@@ -112,7 +182,7 @@ class WifiNetworkConfig(CgmNetworkConfig):
   """
   role = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#role")
   essid = models.CharField(max_length = 50)
-  bssid = models.CharField(max_length = 50) # TODO should be a validated mac address
+  bssid = registry_fields.MACAddressField()
   
   class RegistryMeta(CgmNetworkConfig.RegistryMeta):
     registry_name = _("WiFi Network")
@@ -122,4 +192,31 @@ registration.point("node.config").register_choice("core.interfaces.network#role"
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-ap", _("Backbone-AP"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-sta", _("Backbone-STA"))
 registration.point("node.config").register_subitem(WifiInterfaceConfig, WifiNetworkConfig)
+
+class VpnServerConfig(registration.bases.NodeConfigRegistryItem):
+  """
+  Provides a VPN server specification that the nodes can use.
+  """
+  protocol = registry_fields.SelectorKeyField("node.config", "core.vpn.server#protocol")
+  hostname = models.CharField(max_length = 100)
+  port = models.IntegerField()
+  
+  class RegistryMeta:
+    form_order = 2
+    registry_id = "core.vpn.server"
+    registry_section = _("VPN Servers")
+    registry_name = _("VPN Server")
+    multiple = True
+
+class VpnServerConfigForm(forms.ModelForm):
+  """
+  VPN server configuration form.
+  """
+  port = forms.IntegerField(min_value = 1, max_value = 49151)
+  
+  class Meta:
+    model = VpnServerConfig
+
+registration.point("node.config").register_item(VpnServerConfig)
+registration.register_form_for_item(VpnServerConfig, VpnServerConfigForm)
 
