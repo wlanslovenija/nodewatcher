@@ -11,7 +11,7 @@ def generate_config(node, only_validate = False):
   try:
     platform = cgm_base.get_platform(node.config.core.general().platform)
   except AttributeError:
-    raise cgm_base.ValidationError
+    return None
   
   cfg = platform.generate(node)
   if not only_validate:

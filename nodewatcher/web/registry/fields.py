@@ -36,7 +36,7 @@ class SelectorFormField(form_fields.TypedChoiceField):
       path, attribute = loc.split('#')
       try:
         return reduce(getattr, attribute.split('.'), cfg[path][0])
-      except (KeyError, IndexError):
+      except (KeyError, IndexError, AttributeError):
         return None
     
     self.choices = BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)

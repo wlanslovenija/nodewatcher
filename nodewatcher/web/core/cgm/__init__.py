@@ -19,5 +19,5 @@ def node_cgm_validation(node):
   try:
     cgm.generate_config(node, only_validate = True)
   except cgm_base.ValidationError, e:
-    raise registry_forms.RegistryValidationError(e.args[0])
+    raise registry_forms.RegistryValidationError(*e.args)
 
