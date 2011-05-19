@@ -22,8 +22,12 @@ class SelectorFormField(form_fields.TypedChoiceField):
     Class constructor.
     """
     kwargs['widget'] = widgets.Select(attrs = { 'class' : 'regact_selector' })
-    self._rp_choices = rp_choices
     super(SelectorFormField, self).__init__(*args, **kwargs)
+    
+    # Override choices so we get a lazy list instead of being evaluated right here
+    self._rp_choices = None
+    if rp_choices is not None:
+      self._rp_choices = self._choices = self.widget.choices = rp_choices
   
   def modify_to_context(self, item, cfg):
     """
@@ -59,7 +63,6 @@ class SelectorKeyField(models.CharField):
     """
     Returns an augmented form field.
     """
-    # XXX This code duplication from models.Field is due to the annoying Django bug #9245
     defaults = {
       'required' : not self.blank,
       'label' : capfirst(self.verbose_name),
@@ -75,13 +78,13 @@ class SelectorKeyField(models.CharField):
         defaults['initial'] = self.get_default()
     
     include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
-    defaults['choices'] = self.get_choices(include_blank = include_blank)
+    defaults['choices'] = self._rp_choices
     defaults['coerce'] = self.to_python
     if self.null:
       defaults['empty_value'] = None
     
     defaults.update(kwargs)
-    return SelectorFormField(**defaults) 
+    return SelectorFormField(**defaults)
 
 class ModelSelectorKeyField(models.ForeignKey):
   """
