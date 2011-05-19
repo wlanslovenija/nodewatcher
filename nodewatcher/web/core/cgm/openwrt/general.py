@@ -8,5 +8,5 @@ def general(node, cfg):
   """
   system = cfg.system.add('system')
   system.hostname = node.name
-  system.timezone = node.config.core.general().timezone
+  #system.timezone = node.config.core.general().timezone
 

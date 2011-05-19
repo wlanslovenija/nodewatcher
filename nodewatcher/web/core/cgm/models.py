@@ -2,6 +2,7 @@ from django import forms
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from core import allocation
 from core import models as core_models
 from registry import fields as registry_fields
 from registry import forms as registry_forms
@@ -116,52 +117,27 @@ registration.point("node.config").register_choice("core.interfaces.network#famil
 registration.point("node.config").register_choice("core.interfaces.network#family", "ipv6", _("IPv6"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 
-class AllocatedNetworkConfig(CgmNetworkConfig):
+class AllocatedNetworkConfig(CgmNetworkConfig, allocation.AddressAllocator):
   """
   IP configuration that gets allocated from a pool.
   """
-  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
-  pool = registry_fields.ModelSelectorKeyField(nodes_models.Pool, limit_choices_to = { 'parent' : None })
-  cidr = models.IntegerField(default = 27)
-  usage = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#usage")
-  
   class RegistryMeta(CgmNetworkConfig.RegistryMeta):
     registry_name = _("Allocated Network")
 
-class AllocatedNetworkConfigForm(forms.ModelForm):
+class AllocatedNetworkConfigForm(forms.ModelForm, allocation.AddressAllocatorFormMixin):
   """
   General configuration form.
   """
   class Meta:
     model = AllocatedNetworkConfig
-  
-  def modify_to_context(self, item, cfg):
-    """
-    Dynamically modifies the form.
-    """
-    # Only display pools that are available to the selected project
-    qs = self.fields['pool'].queryset
-    qs = qs.filter(projects = cfg['core.general'][0].project)
-    # TODO pools should use registered family identifiers
-    qs = qs.filter(family = 4 if item.family == "ipv4" else 6)
-    self.fields['pool'].queryset = qs
-    
-    # Only display CIDR range that is available for the selected pool
-    try:
-      pool = item.pool
-      self.fields['cidr'] = registry_fields.SelectorFormField(
-        choices = [(plen, "/%s" % plen) for plen in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)],
-        initial = pool.default_prefix_len,
-        coerce = int,
-        empty_value = None
-      )
-    except nodes_models.Pool.DoesNotExist:
-      self.fields['cidr'] = registry_fields.SelectorFormField()
 
 registration.point("node.config").register_choice("core.interfaces.network#usage", "auto", _("Routing and Clients"))
 registration.point("node.config").register_choice("core.interfaces.network#usage", "routing", _("Routing Loopback"))
 registration.point("node.config").register_choice("core.interfaces.network#usage", "clients", _("Clients"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
+allocation.unregister_allocation_source(core_models.BasicAddressingConfig)
+allocation.register_allocation_source(AllocatedNetworkConfig)
+registration.point("node.config").disable_item_class("core.basic-addressing")
 registration.register_form_for_item(AllocatedNetworkConfig, AllocatedNetworkConfigForm)
 
 class PPPoENetworkConfig(CgmNetworkConfig):

@@ -4,5 +4,8 @@ from registry import registration
 registration.create_point("nodes.Node", "config")
 registration.create_point("nodes.Node", "monitoring")
 
+# Address allocation
+import core.allocation
+
 # Dependencies
 import nodes

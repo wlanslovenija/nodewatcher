@@ -97,6 +97,7 @@ class RegistrationPoint(object):
     
     # Include registration point in item class
     item._registry_regpoint = self
+    item._registry_enabled = True
     
     return True
   
@@ -153,6 +154,18 @@ class RegistrationPoint(object):
         break
     else:
       raise ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
+  
+  def disable_item_class(self, registry_id):
+    """
+    Prevents an item class from being available in configuration options.
+    """
+    self.item_registry[registry_id]._registry_enabled = False
+  
+  def enable_item_class(self, registry_id):
+    """
+    Reenables an item class to be available in configuration options.
+    """
+    self.item_registry[registry_id]._registry_enabled = True
   
   def get_top_level_queryset(self, root, registry_id):
     """

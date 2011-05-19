@@ -400,6 +400,10 @@ def prepare_forms(context):
     item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
     
+    # Skip disabled items
+    if not item_cls._registry_enabled:
+      continue
+    
     # Skip items that are not child items
     if context.hierarchy_parent_cls not in getattr(item_cls, '_registry_parents', [None]):
       continue

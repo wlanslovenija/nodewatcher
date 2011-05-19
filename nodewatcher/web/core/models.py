@@ -3,6 +3,7 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from core import allocation
 from registry import fields as registry_fields
 from registry import forms as registry_forms
 from registry import registration
@@ -34,4 +35,26 @@ class GeneralConfigForm(forms.ModelForm):
 
 registration.point("node.config").register_item(GeneralConfig)
 registration.register_form_for_item(GeneralConfig, GeneralConfigForm)
+
+class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocation.AddressAllocator):
+  """
+  Enables allocation of subnets for the node without the need to define any interfaces.
+  """
+  class RegistryMeta:
+    form_order = 51
+    registry_id = "core.basic-addressing"
+    registry_section = _("Subnet Allocation")
+    registry_name = _("Subnet")
+    multiple = True
+
+class BasicAddressingConfigForm(forms.ModelForm, allocation.AddressAllocatorFormMixin):
+  """
+  General configuration form.
+  """
+  class Meta:
+    model = BasicAddressingConfig
+
+registration.point("node.config").register_item(BasicAddressingConfig)
+registration.register_form_for_item(BasicAddressingConfig, BasicAddressingConfigForm)
+allocation.register_allocation_source(BasicAddressingConfig)
 

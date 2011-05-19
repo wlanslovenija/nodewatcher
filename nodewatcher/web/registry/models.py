@@ -59,6 +59,8 @@ class RegistryItemBase(models.Model):
     mdl = self.content_type.model_class()
     if mdl == self.__class__:
       return self
+    elif mdl is None:
+      raise ImproperlyConfigured("This configuration object ({0}) is of a class that is not available anymore! If you have recently removed any registry modules, convert your database or reinstall them.".format(self.RegistryMeta.registry_id))
     
     return mdl.objects.get(pk = self.pk)
   
