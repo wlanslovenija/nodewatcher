@@ -5,7 +5,9 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.core import validators as core_validators
 from django.conf import settings
-from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType, NodeNames
+
+from web.core.allocation import pool as pool_models
+from web.nodes.models import Project, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, GraphType, NodeNames
 from web.nodes import ipcalc
 from web.nodes.sticker import generate_sticker
 from web.nodes.transitions import validates_node_configuration
@@ -47,7 +49,7 @@ class RegisterNodeForm(forms.Form):
   )
   pool = forms.ModelChoiceField(
     # Cannot use queryset_by_ip as proper queryset is expected
-    Pool.objects.exclude(status = PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
+    pool_models.Pool.objects.exclude(status = pool_models.PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
     empty_label = None,
     label = _("IP pool")
   )
@@ -718,7 +720,7 @@ class AllocateSubnetForm(forms.Form):
     primary_pool = self.__node.get_primary_ip_pool() 
     self.fields['pool'] = forms.ModelChoiceField(
       # Cannot use queryset_by_ip as proper queryset is expected
-      node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
+      node.project.pools.exclude(status = pool_models.PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
       empty_label = None,
       label = _("IP pool"),
       initial = primary_pool.pk if primary_pool else 0
@@ -728,7 +730,7 @@ class AllocateSubnetForm(forms.Form):
     """
     A helper method that returns the IP pools.
     """
-    return queryset_by_ip(self.__node.project.pools.exclude(status = PoolStatus.Full).filter(parent = None), 'ip_subnet', 'description')
+    return queryset_by_ip(self.__node.project.pools.exclude(status = pool_models.PoolStatus.Full).filter(parent = None), 'ip_subnet', 'description')
   
   def clean(self):
     """
@@ -750,7 +752,7 @@ class AllocateSubnetForm(forms.Form):
         raise forms.ValidationError(_("Specified subnet is already in use!"))
 
       # Check if the given subnet is part of any allocation pools (unless it is allocatable)
-      if Pool.contains_network(network, cidr):
+      if pool_models.Pool.contains_network(network, cidr):
         if pool.reserve_subnet(network, cidr, check_only = True):
           self.cleaned_data['reserve'] = True
         else:
@@ -1014,7 +1016,7 @@ class RenumberForm(FormWithWarnings):
     
     for subnet in queryset_by_ip(node.subnet_set.filter(allocated = True), 'ip_subnet'):
       pools = []
-      for pool in queryset_by_ip(node.project.pools.exclude(status = PoolStatus.Full), 'ip_subnet', 'description'):
+      for pool in queryset_by_ip(node.project.pools.exclude(status = pool_models.PoolStatus.Full), 'ip_subnet', 'description'):
         pools.append((pool.pk, _("Renumber to %s [%s/%s]") % (pool.description, pool.network, pool.cidr)))
       
       choices = [
@@ -1042,7 +1044,7 @@ class RenumberForm(FormWithWarnings):
     """
     A helper method that returns all allocations pools.
     """
-    return queryset_by_ip(self.__node.project.pools.exclude(status = PoolStatus.Full), 'ip_subnet', 'description')
+    return queryset_by_ip(self.__node.project.pools.exclude(status = pool_models.PoolStatus.Full), 'ip_subnet', 'description')
   
   def get_subnet_fields(self):
     """
@@ -1072,7 +1074,7 @@ class RenumberForm(FormWithWarnings):
         raise forms.ValidationError(_("Enter a valid IP address or leave the subnet field empty!"))
       
       # Validate pool status
-      pool = Pool.objects.get(pk = action)
+      pool = pool_models.Pool.objects.get(pk = action)
       if not pool.reserve_subnet(manual_ip, prefix_len, check_only = True):
         raise forms.ValidationError(_("Subnet %(subnet)s/%(prefix_len)d cannot be allocated from %(pool)s!") % { 'subnet' : manual_ip, 'prefix_len' : prefix_len, 'pool' : unicode(pool) })
     
@@ -1103,7 +1105,7 @@ class RenumberForm(FormWithWarnings):
         subnet.delete()
       else:
         # This means we should renumber to some other pool
-        pool = Pool.objects.get(pk = action)
+        pool = pool_models.Pool.objects.get(pk = action)
         if manual_ip:
           new_subnet = pool.reserve_subnet(manual_ip, prefix_len)
         else:

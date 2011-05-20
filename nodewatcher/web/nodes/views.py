@@ -16,13 +16,14 @@ from django.utils.translation import ugettext as _
 
 from web.account.models import UserAccount
 from web.account.util import generate_random_password
+from web.core.allocation import pool as pool_models
 from web.generator.models import Profile
 from web.nodes import ipcalc
 from web.nodes import context_processors as nodes_context_processors
 from web.nodes import decorators
 from web.nodes.common import ValidationWarning
 from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
-from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
+from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
 from web.nodes.util import queryset_by_ip
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 
@@ -42,7 +43,7 @@ def pools(request):
   Displays IP allocation pools.
   """
   return render_to_response('nodes/pools.html',
-    { 'pools' : queryset_by_ip(Pool.objects.filter(parent = None), 'ip_subnet') },
+    { 'pools' : queryset_by_ip(pool_models.Pool.objects.filter(parent = None), 'ip_subnet') },
     context_instance = RequestContext(request)
   )
 
@@ -51,7 +52,7 @@ def pools_text(request):
   Displays IP allocation pools as tab separated text values.
   """
   output = []
-  for pool in Pool.objects.filter(parent = None).order_by('id'):
+  for pool in pool_models.Pool.objects.filter(parent = None).order_by('id'):
     output.append("%s\t%s\t%s" % (pool.ip_subnet, pool.family_as_string(), pool.description))
 
   return HttpResponse("\n".join(output), content_type = "text/plain")

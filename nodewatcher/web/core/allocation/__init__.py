@@ -1,7 +1,6 @@
 from django.db import models
 
-# TODO pools should be moved from nodes app to core app
-from nodes import models as nodes_models
+from core.allocation import pool as pool_models
 from registry import fields as registry_fields
 from registry import registration
 
@@ -10,8 +9,7 @@ class AddressAllocator(models.Model):
   An abstract class defining an API for address allocator items.
   """
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
-  # TODO pools should be moved from nodes app to core app
-  pool = registry_fields.ModelSelectorKeyField(nodes_models.Pool, limit_choices_to = { 'parent' : None })
+  pool = registry_fields.ModelSelectorKeyField(pool_models.Pool, limit_choices_to = { 'parent' : None })
   cidr = models.IntegerField(default = 27)
   usage = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#usage")
   
@@ -43,7 +41,7 @@ class AddressAllocatorFormMixin(object):
         coerce = int,
         empty_value = None
       )
-    except nodes_models.Pool.DoesNotExist:
+    except pool_models.Pool.DoesNotExist:
       self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR")
 
 allocation_sources = set()
