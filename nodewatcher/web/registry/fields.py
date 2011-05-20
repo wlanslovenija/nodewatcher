@@ -9,6 +9,8 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
+import south.modelsinspector
+
 from registry import registration
 from registry import models as registry_models
 
@@ -55,6 +57,8 @@ class SelectorKeyField(models.CharField):
     """
     Class constructor.
     """
+    self.regpoint = regpoint
+    self.enum_id = enum_id
     kwargs['max_length'] = 50
     self._rp_choices = kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id)
     super(SelectorKeyField, self).__init__(*args, **kwargs)
@@ -182,4 +186,20 @@ class MACAddressField(models.Field):
     defaults = { 'form_class': MACAddressFormField }
     defaults.update(kwargs)
     return super(MACAddressField, self).formfield(**defaults)
+
+# Add South introspection for our fields
+south.modelsinspector.add_introspection_rules([
+  (
+    [SelectorKeyField],
+    [],
+    {
+      "regpoint" : ["regpoint", {}],
+      "enum_id" : ["enum_id", {}],
+    },
+  ),
+], [r"^.*registry\.fields\.SelectorKeyField$"]
+)
+south.modelsinspector.add_introspection_rules([], [r"^.*registry\.fields\.ModelSelectorKeyField$"])
+south.modelsinspector.add_introspection_rules([], [r"^.*registry\.fields\.IntraRegistryForeignKey$"])
+south.modelsinspector.add_introspection_rules([], [r"^.*registry\.fields\.MACAddressField$"])
 
