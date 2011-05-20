@@ -166,16 +166,29 @@ MAC_RE = r'^([0-9a-fA-F]{2}([:-]?|$)){6}$'
 mac_re = re.compile(MAC_RE)
 
 class MACAddressFormField(form_fields.RegexField):
+  """
+  Form field for MAC/BSSID addresses.
+  """
   default_error_messages = {
     'invalid': _(u'Enter a valid MAC address.'),
   }
 
   def __init__(self, *args, **kwargs):
+    """
+    Class constructor.
+    """
     super(MACAddressFormField, self).__init__(mac_re, *args, **kwargs)
 
 class MACAddressField(models.Field):
+  """
+  Model field for MAC/BSSID addresses.
+  """
   empty_strings_allowed = False
+  
   def __init__(self, *args, **kwargs):
+    """
+    Class constructor.
+    """
     kwargs['max_length'] = 17
     super(MACAddressField, self).__init__(*args, **kwargs)
 
@@ -183,6 +196,9 @@ class MACAddressField(models.Field):
     return "CharField"
 
   def formfield(self, **kwargs):
+    """
+    Returns a MACAddressFormField instance for this model field.
+    """
     defaults = { 'form_class': MACAddressFormField }
     defaults.update(kwargs)
     return super(MACAddressField, self).formfield(**defaults)
