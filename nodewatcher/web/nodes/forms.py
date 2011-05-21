@@ -1,3 +1,6 @@
+from datetime import datetime
+import re
+
 from django import forms
 from django.forms import widgets
 from django.db import transaction, models
@@ -8,7 +11,6 @@ from django.conf import settings
 
 from web.core.allocation import pool as pool_models
 from web.nodes.models import Project, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, GraphType, NodeNames
-from web.nodes import ipcalc
 from web.nodes.sticker import generate_sticker
 from web.nodes.transitions import validates_node_configuration
 from web.nodes.common import FormWithWarnings
@@ -18,8 +20,7 @@ from web.generator.types import IfaceType
 from web.account.util import generate_random_password
 from web.dns.models import Record
 from web.policy.models import TrafficControlClass, Policy, PolicyFamily, PolicyAction
-from datetime import datetime
-import re
+from web.utils import ipcalc
 
 IPV4_ADDR_RE = re.compile(r'^\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b$')
 MAC_ADDR_RE = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')

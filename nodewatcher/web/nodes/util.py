@@ -4,7 +4,7 @@ from django.conf import settings
 
 import south.modelsinspector
 
-from nodes import ipcalc
+from web.utils import ipcalc
 
 # Quote name
 qn = connection.ops.quote_name

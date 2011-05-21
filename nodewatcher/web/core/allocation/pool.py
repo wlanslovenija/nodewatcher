@@ -2,8 +2,7 @@ from django.db import models
 
 # TODO locker should be moved somewhere else, possibly core.utils
 from web.nodes.locker import require_lock
-# TODO ipcalc should be moved somewhere else, possibly core.ipcalc
-from web.nodes import ipcalc
+from web.utils import ipcalc
 # TODO ip fields should be moved somewhere else, possibly core.allocation.fields
 from web.nodes.util import IPField, IPManager, queryset_by_ip
 

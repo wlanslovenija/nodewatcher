@@ -18,7 +18,6 @@ from web.account.models import UserAccount
 from web.account.util import generate_random_password
 from web.core.allocation import pool as pool_models
 from web.generator.models import Profile
-from web.nodes import ipcalc
 from web.nodes import context_processors as nodes_context_processors
 from web.nodes import decorators
 from web.nodes.common import ValidationWarning

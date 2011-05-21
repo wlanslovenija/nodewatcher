@@ -14,11 +14,12 @@ from web.core.allocation import pool as pool_models
 from web.dns.models import Zone, Record
 from web.generator.types import IfaceType
 from web.nodes.locker import require_lock, model_lock
-from web.nodes import ipcalc, data_archive
+from web.nodes import data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
 from web.registry import registration
+from web.utils import ipcalc
 
 class Project(models.Model):
   """
