@@ -152,7 +152,7 @@ class PPPoENetworkConfig(CgmNetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
-class WifiNetworkConfig(CgmNetworkConfig):
+class WifiNetworkConfig(CgmNetworkConfig, allocation.AddressAllocator):
   """
   Configuration for a WiFi network.
   """
@@ -163,11 +163,20 @@ class WifiNetworkConfig(CgmNetworkConfig):
   class RegistryMeta(CgmNetworkConfig.RegistryMeta):
     registry_name = _("WiFi Network")
 
+class WifiNetworkConfigForm(forms.ModelForm, allocation.AddressAllocatorFormMixin):
+  """
+  General configuration form.
+  """
+  class Meta:
+    model = WifiNetworkConfig
+
 registration.point("node.config").register_choice("core.interfaces.network#role", "mesh", _("Mesh"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "endusers", _("Endusers"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-ap", _("Backbone-AP"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-sta", _("Backbone-STA"))
 registration.point("node.config").register_subitem(WifiInterfaceConfig, WifiNetworkConfig)
+allocation.register_allocation_source(WifiNetworkConfig)
+registration.register_form_for_item(WifiNetworkConfig, WifiNetworkConfigForm)
 
 class VpnServerConfig(registration.bases.NodeConfigRegistryItem):
   """
