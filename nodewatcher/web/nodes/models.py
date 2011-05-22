@@ -13,13 +13,12 @@ from django.utils.translation import ugettext as _
 from web.core.allocation import pool as pool_models
 from web.dns.models import Zone, Record
 from web.generator.types import IfaceType
-from web.nodes.locker import require_lock, model_lock
 from web.nodes import data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
 from web.nodes.util import IPField, IPManager, queryset_by_ip
 from web.registry import registration
-from web.utils import ipcalc
+from web.utils import ipcalc, db_locker
 
 class Project(models.Model):
   """
@@ -579,7 +578,7 @@ class Node(models.Model):
     """
     Locks this model instance for update until end of transaction.
     """
-    model_lock(self)
+    db_locker.model_lock(self)
   
   @staticmethod
   def get_exclusive(**kwargs):

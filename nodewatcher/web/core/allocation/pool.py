@@ -1,8 +1,6 @@
 from django.db import models
 
-# TODO locker should be moved somewhere else, possibly core.utils
-from web.nodes.locker import require_lock
-from web.utils import ipcalc
+from web.utils import ipcalc, db_locker
 # TODO ip fields should be moved somewhere else, possibly core.allocation.fields
 from web.nodes.util import IPField, IPManager, queryset_by_ip
 
@@ -232,7 +230,7 @@ class Pool(models.Model):
     else: 
       return u"%s/%d" % (self.network, self.cidr)
   
-  @require_lock('core_pool')
+  @db_locker.require_lock('core_pool')
   def allocate_subnet(self, prefix_len = None):
     """
     Attempts to allocate a subnet from this pool.
