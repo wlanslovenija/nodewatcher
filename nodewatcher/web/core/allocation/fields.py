@@ -117,18 +117,6 @@ class IPField(models.Field):
     
     return (post_sql,)
 
-# TODO this method should be removed as we only support PostgreSQL now
-def queryset_by_ip(queryset, field_name, *sort_first):
-  """
-  Sorts the `query` by `field_name` where it represents some IP typed field. It can first sorts
-  lexicographically by `sort_first` fields, which it sorts normally.
-  
-  On PostgreSQL databases we simply use Django's `order_by` on queryset.
-  """
-  sort = list(sort_first)
-  sort.append(field_name)
-  return queryset.order_by(*sort)
-
 # Add South introspection for IPField
-south.modelsinspector.add_introspection_rules([], [r"^.*nodes\.util\.IPField$"])
+south.modelsinspector.add_introspection_rules([], [r"^.*core\.allocation\.fields\.IPField$"])
 

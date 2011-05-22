@@ -23,7 +23,6 @@ from web.nodes import decorators
 from web.nodes.common import ValidationWarning
 from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
-from web.nodes.util import queryset_by_ip
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 
 from registry import forms as registry_forms
@@ -33,7 +32,7 @@ def nodes(request):
   Display a list of all current nodes and their status.
   """
   return render_to_response('nodes/list.html',
-    { 'nodes' : queryset_by_ip(Node.objects.all(), 'ip', 'node_type') },
+    { 'nodes' : Node.objects.all().order_by('node_type', 'ip') },
     context_instance = RequestContext(request)
   )
 
@@ -42,7 +41,7 @@ def pools(request):
   Displays IP allocation pools.
   """
   return render_to_response('nodes/pools.html',
-    { 'pools' : queryset_by_ip(pool_models.Pool.objects.filter(parent = None), 'ip_subnet') },
+    { 'pools' : pool_models.Pool.objects.filter(parent = None).order_by('ip_subnet') },
     context_instance = RequestContext(request)
   )
 
@@ -128,7 +127,7 @@ def my_nodes(request):
   Display a list of current user's nodes.
   """
   return render_to_response('nodes/my.html',
-    { 'nodes' : queryset_by_ip(request.user.node_set.all(), 'ip', 'node_type') },
+    { 'nodes' : request.user.node_set.all().order_by('node_type', 'ip') },
     context_instance = RequestContext(request)
   )
 

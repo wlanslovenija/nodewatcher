@@ -1,8 +1,7 @@
 from django.db import models
 
 from web.utils import ipcalc, db_locker
-# TODO ip fields should be moved somewhere else, possibly core.allocation.fields
-from web.nodes.util import IPField, IPManager, queryset_by_ip
+import fields as allocation_fields
 
 class PoolAllocationError(Exception):
   pass
@@ -39,10 +38,10 @@ class Pool(models.Model):
   max_prefix_len = models.IntegerField(default = 28, null = True)
   
   # Field for indexed lookups
-  ip_subnet = IPField(null = True)
+  ip_subnet = allocation_fields.IPField(null = True)
   
   # Custom manager
-  objects = IPManager()
+  objects = allocation_fields.IPManager()
   
   class Meta:
     app_label = "core"
@@ -153,7 +152,7 @@ class Pool(models.Model):
     # and traverse the left one
     alloc = None
     if self.children.count() > 0:
-      for child in queryset_by_ip(self.children.exclude(status = PoolStatus.Full), "ip_subnet"):
+      for child in self.children.exclude(status = PoolStatus.Full).order_by("ip_subnet"):
         alloc = child.allocate_buddy(prefix_len)
         if alloc:
           break

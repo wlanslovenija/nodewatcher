@@ -11,12 +11,12 @@ from django.template import loader, Context
 from django.utils.translation import ugettext as _
 
 from web.core.allocation import pool as pool_models
+from web.core.allocation import fields as allocation_fields
 from web.dns.models import Zone, Record
 from web.generator.types import IfaceType
 from web.nodes import data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
-from web.nodes.util import IPField, IPManager, queryset_by_ip
 from web.registry import registration
 from web.utils import ipcalc, db_locker
 
@@ -60,7 +60,7 @@ class Project(models.Model):
     """
     A helper method that returns the IP pools.
     """
-    return queryset_by_ip(self.pools.all(), 'ip_subnet', 'description')
+    return self.pools.all().order_by('description', 'ip_subnet')
 
   def __unicode__(self):
     """
@@ -534,7 +534,7 @@ class Node(models.Model):
     """
     Returns properly ordered subnets.
     """
-    return queryset_by_ip(self.subnet_set.all(), "ip_subnet")
+    return self.subnet_set.all().order_by("ip_subnet")
   
   def get_peers(self):
     """
@@ -699,10 +699,10 @@ class Subnet(models.Model):
   gen_dhcp = models.BooleanField(default = True)
   
   # Field for indexed lookups
-  ip_subnet = IPField(null = True)
+  ip_subnet = allocation_fields.IPField(null = True)
   
   # Custom manager
-  objects = IPManager()
+  objects = allocation_fields.IPManager()
   
   def save(self, **kwargs):
     """
@@ -782,7 +782,7 @@ class Subnet(models.Model):
     if self.cidr == 0:
       return Subnet.objects.none()
 
-    return queryset_by_ip(Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node), "ip_subnet")
+    return Subnet.objects.ip_filter(ip_subnet__conflicts = self.ip_subnet).exclude(cidr = 0).exclude(node = self.node).order_by("ip_subnet")
 
   @staticmethod
   def is_allocated(network, cidr, exclude_node = None):

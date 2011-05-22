@@ -14,7 +14,6 @@ from web.nodes.models import Project, NodeStatus, Node, Subnet, SubnetStatus, An
 from web.nodes.sticker import generate_sticker
 from web.nodes.transitions import validates_node_configuration
 from web.nodes.common import FormWithWarnings
-from web.nodes.util import queryset_by_ip
 from web.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from web.generator.types import IfaceType
 from web.account.util import generate_random_password
@@ -49,7 +48,6 @@ class RegisterNodeForm(forms.Form):
     label = _("Project")
   )
   pool = forms.ModelChoiceField(
-    # Cannot use queryset_by_ip as proper queryset is expected
     pool_models.Pool.objects.exclude(status = pool_models.PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
     empty_label = None,
     label = _("IP pool")
@@ -720,7 +718,6 @@ class AllocateSubnetForm(forms.Form):
     # Populate prefix length choices
     primary_pool = self.__node.get_primary_ip_pool() 
     self.fields['pool'] = forms.ModelChoiceField(
-      # Cannot use queryset_by_ip as proper queryset is expected
       node.project.pools.exclude(status = pool_models.PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet'),
       empty_label = None,
       label = _("IP pool"),
@@ -731,7 +728,7 @@ class AllocateSubnetForm(forms.Form):
     """
     A helper method that returns the IP pools.
     """
-    return queryset_by_ip(self.__node.project.pools.exclude(status = pool_models.PoolStatus.Full).filter(parent = None), 'ip_subnet', 'description')
+    return self.__node.project.pools.exclude(status = pool_models.PoolStatus.Full).filter(parent = None).order_by('description', 'ip_subnet')
   
   def clean(self):
     """
@@ -1015,9 +1012,9 @@ class RenumberForm(FormWithWarnings):
     # Setup dynamic form fields, depending on how may subnets a node has
     primary = node.subnet_set.ip_filter(ip_subnet__contains = "%s/32" % node.ip).filter(allocated = True).exclude(cidr = 0)
     
-    for subnet in queryset_by_ip(node.subnet_set.filter(allocated = True), 'ip_subnet'):
+    for subnet in node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       pools = []
-      for pool in queryset_by_ip(node.project.pools.exclude(status = pool_models.PoolStatus.Full), 'ip_subnet', 'description'):
+      for pool in node.project.pools.exclude(status = pool_models.PoolStatus.Full).order_by('description', 'ip_subnet'):
         pools.append((pool.pk, _("Renumber to %s [%s/%s]") % (pool.description, pool.network, pool.cidr)))
       
       choices = [
@@ -1045,13 +1042,13 @@ class RenumberForm(FormWithWarnings):
     """
     A helper method that returns all allocations pools.
     """
-    return queryset_by_ip(self.__node.project.pools.exclude(status = pool_models.PoolStatus.Full), 'ip_subnet', 'description')
+    return self.__node.project.pools.exclude(status = pool_models.PoolStatus.Full).order_by('description', 'ip_subnet')
   
   def get_subnet_fields(self):
     """
     A helper method that returns all subnet fields in order.
     """
-    for subnet in queryset_by_ip(self.__node.subnet_set.filter(allocated = True), 'ip_subnet'):
+    for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       field = self['subnet_%s' % subnet.pk]
       field.model = subnet
       field.prefix = 'prefix_%s' % subnet.pk
@@ -1062,7 +1059,7 @@ class RenumberForm(FormWithWarnings):
     """
     Additional validation handler.
     """
-    for subnet in queryset_by_ip(self.__node.subnet_set.filter(allocated = True), 'ip_subnet'):
+    for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet'):
       manual_ip = self.cleaned_data.get('manual_%s' % subnet.pk)
       if not manual_ip:
         continue
@@ -1095,7 +1092,7 @@ class RenumberForm(FormWithWarnings):
     old_router_id = self.__node.ip
     
     # Renumber subnets first
-    for subnet in queryset_by_ip(self.__node.subnet_set.filter(allocated = True), 'ip_subnet')[:]:
+    for subnet in self.__node.subnet_set.filter(allocated = True).order_by('ip_subnet')[:]:
       action = int(self.cleaned_data.get('subnet_%s' % subnet.pk))
       prefix_len = int(self.cleaned_data.get('prefix_%s' % subnet.pk) or 27)
       manual_ip = self.cleaned_data.get('manual_%s' % subnet.pk)
