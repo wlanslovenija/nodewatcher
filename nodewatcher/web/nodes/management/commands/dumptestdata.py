@@ -4,6 +4,7 @@ import random
 import sys
 import StringIO as string_io
 import subprocess
+import optparse
 
 from django.conf import settings
 from django.core import management
@@ -30,7 +31,11 @@ class Command(management_base.BaseCommand):
   sanitized dump of the nodewatcher database.
   """
   args = "<dump_archive>"
-  help = "Generates a sanitized dump of the nodewatcher database."
+  help = "Generates a sanitized dump of the nodewatcher database in tar.bz2 format."
+  option_list = management_base.BaseCommand.option_list + (
+    optparse.make_option('--nographs', action = 'store_false', dest = 'store_graphs', default = True,
+      help = 'Tells the dump script to NOT save any generated graph images.'),
+  )
   
   def handle(self, *args, **options):
     """
@@ -96,6 +101,8 @@ class Command(management_base.BaseCommand):
           continue
         elif name == 'django.contrib.auth.models.Message':
           continue
+        elif name.startswith('south.'):
+          continue
 
         yield holder.object
     
@@ -109,9 +116,9 @@ class Command(management_base.BaseCommand):
     out.close()
     json.close()
     
-    # Copy graphs and remove .svn directories
-    ensure_success(subprocess.call(["cp", "-R", settings.GRAPH_DIR, tmp_dir]))
-    subprocess.call(["find", tmp_dir, "-name", ".svn", "-type", "d", "-exec", "rm", "-rf", "{}", ";"])
+    if options.get('store_graphs', True):
+      # Copy graphs when requested
+      ensure_success(subprocess.call(["cp", "-R", settings.GRAPH_DIR, tmp_dir]))
     
     # Generate a tar.bz2 archive
     os.chdir(tmp_dir)

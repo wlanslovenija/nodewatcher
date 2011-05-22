@@ -101,6 +101,7 @@ class Command(management_base.BaseCommand):
     if verbosity >= 1:
       print ">>> Performing initial database sync..."
     management.call_command("syncdb", **options)
+    management.call_command("migrate", **options)
     
     if len(args) < 1:
       if verbosity >= 1:
