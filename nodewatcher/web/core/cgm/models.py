@@ -2,13 +2,12 @@ from django import forms
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from core import allocation
-from core import models as core_models
-from registry import fields as registry_fields
-from registry import forms as registry_forms
-from registry import registration
-
-from nodes import models as nodes_models
+from web.core import allocation
+from web.core import models as core_models
+from web.nodes import models as nodes_models
+from web.registry import fields as registry_fields
+from web.registry import forms as registry_forms
+from web.registry import registration
 
 class CgmGeneralConfig(core_models.GeneralConfig):
   """
@@ -135,9 +134,7 @@ registration.point("node.config").register_choice("core.interfaces.network#usage
 registration.point("node.config").register_choice("core.interfaces.network#usage", "routing", _("Routing Loopback"))
 registration.point("node.config").register_choice("core.interfaces.network#usage", "clients", _("Clients"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
-allocation.unregister_allocation_source(core_models.BasicAddressingConfig)
-allocation.register_allocation_source(AllocatedNetworkConfig)
-registration.point("node.config").disable_item_class("core.basic-addressing")
+registration.point("node.config").unregister_item(core_models.BasicAddressingConfig)
 registration.register_form_for_item(AllocatedNetworkConfig, AllocatedNetworkConfigForm)
 
 class PPPoENetworkConfig(CgmNetworkConfig):
@@ -175,7 +172,6 @@ registration.point("node.config").register_choice("core.interfaces.network#role"
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-ap", _("Backbone-AP"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-sta", _("Backbone-STA"))
 registration.point("node.config").register_subitem(WifiInterfaceConfig, WifiNetworkConfig)
-allocation.register_allocation_source(WifiNetworkConfig)
 registration.register_form_for_item(WifiNetworkConfig, WifiNetworkConfigForm)
 
 class VpnServerConfig(registration.bases.NodeConfigRegistryItem):

@@ -1,14 +1,14 @@
-from registry import registration
-from registry import forms as registry_forms
-from registry import cgm
-from registry.cgm import base as cgm_base
+from web.registry import registration
+from web.registry import forms as registry_forms
+from web.registry import cgm
+from web.registry.cgm import base as cgm_base
 
 # Dependencies
-import core
+import web.core
 
 # Load modules for all supported platforms
-import core.cgm.openwrt
-import core.cgm.ubnt
+import web.core.cgm.openwrt
+import web.core.cgm.ubnt
 
 # Register CGM validator
 @registration.register_validation_hook("node.config")

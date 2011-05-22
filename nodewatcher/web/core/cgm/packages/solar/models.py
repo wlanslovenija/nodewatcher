@@ -2,12 +2,11 @@ from django import forms
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from registry import fields as registry_fields
-from registry import forms as registry_forms
-from registry import registration
-from registry.cgm import base as cgm_base
-
-from core.cgm import models as cgm_models
+from web.core.cgm import models as cgm_models
+from web.registry import fields as registry_fields
+from web.registry import forms as registry_forms
+from web.registry import registration
+from web.registry.cgm import base as cgm_base
 
 class CgmSolarPackageConfig(cgm_models.CgmPackageConfig):
   """

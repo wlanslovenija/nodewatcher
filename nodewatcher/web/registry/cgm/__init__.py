@@ -1,4 +1,4 @@
-from registry.cgm import base as cgm_base
+from web.registry.cgm import base as cgm_base
 
 def generate_config(node, only_validate = False):
   """

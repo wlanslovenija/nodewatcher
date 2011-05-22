@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 
-from registry.cgm import base as cgm_base
+from web.registry.cgm import base as cgm_base
 
 class UCISection(object):
   """
@@ -160,9 +160,9 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 
 # Load all modules for this platform that are included in the core
-import core.cgm.openwrt.general
-import core.cgm.openwrt.vpn
+import web.core.cgm.openwrt.general
+import web.core.cgm.openwrt.vpn
 
 # Load all model-specific modules
-import core.cgm.openwrt.fon2100
+import web.core.cgm.openwrt.fon2100
 

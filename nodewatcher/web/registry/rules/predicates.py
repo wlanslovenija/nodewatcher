@@ -1,10 +1,10 @@
 import hashlib
 import inspect
 
-from registry import access as registry_access
-from registry import forms as registry_forms
-from registry.rules.engine import *
-from registry.cgm import base as cgm_base 
+from web.registry import access as registry_access
+from web.registry import forms as registry_forms
+from web.registry.rules.engine import *
+from web.registry.cgm import base as cgm_base 
 
 # Exports
 __all__ = [

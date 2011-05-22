@@ -3,10 +3,10 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from core import allocation
-from registry import fields as registry_fields
-from registry import forms as registry_forms
-from registry import registration
+from web.core import allocation
+from web.registry import fields as registry_fields
+from web.registry import forms as registry_forms
+from web.registry import registration
 
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   """
@@ -56,5 +56,4 @@ class BasicAddressingConfigForm(forms.ModelForm, allocation.AddressAllocatorForm
 
 registration.point("node.config").register_item(BasicAddressingConfig)
 registration.register_form_for_item(BasicAddressingConfig, BasicAddressingConfigForm)
-allocation.register_allocation_source(BasicAddressingConfig)
 

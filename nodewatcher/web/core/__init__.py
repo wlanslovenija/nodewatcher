@@ -1,11 +1,11 @@
-from registry import registration
+from web.registry import registration
 
 # Create registration points
 registration.create_point("nodes.Node", "config")
 registration.create_point("nodes.Node", "monitoring")
 
 # Address allocation
-import core.allocation
+import web.core.allocation
 
 # Dependencies
-import nodes
+import web.nodes

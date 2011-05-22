@@ -7,8 +7,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import safestring
 
-from registry import forms as registry_forms
-from registry import registration
+from web.registry import forms as registry_forms
+from web.registry import registration
 
 @login_required
 def evaluate_forms(request, regpoint_id, root_id):

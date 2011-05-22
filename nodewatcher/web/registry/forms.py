@@ -5,9 +5,9 @@ from django import forms, template
 from django.core import exceptions
 from django.db import transaction
 
-from registry import rules as registry_rules
-from registry import registration
-from registry.cgm import base as cgm_base
+from web.registry import rules as registry_rules
+from web.registry import registration
+from web.registry.cgm import base as cgm_base
 
 class RegistryValidationError(Exception):
   """
@@ -400,10 +400,6 @@ def prepare_forms(context):
     item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
     
-    # Skip disabled items
-    if not item_cls._registry_enabled:
-      continue
-    
     # Skip items that are not child items
     if context.hierarchy_parent_cls not in getattr(item_cls, '_registry_parents', [None]):
       continue
@@ -619,7 +615,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
     
     # Execute any validation hooks when saving and there are no validation errors
     if save and root is not None and not context.validation_errors:
-      for hook in regpoint.validation_hooks:
+      for hook in regpoint.validation_hooks.values():
         try:
           hook(root)
         except RegistryValidationError, e:

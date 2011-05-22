@@ -3,7 +3,7 @@ import inspect
 
 from django.core.exceptions import ImproperlyConfigured
 
-from registry import registration
+from web.registry import registration
 
 class RouterPort(object):
   """

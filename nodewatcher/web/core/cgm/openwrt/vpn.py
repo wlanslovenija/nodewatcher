@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 
-from registry.cgm import base as cgm_base
-from registry import registration
+from web.registry.cgm import base as cgm_base
+from web.registry import registration
 
 @cgm_base.register_platform_module("openwrt", 50)
 def openvpn(node, cfg):

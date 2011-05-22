@@ -1,5 +1,5 @@
-from registry.cgm import base as cgm_base
-from registry.cgm import routers as cgm_routers
+from web.registry.cgm import base as cgm_base
+from web.registry.cgm import routers as cgm_routers
 
 class Fonera(cgm_routers.RouterBase):
   """

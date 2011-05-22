@@ -4,10 +4,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils import datastructures as django_datastructures
 
-from registry import state as registry_state
-from registry import models as registry_models
-from registry import lookup as registry_lookup
-from registry import access as registry_access
+from web.registry import state as registry_state
+from web.registry import models as registry_models
+from web.registry import lookup as registry_lookup
+from web.registry import access as registry_access
 from web.utils import datastructures as nw_datastructures
 
 bases = registry_state.bases
@@ -54,7 +54,7 @@ class RegistrationPoint(object):
     self.item_classes = {}
     self.choices_registry = {}
     self.flat_lookup_proxies = {}
-    self.validation_hooks = []
+    self.validation_hooks = {}
   
   def _register_item(self, item):
     """
@@ -97,7 +97,6 @@ class RegistrationPoint(object):
     
     # Include registration point in item class
     item._registry_regpoint = self
-    item._registry_enabled = True
     
     return True
   
@@ -131,7 +130,7 @@ class RegistrationPoint(object):
     """
     Registers a registry item in a hierarchical relationship.
     """
-    from registry import fields as registry_fields
+    from web.registry import fields as registry_fields
     
     # Verify parent registration
     if parent not in self.item_classes:
@@ -155,17 +154,49 @@ class RegistrationPoint(object):
     else:
       raise ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
   
-  def disable_item_class(self, registry_id):
+  def _unregister_item(self, item_cls):
     """
-    Prevents an item class from being available in configuration options.
+    A helper method for unregistering a single item.
+    
+    @param item_cls: Registry item class
     """
-    self.item_registry[registry_id]._registry_enabled = False
+    item_cls._registry_endpoint = None
+    del self.item_classes[item_cls]
   
-  def enable_item_class(self, registry_id):
+  def unregister_item(self, item_cls):
     """
-    Reenables an item class to be available in configuration options.
+    Unregisters a previously registered item or subitem. If the specified item
+    defines the top-level schema item, all child items of this type will be unregistered.
+    
+    @param item_cls: Registry item class
     """
-    self.item_registry[registry_id]._registry_enabled = True
+    if not issubclass(item_cls, self.item_base):
+      raise TypeError("Specified class is not a valid registry item!")
+    
+    if item_cls not in self.item_classes:
+      raise ValueError("Registry item '{0}' is not registered!".format(item_cls._meta.object_name))
+    
+    registry_id = item_cls.RegistryMeta.registry_id
+    list_key = item_classes = None
+    for (form_order, reg_id), item_classes in self.item_list.items():
+      if reg_id == registry_id:
+        list_key = (form_order, reg_id)
+        break
+    else:
+      assert False, "Registry item '{0}' is registered, but top-level registry identifier cannot be found!".format(item_cls._meta.object_name)
+    
+    if item_cls.__base__ == self.item_base:
+      # Top-level item, remove all registered subitems as well
+      for item in item_classes.values():
+        self._unregister_item(item)
+      
+      del self.item_list[list_key]
+      del self.item_registry[registry_id]
+    else:
+      # Item that subclasses a top-level item
+      del item_classes[item_cls._meta.module_name]
+      assert len(item_classes) > 0
+      self._unregister_item(item_cls)
   
   def get_top_level_queryset(self, root, registry_id):
     """
@@ -209,6 +240,14 @@ class RegistrationPoint(object):
     Registers a new choice/enumeration.
     """
     self.get_registered_choices(choices_id).add_choice((enum, text), limited_to)
+  
+  def config_items(self):
+    """
+    A generator that iterates through registered items.
+    """
+    for item_classes in self.item_list.values():
+      for item in item_classes.values():
+        yield item
 
 def create_point(model, namespace):
   """
@@ -240,7 +279,7 @@ def create_point(model, namespace):
       base_name,
       (registry_models.RegistryItemBase,),
       {
-        '__module__' : 'registry.models',
+        '__module__' : 'web.registry.models',
         'Meta' : Meta,
         'root' : models.ForeignKey(
           model, null = False, editable = False, related_name = '{0}_%(app_label)s_%(class)s'.format(namespace)
@@ -306,7 +345,7 @@ def register_validation_hook(regpoint):
   form validation for this registration point is completed.
   """
   def wrapper(f):
-    point(regpoint).validation_hooks.append(f)
+    point(regpoint).validation_hooks[f.func_name] = f
     return f
   
   return wrapper

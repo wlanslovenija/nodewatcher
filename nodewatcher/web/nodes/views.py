@@ -25,7 +25,7 @@ from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 
-from registry import forms as registry_forms
+from web.registry import forms as registry_forms
 
 def nodes(request):
   """

@@ -1,8 +1,8 @@
 from django.db import models
 
-from core.allocation import pool as pool_models
-from registry import fields as registry_fields
-from registry import registration
+from web.core.allocation import pool as pool_models
+from web.registry import fields as registry_fields
+from web.registry import registration
 
 class AddressAllocator(models.Model):
   """
@@ -44,41 +44,26 @@ class AddressAllocatorFormMixin(object):
     except pool_models.Pool.DoesNotExist:
       self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR")
 
-allocation_sources = set()
-
-def register_allocation_source(regitem):
-  """
-  Registers a new address allocation request source.
-  
-  @param regitem: Registry item class
-  """
-  if not issubclass(regitem, registration.bases.NodeConfigRegistryItem):
-    raise TypeError("Allocation sources must be node configuration registry items!")
-  
-  if not issubclass(regitem, AddressAllocator):
-    raise TypeError("Allocation sources must implement AddressAllocator API!")
-  
-  allocation_sources.add(regitem)
-
-def unregister_allocation_source(regitem):
-  """
-  Removes an existing new address allocation request source.
-  
-  @param regitem: Registry item class
-  """
-  allocation_sources.remove(regitem)
-
 @registration.register_validation_hook("node.config")
 def node_address_allocation(node):
   """
   Handles address allocation for a node acoording to requests and registered
   allocators.
   """
+  # Automatically discover currently available allocation sources
+  allocation_sources = [
+    item
+    for item in registration.point("node.config").config_items()
+    if issubclass(item, AddressAllocator)
+  ]
+  
+  # Create requests from allocation sources
   requests = set()
   for src in allocation_sources:
     for request in node.config.by_path(src.RegistryMeta.registry_id):
       if isinstance(request, src):
         requests.add(request)
   
+  print requests
   # TODO Compare requests with existing allocations and do something about it
 

@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models, connection
 
-from registry import access as registry_access
+from web.registry import access as registry_access
 
 # Quote name
 qn = connection.ops.quote_name
@@ -15,7 +15,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
     Switches to a different regpoint that determines the short attribute
     name.
     """
-    from registry import registration
+    from web.registry import registration
     clone = self._clone()
     try:
       name = "{0}.{1}".format(self.model._meta.module_name, name)

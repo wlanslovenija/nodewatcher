@@ -1,5 +1,5 @@
-from registry import registration
-from registry.cgm import routers as cgm_routers
+from web.registry import registration
+from web.registry.cgm import routers as cgm_routers
 
 # Registered platform modules
 PLATFORM_REGISTRY = {}

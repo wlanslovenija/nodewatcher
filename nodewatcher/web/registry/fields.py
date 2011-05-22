@@ -11,8 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 
 import south.modelsinspector
 
-from registry import registration
-from registry import models as registry_models
+from web.registry import registration
+from web.registry import models as registry_models
 
 class SelectorFormField(form_fields.TypedChoiceField):
   """
