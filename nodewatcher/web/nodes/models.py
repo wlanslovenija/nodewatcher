@@ -3,6 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes import generic
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.mail import send_mail
@@ -140,6 +141,10 @@ class Node(models.Model):
   This class represents a single node in the network.
   """
   uuid = models.CharField(max_length = 40, primary_key = True)
+  
+  allocations = generic.GenericRelation(pool_models.Allocation)
+  
+  # XXX Old fields, will be removed
   ip = models.CharField(max_length = 40, unique = True)
   name = models.CharField(max_length = 50, null = True, unique = True)
   owner = models.ForeignKey(User, null = True)

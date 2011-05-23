@@ -1,7 +1,9 @@
 from django.db import models
+from django.utils.translation import ugettext as _
 
 from web.core.allocation import pool as pool_models
 from web.registry import fields as registry_fields
+from web.registry import forms as registry_forms
 from web.registry import registration
 
 class AddressAllocator(models.Model):
@@ -15,6 +17,43 @@ class AddressAllocator(models.Model):
   
   class Meta:
     abstract = True
+  
+  def is_satisfied_by(self, allocation):
+    """
+    Returns true if the given allocation satisfies this allocation request.
+    
+    @param allocation: A valid Allocation instance
+    """
+    if allocation.pool.cidr != self.cidr:
+      return False
+    
+    # TODO Pool family
+    
+    if allocation.pool.top_level() != self.pool:
+      return False
+    
+    return True
+  
+  def satisfy(self, obj):
+    """
+    Attempts to satisfy this allocation request by obtaining a new allocation
+    for the specified object.
+    
+    @param obj: A valid Django model instance
+    """
+    allocation = pool_models.Allocation(
+      content_object = obj,
+      pool = self.pool.allocate_subnet(self.cidr)
+    )
+    
+    if allocation.pool is not None:
+      allocation.save()
+    else:
+      raise registry_forms.RegistryValidationError(
+        _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
+          'prefix' : self.cidr, 'pool' : unicode(self.pool)
+        }
+      )
 
 class AddressAllocatorFormMixin(object):
   """
@@ -43,27 +82,4 @@ class AddressAllocatorFormMixin(object):
       )
     except pool_models.Pool.DoesNotExist:
       self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR")
-
-@registration.register_validation_hook("node.config")
-def node_address_allocation(node):
-  """
-  Handles address allocation for a node acoording to requests and registered
-  allocators.
-  """
-  # Automatically discover currently available allocation sources
-  allocation_sources = [
-    item
-    for item in registration.point("node.config").config_items()
-    if issubclass(item, AddressAllocator)
-  ]
-  
-  # Create requests from allocation sources
-  requests = set()
-  for src in allocation_sources:
-    for request in node.config.by_path(src.RegistryMeta.registry_id):
-      if isinstance(request, src):
-        requests.add(request)
-  
-  print requests
-  # TODO Compare requests with existing allocations and do something about it
 

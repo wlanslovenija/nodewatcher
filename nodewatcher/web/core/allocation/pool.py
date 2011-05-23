@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.db import models
 
 from web.utils import ipcalc, db_locker
@@ -170,6 +172,15 @@ class Pool(models.Model):
     
     return alloc
   
+  def top_level(self):
+    """
+    Returns the root of this pool tree.
+    """
+    if self.parent:
+      return self.parent.top_level()
+    
+    return self
+  
   def reclaim_pools(self):
     """
     Coalesces free children back into one if possible.
@@ -248,4 +259,26 @@ class Pool(models.Model):
     
     pool = self.allocate_buddy(prefix_len)
     return pool
+
+class Allocation(models.Model):
+  """
+  Represents an allocation of a subpool to some object (for example: a node).
+  """
+  content_type = models.ForeignKey(ContentType)
+  object_id = models.CharField(max_length = 50)
+  content_object = generic.GenericForeignKey('content_type', 'object_id')
+  pool = models.ForeignKey(Pool)
+  created_at = models.DateTimeField(auto_now_add = True)
+  
+  class Meta:
+    app_label = "core"
+  
+  def free(self):
+    """
+    Frees this allocation and returns it back to the designated pool.
+    """
+    self.pool.status = PoolStatus.Free
+    self.pool.save()
+    self.pool.reclaim_pools()
+    self.delete()
 
