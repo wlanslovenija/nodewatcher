@@ -17,11 +17,11 @@ class Migration(SchemaMigration):
         
         # Adding model 'CgmGeneralConfig'
         db.create_table('cgm_cgmgeneralconfig', (
-            ('platform', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#platform')),
+            ('platform', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#platform')),
             ('password', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('generalconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['core.GeneralConfig'], unique=True, primary_key=True)),
             ('version', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('router', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#router')),
+            ('router', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#router')),
         ))
         db.send_create_signal('cgm', ['CgmGeneralConfig'])
 
@@ -46,7 +46,7 @@ class Migration(SchemaMigration):
         # Adding model 'EthernetInterfaceConfig'
         db.create_table('cgm_ethernetinterfaceconfig', (
             ('cgminterfaceconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmInterfaceConfig'], unique=True, primary_key=True)),
-            ('eth_port', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces#eth_port')),
+            ('eth_port', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces#eth_port')),
         ))
         db.send_create_signal('cgm', ['EthernetInterfaceConfig'])
 
@@ -55,7 +55,7 @@ class Migration(SchemaMigration):
             ('bitrate', self.gf('django.db.models.fields.IntegerField')(default=11)),
             ('cgminterfaceconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmInterfaceConfig'], unique=True, primary_key=True)),
             ('protocol', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('wifi_radio', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces#wifi_radio')),
+            ('wifi_radio', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces#wifi_radio')),
             ('channel', self.gf('django.db.models.fields.IntegerField')(default=8)),
         ))
         db.send_create_signal('cgm', ['WifiInterfaceConfig'])
@@ -65,7 +65,7 @@ class Migration(SchemaMigration):
             ('description', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('enabled', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('interface', self.gf('registry.fields.IntraRegistryForeignKey')(related_name='networks', to=orm['cgm.CgmInterfaceConfig'])),
+            ('interface', self.gf('web.registry.fields.IntraRegistryForeignKey')(related_name='networks', to=orm['cgm.CgmInterfaceConfig'])),
             ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='config_cgm_cgmnetworkconfig', to=orm['nodes.Node'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
@@ -74,17 +74,17 @@ class Migration(SchemaMigration):
         # Adding model 'StaticNetworkConfig'
         db.create_table('cgm_staticnetworkconfig', (
             ('cgmnetworkconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmNetworkConfig'], unique=True, primary_key=True)),
-            ('family', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family')),
+            ('family', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family')),
         ))
         db.send_create_signal('cgm', ['StaticNetworkConfig'])
 
         # Adding model 'AllocatedNetworkConfig'
         db.create_table('cgm_allocatednetworkconfig', (
-            ('usage', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#usage')),
+            ('usage', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#usage')),
             ('cgmnetworkconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmNetworkConfig'], unique=True, primary_key=True)),
             ('cidr', self.gf('django.db.models.fields.IntegerField')(default=27)),
-            ('pool', self.gf('registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool'])),
-            ('family', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family')),
+            ('pool', self.gf('web.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool'])),
+            ('family', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family')),
         ))
         db.send_create_signal('cgm', ['AllocatedNetworkConfig'])
 
@@ -99,15 +99,15 @@ class Migration(SchemaMigration):
         # Adding model 'WifiNetworkConfig'
         db.create_table('cgm_wifinetworkconfig', (
             ('cgmnetworkconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmNetworkConfig'], unique=True, primary_key=True)),
-            ('role', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#role')),
+            ('role', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#role')),
             ('essid', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('bssid', self.gf('registry.fields.MACAddressField')(max_length=17)),
+            ('bssid', self.gf('web.registry.fields.MACAddressField')(max_length=17)),
         ))
         db.send_create_signal('cgm', ['WifiNetworkConfig'])
 
         # Adding model 'VpnServerConfig'
         db.create_table('cgm_vpnserverconfig', (
-            ('protocol', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.vpn.server#protocol')),
+            ('protocol', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.vpn.server#protocol')),
             ('hostname', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('port', self.gf('django.db.models.fields.IntegerField')()),
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
@@ -187,16 +187,16 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'AllocatedNetworkConfig', '_ormbases': ['cgm.CgmNetworkConfig']},
             'cgmnetworkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmNetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
-            'family': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
-            'pool': ('registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Pool']"}),
-            'usage': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Pool']"}),
+            'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'cgm.cgmgeneralconfig': {
             'Meta': {'object_name': 'CgmGeneralConfig', '_ormbases': ['core.GeneralConfig']},
             'generalconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.GeneralConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'platform': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#platform'"}),
-            'router': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#router'"}),
+            'platform': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#platform'"}),
+            'router': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#router'"}),
             'version': ('django.db.models.fields.CharField', [], {'max_length': '20'})
         },
         'cgm.cgminterfaceconfig': {
@@ -212,7 +212,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'interface': ('registry.fields.IntraRegistryForeignKey', [], {'related_name': "'networks'", 'to': "orm['cgm.CgmInterfaceConfig']"}),
+            'interface': ('web.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'networks'", 'to': "orm['cgm.CgmInterfaceConfig']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_cgmnetworkconfig'", 'to': "orm['nodes.Node']"})
         },
         'cgm.cgmpackageconfig': {
@@ -225,7 +225,7 @@ class Migration(SchemaMigration):
         'cgm.ethernetinterfaceconfig': {
             'Meta': {'object_name': 'EthernetInterfaceConfig', '_ormbases': ['cgm.CgmInterfaceConfig']},
             'cgminterfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmInterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'eth_port': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#eth_port'"})
+            'eth_port': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#eth_port'"})
         },
         'cgm.pppoenetworkconfig': {
             'Meta': {'object_name': 'PPPoENetworkConfig', '_ormbases': ['cgm.CgmNetworkConfig']},
@@ -236,7 +236,7 @@ class Migration(SchemaMigration):
         'cgm.staticnetworkconfig': {
             'Meta': {'object_name': 'StaticNetworkConfig', '_ormbases': ['cgm.CgmNetworkConfig']},
             'cgmnetworkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmNetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'family': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"})
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"})
         },
         'cgm.vpnserverconfig': {
             'Meta': {'object_name': 'VpnServerConfig'},
@@ -244,7 +244,7 @@ class Migration(SchemaMigration):
             'hostname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'port': ('django.db.models.fields.IntegerField', [], {}),
-            'protocol': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.vpn.server#protocol'"}),
+            'protocol': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.vpn.server#protocol'"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_vpnserverconfig'", 'to': "orm['nodes.Node']"})
         },
         'cgm.wifiinterfaceconfig': {
@@ -253,14 +253,14 @@ class Migration(SchemaMigration):
             'cgminterfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmInterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'channel': ('django.db.models.fields.IntegerField', [], {'default': '8'}),
             'protocol': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'wifi_radio': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_radio'"})
+            'wifi_radio': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_radio'"})
         },
         'cgm.wifinetworkconfig': {
             'Meta': {'object_name': 'WifiNetworkConfig', '_ormbases': ['cgm.CgmNetworkConfig']},
-            'bssid': ('registry.fields.MACAddressField', [], {'max_length': '17'}),
+            'bssid': ('web.registry.fields.MACAddressField', [], {'max_length': '17'}),
             'cgmnetworkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmNetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'essid': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'role': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"})
+            'role': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"})
         },
         'contenttypes.contenttype': {
             'Meta': {'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -277,7 +277,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'project': ('registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
+            'project': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"})
         },
         'dns.zone': {

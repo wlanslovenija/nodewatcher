@@ -17,7 +17,7 @@ class Migration(SchemaMigration):
             ('geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')()),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('altitude', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('project', self.gf('registry.fields.ModelSelectorKeyField')(to=orm['nodes.Project'])),
+            ('project', self.gf('web.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Project'])),
             ('location', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
             ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='config_core_generalconfig', to=orm['nodes.Node'])),
@@ -27,13 +27,13 @@ class Migration(SchemaMigration):
 
         # Adding model 'BasicAddressingConfig'
         db.create_table('core_basicaddressingconfig', (
-            ('family', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family')),
+            ('family', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family')),
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('usage', self.gf('registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#usage')),
+            ('usage', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#usage')),
             ('cidr', self.gf('django.db.models.fields.IntegerField')(default=27)),
             ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='config_core_basicaddressingconfig', to=orm['nodes.Node'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('pool', self.gf('registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool'])),
+            ('pool', self.gf('web.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool'])),
         ))
         db.send_create_signal('core', ['BasicAddressingConfig'])
     
@@ -88,11 +88,11 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'BasicAddressingConfig'},
             'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'family': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'pool': ('registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Pool']"}),
+            'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Pool']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
-            'usage': ('registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+            'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'core.generalconfig': {
             'Meta': {'object_name': 'GeneralConfig'},
@@ -102,7 +102,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'project': ('registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
+            'project': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"})
         },
         'dns.zone': {
