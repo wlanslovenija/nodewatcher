@@ -2,18 +2,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
 
+from web.registry import fields as registry_fields
 from web.utils import ipcalc, db_locker
 import fields as allocation_fields
 
 class PoolAllocationError(Exception):
   pass
-
-class PoolFamily:
-  """
-  Possible address families.
-  """
-  Ipv4 = 4
-  Ipv6 = 6
 
 class PoolStatus:
   """
@@ -30,7 +24,7 @@ class Pool(models.Model):
   as a Pool instance with proper parent pool reference.
   """
   parent = models.ForeignKey('self', null = True, related_name = 'children')
-  family = models.IntegerField(default = 4)
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
   network = models.CharField(max_length = 50)
   cidr = models.IntegerField()
   status = models.IntegerField(default = PoolStatus.Free)
@@ -224,12 +218,11 @@ class Pool(models.Model):
     """
     Returns this pool's address family as a string.
     """
-    if self.family == PoolFamily.Ipv4:
-      return "IPv4"
-    elif self.family == PoolFamily.Ipv6:
-      return "IPv6"
-    else:
-      return _("unknown")
+    for enum, desc in self._meta.get_field_by_name("family")[0].choices:
+      if enum == self.family:
+        return desc
+    
+    return _("unknown")
 
   def __unicode__(self):
     """

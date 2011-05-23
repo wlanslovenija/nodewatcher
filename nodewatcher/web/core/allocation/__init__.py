@@ -66,8 +66,8 @@ class AddressAllocatorFormMixin(object):
     # Only display pools that are available to the selected project
     qs = self.fields['pool'].queryset
     qs = qs.filter(projects = cfg['core.general'][0].project)
-    # TODO pools should use registered family identifiers
-    qs = qs.filter(family = 4 if item.family == "ipv4" else 6)
+    qs = qs.filter(family = item.family)
+    qs = qs.order_by("description", "ip_subnet")
     self.fields['pool'].queryset = qs
     
     # Only display CIDR range that is available for the selected pool
