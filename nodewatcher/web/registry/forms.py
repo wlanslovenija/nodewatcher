@@ -438,13 +438,16 @@ def prepare_forms(context):
       if not context.save and not context.only_rules:
         # We are generating forms for first-time display purpuses, only include forms for
         # existing models
-        if context.hierarchy_parent_cls is not None:
-          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-          existing_models = existing_models.filter(
-            **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
-          )
+        if context.root is not None:
+          if context.hierarchy_parent_cls is not None:
+            existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+            existing_models = existing_models.filter(
+              **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+            )
+          else:
+            existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
         else:
-          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
+          existing_models = []
         
         for index, mdl in enumerate(existing_models):
           form_prefix = context.base_prefix + '_mu_' + str(index)
@@ -522,19 +525,22 @@ def prepare_forms(context):
           )
     else:
       # This item class only supports a single object to be selected
-      qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-      if context.hierarchy_parent_cls is not None:
-        qs = qs.filter(
-          **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
-        )
-      
-      if not context.save and not context.only_rules:
-        try:
-          mdl = qs.all()[0].cast()
-        except IndexError:
+      if context.root is not None:
+        qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+        if context.hierarchy_parent_cls is not None:
+          qs = qs.filter(
+            **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+          )
+        
+        if not context.save and not context.only_rules:
+          try:
+            mdl = qs.all()[0].cast()
+          except IndexError:
+            mdl = None
+        else:
+          qs.delete()
           mdl = None
       else:
-        qs.delete()
         mdl = None
       
       form_prefix = context.base_prefix + '_mu_0'
