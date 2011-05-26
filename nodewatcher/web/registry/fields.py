@@ -45,7 +45,9 @@ class SelectorFormField(form_fields.TypedChoiceField):
       except (KeyError, IndexError, AttributeError):
         return None
     
-    self.choices = BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
+    self.choices = self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
+    if not self.required:
+      self.choices = BLANK_CHOICE_DASH + self.choices
 
 class SelectorKeyField(models.CharField):
   """
