@@ -48,7 +48,7 @@ class LocationWidget(forms.widgets.TextInput):
       try:
         lat, lng = re.split("[\s,]+", str(value).replace('POINT', '').strip()[1:-1])
         lat, lng = float(lat), float(lng)
-        raise ValueError
+        
         # Override zoom when displaying one node (so we don't get per-project values)
         self.default_location[2] = settings.GOOGLE_MAPS_DEFAULT_NODE_ZOOM
       except (ValueError, TypeError):
