@@ -14,9 +14,9 @@ class CgmGeneralConfig(core_models.GeneralConfig):
   Extended general configuration that contains CGM-related options.
   """
   password = models.CharField(max_length = 30)
-  platform = registry_fields.SelectorKeyField("node.config", "core.general#platform")
-  router = registry_fields.SelectorKeyField("node.config", "core.general#router")
-  version = models.CharField(max_length = 20) # TODO fkey to versions (production, experimental, ...)
+  platform = registry_fields.SelectorKeyField("node.config", "core.general#platform", blank = True)
+  router = registry_fields.SelectorKeyField("node.config", "core.general#router", blank = True)
+  version = models.CharField(max_length = 20, blank = True) # TODO fkey to versions (production, experimental, ...)
   
   class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
     registry_name = _("CGM Configuration")
