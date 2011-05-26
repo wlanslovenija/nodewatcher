@@ -1,7 +1,8 @@
 {% load misc %}
 {% load i18n %}
 
-{% include "registry/render_items.html" %}
+{{ registry_forms.media.js }}
+{{ registry_forms }}
 
 <div id="reg_loading_dialog" title="{% trans "Please Wait" %}" style="display: none;">
   <br/>

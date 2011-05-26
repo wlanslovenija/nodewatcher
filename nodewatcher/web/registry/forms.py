@@ -114,7 +114,7 @@ class AssignToFormAction(RegistryFormAction):
 
 class BasicRegistryRenderItem(object):
   """
-  A simple registry reneder item that includes a form with fields and
+  A simple registry render item that includes a form with fields and
   an item class selector when needed.
   """
   template = 'registry/basic_render_item.html'
@@ -129,6 +129,16 @@ class BasicRegistryRenderItem(object):
     self.form = form
     self.meta_form = meta_form
     self.args = kwargs
+  
+  @property
+  def media(self):
+    """
+    Returns the form Media object for this render item.
+    """
+    if self.form is not None and self.meta_form is not None:
+      return self.form.media + self.meta_form.media
+    else:
+      return None
   
   def __unicode__(self):
     """
@@ -155,9 +165,54 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
     
     @param form: Form containing the fields
     @param meta_form: Form containing selected item metadata
-    @param children: A list of child forms
+    @param children: A list of child form descriptors
     """
     super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms = children)
+    self.children = children
+  
+  @property
+  def media(self):
+    """
+    Returns the form Media object for this render item.
+    """
+    base_media = super(NestedRegistryRenderItem, self).media
+    
+    for child in self.children:
+      # Include media from all child render items
+      for subform in child['subforms']:
+        if base_media is not None:
+          base_media += subform.media
+        else:
+          base_media = subform.media
+      
+      # Include media from meta form
+      if child['submeta'] is not None:
+        base_media += child['submeta'].media
+    
+    return base_media
+
+class RootRegistryRenderItem(NestedRegistryRenderItem):
+  """
+  A registry render item that is returned as the root of the render
+  tree. It contains and renders all top-level forms.
+  """
+  template = 'registry/render_items.html'
+  
+  def __init__(self, forms):
+    """
+    Class constructor.
+    
+    @param forms: A list of form descriptors
+    """
+    super(RootRegistryRenderItem, self).__init__(None, None, forms)
+  
+  def __unicode__(self):
+    """
+    Renders this item.
+    """
+    t = template.loader.get_template(self.template)
+    args = { 'registry_forms' : self.children }
+    return t.render(template.Context(args))
 
 class RegistryMetaForm(forms.Form):
   def __init__(self, items, selected_item = None, force_selector_widget = False, *args, **kwargs):
@@ -608,7 +663,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
   
   try:
     sid = transaction.savepoint()
-    forms = prepare_forms(context)
+    forms = RootRegistryRenderItem(prepare_forms(context))
     
     if only_rules:
       # If only rule validation is requested, we should evaluate rules and then rollback
