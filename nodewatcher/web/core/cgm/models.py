@@ -20,6 +20,7 @@ class CgmGeneralConfig(core_models.GeneralConfig):
   
   class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
     registry_name = _("CGM Configuration")
+    hides_parent = True
 
 class CgmGeneralConfigForm(core_models.GeneralConfigForm):
   class Meta(core_models.GeneralConfigForm.Meta):

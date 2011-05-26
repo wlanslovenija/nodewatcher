@@ -94,9 +94,13 @@ class RegistrationPoint(object):
         ))
       
       self.item_registry[registry_id] = item
+    elif getattr(item.RegistryMeta, 'hides_parent', False):
+      parent = item.__base__
+      parent._registry_hide_requests += 1
     
     # Include registration point in item class
     item._registry_regpoint = self
+    item._registry_hide_requests = 0
     
     return True
   
@@ -160,6 +164,10 @@ class RegistrationPoint(object):
     
     @param item_cls: Registry item class
     """
+    parent = item_cls.__base__
+    if getattr(item_cls.RegistryMeta, 'hides_parent', False) and parent != self.item_base:
+      parent._registry_hide_requests -= 1
+    
     item_cls._registry_endpoint = None
     del self.item_classes[item_cls]
   

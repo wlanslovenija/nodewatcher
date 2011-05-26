@@ -477,14 +477,17 @@ def prepare_forms(context):
       if not context.items:
         continue
     
-    # Remove all items that should not be available for this parent
-    if context.hierarchy_parent_cls is not None:
-      for key, value in context.items.items():
+    # Remove all items that should not be visible
+    for key, value in context.items.items():
+      if value._registry_hide_requests > 0:
+        del context.items[key]
+      
+      if context.hierarchy_parent_cls is not None:
         if value not in context.hierarchy_parent_cls._registry_allowed_children:
           del context.items[key]
-      
-      if not context.items:
-        continue
+    
+    if not context.items:
+      continue
     
     context.default_item_cls = context.items.values()[0]
     
