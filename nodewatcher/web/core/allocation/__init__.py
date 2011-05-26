@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from web.core.allocation import pool as pool_models
+# TODO project model should be moved to core
+from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields
 from web.registry import forms as registry_forms
 from web.registry import registration
@@ -65,9 +67,13 @@ class AddressAllocatorFormMixin(object):
     """
     # Only display pools that are available to the selected project
     qs = self.fields['pool'].queryset
-    qs = qs.filter(projects = cfg['core.general'][0].project)
-    qs = qs.filter(family = item.family)
-    qs = qs.order_by("description", "ip_subnet")
+    try:
+      qs = qs.filter(projects = cfg['core.general'][0].project)
+      qs = qs.filter(family = item.family)
+      qs = qs.order_by("description", "ip_subnet")
+    except nodes_models.Project.DoesNotExist:
+      qs = qs.none()
+    
     self.fields['pool'].queryset = qs
     
     # Only display CIDR range that is available for the selected pool

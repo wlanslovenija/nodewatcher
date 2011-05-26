@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from web.core import allocation
+# TODO project model should be moved to core
+from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields
 from web.registry import forms as registry_form
 from web.registry import registration
@@ -45,12 +47,14 @@ class GeneralConfigForm(forms.ModelForm):
     Dynamically modifies the form.
     """
     # Update the location widget's coordinates accoording to project
-    if item.project:
+    try:
       self.fields['geolocation'].widget.default_location = [
         item.project.geo_lat,
         item.project.geo_long,
         item.project.geo_zoom
       ]
+    except nodes_models.Project.DoesNotExist:
+      pass
 
 registration.point("node.config").register_item(GeneralConfig)
 registration.register_form_for_item(GeneralConfig, GeneralConfigForm)
