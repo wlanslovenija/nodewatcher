@@ -29,7 +29,8 @@ class AddressAllocator(models.Model):
     if allocation.pool.cidr != self.cidr:
       return False
     
-    # TODO Pool family
+    if allocation.pool.family != self.family:
+      return False
     
     if allocation.pool.top_level() != self.pool:
       return False
