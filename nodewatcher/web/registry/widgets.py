@@ -121,7 +121,7 @@ class LocationWidget(forms.widgets.TextInput):
     if lat is None:
       html = self.inner_widget.render("%s" % name, "", { 'id' : 'id_%s' % name })
     else:
-      html = self.inner_widget.render("%s" % name, "POINT(%f, %f)" % (lat, lng), { 'id' : 'id_%s' % name })
+      html = self.inner_widget.render("%s" % name, "POINT(%f %f)" % (lat, lng), { 'id' : 'id_%s' % name })
     
     html += '<div id="gmap_%s" style="width: %dpx; height: %dpx"></div>' % (name, self.map_width, self.map_height)
     return safestring.mark_safe(js + html)
