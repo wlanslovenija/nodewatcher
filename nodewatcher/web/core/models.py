@@ -5,8 +5,9 @@ from django.utils.translation import ugettext as _
 
 from web.core import allocation
 from web.registry import fields as registry_fields
-from web.registry import forms as registry_forms
+from web.registry import forms as registry_form
 from web.registry import registration
+from web.registry import widgets as registry_widgets
 
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   """
@@ -32,6 +33,24 @@ class GeneralConfigForm(forms.ModelForm):
   """
   class Meta:
     model = GeneralConfig
+    widgets = {
+      'geolocation' : registry_widgets.LocationWidget(
+        map_width = 400,
+        map_height = 300
+      )
+    }
+  
+  def modify_to_context(self, item, cfg):
+    """
+    Dynamically modifies the form.
+    """
+    # Update the location widget's coordinates accoording to project
+    if item.project:
+      self.fields['geolocation'].widget.default_location = [
+        item.project.geo_lat,
+        item.project.geo_long,
+        item.project.geo_zoom
+      ]
 
 registration.point("node.config").register_item(GeneralConfig)
 registration.register_form_for_item(GeneralConfig, GeneralConfigForm)

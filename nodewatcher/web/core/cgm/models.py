@@ -21,8 +21,8 @@ class CgmGeneralConfig(core_models.GeneralConfig):
   class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
     registry_name = _("CGM Configuration")
 
-class CgmGeneralConfigForm(forms.ModelForm):
-  class Meta:
+class CgmGeneralConfigForm(core_models.GeneralConfigForm):
+  class Meta(core_models.GeneralConfigForm.Meta):
     model = CgmGeneralConfig
 
 registration.point("node.config").register_item(CgmGeneralConfig)
