@@ -10,7 +10,7 @@ def generate_config(node, only_validate = False):
   # Determine the destination platform
   try:
     platform = cgm_base.get_platform(node.config.core.general().platform)
-  except AttributeError:
+  except (AttributeError, KeyError):
     return None
   
   cfg = platform.generate(node)
