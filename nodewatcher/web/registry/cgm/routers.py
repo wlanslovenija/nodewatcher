@@ -26,12 +26,30 @@ class RouterRadio(object):
   """
   An abstract descriptor of a router radio.
   """
-  def __init__(self, identifier, description):
+  def __init__(self, identifier, description, protocols):
     """
     Class constructor.
     """
     self.identifier = identifier
     self.description = description
+    self.protocols = protocols
+  
+  def get_protocol_choices(self):
+    """
+    Returns a list of protocol choices for this radio.
+    """
+    for protocol in self.protocols:
+      yield protocol.identifier, protocol.description
+  
+  def get_protocol(self, identifier):
+    """
+    Returns the protocol descriptor for a given identifier.
+    
+    @param identifier: Protocol descriptor
+    """
+    for protocol in self.protocols:
+      if protocol.identifier == identifier:
+        return protocol
 
 class IntegratedRadio(RouterRadio):
   """
@@ -150,6 +168,17 @@ class RouterBase(object):
     Prevent modification of router model descriptors.
     """
     raise AttributeError("Router model descriptors are immutable!")
+  
+  @classmethod
+  def get_radio(cls, identifier):
+    """
+    Returns a radio descriptor with the specified identifier.
+    
+    @param identifier: Radio identifier
+    """
+    for radio in cls.radios:
+      if radio.identifier == identifier:
+        return radio
 
 def register_module(platform = None, order = 1):
   """

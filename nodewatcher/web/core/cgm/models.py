@@ -1,5 +1,6 @@
 from django import forms
 from django.db import models
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext as _
 
 from web.core import allocation
@@ -8,6 +9,7 @@ from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields
 from web.registry import forms as registry_forms
 from web.registry import registration
+from web.registry.cgm import base as cgm_base
 
 class CgmGeneralConfig(core_models.GeneralConfig):
   """
@@ -77,13 +79,63 @@ class WifiInterfaceConfig(CgmInterfaceConfig):
   A wireless interface.
   """
   wifi_radio = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_radio")
-  protocol = models.CharField(max_length = 50) # TODO should be a registered choice (router-dep)
-  channel = models.IntegerField(default = 8) # TODO should be a registered choice (proto-dep)
-  bitrate = models.IntegerField(default = 11) # TODO should be a registered choice (proto-dep)
+  protocol = models.CharField(max_length = 50)
+  channel = models.CharField(max_length = 50)
+  bitrate = models.IntegerField(default = 11)
   
   class RegistryMeta(CgmInterfaceConfig.RegistryMeta):
     registry_name = _("Wireless Radio")
 
+class WifiInterfaceConfigForm(forms.ModelForm):
+  """
+  A wireless interface configuration form.
+  """
+  class Meta:
+    model = WifiInterfaceConfig
+  
+  def regulatory_filter(self):
+    """
+    Subclasses may override this method to filter the channels accoording to a
+    filter for a regulatory domain. It should return a list of frequencies that
+    are allowed.
+    """
+    return None
+  
+  def modify_to_context(self, item, cfg):
+    """
+    Handles dynamic protocol/channel selection.
+    """
+    radio = None
+    try:
+      radio = cgm_base.get_platform(cfg['core.general'][0].platform) \
+                      .get_router(cfg['core.general'][0].router) \
+                      .get_radio(item.wifi_radio)
+      
+      # Protocols
+      self.fields['protocol'] = registry_fields.SelectorFormField(
+        label = _("Protocol"),
+        choices = BLANK_CHOICE_DASH + list(radio.get_protocol_choices()),
+        coerce = str,
+        empty_value = None
+      )
+    except (KeyError, IndexError, AttributeError):
+      # Create empty fields on error
+      self.fields['protocol'] = registry_fields.SelectorFormField(label = "Protocol", choices = BLANK_CHOICE_DASH)
+      self.fields['channel'] = registry_fields.SelectorFormField(label = "Channel", choices = BLANK_CHOICE_DASH)
+    
+    # Channels
+    try:
+      self.fields['channel'] = registry_fields.SelectorFormField(
+        label = _("Channel"),
+        choices = BLANK_CHOICE_DASH + list(radio.get_protocol(item.protocol).get_channel_choices(self.regulatory_filter())),
+        coerce = str,
+        empty_value = None
+      )
+    except (KeyError, AttributeError):
+      # Create empty field on error
+      self.fields['channel'] = registry_fields.SelectorFormField(label = "Channel", choices = BLANK_CHOICE_DASH)
+
+registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
 registration.point("node.config").register_item(WifiInterfaceConfig)
 
 class CgmNetworkConfig(registration.bases.NodeConfigRegistryItem):

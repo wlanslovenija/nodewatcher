@@ -1,5 +1,6 @@
 from web.registry.cgm import base as cgm_base
 from web.registry.cgm import routers as cgm_routers
+from web.registry.cgm import protocols as cgm_protocols
 
 class Fonera(cgm_routers.RouterBase):
   """
@@ -9,7 +10,7 @@ class Fonera(cgm_routers.RouterBase):
   name = "Fonera"
   architecture = "atheros"
   radios = [
-    cgm_routers.IntegratedRadio("ath0", "Wifi0")
+    cgm_routers.IntegratedRadio("ath0", "Wifi0", [cgm_protocols.IEEE80211BG])
   ]
   ports = [
     cgm_routers.EthernetPort("eth0", "Ethernet0")
