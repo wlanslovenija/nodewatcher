@@ -42,8 +42,10 @@ class PlatformBase(object):
     
     # Process packages
     for name, cfgclass, package in self._packages:
-      package(node, node.config.core.packages(onlyclass = cfgclass), cfg)
-      self.install_optional_package(name)
+      pkgcfg = node.config.core.packages(onlyclass = cfgclass)
+      if [x for x in pkgcfg if x.enabled]:
+        package(node, pkgcfg, cfg)
+        self.install_optional_package(name)
     
     return cfg
   
