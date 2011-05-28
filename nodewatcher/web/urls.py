@@ -85,8 +85,8 @@ urlpatterns = patterns('',
   # Generator
   url(r'^generator/request/(?P<node>.*)$', 'web.generator.views.request', name = 'generate_node'),
   
-  # Registry dynamic forms
-  url(r'^registry/evaluate_forms/(?P<regpoint_id>.*)/(?P<root_id>.*)$', 'registry.views.evaluate_forms'),
+  # Registry
+  (r'^registry/', include('registry.urls', namespace = 'registry')),
 
   # Authentication
   url(r'^auth/login$', 'django.contrib.auth.views.login', { 'template_name' : 'auth/login.html' }, name = 'auth_login'),
