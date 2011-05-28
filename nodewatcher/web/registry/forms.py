@@ -311,6 +311,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   )
   
   # Discover the current item model in the partially validated config hierarchy
+  form_modified = False
   current_config_item = None
   if context.current_config is not None:
     try:
@@ -328,19 +329,21 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   
   def modify_to_context(obj):
     if not hasattr(obj, 'modify_to_context'):
-      return
+      return False
     
     item = current_config_item or instance
     cfg = context.current_config or context.regpoint.get_accessor(context.root).to_partial()
     obj.modify_to_context(item, cfg)
+    return True
   
   if partial is None:
     # Enable forms to modify themselves accoording to current context
-    modify_to_context(form)
+    form_modified = modify_to_context(form)
   
     # Enable form fields to modify themselves accoording to current context
     for name, field in form.fields.iteritems():
-      modify_to_context(field)
+      if modify_to_context(field):
+        form_modified = True
   
   config = None
   if validate:
@@ -355,6 +358,22 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
           form.save()
       else:
         context.validation_errors = True
+      
+      # Update the current config item as it may have changed due to modify_to_context calls
+      if form_modified and current_config_item is not None:
+        pform = copy.copy(form)
+        pform.cleaned_data = {}
+        pform._errors = {}
+        pform._clean_fields()
+        
+        for field in current_config_item._meta.fields:
+          if not field.editable or field.rel is not None:
+            continue
+          
+          try:
+            setattr(current_config_item, field.name, pform.cleaned_data.get(field.name, None))
+          except AttributeError:
+            pass
     else:
       # We are only interested in all the current values even if they might be incomplete
       # and/or invalid, so we can't do full form validation
