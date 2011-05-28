@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext as _
 
 from web.core.allocation import pool as pool_models
@@ -82,11 +83,11 @@ class AddressAllocatorFormMixin(object):
       pool = item.pool
       self.fields['cidr'] = registry_fields.SelectorFormField(
         label = "CIDR",
-        choices = [(plen, "/%s" % plen) for plen in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)],
+        choices = BLANK_CHOICE_DASH + [(plen, "/%s" % plen) for plen in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)],
         initial = pool.default_prefix_len,
         coerce = int,
         empty_value = None
       )
     except pool_models.Pool.DoesNotExist:
-      self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR")
+      self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR", choices = BLANK_CHOICE_DASH)
 
