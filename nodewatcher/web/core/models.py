@@ -17,10 +17,13 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   router type and the platform used.
   """
   name = models.CharField(max_length = 30)
+  type = registry_fields.SelectorKeyField("node.config", "core.general#type")
   project = registry_fields.ModelSelectorKeyField("nodes.Project")
   location = models.CharField(max_length = 100)
   geolocation = gis_models.PointField()
   altitude = models.IntegerField(default = 0)
+  notes = models.TextField(blank = True, default = "")
+  url = models.CharField(max_length = 200, blank = True, default = "", verbose_name = _("URL"))
   
   class RegistryMeta:
     form_order = 1
@@ -56,6 +59,12 @@ class GeneralConfigForm(forms.ModelForm):
     except nodes_models.Project.DoesNotExist:
       pass
 
+registration.point("node.config").register_choice("core.general#type", "wireless", _("Wireless"))
+registration.point("node.config").register_choice("core.general#type", "server", _("Server"))
+registration.point("node.config").register_choice("core.general#type", "mobile", _("Mobile"))
+registration.point("node.config").register_choice("core.general#type", "test", _("Test"))
+registration.point("node.config").register_choice("core.general#type", "dead", _("Dead"))
+registration.point("node.config").register_choice("core.general#type", "unknown", _("Unknown"))
 registration.point("node.config").register_item(GeneralConfig)
 registration.register_form_for_item(GeneralConfig, GeneralConfigForm)
 
