@@ -215,7 +215,7 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
     return t.render(template.Context(args))
 
 class RegistryMetaForm(forms.Form):
-  def __init__(self, items, selected_item = None, force_selector_widget = False, *args, **kwargs):
+  def __init__(self, items, selected_item = None, force_selector_widget = False, static = False, *args, **kwargs):
     """
     Class constructor.
     """
@@ -225,11 +225,16 @@ class RegistryMetaForm(forms.Form):
       selected_item = items.values()[0]
     selected_item = selected_item._meta.module_name
     
+    if not static and (len(items) > 1 or force_selector_widget):
+      item_widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' })
+    else:
+      item_widget = forms.HiddenInput
+    
     self.fields['item'] = forms.TypedChoiceField(
       choices = [(name, item.RegistryMeta.registry_name) for name, item in items.iteritems()],
       coerce = str,
       initial = selected_item,
-      widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' }) if len(items) > 1 or force_selector_widget else forms.HiddenInput
+      widget = item_widget
     )
     self.fields['prev_item'] = forms.TypedChoiceField(
       choices = [(name, item.RegistryMeta.registry_name) for name, item in items.iteritems()],
@@ -246,7 +251,7 @@ class RegistrySetMetaForm(forms.Form):
   )
 
 def generate_form_for_class(context, prefix, data, index, instance = None, validate = False, partial = None,
-                            force_selector_widget = False):
+                            force_selector_widget = False, static = False):
   """
   A helper function for generating a form for a specific registry item class.
   """
@@ -255,9 +260,10 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   
   # Parse a form that holds the item selector
   meta_form = RegistryMetaForm(context.items, selected_item, data = data, prefix = prefix,
-    force_selector_widget = force_selector_widget
+    force_selector_widget = force_selector_widget,
+    static = static
   )
-  if validate:
+  if validate and not static:
     if not meta_form.is_valid():
       context.validation_errors = True
     else:
@@ -271,7 +277,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   
   # Items have changed between submissions, we should copy some field values from the
   # previous form to the new one
-  if previous_item is not None and selected_item != previous_item:
+  if previous_item is not None and selected_item != previous_item and not static:
     pform = previous_item.get_form()(
       data,
       prefix = prefix + '_' + previous_item._meta.module_name
@@ -380,7 +386,8 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   
   # Generate a new meta form, since the previous item has now changed
   meta_form = RegistryMetaForm(context.items, selected_item, prefix = prefix,
-    force_selector_widget = force_selector_widget
+    force_selector_widget = force_selector_widget,
+    static = static
   )
   
   # Pack forms into a proper abstract representation
@@ -491,96 +498,127 @@ def prepare_forms(context):
     
     context.default_item_cls = context.items.values()[0]
     
-    if getattr(cls_meta, 'multiple', False):
-      # This is an item class that supports multiple objects of the same class
-      if not context.save and not context.only_rules:
-        # We are generating forms for first-time display purpuses, only include forms for
-        # existing models
-        if context.root is not None:
-          if context.hierarchy_parent_cls is not None:
-            existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-            existing_models = existing_models.filter(
-              **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
-            )
-          else:
-            existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
-        else:
-          existing_models = []
-        
-        for index, mdl in enumerate(existing_models):
-          form_prefix = context.base_prefix + '_mu_' + str(index)
-          context.subforms.append(generate_form_for_class(
-            context,
-            form_prefix,
-            None,
-            index,
-            instance = mdl.cast(),
-            force_selector_widget = context.force_selector_widget
-          ))
-        
-        # Create the form that contains metadata for this formset
-        submeta = RegistrySetMetaForm(
-          context.data,
-          prefix = context.base_prefix + '_sm',
-          initial = { 'form_count' : len(context.subforms) }
-        )
-      else:
-        # We are saving or preparing to evaluate rules, so we regenerate all items
+    def existing_models_for_multiple():
+      existing_models = []
+      if context.root is not None:
         if context.hierarchy_parent_cls is not None:
-          qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-          qs = qs.filter(
+          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+          existing_models = existing_models.filter(
             **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
           )
-          qs.delete()
         else:
-          context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True).delete()
-        
-        submeta = RegistrySetMetaForm(
-          context.data,
-          prefix = context.base_prefix + '_sm'
-        )
-        form_count = 0
-        if submeta.is_valid():
-          form_count = submeta.cleaned_data['form_count']
-        else:
-          submeta = RegistrySetMetaForm(
-            prefix = context.base_prefix + '_sm',
-            initial = { 'form_count' : 0 }
-          )
-        
-        # TODO implement 'assign' action (its order is not relevant)
-        context.item_actions = context.actions.get(context.base_prefix, []) + context.actions.get(cls_meta.registry_id, [])
-        meta_modified = False
-        
-        # Generate the right amount of forms
-        for index in xrange(form_count):
+          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
+      else:
+        existing_models = []
+      
+      return existing_models
+    
+    if getattr(cls_meta, 'multiple', False):
+      # This is an item class that supports multiple objects of the same class
+      if getattr(cls_meta, 'multiple_static', False):
+        # All multiple objects that are registered should always be displayed
+        existing_models = existing_models_for_multiple()
+        for index, item in enumerate(context.items.values()):
+          mdl = None
+          for emdl in existing_models:
+            if isinstance(emdl, item):
+              mdl = emdl
+              break
+          else:
+            mdl = item(root = context.root)
+          
           form_prefix = context.base_prefix + '_mu_' + str(index)
           context.subforms.append(generate_form_for_class(
             context,
             form_prefix,
             context.data,
             index,
-            validate = True,
+            instance = mdl,
+            validate = context.save or context.only_rules,
             partial = context.partial_config,
-            force_selector_widget = context.force_selector_widget
+            static = True
           ))
-        
-        # Check for any actions and execute them
-        for action in context.item_actions:
-          action.context = context
-          if action.modify_forms_after():
-            meta_modified = True
-        
-        if meta_modified:
-          # If a form has been modified we cannot simply save, so we fake a validation
-          # error so the user will be displayed the updated forms
-          context.validation_errors = True
+      else:
+        # Dynamically modifiable multiple objects
+        if not context.save and not context.only_rules:
+          # We are generating forms for first-time display purpuses, only include forms for
+          # existing models
+          existing_models = existing_models_for_multiple()
           
-          # Update the submeta form with new count
+          for index, mdl in enumerate(existing_models):
+            form_prefix = context.base_prefix + '_mu_' + str(index)
+            context.subforms.append(generate_form_for_class(
+              context,
+              form_prefix,
+              None,
+              index,
+              instance = mdl.cast(),
+              force_selector_widget = context.force_selector_widget
+            ))
+          
+          # Create the form that contains metadata for this formset
           submeta = RegistrySetMetaForm(
+            context.data,
             prefix = context.base_prefix + '_sm',
             initial = { 'form_count' : len(context.subforms) }
           )
+        else:
+          # We are saving or preparing to evaluate rules, so we regenerate all items
+          if context.hierarchy_parent_cls is not None:
+            qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+            qs = qs.filter(
+              **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+            )
+            qs.delete()
+          else:
+            context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True).delete()
+          
+          submeta = RegistrySetMetaForm(
+            context.data,
+            prefix = context.base_prefix + '_sm'
+          )
+          form_count = 0
+          if submeta.is_valid():
+            form_count = submeta.cleaned_data['form_count']
+          else:
+            submeta = RegistrySetMetaForm(
+              prefix = context.base_prefix + '_sm',
+              initial = { 'form_count' : 0 }
+            )
+          
+          # TODO implement 'assign' action (its order is not relevant)
+          context.item_actions = context.actions.get(context.base_prefix, []) + context.actions.get(cls_meta.registry_id, [])
+          meta_modified = False
+          
+          # Generate the right amount of forms
+          for index in xrange(form_count):
+            form_prefix = context.base_prefix + '_mu_' + str(index)
+            context.subforms.append(generate_form_for_class(
+              context,
+              form_prefix,
+              context.data,
+              index,
+              validate = True,
+              partial = context.partial_config,
+              force_selector_widget = context.force_selector_widget
+            ))
+          
+          # Check for any actions and execute them
+          for action in context.item_actions:
+            action.context = context
+            if action.modify_forms_after():
+              meta_modified = True
+          
+          if meta_modified:
+            # If a form has been modified we cannot simply save, so we fake a validation
+            # error so the user will be displayed the updated forms
+            context.validation_errors = True
+            
+            # Update the submeta form with new count
+            submeta = RegistrySetMetaForm(
+              prefix = context.base_prefix + '_sm',
+              initial = { 'form_count' : len(context.subforms) }
+            )
     else:
       # This item class only supports a single object to be selected
       if context.root is not None:
@@ -615,12 +653,13 @@ def prepare_forms(context):
       submeta = None
     
     forms.append({
-      'name'        : cls_meta.registry_section,
-      'id'          : cls_meta.registry_id,
-      'multiple'    : getattr(cls_meta, 'multiple', False),
-      'subforms'    : context.subforms,
-      'submeta'     : submeta,
-      'prefix'      : context.base_prefix
+      'name'                    : cls_meta.registry_section,
+      'id'                      : cls_meta.registry_id,
+      'multiple'                : getattr(cls_meta, 'multiple', False),
+      'hide_multiple_controls'  : getattr(cls_meta, 'multiple_static', False),
+      'subforms'                : context.subforms,
+      'submeta'                 : submeta,
+      'prefix'                  : context.base_prefix
     })
   
   return forms

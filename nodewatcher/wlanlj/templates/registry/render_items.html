@@ -4,8 +4,10 @@
 {% for descriptor in registry_forms %}
 {% heading 3 descriptor.name %}
   {% if descriptor.multiple %}
+  {% if not descriptor.hide_multiple_controls %}
   <input type="button" value="{% trans 'Add' %}" name="{{ descriptor.prefix }}" class="regact_adder">
   <input type="button" value="{% trans 'Remove Last' %}" name="{{ descriptor.prefix }}" class="regact_remover">
+  {% endif %}
   {{ descriptor.submeta }}
   <div id="{{ descriptor.prefix }}_mu_container">
   {% endif %}
