@@ -137,3 +137,14 @@ class VpnServerRoleConfig(RoleConfig):
 
 registration.point("node.config").register_item(VpnServerRoleConfig)
 
+class RedundantNodeRoleConfig(RoleConfig):
+  """
+  Describes the "redundant node" role.
+  """
+  redundancy_required = models.BooleanField(default = False)
+  
+  class RegistryMeta(RoleConfig.RegistryMeta):
+    registry_name = _("Redundant Node Role")
+
+registration.point("node.config").register_item(RedundantNodeRoleConfig)
+
