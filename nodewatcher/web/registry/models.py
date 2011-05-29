@@ -52,6 +52,18 @@ class RegistryItemBase(models.Model):
     else:
       return cls.__base__.top_model()
   
+  @classmethod
+  def can_add(cls, user):
+    """
+    Returns True if the user has permissions to add this registry item.
+    """
+    return user.has_perm(
+      "%(app_label)s.add_%(module_name)s" % {
+        "app_label" : cls._meta.app_label,
+        "module_name" : cls._meta.module_name
+     }
+   )
+  
   def cast(self):
     """
     Casts this registry item into the proper downwards type.

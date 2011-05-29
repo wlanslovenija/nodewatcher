@@ -27,6 +27,7 @@ def evaluate_forms(request, regpoint_id, root_id):
     # First perform partial validation and rule evaluation
     actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
       regpoint,
+      request,
       root,
       request.POST,
       only_rules = True
@@ -47,6 +48,7 @@ def evaluate_forms(request, regpoint_id, root_id):
     # Apply rules and fully validate processed forms
     _, forms = registry_forms.prepare_forms_for_regpoint_root(
       regpoint,
+      request,
       root,
       request.POST,
       save = True,

@@ -3,7 +3,7 @@ import json
 
 from django import forms, template
 from django.core import exceptions
-from django.db import transaction
+from django.db import transaction, models
 
 from web.registry import rules as registry_rules
 from web.registry import registration
@@ -215,29 +215,36 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
     return t.render(template.Context(args))
 
 class RegistryMetaForm(forms.Form):
-  def __init__(self, items, selected_item = None, force_selector_widget = False, static = False, *args, **kwargs):
+  """
+  Form for selecting which item should be displayed.
+  """
+  def __init__(self, context, selected_item = None, force_selector_widget = False, static = False, *args, **kwargs):
     """
     Class constructor.
     """
     super(RegistryMetaForm, self).__init__(*args, **kwargs)
     
+    # Choose a default item in case one is not set
     if selected_item is None:
-      selected_item = items.values()[0]
+      selected_item = context.items.values()[0]
     selected_item = selected_item._meta.module_name
     
-    if not static and (len(items) > 1 or force_selector_widget):
+    if not static and (len(context.items) > 1 or force_selector_widget):
       item_widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' })
     else:
       item_widget = forms.HiddenInput
     
+    # Generate list of item choices
+    item_choices = [(name, item.RegistryMeta.registry_name) for name, item in context.items.iteritems()]
+    
     self.fields['item'] = forms.TypedChoiceField(
-      choices = [(name, item.RegistryMeta.registry_name) for name, item in items.iteritems()],
+      choices = item_choices,
       coerce = str,
       initial = selected_item,
       widget = item_widget
     )
     self.fields['prev_item'] = forms.TypedChoiceField(
-      choices = [(name, item.RegistryMeta.registry_name) for name, item in items.iteritems()],
+      choices = item_choices,
       coerce = str,
       initial = selected_item,
       widget = forms.HiddenInput
@@ -259,7 +266,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   previous_item = None
   
   # Parse a form that holds the item selector
-  meta_form = RegistryMetaForm(context.items, selected_item, data = data, prefix = prefix,
+  meta_form = RegistryMetaForm(context, selected_item, data = data, prefix = prefix,
     force_selector_widget = force_selector_widget,
     static = static
   )
@@ -404,7 +411,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
         setattr(config, field, value)
   
   # Generate a new meta form, since the previous item has now changed
-  meta_form = RegistryMetaForm(context.items, selected_item, prefix = prefix,
+  meta_form = RegistryMetaForm(context, selected_item, prefix = prefix,
     force_selector_widget = force_selector_widget,
     static = static
   )
@@ -413,6 +420,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
   if hasattr(selected_item, '_registry_has_children'):
     sub_context = RegistryFormContext(
       regpoint = context.regpoint,
+      request = context.request,
       root = context.root,
       data = context.data,
       save = context.save,
@@ -444,6 +452,7 @@ class RegistryFormContext(object):
   Form render context.
   """
   regpoint = None
+  request = None
   root = None
   data = None
   save = False
@@ -464,6 +473,7 @@ class RegistryFormContext(object):
   force_selector_widget = False
   items = None
   item_actions = None
+  existing_items = None
   
   def __init__(self, **kwargs):
     """
@@ -478,6 +488,7 @@ def prepare_forms(context):
   forms = []
   for _, items in context.regpoint.item_list.iteritems():
     context.items = copy.deepcopy(items)
+    context.existing_items = set()
     item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
     
@@ -503,6 +514,22 @@ def prepare_forms(context):
       if not context.items:
         continue
     
+    # Fetch existing models for this item
+    existing_models_qs = models.query.EmptyQuerySet()
+    existing_models = []
+    if context.root is not None:
+      existing_models_qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+      
+      if context.hierarchy_parent_cls is not None:
+        existing_models_qs = existing_models_qs.filter(
+          **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+        )
+      
+      for mdl in existing_models_qs:
+        mdl = mdl.cast()
+        existing_models.append(mdl)
+        context.existing_items.add(mdl.__class__)
+    
     # Remove all items that should not be visible
     for key, value in context.items.items():
       if value._registry_hide_requests > 0:
@@ -511,32 +538,21 @@ def prepare_forms(context):
       if context.hierarchy_parent_cls is not None:
         if value not in context.hierarchy_parent_cls._registry_allowed_children:
           del context.items[key]
+      
+      # Only show items that the user is allowed to see; this includes any item that
+      # the user has "add" permissions on and also any item that already exists
+      if not value.can_add(context.request.user) and value not in context.existing_items:
+        del context.items[key]
     
     if not context.items:
       continue
     
     context.default_item_cls = context.items.values()[0]
     
-    def existing_models_for_multiple():
-      existing_models = []
-      if context.root is not None:
-        if context.hierarchy_parent_cls is not None:
-          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-          existing_models = existing_models.filter(
-            **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
-          )
-        else:
-          existing_models = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id)
-      else:
-        existing_models = []
-      
-      return existing_models
-    
     if getattr(cls_meta, 'multiple', False):
       # This is an item class that supports multiple objects of the same class
       if getattr(cls_meta, 'multiple_static', False):
         # All multiple objects that are registered should always be displayed
-        existing_models = existing_models_for_multiple()
         for index, item in enumerate(context.items.values()):
           mdl = None
           for emdl in existing_models:
@@ -562,8 +578,6 @@ def prepare_forms(context):
         if not context.save and not context.only_rules:
           # We are generating forms for first-time display purpuses, only include forms for
           # existing models
-          existing_models = existing_models_for_multiple()
-          
           for index, mdl in enumerate(existing_models):
             form_prefix = context.base_prefix + '_mu_' + str(index)
             context.subforms.append(generate_form_for_class(
@@ -571,7 +585,7 @@ def prepare_forms(context):
               form_prefix,
               None,
               index,
-              instance = mdl.cast(),
+              instance = mdl,
               force_selector_widget = context.force_selector_widget
             ))
           
@@ -583,14 +597,7 @@ def prepare_forms(context):
           )
         else:
           # We are saving or preparing to evaluate rules, so we regenerate all items
-          if context.hierarchy_parent_cls is not None:
-            qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-            qs = qs.filter(
-              **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
-            )
-            qs.delete()
-          else:
-            context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True).delete()
+          existing_models_qs.delete()
           
           submeta = RegistrySetMetaForm(
             context.data,
@@ -640,22 +647,13 @@ def prepare_forms(context):
             )
     else:
       # This item class only supports a single object to be selected
-      if context.root is not None:
-        qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
-        if context.hierarchy_parent_cls is not None:
-          qs = qs.filter(
-            **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
-          )
+      try:
+        mdl = existing_models[0]
         
-        if not context.save and not context.only_rules:
-          try:
-            mdl = qs.all()[0].cast()
-          except IndexError:
-            mdl = None
-        else:
-          qs.delete()
+        if context.save or context.only_rules:
+          existing_models_qs.delete()
           mdl = None
-      else:
+      except IndexError:
         mdl = None
       
       form_prefix = context.base_prefix + '_mu_0'
@@ -683,13 +681,14 @@ def prepare_forms(context):
   
   return forms
 
-def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = False, only_rules = False, also_rules = False, actions = None,
-                                    current_config = None):
+def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None, save = False, only_rules = False, also_rules = False,
+                                    actions = None, current_config = None):
   """
   Prepares a list of configuration forms for use on a regpoint root's
   configuration page.
   
   @param regpoint: Registration point name or instance
+  @param request: Request instance
   @param root: Registration point root instance for which to generate forms
   @param data: User-supplied POST data
   @param save: Are we performing a save or rendering an initial form
@@ -711,6 +710,7 @@ def prepare_forms_for_regpoint_root(regpoint, root = None, data = None, save = F
   # Prepare context
   context = RegistryFormContext(
     regpoint = regpoint,
+    request = request,
     root = root,
     data = data,
     save = save,

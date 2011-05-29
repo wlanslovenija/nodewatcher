@@ -169,6 +169,7 @@ def node_edit(request, node):
       
       actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
         "node.config",
+        request,
         node,
         data = request.POST,
         only_rules = True
@@ -178,6 +179,7 @@ def node_edit(request, node):
       if form.is_valid() and form.save(node, request.user):
         has_errors, dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
           "node.config",
+          request,
           node,
           data = request.POST,
           save = True,
@@ -254,7 +256,7 @@ def node_edit(request, node):
       })
 
     form = UpdateNodeForm(node, initial = p)
-    dynamic_forms, eval_state = registry_forms.prepare_forms_for_regpoint_root("node.config", node, also_rules = True)
+    dynamic_forms, eval_state = registry_forms.prepare_forms_for_regpoint_root("node.config", request, node, also_rules = True)
 
   return render_to_response('nodes/edit.html',
     { 'form' : form,
