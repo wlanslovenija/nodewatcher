@@ -51,5 +51,5 @@ class NodewatcherBackend(auth_backends.ModelBackend):
     if user_obj.is_staff:
       return True
     
-    return super(NodewatcherBackend, self).has_perm(user_obj, app_label)
+    return super(NodewatcherBackend, self).has_perm(user_obj, perm)
 

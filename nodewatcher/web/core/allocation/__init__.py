@@ -73,7 +73,7 @@ class AddressAllocatorFormMixin(object):
       qs = qs.filter(projects = cfg['core.general'][0].project)
       qs = qs.filter(family = item.family)
       qs = qs.order_by("description", "ip_subnet")
-    except nodes_models.Project.DoesNotExist:
+    except (nodes_models.Project.DoesNotExist, KeyError, AttributeError):
       qs = qs.none()
     
     self.fields['pool'].queryset = qs
@@ -88,6 +88,6 @@ class AddressAllocatorFormMixin(object):
         coerce = int,
         empty_value = None
       )
-    except pool_models.Pool.DoesNotExist:
+    except (pool_models.Pool.DoesNotExist, AttributeError):
       self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR", choices = BLANK_CHOICE_DASH)
 

@@ -56,7 +56,7 @@ class GeneralConfigForm(forms.ModelForm):
         item.project.geo_long,
         item.project.geo_zoom
       ]
-    except nodes_models.Project.DoesNotExist:
+    except (nodes_models.Project.DoesNotExist, AttributeError):
       pass
 
 registration.point("node.config").register_choice("core.general#type", "wireless", _("Wireless"))

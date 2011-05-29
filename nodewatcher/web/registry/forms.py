@@ -534,15 +534,18 @@ def prepare_forms(context):
     for key, value in context.items.items():
       if value._registry_hide_requests > 0:
         del context.items[key]
+        continue
       
       if context.hierarchy_parent_cls is not None:
         if value not in context.hierarchy_parent_cls._registry_allowed_children:
           del context.items[key]
+          continue
       
       # Only show items that the user is allowed to see; this includes any item that
       # the user has "add" permissions on and also any item that already exists
       if not value.can_add(context.request.user) and value not in context.existing_items:
         del context.items[key]
+        continue
     
     if not context.items:
       continue
