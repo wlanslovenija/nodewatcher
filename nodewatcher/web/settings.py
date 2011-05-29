@@ -147,7 +147,7 @@ AUTH_PROFILE_MODULE = 'account.useraccount'
 # We are using SSO with Trac so we have our own auth module, you should probably use something from Django (also to register users)
 # See http://docs.djangoproject.com/en/dev/topics/auth/
 AUTHENTICATION_BACKENDS = (
-  'web.account.auth.CryptBackend',
+  'web.account.auth.NodewatcherBackend',
 )
 
 INSTALLED_APPS = (

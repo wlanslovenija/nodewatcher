@@ -1,13 +1,18 @@
+from crypt import crypt
+
+from django.contrib.auth import backends as auth_backends
 from django.contrib.auth.models import User
 from django.contrib.auth.models import check_password
-from crypt import crypt
 
 if crypt('', '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/') != '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/':
   # crypt does not support MD5 hashed passwords, we will use Python implementation
   from md5crypt import unix_md5_crypt
   crypt = unix_md5_crypt
 
-class CryptBackend:
+class NodewatcherBackend(auth_backends.ModelBackend):
+  """
+  Mildly augmented auth backend.
+  """
   supports_anonymous_user = False
   supports_object_permissions = False
   
@@ -27,7 +32,7 @@ class CryptBackend:
       pass
     except User.DoesNotExist:
       return None
-
+    
     try:
       if crypt(password, user.password) == user.password and user.is_active:
         return user
@@ -37,12 +42,4 @@ class CryptBackend:
       return None
     except ValueError:
       return None
-  
-  def get_user(self, user_id):
-    """
-    Translates the user id into a User object.
-    """
-    try:
-      return User.objects.get(pk = user_id)
-    except User.DoesNotExist:
-      return None
+
