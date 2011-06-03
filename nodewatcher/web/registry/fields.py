@@ -13,6 +13,7 @@ import south.modelsinspector
 
 from web.registry import registration
 from web.registry import models as registry_models
+from web.utils import ipaddr
 
 class SelectorFormField(form_fields.TypedChoiceField):
   """
@@ -193,6 +194,9 @@ class MACAddressField(models.Field):
     super(MACAddressField, self).__init__(*args, **kwargs)
 
   def get_internal_type(self):
+    """
+    Returns the underlying field type.
+    """
     return "CharField"
 
   def formfield(self, **kwargs):
@@ -202,6 +206,97 @@ class MACAddressField(models.Field):
     defaults = { 'form_class': MACAddressFormField }
     defaults.update(kwargs)
     return super(MACAddressField, self).formfield(**defaults)
+
+class IPAddressField(models.Field):
+  """
+  An IP address field that is backed by PostgreSQL inet type and uses ipaddr-py for
+  Python address representation. It can store an address with an optional subnet
+  netmask in CIDR notation.
+  """
+  __metaclass__ = models.SubfieldBase
+  default_error_messages = {
+    'invalid' : _(u'Enter a valid IP address in CIDR notation.'),
+    'subnet_required' : _(u'Enter a valid IP address with subnet in CIDR notation.'),
+    'host_required' : _(u'Enter a valid host IP address.'),
+  }
+  
+  def __init__(self, subnet_required = False, host_required = False, *args, **kwargs):
+    """
+    Class constructor.
+    
+    @param subnet_required: Set to True when a subnet must be entered
+    @param host_required: Set to True when a host must be entered
+    """
+    if subnet_required and host_required:
+      raise ValueError("subnet_required and host_required options are mutually exclusive!")
+    
+    self.subnet_required = subnet_required
+    self.host_required = host_required
+    super(IPAddressField, self).__init__(*args, **kwargs)
+  
+  def db_type(self, connection):
+    """
+    Returns the database column type.
+    """
+    return "inet"
+  
+  @staticmethod
+  def ip_to_python(value, error_messages):
+    if not value:
+      return ""
+    
+    if isinstance(value, ipaddr._IPAddrBase):
+      return value
+    
+    try:
+      return ipaddr.IPNetwork(value.encode('latin-1'))
+    except ValueError:
+      raise exceptions.ValidationError(error_messages['invalid'])
+  
+  def to_python(self, value):
+    """
+    Converts a database value into a Python one.
+    """
+    return self.ip_to_python(value, self.error_messages)
+  
+  def validate(self, value, model_instance):
+    """
+    Performs field validation.
+    """
+    super(IPAddressField, self).validate(value, model_instance)
+    
+    # Validate subnet size
+    if self.subnet_required and value.numhosts <= 1:
+      raise exceptions.ValidationError(self.error_messages['subnet_required'])
+    elif self.host_required and value.numhosts > 1:
+      raise exceptions.ValidationError(self.error_messages['host_required'])
+  
+  def get_prep_value(self, value):
+    """
+    Prepares Python value for saving into the database.
+    """
+    if isinstance(value, ipaddr._IPAddrBase):
+      value = str(value)
+    
+    return unicode(value)
+  
+  def formfield(self, **kwargs):
+    """
+    Returns a proper form field instance.
+    """
+    defaults = { 'form_class' : IPAddressFormField }
+    defaults.update(kwargs)
+    return super(IPAddressField, self).formfield(**defaults)
+
+class IPAddressFormField(form_fields.CharField):
+  """
+  IP address form field.
+  """
+  def to_python(self, value):
+    """
+    Performs IP address validation.
+    """
+    return IPAddressField.ip_to_python(value, IPAddressField.default_error_messages)
 
 # Add South introspection for our fields
 south.modelsinspector.add_introspection_rules([
@@ -213,9 +308,20 @@ south.modelsinspector.add_introspection_rules([
       "enum_id" : ["enum_id", {}],
     },
   ),
-], [r"^.*registry\.fields\.SelectorKeyField$"]
+], [r"^web\.registry\.fields\.SelectorKeyField$"]
 )
-south.modelsinspector.add_introspection_rules([], [r"^.*registry\.fields\.ModelSelectorKeyField$"])
-south.modelsinspector.add_introspection_rules([], [r"^.*registry\.fields\.IntraRegistryForeignKey$"])
-south.modelsinspector.add_introspection_rules([], [r"^.*registry\.fields\.MACAddressField$"])
+south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.ModelSelectorKeyField$"])
+south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.IntraRegistryForeignKey$"])
+south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.MACAddressField$"])
+south.modelsinspector.add_introspection_rules([
+  (
+    [IPAddressField],
+    [],
+    {
+      "subnet_required" : ["subnet_required", { "default" : False }],
+      "host_required" : ["host_required", { "default" : False }],
+    },
+  ),
+], [r"^web\.registry\.fields\.IPAddressField$"]
+)
 

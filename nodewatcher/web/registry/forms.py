@@ -408,7 +408,10 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       partial.setdefault(selected_item.RegistryMeta.registry_id, []).append(config)
       
       for field, value in form.cleaned_data.iteritems():
-        setattr(config, field, value)
+        try:
+          setattr(config, field, value)
+        except exceptions.ValidationError:
+          pass
   
   # Generate a new meta form, since the previous item has now changed
   meta_form = RegistryMetaForm(context, selected_item, prefix = prefix,

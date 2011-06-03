@@ -1,4 +1,5 @@
 from django import forms
+from django.core import exceptions
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext as _
@@ -161,9 +162,28 @@ class StaticNetworkConfig(CgmNetworkConfig):
   Static IP configuration.
   """
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  address = registry_fields.IPAddressField(subnet_required = True)
+  gateway = registry_fields.IPAddressField(host_required = True)
   
   class RegistryMeta(CgmNetworkConfig.RegistryMeta):
     registry_name = _("Static Network")
+  
+  def clean(self):
+    """
+    Verifies that gateway is in the address subnet.
+    """
+    if not self.address or not self.gateway:
+      return
+    
+    family = 6 if self.family == "ipv6" else 4
+    if not (self.address.version == self.gateway.version == family):
+      raise exceptions.ValidationError(_("You must specify IP addresses of the selected address family!"))
+    
+    if self.gateway not in self.address:
+      raise exceptions.ValidationError(_("Specified gateway is not part of the host's subnet!"))
+    
+    if self.gateway.ip == self.address.ip:
+      raise exceptions.ValidationError(_("Host address and gateway address must be different!"))
 
 registration.point("node.config").register_choice("core.interfaces.network#family", "ipv4", _("IPv4"))
 registration.point("node.config").register_choice("core.interfaces.network#family", "ipv6", _("IPv6"))
