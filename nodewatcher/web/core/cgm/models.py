@@ -189,6 +189,17 @@ registration.point("node.config").register_choice("core.interfaces.network#famil
 registration.point("node.config").register_choice("core.interfaces.network#family", "ipv6", _("IPv6"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 
+class DHCPNetworkConfig(CgmNetworkConfig):
+  """
+  DHCP IP configuration.
+  """
+  # No additional fields
+  
+  class RegistryMeta(CgmNetworkConfig.RegistryMeta):
+    registry_name = _("DHCP")
+
+registration.point("node.config").register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
+
 class AllocatedNetworkConfig(CgmNetworkConfig, allocation.AddressAllocator):
   """
   IP configuration that gets allocated from a pool.
