@@ -139,6 +139,17 @@ class WifiInterfaceConfigForm(forms.ModelForm):
 registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
 registration.point("node.config").register_item(WifiInterfaceConfig)
 
+class VpnInterfaceConfig(CgmInterfaceConfig):
+  """
+  VPN interface.
+  """
+  mac = registry_fields.MACAddressField(auto_add = True)
+  
+  class RegistryMeta(CgmInterfaceConfig.RegistryMeta):
+    registry_name = _("VPN Tunnel")
+
+registration.point("node.config").register_item(VpnInterfaceConfig)
+
 class CgmNetworkConfig(registration.bases.NodeConfigRegistryItem):
   """
   Network configuration of an interface.

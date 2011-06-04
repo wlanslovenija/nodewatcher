@@ -1,3 +1,4 @@
+import os
 import re
 
 from django.core import exceptions
@@ -186,12 +187,27 @@ class MACAddressField(models.Field):
   """
   empty_strings_allowed = False
   
-  def __init__(self, *args, **kwargs):
+  def __init__(self, auto_add = False, *args, **kwargs):
     """
     Class constructor.
     """
+    self.auto_add = auto_add
+    if auto_add:
+      kwargs['editable'] = False
+    
     kwargs['max_length'] = 17
     super(MACAddressField, self).__init__(*args, **kwargs)
+
+  def pre_save(self, model_instance, add):
+    """
+    Automatically generate a virtual MAC address when requested.
+    """
+    if self.auto_add and add:
+      value = "00:ff:%02x:%02x:%02x:%02x" % tuple([ord(x) for x in os.urandom(4)])
+      setattr(model_instance, self.attname, value)
+      return value
+    else:
+      return super(MACAddressField, self).pre_save(model_instance, add)
 
   def get_internal_type(self):
     """
@@ -312,7 +328,16 @@ south.modelsinspector.add_introspection_rules([
 )
 south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.ModelSelectorKeyField$"])
 south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.IntraRegistryForeignKey$"])
-south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.MACAddressField$"])
+south.modelsinspector.add_introspection_rules([
+  (
+    [MACAddressField],
+    [],
+    {
+      "auto_add" : ["auto_add", { "default" : False }],
+    },
+  ),
+], [r"^web\.registry\.fields\.MACAddressField$"]
+)
 south.modelsinspector.add_introspection_rules([
   (
     [IPAddressField],
