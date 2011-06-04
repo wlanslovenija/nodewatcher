@@ -98,8 +98,6 @@ class AntennaReferencerFormMixin(object):
     
     # Create and save the new antenna instance
     antenna = Antenna()
-    print orig_cleaned_data
-    print self.cleaned_data
     model_forms.save_instance(self, antenna, fail_message = 'created')
     self.cleaned_data = orig_cleaned_data
     self.instance.antenna = antenna
