@@ -3,7 +3,7 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from web.core import allocation
+from web.core import allocation, antennas
 # TODO project model should be moved to core
 from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields

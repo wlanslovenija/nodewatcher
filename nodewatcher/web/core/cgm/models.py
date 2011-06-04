@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 
 from web.core import allocation
 from web.core import models as core_models
+from web.core import antennas as core_antennas
 from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields
 from web.registry import forms as registry_forms
@@ -83,11 +84,12 @@ class WifiInterfaceConfig(CgmInterfaceConfig):
   protocol = models.CharField(max_length = 50)
   channel = models.CharField(max_length = 50)
   bitrate = models.IntegerField(default = 11)
+  antenna = registry_fields.ModelSelectorKeyField(core_antennas.Antenna, null = True)
   
   class RegistryMeta(CgmInterfaceConfig.RegistryMeta):
     registry_name = _("Wireless Radio")
 
-class WifiInterfaceConfigForm(forms.ModelForm):
+class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFormMixin):
   """
   A wireless interface configuration form.
   """
@@ -106,6 +108,7 @@ class WifiInterfaceConfigForm(forms.ModelForm):
     """
     Handles dynamic protocol/channel selection.
     """
+    super(WifiInterfaceConfigForm, self).modify_to_context(item, cfg)
     radio = None
     try:
       radio = cgm_base.get_platform(cfg['core.general'][0].platform) \
