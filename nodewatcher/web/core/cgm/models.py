@@ -54,6 +54,10 @@ class CgmInterfaceConfig(registration.bases.NodeConfigRegistryItem):
   Interface configuration.
   """
   enabled = models.BooleanField(default = True)
+  limit_out = registry_fields.SelectorKeyField("node.config", "core.interfaces#traffic_limits",
+    verbose_name = _("Limit OUT"), default = "", blank = True)
+  limit_in = registry_fields.SelectorKeyField("node.config", "core.interfaces#traffic_limits",
+    verbose_name = _("Limit IN"), default = "", blank = True)
   
   class RegistryMeta:
     form_order = 50
@@ -63,6 +67,12 @@ class CgmInterfaceConfig(registration.bases.NodeConfigRegistryItem):
     multiple = True
     hidden = True
 
+registration.point("node.config").register_choice("core.interfaces#traffic_limits", "128kbit", _("128 Kbit/s"))
+registration.point("node.config").register_choice("core.interfaces#traffic_limits", "256kbit", _("256 Kbit/s"))
+registration.point("node.config").register_choice("core.interfaces#traffic_limits", "512kbit", _("512 Kbit/s"))
+registration.point("node.config").register_choice("core.interfaces#traffic_limits", "1mbit", _("1 Mbit/s"))
+registration.point("node.config").register_choice("core.interfaces#traffic_limits", "2mbit", _("2 Mbit/s"))
+registration.point("node.config").register_choice("core.interfaces#traffic_limits", "4mbit", _("4 Mbit/s"))
 registration.point("node.config").register_item(CgmInterfaceConfig)
 
 class EthernetInterfaceConfig(CgmInterfaceConfig):
