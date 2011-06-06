@@ -63,13 +63,30 @@ class MiniPCIRadio(RouterRadio):
   """
   pass
 
+class InternalAntenna(object):
+  """
+  Describes an antenna that comes with the router by default.
+  """
+  def __init__(self, identifier, polarization, angle_horizontal, angle_vertical, gain):
+    """
+    Class constructor.
+    """
+    self.identifier = identifier
+    self.polarization = polarization
+    self.angle_horizontal = angle_horizontal
+    self.angle_vertical = angle_vertical
+    self.gain = gain
+
 # A list of attributes that are required to be defined
 REQUIRED_ROUTER_ATTRIBUTES = set([
   'identifier',
   'name',
+  'manufacturer',
+  'url',
   'architecture',
   'radios',
   'ports',
+  'antennas',
 ])
 
 class RouterMeta(type):
@@ -117,6 +134,10 @@ class RouterMeta(type):
       # Validate that list of radios only contains RouterRadio instances
       if len([x for x in attrs['radios'] if not isinstance(x, RouterRadio)]):
         raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
+      
+      # Validate that list of antennas only contains InternalAntenna instances
+      if len([x for x in attrs['antennas'] if not isinstance(x, InternalAntenna)]):
+        raise ImproperlyConfigured("List of router antennas may only contain InternalAntenna instances!")
     
     return new_class
 

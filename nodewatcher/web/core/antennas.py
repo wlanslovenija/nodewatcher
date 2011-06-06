@@ -12,10 +12,13 @@ class Antenna(models.Model):
   POLARIZATION_CHOICES = (
     ('horizontal', _("Horizontal")),
     ('vertical', _("Vertical")),
+    ('circular', _("Circular")),
   )
   
   name = models.CharField(max_length = 100, verbose_name = _("Name"))
   manufacturer = models.CharField(max_length = 100, verbose_name = _("Manufacturer"))
+  internal_for = models.CharField(max_length = 100, editable = False, null = True)
+  internal_id = models.CharField(max_length = 100, editable = False, null = True)
   url = models.URLField(verify_exists = False, verbose_name = _("URL"), blank = True)
   polarization = models.CharField(max_length = 20, choices = POLARIZATION_CHOICES)
   angle_horizontal = models.IntegerField(default = 360, verbose_name = _("Horizontal angle"))
@@ -26,7 +29,13 @@ class Antenna(models.Model):
     app_label = "core"
   
   def __unicode__(self):
-    return "%s - %s" % (self.manufacturer, self.name)
+    """
+    Returns a string representation of this model.
+    """
+    if self.internal_for is not None:
+      return _("[%s internal antenna]") % self.internal_for
+    else:
+      return "%s - %s" % (self.manufacturer, self.name)
 
 ANTENNA_FORM_FIELD_PREFIX = 'antenna_'
 
@@ -70,6 +79,14 @@ class AntennaReferencerFormMixin(object):
     Dynamically displays fields for entering new antenna information.
     """
     self.fields['antenna'].empty_label = _("[Add new antenna]")
+    try:
+      qs = self.fields['antenna'].queryset
+      qs = qs.filter(models.Q(internal_for = cfg['core.general'][0].router) | models.Q(internal_for = None))
+      qs = qs.order_by("internal_for", "internal_id", "name")
+      self.fields['antenna'].queryset = qs
+    except (IndexError, KeyError, AttributeError):
+      pass
+    
     try:
       if item.antenna is not None:
         self._creating_antenna = False

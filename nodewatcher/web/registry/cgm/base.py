@@ -163,3 +163,11 @@ def register_router(platform, router):
   """
   get_platform(platform).register_router(router)
 
+def iterate_routers():
+  """
+  Iterates over all registered routers.
+  """
+  for platform in PLATFORM_REGISTRY.values():
+    for router in platform._routers.values():
+      yield router
+
