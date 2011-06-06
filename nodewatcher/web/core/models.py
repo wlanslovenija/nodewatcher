@@ -23,7 +23,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   geolocation = gis_models.PointField()
   altitude = models.IntegerField(default = 0)
   notes = models.TextField(blank = True, default = "")
-  url = models.CharField(max_length = 200, blank = True, default = "", verbose_name = _("URL"))
+  url = models.URLField(verify_exists = False, blank = True, default = "", verbose_name = _("URL"))
   
   class RegistryMeta:
     form_order = 1
