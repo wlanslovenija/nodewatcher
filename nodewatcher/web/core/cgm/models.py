@@ -94,6 +94,7 @@ class WifiInterfaceConfig(CgmInterfaceConfig):
   protocol = models.CharField(max_length = 50)
   channel = models.CharField(max_length = 50)
   bitrate = models.IntegerField(default = 11)
+  antenna_connector = models.CharField(max_length = 50, null = True)
   antenna = registry_fields.ModelSelectorKeyField(core_antennas.Antenna, null = True)
   
   class RegistryMeta(CgmInterfaceConfig.RegistryMeta):
@@ -132,10 +133,21 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
         coerce = str,
         empty_value = None
       )
+      
+      # Antenna connectors
+      self.fields['antenna_connector'] = registry_fields.SelectorFormField(
+        label = _("Connector"),
+        choices = [("", _("[auto-select]"))] + list(radio.get_connector_choices()),
+        coerce = str,
+        empty_value = None,
+        required = False
+      )
     except (KeyError, IndexError, AttributeError):
       # Create empty fields on error
-      self.fields['protocol'] = registry_fields.SelectorFormField(label = "Protocol", choices = BLANK_CHOICE_DASH)
-      self.fields['channel'] = registry_fields.SelectorFormField(label = "Channel", choices = BLANK_CHOICE_DASH)
+      self.fields['protocol'] = registry_fields.SelectorFormField(label = _("Protocol"), choices = BLANK_CHOICE_DASH)
+      self.fields['channel'] = registry_fields.SelectorFormField(label = _("Channel"), choices = BLANK_CHOICE_DASH)
+      self.fields['antenna_connector'] = registry_fields.SelectorFormField(label = _("Connector"), choices = BLANK_CHOICE_DASH)
+      return
     
     # Channels
     try:
@@ -147,7 +159,7 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
       )
     except (KeyError, AttributeError):
       # Create empty field on error
-      self.fields['channel'] = registry_fields.SelectorFormField(label = "Channel", choices = BLANK_CHOICE_DASH)
+      self.fields['channel'] = registry_fields.SelectorFormField(label = _("Channel"), choices = BLANK_CHOICE_DASH)
 
 registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
 registration.point("node.config").register_item(WifiInterfaceConfig)

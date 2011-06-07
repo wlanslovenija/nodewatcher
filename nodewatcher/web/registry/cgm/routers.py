@@ -22,24 +22,41 @@ class EthernetPort(RouterPort):
   """
   pass
 
+class AntennaConnector(object):
+  """
+  An antenna connector that is present on a specific radio.
+  """
+  def __init__(self, identifier, description):
+    """
+    Class constructor.
+    """
+    self.identifier = identifier
+    self.description = description
+
 class RouterRadio(object):
   """
   An abstract descriptor of a router radio.
   """
-  def __init__(self, identifier, description, protocols):
+  def __init__(self, identifier, description, protocols, connectors):
     """
     Class constructor.
     """
     self.identifier = identifier
     self.description = description
     self.protocols = protocols
+    self.connectors = connectors
+  
+  def get_connector_choices(self):
+    """
+    Returns a list of antenna connector choices for this radio.
+    """
+    return ((c.identifier, c.description) for c in self.connectors)
   
   def get_protocol_choices(self):
     """
     Returns a list of protocol choices for this radio.
     """
-    for protocol in self.protocols:
-      yield protocol.identifier, protocol.description
+    return ((p.identifier, p.description) for p in self.protocols)
   
   def get_protocol(self, identifier):
     """
