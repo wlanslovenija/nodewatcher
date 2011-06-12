@@ -133,7 +133,6 @@ TEMPLATE_DIRS = (
   # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
   # Always use forward slashes, even on Windows.
   # Don't forget to use absolute paths, not relative paths.
-  '/home/kostko/development/wlanlj/nodewatcher/nodewatcher/wlanlj/templates',
   default_template_dir,
 )
 
@@ -204,9 +203,8 @@ GRAPH_TIMESPANS = {
 MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/') # Absolute path to directory containing monitor.py file
 MONITOR_WORKERS = 20 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
 MONITOR_GRAPH_WORKERS = 5
-MONITOR_DISABLE_GRAPHS = False
 MONITOR_POLL_INTERVAL = 300
-MONITOR_OLSR_HOST = '10.254.128.33' # A host with OLSR txt-info plugin running
+MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
 MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
 MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')
 
