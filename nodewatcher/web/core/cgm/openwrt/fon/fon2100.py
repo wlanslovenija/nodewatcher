@@ -12,12 +12,12 @@ class Fonera(cgm_routers.RouterBase):
   url = "http://www.fon.com"
   architecture = "atheros"
   radios = [
-    cgm_routers.IntegratedRadio("ath0", "Wifi0", [cgm_protocols.IEEE80211BG], [
+    cgm_routers.IntegratedRadio("wifi0", "Wifi0", [cgm_protocols.IEEE80211BG], [
       cgm_routers.AntennaConnector("a1", "Antenna0")
     ])
   ]
   ports = [
-    cgm_routers.EthernetPort("eth0", "Ethernet0")
+    cgm_routers.EthernetPort("wan0", "Ethernet0")
   ]
   antennas = [
     cgm_routers.InternalAntenna(

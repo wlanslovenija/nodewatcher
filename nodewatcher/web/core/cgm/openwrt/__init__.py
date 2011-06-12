@@ -164,5 +164,9 @@ import web.core.cgm.openwrt.general
 import web.core.cgm.openwrt.vpn
 
 # Load all model-specific modules
-import web.core.cgm.openwrt.fon2100
+import web.core.cgm.openwrt.fon
+import web.core.cgm.openwrt.linksys
+import web.core.cgm.openwrt.buffalo
+import web.core.cgm.openwrt.mikrotik
+import web.core.cgm.openwrt.asus
 
