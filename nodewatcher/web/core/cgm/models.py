@@ -10,8 +10,11 @@ from web.core import antennas as core_antennas
 from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields
 from web.registry import forms as registry_forms
-from web.registry import registration
+from web.registry import registration, permissions
 from web.registry.cgm import base as cgm_base
+
+# Register a new firmware-generating permission
+permissions.register(nodes_models.Node, 'can_generate_firmware', "Can generate firmware")
 
 class CgmGeneralConfig(core_models.GeneralConfig):
   """

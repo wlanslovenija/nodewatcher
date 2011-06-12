@@ -43,13 +43,16 @@ class NodewatcherBackend(auth_backends.ModelBackend):
     except ValueError:
       return None
   
-  def has_perm(self, user_obj, perm):
+  def has_perm(self, user_obj, perm, obj = None):
     """
     Returns True if the user has a specific permission. 
     """
+    if obj is not None:
+      return False
+    
     # Staff has complete access to anything
     if user_obj.is_staff:
       return True
     
-    return super(NodewatcherBackend, self).has_perm(user_obj, perm)
+    return super(NodewatcherBackend, self).has_perm(user_obj, perm, obj)
 
