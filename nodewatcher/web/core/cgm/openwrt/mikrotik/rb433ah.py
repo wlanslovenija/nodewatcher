@@ -9,7 +9,7 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
   identifier = "rb433ah"
   name = "RB433AH"
   manufacturer = "MikroTik"
-  url = "http://www.mikrotik.com/"
+  url = "http://routerboard.com/RB433AH"
   architecture = "ar71xx"
   radios = [ 
     # FIXME this information is not correct, there are no integrated radios
