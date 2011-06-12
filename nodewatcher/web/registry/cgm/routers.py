@@ -119,41 +119,24 @@ class RouterMeta(type):
     if name != 'RouterBase':
       # Validate the presence of all attributes
       required_attrs = copy.deepcopy(REQUIRED_ROUTER_ATTRIBUTES)
-      for attr in attrs:
-        if attr.startswith('_'):
-          continue
-        
-        if isinstance(attrs[attr], staticmethod):
-          function = getattr(new_class, attr)
-          if not getattr(function, 'cgm_module', False):
-            raise ImproperlyConfigured("Function '{0}' is not marked as a CGM module! Only such functions are allowed in router descriptors!".format(attr))
-          else:
-            continue
-        
-        if attr not in required_attrs:
-          raise ImproperlyConfigured("Attribute '{0}' is not a valid router model attribute!".format(attr))
-        
-        required_attrs.remove(attr)
-      
-      if len(required_attrs) > 0:
-        raise ImproperlyConfigured("The following attributes are required for router model specification: {0}!".format(
-          ", ".join(required_attrs)
-        ))
+      for attr in REQUIRED_ROUTER_ATTRIBUTES:
+        if getattr(new_class, attr, None) is None:
+          raise ImproperlyConfigured("Attribute '{0}' is required for router descriptor specification!".format(attr))
       
       # Router ports and radios cannot both be empty
-      if not len(attrs['radios']) and not len(attrs['ports']):
+      if not len(new_class.radios) and not len(new_class.ports):
         raise ImproperlyConfigured("A router cannot be without radios and ports!")
       
       # Validate that list of ports only contains RouterPort instances
-      if len([x for x in attrs['ports'] if not isinstance(x, RouterPort)]):
+      if len([x for x in new_class.ports if not isinstance(x, RouterPort)]):
         raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
       
       # Validate that list of radios only contains RouterRadio instances
-      if len([x for x in attrs['radios'] if not isinstance(x, RouterRadio)]):
+      if len([x for x in new_class.radios if not isinstance(x, RouterRadio)]):
         raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
       
       # Validate that list of antennas only contains InternalAntenna instances
-      if len([x for x in attrs['antennas'] if not isinstance(x, InternalAntenna)]):
+      if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):
         raise ImproperlyConfigured("List of router antennas may only contain InternalAntenna instances!")
     
     return new_class
@@ -170,7 +153,7 @@ class RouterBase(object):
     Performs router model registration.
     """
     # Register a new choice in the configuration registry
-    registration.point("node.config").register_choice("core.general#router", cls.identifier, cls.name,
+    registration.point("node.config").register_choice("core.general#router", cls.identifier, "%s :: %s" % (cls.manufacturer, cls.name),
       limited_to = ("core.general#platform", platform.name)
     )
     
@@ -188,6 +171,9 @@ class RouterBase(object):
     
     # Register CGM methods
     for _, function in inspect.getmembers(cls, inspect.isfunction):
+      if not getattr(function, 'cgm_module', False):
+        continue
+      
       if function.cgm_module_platform is None or function.cgm_module_platform == platform.name:
         platform.register_module(
           function.cgm_module_order,
