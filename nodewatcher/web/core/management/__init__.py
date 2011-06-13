@@ -7,16 +7,18 @@ from south import signals as south_signals
 from web.core import antennas as core_antennas
 from web.registry.cgm import base as cgm_base
 
+_core_migrated = False
+
 def install_router_fixtures(sender, **kwargs):
   """
   Installs fixtures for all registered router models.
   """
-  # Ensure that we run only after core application has been fully migrated
-  for app in settings.INSTALLED_APPS:
-    if app == "web.core":
-      break
-    elif app.endswith(".%s" % kwargs['app']):
-      return
+  global _core_migrated
+  if kwargs['app'] == "core":
+    _core_migrated = True
+  
+  if not _core_migrated:
+    return
   
   for router in cgm_base.iterate_routers():
     for antenna in router.antennas:
