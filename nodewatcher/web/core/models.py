@@ -20,7 +20,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   type = registry_fields.SelectorKeyField("node.config", "core.general#type")
   project = registry_fields.ModelSelectorKeyField("nodes.Project")
   location = models.CharField(max_length = 100)
-  geolocation = gis_models.PointField()
+  geolocation = gis_models.PointField(null = True)
   altitude = models.IntegerField(default = 0)
   notes = models.TextField(blank = True, default = "")
   url = models.URLField(verify_exists = False, blank = True, default = "", verbose_name = _("URL"))
