@@ -11,6 +11,8 @@ class Migration(DataMigration):
         ("policy", "0001_initial"),
         ("core", "0013_null_geolocation"),
         ("cgm", "0010_add_ant_conn"),
+        ("solar", "0001_initial"),
+        ("digitemp", "0001_initial"),
     )
     
     def forwards(self, orm):
@@ -28,6 +30,8 @@ class Migration(DataMigration):
         vpnserver_ctype = orm['contenttypes.ContentType'].objects.get(app_label = 'cgm', model = 'vpnserverconfig')
         wifiiface_ctype = orm['contenttypes.ContentType'].objects.get(app_label = 'cgm', model = 'wifiinterfaceconfig')
         wifinetconf_ctype = orm['contenttypes.ContentType'].objects.get(app_label = 'cgm', model = 'wifinetworkconfig')
+        solarpkg_ctype = orm['contenttypes.ContentType'].objects.get(app_label = 'solar', model = 'cgmsolarpackageconfig')
+        digitemppkg_ctype = orm['contenttypes.ContentType'].objects.get(app_label = 'digitemp', model = 'cgmdigitemppackageconfig')
         
         for node in orm.Node.objects.exclude(status = 4):
           print "   > Migrating node:", node.name
@@ -259,8 +263,17 @@ class Migration(DataMigration):
                 vpn_server.hostname = host
                 vpn_server.port = port
                 vpn_server.save()
-          
-          # TODO core.packages
+            
+            # core.packages
+            for package in profile.optional_packages.all():
+              if package.fancy_name == 'solar':
+                print "     - Found optional package: solar"
+                pkg = orm['solar.CgmSolarPackageConfig'](root = node, content_type = solarpkg_ctype)
+                pkg.save()
+              elif package.fancy_name == 'digitemp':
+                print "     - Found optional package: digitemp"
+                pkg = orm['digitemp.CgmDigitempPackageConfig'](root = node, content_type = digitemppkg_ctype)
+                pkg.save()
     
     def backwards(self, orm):
         pass
@@ -484,6 +497,10 @@ class Migration(DataMigration):
             'Meta': {'ordering': "['id']", 'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'vpn_server': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'digitemp.cgmdigitemppackageconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'CgmDigitempPackageConfig', '_ormbases': ['cgm.CgmPackageConfig']},
+            'cgmpackageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmPackageConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'dns.zone': {
             'Meta': {'object_name': 'Zone'},
@@ -797,7 +814,11 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'TrafficControlClass'},
             'bandwidth': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        'solar.cgmsolarpackageconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'CgmSolarPackageConfig', '_ormbases': ['cgm.CgmPackageConfig']},
+            'cgmpackageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmPackageConfig']", 'unique': 'True', 'primary_key': 'True'})
         }
     }
 
-    complete_apps = ['core', 'cgm', 'generator', 'policy', 'nodes']
+    complete_apps = ['core', 'cgm', 'generator', 'policy', 'solar', 'digitemp', 'nodes']

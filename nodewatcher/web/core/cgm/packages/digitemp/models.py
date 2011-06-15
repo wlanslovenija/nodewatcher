@@ -8,21 +8,21 @@ from web.registry import forms as registry_forms
 from web.registry import registration
 from web.registry.cgm import base as cgm_base
 
-class CgmSolarPackageConfig(cgm_models.CgmPackageConfig):
+class CgmDigitempPackageConfig(cgm_models.CgmPackageConfig):
   """
   Common configuration for CGM packages.
   """
   # No fields
   
   class RegistryMeta(cgm_models.CgmPackageConfig.RegistryMeta):
-    registry_name = _("Solar")
+    registry_name = _("Digitemp")
 
-registration.point("node.config").register_item(CgmSolarPackageConfig)
+registration.point("node.config").register_item(CgmDigitempPackageConfig)
 
-@cgm_base.register_platform_package("openwrt", "nodewatcher-solar", CgmSolarPackageConfig)
-def solar_package(node, pkgcfg, cfg):
+@cgm_base.register_platform_package("openwrt", "nodewatcher-digitemp", CgmDigitempPackageConfig)
+def digitemp_package(node, pkgcfg, cfg):
   """
-  Configures the solar package for OpenWRT.
+  Configures the digitemp package for OpenWRT.
   """
   pass
 
