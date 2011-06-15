@@ -338,8 +338,13 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     if not hasattr(obj, 'modify_to_context'):
       return False
     
+    if context.root is not None:
+      existing_config = context.regpoint.get_accessor(context.root).to_partial()
+    else:
+      existing_config = {}
+    
     item = current_config_item or instance
-    cfg = context.current_config or context.regpoint.get_accessor(context.root).to_partial()
+    cfg = context.current_config or existing_config
     obj.modify_to_context(item, cfg)
     return True
   
@@ -566,7 +571,10 @@ def prepare_forms(context):
               mdl = emdl
               break
           else:
-            mdl = item(root = context.root)
+            if context.root is not None:
+              mdl = item(root = context.root)
+            else:
+              mdl = item()
           
           form_prefix = context.base_prefix + '_mu_' + str(index)
           context.subforms.append(generate_form_for_class(

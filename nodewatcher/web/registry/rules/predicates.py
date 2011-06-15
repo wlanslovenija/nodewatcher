@@ -194,6 +194,8 @@ def value(location):
       except:
         return None
     
+    if context.root is None:
+      return None
     obj = context.regpoint.get_accessor(context.root).by_path(path)
     
     if obj is None:

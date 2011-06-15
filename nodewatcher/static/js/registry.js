@@ -13,9 +13,6 @@ var registry = {
    */
   reevaluate_rules: function(actions)
   {
-    if (!registry.root_id)
-      return;
-    
     // Prepare form in serialized form (pun intended)
     var forms = $('#registry_forms *').serialize();
     forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));

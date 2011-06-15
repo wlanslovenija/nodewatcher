@@ -14,6 +14,8 @@ from django.template import RequestContext, Context, loader
 from django.utils import safestring
 from django.utils.translation import ugettext as _
 
+from guardian.shortcuts import assign as assign_permission
+
 from web.account.models import UserAccount
 from web.account.util import generate_random_password
 from web.core.allocation import pool as pool_models
@@ -21,7 +23,7 @@ from web.generator.models import Profile
 from web.nodes import context_processors as nodes_context_processors
 from web.nodes import decorators
 from web.nodes.common import ValidationWarning
-from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
+from web.nodes.forms import AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 
@@ -137,36 +139,11 @@ def node_new(request):
   Display a form for registering a new node.
   """
   if request.method == 'POST':
-    form = RegisterNodeForm(request.POST)
-    if form.is_valid() and form.save(request.user):
-      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': form.node.get_current_id() }))
-  else:
-    form = RegisterNodeForm()
-
-  return render_to_response('nodes/new.html',
-    { 'form' : form,
-      'mobile_node_type' : NodeType.Mobile,
-      'dead_node_type' : NodeType.Dead,
-      'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
-      'projects' : Project.objects.all().order_by("id") },
-    context_instance = RequestContext(request)
-  )
-
-@login_required
-@decorators.node_argument
-def node_edit(request, node):
-  """
-  Display a form for registering a new node.
-  """
-  if not node.is_current_owner(request):
-    raise Http404
-  
-  # TODO heavy cleanup needed
-  if request.method == 'POST':
     try:
       sid = transaction.savepoint()
-      form = UpdateNodeForm(node, request.POST)
-      
+      node = Node()
+      node.save()
+    
       actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
         "node.config",
         request,
@@ -176,95 +153,84 @@ def node_edit(request, node):
       )
       eval_state = actions['STATE']
       
-      if form.is_valid() and form.save(node, request.user):
-        has_errors, dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
-          "node.config",
-          request,
-          node,
-          data = request.POST,
-          save = True,
-          actions = actions,
-          current_config = partial_config
-        )
-        if has_errors:
-          transaction.savepoint_rollback(sid)
-        elif form.requires_firmware_update:
-          return render_to_response('nodes/firmware_update_needed.html', {
-              'node' : node
-            },
-            context_instance = RequestContext(request)
-          )
-        else:
-          return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
+      has_errors, dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
+        "node.config",
+        request,
+        node,
+        data = request.POST,
+        save = True,
+        actions = actions,
+        current_config = partial_config
+      )
+      
+      if not has_errors:
+        assign_permission("change_node", request.user, node)
+        assign_permission("remove_node", request.user, node)
+        transaction.savepoint_commit(sid)
+        return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
+      else:
+        transaction.savepoint_rollback(sid)
     except:
       transaction.savepoint_rollback(sid)
       raise
   else:
-    p = {
-      'name'                : node.name,
-      'ip'                  : node.ip,
-      'location'            : node.location,
-      'geo_lat'             : node.geo_lat,
-      'geo_long'            : node.geo_long,
-      'ant_external'        : node.ant_external,
-      'ant_polarization'    : node.ant_polarization,
-      'ant_type'            : node.ant_type,
-      'owner'               : node.owner.id,
-      'project'             : node.project.id,
-      'system_node'         : node.system_node,
-      'border_router'       : node.border_router,
-      'vpn_server'          : node.vpn_server,
-      'node_type'           : node.node_type,
-      'notes'               : node.notes,
-      'url'                 : node.url,
-      'redundancy_req'      : node.redundancy_req
-    }
+    dynamic_forms, eval_state = registry_forms.prepare_forms_for_regpoint_root(
+      "node.config",
+      request,
+      None,
+      also_rules = True
+    )
 
-    try:
-      p.update({
-        'tc_ingress'          : node.gw_policy.get(addr = node.vpn_mac_conf, family = PolicyFamily.Ethernet).tc_class.id
-      })
-    except Policy.DoesNotExist:
-      pass
+  return render_to_response('nodes/new.html',
+    { 'registry_forms' : dynamic_forms,
+      'registry_regpoint' : 'node.config',
+      'eval_state' : safestring.mark_safe(json.dumps(eval_state)) },
+    context_instance = RequestContext(request)
+  )
 
-    try:
-      p.update({
-        'template'            : node.profile.template.id,
-        'use_vpn'             : node.profile.use_vpn,
-        'tc_egress'           : TrafficControlClass.objects.get(bandwidth = node.profile.vpn_egress_limit).id if node.profile.vpn_egress_limit else None,
-        'wan_dhcp'            : node.profile.wan_dhcp,
-        'wan_ip'              : "%s/%s" % (node.profile.wan_ip, node.profile.wan_cidr) if node.profile.wan_ip and node.profile.wan_cidr else None,
-        'wan_gw'              : node.profile.wan_gw,
-        'root_pass'           : node.profile.root_pass,
-        'channel'             : node.profile.channel,
-        'lan_bridge'          : node.profile.lan_bridge,
-        'ant_conn'            : node.profile.antenna,
-        'optional_packages'   : [x.id for x in node.profile.optional_packages.all()]
-      })
-    except Profile.DoesNotExist:
-      p.update({
-        'template'            : None,
-        'use_vpn'             : True,
-        'wan_dhcp'            : True,
-        'wan_ip'              : '',
-        'wan_gw'              : '',
-        'root_pass'           : generate_random_password(8),
-        'channel'             : node.project.channel,
-        'lan_bridge'          : False,
-        'ant_conn'            : 3,
-        'optional_packages'   : []
-      })
-
-    form = UpdateNodeForm(node, initial = p)
-    dynamic_forms, eval_state = registry_forms.prepare_forms_for_regpoint_root("node.config", request, node, also_rules = True)
+@login_required
+@decorators.node_argument
+def node_edit(request, node):
+  """
+  Display a form for registering a new node.
+  """
+  # XXX needs port to permissions
+  if not node.is_current_owner(request):
+    raise Http404
+  
+  if request.method == 'POST':
+    actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
+      "node.config",
+      request,
+      node,
+      data = request.POST,
+      only_rules = True
+    )
+    eval_state = actions['STATE']
+    
+    has_errors, dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
+      "node.config",
+      request,
+      node,
+      data = request.POST,
+      save = True,
+      actions = actions,
+      current_config = partial_config
+    )
+    
+    # TODO handle message that user needs to update firmware when changing options
+    if not has_errors:
+      return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': node.get_current_id() }))
+  else:
+    dynamic_forms, eval_state = registry_forms.prepare_forms_for_regpoint_root(
+      "node.config",
+      request,
+      node,
+      also_rules = True
+    )
 
   return render_to_response('nodes/edit.html',
-    { 'form' : form,
-      'node' : node,
-      'mobile_node_type' : NodeType.Mobile,
-      'dead_node_type' : NodeType.Dead,
-      'nonstaff_border_routers' : getattr(settings, 'NONSTAFF_BORDER_ROUTERS', False),
-      'projects' : Project.objects.all().order_by("id"),
+    { 'node' : node,
       'registry_forms' : dynamic_forms,
       'registry_root' : node,
       'registry_regpoint' : 'node.config',

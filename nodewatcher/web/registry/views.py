@@ -19,10 +19,17 @@ def evaluate_forms(request, regpoint_id, root_id):
     return HttpResponse('')
   
   regpoint = registration.point(regpoint_id)
-  root = get_object_or_404(regpoint.model, pk = root_id)
+  root = get_object_or_404(regpoint.model, pk = root_id) if root_id else None
+  temp_root = False
   
   try:
     sid = transaction.savepoint()
+    if root is None:
+      # Create a fake temporary root (will not be saved because the transaction will
+      # be rolled back)
+      temp_root = True
+      root = regpoint.model()
+      root.save()
     
     # First perform partial validation and rule evaluation
     actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
@@ -64,7 +71,7 @@ def evaluate_forms(request, regpoint_id, root_id):
     {
       'registry_forms' : forms,
       'eval_state' : safestring.mark_safe(json.dumps(actions["STATE"])),
-      'registry_root' : root,
+      'registry_root' : root if not temp_root else None,
       'registry_regpoint' : regpoint_id
     },
     context_instance = RequestContext(request)

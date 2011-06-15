@@ -32,6 +32,8 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     registry_name = _("Basic Configuration")
     lookup_proxies = []
 
+# TODO validate node name via regexp: NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
+
 class GeneralConfigForm(forms.ModelForm):
   """
   General configuration form.
