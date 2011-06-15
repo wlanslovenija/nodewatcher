@@ -13,6 +13,7 @@ class Antenna(models.Model):
     ('horizontal', _("Horizontal")),
     ('vertical', _("Vertical")),
     ('circular', _("Circular")),
+    ('dual', _("Dual")),
   )
   
   name = models.CharField(max_length = 100, verbose_name = _("Name"))
@@ -35,7 +36,7 @@ class Antenna(models.Model):
     if self.internal_for is not None:
       return _("[%s internal antenna]") % self.internal_for
     else:
-      return "%s - %s" % (self.manufacturer, self.name)
+      return "%s :: %s" % (self.manufacturer, self.name)
 
 ANTENNA_FORM_FIELD_PREFIX = 'antenna_'
 
