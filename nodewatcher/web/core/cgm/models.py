@@ -277,8 +277,8 @@ class WifiNetworkConfig(CgmNetworkConfig, allocation.AddressAllocator):
   Configuration for a WiFi network.
   """
   role = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#role")
-  essid = models.CharField(max_length = 50)
-  bssid = registry_fields.MACAddressField()
+  essid = models.CharField(max_length = 50, verbose_name = "ESSID")
+  bssid = registry_fields.MACAddressField(verbose_name = "BSSID")
   
   class RegistryMeta(CgmNetworkConfig.RegistryMeta):
     registry_name = _("WiFi Network")
