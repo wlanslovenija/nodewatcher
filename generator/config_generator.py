@@ -493,7 +493,7 @@ config switch_vlan
         option device   eth0
         option vlan     1
         option ports    "0 1 2 3 4"
-      """.format(
+""".format(
         lan_ip = self.allocateIpForOlsr(),
         mesh_ip = self.ip,
         mesh_mask = self.subnets[0]['mask']
@@ -519,7 +519,7 @@ config policy
 config policy
         option table    'mesh'
         option priority 1000
-      """)
+""")
       f.close()
       
       # Wireless configuration
@@ -542,15 +542,33 @@ config wifi-iface
         option ssid     open.wlan-si.net
         option bssid    02:CA:FF:EE:BA:BE
         option encryption none
-      """)
+""")
       f.close()
       
+      # WiFi hack script
+      inituci_path = os.path.join(directory, "init.d", "inituci")
+      f = open(inituci_path, 'w')
+      f.write("""#!/bin/sh /etc/rc.common
+START=39
+
+start() {
+      uci set wireless.radio0.macaddr=$(cat /sys/class/ieee80211/*/macaddress)
+      uci commit
+      /etc/init.d/inituci disable
+}
+
+stop() {
+}
+""")
+      f.close()
+      os.chmod(inituci_path, 0755)
+ 
       # OLSRd configuration
       f = open(os.path.join(configPath, "olsrd"), 'w')
       f.write("""
 config olsrd
         option config_file      '/etc/olsrd.conf'
-      """)
+""")
       f.close()
       
       f = open(os.path.join(directory, 'olsrd.conf'), 'w')
@@ -589,7 +607,7 @@ Interface "wlan0" "eth0" "edge0"
   HnaInterval 18.0
   HnaValidityTime 324.0
 }}
-      """.format(
+""".format(
         router_id = self.ip,
         hna_subnet = self.subnets[0]['subnet'],
         hna_mask = self.subnets[0]['mask']
@@ -621,7 +639,7 @@ config dhcp mesh
         option limit    {end_ip}
         option leasetime        30m
         option force    1
-      """.format(
+""".format(
         start_ip = start_ip,
         end_ip = end_ip
       ))
@@ -637,7 +655,7 @@ config edge
         option community        'n2n.wlan-si.net'
         option key              'UQP9GjnIrLRUp7Yc'
         option route            '1'
-        """.format(
+""".format(
           vpn_ip = self.vpn['ip']
         ))
         f.close()
@@ -653,7 +671,7 @@ config uhttpd main
         option script_timeout   60
         option network_timeout  30
         option tcp_keepalive    1
-      """.format(
+""".format(
         router_ip = self.ip
       ))
       f.close()
