@@ -539,10 +539,12 @@ config wifi-iface
         option device   radio0
         option network  mesh
         option mode     adhoc
-        option ssid     open.wlan-si.net
+        option ssid     {ssid}
         option bssid    02:CA:FF:EE:BA:BE
         option encryption none
-""")
+""".format(
+        ssid = self.ssid
+      ))
       f.close()
       
       # WiFi hack script
