@@ -557,9 +557,6 @@ start() {
       uci commit
       /etc/init.d/inituci disable
 }
-
-stop() {
-}
 """)
       f.close()
       os.chmod(inituci_path, 0755)
