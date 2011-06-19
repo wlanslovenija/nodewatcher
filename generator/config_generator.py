@@ -547,6 +547,7 @@ config wifi-iface
       
       # WiFi hack script
       inituci_path = os.path.join(directory, "init.d", "inituci")
+      os.mkdir(os.path.join(directory, "init.d"))
       f = open(inituci_path, 'w')
       f.write("""#!/bin/sh /etc/rc.common
 START=39
