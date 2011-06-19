@@ -628,18 +628,19 @@ config dhcp mesh
       f.close()
       
       # N2N VPN configuration
-      f = open(os.path.join(configPath, "n2n"), 'w')
-      f.write("""
+      if self.vpn:
+        f = open(os.path.join(configPath, "n2n"), 'w')
+        f.write("""
 config edge
         option ipaddr           '{vpn_ip}'
         option supernode        '91.185.203.246:4242'
         option community        'n2n.wlan-si.net'
         option key              'UQP9GjnIrLRUp7Yc'
         option route            '1'
-      """.format(
-        vpn_ip = self.allocateIpForOlsr()
-      ))
-      f.close()
+        """.format(
+          vpn_ip = self.vpn['ip']
+        ))
+        f.close()
       
       # uhttpd configuration
       f = open(os.path.join(configPath, "uhttpd"), 'w')
