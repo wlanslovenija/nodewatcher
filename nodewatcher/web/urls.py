@@ -16,8 +16,9 @@ sitemaps = {
 }
 
 urlpatterns = patterns('',
-  # Node lists
+  # Nodes list
   url(r'^$', 'web.nodes.views.nodes', name = 'nodes_list'),
+  url(r'^network/nodes$', lambda request: redirect('nodes_list', permanent=False)), # Nodes list is currently hard-coded as primary landing section, this is not necessary so
   url(r'^nodes/list$', lambda request: redirect('nodes_list', permanent=True)), # Legacy
   url(r'^nodes/node_list$', lambda request: redirect('nodes_list', permanent=True)), # Legacy
 
