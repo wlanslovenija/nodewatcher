@@ -26,7 +26,8 @@ RRA_CONF_MAP = {
   GraphType.WifiSignalNoise : RRAWifiSignalNoise,
   GraphType.WifiSNR         : RRAWifiSNR,
   GraphType.ETX             : RRAETX,
-  GraphType.Temperature     : RRATemperature
+  GraphType.Temperature     : RRATemperature,
+  GraphType.Voltage         : RRAVoltage,
 }
 
 class Grapher(object):

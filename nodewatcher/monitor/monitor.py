@@ -638,7 +638,21 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
             temp = safe_float_convert(value['temp'])
             serial = value['serial']
             grapher.add_graph(GraphType.Temperature, 'Temperature ({0})'.format(serial), 'temp_{0}'.format(serial), temp, name = serial)
-      
+
+      # XXX UGLY HACK: Some random voltage reports
+      if 'voltage' in info:
+        serial = info['voltage']['serial']
+        voltages = [safe_float_convert(info['voltage'][x].strip()) for x in '1234']
+        multipliers = [safe_int_convert(info['voltage']['%dm' % x].strip()) for x in '1234']
+        results = []
+        for voltage, multiplier in zip(voltages, multipliers):
+          if voltage is not None:
+            results.append(voltage * multiplier)
+          else:
+            results.append(None)
+        
+        grapher.add_graph(GraphType.Voltage, 'Voltage ({0})'.format(serial), 'volt_{0}'.format(serial), *results, name = serial)
+
       # Check for installed package versions (every hour)
       try:
         last_pkg_update = n.installedpackage_set.all()[0].last_update

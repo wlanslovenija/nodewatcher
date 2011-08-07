@@ -25,7 +25,8 @@ __all__ = [
   'RRAWifiSNR',
   'RRAETX',
   'RRAGlobalClients',
-  'RRATemperature'
+  'RRATemperature',
+  'RRAVoltage',
 ]
 
 # Models
@@ -686,6 +687,52 @@ class RRASolar(RRAConfiguration):
     r'GPRINT:load:LAST:       Current\:%8.2lf',
     r'GPRINT:load:AVERAGE:Average\:%8.2lf',
     r'GPRINT:load:MAX:Maximum\:%8.2lf\n',
+    '--alt-y-grid',
+    '--units-exponent', '0',
+    '--lower-limit', '0'
+  ]
+
+class RRAVoltage(RRAConfiguration):
+  interval = 1800
+  sources = [
+    DataSource(
+      'volt1',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'volt2',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'volt3',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+    DataSource(
+      'volt4',
+      type = GaugeDST,
+      heartbeat = interval * 2
+    ),
+  ]
+  graph = [
+    "LINE2:volt1#6B7FD3:Voltage 1 [V]",
+    r'GPRINT:volt1:LAST:    Current\:%8.2lf',
+    r'GPRINT:volt1:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:volt1:MAX:Maximum\:%8.2lf\n',
+    "LINE2:volt2#FF00A3:Voltage 2 [V]",
+    r'GPRINT:volt2:LAST:    Current\:%8.2lf',
+    r'GPRINT:volt2:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:volt2:MAX:Maximum\:%8.2lf\n',
+    "LINE2:volt3#CBFE66:Voltage 3 [V]",
+    r'GPRINT:volt3:LAST:    Current\:%8.2lf',
+    r'GPRINT:volt3:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:volt3:MAX:Maximum\:%8.2lf\n',
+    "LINE2:volt4#BAE366:Voltage 4 [V]",
+    r'GPRINT:volt4:LAST:    Current\:%8.2lf',
+    r'GPRINT:volt4:AVERAGE:Average\:%8.2lf',
+    r'GPRINT:volt4:MAX:Maximum\:%8.2lf\n',
     '--alt-y-grid',
     '--units-exponent', '0',
     '--lower-limit', '0'
