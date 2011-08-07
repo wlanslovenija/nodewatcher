@@ -643,7 +643,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       if 'voltage' in info:
         serial = info['voltage']['serial']
         voltages = [safe_float_convert(info['voltage'][x].strip()) for x in '1234']
-        multipliers = [safe_int_convert(info['voltage']['%dm' % x].strip()) for x in '1234']
+        multipliers = [safe_int_convert(info['voltage']['%sm' % x].strip()) for x in '1234']
         results = []
         for voltage, multiplier in zip(voltages, multipliers):
           if voltage is not None:
