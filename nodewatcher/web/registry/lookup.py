@@ -65,10 +65,21 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
     clone = self._clone()
     
     for field, dst in kwargs.iteritems():
-      dst_model, dst_field = dst.split('.')
+      dst_model, dst_field = dst.split('.', 1)
       dst_model = registry_access.get_model_class_by_name(dst_model)
       
-      clone = clone.extra(select = { field : "%s.%s" % (qn(dst_model._meta.db_table), qn(dst_field)) })
+      if '.' in dst_field:
+        dst_field, dst_related = dst_field.split('.')
+      else:
+        dst_related = None
+      
+      dst_field = dst_model._meta.get_field_by_name(dst_field)[0]
+      if dst_related is None:
+        clone = clone.extra(select = { field : "%s.%s" % (qn(dst_model._meta.db_table), qn(dst_field.column)) })
+      else:
+        dst_field_model = dst_field.rel.to
+        dst_related_field = dst_field_model._meta.get_field_by_name(dst_related)[0]
+        clone = clone.extra(select = { field : "%s.%s" % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column)) })
       clone.query.get_initial_alias()
       
       # Join with top-level item
@@ -82,6 +93,13 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         # Join with lower-level item
         clone.query.join(
           (top_model._meta.db_table, dst_model._meta.db_table, top_model._meta.pk.column, dst_model._meta.pk.column),
+          promote = True
+        )
+      
+      if dst_related is not None:
+        dst_field_model = dst_field.rel.to
+        clone.query.join(
+          (dst_model._meta.db_table, dst_field_model._meta.db_table, dst_field.column, dst_field_model._meta.pk.column),
           promote = True
         )
     
