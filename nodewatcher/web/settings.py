@@ -170,6 +170,7 @@ INSTALLED_APPS = (
   'web.core',
   'web.core.cgm',
   'web.core.cgm.packages.solar',
+  'web.core.cgm.packages.digitemp',
   'guardian',
   'south',
 )
