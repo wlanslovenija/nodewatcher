@@ -6,6 +6,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("cgm", "0013_refactor_limits"),
+    )
+
     def forwards(self, orm):
 
         # Renaming model 'Pool' to 'IpPool'
