@@ -9,7 +9,7 @@ import fields as allocation_fields
 class PoolAllocationError(Exception):
   pass
 
-class PoolStatus:
+class IpPoolStatus:
   """
   Possible pools states.
   """
@@ -17,50 +17,51 @@ class PoolStatus:
   Full = 1
   Partial = 2
 
-#class PoolBase(models.Model):
-#  """
-#  An abstract base class for all pool implementations.
-#  """
-#  class Meta:
-#    abstract = True
-#  
-#  parent = models.ForeignKey('self', null = True, related_name = 'children')
-#  #projects = models.ManyToManyField("nodes.Project", related_name = 'pools_%(app_label)s_%(class)s')
-#  
-#  # Bookkeeping for allocated pools
-#  alloc_content_type = models.ForeignKey(ContentType, null = True)
-#  alloc_object_id = models.CharField(max_length = 50, null = True)
-#  alloc_content_object = generic.GenericForeignKey('alloc_content_type', 'alloc_object_id')
-#  alloc_timestamp = models.DateTimeField(null = True)
-#  
-#  def free(self):
-#    """
-#    Frees this allocated item and returns it to the parent pool.
-#    """
-#    raise NotImplementedError
-
-# TODO rename to IpPool
-class Pool(models.Model):
+class PoolBase(models.Model):
   """
-  This class represents an IP pool - that is a subnet available for
-  allocation purpuses. Every IP block that is allocated is represented
-  as a Pool instance with proper parent pool reference.
+  An abstract base class for all pool implementations.
   """
+  class Meta:
+    abstract = True
+  
   parent = models.ForeignKey('self', null = True, related_name = 'children')
-  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
-  network = models.CharField(max_length = 50)
-  cidr = models.IntegerField()
-  status = models.IntegerField(default = PoolStatus.Free)
-  description = models.CharField(max_length = 200, null = True)
-  default_prefix_len = models.IntegerField(null = True)
-  min_prefix_len = models.IntegerField(default = 24, null = True)
-  max_prefix_len = models.IntegerField(default = 28, null = True)
+  projects = models.ManyToManyField("nodes.Project", related_name = 'pools_%(app_label)s_%(class)s')
   
   # Bookkeeping for allocated pools
   alloc_content_type = models.ForeignKey(ContentType, null = True)
   alloc_object_id = models.CharField(max_length = 50, null = True)
   alloc_content_object = generic.GenericForeignKey('alloc_content_type', 'alloc_object_id')
   alloc_timestamp = models.DateTimeField(null = True)
+  
+  def top_level(self):
+    """
+    Returns the root of this pool tree.
+    """
+    if self.parent:
+      return self.parent.top_level()
+    
+    return self
+  
+  def free(self):
+    """
+    Frees this allocated item and returns it to the parent pool.
+    """
+    raise NotImplementedError
+
+class IpPool(PoolBase):
+  """
+  This class represents an IP pool - that is a subnet available for
+  allocation purpuses. Every IP block that is allocated is represented
+  as an IpPool instance with proper parent pool reference.
+  """
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  network = models.CharField(max_length = 50)
+  cidr = models.IntegerField()
+  status = models.IntegerField(default = IpPoolStatus.Free)
+  description = models.CharField(max_length = 200, null = True)
+  default_prefix_len = models.IntegerField(null = True)
+  min_prefix_len = models.IntegerField(default = 24, null = True)
+  max_prefix_len = models.IntegerField(default = 28, null = True)
   
   # Field for indexed lookups
   ip_subnet = allocation_fields.IPField(null = True)
@@ -76,9 +77,9 @@ class Pool(models.Model):
     Saves the model.
     """
     self.ip_subnet = '%s/%s' % (self.network, self.cidr)
-    super(Pool, self).save(**kwargs)
+    super(IpPool, self).save(**kwargs)
   
-  def split(self):
+  def split_buddy(self):
     """
     Splits this pool into two subpools.
     """
@@ -86,12 +87,12 @@ class Pool(models.Model):
     net0 = "%s/%d" % (self.network, self.cidr + 1)
     net1 = str(ipcalc.Network(long(net) + ipcalc.Network(net0).size())) 
     
-    left = Pool(parent = self, family = self.family, network = self.network, cidr = self.cidr + 1)
-    right = Pool(parent = self, family = self.family, network = net1, cidr = self.cidr + 1)
+    left = IpPool(parent = self, family = self.family, network = self.network, cidr = self.cidr + 1)
+    right = IpPool(parent = self, family = self.family, network = net1, cidr = self.cidr + 1)
     left.save()
     right.save()
     
-    self.status = PoolStatus.Partial
+    self.status = IpPoolStatus.Partial
     self.save()
     
     return left, right
@@ -116,10 +117,10 @@ class Pool(models.Model):
       # We don't contain this network, so there is nothing to be done
       return None
     
-    if network == self.network and self.cidr == prefix_len and self.status == PoolStatus.Free:
+    if network == self.network and self.cidr == prefix_len and self.status == IpPoolStatus.Free:
       # We are the network, mark as full and save
       if not check_only:
-        self.status = PoolStatus.Full
+        self.status = IpPoolStatus.Full
         self.save()
         return self
       else:
@@ -128,7 +129,7 @@ class Pool(models.Model):
     # Find the proper network between our children
     alloc = None
     if self.children.count() > 0:
-      for child in self.children.exclude(status = PoolStatus.Full):
+      for child in self.children.exclude(status = IpPoolStatus.Full):
         alloc = child.reserve_subnet(network, prefix_len, check_only)
         if alloc:
           break
@@ -136,12 +137,12 @@ class Pool(models.Model):
         return None
       
       # Something has been allocated, update our status
-      if self.children.filter(status = PoolStatus.Full).count() == 2 and not check_only:
-        self.status = PoolStatus.Full
+      if self.children.filter(status = IpPoolStatus.Full).count() == 2 and not check_only:
+        self.status = IpPoolStatus.Full
         self.save()
     else:
       # Split ourselves into two halves
-      for child in self.split():
+      for child in self.split_buddy():
         alloc = child.reserve_subnet(network, prefix_len, check_only)
         if alloc:
           break
@@ -150,7 +151,7 @@ class Pool(models.Model):
         # Nothing has been allocated, this means that the given subnet
         # was invalid. Remove all children and become free again.
         self.children.all().delete()
-        self.status = PoolStatus.Free
+        self.status = IpPoolStatus.Free
         self.save()
     
     return alloc
@@ -167,9 +168,9 @@ class Pool(models.Model):
       # We have gone too far, allocation has failed
       return None
     
-    if prefix_len == self.cidr and self.status == PoolStatus.Free:
+    if prefix_len == self.cidr and self.status == IpPoolStatus.Free:
       # We have found a free pool of the proper size, use it
-      self.status = PoolStatus.Full
+      self.status = IpPoolStatus.Full
       self.save()
       return self
     
@@ -177,7 +178,7 @@ class Pool(models.Model):
     # and traverse the left one
     alloc = None
     if self.children.count() > 0:
-      for child in self.children.exclude(status = PoolStatus.Full).order_by("ip_subnet"):
+      for child in self.children.exclude(status = IpPoolStatus.Full).order_by("ip_subnet"):
         alloc = child.allocate_buddy(prefix_len)
         if alloc:
           break
@@ -185,48 +186,39 @@ class Pool(models.Model):
         return None
       
       # Something has been allocated, update our status
-      if self.children.filter(status = PoolStatus.Full).count() == 2:
-        self.status = PoolStatus.Full
+      if self.children.filter(status = IpPoolStatus.Full).count() == 2:
+        self.status = IpPoolStatus.Full
         self.save()
     else:
       # Split ourselves into two halves and traverse the left half
-      left, right = self.split()
+      left, right = self.split_buddy()
       alloc = left.allocate_buddy(prefix_len)
     
     return alloc
-  
-  def top_level(self):
-    """
-    Returns the root of this pool tree.
-    """
-    if self.parent:
-      return self.parent.top_level()
-    
-    return self
   
   def reclaim_pools(self):
     """
     Coalesces free children back into one if possible.
     """
-    if self.status == PoolStatus.Free:
+    if self.status == IpPoolStatus.Free:
       return self.parent.reclaim_pools() if self.parent else None
     
     # When all children are free, we don't need them anymore; when only some
     # are free, we mark this pool as partially free
-    free_children = self.children.filter(status = PoolStatus.Free).count()
+    free_children = self.children.filter(status = IpPoolStatus.Free).count()
     if  free_children == 2:
       self.children.all().delete()
-      self.status = PoolStatus.Free
+      self.status = IpPoolStatus.Free
       self.save()
       return self.parent.reclaim_pools() if self.parent else None
     elif free_children == 1:
-      self.status = PoolStatus.Partial
+      self.status = IpPoolStatus.Partial
       self.save()
       return self.parent.reclaim_pools() if self.parent else None
     else:
       # If any of the children are partial, we are partial as well
-      if self.children.filter(status = PoolStatus.Partial).count() > 0:
-        self.status = PoolStatus.Partial
+      if self.children.filter(status = IpPoolStatus.Partial).count() > 0:
+        self.status = IpPoolStatus.Partial
         self.save()
         return self.parent.reclaim_pools() if self.parent else None 
   
@@ -234,7 +226,7 @@ class Pool(models.Model):
     """
     Frees this allocated item and returns it to the parent pool.
     """
-    self.status = PoolStatus.Free
+    self.status = IpPoolStatus.Free
     self.alloc_content_object = None
     self.alloc_timestamp = None
     self.save()
@@ -251,7 +243,7 @@ class Pool(models.Model):
     """
     Returns true if any pools contain this network.
     """
-    return Pool.objects.ip_filter(ip_subnet__conflicts = "%s/%s" % (network, cidr)).count() > 0
+    return IpPool.objects.ip_filter(ip_subnet__conflicts = "%s/%s" % (network, cidr)).count() > 0
   
   def family_as_string(self):
     """
@@ -278,7 +270,7 @@ class Pool(models.Model):
     Attempts to allocate a subnet from this pool.
 
     @param prefix_len: Wanted prefix length
-    @return: A valid Pool instance of the allocated subpool
+    @return: A valid IpPool instance of the allocated subpool
     """
     if not prefix_len:
       prefix_len = self.default_prefix_len

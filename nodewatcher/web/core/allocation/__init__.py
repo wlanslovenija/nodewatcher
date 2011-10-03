@@ -15,10 +15,39 @@ class AddressAllocator(models.Model):
   """
   An abstract class defining an API for address allocator items.
   """
-  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
-  pool = registry_fields.ModelSelectorKeyField(pool_models.Pool, limit_choices_to = { 'parent' : None })
-  cidr = models.IntegerField(default = 27)
+  class Meta:
+    abstract = True
+  
   usage = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#usage")
+  # Each address allocator must also provide a "pool" ModelSelectorKeyField
+  
+  def is_satisfied_by(self, allocation):
+    """
+    Returns true if the given allocation satisfies this allocation request.
+    
+    @param allocation: A valid PoolBase instance
+    """
+    if allocation.top_level() != self.pool:
+      return False
+    
+    return True
+  
+  def satisfy(self, obj):
+    """
+    Attempts to satisfy this allocation request by obtaining a new allocation
+    for the specified object.
+    
+    @param obj: A valid Django model instance
+    """
+    raise NotImplementedError
+
+class IpAddressAllocator(AddressAllocator):
+  """
+  An abstract class defining an API for IP address allocator items.
+  """
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  pool = registry_fields.ModelSelectorKeyField(pool_models.IpPool, limit_choices_to = { 'parent' : None })
+  cidr = models.IntegerField(default = 27)
   
   class Meta:
     abstract = True
@@ -27,15 +56,15 @@ class AddressAllocator(models.Model):
     """
     Returns true if the given allocation satisfies this allocation request.
     
-    @param allocation: A valid Pool instance
+    @param allocation: A valid IpPool instance
     """
+    if not super(IpAddressAllocator, self).is_satisfied_by(allocation):
+      return False
+    
     if allocation.cidr != self.cidr:
       return False
     
     if allocation.family != self.family:
-      return False
-    
-    if allocation.top_level() != self.pool:
       return False
     
     return True
@@ -60,7 +89,7 @@ class AddressAllocator(models.Model):
         }
       )
 
-class AddressAllocatorFormMixin(object):
+class IpAddressAllocatorFormMixin(object):
   """
   A mixin for address allocator forms.
   """
@@ -89,6 +118,6 @@ class AddressAllocatorFormMixin(object):
         coerce = int,
         empty_value = None
       )
-    except (pool_models.Pool.DoesNotExist, AttributeError):
+    except (pool_models.IpPool.DoesNotExist, AttributeError):
       self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR", choices = BLANK_CHOICE_DASH)
 

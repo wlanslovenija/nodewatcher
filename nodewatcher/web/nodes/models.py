@@ -28,7 +28,6 @@ class Project(models.Model):
   """
   name = models.CharField(max_length = 50)
   description = models.CharField(max_length = 200)
-  pool = models.ForeignKey(pool_models.Pool)
   channel = models.IntegerField()
   ssid = models.CharField(max_length = 50)
   ssid_backbone = models.CharField(max_length = 50)
@@ -41,9 +40,6 @@ class Project(models.Model):
   geo_lat = models.FloatField(null = True)
   geo_long = models.FloatField(null = True)
   geo_zoom = models.IntegerField(null = True)
-  
-  # Additional IP allocation pools
-  pools = models.ManyToManyField(pool_models.Pool, related_name = 'projects')
   
   def has_geoloc(self):
     """
@@ -141,9 +137,6 @@ class Node(models.Model):
   This class represents a single node in the network.
   """
   uuid = models.CharField(max_length = 40, primary_key = True)
-  
-  allocations = generic.GenericRelation(pool_models.Pool,
-    content_type_field = 'alloc_content_type', object_id_field = 'alloc_object_id')
   
   # XXX Old fields, will be removed
   ip = models.CharField(max_length = 40, unique = True)

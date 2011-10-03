@@ -259,14 +259,14 @@ class DHCPNetworkConfig(NetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
 
-class AllocatedNetworkConfig(NetworkConfig, allocation.AddressAllocator):
+class AllocatedNetworkConfig(NetworkConfig, allocation.IpAddressAllocator):
   """
   IP configuration that gets allocated from a pool.
   """
   class RegistryMeta(NetworkConfig.RegistryMeta):
     registry_name = _("Allocated Network")
 
-class AllocatedNetworkConfigForm(forms.ModelForm, allocation.AddressAllocatorFormMixin):
+class AllocatedNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
   """
   General configuration form.
   """
@@ -292,7 +292,7 @@ class PPPoENetworkConfig(NetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
-class WifiNetworkConfig(NetworkConfig, allocation.AddressAllocator):
+class WifiNetworkConfig(NetworkConfig, allocation.IpAddressAllocator):
   """
   Configuration for a WiFi network.
   """
@@ -303,7 +303,7 @@ class WifiNetworkConfig(NetworkConfig, allocation.AddressAllocator):
   class RegistryMeta(NetworkConfig.RegistryMeta):
     registry_name = _("WiFi Network")
 
-class WifiNetworkConfigForm(forms.ModelForm, allocation.AddressAllocatorFormMixin):
+class WifiNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
   """
   General configuration form.
   """

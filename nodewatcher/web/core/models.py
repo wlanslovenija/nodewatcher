@@ -113,7 +113,7 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(DescriptionConfig)
 
-class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocation.AddressAllocator):
+class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocation.IpAddressAllocator):
   """
   Enables allocation of subnets for the node without the need to define any interfaces.
   """
@@ -124,7 +124,7 @@ class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocatio
     registry_name = _("Subnet")
     multiple = True
 
-class BasicAddressingConfigForm(forms.ModelForm, allocation.AddressAllocatorFormMixin):
+class BasicAddressingConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
   """
   General configuration form.
   """
