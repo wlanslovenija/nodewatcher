@@ -7,25 +7,17 @@ from django.db import models
 class Migration(SchemaMigration):
 
     depends_on = (
-        ("cgm", "0001_initial"),
-    )
-    needed_by = (
         ("cgm", "0011_schema_refactor"),
     )
 
     def forwards(self, orm):
-        
-        # Adding model 'CgmDigitempPackageConfig'
-        db.create_table('digitemp_cgmdigitemppackageconfig', (
-            ('cgmpackageconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmPackageConfig'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('digitemp', ['CgmDigitempPackageConfig'])
+        db.rename_table('digitemp_cgmdigitemppackageconfig', 'digitemp_digitemppackageconfig')
+        db.rename_column('digitemp_digitemppackageconfig', 'cgmpackageconfig_ptr_id', 'packageconfig_ptr_id')
 
 
     def backwards(self, orm):
-        
-        # Deleting model 'CgmDigitempPackageConfig'
-        db.delete_table('digitemp_cgmdigitemppackageconfig')
+        db.rename_table('digitemp_digitemppackageconfig', 'digitemp_cgmdigitemppackageconfig')
+        db.rename_column('digitemp_cgmdigitemppackageconfig', 'packageconfig_ptr_id', 'cgmpackageconfig_ptr_id')
 
 
     models = {
@@ -58,12 +50,12 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'cgm.cgmpackageconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'CgmPackageConfig'},
+        'cgm.packageconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'PackageConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_cgmpackageconfig'", 'to': "orm['nodes.Node']"})
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_packageconfig'", 'to': "orm['nodes.Node']"})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -94,9 +86,9 @@ class Migration(SchemaMigration):
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.Pool']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        'digitemp.cgmdigitemppackageconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'CgmDigitempPackageConfig', '_ormbases': ['cgm.CgmPackageConfig']},
-            'cgmpackageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmPackageConfig']", 'unique': 'True', 'primary_key': 'True'})
+        'digitemp.digitemppackageconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'DigitempPackageConfig', '_ormbases': ['cgm.PackageConfig']},
+            'packageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.PackageConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'dns.zone': {
             'Meta': {'object_name': 'Zone'},

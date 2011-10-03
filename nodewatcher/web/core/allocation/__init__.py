@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext as _
@@ -25,15 +27,15 @@ class AddressAllocator(models.Model):
     """
     Returns true if the given allocation satisfies this allocation request.
     
-    @param allocation: A valid Allocation instance
+    @param allocation: A valid Pool instance
     """
-    if allocation.pool.cidr != self.cidr:
+    if allocation.cidr != self.cidr:
       return False
     
-    if allocation.pool.family != self.family:
+    if allocation.family != self.family:
       return False
     
-    if allocation.pool.top_level() != self.pool:
+    if allocation.top_level() != self.pool:
       return False
     
     return True
@@ -45,12 +47,11 @@ class AddressAllocator(models.Model):
     
     @param obj: A valid Django model instance
     """
-    allocation = pool_models.Allocation(
-      content_object = obj,
-      pool = self.pool.allocate_subnet(self.cidr)
-    )
+    allocation = self.pool.allocate_subnet(self.cidr)
     
-    if allocation.pool is not None:
+    if allocation is not None:
+      allocation.alloc_content_object = obj
+      allocation.alloc_timestamp = datetime.datetime.now()
       allocation.save()
     else:
       raise registry_forms.RegistryValidationError(
@@ -70,7 +71,7 @@ class AddressAllocatorFormMixin(object):
     # Only display pools that are available to the selected project
     qs = self.fields['pool'].queryset
     try:
-      qs = qs.filter(projects = cfg['core.general'][0].project)
+      qs = qs.filter(projects = cfg['core.project'][0].project)
       qs = qs.filter(family = item.family)
       qs = qs.order_by("description", "ip_subnet")
     except (nodes_models.Project.DoesNotExist, KeyError, AttributeError):

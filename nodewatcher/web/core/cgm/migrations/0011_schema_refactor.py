@@ -6,26 +6,35 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    depends_on = (
-        ("cgm", "0001_initial"),
-    )
-    needed_by = (
-        ("cgm", "0011_schema_refactor"),
-    )
-
     def forwards(self, orm):
-        
-        # Adding model 'CgmDigitempPackageConfig'
-        db.create_table('digitemp_cgmdigitemppackageconfig', (
-            ('cgmpackageconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmPackageConfig'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('digitemp', ['CgmDigitempPackageConfig'])
+        db.rename_table('cgm_cgmpackageconfig', 'cgm_packageconfig')
+        db.rename_table('cgm_cgminterfaceconfig', 'cgm_interfaceconfig')
+        db.rename_table('cgm_cgmnetworkconfig', 'cgm_networkconfig')
 
+        db.rename_column('cgm_vpninterfaceconfig', 'cgminterfaceconfig_ptr_id', 'interfaceconfig_ptr_id')
+        db.rename_column('cgm_wifiinterfaceconfig', 'cgminterfaceconfig_ptr_id', 'interfaceconfig_ptr_id')
+        db.rename_column('cgm_ethernetinterfaceconfig', 'cgminterfaceconfig_ptr_id', 'interfaceconfig_ptr_id')
+
+        db.rename_column('cgm_dhcpnetworkconfig', 'cgmnetworkconfig_ptr_id', 'networkconfig_ptr_id')
+        db.rename_column('cgm_staticnetworkconfig', 'cgmnetworkconfig_ptr_id', 'networkconfig_ptr_id')
+        db.rename_column('cgm_allocatednetworkconfig', 'cgmnetworkconfig_ptr_id', 'networkconfig_ptr_id')
+        db.rename_column('cgm_wifinetworkconfig', 'cgmnetworkconfig_ptr_id', 'networkconfig_ptr_id')
+        db.rename_column('cgm_pppoenetworkconfig', 'cgmnetworkconfig_ptr_id', 'networkconfig_ptr_id')
 
     def backwards(self, orm):
-        
-        # Deleting model 'CgmDigitempPackageConfig'
-        db.delete_table('digitemp_cgmdigitemppackageconfig')
+        db.rename_table('cgm_packageconfig', 'cgm_cgmpackageconfig')
+        db.rename_table('cgm_interfaceconfig', 'cgm_cgminterfaceconfig')
+        db.rename_table('cgm_networkconfig', 'cgm_cgmnetworkconfig')
+
+        db.rename_column('cgm_vpninterfaceconfig', 'interfaceconfig_ptr_id', 'cgminterfaceconfig_ptr_id')
+        db.rename_column('cgm_wifiinterfaceconfig', 'interfaceconfig_ptr_id', 'cgminterfaceconfig_ptr_id')
+        db.rename_column('cgm_ethernetinterfaceconfig', 'interfaceconfig_ptr_id', 'cgminterfaceconfig_ptr_id')
+
+        db.rename_column('cgm_dhcpnetworkconfig', 'networkconfig_ptr_id', 'cgmnetworkconfig_ptr_id')
+        db.rename_column('cgm_staticnetworkconfig', 'networkconfig_ptr_id', 'cgmnetworkconfig_ptr_id')
+        db.rename_column('cgm_allocatednetworkconfig', 'networkconfig_ptr_id', 'cgmnetworkconfig_ptr_id')
+        db.rename_column('cgm_wifinetworkconfig', 'networkconfig_ptr_id', 'cgmnetworkconfig_ptr_id')
+        db.rename_column('cgm_pppoenetworkconfig', 'networkconfig_ptr_id', 'cgmnetworkconfig_ptr_id')
 
 
     models = {
@@ -58,12 +67,103 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'cgm.cgmpackageconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'CgmPackageConfig'},
+        'cgm.allocatednetworkconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'AllocatedNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
+            'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Pool']"}),
+            'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+        },
+        'cgm.cgmgeneralconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'CgmGeneralConfig', '_ormbases': ['core.GeneralConfig']},
+            'generalconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.GeneralConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'password': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'platform': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#platform'", 'blank': 'True'}),
+            'router': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#router'", 'blank': 'True'}),
+            'version': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'})
+        },
+        'cgm.dhcpnetworkconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'DHCPNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
+            'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'cgm.ethernetinterfaceconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'EthernetInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
+            'eth_port': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#eth_port'"}),
+            'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'cgm.interfaceconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'InterfaceConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_cgmpackageconfig'", 'to': "orm['nodes.Node']"})
+            'limit_in': ('web.registry.fields.SelectorKeyField', [], {'default': "''", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#traffic_limits'", 'blank': 'True'}),
+            'limit_out': ('web.registry.fields.SelectorKeyField', [], {'default': "''", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#traffic_limits'", 'blank': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_interfaceconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'cgm.networkconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'NetworkConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'interface': ('web.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'networks'", 'to': "orm['cgm.InterfaceConfig']"}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_networkconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'cgm.packageconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'PackageConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_packageconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'cgm.pppoenetworkconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'PPPoENetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
+            'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'password': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'username': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+        'cgm.staticnetworkconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'StaticNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
+            'address': ('web.registry.fields.IPAddressField', [], {'subnet_required': 'True'}),
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'gateway': ('web.registry.fields.IPAddressField', [], {'host_required': 'True'}),
+            'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'cgm.vpninterfaceconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'VpnInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
+            'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'mac': ('web.registry.fields.MACAddressField', [], {'auto_add': 'True', 'max_length': '17'})
+        },
+        'cgm.vpnserverconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'VpnServerConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'hostname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'port': ('django.db.models.fields.IntegerField', [], {}),
+            'protocol': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.vpn.server#protocol'"}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_vpnserverconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'cgm.wifiinterfaceconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'WifiInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
+            'antenna': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Antenna']", 'null': 'True'}),
+            'antenna_connector': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
+            'bitrate': ('django.db.models.fields.IntegerField', [], {'default': '11'}),
+            'channel': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'protocol': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'wifi_radio': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_radio'"})
+        },
+        'cgm.wifinetworkconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'WifiNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
+            'bssid': ('web.registry.fields.MACAddressField', [], {'max_length': '17'}),
+            'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
+            'essid': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Pool']"}),
+            'role': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"}),
+            'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -80,6 +180,27 @@ class Migration(SchemaMigration):
             'object_id': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'pool': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Pool']"})
         },
+        'core.antenna': {
+            'Meta': {'object_name': 'Antenna'},
+            'angle_horizontal': ('django.db.models.fields.IntegerField', [], {'default': '360'}),
+            'angle_vertical': ('django.db.models.fields.IntegerField', [], {'default': '360'}),
+            'gain': ('django.db.models.fields.IntegerField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'internal_for': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
+            'internal_id': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
+            'manufacturer': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'polarization': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
+        },
+        'core.generalconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'GeneralConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
+            'type': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
+        },
         'core.pool': {
             'Meta': {'object_name': 'Pool'},
             'cidr': ('django.db.models.fields.IntegerField', [], {}),
@@ -93,10 +214,6 @@ class Migration(SchemaMigration):
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.Pool']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        'digitemp.cgmdigitemppackageconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'CgmDigitempPackageConfig', '_ormbases': ['cgm.CgmPackageConfig']},
-            'cgmpackageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmPackageConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'dns.zone': {
             'Meta': {'object_name': 'Zone'},
@@ -203,4 +320,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['digitemp']
+    complete_apps = ['cgm']

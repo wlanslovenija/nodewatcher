@@ -1,31 +1,23 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-class Migration(SchemaMigration):
-
-    depends_on = (
-        ("cgm", "0001_initial"),
-    )
-    needed_by = (
-        ("cgm", "0011_schema_refactor"),
-    )
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        
-        # Adding model 'CgmDigitempPackageConfig'
-        db.create_table('digitemp_cgmdigitemppackageconfig', (
-            ('cgmpackageconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmPackageConfig'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('digitemp', ['CgmDigitempPackageConfig'])
+        # Simply copy the allocations
+        for allocation in orm['core.Allocation'].objects.all():
+          pool = allocation.pool
+          pool.alloc_content_type = allocation.content_type
+          pool.alloc_object_id = allocation.object_id
+          pool.alloc_timestamp = allocation.created_at
+          pool.save()
 
 
     def backwards(self, orm):
-        
-        # Deleting model 'CgmDigitempPackageConfig'
-        db.delete_table('digitemp_cgmdigitemppackageconfig')
+        pass
 
 
     models = {
@@ -58,13 +50,6 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'cgm.cgmpackageconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'CgmPackageConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_cgmpackageconfig'", 'to': "orm['nodes.Node']"})
-        },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -80,8 +65,66 @@ class Migration(SchemaMigration):
             'object_id': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'pool': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Pool']"})
         },
+        'core.antenna': {
+            'Meta': {'object_name': 'Antenna'},
+            'angle_horizontal': ('django.db.models.fields.IntegerField', [], {'default': '360'}),
+            'angle_vertical': ('django.db.models.fields.IntegerField', [], {'default': '360'}),
+            'gain': ('django.db.models.fields.IntegerField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'internal_for': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
+            'internal_id': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
+            'manufacturer': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'polarization': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
+        },
+        'core.basicaddressingconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'BasicAddressingConfig'},
+            'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Pool']"}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
+            'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+        },
+        'core.borderrouterroleconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'border_router': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'core.descriptionconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'DescriptionConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_descriptionconfig'", 'to': "orm['nodes.Node']"}),
+            'url': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'})
+        },
+        'core.generalconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'GeneralConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
+            'type': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
+        },
+        'core.locationconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'LocationConfig'},
+            'address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'altitude': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
+        },
         'core.pool': {
             'Meta': {'object_name': 'Pool'},
+            'alloc_content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
+            'alloc_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
+            'alloc_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'cidr': ('django.db.models.fields.IntegerField', [], {}),
             'default_prefix_len': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
@@ -94,9 +137,33 @@ class Migration(SchemaMigration):
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.Pool']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        'digitemp.cgmdigitemppackageconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'CgmDigitempPackageConfig', '_ormbases': ['cgm.CgmPackageConfig']},
-            'cgmpackageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.CgmPackageConfig']", 'unique': 'True', 'primary_key': 'True'})
+        'core.projectconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'ProjectConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'project': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'core.redundantnoderoleconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'core.roleconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'RoleConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_roleconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'core.systemroleconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'system': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'core.vpnserverroleconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
+            'vpn_server': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'dns.zone': {
             'Meta': {'object_name': 'Zone'},
@@ -203,4 +270,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['digitemp']
+    complete_apps = ['core']

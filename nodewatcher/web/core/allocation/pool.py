@@ -17,6 +17,29 @@ class PoolStatus:
   Full = 1
   Partial = 2
 
+#class PoolBase(models.Model):
+#  """
+#  An abstract base class for all pool implementations.
+#  """
+#  class Meta:
+#    abstract = True
+#  
+#  parent = models.ForeignKey('self', null = True, related_name = 'children')
+#  #projects = models.ManyToManyField("nodes.Project", related_name = 'pools_%(app_label)s_%(class)s')
+#  
+#  # Bookkeeping for allocated pools
+#  alloc_content_type = models.ForeignKey(ContentType, null = True)
+#  alloc_object_id = models.CharField(max_length = 50, null = True)
+#  alloc_content_object = generic.GenericForeignKey('alloc_content_type', 'alloc_object_id')
+#  alloc_timestamp = models.DateTimeField(null = True)
+#  
+#  def free(self):
+#    """
+#    Frees this allocated item and returns it to the parent pool.
+#    """
+#    raise NotImplementedError
+
+# TODO rename to IpPool
 class Pool(models.Model):
   """
   This class represents an IP pool - that is a subnet available for
@@ -32,6 +55,12 @@ class Pool(models.Model):
   default_prefix_len = models.IntegerField(null = True)
   min_prefix_len = models.IntegerField(default = 24, null = True)
   max_prefix_len = models.IntegerField(default = 28, null = True)
+  
+  # Bookkeeping for allocated pools
+  alloc_content_type = models.ForeignKey(ContentType, null = True)
+  alloc_object_id = models.CharField(max_length = 50, null = True)
+  alloc_content_object = generic.GenericForeignKey('alloc_content_type', 'alloc_object_id')
+  alloc_timestamp = models.DateTimeField(null = True)
   
   # Field for indexed lookups
   ip_subnet = allocation_fields.IPField(null = True)
@@ -200,7 +229,17 @@ class Pool(models.Model):
         self.status = PoolStatus.Partial
         self.save()
         return self.parent.reclaim_pools() if self.parent else None 
-
+  
+  def free(self):
+    """
+    Frees this allocated item and returns it to the parent pool.
+    """
+    self.status = PoolStatus.Free
+    self.alloc_content_object = None
+    self.alloc_timestamp = None
+    self.save()
+    self.reclaim_pools()
+  
   def is_leaf(self):
     """
     Returns true if this pool has no children.
@@ -252,26 +291,4 @@ class Pool(models.Model):
     
     pool = self.allocate_buddy(prefix_len)
     return pool
-
-class Allocation(models.Model):
-  """
-  Represents an allocation of a subpool to some object (for example: a node).
-  """
-  content_type = models.ForeignKey(ContentType)
-  object_id = models.CharField(max_length = 50)
-  content_object = generic.GenericForeignKey('content_type', 'object_id')
-  pool = models.ForeignKey(Pool)
-  created_at = models.DateTimeField(auto_now_add = True)
-  
-  class Meta:
-    app_label = "core"
-  
-  def free(self):
-    """
-    Frees this allocation and returns it back to the designated pool.
-    """
-    self.pool.status = PoolStatus.Free
-    self.pool.save()
-    self.pool.reclaim_pools()
-    self.delete()
 

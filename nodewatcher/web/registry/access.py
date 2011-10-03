@@ -3,6 +3,9 @@ from django.contrib.contenttypes.models import ContentType
 class UnknownRegistryIdentifier(Exception):
   pass
 
+class UnknownRegistryClass(Exception):
+  pass
+
 class RegistryResolver(object):
   """
   Resolves registry identifiers in a hierarchical manner.
@@ -101,7 +104,11 @@ def get_model_class_by_name(name):
   try:
     ctype = CTYPE_CACHE[name]
   except KeyError:
-    ctype = ContentType.objects.get(model = name).model_class()
+    try:
+      ctype = ContentType.objects.get(model = name).model_class()
+    except ContentType.DoesNotExist:
+      raise UnknownRegistryClass
+    
     CTYPE_CACHE[name] = ctype
   
   return ctype

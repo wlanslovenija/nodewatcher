@@ -142,7 +142,8 @@ class Node(models.Model):
   """
   uuid = models.CharField(max_length = 40, primary_key = True)
   
-  allocations = generic.GenericRelation(pool_models.Allocation)
+  allocations = generic.GenericRelation(pool_models.Pool,
+    content_type_field = 'alloc_content_type', object_id_field = 'alloc_object_id')
   
   # XXX Old fields, will be removed
   ip = models.CharField(max_length = 40, unique = True)

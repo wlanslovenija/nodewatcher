@@ -66,7 +66,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
     
     for field, dst in kwargs.iteritems():
       dst_model, dst_field = dst.split('.', 1)
-      dst_model = registry_access.get_model_class_by_name(dst_model)
+      try:
+        dst_model = registry_access.get_model_class_by_name(dst_model)
+      except registry_access.UnknownRegistryClass:
+        continue
       
       if '.' in dst_field:
         dst_field, dst_related = dst_field.split('.')

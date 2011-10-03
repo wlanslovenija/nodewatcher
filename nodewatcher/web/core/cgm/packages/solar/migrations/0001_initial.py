@@ -9,6 +9,9 @@ class Migration(SchemaMigration):
     depends_on = (
         ("cgm", "0001_initial"),
     )
+    needed_by = (
+        ("cgm", "0011_schema_refactor"),
+    )
 
     def forwards(self, orm):
         
