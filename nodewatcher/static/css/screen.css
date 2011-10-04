@@ -64,7 +64,7 @@ a img {
 /* line 17, ../../scss/_base.scss */
 body {
   margin: 0px;
-  background: #f0f0f0 url('/../wlansi/css/images/background.png?1282595831') repeat-y top center;
+  background: #f0f0f0 url('/../css/images/background.png?1282595831') repeat-y top center;
   color: #656565;
   font-family: Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif;
   font-size: 13px;
@@ -189,7 +189,7 @@ img {
   margin: 0px auto;
   width: 900px;
   height: 128px;
-  background: transparent url('/../wlansi/css/images/header.png?1282769025') no-repeat bottom left;
+  background: transparent url('/../css/images/header.png?1282769025') no-repeat bottom left;
 }
 /* line 79, ../../scss/_base.scss */
 #header h1 {
@@ -303,7 +303,7 @@ img {
 }
 /* line 121, ../../scss/_base.scss */
 #altlinks li a.rss {
-  background-image: url('/../wlansi/css/images/feed.png?1258488918');
+  background-image: url('/../css/images/feed.png?1258488918');
   padding-left: 20px;
 }
 
@@ -362,7 +362,7 @@ img {
   white-space: nowrap;
   display: inline;
   float: left;
-  background: transparent url('/../wlansi/css/images/bulletgray.png?1282769074') no-repeat center left;
+  background: transparent url('/../css/images/bulletgray.png?1282769074') no-repeat center left;
   padding-left: 9px;
   padding-right: 5px;
 }
@@ -665,22 +665,22 @@ input[type="reset"] {
 h3.folding {
   cursor: pointer;
   margin: 20px 20px 10px 20px;
-  background: transparent url('/../wlansi/css/images/folding_show.png?1282769038') bottom left no-repeat;
+  background: transparent url('/../css/images/folding_show.png?1282769038') bottom left no-repeat;
   border-top: 1px solid #CCCCCC;
   padding-left: 20px;
   padding-top: 5px;
 }
 /* line 297, ../../scss/_base.scss */
 h3.folding.closed {
-  background: transparent url('/../wlansi/css/images/folding_hide.png?1282769033') bottom left no-repeat;
+  background: transparent url('/../css/images/folding_hide.png?1282769033') bottom left no-repeat;
 }
 /* line 298, ../../scss/_base.scss */
 h3.folding:hover {
-  background: transparent url('/../wlansi/css/images/folding_show_hover.png?1282769047') bottom left no-repeat;
+  background: transparent url('/../css/images/folding_show_hover.png?1282769047') bottom left no-repeat;
 }
 /* line 299, ../../scss/_base.scss */
 h3.folding.closed:hover {
-  background: transparent url('/../wlansi/css/images/folding_hide_hover.png?1282769042') bottom left no-repeat;
+  background: transparent url('/../css/images/folding_hide_hover.png?1282769042') bottom left no-repeat;
 }
 
 /* line 306, ../../scss/_base.scss */
@@ -958,31 +958,31 @@ table.smallnodeinfo {
 
 /* line 506, ../../scss/_base.scss */
 .sorting_asc {
-  background: url('/../wlansi/css/images/sort_asc.png?1282769061') no-repeat center right;
+  background: url('/../css/images/sort_asc.png?1282769061') no-repeat center right;
   cursor: pointer;
 }
 
 /* line 511, ../../scss/_base.scss */
 .sorting_desc {
-  background: url('/../wlansi/css/images/sort_desc.png?1282769069') no-repeat center right;
+  background: url('/../css/images/sort_desc.png?1282769069') no-repeat center right;
   cursor: pointer;
 }
 
 /* line 516, ../../scss/_base.scss */
 .sorting {
-  background: url('/../wlansi/css/images/sort_both.png?1282769053') no-repeat center right;
+  background: url('/../css/images/sort_both.png?1282769053') no-repeat center right;
   cursor: pointer;
 }
 
 /* line 521, ../../scss/_base.scss */
 .sorting_asc_disabled {
-  background: url('/../wlansi/css/images/sort_asc_disabled.png?1282769057') no-repeat center right;
+  background: url('/../css/images/sort_asc_disabled.png?1282769057') no-repeat center right;
   cursor: pointer;
 }
 
 /* line 526, ../../scss/_base.scss */
 .sorting_desc_disabled {
-  background: url('/../wlansi/css/images/sort_desc_disabled.png?1282769065') no-repeat center right;
+  background: url('/../css/images/sort_desc_disabled.png?1282769065') no-repeat center right;
   cursor: pointer;
 }
 
@@ -1056,7 +1056,7 @@ table.warnings .icon {
 .graphs .timespan {
   padding: 3px 0 20px 0;
   margin: 0 0 5px 0;
-  background: white url('/../wlansi/css/images/timespan.png?1280772880') no-repeat bottom center;
+  background: white url('/../css/images/timespan.png?1280772880') no-repeat bottom center;
   width: 860px;
   border-bottom: solid white 6px;
 }
@@ -1169,7 +1169,7 @@ table.warnings .icon {
   color: #ff0000;
 }
 
-/* line 26, ../../scss/wlansi/screen.scss */
+/* line 26, ../../scss/screen.scss */
 #metanav {
   position: absolute;
   right: 10px;
@@ -1178,19 +1178,19 @@ table.warnings .icon {
   text-align: right;
 }
 
-/* line 35, ../../scss/wlansi/screen.scss */
+/* line 35, ../../scss/screen.scss */
 #header {
   position: relative;
 }
-/* line 37, ../../scss/wlansi/screen.scss */
+/* line 37, ../../scss/screen.scss */
 #header h1 span {
   display: none;
 }
-/* line 38, ../../scss/wlansi/screen.scss */
+/* line 38, ../../scss/screen.scss */
 #header h2 span {
   display: none;
 }
-/* line 39, ../../scss/wlansi/screen.scss */
+/* line 39, ../../scss/screen.scss */
 #header h1 a {
   display: block;
   position: absolute;
@@ -1199,7 +1199,7 @@ table.warnings .icon {
   top: 10px;
   width: 110px;
 }
-/* line 47, ../../scss/wlansi/screen.scss */
+/* line 47, ../../scss/screen.scss */
 #header h2 a {
   display: block;
   position: absolute;
