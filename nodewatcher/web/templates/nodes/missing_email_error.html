@@ -1,8 +1,4 @@
 {% load i18n %}
 <div class="error{% if classes %} {{ classes }}{% endif %}">
-  {% if profile_configuration_url %}
-  {% blocktrans %}<b>ERROR:</b> You have no e-mail address configured for your account! Please <a href="{{ profile_configuration_url }}">configure yourself a valid e-mail address</a> (you may need to login again). Until then some functions are disabled.{% endblocktrans %}
-  {% else %}
   {% blocktrans %}<b>ERROR:</b> You have no e-mail address configured for your account!{% endblocktrans %}
-  {% endif %}
 </div>

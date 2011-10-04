@@ -36,13 +36,6 @@
     <td class="proplabel">{{ form.password.label_tag }}</td>
     <td class="propbody">{{ form.password }}</td>
   </tr>
-  {% if reset_password_url %}
-  <tr>
-    <td class="proplabel"></td>
-    <td class="propbody propdescription">
-      <a href="{{ reset_password_url }}">Forgot your password?</a>
-    </td>
-  </tr>
   {% endif %}
 </table>
 <div class="buttons"><input type="submit" value="{% trans "Login" %}" /></div>
