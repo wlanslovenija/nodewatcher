@@ -220,7 +220,7 @@ class StaticNetworkConfig(NetworkConfig):
   """
   Static IP configuration.
   """
-  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   address = registry_fields.IPAddressField(subnet_required = True)
   gateway = registry_fields.IPAddressField(host_required = True)
   
@@ -244,8 +244,8 @@ class StaticNetworkConfig(NetworkConfig):
     if self.gateway.ip == self.address.ip:
       raise exceptions.ValidationError(_("Host address and gateway address must be different!"))
 
-registration.point("node.config").register_choice("core.interfaces.network#family", "ipv4", _("IPv4"))
-registration.point("node.config").register_choice("core.interfaces.network#family", "ipv6", _("IPv6"))
+registration.point("node.config").register_choice("core.interfaces.network#ip_family", "ipv4", _("IPv4"))
+registration.point("node.config").register_choice("core.interfaces.network#ip_family", "ipv6", _("IPv6"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 
 class DHCPNetworkConfig(NetworkConfig):

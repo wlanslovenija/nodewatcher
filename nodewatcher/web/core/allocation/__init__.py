@@ -45,7 +45,7 @@ class IpAddressAllocator(AddressAllocator):
   """
   An abstract class defining an API for IP address allocator items.
   """
-  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   pool = registry_fields.ModelSelectorKeyField(pool_models.IpPool, limit_choices_to = { 'parent' : None })
   cidr = models.IntegerField(default = 27)
   

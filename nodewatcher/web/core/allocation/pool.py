@@ -54,7 +54,7 @@ class IpPool(PoolBase):
   allocation purpuses. Every IP block that is allocated is represented
   as an IpPool instance with proper parent pool reference.
   """
-  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#family")
+  family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   network = models.CharField(max_length = 50)
   cidr = models.IntegerField()
   status = models.IntegerField(default = IpPoolStatus.Free)
