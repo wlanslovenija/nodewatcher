@@ -10,8 +10,30 @@ from web.core import allocation as core_allocation
 # Dependencies
 import web.nodes
 
-@registration.register_validation_hook("node.config")
-def node_address_allocation(node):
+@registration.register_validation_hook("node.config", order = "pre", result_id = "allocations")
+def node_address_allocation_setup(node):
+  """
+  Handles address allocation for a node acoording to requests and registered
+  allocators.
+  """
+  allocations = set()
+  
+  # Automatically discover currently available allocation sources
+  allocation_sources = [
+    item
+    for item in registration.point("node.config").config_items()
+    if issubclass(item, core_allocation.AddressAllocator)
+  ]
+  
+  for src in allocation_sources:
+    for allocation in node.config.by_path(src.RegistryMeta.registry_id):
+      if isinstance(allocation, src):
+        allocations.add(allocation)
+  
+  return allocations
+
+@registration.register_validation_hook("node.config", order = "post", result_id = "allocations")
+def node_address_allocation(node, allocations):
   """
   Handles address allocation for a node acoording to requests and registered
   allocators.
@@ -27,33 +49,27 @@ def node_address_allocation(node):
     if issubclass(item, core_allocation.AddressAllocator)
   ]
   
-  # Automatically discover available allocation pool implementations
-  allocation_pools = [
-    item
-    for item in models.get_models()
-    if issubclass(item, pool_models.PoolBase)
-  ]
-  
-  # Create requests from allocation sources
-  allocations = set()
-  for pool_cls in allocation_pools:
-    allocations.update(
-      pool_cls.objects.filter(
-        alloc_content_type__pk = ContentType.objects.get_for_model(node).id,
-        alloc_object_id = node.pk
-      )
-    )
-  
+  unsatisfied_requests = []
   for src in allocation_sources:
     for request in node.config.by_path(src.RegistryMeta.registry_id):
       if isinstance(request, src):
-        for allocation in allocations.copy():
-          if request.is_satisfied_by(allocation):
-            allocations.remove(allocation)
-            break
+        if not request.is_satisfied():
+          unsatisfied_requests.append(request)
         else:
-          # Need to allocate additional resources
-          request.satisfy(node)
+          for allocation in allocations.copy():
+            if allocation.exactly_matches(request):
+              allocations.remove(allocation)
+              break
+  
+  # Attempt to reuse existing resources before requesting new ones
+  for request in unsatisfied_requests:
+    for unused in allocations.copy():
+      if request.satisfy_from(unused):
+        allocations.remove(unused)
+        break
+    else:
+      request.free()
+      request.satisfy(node)
   
   # Free existing unused resources
   # TODO Do this only when saving for real, not on validation runs

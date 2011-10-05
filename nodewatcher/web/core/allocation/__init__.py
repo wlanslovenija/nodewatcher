@@ -19,18 +19,20 @@ class AddressAllocator(models.Model):
     abstract = True
   
   usage = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#usage")
-  # Each address allocator must also provide a "pool" ModelSelectorKeyField
   
-  def is_satisfied_by(self, allocation):
+  def exactly_matches(self, other):
     """
-    Returns true if the given allocation satisfies this allocation request.
-    
-    @param allocation: A valid PoolBase instance
+    Returns true if this allocation request exactly matches the other. This
+    should only return true if both requests share the same allocated
+    resource.
     """
-    if allocation.top_level() != self.pool:
-      return False
-    
-    return True
+    raise NotImplementedError
+  
+  def is_satisfied(self):
+    """
+    Returns true if this allocation request is satisfied.
+    """
+    raise NotImplementedError
   
   def satisfy(self, obj):
     """
@@ -38,6 +40,21 @@ class AddressAllocator(models.Model):
     for the specified object.
     
     @param obj: A valid Django model instance
+    """
+    raise NotImplementedError
+  
+  def satisfy_from(self, other):
+    """
+    Attempts to satisfy this request by taking resources from an existing one.
+    
+    @param other: AddressAllocator instance
+    @return: True if request has been satisfied, False otherwise
+    """
+    raise NotImplementedError
+  
+  def free(self):
+    """
+    Frees this allocation.
     """
     raise NotImplementedError
 
@@ -48,23 +65,60 @@ class IpAddressAllocator(AddressAllocator):
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   pool = registry_fields.ModelSelectorKeyField(pool_models.IpPool, limit_choices_to = { 'parent' : None })
   cidr = models.IntegerField(default = 27)
+  allocation = models.ForeignKey(pool_models.IpPool, editable = False, null = True,
+    on_delete = models.PROTECT, related_name = 'allocations_%(app_label)s_%(class)s')
   
   class Meta:
     abstract = True
   
-  def is_satisfied_by(self, allocation):
+  def exactly_matches(self, other):
     """
-    Returns true if the given allocation satisfies this allocation request.
-    
-    @param allocation: A valid IpPool instance
+    Returns true if this allocation request exactly matches the other. This
+    should only return true if both requests share the same allocated
+    resource.
     """
-    if not super(IpAddressAllocator, self).is_satisfied_by(allocation):
+    if not self.is_satisfied() or not other.is_satisfied():
       return False
     
-    if allocation.cidr != self.cidr:
+    return self.allocation == other.allocation
+  
+  def satisfy_from(self, other):
+    """
+    Attempts to satisfy this request by taking resources from an existing one.
+    
+    @param other: AddressAllocator instance
+    @return: True if request has been satisfied, False otherwise
+    """
+    if not other.is_satisfied():
       return False
     
-    if allocation.family != self.family:
+    if other.family != self.family:
+      return False
+    
+    if other.cidr != self.cidr:
+      return False
+    
+    if other.pool != self.pool:
+      return False
+    
+    self.allocation = other.allocation
+    self.save()
+    return True
+  
+  def is_satisfied(self):
+    """
+    Returns true if this allocation request is satisfied.
+    """
+    if self.allocation is None:
+      return False
+    
+    if self.allocation.family != self.family:
+      return False
+    
+    if self.allocation.cidr != self.cidr:
+      return False
+    
+    if self.allocation.top_level() != self.pool:
       return False
     
     return True
@@ -76,18 +130,30 @@ class IpAddressAllocator(AddressAllocator):
     
     @param obj: A valid Django model instance
     """
-    allocation = self.pool.allocate_subnet(self.cidr)
+    self.allocation = self.pool.allocate_subnet(self.cidr)
     
-    if allocation is not None:
-      allocation.alloc_content_object = obj
-      allocation.alloc_timestamp = datetime.datetime.now()
-      allocation.save()
+    if self.allocation is not None:
+      self.allocation.alloc_content_object = obj
+      self.allocation.alloc_timestamp = datetime.datetime.now()
+      self.allocation.save()
+      self.save()
     else:
       raise registry_forms.RegistryValidationError(
         _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
           'prefix' : self.cidr, 'pool' : unicode(self.pool)
         }
       )
+  
+  def free(self):
+    """
+    Frees this allocation.
+    """
+    if self.allocation is None:
+      return
+    
+    self.allocation.free()
+    self.allocation = None
+    self.save()
 
 class IpAddressAllocatorFormMixin(object):
   """
