@@ -19,6 +19,9 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
   name = models.CharField(max_length = 30)
   type = registry_fields.SelectorKeyField("node.config", "core.general#type")
   
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta:
     form_order = 1
     registry_id = "core.general"
@@ -42,6 +45,9 @@ class ProjectConfig(registration.bases.NodeConfigRegistryItem):
   """
   project = registry_fields.ModelSelectorKeyField("nodes.Project")
   
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta:
     form_order = 2
     registry_id = "core.project"
@@ -59,6 +65,9 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
   country = models.CharField(max_length = 100) # TODO country field?
   geolocation = gis_models.PointField(null = True)
   altitude = models.FloatField(default = 0)
+  
+  class Meta:
+    app_label = "core"
   
   class RegistryMeta:
     form_order = 3
@@ -105,6 +114,9 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
   notes = models.TextField(blank = True, default = "")
   url = models.URLField(verify_exists = False, blank = True, default = "", verbose_name = _("URL"))
   
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta:
     form_order = 4
     registry_id = "core.description"
@@ -117,6 +129,9 @@ class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocatio
   """
   Enables allocation of subnets for the node without the need to define any interfaces.
   """
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta:
     form_order = 51
     registry_id = "core.basic-addressing"
@@ -138,6 +153,9 @@ class RoleConfig(registration.bases.NodeConfigRegistryItem):
   """
   Describes a single node's role.
   """
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta:
     form_order = 20
     registry_id = "core.roles"
@@ -155,6 +173,9 @@ class SystemRoleConfig(RoleConfig):
   """
   system = models.BooleanField(default = False)
   
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta(RoleConfig.RegistryMeta):
     registry_name = _("System Role")
 
@@ -165,6 +186,9 @@ class BorderRouterRoleConfig(RoleConfig):
   Describes the "border router" role.
   """
   border_router = models.BooleanField(default = False)
+  
+  class Meta:
+    app_label = "core"
   
   class RegistryMeta(RoleConfig.RegistryMeta):
     registry_name = _("Border Router Role")
@@ -177,6 +201,9 @@ class VpnServerRoleConfig(RoleConfig):
   """
   vpn_server = models.BooleanField(default = False)
   
+  class Meta:
+    app_label = "core"
+  
   class RegistryMeta(RoleConfig.RegistryMeta):
     registry_name = _("VPN Server Role")
 
@@ -187,6 +214,9 @@ class RedundantNodeRoleConfig(RoleConfig):
   Describes the "redundant node" role.
   """
   redundancy_required = models.BooleanField(default = False)
+  
+  class Meta:
+    app_label = "core"
   
   class RegistryMeta(RoleConfig.RegistryMeta):
     registry_name = _("Redundant Node Role")
