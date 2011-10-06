@@ -64,7 +64,7 @@ class IpAddressAllocator(AddressAllocator):
   """
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   pool = registry_fields.ModelSelectorKeyField(pool_models.IpPool, limit_choices_to = { 'parent' : None })
-  cidr = models.IntegerField(default = 27)
+  prefix_length = models.IntegerField(default = 27)
   allocation = models.ForeignKey(pool_models.IpPool, editable = False, null = True,
     on_delete = models.PROTECT, related_name = 'allocations_%(app_label)s_%(class)s')
   
@@ -95,7 +95,7 @@ class IpAddressAllocator(AddressAllocator):
     if other.family != self.family:
       return False
     
-    if other.cidr != self.cidr:
+    if other.prefix_length != self.prefix_length:
       return False
     
     if other.pool != self.pool:
@@ -115,7 +115,7 @@ class IpAddressAllocator(AddressAllocator):
     if self.allocation.family != self.family:
       return False
     
-    if self.allocation.cidr != self.cidr:
+    if self.allocation.prefix_length != self.prefix_length:
       return False
     
     if self.allocation.top_level() != self.pool:
@@ -130,17 +130,17 @@ class IpAddressAllocator(AddressAllocator):
     
     @param obj: A valid Django model instance
     """
-    self.allocation = self.pool.allocate_subnet(self.cidr)
+    self.allocation = self.pool.allocate_subnet(self.prefix_length)
     
     if self.allocation is not None:
-      self.allocation.alloc_content_object = obj
-      self.allocation.alloc_timestamp = datetime.datetime.now()
+      self.allocation.allocation_content_object = obj
+      self.allocation.allocation_timestamp = datetime.datetime.now()
       self.allocation.save()
       self.save()
     else:
       raise registry_forms.RegistryValidationError(
         _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
-          'prefix' : self.cidr, 'pool' : unicode(self.pool)
+          'prefix' : self.prefix_length, 'pool' : unicode(self.pool)
         }
       )
   
@@ -174,16 +174,19 @@ class IpAddressAllocatorFormMixin(object):
     
     self.fields['pool'].queryset = qs
     
-    # Only display CIDR range that is available for the selected pool
+    # Only display prefix length range that is available for the selected pool
     try:
       pool = item.pool
-      self.fields['cidr'] = registry_fields.SelectorFormField(
-        label = "CIDR",
-        choices = BLANK_CHOICE_DASH + [(plen, "/%s" % plen) for plen in xrange(pool.min_prefix_len, pool.max_prefix_len + 1)],
-        initial = pool.default_prefix_len,
+      self.fields['prefix_length'] = registry_fields.SelectorFormField(
+        label = _("Prefix Length"),
+        choices = BLANK_CHOICE_DASH + [
+          (plen, "/%s" % plen)
+          for plen in xrange(pool.prefix_length_minimum, pool.prefix_length_maximum + 1)
+        ],
+        initial = pool.prefix_length_default,
         coerce = int,
         empty_value = None
       )
     except (pool_models.IpPool.DoesNotExist, AttributeError):
-      self.fields['cidr'] = registry_fields.SelectorFormField(label = "CIDR", choices = BLANK_CHOICE_DASH)
+      self.fields['prefix_length'] = registry_fields.SelectorFormField(label = _("Prefix Length"), choices = BLANK_CHOICE_DASH)
 

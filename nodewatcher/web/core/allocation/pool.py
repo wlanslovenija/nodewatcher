@@ -28,10 +28,10 @@ class PoolBase(models.Model):
   projects = models.ManyToManyField("nodes.Project", related_name = 'pools_%(app_label)s_%(class)s')
   
   # Bookkeeping for allocated pools
-  alloc_content_type = models.ForeignKey(ContentType, null = True)
-  alloc_object_id = models.CharField(max_length = 50, null = True)
-  alloc_content_object = generic.GenericForeignKey('alloc_content_type', 'alloc_object_id')
-  alloc_timestamp = models.DateTimeField(null = True)
+  allocation_content_type = models.ForeignKey(ContentType, null = True)
+  allocation_object_id = models.CharField(max_length = 50, null = True)
+  allocation_content_object = generic.GenericForeignKey('allocation_content_type', 'allocation_object_id')
+  allocation_timestamp = models.DateTimeField(null = True)
   
   def top_level(self):
     """
@@ -56,12 +56,12 @@ class IpPool(PoolBase):
   """
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   network = models.CharField(max_length = 50)
-  cidr = models.IntegerField()
+  prefix_length = models.IntegerField()
   status = models.IntegerField(default = IpPoolStatus.Free)
   description = models.CharField(max_length = 200, null = True)
-  default_prefix_len = models.IntegerField(null = True)
-  min_prefix_len = models.IntegerField(default = 24, null = True)
-  max_prefix_len = models.IntegerField(default = 28, null = True)
+  prefix_length_default = models.IntegerField(null = True)
+  prefix_length_minimum = models.IntegerField(default = 24, null = True)
+  prefix_length_maximum = models.IntegerField(default = 28, null = True)
   
   # Field for indexed lookups
   ip_subnet = allocation_fields.IPField(null = True)
@@ -76,19 +76,19 @@ class IpPool(PoolBase):
     """
     Saves the model.
     """
-    self.ip_subnet = '%s/%s' % (self.network, self.cidr)
+    self.ip_subnet = '%s/%s' % (self.network, self.prefix_length)
     super(IpPool, self).save(**kwargs)
   
   def split_buddy(self):
     """
     Splits this pool into two subpools.
     """
-    net = ipcalc.Network(self.network, self.cidr)
-    net0 = "%s/%d" % (self.network, self.cidr + 1)
+    net = ipcalc.Network(self.network, self.prefix_length)
+    net0 = "%s/%d" % (self.network, self.prefix_length + 1)
     net1 = str(ipcalc.Network(long(net) + ipcalc.Network(net0).size())) 
     
-    left = IpPool(parent = self, family = self.family, network = self.network, cidr = self.cidr + 1)
-    right = IpPool(parent = self, family = self.family, network = net1, cidr = self.cidr + 1)
+    left = IpPool(parent = self, family = self.family, network = self.network, prefix_length = self.prefix_length + 1)
+    right = IpPool(parent = self, family = self.family, network = net1, prefix_length = self.prefix_length + 1)
     left.save()
     right.save()
     
@@ -109,15 +109,15 @@ class IpPool(PoolBase):
     if prefix_len == 31:
       return None
     
-    if not self.parent and (prefix_len < self.min_prefix_len or prefix_len > self.max_prefix_len):
+    if not self.parent and (prefix_len < self.prefix_length_minimum or prefix_len > self.prefix_length_maximum):
       return None 
     
-    net = ipcalc.Network(self.network, self.cidr)
+    net = ipcalc.Network(self.network, self.prefix_length)
     if ipcalc.Network(network, prefix_len) not in net:
       # We don't contain this network, so there is nothing to be done
       return None
     
-    if network == self.network and self.cidr == prefix_len and self.status == IpPoolStatus.Free:
+    if network == self.network and self.prefix_length == prefix_len and self.status == IpPoolStatus.Free:
       # We are the network, mark as full and save
       if not check_only:
         self.status = IpPoolStatus.Full
@@ -164,11 +164,11 @@ class IpPool(PoolBase):
     
     @param prefix_len: Wanted prefix length
     """
-    if self.cidr > prefix_len:
+    if self.prefix_length > prefix_len:
       # We have gone too far, allocation has failed
       return None
     
-    if prefix_len == self.cidr and self.status == IpPoolStatus.Free:
+    if prefix_len == self.prefix_length and self.status == IpPoolStatus.Free:
       # We have found a free pool of the proper size, use it
       self.status = IpPoolStatus.Full
       self.save()
@@ -227,8 +227,8 @@ class IpPool(PoolBase):
     Frees this allocated item and returns it to the parent pool.
     """
     self.status = IpPoolStatus.Free
-    self.alloc_content_object = None
-    self.alloc_timestamp = None
+    self.allocation_content_object = None
+    self.allocation_timestamp = None
     self.save()
     self.reclaim_pools()
   
@@ -239,11 +239,11 @@ class IpPool(PoolBase):
     return self.children.all().count() == 0
 
   @staticmethod
-  def contains_network(network, cidr):
+  def contains_network(network, prefix_length):
     """
     Returns true if any pools contain this network.
     """
-    return IpPool.objects.ip_filter(ip_subnet__conflicts = "%s/%s" % (network, cidr)).count() > 0
+    return IpPool.objects.ip_filter(ip_subnet__conflicts = "%s/%s" % (network, prefix_length)).count() > 0
   
   def family_as_string(self):
     """
@@ -260,9 +260,9 @@ class IpPool(PoolBase):
     Returns a string representation of this pool.
     """
     if self.description:
-      return u"%s [%s/%d]" % (self.description, self.network, self.cidr)
+      return u"%s [%s/%d]" % (self.description, self.network, self.prefix_length)
     else: 
-      return u"%s/%d" % (self.network, self.cidr)
+      return u"%s/%d" % (self.network, self.prefix_length)
   
   @db_locker.require_lock('core_pool')
   def allocate_subnet(self, prefix_len = None):
@@ -273,9 +273,9 @@ class IpPool(PoolBase):
     @return: A valid IpPool instance of the allocated subpool
     """
     if not prefix_len:
-      prefix_len = self.default_prefix_len
+      prefix_len = self.prefix_length_default
     
-    if prefix_len < self.min_prefix_len or prefix_len > self.max_prefix_len:
+    if prefix_len < self.prefix_length_minimum or prefix_len > self.prefix_length_maximum:
       return None
     
     if prefix_len == 31:
