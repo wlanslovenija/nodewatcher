@@ -93,7 +93,7 @@ class RegistrationPoint(object):
       if registry_id in self.item_registry:
         raise ImproperlyConfigured(
           "Multiple top-level registry items claim identifier '{0}'! Claimed by '{1}' and '{2}'.".format(
-            registry_id, self.item_registry[registry_id]._meta.object_name, item._meta.object_name
+            registry_id, self.item_registry[registry_id], item
         ))
       
       self.item_registry[registry_id] = item
