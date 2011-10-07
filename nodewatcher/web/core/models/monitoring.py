@@ -1,3 +1,5 @@
+import polymorphic
+
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -11,7 +13,6 @@ class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
   """
   first_seen = models.DateTimeField(null = True)
   last_seen = models.DateTimeField(null = True)
-  uptime = models.IntegerField(null = True)
   
   class Meta:
     app_label = "core"
@@ -45,8 +46,6 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
   """
   Routing topology.
   """
-  peers_count = models.IntegerField(default = 0)
-  
   class Meta:
     app_label = "core"
   
@@ -56,12 +55,12 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
 
 registration.point("node.monitoring").register_item(RoutingTopologyMonitor)
 
-class TopologyLink(models.Model):
+class TopologyLink(polymorphic.PolymorphicModel):
   """
   Generic topology link not associated with any specific routing protocol.
   """
-  monitor = models.ForeignKey(RoutingTopologyMonitor, related_name = 'peers')
-  peer = models.ForeignKey(nodes_models.Node, related_name = 'peers_generic')
+  monitor = models.ForeignKey(RoutingTopologyMonitor, related_name = 'links')
+  peer = models.ForeignKey(nodes_models.Node, related_name = 'links')
   
   class Meta:
     app_label = "core"

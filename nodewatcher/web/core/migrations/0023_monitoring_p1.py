@@ -7,21 +7,58 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        
+        # Adding model 'StatusMonitor'
+        db.create_table('core_statusmonitor', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+            ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='monitoring_core_statusmonitor', to=orm['nodes.Node'])),
+            ('status', self.gf('web.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.monitoring', enum_id='core.status#status')),
+            ('has_warnings', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        ))
+        db.send_create_signal('core', ['StatusMonitor'])
 
-        db.rename_column('core_ippool', 'default_prefix_len', 'prefix_length_default')
-        db.rename_column('core_ippool', 'min_prefix_len', 'prefix_length_minimum')
-        db.rename_column('core_ippool', 'max_prefix_len', 'prefix_length_maximum')
-        db.rename_column('core_ippool', 'cidr', 'prefix_length')
-        db.rename_column('core_basicaddressingconfig', 'cidr', 'prefix_length')
+        # Adding model 'RoutingTopologyMonitor'
+        db.create_table('core_routingtopologymonitor', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+            ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='monitoring_core_routingtopologymonitor', to=orm['nodes.Node'])),
+        ))
+        db.send_create_signal('core', ['RoutingTopologyMonitor'])
+
+        # Adding model 'GeneralMonitor'
+        db.create_table('core_generalmonitor', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+            ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='monitoring_core_generalmonitor', to=orm['nodes.Node'])),
+            ('first_seen', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+            ('last_seen', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+        ))
+        db.send_create_signal('core', ['GeneralMonitor'])
+
+        # Adding model 'TopologyLink'
+        db.create_table('core_topologylink', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('polymorphic_ctype', self.gf('django.db.models.fields.related.ForeignKey')(related_name='polymorphic_core.topologylink_set', null=True, to=orm['contenttypes.ContentType'])),
+            ('monitor', self.gf('django.db.models.fields.related.ForeignKey')(related_name='links', to=orm['core.RoutingTopologyMonitor'])),
+            ('peer', self.gf('django.db.models.fields.related.ForeignKey')(related_name='links', to=orm['nodes.Node'])),
+        ))
+        db.send_create_signal('core', ['TopologyLink'])
 
 
     def backwards(self, orm):
+        
+        # Deleting model 'StatusMonitor'
+        db.delete_table('core_statusmonitor')
 
-        db.rename_column('core_ippool', 'prefix_length_default', 'default_prefix_len')
-        db.rename_column('core_ippool', 'prefix_length_minimum', 'min_prefix_len')
-        db.rename_column('core_ippool', 'prefix_length_maximum', 'max_prefix_len')
-        db.rename_column('core_ippool', 'prefix_length', 'cidr')
-        db.rename_column('core_basicaddressingconfig', 'prefix_length', 'cidr')
+        # Deleting model 'RoutingTopologyMonitor'
+        db.delete_table('core_routingtopologymonitor')
+
+        # Deleting model 'GeneralMonitor'
+        db.delete_table('core_generalmonitor')
+
+        # Deleting model 'TopologyLink'
+        db.delete_table('core_topologylink')
 
 
     models = {
@@ -106,12 +143,19 @@ class Migration(SchemaMigration):
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
             'type': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
         },
+        'core.generalmonitor': {
+            'Meta': {'object_name': 'GeneralMonitor'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'first_seen': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_seen': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_generalmonitor'", 'to': "orm['nodes.Node']"})
+        },
         'core.ippool': {
             'Meta': {'object_name': 'IpPool'},
-            'alloc_content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
-            'alloc_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
-            'alloc_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'prefix_length_default': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'allocation_content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
+            'allocation_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
+            'allocation_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -119,6 +163,7 @@ class Migration(SchemaMigration):
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.IpPool']"}),
             'prefix_length': ('django.db.models.fields.IntegerField', [], {}),
+            'prefix_length_default': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'prefix_length_maximum': ('django.db.models.fields.IntegerField', [], {'default': '28', 'null': 'True'}),
             'prefix_length_minimum': ('django.db.models.fields.IntegerField', [], {'default': '24', 'null': 'True'}),
             'projects': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'pools_core_ippool'", 'symmetrical': 'False', 'to': "orm['nodes.Project']"}),
@@ -153,10 +198,31 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_roleconfig'", 'to': "orm['nodes.Node']"})
         },
+        'core.routingtopologymonitor': {
+            'Meta': {'object_name': 'RoutingTopologyMonitor'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_routingtopologymonitor'", 'to': "orm['nodes.Node']"})
+        },
+        'core.statusmonitor': {
+            'Meta': {'object_name': 'StatusMonitor'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'has_warnings': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_statusmonitor'", 'to': "orm['nodes.Node']"}),
+            'status': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.monitoring'", 'enum_id': "'core.status#status'"})
+        },
         'core.systemroleconfig': {
             'Meta': {'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'system': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'core.topologylink': {
+            'Meta': {'object_name': 'TopologyLink'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'monitor': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['core.RoutingTopologyMonitor']"}),
+            'peer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['nodes.Node']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'polymorphic_core.topologylink_set'", 'null': 'True', 'to': "orm['contenttypes.ContentType']"})
         },
         'core.vpnserverroleconfig': {
             'Meta': {'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
