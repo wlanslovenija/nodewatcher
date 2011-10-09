@@ -241,6 +241,10 @@ CELERY_IGNORE_RESULT = True
 # configuration/setup will not work.
 ENABLE_GRAPH_DISPLAY = False
 
+# Monitoring
+OLSRD_MONITOR_HOST = '127.0.0.1'
+OLSRD_MONITOR_PORT = 2006
+
 # Registry
 REGISTRY_RULES_MODULES = {
   'node.config' : 'web.rules'
