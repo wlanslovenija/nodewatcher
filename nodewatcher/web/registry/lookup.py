@@ -10,6 +10,14 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
   """
   An augmented query set that enables lookups of values from the registry.
   """
+  def _clone(self, *args, **kwargs):
+    """
+    Clones this queryset.
+    """
+    clone = super(RegistryQuerySet, self)._clone(*args, **kwargs)
+    clone._regpoint = getattr(self, '_regpoint', None)
+    return clone
+  
   def regpoint(self, name):
     """
     Switches to a different regpoint that determines the short attribute
