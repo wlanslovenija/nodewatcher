@@ -125,6 +125,26 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(DescriptionConfig)
 
+class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
+  """
+  Router identifier configuration.
+  """
+  router_id = models.CharField(max_length = 100)
+  family = registry_fields.SelectorKeyField("node.config", "core.routerid#family")
+  
+  class Meta:
+    app_label = "core"
+    
+  class RegistryMeta:
+    form_order = 100
+    registry_id = "core.routerid"
+    multiple = True
+    hidden = True
+
+registration.point("node.config").register_choice("core.routerid#family", "ipv4", _("IPv4"))
+registration.point("node.config").register_choice("core.routerid#family", "ipv6", _("IPv6"))
+registration.point("node.config").register_item(RouterIdConfig)
+
 class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocation.IpAddressAllocator):
   """
   Enables allocation of subnets for the node without the need to define any interfaces.

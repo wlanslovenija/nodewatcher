@@ -47,6 +47,16 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
         except olsr_parser.OlsrParseFailed:
           # TODO emit a global warning somewhere?
           pass
+        
+        # Create nodes that are visible but not registered as invalid
+        visible_routers = set(context.topology.keys())
+        registered_routers = nodes_models.Node.objects.regpoint("config").registry_fields(
+          router_id = "RouterIdConfig.router_id",
+        ).filter(routeridconfig_family = "ipv4").values_list("router_id", flat = True)
+        
+        for router_id in visible_routers.difference(registered_routers):
+          # TODO Create this node and mark it as an invalid node
+          pass
     
     return context, nodes
   
@@ -59,9 +69,18 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
     @param node: Node that is being processed
     @return: A (possibly) modified context
     """
-    # context.routing.olsr.topology[node-router-id]
-    # context.routing.olsr.announces[node-router-id]
-    # TODO populate node's olsr routing topology and announces
+    try:
+      router_id = node.config.core.routerid(queryset = True).get(family = "ipv4")
+      topology = context.routing.olsr.topology.get(router_id, [])
+      announces = context.routing.olsr.announces.get(router_id, [])
+      aliases = context.routing.olsr.aliases.get(router_id, [])
+      
+      # TODO populate monitoring registry
+    except core_models.RouterIdConfig.DoesNotExist:
+      # No router-id for this node can be found for IPv4; this means
+      # that we have nothing to do here
+      pass
+    
     return context
 
 monitor_processors.register_processor(OlsrFetchProcessor)

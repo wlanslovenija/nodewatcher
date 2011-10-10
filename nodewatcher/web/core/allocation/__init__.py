@@ -57,6 +57,18 @@ class AddressAllocator(models.Model):
     Frees this allocation.
     """
     raise NotImplementedError
+  
+  def get_routerid_family(self):
+    """
+    Returns the router-id family identifier for this allocator.
+    """
+    raise NotImplementedError
+  
+  def get_routerid(self):
+    """
+    Generates and returns a router-id from this allocation.
+    """
+    raise NotImplementedError
 
 class IpAddressAllocator(AddressAllocator):
   """
@@ -154,6 +166,18 @@ class IpAddressAllocator(AddressAllocator):
     self.allocation.free()
     self.allocation = None
     self.save()
+  
+  def get_routerid_family(self):
+    """
+    Returns the router-id family identifier for this allocator.
+    """
+    return self.family
+  
+  def get_routerid(self):
+    """
+    Generates and returns a router-id from this allocation.
+    """
+    return str(self.allocation.to_ip_network()[1])
 
 class IpAddressAllocatorFormMixin(object):
   """

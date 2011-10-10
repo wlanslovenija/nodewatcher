@@ -3,7 +3,7 @@ from django.contrib.contenttypes import generic
 from django.db import models
 
 from web.registry import fields as registry_fields
-from web.utils import ipcalc, db_locker
+from web.utils import ipcalc, db_locker, ipaddr
 import fields as allocation_fields
 
 class PoolAllocationError(Exception):
@@ -263,6 +263,12 @@ class IpPool(PoolBase):
       return u"%s [%s/%d]" % (self.description, self.network, self.prefix_length)
     else: 
       return u"%s/%d" % (self.network, self.prefix_length)
+  
+  def to_ip_network(self):
+    """
+    Returns the allocation as an ipaddr.IPNetwork instance.
+    """
+    return ipaddr.IPNetwork("%s/%d" % (self.network, self.prefix_length))
   
   @db_locker.require_lock('core_pool')
   def allocate_subnet(self, prefix_len = None):

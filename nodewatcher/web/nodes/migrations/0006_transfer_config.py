@@ -9,8 +9,8 @@ class Migration(DataMigration):
     depends_on = (
         ("generator", "0001_initial"),
         ("policy", "0001_initial"),
-        ("core", "0020_pool_refactor_p5"),
-        ("cgm", "0016_pool_refactor"),
+        ("core", "0024_router_id"),
+        ("cgm", "0017_cidr_rename"),
         ("solar", "0002_schema_refactor"),
         ("digitemp", "0002_schema_refactor"),
     )
@@ -37,6 +37,7 @@ class Migration(DataMigration):
         brouter_role_ctype    = self.get_content_type(orm, app_label = 'core', model = 'borderrouterroleconfig')
         vpn_role_ctype        = self.get_content_type(orm, app_label = 'core', model = 'vpnserverroleconfig')
         redundant_role_ctype  = self.get_content_type(orm, app_label = 'core', model = 'redundantnoderoleconfig')
+        rid_ctype             = self.get_content_type(orm, app_label = 'core', model = 'routeridconfig')
         ethiface_ctype        = self.get_content_type(orm, app_label = 'cgm', model = 'ethernetinterfaceconfig')
         dhcpnetconf_ctype     = self.get_content_type(orm, app_label = 'cgm', model = 'dhcpnetworkconfig')
         staticnetconf_ctype   = self.get_content_type(orm, app_label = 'cgm', model = 'staticnetworkconfig')
@@ -184,7 +185,7 @@ class Migration(DataMigration):
             wifi_netconf.bssid = "02:CA:FF:EE:BA:BE"
             
             wifi_subnet = node.subnet_set.get(gen_iface_type = 2, allocated = True)
-            pool = orm['core.IpPool'].objects.filter(network = wifi_subnet.subnet, cidr = wifi_subnet.cidr)
+            pool = orm['core.IpPool'].objects.filter(network = wifi_subnet.subnet, prefix_length = wifi_subnet.cidr)
             if not pool:
               continue
             
@@ -194,9 +195,15 @@ class Migration(DataMigration):
             
             wifi_netconf.family = "ipv4"
             wifi_netconf.pool = pool
-            wifi_netconf.cidr = wifi_subnet.cidr
+            wifi_netconf.prefix_length = wifi_subnet.cidr
             wifi_netconf.usage = "auto"
             wifi_netconf.save()
+            
+            # Router identifier
+            routerid = orm['core.RouterIdConfig'](root = node, content_type = rid_ctype)
+            routerid.family = "ipv4"
+            routerid.router_id = node.ip
+            routerid.save()
             
             # WAN (wan0)
             wan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
@@ -226,7 +233,7 @@ class Migration(DataMigration):
             # LAN subnets (lan0)
             lan_subnets = []
             for subnet in node.subnet_set.filter(gen_iface_type = 0, allocated = True):
-              pool = orm['core.IpPool'].objects.filter(network = subnet.subnet, cidr = subnet.cidr)
+              pool = orm['core.IpPool'].objects.filter(network = subnet.subnet, prefix_length = subnet.cidr)
               if not pool:
                 continue
               
@@ -256,7 +263,7 @@ class Migration(DataMigration):
                 alloc_netconf.description = "LAN"
                 alloc_netconf.family = "ipv4"
                 alloc_netconf.pool = subnet['pool']
-                alloc_netconf.cidr = subnet['cidr']
+                alloc_netconf.prefix_length = subnet['cidr']
                 alloc_netconf.usage = "clients"
                 alloc_netconf.allocation = subnet['allocation']
                 alloc_netconf.save()
@@ -354,10 +361,10 @@ class Migration(DataMigration):
         'cgm.allocatednetworkconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'AllocatedNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
             'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_cgm_allocatednetworkconfig'", 'null': 'True', 'to': "orm['core.IpPool']"}),
-            'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']"}),
+            'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'cgm.authenticationconfig': {
@@ -470,11 +477,11 @@ class Migration(DataMigration):
             'Meta': {'ordering': "['id']", 'object_name': 'WifiNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
             'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_cgm_wifinetworkconfig'", 'null': 'True', 'to': "orm['core.IpPool']"}),
             'bssid': ('web.registry.fields.MACAddressField', [], {'max_length': '17'}),
-            'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'essid': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']"}),
+            'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'role': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"}),
             'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
@@ -499,23 +506,23 @@ class Migration(DataMigration):
             'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
         },
         'core.basicaddressingconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'BasicAddressingConfig'},
+            'Meta': {'object_name': 'BasicAddressingConfig'},
             'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_core_basicaddressingconfig'", 'null': 'True', 'to': "orm['core.IpPool']"}),
-            'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'pool': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']"}),
+            'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
             'usage': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'core.borderrouterroleconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'Meta': {'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
             'border_router': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'core.descriptionconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'DescriptionConfig'},
+            'Meta': {'object_name': 'DescriptionConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
@@ -523,33 +530,41 @@ class Migration(DataMigration):
             'url': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'})
         },
         'core.generalconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'GeneralConfig'},
+            'Meta': {'object_name': 'GeneralConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
             'type': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
         },
+        'core.generalmonitor': {
+            'Meta': {'object_name': 'GeneralMonitor'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'first_seen': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_seen': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_generalmonitor'", 'to': "orm['nodes.Node']"})
+        },
         'core.ippool': {
             'Meta': {'object_name': 'IpPool'},
-            'alloc_content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
-            'alloc_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
-            'alloc_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'cidr': ('django.db.models.fields.IntegerField', [], {}),
-            'default_prefix_len': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'allocation_content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
+            'allocation_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
+            'allocation_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'ip_subnet': ('web.core.allocation.fields.IPField', [], {'null': 'True'}),
-            'max_prefix_len': ('django.db.models.fields.IntegerField', [], {'default': '28', 'null': 'True'}),
-            'min_prefix_len': ('django.db.models.fields.IntegerField', [], {'default': '24', 'null': 'True'}),
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.IpPool']"}),
+            'prefix_length': ('django.db.models.fields.IntegerField', [], {}),
+            'prefix_length_default': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'prefix_length_maximum': ('django.db.models.fields.IntegerField', [], {'default': '28', 'null': 'True'}),
+            'prefix_length_minimum': ('django.db.models.fields.IntegerField', [], {'default': '24', 'null': 'True'}),
             'projects': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'pools_core_ippool'", 'symmetrical': 'False', 'to': "orm['nodes.Project']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'core.locationconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'LocationConfig'},
+            'Meta': {'object_name': 'LocationConfig'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'altitude': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -560,30 +575,59 @@ class Migration(DataMigration):
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
         },
         'core.projectconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'ProjectConfig'},
+            'Meta': {'object_name': 'ProjectConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'project': ('web.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
         },
         'core.redundantnoderoleconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
             'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'core.roleconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'RoleConfig'},
+            'Meta': {'object_name': 'RoleConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_roleconfig'", 'to': "orm['nodes.Node']"})
         },
+        'core.routeridconfig': {
+            'Meta': {'object_name': 'RouterIdConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.routerid#family'"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_routeridconfig'", 'to': "orm['nodes.Node']"}),
+            'router_id': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        'core.routingtopologymonitor': {
+            'Meta': {'object_name': 'RoutingTopologyMonitor'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_routingtopologymonitor'", 'to': "orm['nodes.Node']"})
+        },
+        'core.statusmonitor': {
+            'Meta': {'object_name': 'StatusMonitor'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'has_warnings': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_statusmonitor'", 'to': "orm['nodes.Node']"}),
+            'status': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.monitoring'", 'enum_id': "'core.status#status'"})
+        },
         'core.systemroleconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'Meta': {'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'system': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
+        'core.topologylink': {
+            'Meta': {'object_name': 'TopologyLink'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'monitor': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['core.RoutingTopologyMonitor']"}),
+            'peer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['nodes.Node']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'polymorphic_core.topologylink_set'", 'null': 'True', 'to': "orm['contenttypes.ContentType']"})
+        },
         'core.vpnserverroleconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
+            'Meta': {'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'vpn_server': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
@@ -908,4 +952,4 @@ class Migration(DataMigration):
         }
     }
 
-    complete_apps = ['core', 'cgm', 'solar', 'digitemp', 'generator', 'policy', 'nodes']
+    complete_apps = ['core', 'cgm', 'solar', 'digitemp', 'generator', 'policy', 'nodes', 'nodes']
