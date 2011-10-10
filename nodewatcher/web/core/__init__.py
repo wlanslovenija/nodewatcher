@@ -92,10 +92,9 @@ def node_address_allocation(node, allocations):
   for family, request in routerid_requests.iteritems():
     try:
       rid = node.config.core.routerid(queryset = True).get(family = family)
-      rid.router_id = request.get_routerid()
     except core_models.RouterIdConfig.DoesNotExist:
       rid = node.config.core.routerid(create = core_models.RouterIdConfig)
-      rid.router_id = request.get_routerid()
     
+    rid.router_id = request.get_routerid()
     rid.save()
 
