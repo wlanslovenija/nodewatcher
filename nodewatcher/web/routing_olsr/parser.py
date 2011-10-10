@@ -1,5 +1,7 @@
 import urllib
 
+from web.utils import ipaddr
+
 class OlsrParseFailed(Exception):
   pass
 
@@ -45,9 +47,22 @@ class OlsrInfo(object):
     if self._tables is None:
       self._fetch_data()
     
-    # TODO Parse topology information
-    # self._tables['topology']
-    pass
+    # Parse topology information
+    topology = {}
+    for topo_entry in self._tables.get('topology', []):
+      dst, src, lq, ilq, etx = topo_entry[:5]
+      try:
+        topology.setdefault(src, []).append({
+          "dst" : ipaddr.IPAddress(dst),
+          "lq"  : float(lq),
+          "ilq" : float(ilq),
+          "etx" : float(etx),
+        })
+      except ValueError:
+        # Skip entries with INFINITE ETX value
+        continue
+    
+    return topology
   
   def get_announces(self):
     """
@@ -56,9 +71,15 @@ class OlsrInfo(object):
     if self._tables is None:
       self._fetch_data()
     
-    # TODO
-    # self._tables['hna']
-    pass
+    # Parse announced subnets information
+    announces = {}
+    for hna_entry in self._tables.get('hna', []):
+      net, router_id = hna_entry[:2]
+      announces.setdefault(router_id, []).append({
+        "net" : ipaddr.IPNetwork(net),
+      })
+    
+    return announces
 
   def get_aliases(self):
     """
@@ -67,7 +88,15 @@ class OlsrInfo(object):
     if self._tables is None:
       self._fetch_data()
     
-    # TODO
-    # self._tables['mid']
-    pass
+    # Parse router aliases information
+    aliases = {}
+    for mid_entry in self._tables.get('mid', []):
+      router_id, alias = mid_entry[:2]
+      tmp = aliases.setdefault(router_id, [])
+      tmp += [
+        { "alias" : ipaddr.IPAddress(x) }
+        for x in alias.split(';')
+      ]
+    
+    return aliases
 
