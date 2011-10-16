@@ -109,10 +109,6 @@ class Command(management_base.BaseCommand):
     out.close()
     json.close()
     
-    # Copy graphs and remove .svn directories
-    ensure_success(subprocess.call(["cp", "-R", settings.GRAPH_DIR, tmp_dir]))
-    subprocess.call(["find", tmp_dir, "-name", ".svn", "-type", "d", "-exec", "rm", "-rf", "{}", ";"])
-    
     # Generate a tar.bz2 archive
     os.chdir(tmp_dir)
     ensure_success(subprocess.call(["tar cfj {0} *".format(dest_archive)], shell = True))
