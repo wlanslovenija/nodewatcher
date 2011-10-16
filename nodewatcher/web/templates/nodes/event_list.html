@@ -89,7 +89,7 @@
 <tbody>
   {% for event in events %}
   <tr class="{% cycle 'odd' 'even' %}">
-    <td>{{ event.timestamp|date }}</td>
+    <td>{{ event.timestamp|date:"DATETIME_FORMAT" }}</td>
     <td>
       {% if not event.node.name %}
       {{ event.node.ip }}

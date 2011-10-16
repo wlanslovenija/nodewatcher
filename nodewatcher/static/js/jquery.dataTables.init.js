@@ -12,6 +12,13 @@ function extractFirstElementText(data) {
 	return $(data).eq(0).text();
 }
 
+function cleanDate(data) {
+	if (/^\s*never\s*/.test(data)) {
+		return "01 Jan 1970 00:00:00";
+	}
+	return data.replace(/\//g, " ").replace(/,/g, "");
+}
+
 jQuery.fn.dataTableExt.aTypes.push(
 	function (sData) {
 		if (testIP(sData)) {
@@ -40,6 +47,14 @@ jQuery.fn.dataTableExt.aTypes.push(
 		// This code is duplicated in reverse in conversion.py file. Keep them in sync.
 		if (/^\d+(\.\d+)?\s+(KB|MB|GB)$/.test(sData)) {
 			return 'byte-size';
+		}
+		return null;
+	},
+	function (sData) {
+		window.console.log(sData);
+		var parse = Date.parse(cleanDate(sData));
+		if (!isNaN(parse)) {
+			return 'date-clean';
 		}
 		return null;
 	}
@@ -119,6 +134,28 @@ jQuery.fn.dataTableExt.oSort['group-sort-asc'] = function (a, b) {
 
 jQuery.fn.dataTableExt.oSort['group-sort-desc'] = function (a, b) {
 	return jQuery.fn.dataTableExt.oSort['group-sort-asc'](b, a);
+};
+
+function dateCompare(a, b) {
+	var x = Date.parse(cleanDate(a));
+	var y = Date.parse(cleanDate(b));
+
+	if (isNaN(x)) {
+		x = 0;
+	}
+	if (isNaN(y)) {
+		y = 0;
+	}
+
+	return x - y;
+}
+
+jQuery.fn.dataTableExt.oSort['date-clean-asc'] = function (a, b) {
+	return dateCompare(a, b);
+};
+
+jQuery.fn.dataTableExt.oSort['date-clean-desc'] = function (a, b) {
+	return dateCompare(b, a);
 };
 
 function groupDrawCallback(table) {

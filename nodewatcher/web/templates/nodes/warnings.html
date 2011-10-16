@@ -9,7 +9,7 @@
       <td class="icon"><img src="{{ MEDIA_URL }}images/source_{{ warning.source_to_identifier }}.png" alt="{{ warning.source_to_string }}" title="Source: {{ warning.source_to_string|lower }}" /></td>
       <td align="left">
         <span class="datetime">
-          {{ warning.created_at|date }}<br />
+          {{ warning.created_at|date:"DATETIME_FORMAT" }}<br />
         </span>
         {{ warning.to_description_string }}
         {% if current_owner or node.is_invalid %}

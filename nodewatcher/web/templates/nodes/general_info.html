@@ -45,7 +45,7 @@
   <tr>
     <td class="proplabel">{% trans "Last seen" %}</td>
     {% if node.last_seen %}
-    <td class="propbody">{{ node.last_seen|date }}</td>
+    <td class="propbody">{{ node.last_seen|date:"DATETIME_FORMAT" }}</td>
     {% else %}
     <td class="propbody">{% trans "never" %}</td>
     {% endif %}

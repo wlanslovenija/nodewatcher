@@ -35,7 +35,7 @@
       <span class="small_text">{{ item.description }}</span>
       {% endif %}
     </td>
-    <td>{{ item.registred_at|date }}</td>
+    <td>{{ item.registred_at|date:"DATETIME_FORMAT" }}</td>
   </tr>
   {% empty %}
   <tr>

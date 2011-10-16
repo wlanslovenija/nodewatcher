@@ -54,6 +54,31 @@ TIME_ZONE = 'Europe/Ljubljana'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
+URL_VALIDATOR_USER_AGENT = 'Django'
+
+# Date input formats below take as first argument day and then month in x/y/z format
+DATE_INPUT_FORMATS = (
+    '%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%b %d %Y',
+    '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
+    '%B %d, %Y', '%d %B %Y', '%d %B, %Y',
+)
+
+# All those formats are only defaults and are localized for users
+DATE_FORMAT = 'd/M/Y'
+TIME_FORMAT = 'H:i'
+DATETIME_FORMAT = 'd/M/Y, H:i:s'
+YEAR_MONTH_FORMAT = 'F Y'
+MONTH_DAY_FORMAT = 'j F'
+SHORT_DATE_FORMAT = 'd/m/y'
+SHORT_DATETIME_FORMAT = 'd/m/y H:i'
+FIRST_DAY_OF_WEEK = 1
+DECIMAL_SEPARATOR = '.'
+THOUSAND_SEPARATOR = ','
+NUMBER_GROUPING = 0
+
+# We override defaults
+FORMAT_MODULE_PATH = 'web.formats'
+
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
@@ -140,7 +165,6 @@ TEMPLATE_DIRS = (
   default_template_dir,
 )
 
-DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/my/nodes'
 LOGIN_URL = '/auth/login'

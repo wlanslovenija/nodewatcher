@@ -323,7 +323,7 @@ primary subnet and LAN ethernet interface<br />is used to interconnect with poss
     </td>
     <td class="status"><span class="subnet_status_{{ subnet.status_as_string|cut:" " }}">{{ subnet.status_as_string }}</span></td>
     {% if subnet.last_seen %}
-    <td class="timestamp">{{ subnet.last_seen|date }}</td>
+    <td class="timestamp">{{ subnet.last_seen|date:"DATETIME_FORMAT" }}</td>
     {% else %}
     <td class="timestamp">{% trans "never" %}</td>
     {% endif %}

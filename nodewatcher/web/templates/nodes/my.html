@@ -56,7 +56,7 @@
     <td><a href="{% url view_node node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
     <td>{{ node.ip }}</td>
     {% if node.last_seen %}
-    <td>{{ node.last_seen|date:"y-m-d H:i:s" }}</td>
+    <td>{{ node.last_seen|date:"DATETIME_FORMAT" }}</td>
     {% else %}
     <td>{% trans "never" %}</td>
     {% endif %}
