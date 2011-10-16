@@ -42,6 +42,13 @@ class Command(management_base.NoArgsCommand):
         print ">>> Uncompressing data..."
         print "data.json"
       file.extract("data.json")
+
+      if verbosity >= 1:
+        print "static files"
+      static = file.getmembers()
+      static.remove(file.getmember("data.json"))
+      file.extractall(path = settings.MEDIA_ROOT, members = static)
+
       file.close()
     finally:
       os.remove(filename)

@@ -108,9 +108,20 @@ class Command(management_base.BaseCommand):
     serializers.serialize("json", object_transformator(), stream = out)
     out.close()
     json.close()
+
+    # Copy topology
+    ensure_success(subprocess.call([
+        "mkdir",
+        os.path.join(tmp_dir, "graphs"),
+    ]))
+    ensure_success(subprocess.call([
+        "cp",
+        os.path.join(settings.GRAPH_DIR, "network_topology.png"),
+        os.path.join(settings.GRAPH_DIR, "network_topology.dot"),
+        os.path.join(tmp_dir, "graphs"),
+    ]))
     
     # Generate a tar.bz2 archive
     os.chdir(tmp_dir)
     ensure_success(subprocess.call(["tar cfj {0} *".format(dest_archive)], shell = True))
     ensure_success(subprocess.call(["rm", "-rf", tmp_dir]))
-
