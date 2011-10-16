@@ -5,5 +5,6 @@ css_dir = "../css"
 sass_dir = "default"
 images_dir = "../images"
 javascripts_dir = "../js"
+environment = :production
 # To enable relative paths to assets via compass helper functions. Uncomment:
 # relative_assets = true
