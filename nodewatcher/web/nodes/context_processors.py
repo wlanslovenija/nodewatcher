@@ -30,6 +30,7 @@ def global_values(request):
       'contact_page' : settings.NETWORK_CONTACT_PAGE,
       'description'  : getattr(settings, 'NETWORK_DESCRIPTION', None),
       'favicon_url'  : settings.NETWORK_FAVICON_URL,
+      'logo_url'     : settings.NETWORK_LOGO_URL,
     },
     'request' : {
       'path' : request.path,

@@ -16,8 +16,9 @@ NETWORK_NAME = 'wlan slovenija'
 NETWORK_HOME = 'http://wlan-si.net'
 NETWORK_CONTACT = 'open@wlan-si.net'
 NETWORK_CONTACT_PAGE = 'http://wlan-si.net/contact/'
-NETWORK_DESCRIPTION = 'odprto brezžično omrežje Slovenije'
+NETWORK_DESCRIPTION = 'open wireless network of Slovenia'
 NETWORK_FAVICON_URL = MEDIA_URL + 'wlansi/images/favicon.ico'
+NETWORK_LOGO_URL = MEDIA_URL + 'wlansi/images/logo.png'
 
 TEMPLATE_DIRS = (
   wlansi_template_dir,

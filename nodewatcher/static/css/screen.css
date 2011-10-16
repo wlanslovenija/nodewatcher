@@ -163,8 +163,8 @@ img {
 #header {
   margin: 0px auto;
   width: 900px;
-  height: 128px;
-  background: transparent url('/../images/header.png?1318769816') no-repeat bottom left;
+  height: 125px;
+  background: transparent url('/../images/logo.png?1318775911') no-repeat bottom left;
 }
 /* line 68, ../scss/_base.scss */
 #header h1 {

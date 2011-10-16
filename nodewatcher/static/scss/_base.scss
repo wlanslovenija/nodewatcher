@@ -63,8 +63,8 @@ img { border: none }
 #header {
   margin: 0px auto;
   width: $page_width;
-  height: image-height('header.png');
-  background: transparent image-url('header.png') no-repeat bottom left; 
+  height: 125px;
+  background: transparent image-url('logo.png') no-repeat bottom left;
   h1 {padding: 40px 0 0 10px; color: $header_primary_color; overflow: hidden; font-size: $font-size * 2.5; margin: 0;}
   h2 {padding: 0 0 0 10px; color: $header_secondary_color; margin: 0;}
   h1, h2 {a, a:hover {text-decoration: none; color: inherit;}}

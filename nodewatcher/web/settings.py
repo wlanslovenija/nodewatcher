@@ -99,6 +99,7 @@ NETWORK_CONTACT = 'open@example.net'
 NETWORK_CONTACT_PAGE = 'http://example.net/contact'
 NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
 NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
+NETWORK_LOGO_URL = MEDIA_URL + 'images/logo.png'
 
 # Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
 #BITLY_LOGIN = "Your bit.ly login"
