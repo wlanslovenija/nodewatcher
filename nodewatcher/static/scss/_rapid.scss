@@ -1,6 +1,6 @@
 // -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
 
-@import "bullets";
+@import "compass/utilities/lists/bullets";
 @import "compass/utilities/general/reset";
 @import "compass/utilities/general/float";
 
@@ -58,7 +58,7 @@
   } 
 }
 
-@mixin rapid-links($color, $visited_color = $color - 30) {
+@mixin rapid-links($color, $visited_color: $color - 30) {
   text-decoration: none;
 
   &:link {
