@@ -1,13 +1,16 @@
 #!/usr/bin/python
 #
-# wlan ljubljana Image Generator Daemon
+# nodewatcher Image Generator Daemon
 #
 # Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
 #
+
+# TODO: Move to manage.py command
+
 import os
 import time
 
-DESTINATION = "/var/www/packages.wlan-lj.net/images"
+DESTINATION = "/srv/www/bindist/images"
 
 for root, dirs, files in os.walk(DESTINATION):
   for file in files:

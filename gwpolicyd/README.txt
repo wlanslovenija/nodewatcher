@@ -1,4 +1,4 @@
-wlan Ljubljana gateway policy daemon
+nodewatcher gateway policy daemon
 =========================================================================
 
 This daemon can be used to set traffic speed limits to traffic leaving

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# wlan ljubljana OpenWRT image builder
+# nodewatcher OpenWRT image builder
 #
 # Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
 #
@@ -10,7 +10,7 @@ import os
 import sys
 
 print "============================================================================"
-print "                   Ljubljana WiFi Mesh Image Generator"
+print "                     nodewatcher OpenWRT image builder                     "
 print "============================================================================"
 
 parser = OptionParser()

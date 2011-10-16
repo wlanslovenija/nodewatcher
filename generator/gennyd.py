@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# wlan ljubljana Image Generator Daemon
+# nodewatcher firmware generator daemon
 #
 # Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
 #
@@ -11,7 +11,7 @@ import sys, os
 from optparse import OptionParser
 
 print "============================================================================"
-print "                    nodewatcher firmware generator daemon                   "
+print "                   nodewatcher firmware generator daemon                   "
 print "============================================================================"
 
 parser = OptionParser()
@@ -251,7 +251,7 @@ if settings.IMAGE_GENERATOR_USER:
     print "ERROR: Unable to change to '{0}' user!".format(settings.IMAGE_GENERATOR_USER)
     exit(1)
 
-logging.info("wlan ljubljana Image Generator Daemon v0.1 starting up...")
+logging.info("nodewatcher firmware generator daemon v0.1 starting up...")
 
 c = serverconn.ServerConn("127.0.0.1", 11300)
 c.job = job.Job

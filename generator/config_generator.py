@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# wlan ljubljana configuration generator
+# nodewatcher configuration generator
 #
 # Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
 #
@@ -860,7 +860,7 @@ config uhttpd main
       f.write('start() {\n')
       f.write('  # This MAC configuration is used to identify this VPN link for\n')
       f.write('  # traffic policy purpuses. If you change this any policy settings\n')
-      f.write('  # set on wlan Ljubljana gateways will cease to work!\n')
+      f.write('  # set on wlan slovenija gateways will cease to work!\n')
       f.write('  openvpn --mktun --dev tap0\n')
       f.write('  ifconfig tap0 hw ether %s\n' % self.vpn['mac'])
       
