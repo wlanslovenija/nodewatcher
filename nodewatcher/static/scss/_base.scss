@@ -31,17 +31,6 @@ a {
   @include rapid-links($link_color);
 }
 
-@media screen {
-  a.ext-link .icon {
-    background: url(../extlink.gif) center center no-repeat;
-    padding-left: 12px;
-  }
-  a.mail-link .icon {
-    background: url(../envelope.png) center center no-repeat;
-    padding-left: 14px;
-  }
-}
-
 .anchor:link, .anchor:visited, .anchor:link:hover, .anchor:visited:hover {
   border: none;
   color: $link_color+70;

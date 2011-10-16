@@ -11,7 +11,7 @@
   {% if node.url %}
   <tr>
     <td class="proplabel"></td>
-    <td class="propbody"><div class="propdescription"><a href="{{ node.url }}" class="ext-link" rel="nofollow"><span class="icon">&nbsp;</span>{% trans "visit home page" %}</a></div></td>
+    <td class="propbody"><div class="propdescription"><a href="{{ node.url }}" rel="nofollow">{% trans "visit home page" %}</a></div></td>
   </tr>
   {% endif %}
   <tr>
@@ -26,7 +26,7 @@
     <td class="proplabel">{% trans "Maintainer" %}</td>
     {% if node.owner %}
     {% if user.is_authenticated and node.owner.email %}
-    <td class="propbody"><a class="mail-link" href="mailto:{{ node.owner.email }}"><span class="icon">&nbsp;</span>{{ node.owner.username }}</a></td>
+    <td class="propbody"><a href="mailto:{{ node.owner.email }}">{{ node.owner.username }}</a></td>
     {% else %}
     <td class="propbody">{{ node.owner.username }}</td>
     {% endif %}

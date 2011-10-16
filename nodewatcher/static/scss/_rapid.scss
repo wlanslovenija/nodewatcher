@@ -76,15 +76,6 @@
   h4 :link, h4 :visited, h5 :link, h5 :visited, h6 :link, h6 :visited {
     color: inherit;
   }
-
- .ext-link .icon {
-  background: url(../extlink.gif) center center no-repeat;
-  padding-left: 12px;
- }
- .mail-link .icon {
-  background: url(../envelope.png) center center no-repeat;
-  padding-left: 14px;
- }
 }
 
 @mixin rapid-table($font-color, $background-color, $border-color) {
