@@ -28,7 +28,8 @@ def global_values(request):
       'home'         : settings.NETWORK_HOME,
       'contact'      : settings.NETWORK_CONTACT,
       'contact_page' : settings.NETWORK_CONTACT_PAGE,
-      'description'  : getattr(settings, 'NETWORK_DESCRIPTION', None)
+      'description'  : getattr(settings, 'NETWORK_DESCRIPTION', None),
+      'favicon_url'  : settings.NETWORK_FAVICON_URL,
     },
     'request' : {
       'path' : request.path,

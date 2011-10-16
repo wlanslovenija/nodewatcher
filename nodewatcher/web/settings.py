@@ -43,12 +43,6 @@ EMAIL_SUBJECT_PREFIX = '[nodewatcher] '
 EMAIL_EVENTS_SENDER = 'events@example.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'
 
-NETWORK_NAME = 'your network name'
-NETWORK_HOME = 'http://example.net'
-NETWORK_CONTACT = 'open@example.net'
-NETWORK_CONTACT_PAGE = 'http://example.net/contact'
-NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -98,6 +92,13 @@ GOOGLE_MAPS_DEFAULT_LAT = 46.17
 GOOGLE_MAPS_DEFAULT_LONG = 14.96
 GOOGLE_MAPS_DEFAULT_ZOOM = 8
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
+
+NETWORK_NAME = 'your network name'
+NETWORK_HOME = 'http://example.net'
+NETWORK_CONTACT = 'open@example.net'
+NETWORK_CONTACT_PAGE = 'http://example.net/contact'
+NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
+NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
 
 # Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
 #BITLY_LOGIN = "Your bit.ly login"

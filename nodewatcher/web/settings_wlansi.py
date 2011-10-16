@@ -5,7 +5,8 @@
 from settings import *
 
 import os.path
-wlansi_template_dir = os.path.join(settings_dir, '..', '..', 'wlansi', 'templates')
+wlansi_dir = os.path.join(settings_dir, '..', '..', 'wlansi')
+wlansi_template_dir = os.path.join(wlansi_dir, 'templates')
 
 EMAIL_SUBJECT_PREFIX = '[wlan-si] '
 EMAIL_EVENTS_SENDER = 'events@wlan-si.net'
@@ -16,6 +17,7 @@ NETWORK_HOME = 'http://wlan-si.net'
 NETWORK_CONTACT = 'open@wlan-si.net'
 NETWORK_CONTACT_PAGE = 'http://wlan-si.net/contact/'
 NETWORK_DESCRIPTION = 'odprto brezžično omrežje Slovenije'
+NETWORK_FAVICON_URL = MEDIA_URL + 'wlansi/images/favicon.ico'
 
 TEMPLATE_DIRS = (
   wlansi_template_dir,
