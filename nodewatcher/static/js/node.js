@@ -172,10 +172,18 @@ function updatePrefixLengthsForPool() {
 
 function generateRandomPassword(event) {
   event.preventDefault();
+  function random() {
+    // Math.random is not random enough by default
+    now = new Date();
+    for (var i = now.getMilliseconds() % 100; i >= 0; i--) {
+      Math.random();
+    }
+    return Math.random();
+  }
   var choices = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var password = "";
   for (var i = 0; i < 8; i++) {
-    password += choices.charAt(Math.floor(Math.random() * choices.length));
+    password += choices.charAt(Math.floor(random() * choices.length));
   }
   $('#id_root_pass').val(password);
   return false;
