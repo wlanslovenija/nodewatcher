@@ -273,13 +273,11 @@ table.warnings .icon { width: 20px; }
 
 .node_status_pending { color: #B1B1B1; }
 
-.subnet_status_notannounced { color: #ff0000; }
-
-.subnet_status_ok { color: #007B0F; }
-
-.subnet_status_notallocated { color: #FFA82F; }
-
 .subnet_status_collision { color: #ff0000; }
+
+.subnet_status_ok, .subnet_status_peering { color: #007B0F; }
+
+.subnet_status_notallocated, .subnet_status_notannounced { color: #FFA82F; }
 
 #metanav { position: absolute; right: 10px; top: 10px; width: auto; text-align: right; }
 
