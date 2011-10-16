@@ -1,4 +1,7 @@
 {% load i18n %}{% load misc %}{% load graphs %}{% show_graph %}
-{% if graph.name == "tap0" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's Internet uplink." %}</div>{% endif %}
+{% if graph.name == "tap0" or graph.name == "edge0" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's Internet uplink." %}</div>{% endif %}
 {% if graph.name|startswith:"eth" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's ethernet interface." %}</div>{% endif %}
 {% if graph.name|startswith:"wl" or graph.name|startswith:"ath" %}<div class="graphdesc">{% trans "This graph represents traffic of the node's wireless interface." %}</div>{% endif %}
+{% if graph.name == "internal" %}<div class="graphdesc">{% trans "This graph represents traffic between all nodes through this VPN node." %}</div>{% endif %}
+{% if graph.name == "internet" %}<div class="graphdesc">{% trans "This graph represents traffic between this node and Internet." %}</div>{% endif %}
+{% if graph.name == "peering" %}<div class="graphdesc">{% trans "This graph represents traffic between this node and other networks it is peering to." %}</div>{% endif %}
