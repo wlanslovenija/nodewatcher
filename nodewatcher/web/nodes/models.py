@@ -314,6 +314,10 @@ class Node(models.Model):
     """
     Queues deferred requests for redrawing graphs.
     """
+
+    if not settings.ENABLE_GRAPH_DISPLAY:
+        return
+
     from web.monitor import tasks as monitor_tasks
     
     publisher = monitor_tasks.get_publisher()

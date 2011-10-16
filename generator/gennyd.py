@@ -238,17 +238,18 @@ logging.basicConfig(level = logging.DEBUG,
                     filename = os.path.join(WORKDIR, 'generator.log'),
                     filemode = 'a')
 
-# Change ownership for the build directory
-os.system("chown -R {0}:{0} build".format(settings.IMAGE_GENERATOR_USER))
+if settings.IMAGE_GENERATOR_USER:
+  # Change ownership for the build directory
+  os.system("chown -R {0}:{0} build".format(settings.IMAGE_GENERATOR_USER))
 
-# Drop user privileges
-try:
-  info = pwd.getpwnam(settings.IMAGE_GENERATOR_USER)
-  os.setgid(info.pw_gid)
-  os.setuid(info.pw_uid)
-except:
-  print "ERROR: Unable to change to '{0}' user!".format(settings.IMAGE_GENERATOR_USER)
-  exit(1)
+  # Drop user privileges
+  try:
+    info = pwd.getpwnam(settings.IMAGE_GENERATOR_USER)
+    os.setgid(info.pw_gid)
+    os.setuid(info.pw_uid)
+  except:
+    print "ERROR: Unable to change to '{0}' user!".format(settings.IMAGE_GENERATOR_USER)
+    exit(1)
 
 logging.info("wlan ljubljana Image Generator Daemon v0.1 starting up...")
 

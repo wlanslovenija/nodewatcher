@@ -1,10 +1,12 @@
-# coding=utf-8
-# Development Django settings for your network nodewatcher.
+# -*- coding: utf-8 -*-
+#
+# Development Django settings for your network nodewatcher
 
 import os.path
-database_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'db.sqlite').replace('\\', '/')
-default_template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates').replace('\\', '/')
-static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static').replace('\\', '/')
+settings_dir = os.path.abspath(os.path.dirname(__file__))
+database_file = os.path.join(settings_dir, 'db.sqlite')
+default_template_dir = os.path.join(settings_dir, 'templates')
+static_dir = os.path.join(settings_dir, '..', 'static')
 
 import djcelery
 djcelery.setup_loader()
@@ -92,9 +94,9 @@ GOOGLE_MAPS_API_KEY = 'ABQIAAAAsSAo-sxy6T5T7_DN1d9N4xRi_j0U6kJrkFvY4-OX2XYmEAa76
 
 # Where the map displaying all nodes is initially positioned
 # Where the map is initially positioned when adding a new node is configured for each project in the database
-GOOGLE_MAPS_DEFAULT_LAT = 46.05
-GOOGLE_MAPS_DEFAULT_LONG = 14.507
-GOOGLE_MAPS_DEFAULT_ZOOM = 13
+GOOGLE_MAPS_DEFAULT_LAT = 46.17
+GOOGLE_MAPS_DEFAULT_LONG = 14.96
+GOOGLE_MAPS_DEFAULT_ZOOM = 8
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
 
 # Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
@@ -140,9 +142,6 @@ DATE_FORMAT = 'Y-m-d H:i:s'
 FORCE_SCRIPT_NAME = ''
 LOGIN_REDIRECT_URL = '/my/nodes'
 LOGIN_URL = '/auth/login'
-RESET_PASSWORD_URL = 'http://example.net/reset_password'
-PROFILE_CONFIGURATION_URL = 'http://example.net/prefs'
-REGISTER_USER_URL = 'http://example.net/register'
 AUTH_PROFILE_MODULE = 'account.useraccount'
 # We are using SSO with Trac so we have our own auth module, you should probably use something from Django (also to register users)
 # See http://docs.djangoproject.com/en/dev/topics/auth/
@@ -171,17 +170,8 @@ INSTALLED_APPS = (
 #FPING_BIN = '/path/to/fping'
 #PDFLATEX = '/path/to/pdflatex'
 
-# Is image generator enabled or not. If set to False the pybeanstalk dependency is not needed.
-IMAGE_GENERATOR_ENABLED = False
-# Is image generator temporary suspended (like because firmware image it would produce contains errors)?
-# If it is, image requests are not queued and message about that is issued to the user
-IMAGE_GENERATOR_SUSPENDED = False
-IMAGE_GENERATOR_USER = 'nw-generator'
-
-IMAGES_BINDIST_URL = 'http://example.net/images/'
-
 # Graph configuration
-GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs').replace('\\', '/')
+GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs')
 GRAPH_TIMESPAN_PREFIXES = ('day', 'week', 'month', 'year')
 GRAPH_TIMESPANS = {
   'day'   : 86400,
@@ -191,13 +181,12 @@ GRAPH_TIMESPANS = {
 }
 
 # Monitor configuration
-MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/') # Absolute path to directory containing monitor.py file
+MONITOR_WORKDIR = os.path.join(settings_dir, '..', 'monitor') # Absolute path to directory containing monitor.py file
 MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
 MONITOR_GRAPH_WORKERS = 5
 MONITOR_POLL_INTERVAL = 300
 MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
-MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
-MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')
+MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log')
 
 # Data archive configuration
 DATA_ARCHIVE_ENABLED = False
@@ -205,16 +194,26 @@ DATA_ARCHIVE_HOST = '127.0.0.1'
 DATA_ARCHIVE_PORT = 27017
 DATA_ARCHIVE_DB = 'nodewatcher'
 
+# Is image generator enabled or not. If set to False the pybeanstalk dependency is not needed.
+IMAGE_GENERATOR_ENABLED = False
+# Is image generator temporary suspended (like because firmware image it would produce contains errors)?
+# If it is, image requests are not queued and message about that is issued to the user
+IMAGE_GENERATOR_SUSPENDED = False
+# If you want to change the ownership of image files after they have been generated, set the username here
+IMAGE_GENERATOR_USER = None
+
+IMAGES_BINDIST_URL = 'http://example.net/images/'
+
 # Are stickers enabled or not. If set to False the pdflatex dependency is not needed.
 STICKERS_ENABLED = False
 STICKERS_TEMP_DIR = '/tmp/'
-STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers').replace('\\', '/')
+STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers')
 
 # Are non-staff members allowed to mark a node as a border router
 NONSTAFF_BORDER_ROUTERS = False
 
-# Cache backend
-CACHE_BACKEND = "memcached://127.0.0.1:11211/"
+# Cache backend (used by on-demand graph generation, too)
+CACHE_BACKEND = 'locmem://'
 
 # Celery
 BROKER_BACKEND = "mongodb"
