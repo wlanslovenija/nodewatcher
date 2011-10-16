@@ -83,15 +83,22 @@ function toggleLocation() {
   }
 }
 
+function enableDisabledOnSubmit() {
+    $('#content :input').removeAttr('disabled');
+    return true;
+}
+
 function toggleDead() {
   if ($('#id_node_type').attr('value') == deadNodeType) {
     $('.alive').css('display', 'none');
     $('#content :input').not('.dead_active :input').attr('disabled', 'disabled');
+    $('#content form').submit(enableDisabledOnSubmit);
     clickEnabled = false;
   }
   else {
     $('.alive').css('display', '');
     $('#content :input').removeAttr('disabled');
+    $('#content form').unbind('submit', enableDisabledOnSubmit);
     toggleIpInput();
     clickEnabled = true;
   }
