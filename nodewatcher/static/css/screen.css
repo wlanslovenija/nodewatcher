@@ -44,7 +44,7 @@ img { border: none; }
 
 #header { margin: 0px auto; width: 900px; height: 125px; background: transparent url('/../images/logo.png?1318775911') no-repeat bottom left; }
 #header h1 { padding: 40px 0 0 10px; color: #9b9b9b; overflow: hidden; font-size: 2.125em; margin: 0; }
-#header h2 { padding: 0 0 0 10px; color: white; margin: 0; }
+#header h2 { padding: 0 0 0 10px; color: #656565; margin: 0; }
 #header h1 a, #header h1 a:hover, #header h2 a, #header h2 a:hover { text-decoration: none; color: inherit; }
 
 #footer { padding: 30px 10px; font-size: 0.765em; text-align: center; color: #6f6f6f; }
@@ -71,7 +71,7 @@ img { border: none; }
 
 #metanav { position: absolute; top: 10px; overflow: hidden; width: 400px; margin: 0; padding: 0; border: 0; outline: 0; overflow: hidden; display: inline-block; }
 #metanav ul { margin: 0 0 0 10px; font-size: 0.85em; padding: 0px; text-align: left; width: 100%; }
-#metanav ul li { border-width: 0px; color: white; }
+#metanav ul li { border-width: 0px; color: #656565; }
 #metanav ul a { color: #9b9b9b; }
 #metanav li { list-style-image: none; list-style-type: none; margin-left: 0px; white-space: nowrap; display: inline; float: left; background: transparent url('/../images/bulletgray.png?1318769816') no-repeat center left; padding-left: 9px; padding-right: 5px; }
 #metanav li:first-child, #metanav li.first { background: none; padding-left: 0px; }
@@ -84,8 +84,8 @@ img { border: none; }
 
 #mynav { height: 1em; font-size: 0.85em; padding: 5px 0 8px 0; background-color: #9b9b9b; font-weight: bold; text-align: center; }
 #mynav ul { padding: 0; display: inline; margin: 0; }
-#mynav ul li { padding: 0; color: white; }
-#mynav ul li :link, #mynav ul li :visited { padding: 0 10px; color: white; }
+#mynav ul li { padding: 0; color: #656565; }
+#mynav ul li :link, #mynav ul li :visited { padding: 0 10px; color: #656565; }
 
 table.listing { margin-top: 0px; clear: both; border-bottom: 1px solid #cccccc; border-collapse: collapse; border-spacing: 0; width: 100%; }
 table.listing th { text-align: left; padding: 0 1em .1em 0; font-size: 12px; }
