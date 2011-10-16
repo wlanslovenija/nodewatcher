@@ -12,3 +12,4 @@ syntax: regexp
 ^nodewatcher/static/wlansi
 ^nodewatcher/monitor/simulator/data/
 ^generator/build/
+^docs/_build/
