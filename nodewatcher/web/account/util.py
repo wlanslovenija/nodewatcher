@@ -7,6 +7,11 @@ def generate_random_password(length = 20):
   """
   
   # Re-seed random number generator
+  # This can make random values even more predictable if for seed
+  # a time-dependent value is used as time of password generation
+  # is easier to deduce than time of the first seed initialization
+  # But Python uses os.urandom source if available so we are probably
+  # better off
   seed()
 
   x = ''
