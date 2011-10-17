@@ -316,7 +316,7 @@ class Node(models.Model):
     """
 
     if not settings.ENABLE_GRAPH_DISPLAY:
-        return
+      return
 
     from web.monitor import tasks as monitor_tasks
     
