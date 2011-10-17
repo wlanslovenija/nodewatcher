@@ -51,7 +51,6 @@ jQuery.fn.dataTableExt.aTypes.push(
 		return null;
 	},
 	function (sData) {
-		window.console.log(sData);
 		var parse = Date.parse(cleanDate(sData));
 		if (!isNaN(parse)) {
 			return 'date-clean';
