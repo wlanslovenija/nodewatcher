@@ -27,16 +27,6 @@
 <form method="post" action="{% url allocate_subnet node.pk %}">
 {% csrf_token %}
 <table border="0" class="layout proptable">
-  {% if user.is_staff %}
-  <tr>
-    <td class="proplabel">{{ form.network.label }}</td>
-    <td class="propbody">{{ form.network }}</td>
-  </tr>
-  <tr>
-    <td class="proplabel"></td>
-    <td class="propbody propdescription">{% trans "Leave blank for auto-allocation." %}</td>
-  </tr>
-  {% endif %}
   <tr>
     <td class="proplabel">{{ form.pool.label }}</td>
     <td class="propbody">{{ form.pool }}</td>
@@ -45,6 +35,17 @@
     <td class="proplabel">{{ form.prefix_len.label }}</td>
     <td class="propbody"><select name="prefix_len" id="id_prefix_len"></select></td>
   </tr>
+  {% if user.is_staff %}
+  <tr>
+    <td class="proplabel">{{ form.network.label }}</td>
+    <td class="propbody"><label onclick="toggleManualNetworkInput();">
+        <input type="checkbox" id="id_allocate_manual" checked="checked" /> {% trans "Allocate automatically from the IP pool" %}
+      </label>
+      <span class="manual_opts">
+      <br />{{ form.network }}</span>
+    </td>
+  </tr>
+  {% endif %}
   <tr>
     <td class="proplabel">{{ form.description.label }}</td>
     <td class="propbody">{{ form.description }}</td>
@@ -82,9 +83,22 @@
     }
     prefs.attr('value', '' + pool.def); 
   }
+
+  function toggleManualNetworkInput() {
+    if ($('#id_allocate_manual').is(':checked')) {
+      $('#id_network').attr('value', '');
+      $('.manual_opts').css('display', 'none');
+    }
+    else {
+      $('.manual_opts').css('display', '');
+    }
+  }
   
   $(document).ready(function () {
-    $('#id_pool').change(function(event) { updatePrefixLens(); }).change();
+    $('#id_pool').change(function(event) {
+        updatePrefixLens();
+        toggleManualNetworkInput();
+    }).change();
   });
 /* ]]> */
 </script>

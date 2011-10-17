@@ -52,11 +52,13 @@
         {% trans "New prefix length:" %}&nbsp;
         <select name="{{ subnet.prefix }}" id="id_{{ subnet.prefix }}"></select>
         {% if user.is_staff %}
-        <br/>{% trans "Subnet (optional):" %}&nbsp;
-        {{ subnet.manual_ip }}<br/>
+        <br />
         <label onclick="toggleManualSubnetInput('{{ subnet.model.pk }}');">
           <input type="checkbox" id="id_assign_manual_{{ subnet.model.pk }}" checked="checked" /> {% trans "Assign automatically from the IP pool" %}
         </label>
+        <span class="manual_opts">
+        <br/>{% trans "Subnet (optional):" %}&nbsp;
+        {{ subnet.manual_ip }}</span>
         {% endif %}
       </div>
     </td>
@@ -79,7 +81,8 @@
   function updatePrefixLensForPool(subnetId, action) {
     if (action <= 0) {
       $('.prefix_len_prefix_' + subnetId).css('display', 'none');
-    } else {
+    }
+    else {
       var prefs = $('#id_prefix_' + subnetId); 
       $('.prefix_len_prefix_' + subnetId).css('display', '');
       prefs.empty();
@@ -92,16 +95,16 @@
     }
   }
   
-  function toggleManualSubnetInput(subnetId)
-  {
+  function toggleManualSubnetInput(subnetId) {
     var manualSubnet = $('#id_manual_' + subnetId);
     var checkbox = $('#id_assign_manual_' + subnetId); 
     
     if (checkbox.is(':checked')) {
       manualSubnet.attr('value', '');
-      manualSubnet.attr('disabled', 'disabled');
-    } else {
-      manualSubnet.removeAttr('disabled');
+      $('.manual_opts').css('display', 'none');
+    }
+    else {
+      $('.manual_opts').css('display', '');
     }
   }
   
