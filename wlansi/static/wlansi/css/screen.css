@@ -1,3 +1,26 @@
 body {
 	background: url("/wlansi/images/background.png") repeat-x scroll left top white;
 }
+
+#footer hr {
+	display: none;
+}
+
+#footer {
+	border-top: 1px solid;
+	padding: 20px 0;
+	color: #BBBBBB;
+	font-size: 10px;
+}
+
+#footer-license, #footer-links {
+	margin: 1.3em 0;
+}
+
+#footer-license {
+	margin-top: 0;
+}
+
+#footer-links {
+	margin-bottom: 0;
+}
