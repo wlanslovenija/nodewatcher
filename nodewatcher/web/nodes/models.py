@@ -31,7 +31,6 @@ class Project(models.Model):
   ssid_backbone = models.CharField(max_length = 50)
   ssid_mobile = models.CharField(max_length = 50)
   captive_portal = models.BooleanField()
-  sticker = models.CharField(max_length = 50)
   zone = models.ForeignKey(Zone, null = True)
   
   # Geographical location

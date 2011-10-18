@@ -45,8 +45,6 @@ urlpatterns = patterns('',
   url(r'^my/events/$', 'web.nodes.views.event_list', name = 'my_events'),
   url(r'^my/events/subscribe/$', 'web.nodes.views.event_subscribe', name = 'my_events_subscribe'),
   url(r'^my/events/unsubscribe/(?P<subscription_id>\d+)/$', 'web.nodes.views.event_unsubscribe', name = 'my_events_unsubscribe'),
-  url(r'^my/sticker/$', 'web.nodes.views.sticker', name = 'my_sticker'),
-  url(r'^nodes/sticker/$', lambda request: redirect('my_sticker', permanent=True)), # Legacy
   
   # Node itself, public
   # (Those views should have permalinks defined and are also those which have be_robust set to True)
@@ -107,7 +105,7 @@ if getattr(settings, 'DEBUG', False) and not settings.MEDIA_URL.startswith('http
   # Server static files with Django when running in debug mode and MEDIA_URL is local
   
   static_patterns = patterns('',
-    url(r'^(?P<path>(?:css|graphs|images|js|stickers|wlansi)/.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    url(r'^(?P<path>(?:css|graphs|images|js|wlansi)/.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
   )
   
   media_url = settings.MEDIA_URL.lstrip('/')

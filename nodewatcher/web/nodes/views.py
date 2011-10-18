@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.forms import forms
 from django.utils.translation import ugettext as _
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
-from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
+from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.common import ValidationWarning
 from web.nodes.utils import queryset_by_ip
 from web.generator.models import Profile
@@ -491,35 +491,6 @@ def gcl(request):
   clients = APClient.objects.all().order_by('node__name', 'connected_at')
   return render_to_response('nodes/gcl.html',
     { 'clients' : clients },
-    context_instance = RequestContext(request)
-  )
-
-@login_required
-def sticker(request):
-  """
-  Display a form for generating an info sticker.
-  """
-  user = UserProfile.for_user(request.user)
-  
-  # We want disabled error to show only after POST (to be same as image generation behavior)
-  disabled = False
-  if request.method == 'POST':
-    form = InfoStickerForm(request.POST)
-    if form.is_valid():
-      if getattr(settings, 'STICKERS_ENABLED', None):
-        return HttpResponseRedirect(form.save(user))
-      else:
-        disabled = True
-  else:
-    form = InfoStickerForm(initial = {
-      'name'    : user.name,
-      'phone'   : user.phone,
-      'project' : user.project.id if user.project else 0
-    })
-
-  return render_to_response('nodes/sticker.html',
-    { 'form' : form,
-      'stickers_disabled' : disabled },
     context_instance = RequestContext(request)
   )
 

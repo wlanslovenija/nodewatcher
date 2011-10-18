@@ -7,7 +7,6 @@ from django.core import validators as core_validators
 from django.conf import settings
 from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType, NodeNames
 from web.nodes import ipcalc
-from web.nodes.sticker import generate_sticker
 from web.nodes.transitions import validates_node_configuration
 from web.nodes.common import FormWithWarnings
 from web.nodes.utils import queryset_by_ip
@@ -866,36 +865,6 @@ class WhitelistMacForm(forms.Form):
     item.description = self.cleaned_data.get('description')
     item.registred_at = datetime.now()
     item.save()
-
-class InfoStickerForm(forms.Form):
-  """
-  A simple form for whitelisting a MAC address.
-  """
-  name = forms.CharField(max_length = 50, label = _("Your name"))
-  phone = forms.CharField(max_length = 50, label = _("Phone number"))
-  project = forms.ModelChoiceField(
-    Project.objects.all(),
-    initial = getattr((User.objects.all() or [1])[0], "id", None),
-    label = _("Project")
-  )
-  
-  def save(self, user):
-    """
-    Saves info sticker data and generates the sticker.
-    """
-    name = self.cleaned_data.get('name')
-    phone = self.cleaned_data.get('phone')
-    project = self.cleaned_data.get('project')
-
-    if name == user.name and phone == user.phone and project == user.project:
-      regenerate = False
-    else:
-      user.name = name
-      user.phone = phone
-      user.project = project
-      regenerate = True
-
-    return generate_sticker(user, regenerate)
 
 class EventSubscribeForm(forms.Form):
   """

@@ -263,10 +263,10 @@ Projects
 
     INSERT INTO nodes_project
      (name, description, pool_id, channel, ssid, ssid_backbone, ssid_mobile,
-      sticker, zone_id, captive_portal, geo_lat, geo_long, geo_zoom)
+      zone_id, captive_portal, geo_lat, geo_long, geo_zoom)
      VALUES('ArborMesh', 'Example project on the Moon', 1, 6,
       'open.example.net', 'open.example.net-backbone', 'open.example.net-mobile',
-      'default.tex', NULL, true, 46.05, 14.5, 13);
+      NULL, true, 46.05, 14.5, 13);
 
 Values are:
 
@@ -277,7 +277,6 @@ Values are:
 * ``ssid`` -- SSID used in this project
 * ``ssid_backbone`` -- SSID used for backbone nodes in this project
 * ``ssid_mobile`` -- SSID used for mobile nodes in this project
-* ``sticker`` -- name of the LaTeX template file to use for the project when issuing a contact sticker for its nodes
 * ``zone_id`` -- DNS zone id (NULL if DNS capabilities of ''nodewatcher'' are not used)
 * ``captive_portal`` -- should the nodes in this project have captive portals?
 * ``geo_lat`` -- default location of the map when adding a new node (latitude)

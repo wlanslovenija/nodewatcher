@@ -63,7 +63,6 @@
     ssid_backbone: backbone.example.net
     ssid_mobile: mobile.example.net
     captive_portal: True
-    sticker: example.tex
     zone: example.wlan
     pools: [1]
     geo_lat: 46.05

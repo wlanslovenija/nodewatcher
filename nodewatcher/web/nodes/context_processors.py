@@ -45,5 +45,4 @@ def global_values(request):
     'feeds_base_url'         : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', sites_models.Site.objects.get_current().domain),
     'images_bindist_url'     : getattr(settings, 'IMAGES_BINDIST_URL', None),
     'documentation_links'    : getattr(settings, 'DOCUMENTATION_LINKS', {}),
-    'stickers_enabled'       : getattr(settings, 'STICKERS_ENABLED', False),
   }

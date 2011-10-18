@@ -229,7 +229,6 @@ INSTALLED_APPS = (
 # If you have programs installed in exotic locations you can specify them here
 #GRAPHVIZ_BIN = '/path/to/neato'
 #FPING_BIN = '/path/to/fping'
-#PDFLATEX = '/path/to/pdflatex'
 
 # Graph configuration
 GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs')
@@ -264,11 +263,6 @@ IMAGE_GENERATOR_SUSPENDED = False
 IMAGE_GENERATOR_USER = None
 
 IMAGES_BINDIST_URL = 'http://example.net/images/'
-
-# Are stickers enabled or not. If set to False the pdflatex dependency is not needed.
-STICKERS_ENABLED = False
-STICKERS_TEMP_DIR = '/tmp/'
-STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers')
 
 # Are non-staff members allowed to mark a node as a border router
 NONSTAFF_BORDER_ROUTERS = False
