@@ -10,10 +10,10 @@ from web.nodes import ipcalc
 from web.nodes.sticker import generate_sticker
 from web.nodes.transitions import validates_node_configuration
 from web.nodes.common import FormWithWarnings
-from web.nodes.util import queryset_by_ip
+from web.nodes.utils import queryset_by_ip
 from web.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from web.generator.types import IfaceType
-from web.account.util import generate_random_password
+from web.account.utils import generate_random_password
 from web.dns.models import Record
 from web.policy.models import TrafficControlClass, Policy, PolicyFamily, PolicyAction
 from datetime import datetime

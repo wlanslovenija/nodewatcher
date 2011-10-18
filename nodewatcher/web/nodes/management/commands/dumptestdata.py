@@ -72,7 +72,7 @@ class Command(management_base.BaseCommand):
           if not object.is_dead():
             # We do not clean notes for dead nodes as they explain death background
             object.notes = ''
-        elif name == 'web.account.models.UserAccount':
+        elif name == 'web.account.models.UserProfile':
           object.vpn_password = 'XXX'
           object.name = ""
           object.phone = '5551234'

@@ -10,9 +10,9 @@ from django.utils.translation import ugettext as _
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
 from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.common import ValidationWarning
-from web.nodes.util import queryset_by_ip
+from web.nodes.utils import queryset_by_ip
 from web.generator.models import Profile
-from web.account.models import UserAccount
+from web.account.models import UserProfile
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 from datetime import datetime
 from web.nodes import ipcalc
@@ -20,7 +20,7 @@ from web.nodes import context_processors as nodes_context_processors
 from django.core import context_processors as core_context_processors
 from django.core.urlresolvers import reverse
 from web.nodes import decorators
-from web.account.util import generate_random_password
+from web.account.utils import generate_random_password
 
 def nodes(request):
   """
@@ -499,7 +499,7 @@ def sticker(request):
   """
   Display a form for generating an info sticker.
   """
-  user = UserAccount.for_user(request.user)
+  user = UserProfile.for_user(request.user)
   
   # We want disabled error to show only after POST (to be same as image generation behavior)
   disabled = False

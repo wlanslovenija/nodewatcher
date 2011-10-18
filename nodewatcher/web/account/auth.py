@@ -1,45 +1,86 @@
-from django.contrib.auth.models import User
-from django.contrib.auth.models import check_password
-from crypt import crypt
+from django.contrib.auth import models as auth_models
+from django.contrib.auth import backends as auth_backends
+from django.contrib.sessions import models as sessions_models
 
-if crypt('', '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/') != '$1$DIF16...$Xzh7aN9GPHrZPK9DgggUK/':
-  # crypt does not support MD5 hashed passwords, we will use Python implementation
-  from md5crypt import unix_md5_crypt
-  crypt = unix_md5_crypt
+import crypt
+import md5crypt
 
-class CryptBackend:
-  def authenticate(self, username = None, password = None):
+try:
+  import aprmd5
+  APR_ENABLED = True
+except ImportError:
+  APR_ENABLED = False
+
+class AprBackend(object):
+  supports_object_permissions = False
+  supports_anonymous_user = False
+  supports_inactive_user = False
+
+  def authenticate(self, username=None, password=None):
     """
-    Authenticate against the database using OpenBSD's blowfish crypt
-    function.
+    Authenticates against the database using Apache Portable Runtime MD5 hash function.
     """
-    try:
-      user = User.objects.get(username = username)
-      if check_password(password, user.password):
-        # Successfully checked password in Django password format, so we can change it to crypt format
-        salt = '$1$' + User.objects.make_random_password(8)
-        user.password = crypt(password, salt)
-        user.save()
-    except ValueError:
-      pass
-    except User.DoesNotExist:
-      return None
 
-    try:
-      if crypt(password, user.password) == user.password and user.is_active:
-        return user
-      else:
+    if not APR_ENABLED:
         return None
-    except User.DoesNotExist:
-      return None
+
+    try:
+      user = auth_models.User.objects.get(username=username)
+      if aprmd5.password_validate(password, user.password):
+        # Successfully checked password, so we change it to the Django password format
+        user.set_password(password)
+        user.save()
+        return user
     except ValueError:
+      return None
+    except auth_models.User.DoesNotExist:
       return None
   
   def get_user(self, user_id):
     """
-    Translates the user id into a User object.
+    Translates the user ID into the User object.
     """
     try:
-      return User.objects.get(pk = user_id)
-    except User.DoesNotExist:
+      return auth_models.User.objects.get(pk=user_id)
+    except auth_models.User.DoesNotExist:
+      return None
+
+class CryptBackend(object):
+  supports_object_permissions = False
+  supports_anonymous_user = False
+  supports_inactive_user = False
+
+  def authenticate(self, username=None, password=None):
+    """
+    Authenticates against the database using crypt hash function.
+    """
+    try:
+      user = auth_models.User.objects.get(username=username)
+      if crypt.crypt(password, user.password) == user.password or md5crypt.md5crypt(password, user.password) == user.password:
+        # Successfully checked password, so we change it to the Django password format
+        user.set_password(password)
+        user.save()
+        return user
+    except ValueError:
+      return None
+    except auth_models.User.DoesNotExist:
+      return None
+  
+  def get_user(self, user_id):
+    """
+    Translates the user ID into the User object.
+    """
+    try:
+      return auth_models.User.objects.get(pk=user_id)
+    except auth_models.User.DoesNotExist:
+      return None
+
+class ModelBackend(auth_backends.ModelBackend):
+  def authenticate(self, username=None, password=None):
+    """
+    Authenticates against the database using official implementation but catches exceptions.
+    """
+    try:
+      return super(ModelBackend, self).authenticate(username, password)
+    except ValueError:
       return None

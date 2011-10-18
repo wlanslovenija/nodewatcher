@@ -6,7 +6,7 @@ sys.path.append('/var/www/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'web.settings_production'
 
 # Import our models
-from web.account.models import UserAccount
+from web.account.models import UserProfile
 from django.contrib.auth.models import User
 from django.db import transaction
 
@@ -21,7 +21,7 @@ def authenticate_in_db(username, password):
       return True
   except User.DoesNotExist:
     return False
-  except UserAccount.DoesNotExist:
+  except UserProfile.DoesNotExist:
     return False
 
 f = open('/etc/openvpn/users.txt', 'r')

@@ -6,6 +6,8 @@ import os.path
 settings_dir = os.path.abspath(os.path.dirname(__file__))
 database_file = os.path.join(settings_dir, 'db.sqlite')
 default_template_dir = os.path.join(settings_dir, 'templates')
+locale_dir = os.path.join(settings_dir, 'locale')
+geoip_dir = os.path.join(settings_dir, '..', 'geoip')
 static_dir = os.path.join(settings_dir, '..', 'static')
 
 import djcelery
@@ -39,28 +41,45 @@ DATABASES = {
 EMAIL_TO_CONSOLE = True
 
 EMAIL_HOST = 'localhost'
+# We use also translation mechanism to set subject for password reset e-mail to this format
 EMAIL_SUBJECT_PREFIX = '[nodewatcher] '
 EMAIL_EVENTS_SENDER = 'events@example.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'
+DEFAULT_FROM_EMAIL = 'webmaster@example.net'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
+# On Unix systems, a value of None will cause Django to use the same
+# timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'Europe/Ljubljana'
 
 # Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+# http://www.i18nguy.com/unicode/language-identifiers.html and
+# http://docs.djangoproject.com/en/dev/topics/i18n/#term-language-code
+LANGUAGE_CODE = 'en'
+
+_ = lambda s: s # Dummy function so that makemessages finds it
+LANGUAGES = (
+  ('en', _('English')),
+)
+
+LOCALE_PATHS = (
+  locale_dir,
+)
+
+GEOIP_PATH = geoip_dir
+DEFAULT_COUNTRY = 'SI'
 
 URL_VALIDATOR_USER_AGENT = 'Django'
 
 # Date input formats below take as first argument day and then month in x/y/z format
 DATE_INPUT_FORMATS = (
-    '%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%b %d %Y',
-    '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
-    '%B %d, %Y', '%d %B %Y', '%d %B, %Y',
+  '%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%b %d %Y',
+  '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
+  '%B %d, %Y', '%d %B %Y', '%d %B, %Y',
 )
 
 # All those formats are only defaults and are localized for users
@@ -140,12 +159,13 @@ TEMPLATE_LOADERS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-  'django.core.context_processors.auth',
+  'django.contrib.auth.context_processors.auth',
   'django.core.context_processors.debug',
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
+  'django.contrib.messages.context_processors.messages',
   'web.nodes.context_processors.web_client_node',
-  'web.nodes.context_processors.global_values'
+  'web.nodes.context_processors.global_values',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -153,6 +173,7 @@ MIDDLEWARE_CLASSES = (
   'django.contrib.sessions.middleware.SessionMiddleware',
   'django.middleware.csrf.CsrfViewMiddleware',
   'django.contrib.auth.middleware.AuthenticationMiddleware',
+  'django.contrib.messages.middleware.MessageMiddleware',
   'django.middleware.transaction.TransactionMiddleware',
 )
 
@@ -166,12 +187,24 @@ TEMPLATE_DIRS = (
 )
 
 FORCE_SCRIPT_NAME = ''
+
 LOGIN_REDIRECT_URL = '/my/nodes'
-LOGIN_URL = '/auth/login'
-AUTH_PROFILE_MODULE = 'account.useraccount'
-# We are using SSO with Trac so we have our own auth module, you should probably use something from Django (also to register users)
-# See http://docs.djangoproject.com/en/dev/topics/auth/
+LOGIN_URL = '/account/login'
+LOGOUT_URL = '/account/logout'
+
+AUTH_PROFILE_MODULE = 'account.UserProfile'
+
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_OPEN = True
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+CSRF_FAILURE_VIEW = 'web.nodes.views.csrf_failure'
+
+# We support some common password formats to ease transition
 AUTHENTICATION_BACKENDS = (
+  'web.account.auth.ModelBackend',
+  'web.account.auth.AprBackend',
   'web.account.auth.CryptBackend',
 )
 
@@ -180,8 +213,10 @@ INSTALLED_APPS = (
   'django.contrib.contenttypes',
   'django.contrib.sessions',
   'django.contrib.sites',
+  'django.contrib.messages',
   'django.contrib.sitemaps',
   'djcelery',
+  'registration',
   'web.nodes',
   'web.generator',
   'web.account',

@@ -11,6 +11,7 @@ wlansi_template_dir = os.path.join(wlansi_dir, 'templates')
 EMAIL_SUBJECT_PREFIX = '[wlan-si] '
 EMAIL_EVENTS_SENDER = 'events@wlan-si.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-si.net'
+DEFAULT_FROM_EMAIL = 'open@wlan-si.net'
 
 NETWORK_NAME = 'wlan slovenija'
 NETWORK_HOME = 'http://wlan-si.net'

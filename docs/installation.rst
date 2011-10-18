@@ -43,6 +43,8 @@ The following Python modules are required:
 
 * celery (2.2.1)
 * django-celery (2.2.1)
+* django-registration
+* python-aprmd5
 * pybeanstalk
 
 The following PostgreSQL extension is required:

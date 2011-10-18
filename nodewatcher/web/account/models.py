@@ -1,25 +1,28 @@
-from django.db import models
-from django.contrib.auth.models import User
-from web.account.util import generate_random_password
-from web.nodes.models import Project
+from django.db import models as django_models
+from django.contrib.auth import models as auth_models
 
-class UserAccount(models.Model):
+from web.account import utils
+from web.nodes import models
+
+class UserProfile(django_models.Model):
   """
-  User account extension.
+  This class represents an user profile.
   """
-  user = models.ForeignKey(User, unique = True)
-  vpn_password = models.CharField(max_length = 50, null = True)
-  name = models.CharField(max_length = 50, null = True)
-  phone = models.CharField(max_length = 50, null = True)
-  info_sticker = models.BooleanField(default = False)
-  project = models.ForeignKey(Project, null = True)
-  developer = models.BooleanField(default = False)
+
+  user = django_models.OneToOneField(auth_models.User, editable=False)
+
+  vpn_password = django_models.CharField(max_length = 50, null = True)
+  name = django_models.CharField(max_length = 50, null = True)
+  phone = django_models.CharField(max_length = 50, null = True)
+  info_sticker = django_models.BooleanField(default = False)
+  project = django_models.ForeignKey(models.Project, null = True)
+  developer = django_models.BooleanField(default = False)
 
   def generate_vpn_password(self):
     """
     Generates a new VPN password.
     """
-    self.vpn_password = generate_random_password()
+    self.vpn_password = utils.generate_random_password()
     self.save()
 
   @staticmethod
@@ -30,9 +33,8 @@ class UserAccount(models.Model):
     """
     try:
       profile = user.get_profile()
-    except UserAccount.DoesNotExist:
-      profile = UserAccount(user = user)
+    except UserProfile.DoesNotExist:
+      profile = UserProfile(user = user)
       profile.generate_vpn_password()
 
     return profile
-

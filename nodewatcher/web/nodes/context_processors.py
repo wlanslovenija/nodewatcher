@@ -1,6 +1,8 @@
 from django.conf import settings
-from django.contrib.sites.models import Site
-from web.nodes.models import Subnet
+from django.contrib import auth
+from django.contrib.sites import models as sites_models
+
+from web.nodes import models
 
 def web_client_node(request):
   """
@@ -9,7 +11,7 @@ def web_client_node(request):
   a node's allocated subnet.
   """
   try:
-    subnet = Subnet.objects.ip_filter(ip_subnet__contains = request.META["REMOTE_ADDR"]).exclude(cidr = 0)[0]
+    subnet = models.Subnet.objects.ip_filter(ip_subnet__contains = request.META["REMOTE_ADDR"]).exclude(cidr = 0)[0]
     node = subnet.node
   except IndexError:
     node = None
@@ -33,14 +35,15 @@ def global_values(request):
       'logo_url'     : settings.NETWORK_LOGO_URL,
     },
     'request' : {
-      'path' : request.path,
+      'path'          : request.path,
+      'get_full_path' : request.get_full_path(),
     },
-    'base_url'                  : "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', Site.objects.get_current().domain),
-    'feeds_base_url'            : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', Site.objects.get_current().domain),
-    'images_bindist_url'        : getattr(settings, 'IMAGES_BINDIST_URL', None),
-    'documentation_links'       : getattr(settings, 'DOCUMENTATION_LINKS', {}),
-    'stickers_enabled'          : getattr(settings, 'STICKERS_ENABLED', False),
-    'generator_enabled'         : getattr(settings, 'IMAGE_GENERATOR_ENABLED', False) or \
-                                  getattr(settings, 'DEBUG', False)
+    'site'                   : sites_models.Site.objects.get_current() if sites_models.Site._meta.installed else sites_models.RequestSite(request),
+    'redirect_field_name'    : auth.REDIRECT_FIELD_NAME,
+    'context_processor_next' : request.REQUEST.get(auth.REDIRECT_FIELD_NAME, ''),
+    'base_url'               : "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', sites_models.Site.objects.get_current().domain),
+    'feeds_base_url'         : "%s://%s" % ('https' if getattr(settings, 'FEEDS_USE_HTTPS', None) else 'http', sites_models.Site.objects.get_current().domain),
+    'images_bindist_url'     : getattr(settings, 'IMAGES_BINDIST_URL', None),
+    'documentation_links'    : getattr(settings, 'DOCUMENTATION_LINKS', {}),
+    'stickers_enabled'       : getattr(settings, 'STICKERS_ENABLED', False),
   }
-
