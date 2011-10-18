@@ -1,26 +1,27 @@
+from datetime import datetime
 import os.path
+
 from django.conf import settings
 from django.template import RequestContext, Context, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError, HttpResponseForbidden
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models, transaction
 from django.forms import forms
 from django.utils.translation import ugettext as _
-from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
+from django.core import context_processors as core_context_processors
+from django.core.urlresolvers import reverse
+
+from web.account import decorators as account_decorators
+from web.account.utils import generate_random_password, initial_accepts_request
+from web.nodes import ipcalc
+from web.nodes import context_processors as nodes_context_processors
+from web.nodes import decorators
 from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.common import ValidationWarning
 from web.nodes.util import queryset_by_ip
 from web.generator.models import Profile
-from web.account.models import UserProfile
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
-from datetime import datetime
-from web.nodes import ipcalc
-from web.nodes import context_processors as nodes_context_processors
-from django.core import context_processors as core_context_processors
-from django.core.urlresolvers import reverse
-from web.nodes import decorators
-from web.account.utils import generate_random_password
+from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
 
 def nodes(request):
   """
@@ -116,7 +117,7 @@ def statistics(request):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def my_nodes(request):
   """
   Display a list of current user's nodes.
@@ -126,17 +127,17 @@ def my_nodes(request):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def node_new(request):
   """
   Display a form for registering a new node.
   """
   if request.method == 'POST':
-    form = RegisterNodeForm(request.POST)
+    form = initial_accepts_request(request, RegisterNodeForm)(request.POST)
     if form.is_valid() and form.save(request.user):
       return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': form.node.get_current_id() }))
   else:
-    form = RegisterNodeForm()
+    form = initial_accepts_request(request, RegisterNodeForm)()
 
   return render_to_response('nodes/new.html',
     { 'form' : form,
@@ -147,7 +148,7 @@ def node_new(request):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_edit(request, node):
   """
@@ -250,7 +251,7 @@ def node(request, node):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_reset(request, node):
   """
@@ -275,7 +276,7 @@ def node_reset(request, node):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_remove(request, node):
   """
@@ -296,7 +297,7 @@ def node_remove(request, node):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_renumber(request, node):
   """
@@ -333,7 +334,7 @@ def node_renumber(request, node):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_allocate_subnet(request, node):
   """
@@ -355,7 +356,7 @@ def node_allocate_subnet(request, node):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_deallocate_subnet(request, node, subnet_id):
   """
@@ -380,7 +381,7 @@ def node_deallocate_subnet(request, node, subnet_id):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def node_edit_subnet(request, node, subnet_id):
   """
@@ -411,7 +412,7 @@ def node_edit_subnet(request, node, subnet_id):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def whitelisted_mac(request):
   """
   Display a form for whitelisting a MAC address.
@@ -431,7 +432,7 @@ def whitelisted_mac(request):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def unwhitelist_mac(request, item_id):
   """
   Removes a whitelisted MAC address.
@@ -514,7 +515,7 @@ def node_events(request, node):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def event_list(request):
   """
   Display a list of current user's events.
@@ -525,7 +526,7 @@ def event_list(request):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def event_subscribe(request):
   """
   Display a form for subscribing to an event.
@@ -544,7 +545,7 @@ def event_subscribe(request):
     context_instance = RequestContext(request)
   )
 
-@login_required
+@account_decorators.authenticated_required
 def event_unsubscribe(request, subscription_id):
   """
   Removes event subscription.
@@ -557,7 +558,7 @@ def event_unsubscribe(request, subscription_id):
 
   return HttpResponseRedirect(reverse('my_events'))
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def package_list(request, node):
   """

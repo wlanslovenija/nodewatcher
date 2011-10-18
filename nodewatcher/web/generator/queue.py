@@ -1,7 +1,6 @@
 from web.nodes.models import Node
 from web.generator.models import IfaceTemplate
 from web.generator.types import IfaceType
-from web.account.models import UserProfile
 from django.conf import settings
 
 if getattr(settings, 'IMAGE_GENERATOR_ENABLED', None):
@@ -37,15 +36,12 @@ def queue_generator_job(node, email_user, config_only = False):
       'dhcp'        : subnet.gen_dhcp
     })
   
-  # Generate VPN password if needed
-  profile = UserProfile.for_user(node.owner)
-
   data = {
     'uuid'            : node.uuid,
     'ip'              : node.ip,
     'hostname'        : node.name,
     'vpn_username'    : node.owner.username,
-    'vpn_password'    : profile.vpn_password,
+    'vpn_password'    : 'dummy_password',
     'vpn_mac'         : node.vpn_mac_conf,
     'project'         : node.project.name,
     'ssid'            : node.configured_essid,

@@ -133,6 +133,16 @@ class NodeType:
   Mobile = 5
   Dead = 6
 
+def project_default(request=None):
+  if request and hasattr(request.user, 'get_profile'):
+    return request.user.get_profile().default_project
+  else:
+    projects = Project.objects.all()
+    if projects.exists():
+      return projects[0]
+    else:
+      return None
+
 class Node(models.Model):
   """
   This class represents a single node in the network.
@@ -142,7 +152,7 @@ class Node(models.Model):
   name = models.CharField(max_length = 50, null = True, unique = True)
   owner = models.ForeignKey(User, null = True)
   location = models.CharField(max_length = 200, null = True)
-  project = models.ForeignKey(Project, null = True, related_name = 'nodes')
+  project = models.ForeignKey(Project, null = True, related_name = 'nodes', default = project_default)
   notes = models.CharField(max_length = 1000, null = True)
   url = models.CharField(max_length = 200, null = True)
 
@@ -599,7 +609,7 @@ class Node(models.Model):
     """
     return self.pk if self.is_invalid() else self.name
   
-  def get_full_url(self, use_https=getattr(settings, 'USE_HTTPS', None)):
+  def get_full_url(self, use_https=getattr(settings, 'USE_HTTPS', False)):
     """
     Returns (full) absolute URL for the node.
     """
@@ -1632,7 +1642,7 @@ class EventSubscription(models.Model):
                     'contact'     : settings.NETWORK_CONTACT,
                     'description' : getattr(settings, 'NETWORK_DESCRIPTION', None)
                   },
-      'base_url' : "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', Site.objects.get_current().domain)
+      'base_url' : "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', False) else 'http', Site.objects.get_current().domain)
     })
 
     # Format node name and IP

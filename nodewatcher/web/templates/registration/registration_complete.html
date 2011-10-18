@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Registration" %}{% endblock %}
+
+{% block heading %}
+{% with _("Registration") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<p>{% blocktrans %}Registration completed successfully. An e-mail with activation instructions for your new account has been sent to your
+e-mail address. Until you activate your new account you cannot log in into it.{% endblocktrans %}</p>
+{% endblock %}

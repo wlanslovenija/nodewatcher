@@ -1,16 +1,17 @@
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
 from django.conf import settings
+
+from web.account import decorators as account_decorators
+from web.nodes import decorators
 from web.nodes.models import Node
 from web.generator.models import Profile
 from web.generator.queue import queue_generator_job
 from web.generator.forms import GenerateImageForm
-from web.nodes import decorators
 
-@login_required
+@account_decorators.authenticated_required
 @decorators.node_argument
 def request(request, node):
   """

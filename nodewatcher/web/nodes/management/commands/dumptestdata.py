@@ -10,7 +10,7 @@ from django.core import management
 from django.core.management import base as management_base
 from django.core import serializers
 
-from web.nodes import ipcalc
+from web.nodes import ipcalc, project_default
 
 # TODO: Make temporary directory configurable
 
@@ -72,13 +72,14 @@ class Command(management_base.BaseCommand):
           if not object.is_dead():
             # We do not clean notes for dead nodes as they explain death background
             object.notes = ''
-        elif name == 'web.account.models.UserProfile':
-          object.vpn_password = 'XXX'
-          object.name = ""
-          object.phone = '5551234'
+        elif name == 'web.account.models.UserProfileAndSettings':
+          object.phone_number = '+411234567'
+          object.country = settings.DEFAULT_COUNTRY
+          object.language = settings.LANGUAGES[0][0]
+          object.default_project = project_default()
         elif name == 'django.contrib.auth.models.User':
-          object.first_name = ""
-          object.last_name = ""
+          object.first_name = "Foo"
+          object.last_name = "Bar"
           object.email = "user@example.net"
           object.password = '$1$1qL5F...$ZPQdHpHMsvNQGI4rIbAG70' # Password for all users is 123
         elif name == 'web.generator.models.Profile':

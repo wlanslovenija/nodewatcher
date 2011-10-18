@@ -5,11 +5,5 @@
   pk: 1
   fields:
     domain: nodes.example.net
-    name: generic nodewatcher installation
-
-- model: sites.Site
-  pk: 2
-  fields:
-    domain: nodes.wlan-si.net
-    name: wlan slovenija
+    name: your network name
 

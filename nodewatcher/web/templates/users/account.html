@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Account" %}{% endblock %}
+
+{% block heading %}
+{% with _("Account") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+{% url auth_password_change as auth_password_change_url %}
+<p>{% blocktrans %}Do you want to <a href="{{ auth_password_change_url }}">change your password</a>?{% endblocktrans %}</p>
+{% with _("Update account") as form_submit %}
+{% url user_account as form_action %}
+{% include "form.html" %}
+{% endwith %}
+{% endblock %}

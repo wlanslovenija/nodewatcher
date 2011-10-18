@@ -37,6 +37,7 @@ The following (Debian, Ubuntu ...) packages are required:
 * python-pyparsing
 * python-anyjson
 * python-pymongo
+* python-geoip
 * beanstalkd
 
 The following Python modules are required:
@@ -44,6 +45,7 @@ The following Python modules are required:
 * celery (2.2.1)
 * django-celery (2.2.1)
 * django-registration
+* django-phonenumber-field
 * python-aprmd5
 * pybeanstalk
 
@@ -57,7 +59,8 @@ Install them all with a single command::
 
     sudo aptitude install python python-django python-rrdtool \
     python-lxml python-yaml python-memcache fping graphviz memcached python-psycopg2 \
-    python-django-picklefield python-pyparsing python-anyjson python-pymongo beanstalkd
+    python-django-picklefield python-pyparsing python-anyjson python-pymongo beanstalkd \
+    python-geoip
 
 Getting Source
 --------------

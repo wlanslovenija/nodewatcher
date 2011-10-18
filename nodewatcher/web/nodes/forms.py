@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.core import validators as core_validators
 from django.conf import settings
-from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType, NodeNames
+from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStatus, AntennaType, PolarizationType, WhitelistItem, EventCode, EventSubscription, NodeType, Event, EventSource, SubscriptionType, Link, RenumberNotice, PoolStatus, GraphType, NodeNames, project_default
 from web.nodes import ipcalc
 from web.nodes.transitions import validates_node_configuration
 from web.nodes.common import FormWithWarnings
@@ -40,7 +40,7 @@ class RegisterNodeForm(forms.Form):
   assign_ip = forms.BooleanField(required = False, label = _("Assign automatically from the IP pool"), initial = True)
   project = forms.ModelChoiceField(
     Project.objects.all(),
-    initial = getattr((Project.objects.all() or [1])[0], "id", None),
+    initial = project_default,
     empty_label = None,
     label = _("Project")
   )

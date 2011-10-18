@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n misc %}
+
+{% block title %}{% blocktrans %}User {{ username }}{% endblocktrans %}{% endblock %}
+
+{% block heading %}
+{% setcontext as heading %}
+{% blocktrans %}User {{ username }}{% endblocktrans %}
+{% endsetcontext %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<p>User: {{ username }}.</p>
+{% endblock %}

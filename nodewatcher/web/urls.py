@@ -1,46 +1,103 @@
-from django.conf.urls.defaults import *
-from web.nodes.feeds import LatestEvents, ActiveNodes
-from web.nodes.sitemaps import NodeSitemap, StaticSitemap, RootPageSitemap
+from django import shortcuts
 from django.conf import settings
-from django.shortcuts import redirect
+from django.conf.urls.defaults import *
+from django.contrib.auth import views as auth_views
+from django.core import urlresolvers
+from django.utils import functional as functional_utils
+from django.views.generic import simple as generic_simple
+
+from registration import views as registration_views
+
+from web.account import decorators
+from web.account import forms
+from web.nodes import feeds
+from web.nodes import sitemaps
 
 # Legacy feeds (GeoDjango feeds have not yet been upgraded to new code)
-feeds = {
-  'active'  : ActiveNodes,
+feeds_dict = {
+  'active' : feeds.ActiveNodes,
 }
 
 sitemaps = {
-  'nodes'   : NodeSitemap,
-  'static'  : StaticSitemap,
-  'root'    : RootPageSitemap,
+  'nodes'  : sitemaps.NodeSitemap,
+  'static' : sitemaps.StaticSitemap,
+  'root'   : sitemaps.RootPageSitemap,
 }
+
+# We pass redirect targets as a lazy unicode string as we are backreferencing.
+# We wrap views with custom decorators to force anonymous and authenticated access to them (it is strange to
+# try to register a new account while still logged in with another account). We redirect the user away and tell
+# the user what has happened with messages.
+# Some views use those decorators already so they are not used here. `logout_redirect` does not require
+# authenticated access on purpose.
+# We use custom login and logout views which give messages to the user explaining what has happened with login
+# and logout. We do not assume the user understands what is happening behind the scenes.
+account_patterns = patterns('',
+  url(r'^activate/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
+      'template': 'registration/activation_complete.html',
+    }, name='registration_activation_complete'),
+  url(r'^activate/(?P<activation_key>\w+)/$', decorators.anonymous_required(function=registration_views.activate), {
+      'backend': 'web.account.regbackend.ProfileBackend',
+    }, name='registration_activate'),
+  url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
+      'backend': 'web.account.regbackend.ProfileBackend',
+    }, name='registration_register'),
+  url(r'^register/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
+      'template': 'registration/registration_complete.html',
+    }, name='registration_complete'),
+  url(r'^register/closed/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
+      'template': 'registration/registration_closed.html',
+    }, name='registration_disallowed'),
+  url(r'^email/change/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
+      'template': 'registration/email_change_complete.html',
+    }, name='email_change_complete'),
+  url(r'^login/$', 'web.account.views.login', name='auth_login'),
+  url(r'^logout/$', 'web.account.views.logout_redirect', name='auth_logout'),
+  url(r'^password/change/$', decorators.authenticated_required(function=auth_views.password_change), {
+      'post_change_redirect': functional_utils.lazy(urlresolvers.reverse, unicode)('auth_password_change_done'),
+      'password_change_form': forms.PasswordChangeForm,
+    }, name='auth_password_change'),
+  url(r'^password/change/complete/$', decorators.authenticated_required(function=auth_views.password_change_done), name='auth_password_change_done'),
+  url(r'^password/reset/$', decorators.anonymous_required(function=auth_views.password_reset), {
+      'email_template_name': 'registration/password_reset_email.txt',
+      'password_reset_form': forms.PasswordResetForm,
+      'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, unicode)('auth_password_reset_done'),
+    }, name='auth_password_reset'),
+  url(r'^password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', decorators.anonymous_required(function=auth_views.password_reset_confirm), {
+      'set_password_form': forms.SetPasswordForm,
+      'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, unicode)('auth_password_reset_complete'),
+    }, name='auth_password_reset_confirm'),
+  url(r'^password/reset/complete/$', decorators.anonymous_required(function=auth_views.password_reset_complete), name='auth_password_reset_complete'),
+  url(r'^password/reset/done/$', decorators.anonymous_required(function=auth_views.password_reset_done), name='auth_password_reset_done'),
+  url(r'^$', 'web.account.views.account', name='user_account'),
+)
 
 urlpatterns = patterns('',
   # Nodes list
   url(r'^$', 'web.nodes.views.nodes', name = 'nodes_list'),
-  url(r'^network/nodes/$', lambda request: redirect('nodes_list', permanent=False)), # Nodes list is currently hard-coded as primary landing section, this is not necessary so
-  url(r'^nodes/list/$', lambda request: redirect('nodes_list', permanent=True)), # Legacy
-  url(r'^nodes/node_list/$', lambda request: redirect('nodes_list', permanent=True)), # Legacy
+  url(r'^network/nodes/$', lambda request: shortcuts.redirect('nodes_list', permanent=False)), # Nodes list is currently hard-coded as primary landing section, this is not necessary so
+  url(r'^nodes/list/$', lambda request: shortcuts.redirect('nodes_list', permanent=True)), # Legacy
+  url(r'^nodes/node_list/$', lambda request: shortcuts.redirect('nodes_list', permanent=True)), # Legacy
 
   # Global nodes information
   url(r'^network/statistics/$', 'web.nodes.views.statistics', name = 'network_statistics'),
-  url(r'^nodes/statistics/$', lambda request: redirect('network_statistics', permanent=True)), # Legacy
+  url(r'^nodes/statistics/$', lambda request: shortcuts.redirect('network_statistics', permanent=True)), # Legacy
   url(r'^network/events/$', 'web.nodes.views.global_events', name = 'network_events'),
-  url(r'^nodes/events/global/$', lambda request: redirect('network_events', permanent=True)), # Legacy
+  url(r'^nodes/events/global/$', lambda request: shortcuts.redirect('network_events', permanent=True)), # Legacy
   url(r'^network/clients/$', 'web.nodes.views.gcl', name = 'network_clients'),
-  url(r'^nodes/gcl/$', lambda request: redirect('network_clients', permanent=True)), # Legacy
+  url(r'^nodes/gcl/$', lambda request: shortcuts.redirect('network_clients', permanent=True)), # Legacy
   url(r'^network/topology/$', 'web.nodes.views.topology', name = 'network_topology'),
-  url(r'^nodes/topology/$', lambda request: redirect('network_topology', permanent=True)), # Legacy
+  url(r'^nodes/topology/$', lambda request: shortcuts.redirect('network_topology', permanent=True)), # Legacy
   url(r'^network/map/$', 'web.nodes.views.map', name = 'network_map'),
-  url(r'^nodes/map/$', lambda request: redirect('network_map', permanent=True)), # Legacy
+  url(r'^nodes/map/$', lambda request: shortcuts.redirect('network_map', permanent=True)), # Legacy
   
   # Node maintainers
   url(r'^my/nodes/$', 'web.nodes.views.my_nodes', name = 'my_nodes'),
-  url(r'^nodes/my_nodes/$', lambda request: redirect('my_nodes', permanent=True)), # Legacy
+  url(r'^nodes/my_nodes/$', lambda request: shortcuts.redirect('my_nodes', permanent=True)), # Legacy
   url(r'^my/new/$', 'web.nodes.views.node_new', name = 'new_node'),
-  url(r'^nodes/new/$', lambda request: redirect('new_node', permanent=True)), # Legacy
+  url(r'^nodes/new/$', lambda request: shortcuts.redirect('new_node', permanent=True)), # Legacy
   url(r'^my/whitelist/$', 'web.nodes.views.whitelisted_mac', name = 'my_whitelist'),
-  url(r'^nodes/whitelisted_mac/$', lambda request: redirect('my_whitelist', permanent=True)), # Legacy
+  url(r'^nodes/whitelisted_mac/$', lambda request: shortcuts.redirect('my_whitelist', permanent=True)), # Legacy
   url(r'^my/whitelist/remove/(?P<item_id>\d+)/$', 'web.nodes.views.unwhitelist_mac', name = 'my_whitelist_remove'),  
   url(r'^my/events/$', 'web.nodes.views.event_list', name = 'my_events'),
   url(r'^my/events/subscribe/$', 'web.nodes.views.event_subscribe', name = 'my_events_subscribe'),
@@ -49,13 +106,13 @@ urlpatterns = patterns('',
   # Node itself, public
   # (Those views should have permalinks defined and are also those which have be_robust set to True)
   url(r'^node/(?P<node>[^/]+)/$', 'web.nodes.views.node', name = 'view_node'),
-  url(r'^nodes/node/(?P<node>.+)/$', lambda request, node: redirect('view_node', permanent=True, node=node)), # Legacy
+  url(r'^nodes/node/(?P<node>.+)/$', lambda request, node: shortcuts.redirect('view_node', permanent=True, node=node)), # Legacy
   url(r'^node/(?P<node>[^/]+)/events/$', 'web.nodes.views.node_events', name = 'view_node_events'),
-  url(r'^nodes/events/(?P<node>.+)/$', lambda request, node: redirect('view_node_events', permanent=True, node=node)), # Legacy
+  url(r'^nodes/events/(?P<node>.+)/$', lambda request, node: shortcuts.redirect('view_node_events', permanent=True, node=node)), # Legacy
   
   # Node itself, private
   url(r'^node/(?P<node>[^/]+)/packages/$', 'web.nodes.views.package_list', name = 'view_node_packages'),
-  url(r'^nodes/installed_packages/(?P<node>.+)/$', lambda request, node: redirect('view_node_packages', permanent=True, node=node)), # Legacy
+  url(r'^nodes/installed_packages/(?P<node>.+)/$', lambda request, node: shortcuts.redirect('view_node_packages', permanent=True, node=node)), # Legacy
   
   # Node manipulation
   url(r'^node/(?P<node>[^/]+)/edit/$', 'web.nodes.views.node_edit', name = 'edit_node'),
@@ -71,8 +128,8 @@ urlpatterns = patterns('',
   
   # Feeds
   url(r'^feeds/whitelist/$', 'web.nodes.views.whitelist'),
-  url(r'^feeds/rss/events(?:/(?P<username>.+))?/$', LatestEvents(), name = 'events_feed'),
-  url(r'^feeds/rss/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }, name = 'feeds'),
+  url(r'^feeds/rss/events(?:/(?P<username>.+))?/$', feeds.LatestEvents(), name = 'events_feed'),
+  url(r'^feeds/rss/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds_dict }, name = 'feeds'),
 
   # Pools
   url(r'^pools/$', 'web.nodes.views.pools', name = 'pools'),
@@ -84,10 +141,9 @@ urlpatterns = patterns('',
   # Generator
   url(r'^generator/request/(?P<node>.*)/$', 'web.generator.views.request', name = 'generate_node'),
 
-  # Authentication
-  url(r'^account/login/$', 'django.contrib.auth.views.login', name = 'auth_login'),
-  url(r'^account/logout/$', 'django.contrib.auth.views.logout_then_login', name = 'auth_logout'),
-  url(r'^account/$', lambda request: redirect('auth_login', permanent=True)),
+  # Accounts
+  (r'^account/', include(account_patterns)),
+  url(r'^user/(?P<username>[\w.@+-]+)/$', 'web.account.views.user', name = 'user_page'),
 )
 
 handler403 = 'web.nodes.views.forbidden_view'

@@ -1,0 +1,51 @@
+{% spaceless %}
+{% load i18n %}
+{% comment %}
+Template which uses `form` (form object), `form_submit` (submit button label) and `form_action` (form action URL) from
+the context.
+
+We use `next` from the context or use `context_processor_next`, which is set to `next` from request arguments, to set
+where the form should redirect after submission.
+{% endcomment %}
+{% if form %}
+  {% if form.is_multipart %}
+    <form action="{{ form_action }}" method="post" enctype="multipart/form-data">
+  {% else %}
+    <form action="{{ form_action }}" method="post">
+  {% endif %}
+  {% if form.errors %}
+    <p class="errornote">{% blocktrans count form.errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}</p>
+    {{ form.non_field_errors }}
+  {% endif %}
+    {% csrf_token %}
+    {% if next|default:context_processor_next %}<div style='display:none'><input type="hidden" name="{{ redirect_field_name }}" value="{{ next|default:context_processor_next }}" /></div>{% endif %}
+    {% for field in form.hidden_fields %}
+      <div style='display:none'>{{ field }}</div>
+    {% endfor %}
+    {% for field in form.visible_fields %}
+      {% ifchanged field.fieldset.name %}
+        {% if not forloop.first %}
+          </ul>
+          </fieldset>
+        {% endif %}
+        <fieldset>
+        {% if field.fieldset.name %}<legend>{{ field.fieldset.name }}</legend>{% endif %}
+        <ul>
+      {% endifchanged %}
+      <li{% if field.css_classes %} class="{{ field.css_classes }}"{% endif %}>
+        {{ field.label_tag }} {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}<p class="help">{{ field.help_text }}</p>{% endif %}
+      </li>
+      {% if forloop.last %}
+        </ul>
+        </fieldset>
+      {% endif %}
+    {% endfor %}
+    <div class="buttons">
+      <input type="reset" value="Reset" />
+      <input type="submit" value="{{ form_submit }}" />
+    </div>
+  </form>
+{% endif %}
+{% endspaceless %}

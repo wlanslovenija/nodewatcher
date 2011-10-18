@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Activation" %}{% endblock %}
+
+{% block heading %}
+{% with _("Activation") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+{% url auth_login as auth_login_url %}
+<p>{% blocktrans %}Activation of your account has <strong>not</strong> been successful. Please recheck activation instructions, especially that you have opened complete activation URL. Or maybe your account is <a href="{{ auth_login_url }}">already activated</a>?{% endblocktrans %}</p>
+{% endblock %}

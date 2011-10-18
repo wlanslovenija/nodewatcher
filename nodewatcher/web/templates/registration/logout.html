@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Logout" %}{% endblock %}
+
+{% block heading %}
+{% with _("Logout") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<p>{% blocktrans %}You have successfully logged out.{% endblocktrans %}</p>
+{% endblock %}

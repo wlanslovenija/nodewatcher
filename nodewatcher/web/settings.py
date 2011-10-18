@@ -35,18 +35,6 @@ DATABASES = {
   },
 }
 
-# For local development it is better to send all e-mails to console
-# Disable for production use and e-mails will be really send to users
-# With version 1.2 Django supports e-mail backends which can be used instead of this
-EMAIL_TO_CONSOLE = True
-
-EMAIL_HOST = 'localhost'
-# We use also translation mechanism to set subject for password reset e-mail to this format
-EMAIL_SUBJECT_PREFIX = '[nodewatcher] '
-EMAIL_EVENTS_SENDER = 'events@example.net'
-EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'
-DEFAULT_FROM_EMAIL = 'webmaster@example.net'
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -137,13 +125,26 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.96
 GOOGLE_MAPS_DEFAULT_ZOOM = 8
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
 
-NETWORK_NAME = 'your network name'
+NETWORK_NAME = 'your network name' # You probably want to configure your site name the same
 NETWORK_HOME = 'http://example.net'
 NETWORK_CONTACT = 'open@example.net'
 NETWORK_CONTACT_PAGE = 'http://example.net/contact'
 NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
 NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
 NETWORK_LOGO_URL = MEDIA_URL + 'images/logo.png'
+
+# For local development it is better to send all e-mails to console
+# Disable for production use and e-mails will be really send to users
+# With version 1.2 Django supports e-mail backends which can be used instead of this
+EMAIL_TO_CONSOLE = True
+
+EMAIL_HOST = 'localhost'
+# For backwards compatibility (before it was possible to configure password reset
+# subject through a template) we also format subject prefix through localization
+EMAIL_SUBJECT_PREFIX = '[' + NETWORK_NAME + '] ' # Prefix is defined also in some subject templates
+EMAIL_EVENTS_SENDER = 'events@example.net'
+EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'
+DEFAULT_FROM_EMAIL = 'webmaster@example.net'
 
 # Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
 #BITLY_LOGIN = "Your bit.ly login"
@@ -192,7 +193,7 @@ LOGIN_REDIRECT_URL = '/my/nodes'
 LOGIN_URL = '/account/login'
 LOGOUT_URL = '/account/logout'
 
-AUTH_PROFILE_MODULE = 'account.UserProfile'
+AUTH_PROFILE_MODULE = 'account.UserProfileAndSettings'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True

@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load misc %}
 
 {% block title %}{% trans "Login" %}{% endblock %}
 
@@ -12,33 +11,17 @@
 
 {% block contenttype %}login{% endblock %}
 
-{% block ctxtnav %}{% endblock %}
-
 {% block content %}
-<form action="{% url auth_login %}" method="post" id="acctmgr_loginform" >
-{% csrf_token %}
-
-{% if form.non_field_errors %}
-<p class="error">
-  <strong>{% trans "Error" %}:</strong>
-  {% for error in form.non_field_errors %}
-  {{ error }}
-  {% endfor %}
-</p>
-{% endif %}
-<input type="hidden" name="next" value="{{ next }}" />
-<table border="0" class="proptable">
-  <tr>
-    <td class="proplabel">{{ form.username.label_tag }}</td>
-    <td class="propbody">{{ form.username }}</td>
-  </tr>
-  <tr>
-    <td class="proplabel">{{ form.password.label_tag }}</td>
-    <td class="propbody">{{ form.password }}</td>
-  </tr>
-</table>
-<div class="buttons"><input type="submit" value="{% trans "Login" %}" /></div>
-</form>
+{% url registration_register as registration_register_url %}
+<p>{% blocktrans %}To log in, please enter your valid username and password in the form bellow. Don't have them yet? In that case <a href="{{ registration_register_url }}">register</a> to get them.{% endblocktrans %}</p>
+<div id="loginform">
+{% with _("Log in") as form_submit %}
+{% url auth_login as form_action %}
+{% include "form.html" %}
+{% endwith %}
+{% url auth_password_reset as auth_password_reset_url %}
+<p>{% blocktrans %}Have you <a href="{{ auth_password_reset_url }}">forgotten your password</a>?{% endblocktrans %}</p>
+</div>
 {% endblock %}
 
 {% block js %}

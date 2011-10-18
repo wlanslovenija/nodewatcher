@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Account" %}{% endblock %}
+
+{% block heading %}
+{% with _("Account") as heading %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<p>{% blocktrans %}You have changed your e-mail address and your account has been inactivated. An e-mail with activation instructions has been sent
+to your new e-mail address. Until you activate your new e-mail address you cannot log in into your account.{% endblocktrans %}</p>
+{% endblock %}
