@@ -16,7 +16,7 @@ from web.nodes.locker import require_lock, model_lock
 from web.nodes import ipcalc, data_archive
 from web.nodes.common import load_plugin
 from web.nodes.transitions import RouterTransition
-from web.nodes.utils import IPField, IPManager, queryset_by_ip
+from web.nodes.util import IPField, IPManager, queryset_by_ip
 
 class Project(models.Model):
   """

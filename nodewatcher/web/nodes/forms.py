@@ -9,7 +9,7 @@ from web.nodes.models import Project, Pool, NodeStatus, Node, Subnet, SubnetStat
 from web.nodes import ipcalc
 from web.nodes.transitions import validates_node_configuration
 from web.nodes.common import FormWithWarnings
-from web.nodes.utils import queryset_by_ip
+from web.nodes.util import queryset_by_ip
 from web.generator.models import Template, Profile, OptionalPackage, gen_mac_address
 from web.generator.types import IfaceType
 from web.account.utils import generate_random_password

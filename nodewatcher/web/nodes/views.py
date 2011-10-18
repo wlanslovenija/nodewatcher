@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, Pool, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType, PoolStatus
 from web.nodes.forms import RegisterNodeForm, UpdateNodeForm, AllocateSubnetForm, WhitelistMacForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.common import ValidationWarning
-from web.nodes.utils import queryset_by_ip
+from web.nodes.util import queryset_by_ip
 from web.generator.models import Profile
 from web.account.models import UserProfile
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
