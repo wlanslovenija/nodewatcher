@@ -87,9 +87,9 @@ urlpatterns = patterns('',
   url(r'^generator/request/(?P<node>.*)/$', 'web.generator.views.request', name = 'generate_node'),
 
   # Authentication
-  url(r'^auth/login/$', 'django.contrib.auth.views.login', { 'template_name' : 'auth/login.html' }, name = 'auth_login'),
-  url(r'^auth/logout/$', 'django.contrib.auth.views.logout_then_login', name = 'auth_logout'),
-  url(r'^auth/$', lambda request: redirect('auth_login', permanent=True)),
+  url(r'^account/login/$', 'django.contrib.auth.views.login', name = 'auth_login'),
+  url(r'^account/logout/$', 'django.contrib.auth.views.logout_then_login', name = 'auth_logout'),
+  url(r'^account/$', lambda request: redirect('auth_login', permanent=True)),
 )
 
 handler403 = 'web.nodes.views.forbidden_view'
