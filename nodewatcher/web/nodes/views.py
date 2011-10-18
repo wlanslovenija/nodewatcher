@@ -601,22 +601,9 @@ def package_list(request, node):
     context_instance = RequestContext(request)
   )
 
-def server_error(request, template_name='500.html'):
+def forbidden_view(request, reason=""):
   """
-  500 error handler with some request processors.
-
-  Templates: `500.html`
-  Context: None
-  """
-  t = loader.get_template(template_name) # You need to create a 500.html template.
-  context = {}
-  for proc in (core_context_processors.media, nodes_context_processors.global_values):
-    context.update(proc(request))
-  return HttpResponseServerError(t.render(Context(context)))
-
-def csrf_failure(request, reason=""):
-  """
-  Displays 403 fobidden page when request fails CSRF protection.
+  Displays 403 fobidden page. For example, when request fails CSRF protection.
   """
 
   from django.middleware.csrf import REASON_NO_REFERER

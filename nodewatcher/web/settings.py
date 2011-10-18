@@ -199,7 +199,7 @@ REGISTRATION_OPEN = True
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
-CSRF_FAILURE_VIEW = 'web.nodes.views.csrf_failure'
+CSRF_FAILURE_VIEW = 'web.nodes.views.forbidden_view'
 
 # We support some common password formats to ease transition
 AUTHENTICATION_BACKENDS = (

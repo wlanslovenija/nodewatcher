@@ -92,13 +92,18 @@ urlpatterns = patterns('',
   url(r'^auth/$', lambda request: redirect('auth_login', permanent=True)),
 )
 
-handler500 = 'web.nodes.views.server_error'
-if getattr(settings, 'DEBUG', None):
+handler403 = 'web.nodes.views.forbidden_view'
+handler404 = 'django.views.defaults.page_not_found'
+handler500 = 'django.views.defaults.server_error'
+
+if getattr(settings, 'DEBUG', False):
   urlpatterns += patterns('',
-    (r'^500/$', 'web.nodes.views.server_error'),
+    (r'^403/$', handler403),
+    (r'^404/$', handler404),
+    (r'^500/$', handler500),
   )
 
-if getattr(settings, 'DEBUG', None) and not settings.MEDIA_URL.startswith('http'):
+if getattr(settings, 'DEBUG', False) and not settings.MEDIA_URL.startswith('http'):
   # Server static files with Django when running in debug mode and MEDIA_URL is local
   
   static_patterns = patterns('',
