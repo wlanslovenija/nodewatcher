@@ -1,7 +1,7 @@
 import os.path
 from django.conf import settings
 from django.template import RequestContext, Context, loader
-from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import models, transaction
@@ -614,3 +614,15 @@ def server_error(request, template_name='500.html'):
     context.update(proc(request))
   return HttpResponseServerError(t.render(Context(context)))
 
+def csrf_failure(request, reason=""):
+  """
+  Displays 403 fobidden page when request fails CSRF protection.
+  """
+
+  from django.middleware.csrf import REASON_NO_REFERER
+  t = loader.get_template("403.html")
+  return HttpResponseForbidden(t.render(RequestContext(request, {
+      'DEBUG'  : settings.DEBUG,
+      'reason' : reason,
+      'no_referer' : reason == REASON_NO_REFERER,
+    })))
