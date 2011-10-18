@@ -24,7 +24,7 @@ function createMarker(node) {
   var m = new google.maps.Marker(new google.maps.LatLng(node.lat, node.long), opts);
   GEvent.addListener(m, "click", function() {
     html = "<b>Node " + node.name + "</b><div class=\"gmap_details\">Status: <span class=\"node_status_" +
-           node.status + "\">" + node.status + "</span><br><a href=\"/nodes/node/" + node.pk +"\">more information</a>";
+           node.status + "\">" + node.status + "</span><br><a href=\"/nodes/node/" + node.pk +"/\">more information</a>";
     if (node.url) html = html + " | <a href=\"" + node.url + "\">visit home page</a>";
     m.openInfoWindowHtml(html + "</div>");
   });
