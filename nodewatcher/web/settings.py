@@ -140,7 +140,7 @@ EMAIL_TO_CONSOLE = True
 
 EMAIL_HOST = 'localhost'
 # For backwards compatibility (before it was possible to configure password reset
-# subject through a template) we also format subject prefix through localization
+# subject through a template) we also format subject prefix through internationalization
 EMAIL_SUBJECT_PREFIX = '[' + NETWORK_NAME + '] ' # Prefix is defined also in some subject templates
 EMAIL_EVENTS_SENDER = 'events@example.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'

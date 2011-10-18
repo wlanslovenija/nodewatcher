@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-10-19 01:33+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: account/geo_fields.py:262
+msgid "Unknown or unspecified country"
+msgstr "Other country"
+
+#: contrib/auth/forms.py:15 contrib/auth/forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Letters, digits and @/./+/-/_ only."
+
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+
+#: contrib/auth/forms.py:136
+#, python-format
+msgid "Password reset on %s"
+msgstr "[%s] Password reset"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:5
+msgid "First, enter a username and password. Then, you'll be able to edit more user options."
+msgstr "Enter a username, password and other values. You'll be able to edit more user options later."

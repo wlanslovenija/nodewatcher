@@ -986,7 +986,11 @@ class RenumberForm(FormWithWarnings):
     for subnet in queryset_by_ip(node.subnet_set.filter(allocated = True), 'ip_subnet'):
       pools = []
       for pool in queryset_by_ip(node.project.pools.exclude(status = PoolStatus.Full), 'ip_subnet', 'description'):
-        pools.append((pool.pk, _("Renumber to %s [%s/%s]") % (pool.description, pool.network, pool.cidr)))
+        pools.append((pool.pk, _("Renumber to %(description)s [%(network)s/%(cidr)s]") % {
+          'description': pool.description,
+          'network': pool.network,
+          'cidr': pool.cidr,
+        }))
       
       choices = [
         (RenumberAction.Keep, _("Keep")),
