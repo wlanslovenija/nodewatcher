@@ -995,7 +995,7 @@ class GraphItemNP(object):
     """
     Returns properly sorted graph item children.
     """
-    if not self.children:
+    if not getattr(self, 'children', None):
       return []
 
     return self.children.order_by('display_priority', 'name')
