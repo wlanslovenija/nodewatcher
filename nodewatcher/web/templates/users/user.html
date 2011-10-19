@@ -13,5 +13,5 @@
 {% block content %}
 {% url user_account as user_account_url %}
 <p>{% blocktrans %}Do you want to <a href="{{ user_account_url }}">change your account</a>?{% endblocktrans %}</p>
-<p>User: {{ username }}.</p>
+<p>{% trans "Username" %} {{ username }}.</p>
 {% endblock %}
