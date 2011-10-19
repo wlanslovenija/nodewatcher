@@ -7,8 +7,8 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 database_file = os.path.join(settings_dir, 'db.sqlite')
 default_template_dir = os.path.join(settings_dir, 'templates')
 locale_dir = os.path.join(settings_dir, 'locale')
-geoip_dir = os.path.abspath((os.path.join(settings_dir, '..', 'geoip'))
-static_dir = os.path.abspath(os.path.join(settings_dir, '..', 'static')))
+geoip_dir = os.path.abspath(os.path.join(settings_dir, '..', 'geoip'))
+static_dir = os.path.abspath(os.path.join(settings_dir, '..', 'static'))
 
 import djcelery
 djcelery.setup_loader()
