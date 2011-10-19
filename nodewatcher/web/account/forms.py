@@ -133,7 +133,7 @@ class UserChangeForm(AdminUserChangeForm):
     super(UserChangeForm, self).__init__(*args, **kwargs)
     del self.fields['username']
     
-    self.fields['email'].help_text = _('If you change your e-mail address you will have to activate your account again so carefully enter it. It will be kept private.')
+    self.fields['email'].help_text = _('If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.')
   
   class Meta(AdminUserChangeForm.Meta):
     fields = admin_util.flatten_fieldsets(user_change_fieldsets)
