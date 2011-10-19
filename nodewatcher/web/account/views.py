@@ -28,7 +28,7 @@ def user(request, username):
 @decorators.authenticated_required
 def account(request):
   """
-  View which displays `web.account.forms.UserAndProfileChangeForm` form for users to change their account.
+  View which displays `web.account.forms.AccountChangeForm` form for users to change their account.
   
   If the user changes her e-mail address her account is inactivated and she gets an activation e-mail.
   """
@@ -37,7 +37,7 @@ def account(request):
   
   if request.method == 'POST':
     stored_user = copy.copy(request.user)
-    form = forms.UserAndProfileChangeForm(request.POST, instance=[request.user, request.user.get_profile()])
+    form = forms.AccountChangeForm(request.POST, instance=[request.user, request.user.get_profile()])
     if form.is_valid():
       objs = form.save()
       messages.success(request, _("Your account has been successfully updated."), fail_silently=True)
@@ -66,7 +66,7 @@ def account(request):
         # Invalidates profile cache
         delattr(request.user, '_profile_cache')
   else:
-    form = forms.UserAndProfileChangeForm(instance=[request.user, request.user.get_profile()])
+    form = forms.AccountChangeForm(instance=[request.user, request.user.get_profile()])
   
   return shortcuts.render_to_response("users/account.html", {
     'form': form,

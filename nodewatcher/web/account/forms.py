@@ -142,11 +142,14 @@ class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
   """
   This class defines change form for `web.account.models.UserProfileAndSettings` objects.
   """
-  
+
+  error_css_class = 'error'
+  required_css_class = 'required'
+
   class Meta:
     model = models.UserProfileAndSettings
 
-class UserRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
+class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
   """
   This class defines combined form for `django.contrib.auth.models.User` and `web.account.models.UserProfileAndSettings` objects.
   It is used for user registration.
@@ -154,10 +157,7 @@ class UserRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsInclude
   
   error_css_class = 'error'
   required_css_class = 'required'
-  fieldset = UserCreationForm.fieldset + [(
-    utils_text.capfirst(UserProfileAndSettingsChangeForm.Meta.model._meta.verbose_name), {
-      'fields': UserProfileAndSettingsChangeForm.base_fields.keys(),
-    })]
+  fieldset = UserCreationForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
   
   def save(self, commit=True):
     # We disable save method as registration module (through `web.account.regbackend.ProfileBackend` backend) takes
@@ -209,16 +209,13 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
     super(PasswordChangeForm, self).__init__(*args, **kwargs)
     check_password_length(self)
 
-class UserAndProfileChangeForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
+class AccountChangeForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
   """
   This class defines combined change form for `django.contrib.auth.models.User` and `web.account.models.UserProfileAndSettings` objects.
   """
   
   error_css_class = 'error'
   required_css_class = 'required'
-  fieldset = UserChangeForm.fieldset + [(
-    utils_text.capfirst(UserProfileAndSettingsChangeForm.Meta.model._meta.verbose_name), {
-      'fields': UserProfileAndSettingsChangeForm.base_fields.keys(),
-    })]
+  fieldset = UserChangeForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
   
   __metaclass__ = metaforms.ParentsIncludedModelFormMetaclass

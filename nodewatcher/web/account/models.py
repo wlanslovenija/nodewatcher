@@ -25,12 +25,22 @@ class UserProfileAndSettings(django_models.Model):
   language = geo_fields.LanguageField(_('language'), help_text=_('Choose the language you wish this site to be in.'))
   default_project = django_models.ForeignKey(models.Project, default=models.project_default, null=True, verbose_name=_('default project'))
 
+  # AccountRegistrationForm and AccountChangeForm uses this
+  fieldset = (
+    (_('Additional personal info'), {
+      'fields': ('phone_number', 'country'),
+    }),
+    (_('Settings'), {
+      'fields': ('language', 'default_project'),
+    }),
+  )
+
   class Meta:
-    verbose_name = _('user profile')
-    verbose_name_plural = _('users profiles')
+    verbose_name = _('user profile and settings')
+    verbose_name_plural = _('users profiles and settings')
 
   def __unicode__(self):
-    return u"profile for %s" % (self.user)
+    return u"profile and settings for %s" % (self.user)
   
   @django_models.permalink
   def get_absolute_url(self):

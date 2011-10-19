@@ -51,7 +51,7 @@ class ProfileBackend(backends_default.DefaultBackend):
     """
     Returns the default form class used for user registration.
     
-    It returns `web.account.forms.UserRegistrationForm` form which contains fields for both user and user profile objects.
+    It returns `web.account.forms.AccountRegistrationForm` form which contains fields for both user and user profile objects.
     """
 
-    return utils.initial_accepts_request(request, forms.UserRegistrationForm)
+    return utils.initial_accepts_request(request, forms.AccountRegistrationForm)
