@@ -512,6 +512,11 @@ config policy
         option priority 999
 
 config policy
+        option dest_ip  '{subnet}/{cidr}'
+        option table    'main'
+        option priority 999
+
+config policy
         option device   'eth1'
         option table    'main'
         option priority 999
@@ -519,7 +524,10 @@ config policy
 config policy
         option table    'mesh'
         option priority 1000
-""")
+""".format(
+        subnet = self.subnets[0]['subnet'],
+        cidr = self.subnets[0]['cidr']
+      ))
       f.close()
       
       # Wireless configuration
