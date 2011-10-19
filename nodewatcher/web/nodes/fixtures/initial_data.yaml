@@ -7,3 +7,9 @@
     domain: nodes.example.net
     name: your network name
 
+- model: sites.Site
+  pk: 2
+  fields:
+    domain: nodes.wlan-si.net
+    name: wlan slovenija
+

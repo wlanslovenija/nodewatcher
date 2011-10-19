@@ -8,10 +8,7 @@ import os.path
 wlansi_dir = os.path.abspath(os.path.join(settings_dir, '..', '..', 'wlansi'))
 wlansi_template_dir = os.path.join(wlansi_dir, 'templates')
 
-EMAIL_SUBJECT_PREFIX = '[wlan slovenija] '
-EMAIL_EVENTS_SENDER = 'events@wlan-si.net'
-EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-si.net'
-DEFAULT_FROM_EMAIL = 'open@wlan-si.net'
+SITE_ID = 2
 
 NETWORK_NAME = 'wlan slovenija'
 NETWORK_HOME = 'http://wlan-si.net'
@@ -20,6 +17,11 @@ NETWORK_CONTACT_PAGE = 'http://wlan-si.net/contact/'
 NETWORK_DESCRIPTION = 'open wireless network of Slovenia'
 NETWORK_FAVICON_URL = MEDIA_URL + 'wlansi/images/favicon.ico'
 NETWORK_LOGO_URL = MEDIA_URL + 'wlansi/images/logo.png'
+
+EMAIL_SUBJECT_PREFIX = '[' + NETWORK_NAME + '] '
+EMAIL_EVENTS_SENDER = 'events@wlan-si.net'
+EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-si.net'
+DEFAULT_FROM_EMAIL = 'open@wlan-si.net'
 
 TEMPLATE_DIRS = (
   wlansi_template_dir,
