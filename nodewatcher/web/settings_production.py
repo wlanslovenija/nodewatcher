@@ -41,6 +41,7 @@ USE_HTTPS = True
 # GOOGLE_MAPS_API_KEY is in secrets
 
 MONITOR_WORKERS = 20
+MONITOR_USER = 'nw-monitor'
 
 DATA_ARCHIVE_ENABLED = True
 

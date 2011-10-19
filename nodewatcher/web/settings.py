@@ -7,8 +7,8 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 database_file = os.path.join(settings_dir, 'db.sqlite')
 default_template_dir = os.path.join(settings_dir, 'templates')
 locale_dir = os.path.join(settings_dir, 'locale')
-geoip_dir = os.path.join(settings_dir, '..', 'geoip')
-static_dir = os.path.join(settings_dir, '..', 'static')
+geoip_dir = os.path.abspath((os.path.join(settings_dir, '..', 'geoip'))
+static_dir = os.path.abspath(os.path.join(settings_dir, '..', 'static')))
 
 import djcelery
 djcelery.setup_loader()
@@ -238,11 +238,11 @@ GRAPH_TIMESPANS = {
   'day'   : 86400,
   'week'  : 604800,
   'month' : 2678400,
-  'year'  : 33053184
+  'year'  : 33053184,
 }
 
 # Monitor configuration
-MONITOR_WORKDIR = os.path.join(settings_dir, '..', 'monitor') # Absolute path to directory containing monitor.py file
+MONITOR_WORKDIR = os.path.abspath(os.path.join(settings_dir, '..', 'monitor')) # Absolute path to directory containing monitor.py file
 MONITOR_WORKERS = 1 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
 MONITOR_GRAPH_WORKERS = 5
 MONITOR_POLL_INTERVAL = 300

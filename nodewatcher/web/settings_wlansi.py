@@ -5,7 +5,7 @@
 from settings import *
 
 import os.path
-wlansi_dir = os.path.join(settings_dir, '..', '..', 'wlansi')
+wlansi_dir = os.path.abspath(os.path.join(settings_dir, '..', '..', 'wlansi'))
 wlansi_template_dir = os.path.join(wlansi_dir, 'templates')
 
 EMAIL_SUBJECT_PREFIX = '[wlan slovenija] '
