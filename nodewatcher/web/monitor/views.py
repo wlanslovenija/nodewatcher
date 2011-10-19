@@ -10,7 +10,7 @@ from django.views.static import serve
 
 from web.monitor import tasks as monitor_tasks
 
-@cache_control(must_revalidate = True, max_age = 300)
+@cache_control(max_age = 300)
 def graph_image(request, graph_id, timespan):
   """
   Serves the graph image, requesting graph redraw when necessary.
