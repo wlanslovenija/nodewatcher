@@ -7,6 +7,7 @@ from django.forms.extras import widgets
 from django.contrib.admin import util as admin_util
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import forms as auth_forms
+from django.contrib.auth import models as auth_models
 from django.utils import text as utils_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -100,6 +101,15 @@ class UserCreationForm(auth_forms.UserCreationForm):
     if not self.cleaned_data.get('password1'):
       return self.cleaned_data.get('password2')
     return super(UserCreationForm, self).clean_password2()
+
+  def clean_username(self):
+    # Check for username existence in a case-insensitive manner
+    username = super(UserCreationForm, self).clean_username()
+    try:
+      auth_models.User.objects.get(username__iexact=username)
+    except auth_models.User.DoesNotExist:
+      return username
+    raise forms.ValidationError(_("A user with that username already exists."))
 
 class AdminUserChangeForm(auth_forms.UserChangeForm):
   """

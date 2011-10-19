@@ -25,7 +25,7 @@ class AprBackend(object):
         return None
 
     try:
-      user = auth_models.User.objects.get(username=username)
+      user = auth_models.User.objects.get(username__iexact=username)
       if aprmd5.password_validate(password, user.password):
         # Successfully checked password, so we change it to the Django password format
         user.set_password(password)
@@ -55,7 +55,7 @@ class CryptBackend(object):
     Authenticates against the database using crypt hash function.
     """
     try:
-      user = auth_models.User.objects.get(username=username)
+      user = auth_models.User.objects.get(username__iexact=username)
       if crypt.crypt(password, user.password) == user.password or md5crypt.md5crypt(password, user.password) == user.password:
         # Successfully checked password, so we change it to the Django password format
         user.set_password(password)
@@ -78,9 +78,13 @@ class CryptBackend(object):
 class ModelBackend(auth_backends.ModelBackend):
   def authenticate(self, username=None, password=None):
     """
-    Authenticates against the database using official implementation but catches exceptions.
+    Authenticates against the database using official implementation but catches exceptions and does it in case-insensitive manner.
     """
     try:
-      return super(ModelBackend, self).authenticate(username, password)
+      user = auth_models.User.objects.get(username__iexact=username)
+      if user.check_password(password):
+        return user
     except ValueError:
+      return None
+    except auth_models.User.DoesNotExist:
       return None
