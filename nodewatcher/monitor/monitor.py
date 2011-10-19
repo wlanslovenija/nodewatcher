@@ -442,7 +442,7 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
         n.wifi_error_count = error_count
       
       if 'net' in info:
-        loss_count = safe_int_convert(info['net']['losses'])
+        loss_count = safe_int_convert(info['net']['losses']) if 'losses' in info['net'] else 0
         if loss_count != n.loss_count and loss_count > 1:
           Event.create_event(n, EventCode.ConnectivityLoss, '', EventSource.Monitor, data = 'Old count: %s\n  New count: %s' % (n.loss_count, loss_count))
         
