@@ -1,13 +1,31 @@
-{% load i18n %}<div id="metanav" class="nav">
-  <ul>
-    {% spaceless %}
-    {% if user.is_authenticated %}
-    <li class="first">{% trans "logged in as" %} {{ user.username }}</li>
-    <li><a href="{% url auth_logout %}">{% trans "Logout" %}</a></li>
-    <li class="last"><a href="{% url my_nodes %}">{% trans "My Nodes" %}</a></li>
-    {% else %}
-    <li class="first"><a href="{% url auth_login %}">{% trans "Login" %}</a></li>
-    {% endif %}
-    {% endspaceless %}
-  </ul>
-</div>
+{% spaceless %}
+{% load i18n account_tags %}
+{% comment %}
+We use `next` from the context or use `context_processor_next` or use the current page to get redirect target.
+{% endcomment %}
+{% with next|default:context_processor_next|default:request.get_full_path as next_url %}
+  <div id="metanav" class="nav">
+    <ul>
+      {% if user.is_authenticated %}
+        {% comment %}
+        If the user wants to log out we would like to take her back to the current page or if she has already been redirected
+        to the current page from some other page then to take her back to that page. But only if the target does not require
+        authenticated access which would be after logout denied.
+		{% endcomment %}
+		{% url user_page user.username as user_account_url %}
+		<li class="first">{% blocktrans with user.username as username %}logged in as <a href="{{ user_account_url }}">{{ username }}</a>{% endblocktrans %}</li>
+        <li><a href="{% url auth_logout %}{% if next_url and not next_url|authenticated_required %}?{{ redirect_field_name }}={{ next_url|urlencode }}{% endif %}">{% trans "Logout" %}</a></li>
+        <li class="last"><a href="{% url my_nodes %}">{% trans "My Nodes" %}</a></li>
+      {% else %}
+        {% comment %}
+        If the user wants to log in we would like to take her back to the current page or if she has already been redirected
+        to the current page from some other page then to take her back to that page. But only if the target does not require
+        anonymous access which would be after logout denied.
+        {% endcomment %}
+        <li class="first"><a href="{% url auth_login %}{% if next_url and not next_url|anonymous_required %}?{{ redirect_field_name }}={{ next_url|urlencode }}{% endif %}">{% trans "Login" %}</a></li>
+        <li class="last"><a href="{% url registration_register %}">{% trans "Register" %}</a></li>
+      {% endif %}
+    </ul>
+  </div>
+{% endwith %}
+{% endspaceless %}
