@@ -44,7 +44,7 @@ The following Python modules are required:
 
 * celery (2.2.1)
 * django-celery (2.2.1)
-* django-registration
+* django-registration (newer than revision 6d2e42a13cb6, > 0.7)
 * django-phonenumber-field
 * python-aprmd5
 * pybeanstalk
