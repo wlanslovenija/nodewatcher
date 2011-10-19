@@ -86,7 +86,7 @@ class DotTopologyPlotter:
       subprocess.check_call(
         [
           DotTopologyPlotter.GRAPHVIZ_BIN, '-Tpng',
-          '-Gsize=10.0,1000.0', '-Gfontpath=/usr/share/fonts/corefonts',
+          '-Gfontpath=/usr/share/fonts/corefonts',
           '-Nfontname=verdana', '-Nfontsize=12',
           '-Efontname=verdana', '-Efontsize=10', '-Elen=3', '-Earrowsize=1',
           '-o', filename_graph,
