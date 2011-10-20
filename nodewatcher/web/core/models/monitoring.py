@@ -65,3 +65,23 @@ class TopologyLink(polymorphic.PolymorphicModel):
   class Meta:
     app_label = "core"
 
+class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
+  """
+  Node's announced networks.
+  """
+  network = registry_fields.IPAddressField()
+  status = registry_fields.SelectorKeyField("node.monitoring", "network.routing.announces#status")
+  
+  class Meta:
+    app_label = "core"
+  
+  class RegistryMeta:
+    registry_id = "network.routing.announces"
+    multiple = True
+
+registration.point("node.monitoring").register_choice("network.routing.announces#status", "ok", _("Ok"))
+registration.point("node.monitoring").register_choice("network.routing.announces#status", "alias", _("Alias"))
+registration.point("node.monitoring").register_choice("network.routing.announces#status", "unallocated", _("Unallocated"))
+registration.point("node.monitoring").register_choice("network.routing.announces#status", "conflicting", _("Conflicting"))
+registration.point("node.monitoring").register_item(RoutingAnnounceMonitor)
+
