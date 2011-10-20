@@ -36,6 +36,11 @@ SITEMAPS_USE_HTTPS = True
 FEEDS_USE_HTTPS = True
 USE_HTTPS = True
 
+# We want that Django knows that it is in fact running behind a HTTPS-only proxy
+MIDDLEWARE_CLASSES = (
+  'web.nodes.middleware.HttpsMiddleware',
+) + MIDDLEWARE_CLASSES
+
 # SECRET_KEY is in secrets
 
 # GOOGLE_MAPS_API_KEY is in secrets
