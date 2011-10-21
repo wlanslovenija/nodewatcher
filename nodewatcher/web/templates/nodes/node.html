@@ -57,6 +57,12 @@
 
 <div class="embedded">
 
+
+
+{% if node.geo_lat and node.geo_long %}
+  <div id="gmap" ></div>
+{% endif %}
+
 {% if current_owner %}
   <div class="actions">
   <ul>
@@ -81,14 +87,6 @@
   {% endif %}
   </div>
 {% endif %}
-
-<img src="{{ MEDIA_URL }}images/status_{{ node.status_as_string }}_big.png" title="{{ node.status_as_string }}" alt="{{ node.status_as_string }}" />
-
-
-{% if node.geo_lat and node.geo_long %}
-  <div id="gmap" ></div>
-{% endif %}
-
 
 
 </div>

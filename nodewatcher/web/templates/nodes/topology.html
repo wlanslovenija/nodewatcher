@@ -10,6 +10,7 @@
 {% endwith %}
 {% endblock %}
 
+{% block contenttype %}nodetopology{% endblock %}
 {% block content %}
 <img id="topology" src="{{ MEDIA_URL }}graphs/network_topology.png" alt="{% trans "Network Topology View" %}" /><br/>
 <div class="legend">

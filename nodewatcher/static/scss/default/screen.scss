@@ -1,27 +1,50 @@
 // -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
 
+@import "compass/reset";
+@import "compass/utilities/lists/horizontal-list";
+@import "compass/utilities/general/clearfix";
+@import "compass/utilities/links";
+@import "compass/utilities/lists/bullets";
+@import "compass/css3/border-radius";
+@import "blueprint/typography";
+@import "blueprint/form";
+@import "../_rapid.scss";
+
 $font_size : 0.85em;
 $rounding : 3px;
 
-$primary_color : #68ae2c;
-$secondary_color : #aade7e;
-$tertiary_color : #9b9b9b; 
+$primary : #68ae2c; // used for important text, darker stuff
+$secondary : #aade7e; // used for highlights, usually with primary color
+$neutral : #656565; // neutral third color, used similarly to secondary color
+$neutral_background : #9b9b9b; // neutral third color, used similarly to secondary color
 
-$font_color : #656565;
+$error_text: #8e1a1a; // error text
+$error_background: #F2D3D3; // error background (also check some images)
 
-$background_color : #FFFFFF;
+$font_color : #656565; // default font color
 
-$header_primary_color : $tertiary_color;
-$header_secondary_color : $font_color;
+$background_color : #FFFFFF; // default background color
 
-$link_color : $primary_color;
+$header_primary : black;
+$header_secondary : $font_color;
 
-$page_width : 900px;
-$content_border : 20px;
-$content_width : $page_width - 2 * $content_border ;
+$link_color : $primary;
 
+$content_fixed_width : 900px; // width for fixed content
+$content_spacing : 20px; // space for content
 
-@import "../_base.scss"; 
+body {
+  margin: 0px;
+  color: $font-color;
+  font-family: Verdana, Arial, 'Bitstream Vera Sans', Helvetica, sans-serif;
+  font-size:13px; 
+}
+
+#header {
+  h1 {padding: 40px 0 10px 10px; color: $header_primary; overflow: hidden; font-size: $font-size * 2.5; margin: 0;}
+  h2 {padding: 0 0 10px 10px; color: $header_secondary; margin: 0;}
+  h1, h2 {a, a:hover {text-decoration: none; color: inherit;}}
+}
 
 #metanav {
   position: absolute;
@@ -29,27 +52,669 @@ $content_width : $page_width - 2 * $content_border ;
   top: 10px;
   width: auto;
   text-align: right;
-
+  ul {
+    margin: 0 0 0 10px;
+    font-size: $font-size;
+	  padding: 0px;
+    text-align: left;
+	  width: 100%;
+    li { padding: 0; color: $neutral;}
+    li:before { content: " • "; color: $neutral_background;}
+    li.first:before { content: none;}
+    a {color: $header_primary;}
+  }
 }
 
-#header {
+#main {
+  background: $background_color;
+  margin-top: 0px;
+  min-height: 300px;
+  border-width: 0 1px;
+  h1 { clear: none; }
+}
+
+#navigation { 
+  height: 1em;
+  font-size: $font-size * 1.15;
+  padding: 5px 0 8px 0;
+  background-color: $secondary;
+  font-weight: bold;
+  ul {
+   padding: 0;
+   display: inline;
+   margin: 0;
+   li { padding: 0; color: $header_primary; }
+   li :link, li :visited { padding: 0 10px; color: $header_primary; }
+  }
+}
+
+
+.nav {
+ li {
+    display: inline;
+    padding: 0 .75em;
+    white-space: nowrap;
+   }
+  h2, hr { display: none }
+  ul { list-style: none; margin: 0; text-align: right }
+}
+
+#mynav {
+  height: 1em;
+  font-size: $font-size;
+  padding: 5px 0 8px 0;
+  background-color: $neutral_background;
+  font-weight: bold;
+  text-align: center; 
+  ul {
+   padding: 0;
+   display: inline;
+   margin: 0;
+   li { padding: 0; color: $secondary; }
+   li :link, li :visited { padding: 0 10px; color: $secondary; }
+  }
+}
+
+#altlinks {
+  clear: both; text-align: center;
+  h3 { font-size: $font-size * 1.2; letter-spacing: normal; margin: 0 }
+  ul { list-style: none; margin: 0; padding: 0 0 1em }
+  li {
+    display: inline;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 0 1em;
+    white-space: nowrap;
+  }
+  li.last { border-right: none }
+  li :link, #altlinks li :visited {
+    background-repeat: no-repeat;
+    color: $neutral;
+    border: none;
+    padding: 0 0 2px;
+  }
+  li a.rss { background-image: image-url('feed.png'); padding-left: 20px }
+}
+
+#footer {
+  padding: 30px 10px;
+  font-size: $font-size * 0.9;
+  text-align: center;
+  color: $font-color + 10;
+  a { @include rapid-links($font_color - 30); }
+}
+
+#content {
+	margin: $content_spacing;
+  clear: both;
+
+  abbr {
+    cursor: help;
+    border-bottom: 1px dotted __text__;
+    font-size: $font-size * 0.8;
+    text-transform: uppercase;
+  }
+
+  table.layout {
+    width: 100%;
+  }
+
+  .proptable {
+    width: 100%;
+    margin: 3px 0 15px 0;
+    clear: none;
+    td {padding: 5px; vertical-align: top;}
+    td.proplabel {
+      width: 33%;
+      background: $background_color - 10;
+      font-weight: bold;
+    }
+    td.propbody {
+      width: 65%;
+    }
+    .propdescription {
+      font-size: $font-size * 0.85;
+      color: $font-color + 30;
+    }
+
+    &.narrow {
+      /*font-size: $font-size * 1.5;*/
+      width: $content_fixed_width - 300px;
+      td.proplabel {width: ($content_fixed_width - 300px) * 0.3; background: none; }
+      td.propbody {width: ($content_fixed_width - 300px) * 0.7;}
+    }
+
+  }  
+  .small_text {
+    font-size: $font-size * 0.8;
+    color: $font-color + 30;
+  }
+
+  &.nodes {
+
+    .node_details {clear: both;}
+
+  }
+
+  &.nodetopology {
+
+    #topology {
+      max-width: $content_fixed_width;
+    }
+  }
+
+  &.register, &.login, &.nodetopology, &.nodes {
+    width: $content_fixed_width;
+    margin: $content_spacing auto;
+  }
+
+  .buttons {
+    text-align: right;
+  }
+}
+
+/* General content */
+
+a {
+  @include rapid-links($link_color);
+}
+
+* > .anchor:link, * > .anchor:visited {
+  visibility: hidden;
+}
+
+h1:hover .anchor, h2:hover .anchor, h3:hover .anchor,
+h4:hover .anchor, h5:hover .anchor, h6:hover .anchor {
+  visibility: visible;
+}
+
+h1, h2, h3, h4 {
+ font-weight: bold;
+ letter-spacing: -0.018em;
+ page-break-after: avoid;
+} 
+h1 { font-size: $font-size * 1.7; margin: .15em 0 0.5em 0; vertical-align: bottom;}
+h2 { font-size: $font-size * 1.4; margin: .10em 0 0.4em 0; }
+h3 { font-size: $font-size * 1.25; margin: .7em 0 0.2em 0; }
+hr { border: none;  border-top: 1px solid #ccb; margin: 2em 0 }
+address { font-style: normal }
+img { border: none }
+
+/* Misc */
+
+.permalink {
+  float: right;
+  margin-top: 0.4em;
+}
+
+tr.inner_header {
+  background-color: #F2FBE4;
+  font-weight: bold;
+}
+
+.embedded {
+  float: right;
+  #gmap {
+    width: 300px;
+    height: 250px;
+
+  }
+  .actions {
+    width: 300px;
+
+  }
+}
+
+
+.summary {
+  background: #ffd;
+  border: 1px outset #996;
+  margin-top: 1em;
+  padding: .5em 1em;
   position: relative;
-  h1 span {display: none;}
-  h2 span {display: none;}
-  h1 a {
-    display:block;
-    position:absolute;
-    height:110px;
-    left:10px;
-    top: 10px;
-    width:110px;
+}
+
+.networksummary h2 {
+  margin-top: 20px;
+}
+
+.networksummary table.layout td.nodes {
+  text-align: center;
+  vertical-align: baseline;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.optional_packages ul {
+  padding: 0 0 0 0;
+}
+
+.optional_packages ul li {
+  list-style-type: none;
+}
+
+.details .first_column_width {
+  width: 300px;
+}
+
+.first_column_width {
+  width: 200px;
+}
+
+
+.details_title {
+  clear: both;
+}
+
+table.smallnodeinfo {
+  float: right;
+  @include border-radius($rounding);
+  background-color:#F5F7F5;
+  border:medium none;
+  padding: 5px;
+  margin-right: 5px;
+  width: auto;
+}
+
+.smallnodeinfo .first_column_width {
+  width: 100px;
+}
+
+.smallnodeinfo td {
+  font-size: 60%;
+}
+
+/* Node status colors */
+
+.node_status_up {color: #007B0F;}
+
+.node_status_invalid {color: #F8C901;}
+
+.node_status_awaitingrenumber {color: #5EA1EF;}
+
+.node_status_new {color: #88BD32;}
+
+.node_status_visible {color: #00ADD1;}
+
+.node_status_down {color: #CB0000;}
+
+.node_status_duped {color: #7E0097;}
+
+.node_status_pending {color: #B1B1B1;}
+
+.subnet_status_collision {color: #ff0000;}
+
+.subnet_status_ok, .subnet_status_peering {color: #007B0F;}
+
+.subnet_status_notallocated, .subnet_status_notannounced {color: #FFA82F;}
+
+/* Table listing */
+
+table.listing {
+  @include rapid-table($font-color, #eee, #ccc);
+  tbody {
+    tr.section_title:hover, tr.section_title:focus, tr.section_title { background-color: #FFFFFF; } 
+    tr.webclient { background-color: #EEFFD6; }
+    tr.webclient td.name { font-weight: bold;}
   }
-  h2 a {
-    display:block;
-    position:absolute;
-    height:70px;
-    left:100px;
-    width:300px;
-    top: 50px;
+
+  tbody td.notice, tbody th.notice {
+    padding: 5px;
+    border: 1px solid #D7D7D7;
+    background-color: #E1FFB8;
+    color: #3D6744;
+    text-align: center;
+  }
+
+  .section_title td {
+    font-weight: bold;
+    h3 {margin: 0; }
+  }
+
+  tbody td.center {
+    text-align: center;
   }
 }
+
+
+.dataTables_wrapper {
+  clear: both;
+  input {font-size: $font-size * 0.8;}
+}
+
+.dataTables_filter {
+  width: 50%;
+  float: right;
+  text-align: right;
+  color: $neutral;
+}
+
+.dataTables_info {
+  width: 40%;
+  float: left;
+  padding: 5px;
+  color: $neutral;
+}
+
+.dataTables_empty {
+  text-align: center;
+}
+
+.sorting_asc {
+  &:after { content: "▲"; float: right; color: $primary; }
+  cursor: pointer;
+}
+
+.sorting_desc {
+  &:after { content: "▼"; float: right; color: $primary; }
+  cursor: pointer;
+}
+
+.sorting {
+  &:after { content: "●"; float: right; color: $secondary; }
+  &:hover:after { content: "●"; float: right; color: $primary; }
+  cursor: pointer;
+}
+
+.sorting_asc_disabled {
+  &:after { content: "▲"; float: right; color: $secondary; }
+  &:hover:after { content: "▲"; float: right; color: $primary; }
+  cursor: pointer;
+}
+
+.sorting_desc_disabled {
+  &:after { content: "▼"; float: right; color: $secondary; }
+  &:hover:after { content: "▼"; float: right; color: $primary; }
+  cursor: pointer;
+}
+
+.dataTables_empty {
+  text-align: center;
+}
+
+tr.subnet td.status,
+tr.subnet td.timestamp {
+  text-align: center;
+}
+
+tr.subnet .description {
+  margin-left: 5px;
+  font-size: 10px;
+  color: #979797;
+}
+
+tr.conflicting .identifier {
+  color: red;
+  font-weight: bold;
+}
+
+tr.conflicting .conflict {
+  color: red;
+  font-size: 10px;
+}
+
+tr.conflicting .conflict ul {
+  margin: 0px;
+  padding: 0px 10px;
+}
+
+tr.conflicting .conflict li {
+  list-style-type: none;
+}
+
+.nodelist table.listing td {
+  font-size: 12px;
+}
+
+.table_links {text-align: center;}
+
+
+
+/* Legends */
+
+.legend {
+  font-size: 90%;
+  padding: 0px 10px;
+  dl {padding: 5px 2px 15px 2px;}
+  dt {display: table-cell; margin-bottom: 5px; white-space: nowrap;}
+  dt:after { margin-left: 0.5em; content: '–'; white-space: nowrap; }
+  dl dt img { vertical-align: middle; }
+  dd { display: table-cell; padding-left: 0.5em; }
+  dd.defintion_end { display: block; height: 3px; }
+}
+
+.status_legend dt img {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: -0.5em;
+}
+
+.status_legend dt {
+  padding-left: 20px;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+}
+
+
+/* Forms */
+
+form {
+
+  ul.errorlist {
+    color: $error_text;
+    width: 100%; 
+    margin: 0 auto 5px auto;
+    font-size: $font-size * 0.9;
+    li { 
+      background: $error_background none;
+      margin: 0px;
+      padding: 4px;
+    }
+
+  }
+
+  fieldset ul.errorlist {
+
+    background: transparent;
+    position: absolute;
+    top: 10px;
+    left: 100%;
+    width: 100px;
+  }
+
+  text-align: left;
+  margin: 20px 0;
+  fieldset {
+    width: 480px;
+    legend {
+      margin: 20px 0 10px 0;
+      font-size: $font-size * 1.3;
+      font-weight: bold;
+    }
+    input {width: 300px;}
+    label {display: inline-block; width: 170px;}
+  }  
+  fieldset>ul>li, .buttons li {background: none; padding: 10px 0 10px 0; }
+  
+  .buttons { margin: 20px; text-align: center;} 
+
+  .required label:after {
+    content: "*";
+    font-weight: bold;
+    color: $secondary;
+  }
+
+  .help {
+    color: $font_color + 80;
+    font-size: $font-size * 0.85;
+    padding-top: 5px;
+  }
+
+  li.error {
+    @include blueprint-form-borders($error_text, $error_text, transparent);
+    position: relative;
+    clear: both;
+  }
+
+  select {
+    background-color: white;
+    margin-right: 5px;
+    max-width: 300px;
+  }
+
+  input[type="submit"], input[type="reset"] {
+    border: none;
+    padding: 3px;
+    min-width: 100px;
+    color: $primary;
+  }
+
+  .buttons {
+    @include horizontal-list;
+    input { margin: 5px; }
+  }
+
+  @include blueprint-form-borders($primary, $primary + 60, transparent);
+}
+
+
+.errornote {
+  width: 100%;
+  margin: 0;
+  padding: 5px 0;
+  background: $error_background none;
+  color: $error_text;
+  text-align: center;
+}
+
+
+.warning {
+  width: 100%;
+  margin: 10px 0;
+  padding: 5px;
+  background-color: #FFEE99;
+  color: #FF9500;
+  text-align: center;
+
+  table.warnings {
+    td {
+      padding: 5px;
+      vertical-align: top;
+    }
+    .help, .datetime {
+      font-size: 10px;
+      color: #FF9500;
+    }
+    .icon {
+      width: 20px;
+    }
+  }
+}
+
+
+
+.notice, .messages {
+  margin: 10px 0;
+  padding: 5px;
+  background-color: #AABBEE;
+  color: #0022BB;
+  text-align: center;
+}
+
+
+/* Graphs */
+
+.graphs {
+  div.graph {
+    text-align: center;
+    clear: both;
+    margin-bottom: 10px;
+  }
+  text-align: center;
+  .timespan {
+    padding: 3px 0 20px 0;
+    margin: 0 0 5px 0;
+    background: white image-url('timespan.png') no-repeat bottom center;
+    width: $content_fixed_width;
+    border-bottom: solid white 6px;
+    a {
+      @include border-radius($rounding);
+      color: #999999;
+      padding: 2px 5px;
+      margin-left: 4px;
+      font-size: 90%;
+    }
+    a:hover {
+      background-color: #EEEEEE;
+      text-decoration: none;
+    }
+    a.selected, a.selected:hover {
+      background-color: #CCCCCC;
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+.graphmenu {
+  text-align: left;
+  margin: 0 auto;
+  width: 566px;
+}
+
+.graphmenu .timespan{
+  float: right;
+}
+
+.graphdesc {
+  color: #666;
+  font-size: 85%;
+  text-align: center;
+  clear: both;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 566px;
+  ul {
+    padding: 0;
+    li {list-style: none; margin-left: 0;}
+  }
+}
+
+
+/* Google Maps */
+
+.gmap_wrapper {
+
+#gmap {
+  border: 1px solid #D7D7D7;
+  width: 100%;
+  height: 600px;
+}
+
+#gmap_statusbar {
+  font-size: $font-size * 0.8;
+  color: $font-color + 30;
+}
+
+}
+
+.gmap_details {
+  font-size: 80%;
+}
+
+/* Folding */
+
+h3.folding {
+	cursor: pointer;
+	margin: 20px 20px 10px 20px;
+	border-top: 1px solid #CCCCCC;
+	padding-left: 2px;
+	padding-top: 5px;
+
+  &:before { content: "▼ "; color: $secondary; }
+  &.closed:before { content: "▲ "; color: $secondary; }
+  &:hover:before { content: "▼ "; color: $primary; }
+  &.closed:hover:before { content: "▲ "; color: $primary; }
+}
+

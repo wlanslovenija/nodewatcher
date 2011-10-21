@@ -34,14 +34,14 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
 <table border="0" width="100%" class="listing">
 <thead>
   <tr>
-    <th style="width: 4%;"></th>
+    <th style="width: 3%;" class="center"></th>
     <th style="width: 22%;"><b>{% trans "Node name" %}</b></th>
     <th style="width: 15%;"><b>IP</b></th>
     <th style="width: 21%;"><b>{% trans "Last seen up" %}</b></th>
-    <th style="width: 8%;" class="center"><b>{% trans "Status" %}</b></th>
-    <th style="width: 8%;" class="center"><b>{% trans "Peers" %}</b></th>
-    <th style="width: 8%;" class="center"><b>{% trans "Clients" %}</b></th>
-    <th style="width: 10%;" class="center"><b>{% trans "Project" %}</b></th>
+    <th style="width: 6%;" class="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 6%;" class="center"><b>{% trans "Peers" %}</b></th>
+    <th style="width: 6%;" class="center"><b>{% trans "Clients" %}</b></th>
+    <th style="width: 17%;" class="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 {% if user.is_authenticated %}
@@ -60,7 +60,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
     <td colspan="8">{% heading 3 node.node_type_as_string_plural %}</td>
   </tr>
   {% endifchanged %}
-  <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
+  <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %} node_status_{{ node.status_as_string }}">
     <td align="center">
       {% if node.warnings %}
       <a href="{% url view_node node.get_current_id %}">
