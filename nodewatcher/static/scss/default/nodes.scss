@@ -1,0 +1,25 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
+
+/* Node status colors */
+
+.node_status_up {color: #007B0F;}
+
+.node_status_invalid {color: #F8C901;}
+
+.node_status_awaitingrenumber {color: #5EA1EF;}
+
+.node_status_new {color: #88BD32;}
+
+.node_status_visible {color: #00ADD1;}
+
+.node_status_down {color: #CB0000;}
+
+.node_status_duped {color: #7E0097;}
+
+.node_status_pending {color: #B1B1B1;}
+
+.subnet_status_collision {color: #ff0000;}
+
+.subnet_status_ok, .subnet_status_peering {color: #007B0F;}
+
+.subnet_status_notallocated, .subnet_status_notannounced {color: #FFA82F;}

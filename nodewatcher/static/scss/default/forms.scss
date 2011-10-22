@@ -1,0 +1,88 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
+
+@import "compass/utilities/lists/horizontal-list";
+@import "blueprint/form";
+
+$error_text: #8e1a1a; // error text
+$error_background: #F2D3D3; // error background (also check some images)
+
+/* Forms */
+
+form {
+
+  ul.errorlist {
+    color: $error_text;
+    width: 100%; 
+    margin: 0 auto 5px auto;
+    font-size: 90%;
+    li { 
+      background: $error_background none;
+      margin: 0px;
+      padding: 4px;
+    }
+
+  }
+
+  fieldset ul.errorlist {
+
+    background: transparent;
+    position: absolute;
+    top: 10px;
+    left: 100%;
+    width: 100px;
+  }
+
+  text-align: left;
+  margin: 20px 0;
+  fieldset {
+    width: 480px;
+    legend {
+      margin: 20px 0 10px 0;
+      font-size: 130%;
+      font-weight: bold;
+    }
+    input {width: 300px;}
+    label {display: inline-block; width: 170px;}
+  }  
+  fieldset>ul>li, .buttons li {background: none; padding: 10px 0 10px 0; }
+  
+  .buttons { margin: 20px; text-align: center;} 
+
+  .required label:after {
+    content: " *";
+    font-weight: bold;
+    color: $error_text;
+  }
+
+  .help {
+    color: #AFAFAF;
+    font-size: 85%;
+    padding-top: 5px;
+  }
+
+  li.error {
+    @include blueprint-form-borders($error_text, $error_text, transparent);
+    position: relative;
+    clear: both;
+  }
+
+  select {
+    background-color: white;
+    margin-right: 5px;
+    max-width: 300px;
+  }
+
+  input[type="submit"], input[type="reset"] {
+    border: none;
+    padding: 3px;
+    min-width: 100px;
+    font-weight: bold;
+  }
+
+  .buttons {
+    @include horizontal-list;
+    input { margin: 5px; }
+  }
+
+  @include blueprint-form-borders(#AFAFAF, #AFAFAF - 60, transparent);
+}
