@@ -10,7 +10,8 @@ from django.core import management
 from django.core.management import base as management_base
 from django.core import serializers
 
-from web.nodes import ipcalc, project_default
+from web.nodes import ipcalc
+from web.nodes.models import project_default
 
 # TODO: Make temporary directory configurable
 
