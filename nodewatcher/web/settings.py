@@ -131,7 +131,7 @@ NETWORK_CONTACT = 'open@example.net'
 NETWORK_CONTACT_PAGE = 'http://example.net/contact'
 NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
 NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
-NETWORK_LOGO_URL = MEDIA_URL + 'images/logo.png'
+NETWORK_LOGO_URL = None
 
 # For local development it is better to send all e-mails to console
 # Disable for production use and e-mails will be really send to users

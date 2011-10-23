@@ -1,7 +1,7 @@
-{% load i18n %}{% load misc %}<div id="header">
+{% load i18n %}{% load misc %}<div id="header"{% if network.logo_url %} style="background: transparent url('{{ network.logo_url|escape }}') no-repeat bottom left;"{% endif %}>
 {% include "account.html" %}
-<h1><a href="{% url nodes_list %}"><span>{{ network.name }}</span></a></h1>
-{% if network.description %}<h2><a href="{% url nodes_list %}"><span>{{ network.description }}</span></a></h2>{% endif %}
+<h1><a href="{% url nodes_list %}"><span{% if network.logo_url %} style="visibility: hidden;"{% endif %}>{{ network.name }}</span></a></h1>
+{% if network.description %}<h2><a href="{% url nodes_list %}"><span {% if network.logo_url %} style="visibility: hidden;"{% endif %}>{{ network.description }}</span></a></h2>{% endif %}
 </div>
 
 
