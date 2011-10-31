@@ -22,6 +22,7 @@ EMAIL_SUBJECT_PREFIX = '[' + NETWORK_NAME + '] '
 EMAIL_EVENTS_SENDER = 'events@wlan-si.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@wlan-si.net'
 DEFAULT_FROM_EMAIL = 'open@wlan-si.net'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 TEMPLATE_DIRS = (
   wlansi_template_dir,

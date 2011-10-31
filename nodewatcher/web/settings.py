@@ -145,6 +145,7 @@ EMAIL_SUBJECT_PREFIX = '[' + NETWORK_NAME + '] ' # Prefix is defined also in som
 EMAIL_EVENTS_SENDER = 'events@example.net'
 EMAIL_IMAGE_GENERATOR_SENDER = 'generator@example.net'
 DEFAULT_FROM_EMAIL = 'webmaster@example.net'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
 #BITLY_LOGIN = "Your bit.ly login"
