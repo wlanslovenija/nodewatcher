@@ -190,9 +190,9 @@ TEMPLATE_DIRS = (
 
 FORCE_SCRIPT_NAME = ''
 
-LOGIN_REDIRECT_URL = '/my/nodes'
-LOGIN_URL = '/account/login'
-LOGOUT_URL = '/account/logout'
+LOGIN_REDIRECT_URL = '/my/nodes/'
+LOGIN_URL = '/account/login/'
+LOGOUT_URL = '/account/logout/'
 
 AUTH_PROFILE_MODULE = 'account.UserProfileAndSettings'
 
