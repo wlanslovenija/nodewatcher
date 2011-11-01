@@ -7,7 +7,7 @@
 
 # First parse options (this must be done here since they contain import paths
 # that must be parsed before Django models can be imported)
-import sys, os
+import sys, os, re
 from optparse import OptionParser
 
 print "============================================================================"
@@ -181,7 +181,9 @@ def generate_image(d):
     # Read image version
     try:
       f = open(glob('%s/build/%s/build_dir/target-*/root-*/etc/version' % (WORKDIR, d['imagebuilder']))[0], 'r')
-      version = f.read().strip().replace('.', '_')
+      version = f.read().strip()
+      version = re.sub(r'\W+', '_', version)
+      version = re.sub(r'_+', '_', version)
       f.close()
     except:
       version = 'unknown'
