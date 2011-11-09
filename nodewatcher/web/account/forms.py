@@ -185,6 +185,17 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
   error_css_class = 'error'
   required_css_class = 'required'
 
+  def clean(self):
+      msg = _("Please enter a correct username and password. Note that both fields are case-sensitive.")
+      try:
+          super(AuthenticationForm, self).clean()
+      except forms.ValidationError, e:
+          if (hasattr(e, 'args') and msg in e.args) or (hasattr(e, 'message') and e.message == msg) or (hasattr(e, 'messages') and msg in e.messages):
+              raise forms.ValidationError(_("Please enter a correct username and password. Note that password is case-sensitive."))
+          else:
+              raise
+      return self.cleaned_data
+
 class PasswordResetForm(auth_forms.PasswordResetForm):
   """
   This class adds CSS classes to `django.contrib.auth.forms.PasswordResetForm` form.
