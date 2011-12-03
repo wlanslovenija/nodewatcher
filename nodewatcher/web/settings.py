@@ -135,7 +135,6 @@ NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
 #Use NETWORK_LOGO_URL if you want to set an image logo instead of the network name in the header
 #NETWORK_LOGO_URL = MEDIA_URL + 'images/logo.png'
 
-
 # For local development it is better to send all e-mails to console
 # Disable for production use and e-mails will be really send to users
 # With version 1.2 Django supports e-mail backends which can be used instead of this
