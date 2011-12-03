@@ -1,7 +1,11 @@
 {% load i18n %}{% load misc %}<div id="header">
 {% include "account.html" %}
+{% if network.logo_url %}
+<a href="{% url nodes_list %}"><img src="{{ network.logo_url }}" alt="{{ network.name }}" title="{{ network.name }}" /></a>
+{% else %}
 <h1><a href="{% url nodes_list %}"><span>{{ network.name }}</span></a></h1>
 {% if network.description %}<h2><a href="{% url nodes_list %}"><span>{{ network.description }}</span></a></h2>{% endif %}
+{% endif %}
 </div>
 
 

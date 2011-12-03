@@ -82,8 +82,9 @@ body {
    padding: 0;
    display: inline;
    margin: 0;
-   li { padding: 0; color: $header_primary; }
-   li :link, li :visited { padding: 0 10px; color: $header_primary; }
+   li { padding: 0; color: $neutral; }
+   li :link, li :visited { padding: 0 10px; color: $neutral; }
+   li a:hover { text-decoration: none; color: $primary; }
   }
 }
 
@@ -110,8 +111,9 @@ body {
    padding: 0;
    display: inline;
    margin: 0;
-   li { padding: 0; color: $primary; }
-   li :link, li :visited { padding: 0 10px; color: $primary; }
+   li { padding: 0; color: $neutral; }
+   li :link, li :visited { padding: 0 10px; color: $neutral;}
+   li a:hover { text-decoration: none; color: $primary;}
   }
 }
 
@@ -442,14 +444,14 @@ table.layout {
 /* Legends */
 
 .legend {
-  font-size: 90%;
   padding: 0px 10px;
   dl {padding: 5px 2px 15px 2px;}
-  dt {display: table-cell; margin-bottom: 5px; white-space: nowrap;}
+  dt {display: table-cell; margin: 2px 0 5px 2px; white-space: nowrap;}
   dt:after { margin-left: 0.5em; content: '–'; white-space: nowrap; }
   dl dt img { vertical-align: middle; }
   dd { display: table-cell; padding-left: 0.5em; }
   dd.defintion_end { display: block; height: 3px; }
+  dt span.node_status_gmap { margin-left: 25px;}
 }
 
 .status_legend dt img {
@@ -459,7 +461,7 @@ table.layout {
 }
 
 .status_legend dt {
-  padding-left: 20px;
+  padding-left: 2px;
   padding-top: 0.25em;
   padding-bottom: 0.25em;
 }
@@ -481,7 +483,7 @@ table.layout {
 .warning {
   width: 100%;
   margin: 10px 0;
-  padding: 5px;
+  padding: 5px 0;
   background-color: #FFEE99;
   color: #FF9500;
   text-align: center;
@@ -513,6 +515,11 @@ table.layout {
 /* Graphs */
 
 .graphs {
+  h2 {
+    text-align: left;
+    margin-top: 30px;
+  }
+
   div.graph {
     text-align: center;
     clear: both;
@@ -585,6 +592,22 @@ table.layout {
   color: $font-color + 30;
 }
 
+.projects {
+  width: 50%;
+  float: right;
+  text-align: right;
+  .projects_listing {
+    .project { 
+      display: inline-block; width: 150px; height: 30px; text-align: left;
+    }
+    margin-bottom: 30px;
+  }
+}
+
+.legend {
+  width: 50%;
+}
+
 }
 
 .gmap_details {
@@ -595,7 +618,7 @@ table.layout {
 
 h3.folding {
 	cursor: pointer;
-	margin: 20px 20px 10px 20px;
+	margin: 20px 2px 10px 2px;
 	border-top: 1px solid #CCCCCC;
 	padding-left: 2px;
 	padding-top: 5px;

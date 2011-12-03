@@ -17,6 +17,34 @@
 {% block permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
 {% block head_permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
 
+{% block ctxtnav %}
+{{ block.super }}
+{% if current_owner %}
+<div id="mynav" class="nav">
+  <ul>
+    <li><a href="{% url edit_node node.get_current_id %}">{% trans "Edit node" %}</a></li>
+    {% if not node.is_dead %}
+      {% if node.profile %}
+        <li><a href="{% url generate_node node.get_current_id %}">{% trans "Generate image" %}</a></li>
+      {% endif %}
+      <li><a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a></li>
+    {% endif %}
+  </ul>
+  {% if not node.is_dead %}
+    <ul>
+      <li><a href="{% url renumber_node node.get_current_id %}">{% trans "Renumber node" %}</a></li>    
+    </ul>
+    <ul>
+      {% if node.is_resettable %}
+        <li><a href="{% url reset_node node.get_current_id %}">{% trans "Reset node" %}</a></li>
+      {% endif %}
+      <li><a href="{% url remove_node node.get_current_id %}">{% trans "Remove node" %}</a></li>
+    </ul>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 
 {% include "nodes/warnings.html" %}
@@ -62,32 +90,6 @@
 {% if node.geo_lat and node.geo_long %}
   <div id="gmap" ></div>
 {% endif %}
-
-{% if current_owner %}
-  <div class="actions">
-  <ul>
-    <li><a href="{% url edit_node node.get_current_id %}">{% trans "Edit node" %}</a></li>
-    {% if not node.is_dead %}
-      {% if node.profile %}
-        <li><a href="{% url generate_node node.get_current_id %}">{% trans "Generate image" %}</a></li>
-      {% endif %}
-      <li><a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a></li>
-    {% endif %}
-  </ul>
-  {% if not node.is_dead %}
-    <ul>
-      <li><a href="{% url renumber_node node.get_current_id %}">{% trans "Renumber node" %}</a></li>    
-    </ul>
-    <ul>
-      {% if node.is_resettable %}
-        <li><a href="{% url reset_node node.get_current_id %}">{% trans "Reset node" %}</a></li>
-      {% endif %}
-      <li><a href="{% url remove_node node.get_current_id %}">{% trans "Remove node" %}</a></li>
-    </ul>
-  {% endif %}
-  </div>
-{% endif %}
-
 
 </div>
 
