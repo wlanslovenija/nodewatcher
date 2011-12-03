@@ -14,19 +14,18 @@ $font_size : 0.85em;
 $rounding : 3px;
 
 $primary : #68ae2c; // used for important text, darker stuff
-$secondary : #aade7e; // used for highlights, usually with primary color
-$neutral : #656565; // neutral third color, used similarly to secondary color
-$neutral_background : #9b9b9b; // neutral third color, used similarly to secondary color
+$neutral : #656565; // neutral primary color
+$neutral_background : #EEEEEE; // neutral background color
 
 $error_text: #8e1a1a; // error text
 $error_background: #F2D3D3; // error background (also check some images)
 
-$font_color : #656565; // default font color
+$font_color : $neutral; // default font color
 
-$background_color : #FFFFFF; // default background color
+$background_color : white; // default background color
 
-$header_primary : black;
-$header_secondary : $font_color;
+$header_primary : $primary;
+$header_secondary : $neutral;
 
 $link_color : $primary;
 
@@ -76,15 +75,16 @@ body {
 #navigation { 
   height: 1em;
   font-size: $font-size * 1.15;
-  padding: 5px 0 8px 0;
-  background-color: $secondary;
+  padding: 5px 0 5px 0;
+  background: $neutral_background url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAD0lEQVQImWNgwARStBAAABpPAIPQzAGMAAAAAElFTkSuQmCC) repeat top left;
   font-weight: bold;
   ul {
    padding: 0;
    display: inline;
    margin: 0;
-   li { padding: 0; color: $header_primary; }
-   li :link, li :visited { padding: 0 10px; color: $header_primary; }
+   li { padding: 0; color: $neutral; }
+   li :link, li :visited { padding: 0 10px; color: $neutral; }
+   li a:hover { text-decoration: none; color: $primary; }
   }
 }
 
@@ -102,16 +102,18 @@ body {
 #mynav {
   height: 1em;
   font-size: $font-size;
-  padding: 5px 0 8px 0;
+  margin-top: 10px;
+  padding: 5px 0 5px 0;
   background-color: $neutral_background;
   font-weight: bold;
-  text-align: center; 
+  text-align: left; 
   ul {
    padding: 0;
    display: inline;
    margin: 0;
-   li { padding: 0; color: $secondary; }
-   li :link, li :visited { padding: 0 10px; color: $secondary; }
+   li { padding: 0; color: $neutral; }
+   li :link, li :visited { padding: 0 10px; color: $neutral;}
+   li a:hover { text-decoration: none; color: $primary;}
   }
 }
 
@@ -148,59 +150,10 @@ body {
 	margin: $content_spacing;
   clear: both;
 
-  abbr {
-    cursor: help;
-    border-bottom: 1px dotted __text__;
-    font-size: $font-size * 0.8;
-    text-transform: uppercase;
-  }
+  &.nodes .node_details {clear: both;}
 
-  table.layout {
-    width: 100%;
-  }
-
-  .proptable {
-    width: 100%;
-    margin: 3px 0 15px 0;
-    clear: none;
-    td {padding: 5px; vertical-align: top;}
-    td.proplabel {
-      width: 33%;
-      background: $background_color - 10;
-      font-weight: bold;
-    }
-    td.propbody {
-      width: 65%;
-    }
-    .propdescription {
-      font-size: $font-size * 0.85;
-      color: $font-color + 30;
-    }
-
-    &.narrow {
-      /*font-size: $font-size * 1.5;*/
-      width: $content_fixed_width - 300px;
-      td.proplabel {width: ($content_fixed_width - 300px) * 0.3; background: none; }
-      td.propbody {width: ($content_fixed_width - 300px) * 0.7;}
-    }
-
-  }  
-  .small_text {
-    font-size: $font-size * 0.8;
-    color: $font-color + 30;
-  }
-
-  &.nodes {
-
-    .node_details {clear: both;}
-
-  }
-
-  &.nodetopology {
-
-    #topology {
+  &.nodetopology #topology {
       max-width: $content_fixed_width;
-    }
   }
 
   &.register, &.login, &.nodetopology, &.nodes {
@@ -217,6 +170,13 @@ body {
 
 a {
   @include rapid-links($link_color);
+}
+
+abbr {
+  cursor: help;
+  border-bottom: 1px dotted __text__;
+  font-size: $font-size * 0.8;
+  text-transform: uppercase;
 }
 
 * > .anchor:link, * > .anchor:visited {
@@ -239,6 +199,12 @@ h3 { font-size: $font-size * 1.25; margin: .7em 0 0.2em 0; }
 hr { border: none;  border-top: 1px solid #ccb; margin: 2em 0 }
 address { font-style: normal }
 img { border: none }
+
+
+.small_text {
+  font-size: $font-size * 0.8;
+  color: $font-color + 30;
+}
 
 /* Misc */
 
@@ -324,34 +290,10 @@ table.smallnodeinfo {
   font-size: 60%;
 }
 
-/* Node status colors */
-
-.node_status_up {color: #007B0F;}
-
-.node_status_invalid {color: #F8C901;}
-
-.node_status_awaitingrenumber {color: #5EA1EF;}
-
-.node_status_new {color: #88BD32;}
-
-.node_status_visible {color: #00ADD1;}
-
-.node_status_down {color: #CB0000;}
-
-.node_status_duped {color: #7E0097;}
-
-.node_status_pending {color: #B1B1B1;}
-
-.subnet_status_collision {color: #ff0000;}
-
-.subnet_status_ok, .subnet_status_peering {color: #007B0F;}
-
-.subnet_status_notallocated, .subnet_status_notannounced {color: #FFA82F;}
-
 /* Table listing */
 
 table.listing {
-  @include rapid-table($font-color, #eee, #ccc);
+  @include rapid-table($font-color, #EEEEEE, #CCCCCC);
   tbody {
     tr.section_title:hover, tr.section_title:focus, tr.section_title { background-color: #FFFFFF; } 
     tr.webclient { background-color: #EEFFD6; }
@@ -411,19 +353,19 @@ table.listing {
 }
 
 .sorting {
-  &:after { content: "●"; float: right; color: $secondary; }
+  &:after { content: "●"; float: right; color: $neutral; }
   &:hover:after { content: "●"; float: right; color: $primary; }
   cursor: pointer;
 }
 
 .sorting_asc_disabled {
-  &:after { content: "▲"; float: right; color: $secondary; }
+  &:after { content: "▲"; float: right; color: $neutral; }
   &:hover:after { content: "▲"; float: right; color: $primary; }
   cursor: pointer;
 }
 
 .sorting_desc_disabled {
-  &:after { content: "▼"; float: right; color: $secondary; }
+  &:after { content: "▼"; float: right; color: $neutral; }
   &:hover:after { content: "▼"; float: right; color: $primary; }
   cursor: pointer;
 }
@@ -468,19 +410,48 @@ tr.conflicting .conflict li {
 
 .table_links {text-align: center;}
 
+table.layout {
+  width: 100%;
+}
 
+.proptable {
+  width: 100%;
+  margin: 3px 0 15px 0;
+  clear: none;
+  td {padding: 5px; vertical-align: top;}
+  td.proplabel {
+    width: 33%;
+    background: $background_color - 10;
+    font-weight: bold;
+  }
+  td.propbody {
+    width: 65%;
+  }
+  .propdescription {
+    font-size: $font-size * 0.85;
+    color: $font-color + 30;
+  }
+
+  &.narrow {
+    /*font-size: $font-size * 1.5;*/
+    width: $content_fixed_width - 300px;
+    td.proplabel {width: ($content_fixed_width - 300px) * 0.3; background: none; }
+    td.propbody {width: ($content_fixed_width - 300px) * 0.7;}
+  }
+
+}
 
 /* Legends */
 
 .legend {
-  font-size: 90%;
   padding: 0px 10px;
   dl {padding: 5px 2px 15px 2px;}
-  dt {display: table-cell; margin-bottom: 5px; white-space: nowrap;}
+  dt {display: table-cell; margin: 2px 0 5px 2px; white-space: nowrap;}
   dt:after { margin-left: 0.5em; content: '–'; white-space: nowrap; }
   dl dt img { vertical-align: middle; }
   dd { display: table-cell; padding-left: 0.5em; }
   dd.defintion_end { display: block; height: 3px; }
+  dt span.node_status_gmap { margin-left: 25px;}
 }
 
 .status_legend dt img {
@@ -490,92 +461,13 @@ tr.conflicting .conflict li {
 }
 
 .status_legend dt {
-  padding-left: 20px;
+  padding-left: 2px;
   padding-top: 0.25em;
   padding-bottom: 0.25em;
 }
 
 
-/* Forms */
 
-form {
-
-  ul.errorlist {
-    color: $error_text;
-    width: 100%; 
-    margin: 0 auto 5px auto;
-    font-size: $font-size * 0.9;
-    li { 
-      background: $error_background none;
-      margin: 0px;
-      padding: 4px;
-    }
-
-  }
-
-  fieldset ul.errorlist {
-
-    background: transparent;
-    position: absolute;
-    top: 10px;
-    left: 100%;
-    width: 100px;
-  }
-
-  text-align: left;
-  margin: 20px 0;
-  fieldset {
-    width: 480px;
-    legend {
-      margin: 20px 0 10px 0;
-      font-size: $font-size * 1.3;
-      font-weight: bold;
-    }
-    input {width: 300px;}
-    label {display: inline-block; width: 170px;}
-  }  
-  fieldset>ul>li, .buttons li {background: none; padding: 10px 0 10px 0; }
-  
-  .buttons { margin: 20px; text-align: center;} 
-
-  .required label:after {
-    content: "*";
-    font-weight: bold;
-    color: $secondary;
-  }
-
-  .help {
-    color: $font_color + 80;
-    font-size: $font-size * 0.85;
-    padding-top: 5px;
-  }
-
-  li.error {
-    @include blueprint-form-borders($error_text, $error_text, transparent);
-    position: relative;
-    clear: both;
-  }
-
-  select {
-    background-color: white;
-    margin-right: 5px;
-    max-width: 300px;
-  }
-
-  input[type="submit"], input[type="reset"] {
-    border: none;
-    padding: 3px;
-    min-width: 100px;
-    color: $primary;
-  }
-
-  .buttons {
-    @include horizontal-list;
-    input { margin: 5px; }
-  }
-
-  @include blueprint-form-borders($primary, $primary + 60, transparent);
-}
 
 
 .errornote {
@@ -591,7 +483,7 @@ form {
 .warning {
   width: 100%;
   margin: 10px 0;
-  padding: 5px;
+  padding: 5px 0;
   background-color: #FFEE99;
   color: #FF9500;
   text-align: center;
@@ -611,8 +503,6 @@ form {
   }
 }
 
-
-
 .notice, .messages {
   margin: 10px 0;
   padding: 5px;
@@ -625,6 +515,11 @@ form {
 /* Graphs */
 
 .graphs {
+  h2 {
+    text-align: left;
+    margin-top: 30px;
+  }
+
   div.graph {
     text-align: center;
     clear: both;
@@ -667,7 +562,7 @@ form {
 }
 
 .graphdesc {
-  color: #666;
+  color: #656565;
   font-size: 85%;
   text-align: center;
   clear: both;
@@ -697,6 +592,22 @@ form {
   color: $font-color + 30;
 }
 
+.projects {
+  width: 50%;
+  float: right;
+  text-align: right;
+  .projects_listing {
+    .project { 
+      display: inline-block; width: 150px; height: 30px; text-align: left;
+    }
+    margin-bottom: 30px;
+  }
+}
+
+.legend {
+  width: 50%;
+}
+
 }
 
 .gmap_details {
@@ -707,13 +618,13 @@ form {
 
 h3.folding {
 	cursor: pointer;
-	margin: 20px 20px 10px 20px;
+	margin: 20px 2px 10px 2px;
 	border-top: 1px solid #CCCCCC;
 	padding-left: 2px;
 	padding-top: 5px;
 
-  &:before { content: "▼ "; color: $secondary; }
-  &.closed:before { content: "▲ "; color: $secondary; }
+  &:before { content: "▼ "; color: $neutral; }
+  &.closed:before { content: "▲ "; color: $neutral; }
   &:hover:before { content: "▼ "; color: $primary; }
   &.closed:hover:before { content: "▲ "; color: $primary; }
 }

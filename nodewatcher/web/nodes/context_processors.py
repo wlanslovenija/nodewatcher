@@ -28,11 +28,11 @@ def global_values(request):
     'network' : {
       'name'         : settings.NETWORK_NAME,
       'home'         : settings.NETWORK_HOME,
-      'contact'      : settings.NETWORK_CONTACT,
-      'contact_page' : settings.NETWORK_CONTACT_PAGE,
+      'contact'      : getattr(settings, 'NETWORK_CONTACT', None),
+      'contact_page' : getattr(settings, 'NETWORK_CONTACT_PAGE', None),
       'description'  : getattr(settings, 'NETWORK_DESCRIPTION', None),
-      'favicon_url'  : settings.NETWORK_FAVICON_URL,
-      'logo_url'     : settings.NETWORK_LOGO_URL,
+      'favicon_url'  : getattr(settings, 'NETWORK_FAVICON_URL', None),
+      'logo_url'     : getattr(settings, 'NETWORK_LOGO_URL', None),
     },
     'request' : {
       'path'          : request.path,

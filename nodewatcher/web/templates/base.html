@@ -3,8 +3,6 @@
 <head>
   <title>{% block title %}{% endblock %} – {{ network.name }}{% if network.description %} – {{ network.description }}{% endif %}</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-  <link rel="shortcut icon" href="{{ network.favicon_url }}" type="image/x-icon" />
-  <link rel="icon" href="{{ network.favicon_url }}" type="image/x-icon" />
   {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
   <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.js"></script>
   <!--[if lt IE 7]>
@@ -13,6 +11,8 @@
   <!--[if IE]>
   <script type="text/javascript" src="{{ MEDIA_URL }}js/ie_hacks.js"></script>
   <![endif]-->
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/nodes.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/forms.css" media="all" />
   <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/screen.css" media="screen,projection" />
   <script type="text/javascript" src="{{ MEDIA_URL }}js/folding.js"></script>
   <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>

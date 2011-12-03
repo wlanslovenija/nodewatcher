@@ -27,12 +27,15 @@
 </tr>
 </table>
 
-<div>
-{% trans "All registered/visible nodes:" %} {{ node_count }}<br/>
-{% trans "Nodes with warnings:" %} {{ nodes_warned }}<br/>
-{% trans "Nodes with an external antenna:" %} {{ external_ant }}<br/>
-{% trans "Test nodes:" %} {{ nodes_test }}<br/>
-{% trans "Dead nodes:" %} {{ nodes_dead }}<br/>
+{% heading 3 _("Details") "folding closed" %}
+<div id="details_foldee">
+<ul>
+<li>{% trans "All registered/visible nodes:" %} {{ node_count }}</li>
+<li>{% trans "Nodes with warnings:" %} {{ nodes_warned }}</li>
+<li>{% trans "Nodes with an external antenna:" %} {{ external_ant }}</li>
+<li>{% trans "Test nodes:" %} {{ nodes_test }}</li>
+<li>{% trans "Dead nodes:" %} {{ nodes_dead }}</li>
+</ul>
 </div>
 
 {% heading 3 _("Nodes by router type") "folding closed" %}
@@ -77,8 +80,8 @@
   {% trans "Number of subnets" %}: {{ subnet_count }}<br/>
   {% trans "Average immediate neighbours (peers) per node" %}: {{ peers_avg }}<br/>
 </div>
-{% heading 2 _("Graphs") %}
 <div class="graphs">
+{% heading 2 _("Graphs") %}
 <div class="timespan">
   {% for timespan in timespans reversed %}
   <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_timespan = '{{ timespan }}'; graph_display_changed(); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>

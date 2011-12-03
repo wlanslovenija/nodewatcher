@@ -15,6 +15,21 @@
 {% block contenttype %}nodemap{% endblock %}
 {% block content %}
 <div class="gmap_wrapper">
+<p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
+<a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
+<div id="gmap"></div>
+<span id="gmap_statusbar">&nbsp;</span>
+<div class="controls">
+<div class="projects">
+{% heading 3 _("Projects:") %}
+<div class="projects_listing">
+{% for project in projects %}
+<span class="project">
+<input type="checkbox" name="gmap_project" id="gmap_project_{{ project.id }}" value="{{ project.id }}" {% if project.has_nodes %}checked="checked"{% else %}disabled="disabled" title="{% trans "Project has no nodes" %}"{% endif %} />
+<label for="gmap_project_{{ project.id }}"{% if not project.has_nodes %} title="{% trans "Project has no nodes" %}"{% endif %}>{{ project.name }}</label>
+</span>
+{% endfor %}
+</div>
 {% trans "Position map to encompass all nodes of " %}
 <select id="gmap_center">
   <option value="" id="gmap_center_default">---------</option>
@@ -22,51 +37,27 @@
   <option value="{{ project.id }}"{% if not project.has_nodes %} disabled="disabled" title="{% trans "Project has no nodes" %}"{% endif %}>{{ project.name }}</option>
   {% endfor %}
 </select>{% trans " project" %}
-<br />
-{% trans "Show nodes based on project:" %}
-{% for project in projects %}
-<input type="checkbox" name="gmap_project" id="gmap_project_{{ project.id }}" value="{{ project.id }}" {% if project.has_nodes %}checked="checked"{% else %}disabled="disabled" title="{% trans "Project has no nodes" %}"{% endif %} />
-<label for="gmap_project_{{ project.id }}"{% if not project.has_nodes %} title="{% trans "Project has no nodes" %}"{% endif %}>{{ project.name }}</label>
-{% endfor %}
-<br />
-{% trans "Show nodes based on status:" %}
-<input type="checkbox" name="gmap_status" id="gmap_status_up" value="up" checked="checked" title="{% statusdesc "up" %}" />
-<label for="gmap_status_up" title="{% statusdesc "up" %}">up</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_visible" value="visible" checked="checked" title="{% statusdesc "visible" %}" />
-<label for="gmap_status_visible" title="{% statusdesc "visible" %}">visible</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_down" value="down" checked="checked" title="{% statusdesc "down" %}" />
-<label for="gmap_status_down" title="{% statusdesc "down" %}">down</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_duped" value="duped" checked="checked" title="{% statusdesc "duped" %}" />
-<label for="gmap_status_duped" title="{% statusdesc "duped" %}">duped</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_new" value="new" checked="checked" title="{% statusdesc "new" %}" />
-<label for="gmap_status_new" title="{% statusdesc "new" %}">new</label>
-<input type="checkbox" name="gmap_status" id="gmap_status_pending" value="pending" checked="checked" title="{% statusdesc "pending" %}" />
-<label for="gmap_status_pending" title="{% statusdesc "pending" %}">pending</label>
-<div id="gmap"></div>
-<span id="gmap_statusbar">&nbsp;</span>
 </div>
 <div class="legend">
 {% url network_topology as network_topology %}
-<p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
-<a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
 {% heading 3 _("Node status key:") %}
 <dl class="status_legend">
-  <dt>{{ "up"|status:"gmap" }}</dt>
+  <dt><input type="checkbox" name="gmap_status" id="gmap_status_up" value="up" checked="checked" title="{% statusdesc "up" %}" />{{ "up"|status:"gmap" }}</dt>
   <dd>{% statusdesc "up" %}</dd>
   <dd class="defintion_end"></dd>
-  <dt>{{ "visible"|status:"gmap" }}</dt>
+  <dt><input type="checkbox" name="gmap_status" id="gmap_status_visible" value="visible" checked="checked" title="{% statusdesc "visible" %}" />{{ "visible"|status:"gmap" }}</dt>
   <dd>{% statusdesc "visible" %}</dd>
   <dd class="defintion_end"></dd>
-  <dt>{{ "down"|status:"gmap" }}</dt>
+  <dt><input type="checkbox" name="gmap_status" id="gmap_status_down" value="down" checked="checked" title="{% statusdesc "down" %}" />{{ "down"|status:"gmap" }}</dt>
   <dd>{% statusdesc "down" %}</dd>
   <dd class="defintion_end"></dd>
-  <dt>{{ "duped"|status:"gmap" }}</dt>
+  <dt><input type="checkbox" name="gmap_status" id="gmap_status_duped" value="duped" checked="checked" title="{% statusdesc "duped" %}" />{{ "duped"|status:"gmap" }}</dt>
   <dd>{% statusdesc "duped" %}</dd>
   <dd class="defintion_end"></dd>
-  <dt>{{ "new"|status:"gmap" }}</dt>
+  <dt><input type="checkbox" name="gmap_status" id="gmap_status_new" value="new" checked="checked" title="{% statusdesc "new" %}" />{{ "new"|status:"gmap" }}</dt>
   <dd>{% statusdesc "new" %}</dd>
   <dd class="defintion_end"></dd>
-  <dt>{{ "pending"|status:"gmap" }}</dt>
+  <dt><input type="checkbox" name="gmap_status" id="gmap_status_pending" value="pending" checked="checked" title="{% statusdesc "pending" %}" />{{ "pending"|status:"gmap" }}</dt>
   <dd>{% statusdesc "pending" %}</dd>
   <dd class="defintion_end"></dd>
 </dl>
@@ -88,6 +79,9 @@ The node marked with symbol <img src="{{ MEDIA_URL }}images/symbol_wc.png" alt="
 <p>{% blocktrans %}Green links are usable links in the network. Blue and red ones are those where nodes connected with each
 other but bad link quality (packet loss on the link) interfere with usefulness of the link. Closer the ETX (measure of the
 link quality) is to 1.0 better it is.{% endblocktrans %}</p>
+</div>
+
+</div>
 </div>
 {% endblock %}
 
