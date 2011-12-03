@@ -130,7 +130,9 @@ NETWORK_HOME = 'http://example.net'
 NETWORK_CONTACT = 'open@example.net'
 NETWORK_CONTACT_PAGE = 'http://example.net/contact'
 NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
-NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
+
+#Use NETWORK_FAVICON_URL if you want to set a favicon included in HTML
+#NETWORK_FAVICON_URL = MEDIA_URL + 'images/favicon.ico'
 
 #Use NETWORK_LOGO_URL if you want to set an image logo instead of the network name in the header
 #NETWORK_LOGO_URL = MEDIA_URL + 'images/logo.png'
