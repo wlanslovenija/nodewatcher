@@ -15,6 +15,7 @@
 {% block contenttype %}nodemap{% endblock %}
 {% block content %}
 <div class="gmap_wrapper">
+{% url network_topology as network_topology %}
 <p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
 <a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
 <div id="gmap"></div>
@@ -39,7 +40,6 @@
 </select>{% trans " project" %}
 </div>
 <div class="legend">
-{% url network_topology as network_topology %}
 {% heading 3 _("Node status key:") %}
 <dl class="status_legend">
   <dt><input type="checkbox" name="gmap_status" id="gmap_status_up" value="up" checked="checked" title="{% statusdesc "up" %}" />{{ "up"|status:"gmap" }}</dt>
