@@ -566,6 +566,8 @@ start() {
       uci set wireless.radio0.macaddr=$(cat /sys/class/ieee80211/*/macaddress)
       uci commit
       /etc/init.d/inituci disable
+      /etc/init.d/firewall disable
+      /etc/init.d/firewall stop
 }
 """)
       f.close()
