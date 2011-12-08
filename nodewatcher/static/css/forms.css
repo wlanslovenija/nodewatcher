@@ -92,7 +92,7 @@ form select {
   max-width: 300px;
 }
 /* line 75, ../scss/default/forms.scss */
-form input[type="submit"], form input[type="reset"] {
+form input[type="submit"], form input[type="reset"], form input[type="button"] {
   border: none;
   padding: 3px;
   min-width: 100px;
