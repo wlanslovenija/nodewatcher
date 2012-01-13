@@ -38,6 +38,21 @@ class ProcessorContext(dict):
     Attribute update.
     """
     reduce(lambda x, y: x[y], self._namespace, self)[name] = value
+
+  def merge_with(self, other):
+    """
+    Merges this dictionary with another (recursively).
+    """
+    for k, v in other.iteritems():
+      if k in self:
+        try:
+          self[k] = self[k].merge_with(v)
+        except AttributeError:
+          self[k] = v
+      else:
+        self[k] = v
+    
+    return self
   
   @contextlib.contextmanager
   def in_namespace(self, namespace):
