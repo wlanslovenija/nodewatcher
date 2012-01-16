@@ -23,7 +23,7 @@ from web.generator.models import Profile
 from web.nodes import context_processors as nodes_context_processors
 from web.nodes import decorators
 from web.nodes.common import ValidationWarning
-from web.nodes.forms import AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
+#from web.nodes.forms import AllocateSubnetForm, WhitelistMacForm, InfoStickerForm, EventSubscribeForm, RenumberForm, RenumberAction, EditSubnetForm
 from web.nodes.models import Node, NodeType, NodeStatus, Subnet, SubnetStatus, APClient, WhitelistItem, Link, Event, EventSubscription, SubscriptionType, Project, EventCode, EventSource, GraphItemNP, GraphType
 from web.policy.models import Policy, PolicyFamily, TrafficControlClass
 
@@ -34,7 +34,14 @@ def nodes(request):
   Display a list of all current nodes and their status.
   """
   return render_to_response('nodes/list.html',
-    { 'nodes' : Node.objects.all().order_by('node_type', 'ip') },
+    {
+      'nodes' : Node.objects.regpoint("config").registry_fields(
+        name = "GeneralConfig.name",
+        type = "GeneralConfig.type",
+        router_id = "RouterIdConfig.router_id",
+        status = "StatusMonitor.status",
+      ).order_by('type', 'router_id')
+    },
     context_instance = RequestContext(request)
   )
 

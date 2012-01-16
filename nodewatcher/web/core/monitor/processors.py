@@ -1,4 +1,5 @@
 import contextlib
+import logging
 
 # Registered processors
 processors = []
@@ -69,6 +70,12 @@ class MonitoringProcessor(object):
   """
   Interface for a monitoring processor.
   """
+  def __init__(self):
+    """
+    Class constructor.
+    """
+    self.logger = logging.getLogger("monitor.processor.%s" % self.__class__.__name__)
+  
   def preprocess(self, context, nodes):
     """
     Invoked before processing specific nodes and should select the nodes
@@ -120,5 +127,5 @@ def register_processor(processor):
   @param processor: Class implementing the MonitoringProcessor interface
   """
   global processors
-  processors.append(processor)
+  processors.append(processor())
 

@@ -36,7 +36,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
   <tr>
     <th style="width: 4%;"></th>
     <th style="width: 22%;"><b>{% trans "Node name" %}</b></th>
-    <th style="width: 15%;"><b>IP</b></th>
+    <th style="width: 15%;"><b>{% trans "Router ID" %}</b></th>
     <th style="width: 21%;"><b>{% trans "Last seen up" %}</b></th>
     <th style="width: 8%;" align="center"><b>{% trans "Status" %}</b></th>
     <th style="width: 8%;" align="center"><b>{% trans "Peers" %}</b></th>
@@ -69,7 +69,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
       {% endif %}
     </td>
     <td class="name"><a href="{% url view_node node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
-    <td>{{ node.ip }}</td>
+    <td>{{ node.router_id }}</td>
     {% if node.last_seen %}
     <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>
     {% else %}

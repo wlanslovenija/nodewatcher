@@ -264,3 +264,51 @@ DOCUMENTATION_LINKS = {
   'snr'                  : 'http://en.wikipedia.org/wiki/Signal-to-noise_ratio',
   'bitrate'              : 'http://en.wikipedia.org/wiki/Bit_rate',
 }
+
+# Logging configuration
+LOGGING = {
+  'version': 1,
+  'disable_existing_loggers': True,
+  'formatters': {
+    'verbose': {
+      'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+    },
+    'simple': {
+      'format': '[%(levelname)s/%(name)s] %(message)s'
+    },
+  },
+  'filters': {
+  },
+  'handlers': {
+    'null': {
+      'level':'DEBUG',
+      'class':'django.utils.log.NullHandler',
+    },
+    'console':{
+      'level':'DEBUG',
+      'class':'logging.StreamHandler',
+      'formatter': 'simple',
+    },
+    'mail_admins': {
+      'level': 'ERROR',
+      'class': 'django.utils.log.AdminEmailHandler',
+    }
+  },
+  'loggers': {
+    'django': {
+      'handlers':['null'],
+      'propagate': True,
+      'level':'INFO',
+    },
+    'django.request': {
+      'handlers': ['mail_admins'],
+      'level': 'ERROR',
+      'propagate': False,
+    },
+    'monitor': {
+      'handlers': ['console'],
+      'level': 'INFO',
+    }
+  }
+}
+

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import ugettext as _
 
 from web.core import models as core_models
@@ -48,6 +48,7 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
     """
     with context.in_namespace("routing"):
       with context.in_namespace("olsr"):
+        self.logger.info("Parsing olsrd information...")
         olsr_info = olsr_parser.OlsrInfo(host = settings.OLSRD_MONITOR_HOST,
           port = settings.OLSRD_MONITOR_PORT)
         
@@ -56,10 +57,11 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
           context.announces = olsr_info.get_announces()
           context.aliases = olsr_info.get_aliases()
         except olsr_parser.OlsrParseFailed:
-          # TODO emit a global warning somewhere?
-          pass
+          self.logger.warning("Failed to parse olsrd feeds!")
+          raise
         
         # Create a mapping from router ids to nodes
+        self.logger.info("Mapping router IDs to node instances...")
         visible_routers = set(context.topology.keys())
         registered_routers = set()
         context.router_id_map = {}
@@ -68,12 +70,18 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
           context.router_id_map[node.router_id] = node
           registered_routers.add(node.router_id)
         
+        self.logger.info("Creating unknown node instances...")
         for router_id in visible_routers.difference(registered_routers):
           # Create an invalid node for each unknown router id seen by olsrd
           node = nodes_models.Node()
           node.save()
           nodes.append(node)
           context.router_id_map[router_id] = node
+          
+          rid_cfg = node.config.core.routerid(create = core_models.RouterIdConfig)
+          rid_cfg.router_id = router_id
+          rid_cfg.family = "ipv4"
+          rid_cfg.save()
           
           status_mon = node.monitoring.core.status(create = core_models.StatusMonitor)
           status_mon.status = "invalid"

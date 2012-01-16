@@ -136,116 +136,14 @@ class Node(models.Model):
   """
   This class represents a single node in the network.
   """
-  uuid = models.CharField(max_length = 40, primary_key = True)
-  
-  # XXX Old fields, will be removed
-  ip = models.CharField(max_length = 40, unique = True)
-  name = models.CharField(max_length = 50, null = True, unique = True)
-  owner = models.ForeignKey(User, null = True)
-  location = models.CharField(max_length = 200, null = True)
-  project = models.ForeignKey(Project, null = True, related_name = 'nodes')
-  notes = models.CharField(max_length = 1000, null = True)
-  url = models.CharField(max_length = 200, null = True)
-
-  # System nodes are special purpuse nodes that provide external
-  # services such as VPN
-  system_node = models.BooleanField(default = False)
-  border_router = models.BooleanField(default = False)
-  vpn_server = models.BooleanField(default = False)
-  node_type = models.IntegerField(default = NodeType.Wireless)
-  redundancy_link = models.BooleanField(default = False)
-  redundancy_req = models.BooleanField(default = False)
-  conflicting_subnets = models.BooleanField(default = False)
-
-  # Geographical location
-  geo_lat = models.FloatField(null = True)
-  geo_long = models.FloatField(null = True)
-
-  # Antenna information
-  ant_external = models.BooleanField(default = False)
-  ant_polarization = models.IntegerField(default = PolarizationType.Unknown)
-  ant_type = models.IntegerField(default = AntennaType.Unknown)
-  
-  # Node visibility between monitoring runs (this is only used by the monitor daemon)
-  visible = models.BooleanField()
-
-  # Basic status (set by the monitor daemon)
-  warnings = models.BooleanField(default = False)
-  status = models.IntegerField(null = True)
-  peers = models.IntegerField(null = True, default = 0)
-  peer_list = models.ManyToManyField('self', through = 'Link', symmetrical = False)
-  last_seen = models.DateTimeField(null = True)
-  first_seen = models.DateTimeField(null = True)
-  channel = models.IntegerField(null = True)
-  wifi_mac = models.CharField(max_length = 20, null = True)
-  vpn_mac = models.CharField(max_length = 20, null = True)
-  vpn_mac_conf = models.CharField(max_length = 20, null = True, unique = True)
-  awaiting_renumber = models.BooleanField(default = False)
-  
-  # Peering history
-  peer_history = models.ManyToManyField('self')
-
-  # RTT measurements (set by the monitor daemon)
-  rtt_min = models.FloatField(null = True)
-  rtt_avg = models.FloatField(null = True)
-  rtt_max = models.FloatField(null = True)
-  pkt_loss = models.IntegerField(null = True)
-
-  # Aditional status (set by the monitor daemon)
-  firmware_version = models.CharField(max_length = 50, null = True)
-  bssid = models.CharField(max_length = 50, null = True)
-  essid = models.CharField(max_length = 50, null = True)
-  local_time = models.DateTimeField(null = True)
-  clients = models.IntegerField(null = True)
-  clients_so_far = models.IntegerField(default = 0)
-  uptime = models.IntegerField(null = True)
-  uptime_so_far = models.IntegerField(null = True)
-  uptime_last = models.DateTimeField(null = True)
-  loadavg_1min = models.FloatField(null = True)
-  loadavg_5min = models.FloatField(null = True)
-  loadavg_15min = models.FloatField(null = True)
-  memfree = models.IntegerField(null = True)
-  numproc = models.IntegerField(null = True)
-  captive_portal_status = models.BooleanField(default = True)
-  dns_works = models.BooleanField(default = True)
-  reported_uuid = models.CharField(max_length = 40, null = True)
-  thresh_rts = models.IntegerField(null = True)
-  thresh_frag = models.IntegerField(null = True)
-  loss_count = models.IntegerField(null = True)
-  wifi_error_count = models.IntegerField(null = True)
+  uuid = models.CharField(max_length = 40, primary_key = True)  
   
   def reset(self):
     """
     Resets node data.
     """
-    self.status = NodeStatus.Pending
-    self.last_seen = None
-    self.first_seen = None
-    self.channel = None
-    self.wifi_mac = None
-    self.vpn_mac = None
-    self.rtt_min = None
-    self.rtt_avg = None
-    self.rtt_max = None
-    self.pkt_loss = None
-    self.firmware_version = None
-    self.bssid = None
-    self.essid = None
-    self.local_time = None
-    self.clients = 0
-    self.clients_so_far = 0
-    self.uptime = None
-    self.uptime_so_far = None
-    self.loadavg_1min = None
-    self.loadavg_5min = None
-    self.loadavg_15min = None
-    self.memfree = None
-    self.numproc = None
-    self.captive_portal_status = True
-    self.thresh_rts = None
-    self.thresh_frag = None
-    self.loss_count = None
-    self.wifi_error_count = None
+    # TODO port this
+    raise NotImplementedError
 
     # Mark related graph items for removal by the monitoring daemon
     self.graphitem_set.all().update(need_removal = True)
@@ -354,7 +252,8 @@ class Node(models.Model):
     """
     Returns true if the node is invalid.
     """
-    return self.status in (NodeStatus.Invalid, NodeStatus.AwaitingRenumber)
+    # TODO remove
+    return False
 
   def is_wireless_node(self):
     """
@@ -482,18 +381,8 @@ class Node(models.Model):
     """
     Returns node type as string.
     """
-    if self.node_type == NodeType.Wireless:
-      return _("Wireless nodes")
-    elif self.node_type == NodeType.Server:
-      return _("Server nodes")
-    elif self.node_type == NodeType.Test:
-      return _("Test nodes")
-    elif self.node_type == NodeType.Mobile:
-      return _("Mobile nodes")
-    elif self.node_type == NodeType.Dead:
-      return _("Dead nodes")
-    else:
-      return _("Unknown nodes")
+    # TODO port to new schema
+    return self.type
 
   def get_warnings(self):
     """
@@ -631,10 +520,7 @@ class Node(models.Model):
     """
     Returns a string representation of this node.
     """
-    if not self.name:
-      return "unknown (%s)" % self.ip
-
-    return "%s (%s)" % (self.name, self.ip)
+    return self.uuid
 
 class Link(models.Model):
   """
