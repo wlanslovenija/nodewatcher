@@ -50,6 +50,9 @@ class Migration(DataMigration):
         solarpkg_ctype        = self.get_content_type(orm, app_label = 'solar', model = 'solarpackageconfig')
         digitemppkg_ctype     = self.get_content_type(orm, app_label = 'digitemp', model = 'digitemppackageconfig')
         
+        # Remove all invalid nodes
+        orm.Node.objects.filter(status = 4).delete()
+        
         for node in orm.Node.objects.exclude(status = 4):
           print "   > Migrating node:", node.name
           
@@ -107,6 +110,7 @@ class Migration(DataMigration):
               "wl-500gp-v1" : "wl500gpv1",
               "wl-500gd" : "wl500gpv1",
               "rb433ah" : "rb433ah",
+              "tp-wr741nd" : "wr741nd",
             }
             general.router = router_map[profile.template.short_name]
             general.platform = "openwrt"
@@ -136,6 +140,13 @@ class Migration(DataMigration):
           redundant_node_role = orm['core.RedundantNodeRoleConfig'](root = node, content_type = redundant_role_ctype)
           redundant_node_role.redundancy_required = node.redundancy_req
           redundant_node_role.save()
+          
+          # core.routerid
+          print "     - Router-ID:", node.ip
+          routerid = orm['core.RouterIdConfig'](root = node, content_type = rid_ctype)
+          routerid.family = "ipv4"
+          routerid.router_id = node.ip
+          routerid.save()
           
           # core.interfaces + core.interfaces.network
           if profile is not None:
@@ -187,6 +198,7 @@ class Migration(DataMigration):
             wifi_subnet = node.subnet_set.get(gen_iface_type = 2, allocated = True)
             pool = orm['core.IpPool'].objects.filter(network = wifi_subnet.subnet, prefix_length = wifi_subnet.cidr)
             if not pool:
+              print "     - WARNING: Primary IP pool not found, skipping network configuration!"
               continue
             
             wifi_netconf.allocation = pool = pool[0]
@@ -198,12 +210,6 @@ class Migration(DataMigration):
             wifi_netconf.prefix_length = wifi_subnet.cidr
             wifi_netconf.usage = "auto"
             wifi_netconf.save()
-            
-            # Router identifier
-            routerid = orm['core.RouterIdConfig'](root = node, content_type = rid_ctype)
-            routerid.family = "ipv4"
-            routerid.router_id = node.ip
-            routerid.save()
             
             # WAN (wan0)
             wan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
@@ -322,7 +328,7 @@ class Migration(DataMigration):
                 pkg.save()
           else:
             # TODO Migrate nodes without profiles (we need to ensure proper interfaces)
-            pass
+            print "     - Node has no profile configured."
     
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")
