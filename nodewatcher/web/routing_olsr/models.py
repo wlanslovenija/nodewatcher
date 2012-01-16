@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import ugettext as _
 
 from web.core import models as core_models
