@@ -22,7 +22,7 @@ class AprBackend(object):
     """
 
     if not APR_ENABLED:
-        return None
+      return None
 
     try:
       user = auth_models.User.objects.get(username__iexact=username)
