@@ -85,13 +85,15 @@ class Record(models.Model):
       record.save()
 
     # Update the zones
-    if old_zone and old_zone != record.zone:
-      old_zone.serial += 1
-      old_zone.save()
-    
     try:
+      if old_zone and old_zone != record.zone:
+        old_zone.serial += 1
+        old_zone.save()
+
       record.zone.serial += 1
       record.zone.save()
     except Zone.DoesNotExist:
-      pass
+      if old_zone:
+        old_zone.serial += 1
+        old_zone.save()
 
