@@ -1,0 +1,5 @@
+*.log
+*.sqlite
+*.sqlite-journal
+*.pyc
+*.rrd
