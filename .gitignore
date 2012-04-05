@@ -3,3 +3,4 @@
 *.sqlite-journal
 *.pyc
 *.rrd
+.idea
