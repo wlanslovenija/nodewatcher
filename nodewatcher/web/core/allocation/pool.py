@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from web.registry import fields as registry_fields
 from web.utils import ipcalc, db_locker, ipaddr
@@ -32,7 +33,16 @@ class PoolBase(models.Model):
   allocation_object_id = models.CharField(max_length = 50, null = True)
   allocation_content_object = generic.GenericForeignKey('allocation_content_type', 'allocation_object_id')
   allocation_timestamp = models.DateTimeField(null = True)
-  
+
+  @classmethod
+  def modifies_pool(cls, f):
+    def decorator(self, *args, **kwargs):
+      # Lock our own instance
+      locked_instance = self.__class__.objects.select_for_update().get(pk = self.pk)
+      return f(locked_instance, *args, **kwargs)
+
+    return decorator
+
   def top_level(self):
     """
     Returns the root of this pool tree.
@@ -79,9 +89,12 @@ class IpPool(PoolBase):
     self.ip_subnet = '%s/%s' % (self.network, self.prefix_length)
     super(IpPool, self).save(**kwargs)
   
-  def split_buddy(self):
+  def _split_buddy(self):
     """
     Splits this pool into two subpools.
+
+    WARNING: This method must be called on an object that is locked for
+    updates using `select_for_update`. Otherwise this will cause corruptions.
     """
     net = ipcalc.Network(self.network, self.prefix_length)
     net0 = "%s/%d" % (self.network, self.prefix_length + 1)
@@ -96,7 +109,8 @@ class IpPool(PoolBase):
     self.save()
     
     return left, right
-  
+
+  @PoolBase.modifies_pool
   def reserve_subnet(self, network, prefix_len, check_only = False):
     """
     Attempts to reserve a specific subnet in the allocation pool. The subnet
@@ -129,7 +143,7 @@ class IpPool(PoolBase):
     # Find the proper network between our children
     alloc = None
     if self.children.count() > 0:
-      for child in self.children.exclude(status = IpPoolStatus.Full):
+      for child in self.children.exclude(status = IpPoolStatus.Full).select_for_update():
         alloc = child.reserve_subnet(network, prefix_len, check_only)
         if alloc:
           break
@@ -142,7 +156,7 @@ class IpPool(PoolBase):
         self.save()
     else:
       # Split ourselves into two halves
-      for child in self.split_buddy():
+      for child in self._split_buddy():
         alloc = child.reserve_subnet(network, prefix_len, check_only)
         if alloc:
           break
@@ -155,12 +169,15 @@ class IpPool(PoolBase):
         self.save()
     
     return alloc
-  
-  def allocate_buddy(self, prefix_len):
+
+  def _allocate_buddy(self, prefix_len):
     """
     Allocate IP addresses from the pool in a buddy-like allocation scheme. This
     operation may split existing free pools into smaller ones to accomodate the
     new allocation.
+
+    WARNING: This method must be called on an object that is locked for
+    updates using `select_for_update`. Otherwise this will cause corruptions.
     
     @param prefix_len: Wanted prefix length
     """
@@ -178,8 +195,8 @@ class IpPool(PoolBase):
     # and traverse the left one
     alloc = None
     if self.children.count() > 0:
-      for child in self.children.exclude(status = IpPoolStatus.Full).order_by("ip_subnet"):
-        alloc = child.allocate_buddy(prefix_len)
+      for child in self.children.exclude(status = IpPoolStatus.Full).order_by("ip_subnet").select_for_update():
+        alloc = child._allocate_buddy(prefix_len)
         if alloc:
           break
       else:
@@ -191,11 +208,12 @@ class IpPool(PoolBase):
         self.save()
     else:
       # Split ourselves into two halves and traverse the left half
-      left, right = self.split_buddy()
-      alloc = left.allocate_buddy(prefix_len)
+      left, right = self._split_buddy()
+      alloc = left._allocate_buddy(prefix_len)
     
     return alloc
-  
+
+  @PoolBase.modifies_pool
   def reclaim_pools(self):
     """
     Coalesces free children back into one if possible.
@@ -220,8 +238,9 @@ class IpPool(PoolBase):
       if self.children.filter(status = IpPoolStatus.Partial).count() > 0:
         self.status = IpPoolStatus.Partial
         self.save()
-        return self.parent.reclaim_pools() if self.parent else None 
-  
+        return self.parent.reclaim_pools() if self.parent else None
+
+  @PoolBase.modifies_pool
   def free(self):
     """
     Frees this allocated item and returns it to the parent pool.
@@ -269,8 +288,8 @@ class IpPool(PoolBase):
     Returns the allocation as an ipaddr.IPNetwork instance.
     """
     return ipaddr.IPNetwork("%s/%d" % (self.network, self.prefix_length))
-  
-  @db_locker.require_lock('core_pool')
+
+  @PoolBase.modifies_pool
   def allocate_subnet(self, prefix_len = None):
     """
     Attempts to allocate a subnet from this pool.
@@ -286,7 +305,7 @@ class IpPool(PoolBase):
     
     if prefix_len == 31:
       return None
-    
-    pool = self.allocate_buddy(prefix_len)
+
+    pool = self._allocate_buddy(prefix_len)
     return pool
 
