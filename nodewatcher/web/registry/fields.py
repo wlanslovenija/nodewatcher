@@ -254,7 +254,11 @@ class IPAddressField(models.Field):
     """
     Returns the database column type.
     """
-    return "inet"
+    # XXX This extra space is there so that stupid Django PostgreSQL backend
+    #     doesn't mangle the column by casting it via HOST() in WHERE clauses. A
+    #     cleaner approach would be to override the WhereNode and fix make_atom,
+    #     then integrate this with our augmented QuerySet.
+    return "inet "
   
   @staticmethod
   def ip_to_python(value, error_messages):

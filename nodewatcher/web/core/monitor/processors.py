@@ -82,8 +82,8 @@ class MonitoringProcessor(object):
     that will be processed.
     
     @param context: Current context
-    @param nodes: A list of nodes that are to be processed
-    @return: A (possibly) modified context and a (possibly) filtered list of nodes
+    @param nodes: A set of nodes that are to be processed
+    @return: A (possibly) modified context and a (possibly) modified set of nodes
     """
     return context, nodes
   
@@ -92,7 +92,7 @@ class MonitoringProcessor(object):
     Invoked after processing specific nodes.
     
     @param context: Current context
-    @param nodes: A list of nodes that have been processed
+    @param nodes: A set of nodes that have been processed
     @return: A (possibly) modified context
     """
     return context

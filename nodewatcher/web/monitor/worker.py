@@ -19,7 +19,10 @@ logger = logging.getLogger("monitor.worker")
 
 class Worker(object):
   def cycle(self):
-    nodes = list(nodes_models.Node.objects.all())
+    """
+    Performs a single monitoring cycle.
+    """
+    nodes = set()
     context = monitor_processors.ProcessorContext()
     
     # Pre-processing
@@ -34,9 +37,31 @@ class Worker(object):
         logger.error("Preprocessor has failed with exception:")
         logger.error(traceback.format_exc())
 
-    # TODO where is node removal handled?
+    # Find nodes that haven't been claimed by any processor and are invalid; such
+    # nodes should be removed from the database
+    logger.info("Purging unclaimed stale nodes...")
+    for node in nodes_models.Node.objects.regpoint("monitoring") \
+      .filter(statusmonitor_status = "invalid") \
+      .exclude(pk__in = nodes):
+      node.delete()
 
-    #print nodes
+    # Perform per-node processing in two stages
+    logger.info("Running per-node first stage processors...")
+    # TODO make this run in parallel
+    for node in nodes:
+      for p in monitor_processors.processors:
+        try:
+          sid = transaction.savepoint()
+          context = p.process_first_pass(context, node)
+          transaction.savepoint_commit(sid)
+        except:
+          transaction.savepoint_rollback(sid)
+          logger.error("First stage processor has failed with exception:")
+          logger.error(traceback.format_exc())
+
+    # TODO second pass
+
+    # TODO post-processing
 
   def run(self):
     print BANNER

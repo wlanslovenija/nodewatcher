@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -65,17 +67,22 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
         visible_routers = set(context.topology.keys())
         registered_routers = set()
         context.router_id_map = {}
-        for node in nodes_models.Node.objects.regpoint("config").registry_fields( \
-          router_id = "RouterIdConfig.router_id").filter(routeridconfig_family = "ipv4"):
+        for node in nodes_models.Node.objects.regpoint("config") \
+          .registry_fields(router_id = "RouterIdConfig.router_id") \
+          .filter(
+            routeridconfig_family = "ipv4",
+            routeridconfig_router_id__in = visible_routers
+          ):
           context.router_id_map[node.router_id] = node
           registered_routers.add(node.router_id)
+          nodes.add(node)
         
         self.logger.info("Creating unknown node instances...")
         for router_id in visible_routers.difference(registered_routers):
           # Create an invalid node for each unknown router id seen by olsrd
           node = nodes_models.Node()
           node.save()
-          nodes.append(node)
+          nodes.add(node)
           context.router_id_map[router_id] = node
           
           rid_cfg = node.config.core.routerid(create = core_models.RouterIdConfig)
@@ -99,59 +106,61 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
     @return: A (possibly) modified context
     """
     try:
-      router_id = node.config.core.routerid(queryset = True).get(family = "ipv4")
+      router_id = node.config.core.routerid(queryset = True).get(family = "ipv4").router_id
       topology = context.routing.olsr.topology.get(router_id, [])
       announces = context.routing.olsr.announces.get(router_id, [])
       aliases = context.routing.olsr.aliases.get(router_id, [])
       
       # Setup links in topology tables
       try:
-        rtm = node.monitoring.network.topology(onlyclass = OlsrRoutingTopologyMonitor)[0]
-        existing_links = set(rtm.links.all())
+        rtm = node.monitoring.network.routing.topology(onlyclass = OlsrRoutingTopologyMonitor)[0]
       except IndexError:
-        rtm = node.monitoring.network.topology(create = OlsrRoutingTopologyMonitor)
+        rtm = node.monitoring.network.routing.topology(create = OlsrRoutingTopologyMonitor)
         rtm.save()
-        existing_links = set()
-      
+
+      if not topology:
+        self.logger.warning("Empty topology entry for router ID %s!" % router_id)
+
+      visible_links = []
       for link in topology:
-        dst_node = context.routing.olsr.router_id_map.get(link['dst'], None)
+        dst_node = context.routing.olsr.router_id_map.get(str(link['dst']), None)
         if not dst_node:
-          # XXX How should this be handled? Inconsistency in topology table???
+          self.logger.warning("Inconsistency in topology table for router ID %s!" % link['dst'])
           continue
-        
-        for elink in existing_links.copy():
-          if elink.peer == dst_node:
-            existing_links.remove(elink)
-            break
-        else:
+
+        try:
+          elink = rtm.links.get(peer = dst_node)
+        except core_models.TopologyLink.DoesNotExist:
           elink = OlsrTopologyLink(monitor = rtm, peer = dst_node)
-        
+
         elink.lq = link['lq']
         elink.ilq = link['ilq']
         elink.etx = link['etx']
+        elink.last_seen = datetime.datetime.now()
         elink.save()
+        visible_links.append(elink)
       
       # Remove all links that do not exist anymore
-      for link in existing_links:
-        link.delete()
-      
+      rtm.links.exclude(pk__in = [x.pk for x in visible_links]).delete()
+
       # Setup networks in announce tables
-      existing_announces = node.monitoring.network.announces(onlyclass = OlsrRoutingAnnounceMonitor)
+      visible_announces = []
+      existing_announces = node.monitoring.network.routing.announces(
+        onlyclass = OlsrRoutingAnnounceMonitor, queryset = True)
       for announce in announces + aliases:
         network = announce['net'] if 'net' in announce else announce['alias']
-        for eannounce in existing_announces.copy():
-          if eannounce.network == network:
-            existing_announces.remove(eannounce)
-            break
-        else:
+        try:
+          eannounce = existing_announces.get(network = network)
+        except core_models.RoutingAnnounceMonitor.DoesNotExist:
           eannounce = OlsrRoutingAnnounceMonitor(root = node, network = network)
-        
+
         eannounce.status = "ok" if 'net' in announce else "alias"
+        eannounce.last_seen = datetime.datetime.now()
         eannounce.save()
+        visible_announces.append(eannounce)
       
       # Remove all announces that do not exist anymore
-      for announce in existing_announces:
-        announce.delete()
+      existing_announces.exclude(pk__in = [x.pk for x in visible_announces]).delete()
     except core_models.RouterIdConfig.DoesNotExist:
       # No router-id for this node can be found for IPv4; this means
       # that we have nothing to do here

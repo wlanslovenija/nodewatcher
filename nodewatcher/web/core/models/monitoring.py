@@ -61,6 +61,7 @@ class TopologyLink(polymorphic.PolymorphicModel):
   """
   monitor = models.ForeignKey(RoutingTopologyMonitor, related_name = 'links')
   peer = models.ForeignKey(nodes_models.Node, related_name = 'links')
+  last_seen = models.DateTimeField()
   
   class Meta:
     app_label = "core"
@@ -71,6 +72,7 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
   """
   network = registry_fields.IPAddressField()
   status = registry_fields.SelectorKeyField("node.monitoring", "network.routing.announces#status")
+  last_seen = models.DateTimeField()
   
   class Meta:
     app_label = "core"

@@ -1578,39 +1578,3 @@ class NodeNames(models.Model):
   """
   name = models.CharField(max_length = 50, primary_key = True)
   node = models.ForeignKey(Node, related_name = 'names')
-
-def subnet_on_delete_callback(sender, **kwargs):
-  """
-  On delete callback for Subnets.
-  """
-  instance = kwargs['instance']
-  if not instance.allocated:
-    return
-  
-  try:
-    subnet = pool_models.Pool.objects.get(network = instance.subnet, cidr = instance.cidr)
-    if subnet.status == pool_models.PoolStatus.Full:
-      subnet.status = pool_models.PoolStatus.Free
-      subnet.save()
-      subnet.reclaim_pools()
-  except pool_models.Pool.DoesNotExist:
-    pass
-
-def node_on_delete_callback(sender, **kwargs):
-  """
-  On delete callback for Nodes.
-  """
-  Record.remove_for_node(kwargs['instance'])
-
-  # Check if node has a /32 subnet assigned and free it if needed
-  try:
-    subnet = pool_models.Pool.objects.get(network = kwargs['instance'].ip, cidr = 32)
-    if subnet.status == pool_models.PoolStatus.Full:
-      subnet.status = pool_models.PoolStatus.Free
-      subnet.save()
-      subnet.reclaim_pools()
-  except pool_models.Pool.DoesNotExist:
-    pass
-
-models.signals.pre_delete.connect(subnet_on_delete_callback, sender = Subnet)
-models.signals.pre_delete.connect(node_on_delete_callback, sender = Node)
