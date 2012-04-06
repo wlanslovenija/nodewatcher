@@ -1,5 +1,19 @@
+import multiprocessing
+
+from django.db import transaction, connection
 from django.utils import unittest
 from core.allocation.pool import IpPool, IpPoolStatus
+
+@transaction.commit_on_success
+def _concurrent_allocation_worker(pool):
+  try:
+    alloc = pool.allocate_subnet(prefix_len = 27)
+    alloc.free()
+    alloc = pool.allocate_subnet(prefix_len = 27)
+  except:
+    return None
+
+  return (alloc.network, alloc.prefix_length)
 
 class IpPoolTestCase(unittest.TestCase):
   def setUp(self):
@@ -56,3 +70,19 @@ class IpPoolTestCase(unittest.TestCase):
     self.assertNotEqual(a, None)
     self.assertNotEqual(b, None)
     self.assertEqual(c, None)
+
+  def test_concurrent_allocation(self):
+    # Close the connection to avoid sharing it with child processes
+    connection.close()
+    # Create the worker pool
+    workers = multiprocessing.Pool(10)
+    NUM_REQUESTS = 100
+
+    try:
+      # Submit lots of requests and verify that all are unique and fulfilled
+      allocations = set(workers.map(_concurrent_allocation_worker, [self.pool] * NUM_REQUESTS))
+      self.assertEqual(len(allocations), NUM_REQUESTS)
+    finally:
+      workers.close()
+      workers.join()
+
