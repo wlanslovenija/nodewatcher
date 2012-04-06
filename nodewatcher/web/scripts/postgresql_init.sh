@@ -3,6 +3,8 @@
 CONTRIB_DIR=""
 if [ -d /usr/share/postgresql/8.4/contrib ]; then
   CONTRIB_DIR="/usr/share/postgresql/8.4/contrib"
+elif [ -d /usr/share/postgresql/9.1/contrib ]; then
+  CONTRIB_DIR="/usr/share/postgresql/9.1/contrib"
 elif [ -d /usr/share/postgresql-8.3/contrib ]; then
   CONTRIB_DIR="/usr/share/postgresql-8.3/contrib"
 else
@@ -17,7 +19,7 @@ dropuser -U postgres nodewatcher || true
 createuser -U postgres -S -D -R nodewatcher || true
 createdb -U postgres -E UNICODE -T template0 -O nodewatcher nodewatcher
 psql -U postgres nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
-createlang -U postgres plpgsql nodewatcher
+createlang -U postgres plpgsql nodewatcher || true
 psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/postgis.sql
 psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis_comments.sql
 psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/spatial_ref_sys.sql
