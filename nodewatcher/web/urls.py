@@ -73,7 +73,7 @@ urlpatterns = patterns('',
   # Feeds
   url(r'^feeds/whitelist$', 'web.nodes.views.whitelist'),
   url(r'^feeds/rss/events(?:/(?P<username>.+))?$', LatestEvents(), name = 'events_feed'),
-  url(r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds }, name = 'feeds'),
+  url(r'^feeds/rss/(?P<url>.*)$', 'django.contrib.syndication.views.Feed', { 'feed_dict' : feeds }, name = 'feeds'),
 
   # Pools
   url(r'^pools$', 'web.nodes.views.pools', name = 'pools'),
