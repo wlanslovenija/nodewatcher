@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from web.registry import fields as registry_fields
-from web.utils import ipcalc, db_locker, ipaddr
+from web.utils import ipcalc, ipaddr
 import fields as allocation_fields
 
 class PoolAllocationError(Exception):
