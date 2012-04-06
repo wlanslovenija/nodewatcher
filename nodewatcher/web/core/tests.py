@@ -71,6 +71,15 @@ class IpPoolTestCase(unittest.TestCase):
     self.assertNotEqual(b, None)
     self.assertEqual(c, None)
 
+  def test_freeing(self):
+    # Test that free works as expected
+    a = self.pool.allocate_subnet(prefix_len = 26)
+    b = self.pool.allocate_subnet(prefix_len = 27)
+    a.free()
+    c = self.pool.allocate_subnet(prefix_len = 26)
+    self.assertEqual(c.network, a.network)
+    self.assertEqual(c.prefix_length, a.prefix_length)
+
   def test_concurrent_allocation(self):
     # Close the connection to avoid sharing it with child processes
     connection.close()
