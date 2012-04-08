@@ -32,6 +32,9 @@ class Worker(object):
         sid = transaction.savepoint()
         context, nodes = p.preprocess(context, nodes)
         transaction.savepoint_commit(sid)
+      except KeyboardInterrupt:
+        logger.info("Aborted by user.")
+        return
       except:
         transaction.savepoint_rollback(sid)
         logger.error("Preprocessor has failed with exception:")
@@ -52,8 +55,11 @@ class Worker(object):
       for p in monitor_processors.processors:
         try:
           sid = transaction.savepoint()
-          context = p.process_first_pass(context, node)
+          p.process_first_pass(context, node)
           transaction.savepoint_commit(sid)
+        except KeyboardInterrupt:
+          logger.info("Aborted by user.")
+          return
         except:
           transaction.savepoint_rollback(sid)
           logger.error("First stage processor has failed with exception:")
