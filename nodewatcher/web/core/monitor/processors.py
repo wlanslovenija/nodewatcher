@@ -1,5 +1,6 @@
 import contextlib
 import logging
+import traceback
 
 # Registered processors
 processors = []
@@ -75,7 +76,17 @@ class MonitoringProcessor(object):
     Class constructor.
     """
     self.logger = logging.getLogger("monitor.processor.%s" % self.__class__.__name__)
-  
+
+  def report_exception(self, msg = "Processor has failed with exception:"):
+    """
+    Reports an exception via the built-in logger.
+
+    @param msg: Message that should be included before the backtrace
+    """
+    if msg:
+      self.logger.error(msg)
+    self.logger.error(traceback.format_exc())
+
   def preprocess(self, context, nodes):
     """
     Invoked before processing specific nodes and should select the nodes
