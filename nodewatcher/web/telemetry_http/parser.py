@@ -1,8 +1,6 @@
 import socket
 import urllib
 
-from web.utils import ipaddr
-
 class HttpTelemetryParseFailed(Exception):
   pass
 
