@@ -15,7 +15,7 @@ class HttpTelemetryContext(monitor_processors.ProcessorContext):
     node by checking the returned telemetry output.
 
     @param module: Module name (dot-separated namespace)
-    @return: An integer representing the version or None if module is
+    @return: An integer representing the version or 0 if module is
       not installed/present
     """
     module = module.replace('.', '-')
@@ -26,9 +26,9 @@ class HttpTelemetryContext(monitor_processors.ProcessorContext):
       except ValueError:
         # This could only happen when the parsed output is corrupted as serial
         # should always be an integer
-        return None
+        return 0
 
-    return None
+    return 0
 
 class HttpTelemetryModule(monitor_telemetry.TelemetryModule):
   """
