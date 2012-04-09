@@ -87,3 +87,17 @@ registration.point("node.monitoring").register_choice("network.routing.announces
 registration.point("node.monitoring").register_choice("network.routing.announces#status", "conflicting", _("Conflicting"))
 registration.point("node.monitoring").register_item(RoutingAnnounceMonitor)
 
+class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
+  """
+  Basic system status information like uptime and the local time.
+  """
+  uptime = models.PositiveIntegerField()
+  local_time = models.DateTimeField()
+
+  class Meta:
+    app_label = "core"
+
+  class RegistryMeta:
+    registry_id = "system.status"
+
+registration.point("node.monitoring").register_item(SystemStatusMonitor)

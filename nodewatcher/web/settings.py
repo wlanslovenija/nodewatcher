@@ -172,6 +172,7 @@ INSTALLED_APPS = (
   'web.core.cgm.packages.digitemp',
   'web.routing_olsr',
   'web.telemetry_http',
+  'web.telemetry_core',
   'guardian',
   'south',
 )

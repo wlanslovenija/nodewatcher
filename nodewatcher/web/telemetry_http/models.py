@@ -1,6 +1,34 @@
 from web.core import models as core_models
 from web.core.monitor import telemetry as monitor_telemetry
+from web.core.monitor import processors as monitor_processors
 from . import parser as telemetry_parser
+
+class HttpTelemetryContext(monitor_processors.ProcessorContext):
+  """
+  Augmented context for HTTP telemetry information that can be used
+  by store/analyze modules for some common functionality like checking
+  module presence/versions.
+  """
+  def get_module_version(self, module):
+    """
+    Returns the active version of a telemetry module present on the remote
+    node by checking the returned telemetry output.
+
+    @param module: Module name (dot-separated namespace)
+    @return: An integer representing the version or None if module is
+      not installed/present
+    """
+    module = module.replace('.', '-')
+    metadata = self.META.modules.get(module)
+    if metadata:
+      try:
+        return int(metadata.serial)
+      except ValueError:
+        # This could only happen when the parsed output is corrupted as serial
+        # should always be an integer
+        return None
+
+    return None
 
 class HttpTelemetryModule(monitor_telemetry.TelemetryModule):
   """
@@ -22,7 +50,7 @@ class HttpTelemetryModule(monitor_telemetry.TelemetryModule):
       parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
 
       # Fetch information from the router and merge it into local context
-      with context.in_namespace("http"):
+      with context.in_namespace("http", HttpTelemetryContext):
         try:
           parser.parse_into(context)
         except telemetry_parser.HttpTelemetryParseFailed:
