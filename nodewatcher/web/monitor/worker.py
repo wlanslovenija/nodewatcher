@@ -1,3 +1,4 @@
+import copy
 import logging
 import multiprocessing
 import traceback
@@ -52,10 +53,11 @@ class Worker(object):
     logger.info("Running per-node first stage processors...")
     # TODO make this run in parallel
     for node in nodes:
+      context_snapshot = copy.deepcopy(context)
       for p in monitor_processors.processors:
         try:
           sid = transaction.savepoint()
-          p.process_first_pass(context, node)
+          p.process_first_pass(context_snapshot, node)
           transaction.savepoint_commit(sid)
         except KeyboardInterrupt:
           logger.info("Aborted by user.")
