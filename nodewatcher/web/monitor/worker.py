@@ -19,6 +19,7 @@ BANNER = """
 logger = logging.getLogger("monitor.worker")
 
 class Worker(object):
+  @transaction.commit_on_success
   def cycle(self):
     """
     Performs a single monitoring cycle.
