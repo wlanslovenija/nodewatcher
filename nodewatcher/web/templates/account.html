@@ -7,7 +7,6 @@
     {% if profile_configuration_url %}
     <li><a href="{{ profile_configuration_url }}">Preferences</a></li>
     {% endif %}
-    <li class="last"><a href="{% url my_nodes %}">{% trans "My Nodes" %}</a></li>
     {% else %}
     <li class="first"><a href="{% url auth_login %}">{% trans "Login" %}</a></li>
     {% if profile_configuration_url %}

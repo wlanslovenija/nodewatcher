@@ -114,8 +114,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'django.core.context_processors.debug',
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
-  'web.nodes.context_processors.web_client_node',
-  'web.nodes.context_processors.global_values'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -177,53 +175,8 @@ INSTALLED_APPS = (
   'south',
 )
 
-# External programs configuration
-# If you have programs installed in exotic locations you can specify them here
-#GRAPHVIZ_BIN = '/path/to/neato'
-#FPING_BIN = '/path/to/fping'
-#PDFLATEX = '/path/to/pdflatex'
-
-# Is image generator enabled or not. If set to False the pybeanstalk dependency is not needed.
-IMAGE_GENERATOR_ENABLED = False
-# Is image generator temporary suspended (like because firmware image it would produce contains errors)?
-# If it is, image requests are not queued and message about that is issued to the user
-IMAGE_GENERATOR_SUSPENDED = False
-IMAGE_GENERATOR_USER = 'nw-generator'
-
-IMAGES_BINDIST_URL = 'http://example.net/images/'
-
-# Graph configuration
-GRAPH_DIR = os.path.join(MEDIA_ROOT, 'graphs').replace('\\', '/')
-GRAPH_TIMESPAN_PREFIXES = ('day', 'week', 'month', 'year')
-GRAPH_TIMESPANS = {
-  'day'   : 86400,
-  'week'  : 604800,
-  'month' : 2678400,
-  'year'  : 33053184
-}
-
 # Monitor configuration
-MONITOR_WORKDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'monitor').replace('\\', '/') # Absolute path to directory containing monitor.py file
 MONITOR_WORKERS = 20 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
-MONITOR_GRAPH_WORKERS = 5
-MONITOR_POLL_INTERVAL = 300
-MONITOR_OLSR_HOST = '127.0.0.1' # A host with OLSR txt-info plugin running
-MONITOR_USER = 'monitor' # User to chuid monitor process to (currently ignored)
-MONITOR_LOGFILE = os.path.join(MONITOR_WORKDIR, 'monitor.log').replace('\\', '/')
-
-# Data archive configuration
-DATA_ARCHIVE_ENABLED = False
-DATA_ARCHIVE_HOST = '127.0.0.1'
-DATA_ARCHIVE_PORT = 27017
-DATA_ARCHIVE_DB = 'nodewatcher'
-
-# Are stickers enabled or not. If set to False the pdflatex dependency is not needed.
-STICKERS_ENABLED = False
-STICKERS_TEMP_DIR = '/tmp/'
-STICKERS_DIR = os.path.join(MEDIA_ROOT, 'stickers').replace('\\', '/')
-
-# Are non-staff members allowed to mark a node as a border router
-NONSTAFF_BORDER_ROUTERS = False
 
 # Cache backend
 CACHE_BACKEND = "memcached://127.0.0.1:11211/"
@@ -235,13 +188,6 @@ BROKER_PORT = 27017
 BROKER_VHOST = "nodewatcher"
 CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
-
-# Enabling the on-demand graph generation requires a working Celery broker
-# configuration and a celeryd daemon running in the background to dispatch
-# tasks that generate graphs. Simply enabling this option without proper
-# configuration/setup will not work.
-ENABLE_GRAPH_DISPLAY = False
-
 # Monitoring
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
