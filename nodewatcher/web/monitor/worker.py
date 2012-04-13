@@ -3,7 +3,8 @@ import logging
 import multiprocessing
 import traceback
 
-from django.db import transaction
+from django.conf import settings
+from django.db import connection, transaction
 
 from web.core.monitor import processors as monitor_processors
 from web.nodes import models as nodes_models
@@ -17,6 +18,24 @@ BANNER = """
 
 # Logger instance
 logger = logging.getLogger("monitor.worker")
+
+@transaction.commit_on_success
+def stage_worker(args):
+  """
+  Runs stage processors on a given node.
+  """
+  context, node, stage = args
+  for p in monitor_processors.processors:
+    try:
+      sid = transaction.savepoint()
+      getattr(p, stage)(context, node)
+      transaction.savepoint_commit(sid)
+    except KeyboardInterrupt:
+      raise
+    except:
+      transaction.savepoint_rollback(sid)
+      logger.error("First stage processor has failed with exception:")
+      logger.error(traceback.format_exc())
 
 class Worker(object):
   @transaction.commit_on_success
@@ -35,8 +54,7 @@ class Worker(object):
         context, nodes = p.preprocess(context, nodes)
         transaction.savepoint_commit(sid)
       except KeyboardInterrupt:
-        logger.info("Aborted by user.")
-        return
+        raise
       except:
         transaction.savepoint_rollback(sid)
         logger.error("Preprocessor has failed with exception:")
@@ -51,29 +69,39 @@ class Worker(object):
       node.delete()
 
     # Perform per-node processing in two stages
-    logger.info("Running per-node first stage processors...")
-    # TODO make this run in parallel
-    for node in nodes:
-      context_snapshot = copy.deepcopy(context)
-      for p in monitor_processors.processors:
-        try:
-          sid = transaction.savepoint()
-          p.process_first_pass(context_snapshot, node)
-          transaction.savepoint_commit(sid)
-        except KeyboardInterrupt:
-          logger.info("Aborted by user.")
-          return
-        except:
-          transaction.savepoint_rollback(sid)
-          logger.error("First stage processor has failed with exception:")
-          logger.error(traceback.format_exc())
+    logger.info("Running per-node first pass processors...")
+    self.workers.map(stage_worker, ((context, node, "process_first_pass") for node in nodes))
+    logger.info("First pass completed.")
 
-    # TODO second pass
+    logger.info("Running per-node second pass processors...")
+    self.workers.map(stage_worker, ((context, node, "process_second_pass") for node in nodes))
+    logger.info("Second pass completed.")
 
     # TODO post-processing
 
+    logger.info("All done.")
+
+  def prepare_workers(self):
+    # Close the connection before forking the workers as otherwise resources will be
+    # shared and chaos will ensue
+    connection.close()
+
+    # Prepare worker processes
+    self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS)
+    logger.info("Ready with %d workers." % settings.MONITOR_WORKERS)
+
   def run(self):
     print BANNER
+    logger.info("Preparing the worker pool...")
+    self.prepare_workers()
+
     logger.info("Entering monitoring cycle...")
-    self.cycle()
+    try:
+      self.cycle()
+    except KeyboardInterrupt:
+      logger.info("Aborted by user.")
+    finally:
+      # Ensure that the worker pool gets cleaned up after processing is completed
+      self.workers.close()
+      self.workers.join()
 
