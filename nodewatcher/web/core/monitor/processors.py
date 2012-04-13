@@ -10,13 +10,15 @@ class ProcessorContext(dict):
   A simple dictionary wrapper that supports automatic nesting
   of namespaces and attribute access.
   """
-  def __init__(self):
+  def __new__(cls):
     """
-    Class constructor.
+    Class instance creator. This is overriden so we ensure that the namespace
+    attribute is present - which is required in case of unpickling instances.
     """
-    dict.__init__(self)
-    self.__dict__['_namespace'] = []
-  
+    instance = dict.__new__(cls)
+    instance._namespace = []
+    return instance
+
   def __getitem__(self, key):
     """
     Namespace-aware __getitem__.
@@ -64,7 +66,7 @@ class ProcessorContext(dict):
     Attribute access.
     """
     if name.startswith('_'):
-      return super(ProcessorContext, self).__getattr__(name)
+      return super(ProcessorContext, self).__getattribute__(name)
     return self[name]
   
   def __setattr__(self, name, value):
