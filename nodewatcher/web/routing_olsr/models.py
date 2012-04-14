@@ -60,7 +60,7 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
           context.aliases = olsr_info.get_aliases()
         except olsr_parser.OlsrParseFailed:
           self.logger.warning("Failed to parse olsrd feeds!")
-          raise
+          return context, nodes
         
         # Create a mapping from router ids to nodes
         self.logger.info("Mapping router IDs to node instances...")
