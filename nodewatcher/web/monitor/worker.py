@@ -1,4 +1,3 @@
-import copy
 import logging
 import multiprocessing
 import traceback
@@ -78,7 +77,19 @@ class Worker(object):
     self.workers.map(stage_worker, ((context, node, "process_second_pass") for node in nodes))
     logger.info("Second pass completed.")
 
-    # TODO post-processing
+    # Post-processing
+    for p in monitor_processors.processors:
+      try:
+        logger.info("Running postprocessor %s..." % p.__class__.__name__)
+        context = p.postprocess(context, nodes)
+        transaction.commit()
+      except KeyboardInterrupt:
+        transaction.rollback()
+        raise
+      except:
+        transaction.rollback()
+        logger.error("Preprocessor has failed with exception:")
+        logger.error(traceback.format_exc())
 
     logger.info("All done.")
 
