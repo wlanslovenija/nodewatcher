@@ -96,7 +96,7 @@ class NodeConfig(object):
   ip = None
   subnets = None
   vpn = None
-  vpnServer = (("91.185.203.246", 9999), ("91.185.199.246", 9999))
+  vpnServer = (("91.185.203.246", 9999), ("46.54.226.43", 9999))
   dns = ("10.254.0.1", "10.254.0.2")
   ntp = ("10.254.0.1", "10.254.0.2")
   interfaces = None
@@ -507,7 +507,7 @@ config table mesh
         option id       20
 
 config policy
-        option dest_ip  '91.185.203.246'
+        option dest_ip  '91.185.199.246'
         option table    'main'
         option priority 999
 
@@ -661,7 +661,7 @@ config dhcp mesh
         f.write("""
 config edge
         option ipaddr           '{vpn_ip}'
-        option supernode        '91.185.203.246:4242'
+        option supernode        '91.185.199.246:4242'
         option community        'n2n.wlan-si.net'
         option key              'UQP9GjnIrLRUp7Yc'
         option route            '1'
