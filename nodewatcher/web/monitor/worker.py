@@ -22,7 +22,7 @@ logger = logging.getLogger("monitor.worker")
 @transaction.commit_manually
 def stage_worker(args):
   """
-  Runs stage processors on a given node.
+  Runs a list of (node) processors on a given node.
   """
   context, node, processors = args
   for p in processors:
@@ -38,6 +38,9 @@ def stage_worker(args):
       logger.error(traceback.format_exc())
 
 class Worker(object):
+  """
+  Monitoring daemon.
+  """
   def prepare_processors(self):
     """
     Loads all processors as specified in configuration and groups them
@@ -59,6 +62,8 @@ class Worker(object):
         prev_class = self.processors[-1][-1]
         curr_class = processor
 
+        # Consecutive node processors are grouped together so they will all be run in parallel
+        # on the list of nodes that has been prepared by recent network processor invocations
         if issubclass(prev_class, monitor_processors.NodeProcessor) and \
           issubclass(curr_class, monitor_processors.NodeProcessor):
           self.processors[-1].append(processor)
@@ -128,11 +133,13 @@ class Worker(object):
 
     logger.info("Entering monitoring cycle...")
     try:
+      # TODO this should be run in a loop or something
       self.cycle()
     except KeyboardInterrupt:
       logger.info("Aborted by user.")
     finally:
       # Ensure that the worker pool gets cleaned up after processing is completed
+      logger.info("Stopping worker processes...")
       self.workers.close()
       self.workers.join()
 
