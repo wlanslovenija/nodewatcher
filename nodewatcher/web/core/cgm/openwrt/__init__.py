@@ -161,7 +161,6 @@ cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 
 # Load all modules for this platform that are included in the core
 import web.core.cgm.openwrt.general
-import web.core.cgm.openwrt.vpn
 
 # Load all model-specific modules
 import web.core.cgm.openwrt.fon
