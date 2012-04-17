@@ -97,12 +97,6 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.507
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
 
-# Configure with your bit.ly and Twitter user data to enable tweets via Twitther for some network events
-#BITLY_LOGIN = "Your bit.ly login"
-#BITLY_API_KEY = "Your bit.ly API key"
-#TWITTER_USERNAME = "Your Twitter username"
-#TWITTER_PASSWORD = "Your Twitter password"
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
   'django.template.loaders.filesystem.Loader',
@@ -204,21 +198,6 @@ OLSRD_MONITOR_PORT = 2006
 # Registry
 REGISTRY_RULES_MODULES = {
   'node.config' : 'web.rules'
-}
-
-DOCUMENTATION_LINKS = {
-#  'custom_node'          : 'http://example.net/wiki/CustomNode',
-#  'known_issues'         : 'http://example.net/wiki/KnownIssues',
-#  'report_issue'         : 'http://example.net/newticket',
-  'diversity'            : 'http://en.wikipedia.org/wiki/Antenna_diversity',
-  'decimal_degrees'      : 'http://en.wikipedia.org/wiki/Decimal_degrees',
-  'ip_address'           : 'http://en.wikipedia.org/wiki/IP_address',
-#  'solar'                : 'http://example.net/wiki/Solar',
-  'antenna_type'         : 'http://en.wikipedia.org/wiki/Antenna_%28radio%29',
-  'antenna_polarization' : 'http://en.wikipedia.org/wiki/Antenna_%28radio%29#Polarization',
-  'vpn'                  : 'http://en.wikipedia.org/wiki/Virtual_private_network',
-  'snr'                  : 'http://en.wikipedia.org/wiki/Signal-to-noise_ratio',
-  'bitrate'              : 'http://en.wikipedia.org/wiki/Bit_rate',
 }
 
 # Logging configuration
