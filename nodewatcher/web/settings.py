@@ -191,10 +191,10 @@ CELERY_IGNORE_RESULT = True
 
 # Monitoring
 MONITOR_PROCESSORS = (
-  'web.routing_olsr.models.OLSRTopology',
-  'web.routing_olsr.models.OLSRNodePostprocess',
-  'web.telemetry_http.models.HTTPTelemetry',
-  'web.telemetry_core.models.SystemStatusCheck',
+  'web.routing_olsr.processors.OLSRTopology',
+  'web.routing_olsr.processors.OLSRNodePostprocess',
+  'web.telemetry_http.processors.HTTPTelemetry',
+  'web.telemetry_core.processors.SystemStatusCheck',
   'web.monitor.processors.PurgeInvalidNodes'
 )
 
