@@ -2,9 +2,6 @@ import contextlib
 import logging
 import traceback
 
-# Registered processors
-processors = []
-
 class ProcessorContext(dict):
   """
   A simple dictionary wrapper that supports automatic nesting
@@ -138,58 +135,37 @@ class MonitoringProcessor(object):
       self.logger.error(msg)
     self.logger.error(traceback.format_exc())
 
-  def preprocess(self, context, nodes):
+class NetworkProcessor(MonitoringProcessor):
+  """
+  Network processors are called with a set of nodes as a parameter and are run
+  serially.
+  """
+  def process(self, context, nodes):
     """
-    Invoked before processing specific nodes and should select the nodes
-    that will be processed.
-    
+    Performs network-wide processing and selects the nodes that will be processed
+    in any following processors. Context is passed between network processors.
+
     @param context: Current context
     @param nodes: A set of nodes that are to be processed
     @return: A (possibly) modified context and a (possibly) modified set of nodes
     """
     return context, nodes
-  
-  def postprocess(self, context, nodes):
-    """
-    Invoked after processing specific nodes.
-    
-    @param context: Current context
-    @param nodes: A set of nodes that have been processed
-    @return: A (possibly) modified context
-    """
-    return context
-  
-  def process_first_pass(self, context, node):
-    """
-    Called for every processed node in the first pass. Should fetch and store
-    data for the second pass.
-    
-    @param context: Current context
-    @param node: Node that is being processed
-    @return: A (possibly) modified context
-    """
-    return context
-  
-  def process_second_pass(self, context, node):
-    """
-    Called for every processed node in the second pass. Should analyze the stored
-    data but should not modify it in such a way to affect other analyzers (undefined
-    results if it does).
-    
-    @param context: Current context
-    @param node: Node that is being processed
-    @return: A (possibly) modified context
-    """
-    return context
 
-def register_processor(processor):
+class NodeProcessor(MonitoringProcessor):
   """
-  Registers a new class to be a monitoring processor.
-  
-  @param processor: Class implementing the MonitoringProcessor interface
+  Node processors are called for each node in a worker process. They run in parallel
+  for all nodes at once (depending on worker count). Context is discarded once
+  all NodeProcessors for a specific node are run.
   """
-  global processors
-  processors.append(processor())
+  def process(self, context, node):
+    """
+    Called for every processed node.
+
+    @param context: Current context
+    @param node: Node that is being processed
+    @return: A (possibly) modified context
+    """
+    return context
 
 def depends_on_context(*keys):
   """

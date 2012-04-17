@@ -8,7 +8,6 @@ from web.core import models as core_models
 from web.core.monitor import processors as monitor_processors
 from web.nodes import models as nodes_models
 from web.routing_olsr import parser as olsr_parser
-from web.registry import fields as registry_fields
 from web.registry import registration
 
 class OlsrRoutingTopologyMonitor(core_models.RoutingTopologyMonitor):
@@ -35,18 +34,18 @@ class OlsrRoutingAnnounceMonitor(core_models.RoutingAnnounceMonitor):
 
 registration.point("node.monitoring").register_item(OlsrRoutingAnnounceMonitor)
 
-class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
+class OLSRTopology(monitor_processors.NetworkProcessor):
   """
   Processor that handles monitoring of olsrd routing daemon.
   """
-  def preprocess(self, context, nodes):
+  def process(self, context, nodes):
     """
-    Invoked before processing specific nodes and should select the nodes
-    that will be processed.
-    
+    Performs network-wide processing and selects the nodes that will be processed
+    in any following processors.
+
     @param context: Current context
-    @param nodes: A list of nodes that are to be processed
-    @return: A (possibly) modified context and a (possibly) filtered list of nodes
+    @param nodes: A set of nodes that are to be processed
+    @return: A (possibly) modified context and a (possibly) modified set of nodes
     """
     with context.in_namespace("routing"):
       with context.in_namespace("olsr"):
@@ -95,12 +94,12 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
           status_mon.save()
     
     return context, nodes
-  
-  def process_first_pass(self, context, node):
+
+class OLSRNodePostprocess(monitor_processors.NodeProcessor):
+  def process(self, context, node):
     """
-    Called for every processed node in the first pass. Should fetch and store
-    data for the second pass.
-    
+    Called for every processed node.
+
     @param context: Current context
     @param node: Node that is being processed
     @return: A (possibly) modified context
@@ -167,6 +166,3 @@ class OlsrFetchProcessor(monitor_processors.MonitoringProcessor):
       pass
     
     return context
-
-monitor_processors.register_processor(OlsrFetchProcessor)
-

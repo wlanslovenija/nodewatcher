@@ -188,7 +188,16 @@ BROKER_PORT = 27017
 BROKER_VHOST = "nodewatcher"
 CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
+
 # Monitoring
+MONITOR_PROCESSORS = (
+  'web.routing_olsr.models.OLSRTopology',
+  'web.routing_olsr.models.OLSRNodePostprocess',
+  'web.telemetry_http.models.HTTPTelemetry',
+  'web.telemetry_core.models.SystemStatusCheck',
+  'web.monitor.processors.PurgeInvalidNodes'
+)
+
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
 

@@ -1,19 +1,17 @@
 import datetime
 
 from web.core import models as core_models
-from web.core.monitor import telemetry as monitor_telemetry
 from web.core.monitor import processors as monitor_processors
 
-class SystemStatusTelemetryModule(monitor_telemetry.TelemetryModule):
+class SystemStatusCheck(monitor_processors.NodeProcessor):
   """
   Stores system status telemetry data into the database. Will only run if HTTP
   telemetry module has previously fetched data.
   """
   @monitor_processors.depends_on_context("http")
-  def store(self, context, node):
+  def process(self, context, node):
     """
-    Retrieves data from nodewatcher telemetry and stores it into the monitoring
-    schema.
+    Called for every processed node.
 
     @param context: Current context
     @param node: Node that is being processed
@@ -33,5 +31,3 @@ class SystemStatusTelemetryModule(monitor_telemetry.TelemetryModule):
       status.save()
 
     return context
-
-monitor_telemetry.register_module(SystemStatusTelemetryModule)
