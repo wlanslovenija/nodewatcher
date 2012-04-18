@@ -183,7 +183,10 @@ BROKER_VHOST = "nodewatcher"
 CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
 
-# Monitoring
+# Monitoring processors configuration; this defines the order in which monitoring processors
+# will be called. Multiple consecutive node processors will be automatically grouped and
+# executed in parallel for all nodes that have been chosen so far by network processors. Only
+# processors that are specified here will be called.
 MONITOR_PROCESSORS = (
   'web.routing_olsr.processors.OLSRTopology',
   'web.routing_olsr.processors.OLSRNodePostprocess',
