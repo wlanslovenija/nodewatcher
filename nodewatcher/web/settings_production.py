@@ -23,7 +23,7 @@ DATABASES = {
     'NAME'     : 'wlansi',
     'USER'     : 'wlansi_nw',
     'PASSWORD' : DB_PASSWORD, # Defined in secrets
-    'HOST'     : 'dbpgsql',
+    'HOST'     : 'localhost',
     'PORT'     : '',
   }
 }
