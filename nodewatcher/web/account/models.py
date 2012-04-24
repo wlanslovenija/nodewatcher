@@ -1,5 +1,7 @@
 from django.conf import settings
+from django import db
 from django.db import models as django_models
+from django.db.models import signals
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.template import loader
@@ -45,6 +47,16 @@ class UserProfileAndSettings(django_models.Model):
   @django_models.permalink
   def get_absolute_url(self):
     return ('user_account',)
+
+def create_profile_and_settings(sender, instance, created, **kwargs):
+  if created:
+    try:
+      # We try to create profile and settings object so that it always exist
+      UserProfileAndSettings.objects.create(user=instance)
+    except db.IntegrityError:
+      pass
+
+signals.post_save.connect(create_profile_and_settings, sender=auth_models.User)
 
 # Monkey patach registration_models.RegistrationProfile
 
@@ -100,7 +112,7 @@ activation_key_expired.boolean = True
 registration_models.RegistrationProfile.activation_key_expired = activation_key_expired
 
 try:
-# So that signals are registred early on
+  # So that signals are registred early on
   import web.account.signals
 except ImportError:
   # Probably circular imports
