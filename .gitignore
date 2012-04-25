@@ -1,0 +1,14 @@
+.*
+*.log
+*.sqlite
+*.sqlite-journal
+*.pyc
+*.rrd
+/nodewatcher/web/secrets.py
+/nodewatcher/web/*.xml
+/nodewatcher/web/*.json
+/nodewatcher/static/graphs/
+/nodewatcher/static/wlansi
+/nodewatcher/monitor/simulator/data/
+/generator/build/
+/docs/_build/
