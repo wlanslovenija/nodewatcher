@@ -34,7 +34,7 @@ elif not options.destination:
   exit(1)
 
 # Setup import paths, since we are using Django models
-sys.path.append(options.path)
+sys.path.append(os.path.abspath(options.path))
 os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Django stuff
