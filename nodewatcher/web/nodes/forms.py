@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from django.db import transaction, models
+from django.db import connection, transaction, models
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.core import validators as core_validators
@@ -652,7 +652,7 @@ class UpdateNodeForm(forms.Form):
         for key, value in kwargs.iteritems():
           field = getattr(profile, key)
           meta = profile._meta.get_field(key)
-          prep = meta.get_db_prep_value(value)
+          prep = meta.get_db_prep_value(value, connection)
           
           if isinstance(meta, models.ManyToManyField):
             if set([m.pk for m in field.all()]) != set([m.pk for m in value]):
