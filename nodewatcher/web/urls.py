@@ -13,11 +13,6 @@ from web.account import forms
 from web.nodes import feeds
 from web.nodes import sitemaps
 
-# Legacy feeds (GeoDjango feeds have not yet been upgraded to new code)
-feeds_dict = {
-  'active' : feeds.ActiveNodes,
-}
-
 sitemaps = {
   'nodes'  : sitemaps.NodeSitemap,
   'static' : sitemaps.StaticSitemap,
@@ -129,7 +124,7 @@ urlpatterns = patterns('',
   # Feeds
   url(r'^feeds/whitelist/$', 'web.nodes.views.whitelist'),
   url(r'^feeds/rss/events(?:/(?P<username>[\w.@+-]+))?/$', feeds.LatestEvents(), name = 'events_feed'),
-  url(r'^feeds/rss/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', { 'feed_dict' : feeds_dict }, name = 'feeds'),
+  url(r'^feeds/rss/active/$', feeds.ActiveNodes(), name = 'active_feed'),
 
   # Pools
   url(r'^pools/$', 'web.nodes.views.pools', name = 'pools'),

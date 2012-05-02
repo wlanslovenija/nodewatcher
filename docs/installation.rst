@@ -24,7 +24,7 @@ Prerequisites
 The following (Debian, Ubuntu ...) packages are required:
 
 * python (>= 2.6, *>= 3.0 not supported*)
-* python-django (1.2.x)
+* python-django (1.4.x)
 * python-rrdtool (with rrdtool >= 1.3.5)
 * python-lxml
 * python-yaml
@@ -34,6 +34,7 @@ The following (Debian, Ubuntu ...) packages are required:
 * memcached
 * python-psycopg2
 * python-django-picklefield 
+* python-django-south
 * python-pyparsing
 * python-anyjson
 * python-pymongo
@@ -42,8 +43,8 @@ The following (Debian, Ubuntu ...) packages are required:
 
 The following Python modules are required:
 
-* celery (2.2.1)
-* django-celery (2.2.1)
+* celery (2.5.3)
+* django-celery (2.5.5)
 * django-registration (newer than revision 6d2e42a13cb6, > 0.7)
 * django-phonenumber-field
 * python-aprmd5
@@ -59,8 +60,8 @@ Install them all with a single command::
 
     sudo aptitude install python python-django python-rrdtool \
     python-lxml python-yaml python-memcache fping graphviz memcached python-psycopg2 \
-    python-django-picklefield python-pyparsing python-anyjson python-pymongo beanstalkd \
-    python-geoip
+    python-django-picklefield python-django-south python-pyparsing python-anyjson \
+    python-pymongo beanstalkd python-geoip
 
 Getting Source
 --------------
