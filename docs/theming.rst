@@ -92,7 +92,7 @@ Changing Django Templates
 
 More drastic changes in layout can be made by modifying the Django templates.
 In this case some knowledge of Django templating system is required. You can
-then override specific template files from ``web/templates`` directory by
+then override specific template files from ``frontend/templates`` directory by
 copying them in some other directory, modifying them and then adding the
 directory path to the templates directory list ``TEMPLATE_DIRS`` in your
 ``settings.py`` file (before the default templates directory). Templates are

@@ -14,9 +14,9 @@ if os.getuid() != 0:
 
 # Parse command line options
 parser = OptionParser()
-parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "web" Python module')
+parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "frontend" Python module')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use',
-                  default = 'web.settings_production')
+                  default = 'frontend.settings_production')
 parser.add_option('-i', '--interface', dest = 'interface', help = 'Shaped interface')
 parser.add_option('-p', '--prefix', dest = 'prefix', help = 'Subnet prefix')
 parser.add_option('-r', '--refresh-interval', dest = 'refresh', type = 'int',

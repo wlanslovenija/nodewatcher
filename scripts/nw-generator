@@ -25,7 +25,7 @@ PIDFILE=/var/run/$NAME.pid
 # Variables in START*_OPTS and DAEMON_ARGS will be expanded later with eval
 STARTSTOP_OPTS='--quiet --exec $DAEMON --chdir $DAEMON_CHDIR'
 START_OPTS='--background --make-pidfile'
-DAEMON_ARGS='gennyd.py --path=../nodewatcher --settings=web.settings_production \
+DAEMON_ARGS='gennyd.py --path=../nodewatcher --settings=frontend.settings_production \
  --destination=/srv/www/bindist/images'
 
 # Activate virtualenv Python environment

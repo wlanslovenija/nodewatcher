@@ -26,7 +26,7 @@ PIDFILE=/var/run/$NAME.pid
 STARTSTOP_OPTS='--quiet --exec $DAEMON --chdir $DAEMON_CHDIR \
  --chuid $DAEMON_USER --user $DAEMON_USER --group $DAEMON_GROUP'
 START_OPTS='--background --make-pidfile'
-DAEMON_ARGS='monitor.py --path=.. --settings=web.settings_production \
+DAEMON_ARGS='monitor.py --path=.. --settings=frontend.settings_production \
  --collect-simulation'
 
 # Activate virtualenv Python environment

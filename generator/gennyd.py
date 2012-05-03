@@ -15,7 +15,7 @@ print "                   nodewatcher firmware generator daemon                 
 print "============================================================================"
 
 parser = OptionParser()
-parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "web" Python module')
+parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "frontend" Python module')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
 parser.add_option('--destination', dest = 'destination', help = 'Firmware destination directory')
 options, args = parser.parse_args()

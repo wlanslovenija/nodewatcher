@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 # Django models
-from web.policy.models import Policy, PolicyJob, TrafficControlClass
+from frontend.policy.models import Policy, PolicyJob, TrafficControlClass
 from django.db import transaction
 
 TC = '/sbin/tc'

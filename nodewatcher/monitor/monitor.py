@@ -15,7 +15,7 @@ print "                       nodewatcher monitoring daemon                     
 print "============================================================================"
 
 parser = OptionParser()
-parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "web" Python module')
+parser.add_option('--path', dest = 'path', help = 'Path that contains nodewatcher "frontend" Python module')
 parser.add_option('--settings', dest = 'settings', help = 'Django settings to use')
 parser.add_option('--olsr-host', dest = 'olsr_host', help = 'A host with OLSR txt-info plugin running (overrides settings file)')
 parser.add_option('--stress-test', dest = 'stress_test', help = 'Perform a stress test (only used for development)', action = 'store_true')
@@ -42,13 +42,13 @@ elif options.reverse_populate and (not options.rp_node or not options.rp_graph):
   exit(1)
 
 # Setup import paths, since we are using Django models
-sys.path.append(options.path)
+sys.path.append(os.path.abspath(options.path))
 os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
 # Import our models
-from web.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning, Tweet
-from web.generator.models import Template, Profile
-from web.nodes import data_archive
+from frontend.nodes.models import Node, NodeStatus, Subnet, SubnetStatus, APClient, Link, GraphType, GraphItem, Event, EventSource, EventCode, IfaceType, InstalledPackage, NodeType, RenumberNotice, WarningCode, NodeWarning, Tweet
+from frontend.generator.models import Template, Profile
+from frontend.nodes import data_archive
 from django.db import transaction, models, connection
 from django.conf import settings
 
@@ -66,8 +66,8 @@ else:
   nodewatcher.COLLECT_SIMULATION_DATA = options.collect_sim
   wifi_utils.COLLECT_SIMULATION_DATA = options.collect_sim
 
-from web.monitor.rrd import *
-from web.monitor import graphs
+from frontend.monitor.rrd import *
+from frontend.monitor import graphs
 from lib.topology import DotTopologyPlotter
 from lib import ipcalc
 from time import sleep

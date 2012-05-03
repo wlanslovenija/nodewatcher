@@ -14,7 +14,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC="Nodewatcher task queue daemon"
 NAME=nw-celery
-PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher/web
+PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher/frontend
 SCRIPTNAME=/etc/init.d/$NAME
 DAEMON=/srv/nodewatcher/env_nodewatcher/bin/python
 DAEMON_CHDIR=$PROJECT_PATH
@@ -26,7 +26,7 @@ PIDFILE=/var/run/$NAME.pid
 STARTSTOP_OPTS='--quiet --exec $DAEMON --chdir $DAEMON_CHDIR \
  --chuid $DAEMON_USER --user $DAEMON_USER --group $DAEMON_GROUP'
 START_OPTS='--background --make-pidfile'
-DAEMON_ARGS='manage.py celeryd --settings=web.settings_production --pythonpath=$PROJECT_PATH \
+DAEMON_ARGS='manage.py celeryd --settings=frontend.settings_production --pythonpath=$PROJECT_PATH \
  -l info -c 3 --maxtasksperchild=50'
 
 # Activate virtualenv Python environment

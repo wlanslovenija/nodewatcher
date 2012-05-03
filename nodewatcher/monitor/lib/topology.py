@@ -1,7 +1,7 @@
 import subprocess
 import logging
 from traceback import print_exc
-from web.nodes.models import NodeType
+from frontend.nodes.models import NodeType
 
 class DotTopologyPlotter:
   """

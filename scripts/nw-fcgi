@@ -15,7 +15,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC="Nodewatcher on FastCGI Django"
 NAME=nw-fcgi
-PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher/web
+PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher/frontend
 SCRIPTNAME=/etc/init.d/$NAME
 DAEMON=/srv/nodewatcher/env_nodewatcher/bin/python
 DAEMON_CHDIR=$PROJECT_PATH
@@ -29,7 +29,7 @@ FCGI_PORT=9140
 STARTSTOP_OPTS='--quiet --exec $DAEMON --chdir $DAEMON_CHDIR \
  --chuid $DAEMON_USER --user $DAEMON_USER --group $DAEMON_GROUP'
 #START_OPTS='--background --make-pidfile'
-DAEMON_ARGS='manage.py runfcgi --settings=web.settings_production --pythonpath=$PROJECT_PATH \
+DAEMON_ARGS='manage.py runfcgi --settings=frontend.settings_production --pythonpath=$PROJECT_PATH \
  protocol=fcgi maxrequests=200 host=$FCGI_HOST port=$FCGI_PORT pidfile=$PIDFILE'
 
 # Activate virtualenv Python environment
