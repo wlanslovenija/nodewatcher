@@ -994,6 +994,9 @@ def check_network_status():
   # Remove invisible links
   Link.objects.filter(visible = False).delete()
   
+  # Commit updates to release any pending locks
+  transaction.commit()
+  
   # Add nodes to topology map and generate output
   if not getattr(settings, 'MONITOR_DISABLE_GRAPHS', None):
     # Only generate topology when graphing is not disabled
