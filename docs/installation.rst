@@ -342,12 +342,11 @@ Simulation of Monitor Data
 To simulate monitor data you should set ``MONITOR_ENABLE_SIMULATION`` to
 ``True`` in your setting file. In this case the whole network is simulated and
 no node with OLSR providing the data feed is required. **This may not be
-suitable for all test scenarios.** Simulation data can be found in
+suitable for all test scenarios.** Simulation data should be provided in
 ``simulator/data`` directory.
 
-It might be useful to fetch the latest simulation data that can be retrieved
-from `this location`_. Simply unpack it into ``simulator/data`` directory and
-it will overwrite data fetched from the repository.
+The latest simulation data that can be retrieved from `this location`_. Simply
+unpack it into ``simulator/data`` directory.
 
 .. _this location: http://bindist.wlan-si.net/data/simulator-dataset.tar.bz2
 
