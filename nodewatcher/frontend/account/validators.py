@@ -1,4 +1,4 @@
-import socket
+import dns.resolver
 
 from django.core import exceptions
 from django.core import validators
@@ -17,12 +17,11 @@ def validate_email_with_hostname(value):
     hostname_part = parts[-1]
     try:
       # Try to resolve it
-      socket.getaddrinfo(hostname_part, None)
+      dns.resolver.query(hostname_part, 'MX')
     except:
       try:
-        # Try internationalized domain name
-        hostname_part = hostname_part.encode('idna')
-        socket.getaddrinfo(hostname_part, None)
+        # If MX record does not exist, SMTP fails back to A (or AAAA) records.
+        dns.resolver.query(hostname_part)
         return
       except:
         pass

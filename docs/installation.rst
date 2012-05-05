@@ -39,6 +39,7 @@ The following (Debian, Ubuntu ...) packages are required:
 * python-anyjson
 * python-pymongo
 * python-geoip
+* python-dnspython
 * beanstalkd
 
 The following Python modules are required:
@@ -61,7 +62,7 @@ Install them all with a single command::
     sudo aptitude install python python-django python-rrdtool \
     python-lxml python-yaml python-memcache fping graphviz memcached python-psycopg2 \
     python-django-picklefield python-django-south python-pyparsing python-anyjson \
-    python-pymongo beanstalkd python-geoip
+    python-pymongo beanstalkd python-geoip python-dnspython
 
 Getting Source
 --------------
