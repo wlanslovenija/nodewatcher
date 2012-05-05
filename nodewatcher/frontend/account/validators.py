@@ -1,8 +1,7 @@
-import dns.resolver
-
-from django.core import exceptions
-from django.core import validators
+from django.core import exceptions, validators
 from django.utils.translation import ugettext_lazy as _
+
+import dns.resolver
 
 def validate_email_with_hostname(value):
   """
@@ -15,14 +14,19 @@ def validate_email_with_hostname(value):
   if value and u'@' in value:
     parts = value.split(u'@')
     hostname_part = parts[-1]
+
     try:
       # Try to resolve it
       dns.resolver.query(hostname_part, 'MX')
+      return
     except:
-      try:
-        # If MX record does not exist, SMTP fails back to A (or AAAA) records.
-        dns.resolver.query(hostname_part)
-        return
-      except:
-        pass
-      raise exceptions.ValidationError(_(u'Enter a valid e-mail address.'), code='invalid')
+      pass
+
+    try:
+      # If MX record does not exist, SMTP fails back to A (or AAAA) records
+      dns.resolver.query(hostname_part)
+      return
+    except:
+      pass
+
+    raise exceptions.ValidationError(_(u'Enter a valid e-mail address.'), code='invalid')
