@@ -15,7 +15,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC="Nodewatcher on FastCGI Django"
 NAME=nw-fcgi
-PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher/frontend
+PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher
 SCRIPTNAME=/etc/init.d/$NAME
 DAEMON=/srv/nodewatcher/env_nodewatcher/bin/python
 DAEMON_CHDIR=$PROJECT_PATH

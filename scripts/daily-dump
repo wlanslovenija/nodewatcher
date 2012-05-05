@@ -4,7 +4,7 @@
 . /srv/nodewatcher/env_nodewatcher/bin/activate
 
 # Dump database
-cd /srv/nodewatcher/nodewatcher/nodewatcher/frontend
+cd /srv/nodewatcher/nodewatcher/nodewatcher
 python manage.py dumptestdata --settings=frontend.settings_production /srv/www/bindist/data/dump.tar.bz2
 
 # Prepare fresh simulator dataset

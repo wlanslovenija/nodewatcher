@@ -14,7 +14,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC="Nodewatcher task queue daemon"
 NAME=nw-celery
-PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher/frontend
+PROJECT_PATH=/srv/nodewatcher/nodewatcher/nodewatcher
 SCRIPTNAME=/etc/init.d/$NAME
 DAEMON=/srv/nodewatcher/env_nodewatcher/bin/python
 DAEMON_CHDIR=$PROJECT_PATH
