@@ -1104,6 +1104,14 @@ class PoolStatus:
   Full = 1
   Partial = 2
 
+def modifies_pool(f):
+  def decorator(self, *args, **kwargs):
+    # Lock our own instance
+    locked_instance = self.__class__.objects.select_for_update().get(pk = self.pk)
+    return f(locked_instance, *args, **kwargs)
+
+  return decorator
+
 class Pool(models.Model):
   """
   This class represents an IP pool - that is a subnet available for
@@ -1151,6 +1159,7 @@ class Pool(models.Model):
     
     return left, right
   
+  @modifies_pool
   def reserve_subnet(self, network, prefix_len, check_only = False):
     """
     Attempts to reserve a specific subnet in the allocation pool. The subnet
@@ -1183,7 +1192,7 @@ class Pool(models.Model):
     # Find the proper network between our children
     alloc = None
     if self.children.count() > 0:
-      for child in self.children.exclude(status = PoolStatus.Full):
+      for child in self.children.exclude(status = PoolStatus.Full).select_for_update():
         alloc = child.reserve_subnet(network, prefix_len, check_only)
         if alloc:
           break
@@ -1232,7 +1241,7 @@ class Pool(models.Model):
     # and traverse the left one
     alloc = None
     if self.children.count() > 0:
-      for child in queryset_by_ip(self.children.exclude(status = PoolStatus.Full), "ip_subnet"):
+      for child in queryset_by_ip(self.children.exclude(status = PoolStatus.Full), "ip_subnet").select_for_update():
         alloc = child.allocate_buddy(prefix_len)
         if alloc:
           break
@@ -1250,6 +1259,7 @@ class Pool(models.Model):
     
     return alloc
   
+  @modifies_pool
   def reclaim_pools(self):
     """
     Coalesces free children back into one if possible.
@@ -1275,6 +1285,15 @@ class Pool(models.Model):
         self.status = PoolStatus.Partial
         self.save()
         return self.parent.reclaim_pools() if self.parent else None 
+
+  @modifies_pool
+  def free(self):
+    """
+    Frees this allocation.
+    """
+    self.status = PoolStatus.Free
+    self.save()
+    self.reclaim_pools()
 
   def is_leaf(self):
     """
@@ -1309,7 +1328,7 @@ class Pool(models.Model):
     else: 
       return u"%s/%d" % (self.network, self.cidr)
   
-  @require_lock('nodes_pool', 'nodes_subnet')
+  @modifies_pool
   def allocate_subnet(self, prefix_len = None):
     """
     Attempts to allocate a subnet from this pool.
@@ -1964,11 +1983,9 @@ def subnet_on_delete_callback(sender, **kwargs):
     return
 
   try:
-    subnet = Pool.objects.get(network = instance.subnet, cidr = instance.cidr)
+    subnet = Pool.objects.select_for_update().get(network = instance.subnet, cidr = instance.cidr)
     if subnet.status == PoolStatus.Full:
-      subnet.status = PoolStatus.Free
-      subnet.save()
-      subnet.reclaim_pools()
+      subnet.free()
   except Pool.DoesNotExist:
     pass
 
@@ -1980,11 +1997,9 @@ def node_on_delete_callback(sender, **kwargs):
 
   # Check if node has a /32 subnet assigned and free it if needed
   try:
-    subnet = Pool.objects.get(network = kwargs['instance'].ip, cidr = 32)
+    subnet = Pool.objects.select_for_update().get(network = kwargs['instance'].ip, cidr = 32)
     if subnet.status == PoolStatus.Full:
-      subnet.status = PoolStatus.Free
-      subnet.save()
-      subnet.reclaim_pools()
+      subnet.free()
   except Pool.DoesNotExist:
     pass
 
