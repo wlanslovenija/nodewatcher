@@ -22,6 +22,9 @@ class Record(models.Model):
   data = models.CharField(max_length = 255)
   mx_priority = models.IntegerField(default = 0)
 
+  class Meta:
+    unique_together = ("zone", "name", "type")
+
   @staticmethod
   def for_node(node, zone = None, name = None):
     """
