@@ -214,6 +214,16 @@ AUTHENTICATION_BACKENDS = (
   'frontend.account.auth.CryptBackend',
 )
 
+# TODO: Convert to Django default after migration of all dependent systems to Django 1.4
+PASSWORD_HASHERS = (
+  'django.contrib.auth.hashers.SHA1PasswordHasher',
+  'django.contrib.auth.hashers.MD5PasswordHasher',
+  'django.contrib.auth.hashers.CryptPasswordHasher',
+  'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+  'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+  'django.contrib.auth.hashers.BCryptPasswordHasher',
+)
+
 INSTALLED_APPS = (
   'django.contrib.auth',
   'django.contrib.contenttypes',
