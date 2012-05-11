@@ -33,7 +33,7 @@ class SelectorFormField(form_fields.TypedChoiceField):
     if rp_choices is not None:
       self._rp_choices = self._choices = self.widget.choices = rp_choices
   
-  def modify_to_context(self, item, cfg):
+  def modify_to_context(self, item, cfg, request):
     """
     Adapts the field to current registry context.
     """

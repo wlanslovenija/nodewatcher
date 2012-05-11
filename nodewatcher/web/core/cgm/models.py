@@ -138,11 +138,11 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
     """
     return None
   
-  def modify_to_context(self, item, cfg):
+  def modify_to_context(self, item, cfg, request):
     """
     Handles dynamic protocol/channel selection.
     """
-    super(WifiInterfaceConfigForm, self).modify_to_context(item, cfg)
+    super(WifiInterfaceConfigForm, self).modify_to_context(item, cfg, request)
     radio = None
     try:
       radio = cgm_base.get_platform(cfg['core.general'][0].platform) \

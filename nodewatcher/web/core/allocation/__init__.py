@@ -183,7 +183,7 @@ class IpAddressAllocatorFormMixin(object):
   """
   A mixin for address allocator forms.
   """
-  def modify_to_context(self, item, cfg):
+  def modify_to_context(self, item, cfg, request):
     """
     Dynamically modifies the form.
     """

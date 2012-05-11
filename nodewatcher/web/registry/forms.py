@@ -361,7 +361,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     
     item = current_config_item or instance
     cfg = context.current_config or existing_config
-    obj.modify_to_context(item, cfg)
+    obj.modify_to_context(item, cfg, context.request)
     return True
   
   if partial is None:

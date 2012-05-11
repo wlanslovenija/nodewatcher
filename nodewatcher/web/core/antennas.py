@@ -75,7 +75,7 @@ class AntennaReferencerFormMixin(object):
   """
   __metaclass__ = AntennaReferencerFormMixinMeta
   
-  def modify_to_context(self, item, cfg):
+  def modify_to_context(self, item, cfg, request):
     """
     Dynamically displays fields for entering new antenna information.
     """

@@ -88,7 +88,7 @@ class LocationConfigForm(forms.ModelForm):
       )
     }
   
-  def modify_to_context(self, item, cfg):
+  def modify_to_context(self, item, cfg, request):
     """
     Dynamically modifies the form.
     """
