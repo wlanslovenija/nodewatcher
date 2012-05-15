@@ -9,7 +9,7 @@ from web.core.allocation import pool as pool_models
 from web.nodes import models as nodes_models
 from web.registry import fields as registry_fields
 from web.registry import forms as registry_forms
-from web.registry import registration
+from web.registry import registration, permissions
 
 class AddressAllocator(models.Model):
   """
@@ -77,6 +77,7 @@ class IpAddressAllocator(AddressAllocator):
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   pool = registry_fields.ModelSelectorKeyField(pool_models.IpPool, limit_choices_to = { 'parent' : None })
   prefix_length = models.IntegerField(default = 27)
+  subnet_hint = registry_fields.IPAddressField(null = True, blank = True)
   allocation = models.ForeignKey(pool_models.IpPool, editable = False, null = True,
     on_delete = models.PROTECT, related_name = 'allocations_%(app_label)s_%(class)s')
   
@@ -112,6 +113,9 @@ class IpAddressAllocator(AddressAllocator):
     
     if other.pool != self.pool:
       return False
+
+    if other.subnet_hint != self.subnet_hint:
+      return False
     
     self.allocation = other.allocation
     self.save()
@@ -130,6 +134,9 @@ class IpAddressAllocator(AddressAllocator):
     if self.allocation.prefix_length != self.prefix_length:
       return False
     
+    if self.subnet_hint is not None and self.allocation.network != str(self.subnet_hint.network):
+      return False
+    
     if self.allocation.top_level() != self.pool:
       return False
     
@@ -142,7 +149,10 @@ class IpAddressAllocator(AddressAllocator):
     
     @param obj: A valid Django model instance
     """
-    self.allocation = self.pool.allocate_subnet(self.prefix_length)
+    if self.subnet_hint is not None:
+      self.allocation = self.pool.reserve_subnet(str(self.subnet_hint.network), self.prefix_length)
+    else:
+      self.allocation = self.pool.allocate_subnet(self.prefix_length)
     
     if self.allocation is not None:
       self.allocation.allocation_content_object = obj
@@ -179,6 +189,9 @@ class IpAddressAllocator(AddressAllocator):
     """
     return str(self.allocation.to_ip_network()[1])
 
+# Register a new manual pool allocation permission
+permissions.register(pool_models.IpPool, 'can_allocate_manually', "Can allocate manually")
+
 class IpAddressAllocatorFormMixin(object):
   """
   A mixin for address allocator forms.
@@ -213,4 +226,11 @@ class IpAddressAllocatorFormMixin(object):
       )
     except (pool_models.IpPool.DoesNotExist, AttributeError):
       self.fields['prefix_length'] = registry_fields.SelectorFormField(label = _("Prefix Length"), choices = BLANK_CHOICE_DASH)
+
+    # If user has sufficient permissions, enable manual entry
+    try:
+      if not request.user.has_perm('can_allocate_manually', item.pool):
+        del self.fields['subnet_hint']
+    except pool_models.IpPool.DoesNotExist:
+      del self.fields['subnet_hint']
 
