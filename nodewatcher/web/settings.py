@@ -195,6 +195,15 @@ MONITOR_PROCESSORS = (
   'web.monitor.processors.PurgeInvalidNodes'
 )
 
+# Registry form processors hook into configuration changes
+# performed by users via the forms user interface
+REGISTRY_FORM_PROCESSORS = {
+  'node.config' : [
+    'web.core.allocation.processors.AutoPoolAllocator',
+    'web.core.cgm.processors.NodeCgmValidator',
+  ]
+}
+
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
 

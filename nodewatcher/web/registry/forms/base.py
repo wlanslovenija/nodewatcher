@@ -2,8 +2,10 @@ import copy
 import json
 
 from django import forms, template
+from django.conf import settings
 from django.core import exceptions
 from django.db import transaction, models
+from django.utils import importlib
 from django.utils.datastructures import SortedDict
 
 from web.registry import rules as registry_rules
@@ -753,13 +755,22 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
     partial_config = {} if only_rules else None,
     validation_errors = False
   )
-  
-  # Execute validation hooks that need to be called before config modification
-  pre_hook_results = {}
-  if save and root is not None:
-    for hook in regpoint.validation_hooks["pre"].values():
-      pre_hook_results[hook.result_id] = hook(root)
-  
+
+  # Prepare form processors
+  form_processors = []
+  for proc_module in settings.REGISTRY_FORM_PROCESSORS.get(regpoint.name, []):
+    i = proc_module.rfind(".")
+    module, attr = proc_module[:i], proc_module[i+1:]
+    try:
+      module = importlib.import_module(module)
+      form_processors.append(getattr(module, attr)())
+    except (ImportError, AttributeError):
+      raise exceptions.ImproperlyConfigured("Error importing registry form processor %s!" % proc_module)
+
+  # Execute form preprocessing
+  for processor in form_processors:
+    processor.preprocess(root)
+
   try:
     sid = transaction.savepoint()
     forms = RootRegistryRenderItem(prepare_forms(context))
@@ -775,17 +786,14 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
     
     # Execute any validation hooks when saving and there are no validation errors
     if save and root is not None and not context.validation_errors:
-      for hook in regpoint.validation_hooks["post"].values():
+      for processor in form_processors:
         try:
-          if hook.result_id is not None:
-            hook(root, pre_hook_results[hook.result_id])
-          else:
-            hook(root)
+          processor.postprocess(root)
         except RegistryValidationError, e:
           context.validation_errors = True
           # TODO Handle validation errors
           raise
-    
+
     if not context.validation_errors:
       transaction.savepoint_commit(sid)
     else:

@@ -54,11 +54,7 @@ class RegistrationPoint(object):
     self.item_classes = {}
     self.choices_registry = {}
     self.flat_lookup_proxies = {}
-    self.validation_hooks = {
-      "pre" : {},
-      "post" : {}
-    }
-  
+
   def _register_item(self, item):
     """
     Common functions for registering an item for both simple items and hierarchical
@@ -349,16 +345,3 @@ def register_form_for_item(item, form_class):
     item._forms = {}
   
   item._forms[item] = form_class
-
-def register_validation_hook(regpoint, order = "post", result_id = None):
-  """
-  A decorator that registers a new validation hook that gets applied after
-  form validation for this registration point is completed.
-  """
-  def wrapper(f):
-    f.result_id = result_id
-    point(regpoint).validation_hooks[order][f.func_name] = f
-    return f
-  
-  return wrapper
-
