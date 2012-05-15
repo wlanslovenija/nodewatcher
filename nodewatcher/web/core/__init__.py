@@ -81,6 +81,10 @@ def node_address_allocation(node, allocations):
     else:
       request.free()
       request.satisfy(node)
+
+      # Prevent the allocation from being freed
+      if request in allocations:
+        allocations.remove(request)
   
   # Free existing unused resources
   # TODO Do this only when saving for real, not on validation runs
