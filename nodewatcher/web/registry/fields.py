@@ -263,7 +263,7 @@ class IPAddressField(models.Field):
   @staticmethod
   def ip_to_python(value, error_messages):
     if not value:
-      return ""
+      return None
     
     if isinstance(value, ipaddr._IPAddrBase):
       return value
@@ -295,6 +295,8 @@ class IPAddressField(models.Field):
     """
     Prepares Python value for saving into the database.
     """
+    if not value:
+      return None
     if isinstance(value, ipaddr._IPAddrBase):
       value = str(value)
     
