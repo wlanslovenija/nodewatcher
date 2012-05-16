@@ -13,13 +13,11 @@
 
 {% block contenttype %}nodelist{% endblock %}
 {% block rss %}
-  <link rel="alternate" href="{% url active_feed %}" title="{{ network.name }} – Active nodes" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}
   <h3>{% trans "Download in other formats" %}:</h3>
   <ul>
-    <li class="first last"><a class="rss" href="{% url active_feed %}">{% trans "RSS Feed" %}</a> ({% trans "open in" %} <a href="http://maps.google.com/maps?q={{ feeds_base_url|urlencode }}{% url active_feed as feeds_active %}{{ feeds_active|urlencode }}">Google Maps</a>)</li>
   </ul>
 {% endblock %}
 
@@ -34,14 +32,14 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
 <table border="0" width="100%" class="listing">
 <thead>
   <tr>
-    <th style="width: 3%;" class="center"></th>
+    <th style="width: 4%;"></th>
     <th style="width: 22%;"><b>{% trans "Node name" %}</b></th>
     <th style="width: 15%;"><b>IP</b></th>
     <th style="width: 21%;"><b>{% trans "Last seen up" %}</b></th>
-    <th style="width: 6%;" class="center"><b>{% trans "Status" %}</b></th>
-    <th style="width: 6%;" class="center"><b>{% trans "Peers" %}</b></th>
-    <th style="width: 6%;" class="center"><b>{% trans "Clients" %}</b></th>
-    <th style="width: 17%;" class="center"><b>{% trans "Project" %}</b></th>
+    <th style="width: 8%;" class="center"><b>{% trans "Status" %}</b></th>
+    <th style="width: 8%;" class="center"><b>{% trans "Peers" %}</b></th>
+    <th style="width: 8%;" class="center"><b>{% trans "Clients" %}</b></th>
+    <th style="width: 10%;" class="center"><b>{% trans "Project" %}</b></th>
   </tr>
 </thead>
 {% if user.is_authenticated %}
@@ -60,7 +58,7 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
     <td colspan="8">{% heading 3 node.node_type_as_string_plural %}</td>
   </tr>
   {% endifchanged %}
-  <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %} node_status_{{ node.status_as_string }}">
+  <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
     <td align="center">
       {% if node.warnings %}
       <a href="{% url view_node node.get_current_id %}">
@@ -68,10 +66,10 @@ You are using the <a href="{% url view_node web_client_node.get_current_id %}">{
       </a>
       {% endif %}
     </td>
-    <td class="name"><a href="{% url view_node node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
-    <td>{{ node.ip }}</td>
+    <td class="name"><a href="{% url edit_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+    <td>{{ node.router_id }}</td>
     {% if node.last_seen %}
-    <td>{{ node.last_seen|date:"DATETIME_FORMAT" }}</td>
+    <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>
     {% else %}
     <td>{% trans "never" %}</td>
     {% endif %}

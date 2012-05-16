@@ -1,0 +1,20 @@
+{% load misc %}
+{% load i18n %}
+
+{{ registry_forms.media.js }}
+{{ registry_forms }}
+
+<div id="reg_loading_dialog" title="{% trans "Please Wait" %}" style="display: none;">
+  <br/>
+	<p style="text-align: center;">
+	  {% trans "Updating form fields..." %}
+	</p>
+</div>
+
+<input type="hidden" name="STATE" id="reg_eval_state" value='{{ eval_state }}' />
+<script type="text/javascript"  src="{{ MEDIA_URL }}js/registry.js"></script>
+<script type="text/javascript">
+  registry.regpoint_id = "{{ registry_regpoint }}";
+  registry.root_id = "{{ registry_root.pk }}";
+</script>
+

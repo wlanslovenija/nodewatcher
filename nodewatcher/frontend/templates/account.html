@@ -14,8 +14,7 @@ We use `next` from the context or use `context_processor_next` or use the curren
 		{% endcomment %}
 		{% url user_page user.username as user_account_url %}
 		<li class="first">{% blocktrans with user.username as username %}logged in as <a href="{{ user_account_url }}">{{ username }}</a>{% endblocktrans %}</li>
-        <li><a href="{% url auth_logout %}{% if next_url and not next_url|authenticated_required %}?{{ redirect_field_name }}={{ next_url|urlencode }}{% endif %}">{% trans "Logout" %}</a></li>
-        <li class="last"><a href="{% url my_nodes %}">{% trans "My Nodes" %}</a></li>
+        <li class="last"><a href="{% url auth_logout %}{% if next_url and not next_url|authenticated_required %}?{{ redirect_field_name }}={{ next_url|urlencode }}{% endif %}">{% trans "Logout" %}</a></li>
       {% else %}
         {% comment %}
         If the user wants to log in we would like to take her back to the current page or if she has already been redirected

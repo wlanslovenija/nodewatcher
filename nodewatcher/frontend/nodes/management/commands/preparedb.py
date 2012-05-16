@@ -45,7 +45,7 @@ class Command(management_base.BaseCommand):
     
     # Determine the database backend
     db_backend = settings.DATABASES['default']['ENGINE']
-    if db_backend.find('postgresql') != -1:
+    if db_backend.find('postgresql') != -1 or db_backend.find('postgis') != -1:
       db_backend = 'postgresql'
     elif db_backend.find('sqlite') != -1:
       db_backend = 'sqlite'
@@ -101,6 +101,7 @@ class Command(management_base.BaseCommand):
     if verbosity >= 1:
       print ">>> Performing initial database sync..."
     management.call_command("syncdb", **options)
+    management.call_command("migrate", **options)
     
     if len(args) < 1:
       if verbosity >= 1:
