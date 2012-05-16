@@ -22,7 +22,7 @@ class AutoPoolAllocator(processors.RegistryFormProcessor):
     if node is None:
       # A new node is being registered, so we have nothing to add here
       return
-    
+
     # Automatically discover currently available allocation sources
     allocation_sources = [
       item

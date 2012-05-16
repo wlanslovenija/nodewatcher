@@ -4,8 +4,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from web.registry import fields as registry_fields
-from web.utils import ipcalc, ipaddr
-import fields as allocation_fields
+from web.utils import ipaddr
+from . import fields as allocation_fields
 
 class PoolAllocationError(Exception):
   pass
@@ -96,12 +96,11 @@ class IpPool(PoolBase):
     WARNING: This method must be called on an object that is locked for
     updates using `select_for_update`. Otherwise this will cause corruptions.
     """
-    net = ipcalc.Network(self.network, self.prefix_length)
-    net0 = "%s/%d" % (self.network, self.prefix_length + 1)
-    net1 = str(ipcalc.Network(long(net) + ipcalc.Network(net0).size())) 
-    
-    left = IpPool(parent = self, family = self.family, network = self.network, prefix_length = self.prefix_length + 1)
-    right = IpPool(parent = self, family = self.family, network = net1, prefix_length = self.prefix_length + 1)
+    net = ipaddr.IPNetwork("%s/%d" % (self.network, self.prefix_length))
+    net0, net1 = net.subnet()
+
+    left = IpPool(parent = self, family = self.family, network = str(net0.network), prefix_length = net0.prefixlen)
+    right = IpPool(parent = self, family = self.family, network = str(net1.network), prefix_length = net1.prefixlen)
     left.save()
     right.save()
     
@@ -125,9 +124,8 @@ class IpPool(PoolBase):
     
     if not self.parent and (prefix_len < self.prefix_length_minimum or prefix_len > self.prefix_length_maximum):
       return None 
-    
-    net = ipcalc.Network(self.network, self.prefix_length)
-    if ipcalc.Network(network, prefix_len) not in net:
+
+    if ipaddr.IPNetwork("%s/%d" % (network, prefix_len)) not in self.to_ip_network():
       # We don't contain this network, so there is nothing to be done
       return None
     
