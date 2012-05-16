@@ -17,7 +17,7 @@ urlpatterns = patterns('',
   url(r'^node/(?P<node>[^/]+)/edit$', 'web.nodes.views.node_edit', name = 'edit_node'),
 
   # Registry
-  (r'^registry/', include('registry.urls', namespace = 'registry')),
+  (r'^registry/', include('web.registry.urls', namespace = 'registry')),
 
   # Authentication
   url(r'^auth/login$', 'django.contrib.auth.views.login', { 'template_name' : 'auth/login.html' }, name = 'auth_login'),
