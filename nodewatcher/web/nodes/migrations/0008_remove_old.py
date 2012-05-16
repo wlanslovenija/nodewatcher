@@ -116,7 +116,7 @@ class Migration(SchemaMigration):
             ('node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['nodes.Node'])),
             ('allocated_at', self.gf('django.db.models.fields.DateTimeField')(null=True)),
             ('description', self.gf('django.db.models.fields.CharField')(max_length=200, null=True)),
-            ('ip_subnet', self.gf('web.core.allocation.fields.IPField')(null=True)),
+            ('ip_subnet', self.gf('django.db.models.fields.CharField')(null=True)),
             ('visible', self.gf('django.db.models.fields.BooleanField')(default=False, db_index=True)),
             ('allocated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('cidr', self.gf('django.db.models.fields.IntegerField')()),

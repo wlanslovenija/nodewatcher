@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from web.registry import fields as registry_fields
 from web.utils import ipaddr
-from . import fields as allocation_fields
 
 class PoolAllocationError(Exception):
   pass
@@ -72,12 +71,7 @@ class IpPool(PoolBase):
   prefix_length_default = models.IntegerField(null = True)
   prefix_length_minimum = models.IntegerField(default = 24, null = True)
   prefix_length_maximum = models.IntegerField(default = 28, null = True)
-  
-  # Field for indexed lookups
-  ip_subnet = allocation_fields.IPField(null = True)
-  
-  # Custom manager
-  objects = allocation_fields.IPManager()
+  ip_subnet = registry_fields.IPAddressField(null = True)
   
   class Meta:
     app_label = "core"
@@ -255,13 +249,6 @@ class IpPool(PoolBase):
     """
     return self.children.all().count() == 0
 
-  @staticmethod
-  def contains_network(network, prefix_length):
-    """
-    Returns true if any pools contain this network.
-    """
-    return IpPool.objects.ip_filter(ip_subnet__conflicts = "%s/%s" % (network, prefix_length)).count() > 0
-  
   def family_as_string(self):
     """
     Returns this pool's address family as a string.

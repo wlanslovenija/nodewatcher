@@ -174,7 +174,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             'family': ('django.db.models.fields.IntegerField', [], {'default': '4'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip_subnet': ('core.allocation.fields.IPField', [], {'null': 'True'}),
+            'ip_subnet': ('django.db.models.fields.CharField', [], {'null': 'True'}),
             'max_prefix_len': ('django.db.models.fields.IntegerField', [], {'default': '28', 'null': 'True'}),
             'min_prefix_len': ('django.db.models.fields.IntegerField', [], {'default': '24', 'null': 'True'}),
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),

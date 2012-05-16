@@ -257,7 +257,7 @@ class Migration(SchemaMigration):
             'gen_dhcp': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'gen_iface_type': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip_subnet': ('web.core.allocation.fields.IPField', [], {'null': 'True'}),
+            'ip_subnet': ('django.db.models.fields.CharField', [], {'null': 'True'}),
             'last_seen': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['nodes.Node']"}),
             'status': ('django.db.models.fields.IntegerField', [], {}),

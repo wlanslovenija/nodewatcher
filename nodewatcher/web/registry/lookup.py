@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models as gis_models
-from django.db import models, connection
+from django.db import models, connection, connections, DEFAULT_DB_ALIAS
+from django.db.models.sql.constants import LOOKUP_SEP
 
 from web.registry import access as registry_access
 
@@ -116,6 +117,29 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
     
     return clone
 
+  def ip_filter(self, **kwargs):
+    """
+    Performs a lookup on inet fields.
+    """
+    connection = connections[self._db or DEFAULT_DB_ALIAS]
+    where_opts = []
+    for key, value in kwargs.iteritems():
+      field, op = key.split(LOOKUP_SEP)
+      field_obj = self.model._meta.get_field_by_name(field)[0]
+      value = field_obj.get_db_prep_lookup('exact', value, connection = connection)[0]
+      field = "%s.%s" % (self.model._meta.db_table, field)
+
+      if op == 'contains':
+        where_opts.append('%s >>= %s' % (field, value))
+      elif op == 'contained':
+        where_opts.append('%s <<= %s' % (field, value))
+      elif op == 'conflicts':
+        where_opts.append('(%s <<= %s OR %s >>= %s)' % (field, value, field, value))
+      else:
+        raise TypeError('Operation %s not supported.' % op)
+
+    return self.extra(where = where_opts)
+
 class RegistryLookupManager(gis_models.GeoManager):
   """
   A manager for doing lookups over the registry models.
@@ -140,5 +164,3 @@ class RegistryLookupManager(gis_models.GeoManager):
   
   def registry_fields(self, **kwargs):
     return self.get_query_set().registry_fields(**kwargs)
-
-

@@ -123,7 +123,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             'family': ('web.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip_subnet': ('web.core.allocation.fields.IPField', [], {'null': 'True'}),
+            'ip_subnet': ('django.db.models.fields.CharField', [], {'null': 'True'}),
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.IpPool']"}),
             'prefix_length': ('django.db.models.fields.IntegerField', [], {}),
