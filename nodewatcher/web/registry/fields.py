@@ -318,6 +318,9 @@ class IPAddressFormField(form_fields.CharField):
     """
     Prepare field value for display inside the form.
     """
+    if value is None:
+      return None
+
     value = str(value)
     if value.endswith('/32'):
       value = value[:-3]
