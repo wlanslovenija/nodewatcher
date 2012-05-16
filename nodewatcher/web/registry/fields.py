@@ -314,6 +314,15 @@ class IPAddressFormField(form_fields.CharField):
   """
   IP address form field.
   """
+  def prepare_value(self, value):
+    """
+    Prepare field value for display inside the form.
+    """
+    value = str(value)
+    if value.endswith('/32'):
+      value = value[:-3]
+    return value
+
   def to_python(self, value):
     """
     Performs IP address validation.

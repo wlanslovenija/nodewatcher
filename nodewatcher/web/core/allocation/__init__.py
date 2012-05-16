@@ -77,7 +77,7 @@ class IpAddressAllocator(AddressAllocator):
   family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
   pool = registry_fields.ModelSelectorKeyField(pool_models.IpPool, limit_choices_to = { 'parent' : None })
   prefix_length = models.IntegerField(default = 27)
-  subnet_hint = registry_fields.IPAddressField(null = True, blank = True)
+  subnet_hint = registry_fields.IPAddressField(null = True, blank = True, host_required = True)
   allocation = models.ForeignKey(pool_models.IpPool, editable = False, null = True,
     on_delete = models.PROTECT, related_name = 'allocations_%(app_label)s_%(class)s')
   
