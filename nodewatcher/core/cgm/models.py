@@ -130,7 +130,7 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
   class Meta:
     model = WifiInterfaceConfig
   
-  def regulatory_filter(self):
+  def regulatory_filter(self, request):
     """
     Subclasses may override this method to filter the channels accoording to a
     filter for a regulatory domain. It should return a list of frequencies that
@@ -176,7 +176,7 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
     try:
       self.fields['channel'] = registry_fields.SelectorFormField(
         label = _("Channel"),
-        choices = BLANK_CHOICE_DASH + list(radio.get_protocol(item.protocol).get_channel_choices(self.regulatory_filter())),
+        choices = BLANK_CHOICE_DASH + list(radio.get_protocol(item.protocol).get_channel_choices(self.regulatory_filter(request))),
         coerce = str,
         empty_value = None
       )
