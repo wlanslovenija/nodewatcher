@@ -2,8 +2,6 @@ import uuid
 
 from django.db import models
 
-# TODO this model should be moved and rewritten
-from nodewatcher.dns.models import Zone
 class Project(models.Model):
   """
   This class represents a project. Each project can contains some
@@ -17,7 +15,6 @@ class Project(models.Model):
   ssid_mobile = models.CharField(max_length = 50)
   captive_portal = models.BooleanField()
   sticker = models.CharField(max_length = 50)
-  zone = models.ForeignKey(Zone, null = True)
   
   # Geographical location
   geo_lat = models.FloatField(null = True)

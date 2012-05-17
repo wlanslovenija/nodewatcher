@@ -200,7 +200,6 @@ INSTALLED_APPS = (
   'nodewatcher.nodes',
   'nodewatcher.generator',
   'nodewatcher.account',
-  'nodewatcher.dns',
   'nodewatcher.policy',
   'nodewatcher.monitor',
   'nodewatcher.registry',
