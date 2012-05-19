@@ -4,13 +4,12 @@ import json
 from django import forms, template
 from django.conf import settings
 from django.core import exceptions
-from django.db import transaction, models
+from django.db import transaction
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 
 from nodewatcher.registry import rules as registry_rules
 from nodewatcher.registry import registration
-from nodewatcher.registry.cgm import base as cgm_base
 
 class RegistryValidationError(Exception):
   """
@@ -323,7 +322,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       if context.hierarchy_parent_cls is not None:
         setattr(
           instance,
-          selected_item._registry_parents[context.hierarchy_parent_cls].name,
+          selected_item._registry_object_parent_link.name,
           context.hierarchy_parent_obj
         )
   
@@ -343,7 +342,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       if context.hierarchy_parent_current is not None:
         current_config_item = getattr(
           context.hierarchy_parent_current,
-          selected_item._registry_parents[context.hierarchy_parent_cls].rel.related_name
+          selected_item._registry_object_parent_link.rel.related_name
         )[index]
       else:
         current_config_item = context.current_config[selected_item.RegistryMeta.registry_id][index]
@@ -415,7 +414,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       if context.hierarchy_parent_partial is not None:
         setattr(
           config,
-          selected_item._registry_parents[context.hierarchy_parent_cls].name,
+          selected_item._registry_object_parent_link.name,
           context.hierarchy_parent_partial
         )
         
@@ -423,7 +422,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
         virtual_relation = getattr(context.hierarchy_parent_partial, '_registry_virtual_relation', {})
         desc = getattr(
           context.hierarchy_parent_partial.__class__,
-          selected_item._registry_parents[context.hierarchy_parent_cls].rel.related_name
+          selected_item._registry_object_parent_link.rel.related_name
         )
         virtual_relation.setdefault(desc, []).append(config)
         context.hierarchy_parent_partial._registry_virtual_relation = virtual_relation
@@ -513,15 +512,12 @@ def prepare_forms(context):
   Prepares forms for some registry items.
   """
   forms = []
-  for _, items in context.regpoint.item_list.iteritems():
+  for items in context.regpoint.get_children(context.hierarchy_parent_cls):
+    # TODO is a deep copy really needed? shouldn't a shallow one suffice?
     context.items = copy.deepcopy(items)
     context.existing_items = set()
     item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
-    
-    # Skip items that are not child items
-    if context.hierarchy_parent_cls not in getattr(item_cls, '_registry_parents', [None]):
-      continue
 
     if context.hierarchy_prefix is not None:
       context.base_prefix = context.hierarchy_prefix + '_' + cls_meta.registry_id.replace('.', '_')
@@ -531,7 +527,7 @@ def prepare_forms(context):
     context.subforms = []
     context.force_selector_widget = False
     
-    if getattr(cls_meta, 'hidden', False):
+    if getattr(cls_meta, 'hidden', False) and item_cls._meta.module_name in context.items:
       # The top-level item should be hidden
       del context.items[item_cls._meta.module_name]
       context.force_selector_widget = True
@@ -548,11 +544,19 @@ def prepare_forms(context):
       
       if context.hierarchy_parent_cls is not None:
         existing_models_qs = existing_models_qs.filter(
-          **{ item_cls._registry_parents[context.hierarchy_parent_cls].name : context.hierarchy_parent_obj }
+          **{ item_cls._registry_object_parent_link.name : context.hierarchy_parent_obj }
         )
       
       for mdl in existing_models_qs:
         mdl = mdl.cast()
+
+        # When we are looking for existing top-level objects in object hierarchy, we should
+        # skip those that have the parent link set to a non-NULL value
+        if context.hierarchy_parent_cls is None and \
+           getattr(mdl, '_registry_object_parent', None) is not None:
+          if getattr(mdl, mdl._registry_object_parent_link.name) is not None:
+            continue
+
         context.existing_models[mdl.pk] = mdl
         context.existing_items.add(mdl.__class__)
     
@@ -561,11 +565,6 @@ def prepare_forms(context):
       if value._registry_hide_requests > 0:
         del context.items[key]
         continue
-      
-      if context.hierarchy_parent_cls is not None:
-        if value not in context.hierarchy_parent_cls._registry_allowed_children:
-          del context.items[key]
-          continue
       
       # Only show items that the user is allowed to see; this includes any item that
       # the user has "add" permissions on and also any item that already exists

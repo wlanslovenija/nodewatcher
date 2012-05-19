@@ -41,6 +41,10 @@ class RegistrationPoint(object):
   """
   Registration point is a state holder for registry operations. There can be
   multiple registration points, each rooted at its own model.
+
+  The registry has two hierarchies:
+    - class hierarchy (static)
+    - object hierarchy (runtime editable)
   """
   def __init__(self, model, namespace, point_id):
     """
@@ -50,12 +54,19 @@ class RegistrationPoint(object):
     self.namespace = namespace
     self.name = point_id
     self.item_registry = {}
-    self.item_list = django_datastructures.SortedDict()
-    self.item_classes = {}
+    self.item_classes = set()
+    self.item_object_toplevel = django_datastructures.SortedDict()
     self.choices_registry = {}
     self.flat_lookup_proxies = {}
 
-  def _register_item(self, item):
+  def _register_item_to_container(self, item, container):
+    item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
+    item_dict[item._meta.module_name] = item
+    return django_datastructures.SortedDict(
+      sorted(container.items(), key = lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_order', 0))
+    )
+
+  def _register_item(self, item, object_toplevel = True):
     """
     Common functions for registering an item for both simple items and hierarchical
     ones.
@@ -71,19 +82,15 @@ class RegistrationPoint(object):
     if item in self.item_classes:
       return False
     else:
-      self.item_classes[item] = True
-    
-    # Insert into item list
-    items = self.item_list
-    item_dict = items.setdefault(
-      (getattr(item.RegistryMeta, 'form_order', 0), item.RegistryMeta.registry_id),
-      {}
-    )
-    item_dict[item._meta.module_name] = item
-    self.item_list = django_datastructures.SortedDict(sorted(items.items(), key = lambda x: x[0]))
-    
-    # Only record the top-level item in the registry as there could be multiple
-    # specializations that define their own limits
+      self.item_classes.add(item)
+
+    # Record the item in object hierarchy so we know which items don't depend on any other items in the
+    # object (runtime editable) hierarchy
+    if object_toplevel:
+      self.item_object_toplevel = self._register_item_to_container(item, self.item_object_toplevel)
+
+    # Only record the top-level item (class hierarchy) in the registry as there could be multiple
+    # specializations that define their own extensions
     if item.__base__ == self.item_base:
       registry_id = item.RegistryMeta.registry_id
       if registry_id in self.item_registry:
@@ -138,24 +145,36 @@ class RegistrationPoint(object):
     # Verify parent registration
     if parent not in self.item_classes:
       raise ImproperlyConfigured("Parent class '{0}' is not yet registered!".format(parent._meta.object_name))
-    
-    self._register_item(child)
-    
+
+    top_level = True
+
+    # TODO perform validation for multiple defined intra registry foreign keys
+
     # Augment the item with hierarchy information, discover foreign keys
     for field in child._meta.fields:
       if isinstance(field, registry_fields.IntraRegistryForeignKey) and issubclass(parent, field.rel.to):
+        if not field.null:
+          # Foreign key is required for this subitem, so it can't be a top-level item
+          top_level = False
+
+        # We have to use __dict__.get instead of getattr to prevent propagation of attribute access
+        # to parent classes where these subitems might not be registered
+        parent._registry_object_children = self._register_item_to_container(child,
+          parent.__dict__.get('_registry_object_children', django_datastructures.SortedDict()))
+
+        # Setup the parent relation and verify that one doesn't already exist
+        if child.__dict__.get('_registry_object_parent', None) is not None:
+          raise ImproperlyConfigured("Registry item cannot have two object parents!")
+        child._registry_object_parent = parent
+        child._registry_object_parent_link = field
+
         parent._registry_has_children = True
-        parent._registry_allowed_children = parent.__dict__.get('_registry_allowed_children', set())
-        parent._registry_allowed_children.add(child)
-        
-        if hasattr(child, '_registry_parents'):
-          child._registry_parents[parent] = field
-        else:
-          child._registry_parents = { parent : field }
-        
         break
     else:
       raise ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
+
+    # Register item with the registry
+    self._register_item(child, top_level)
   
   def _unregister_item(self, item_cls):
     """
@@ -168,7 +187,7 @@ class RegistrationPoint(object):
       parent._registry_hide_requests -= 1
     
     item_cls._registry_endpoint = None
-    del self.item_classes[item_cls]
+    self.item_classes.remove(item_cls)
   
   def unregister_item(self, item_cls):
     """
@@ -184,27 +203,35 @@ class RegistrationPoint(object):
       raise ValueError("Registry item '{0}' is not registered!".format(item_cls._meta.object_name))
     
     registry_id = item_cls.RegistryMeta.registry_id
-    list_key = item_classes = None
-    for (form_order, reg_id), item_classes in self.item_list.items():
-      if reg_id == registry_id:
-        list_key = (form_order, reg_id)
-        break
-    else:
-      assert False, "Registry item '{0}' is registered, but top-level registry identifier cannot be found!".format(item_cls._meta.object_name)
-    
+    # TODO properly handle removal with new item list
+
     if item_cls.__base__ == self.item_base:
       # Top-level item, remove all registered subitems as well
-      for item in item_classes.values():
+      for item in self.item_object_toplevel[registry_id].values():
         self._unregister_item(item)
-      
-      del self.item_list[list_key]
+
+      del self.item_object_toplevel[registry_id]
       del self.item_registry[registry_id]
     else:
       # Item that subclasses a top-level item
-      del item_classes[item_cls._meta.module_name]
-      assert len(item_classes) > 0
+      del self.item_object_toplevel[registry_id][item_cls._meta.module_name]
+      assert len(self.item_object_toplevel[registry_id]) > 0
       self._unregister_item(item_cls)
-  
+
+  def get_children(self, parent = None):
+    """
+    Returns the child registry item classes that are available under the given
+    parent registry item (via internal foreign key relationships). If None is
+    specified as `parent` then only registry items that are available at the
+    topmost level are returned.
+
+    :param parent: Parent registry item class or None
+    """
+    if parent is None:
+      return self.item_object_toplevel.values()
+    else:
+      return parent._registry_object_children.values()
+
   def get_top_level_queryset(self, root, registry_id):
     """
     Returns the queryset for fetching top-level items for the specific registry
@@ -252,9 +279,7 @@ class RegistrationPoint(object):
     """
     A generator that iterates through registered items.
     """
-    for item_classes in self.item_list.values():
-      for item in item_classes.values():
-        yield item
+    return iter(self.item_classes)
 
 def create_point(model, namespace):
   """
