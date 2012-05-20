@@ -1,8 +1,8 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          nw-monitor
-# Required-Start:    $local_fs $remote_fs $network $syslog mongodb nw-celery
-# Required-Stop:     $local_fs $remote_fs $network $syslog mongodb nw-celery
+# Required-Start:    $local_fs $remote_fs $network $syslog exim4 mongodb postgresql
+# Required-Stop:     $local_fs $remote_fs $network $syslog exim4 mongodb postgresql
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Nodewatcher monitoring daemon
