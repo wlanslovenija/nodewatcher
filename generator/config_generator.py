@@ -477,10 +477,14 @@ config interface lan
         option netmask  255.255.0.0
 
 config interface mesh
-        option ifname   wlan0
         option proto    static
         option ipaddr   {mesh_ip}
-        option netmask  {mesh_mask}
+        option netmask  255.255.0.0
+
+config interface clients
+        option proto    static
+        option ipaddr   {clients_ip}
+        option netmask  {clients_mask}
 
 config interface digger0
         option ifname   digger0
@@ -502,7 +506,8 @@ config switch_vlan
 """.format(
         lan_ip = self.allocateIpForOlsr(),
         mesh_ip = self.ip,
-        mesh_mask = self.subnets[0]['mask'],
+        clients_ip = self.allocateIpForOlsr(),
+        clients_mask = self.subnets[0]['mask'],
         vpn_ip = self.vpn['ip']
       ))
       f.close()
@@ -554,18 +559,28 @@ START=39
 start() {{
       uci delete wireless.radio0.disabled
       uci set wireless.radio0.channel=8
-      uci set wireless.@wifi-iface[0].network=mesh
-      uci set wireless.@wifi-iface[0].mode=adhoc
+      
+      uci set wireless.@wifi-iface[0].device=radio0
+      uci set wireless.@wifi-iface[0].network=clients
+      uci set wireless.@wifi-iface[0].mode=ap
       uci set wireless.@wifi-iface[0].ssid={ssid}
-      uci set wireless.@wifi-iface[0].bssid=02:CA:FF:EE:BA:BE
       uci set wireless.@wifi-iface[0].encryption=none
+      
+      uci add wireless wifi-iface
+      uci set wireless.@wifi-iface[1].device=radio0
+      uci set wireless.@wifi-iface[1].network=mesh
+      uci set wireless.@wifi-iface[1].mode=adhoc
+      uci set wireless.@wifi-iface[1].ssid={mesh_ssid}
+      uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[1].encryption=none
+      
       uci commit
       /etc/init.d/inituci disable
       /etc/init.d/firewall disable
       /etc/init.d/firewall stop
       /sbin/wifi up
 }}
-""".format(ssid = self.ssid))
+""".format(ssid = self.ssid, mesh_ssid = self.ssid.replace('open', 'mesh')))
       f.close()
       os.chmod(inituci_path, 0755)
  
@@ -601,7 +616,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0" "eth0" "digger0"
+Interface "wlan0-1" "wlan1" "eth0" "digger0"
 {{
   IPv4Multicast 255.255.255.255
   HelloInterval 5.0
@@ -622,7 +637,7 @@ Interface "wlan0" "eth0" "digger0"
       
       # DHCP configuration
       network = ipcalc.Network("%s/%s" % (self.subnets[0]['subnet'], self.subnets[0]['cidr']))
-      start_ip = str(ipcalc.IP(long(network.network()) + 4)).split(".")[-1]
+      start_ip = str(ipcalc.IP(long(network.network()) + 5)).split(".")[-1]
       end_ip = str(network.host_last()).split(".")[-1]
       
       f = open(os.path.join(configPath, "dhcp"), 'w')
@@ -639,8 +654,8 @@ config dnsmasq
         list server             '10.254.0.1'
         list server             '10.254.0.2'
 
-config dhcp mesh
-        option interface        mesh
+config dhcp clients
+        option interface        clients
         option start    {start_ip}
         option limit    {end_ip}
         option leasetime        30m
