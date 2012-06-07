@@ -96,7 +96,7 @@ class NodeConfig(object):
   ip = None
   subnets = None
   vpn = None
-  vpnServer = (("91.185.203.246", 9999), ("46.54.226.43", 9999), ("46.54.226.49", 9999))
+  vpnServer = (("46.54.226.43", 9999), ("91.185.203.246", 9999), ("46.54.226.49", 9999))
   dns = ("10.254.0.1", "10.254.0.2")
   ntp = ("10.254.0.1", "10.254.0.2")
   interfaces = None
@@ -444,7 +444,245 @@ class OpenWrtConfig(NodeConfig):
     
     # XXX hardcoded new tplink for openwrt trunk; this is a quick hack for
     #     supporting tp-link wr741nd devices that we need
-    if self.openwrtVersion == 'hardcoded-tpl-trunk':
+    if self.openwrtVersion == 'nextgen':
+      # Setup passwords
+      self.__generatePasswords()
+      
+      # Write UUID to /etc/uuid
+      f = open(os.path.join(directory, 'uuid'), 'w')
+      f.write(self.uuid)
+      f.close()
+      
+      # Create the 'config' directory
+      configPath = os.path.join(directory, 'config')
+      os.mkdir(configPath)
+      
+      # General configuration
+      f = open(os.path.join(configPath, "system"), 'w')
+      self.__generateSystemConfig(f)
+      
+      # Network configuration
+      f = open(os.path.join(configPath, "network"), 'w')
+      f.write("""
+config interface loopback
+        option ifname   lo
+        option proto    static
+        option ipaddr   127.0.0.1
+        option netmask  255.0.0.0
+
+config interface lan
+        option ifname   eth0
+        option proto    static
+        option ipaddr   {lan_ip}
+        option netmask  255.255.0.0
+
+config interface mesh
+        option ifname   wlan0
+        option proto    static
+        option ipaddr   {mesh_ip}
+        option netmask  {mesh_mask}
+
+config interface digger0
+        option ifname   digger0
+        option proto    static
+        option ipaddr   {vpn_ip}
+        option netmask  255.255.0.0
+
+config interface wan
+        option ifname   eth1
+        option proto    dhcp
+
+config switch eth0
+        option enable_vlan      1
+
+config switch_vlan
+        option device   eth0
+        option vlan     1
+        option ports    "0 1 2 3 4"
+""".format(
+        lan_ip = self.allocateIpForOlsr(),
+        mesh_ip = self.ip,
+        mesh_mask = self.subnets[0]['mask'],
+        vpn_ip = self.vpn['ip']
+      ))
+      f.close()
+      
+      # Policy routing configuration
+      f = open(os.path.join(configPath, "routing"), 'w')
+      f.write("""
+config table mesh
+        option id       20
+""")
+
+      for server, port in self.vpnServer:
+        f.write("""
+config policy
+        option dest_ip  '{0}'
+        option table    'main'
+        option priority 999
+""".format(server))
+      
+      f.write("""
+config policy
+        option dest_ip  '{subnet}/{cidr}'
+        option table    'main'
+        option priority 999
+
+config policy
+        option device   'eth1'
+        option table    'main'
+        option priority 999
+
+config policy
+        option table    'mesh'
+        option priority 1000
+""".format(
+        subnet = self.subnets[0]['subnet'],
+        cidr = self.subnets[0]['cidr']
+      ))
+      
+      f.close()
+      
+      # Wireless configuration
+      # WiFi hack script
+      inituci_path = os.path.join(directory, "init.d", "inituci")
+      os.mkdir(os.path.join(directory, "init.d"))
+      f = open(inituci_path, 'w')
+      f.write("""#!/bin/sh /etc/rc.common
+START=39
+
+start() {{
+      uci delete wireless.radio0.disabled
+      uci set wireless.radio0.channel=8
+      uci set wireless.@wifi-iface[0].network=mesh
+      uci set wireless.@wifi-iface[0].mode=adhoc
+      uci set wireless.@wifi-iface[0].ssid={ssid}
+      uci set wireless.@wifi-iface[0].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[0].encryption=none
+      uci commit
+      /etc/init.d/inituci disable
+      /etc/init.d/firewall disable
+      /etc/init.d/firewall stop
+      /sbin/wifi up
+}}
+""".format(ssid = self.ssid))
+      f.close()
+      os.chmod(inituci_path, 0755)
+ 
+      # OLSRd configuration
+      f = open(os.path.join(configPath, "olsrd"), 'w')
+      f.write("""
+config olsrd
+        option config_file      '/etc/olsrd.conf'
+""")
+      f.close()
+      
+      f = open(os.path.join(directory, 'olsrd.conf'), 'w')
+      f.write("""
+Hna4
+{{
+  {hna_subnet}  {hna_mask}
+}}
+
+AllowNoInt yes
+UseHysteresis no
+LinkQualityFishEye 0
+Willingness 3
+LinkQualityLevel 2
+LinkQualityAging 0.1
+LinkQualityAlgorithm "etx_ff"
+FIBMetric "flat"
+Pollrate 0.025
+TcRedundancy 2
+MprCoverage 3
+NatThreshold 0.75
+SmartGateway no
+MainIp {router_id}
+SrcIpRoutes yes
+RtTable 20
+
+Interface "wlan0" "eth0" "digger0"
+{{
+  IPv4Multicast 255.255.255.255
+  HelloInterval 5.0
+  HelloValidityTime 40.0
+  TcInterval 7.0
+  TcValidityTime 161.0
+  MidInterval 18.0
+  MidValidityTime 324.0
+  HnaInterval 18.0
+  HnaValidityTime 324.0
+}}
+""".format(
+        router_id = self.ip,
+        hna_subnet = self.subnets[0]['subnet'],
+        hna_mask = self.subnets[0]['mask']
+      ))
+      f.close()
+      
+      # DHCP configuration
+      network = ipcalc.Network("%s/%s" % (self.subnets[0]['subnet'], self.subnets[0]['cidr']))
+      start_ip = str(ipcalc.IP(long(network.network()) + 4)).split(".")[-1]
+      end_ip = str(network.host_last()).split(".")[-1]
+      
+      f = open(os.path.join(configPath, "dhcp"), 'w')
+      f.write("""
+config dnsmasq
+        option domainneeded     1
+        option boguspriv        1
+        option localise_queries 1
+        option rebind_protection 0
+        option nonegcache       1
+        option noresolv         1
+        option authoritative    1
+        option leasefile        '/tmp/dhcp.leases'
+        list server             '10.254.0.1'
+        list server             '10.254.0.2'
+
+config dhcp mesh
+        option interface        mesh
+        option start    {start_ip}
+        option limit    {end_ip}
+        option leasetime        30m
+        option force    1
+""".format(
+        start_ip = start_ip,
+        end_ip = end_ip
+      ))
+      f.close()
+      
+      # Tunneldigger VPN configuration
+      if self.vpn:
+        f = open(os.path.join(configPath, "tunneldigger"), 'w')
+        f.write("""
+config broker
+        option address          '{broker_ip}'
+        option port             53
+        option uuid             '{uuid}'
+        option interface        'digger0'
+""".format(
+          broker_ip = self.vpnServer[0][0],
+          uuid = self.uuid,
+        ))
+        f.close()
+      
+      # uhttpd configuration
+      f = open(os.path.join(configPath, "uhttpd"), 'w')
+      f.write("""
+config uhttpd main
+        list listen_http        {router_ip}:80
+        option home             '/www'
+        option cgi_prefix       '/cgi-bin'
+
+        option script_timeout   60
+        option network_timeout  30
+        option tcp_keepalive    1
+""".format(
+        router_ip = self.ip
+      ))
+      f.close()
+      return
+    elif self.openwrtVersion == 'hardcoded-tpl-trunk':
       # Setup passwords
       self.__generatePasswords()
       
@@ -531,30 +769,6 @@ config policy
       f.close()
       
       # Wireless configuration
-      f = open(os.path.join(configPath, "wireless"), 'w')
-      f.write("""
-config wifi-device  radio0
-        option type     mac80211
-        option channel  8
-        option hwmode   11ng
-        option htmode   HT20
-        list ht_capab   SHORT-GI-40
-        list ht_capab   TX-STBC
-        list ht_capab   RX-STBC1
-        list ht_capab   DSSS_CCK-40
-
-config wifi-iface
-        option device   radio0
-        option network  mesh
-        option mode     adhoc
-        option ssid     {ssid}
-        option bssid    02:CA:FF:EE:BA:BE
-        option encryption none
-""".format(
-        ssid = self.ssid
-      ))
-      f.close()
-      
       # WiFi hack script
       inituci_path = os.path.join(directory, "init.d", "inituci")
       os.mkdir(os.path.join(directory, "init.d"))
@@ -562,14 +776,21 @@ config wifi-iface
       f.write("""#!/bin/sh /etc/rc.common
 START=39
 
-start() {
-      uci set wireless.radio0.macaddr=$(cat /sys/class/ieee80211/*/macaddress)
+start() {{
+      uci delete wireless.radio0.disabled
+      uci set wireless.radio0.channel=8
+      uci set wireless.@wifi-iface[0].network=mesh
+      uci set wireless.@wifi-iface[0].mode=adhoc
+      uci set wireless.@wifi-iface[0].ssid={ssid}
+      uci set wireless.@wifi-iface[0].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[0].encryption=none
       uci commit
       /etc/init.d/inituci disable
       /etc/init.d/firewall disable
       /etc/init.d/firewall stop
-}
-""")
+      /sbin/wifi up
+}}
+""".format(ssid = self.ssid))
       f.close()
       os.chmod(inituci_path, 0755)
  
@@ -759,6 +980,11 @@ config uhttpd main
     """
     if self.openwrtVersion == 'hardcoded-tpl-trunk':
       raise Exception("Cannot generate image for this version!")
+    elif self.openwrtVersion == 'nextgen':
+      buildString = 'make image FILES="../files" PROFILE="TLWR741" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe -wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger"'
+      os.chdir(path)
+      os.system(buildString)
+      return
     
     if self.wifiDriver in driverPackages:
       self.addPackage(*driverPackages[self.wifiDriver])
@@ -1103,6 +1329,7 @@ config uhttpd main
     # System configuration
     f.write('config system\n')
     f.write('\toption hostname %s\n' % self.hostname)
+    f.write('\toption uuid "%s"\n' % self.uuid)
     f.write('\toption timezone "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"\n')
     f.write('\n')
     f.close()
