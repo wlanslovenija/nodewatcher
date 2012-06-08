@@ -483,7 +483,7 @@ config interface mesh
 
 config interface clients
         option proto    static
-        option ipaddr   {clients_ip}
+        option ipaddr   {mesh_ip}
         option netmask  {clients_mask}
 
 config interface digger0
@@ -506,7 +506,6 @@ config switch_vlan
 """.format(
         lan_ip = self.allocateIpForOlsr(),
         mesh_ip = self.ip,
-        clients_ip = self.allocateIpForOlsr(),
         clients_mask = self.subnets[0]['mask'],
         vpn_ip = self.vpn['ip']
       ))
@@ -637,7 +636,7 @@ Interface "wlan0-1" "wlan1" "eth0" "digger0"
       
       # DHCP configuration
       network = ipcalc.Network("%s/%s" % (self.subnets[0]['subnet'], self.subnets[0]['cidr']))
-      start_ip = str(ipcalc.IP(long(network.network()) + 5)).split(".")[-1]
+      start_ip = str(ipcalc.IP(long(network.network()) + 4)).split(".")[-1]
       end_ip = str(network.host_last()).split(".")[-1]
       
       f = open(os.path.join(configPath, "dhcp"), 'w')
