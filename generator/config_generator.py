@@ -615,7 +615,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0-1" "wlan1" "eth0" "digger0"
+Interface "wlan0-1" "wlan1" "eth0" {diggers}
 {{
   IPv4Multicast 255.255.255.255
   HelloInterval 5.0
@@ -630,7 +630,8 @@ Interface "wlan0-1" "wlan1" "eth0" "digger0"
 """.format(
         router_id = self.ip,
         hna_subnet = self.subnets[0]['subnet'],
-        hna_mask = self.subnets[0]['mask']
+        hna_mask = self.subnets[0]['mask'],
+        diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.vpnServer))])
       ))
       f.close()
       
@@ -668,16 +669,19 @@ config dhcp clients
       # Tunneldigger VPN configuration
       if self.vpn:
         f = open(os.path.join(configPath, "tunneldigger"), 'w')
-        f.write("""
+        iface = 0
+        
+        for server, port in self.vpnServer:
+          f.write("""
 config broker
         option address          '{broker_ip}'
         option port             53
         option uuid             '{uuid}'
-        option interface        'digger0'
-""".format(
-          broker_ip = self.vpnServer[0][0],
-          uuid = self.uuid,
-        ))
+        option interface        'digger{iface}'
+
+""".format(broker_ip = server, uuid = self.uuid, iface = iface))
+          iface += 1
+        
         f.close()
       
       # uhttpd configuration
