@@ -470,18 +470,14 @@ config interface loopback
         option ipaddr   127.0.0.1
         option netmask  255.0.0.0
 
-config interface lan
-        option ifname   eth0
-        option proto    static
-        option ipaddr   {lan_ip}
-        option netmask  255.255.0.0
-
 config interface mesh
         option proto    static
         option ipaddr   {mesh_ip}
         option netmask  255.255.0.0
 
 config interface clients
+        option ifname   eth0
+        option type     bridge
         option proto    static
         option ipaddr   {mesh_ip}
         option netmask  {clients_mask}
@@ -615,7 +611,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0-1" "wlan1" "eth0" {diggers}
+Interface "wlan0-1" "wlan1" {diggers}
 {{
   IPv4Multicast 255.255.255.255
   HelloInterval 5.0
