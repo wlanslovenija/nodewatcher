@@ -7,12 +7,17 @@ from django.contrib.auth import models as auth_models
 from django.core import exceptions
 from django.db import models
 from django.forms import models as forms_models
+from django.utils import crypto
 
 def generate_random_password(length=8):
   """
   Generates a random password.
   """
-  
+
+  # Since Django 1.4
+  if hasattr(crypto, 'get_random_string'):
+    return crypto.get_random_string(length)
+
   # Re-seed random number generator
   # This can make random values even more predictable if for seed
   # a time-dependent value is used as time of password generation
