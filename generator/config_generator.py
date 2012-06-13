@@ -611,7 +611,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0-1" "wlan1" {diggers}
+Interface "wlan0-1" "wlan1" "br-clients" {diggers}
 {{
   IPv4Multicast 255.255.255.255
   HelloInterval 5.0
