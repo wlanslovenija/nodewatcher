@@ -45,11 +45,11 @@ class Command(management_base.BaseCommand):
     
     # Determine the database backend
     db_backend = settings.DATABASES['default']['ENGINE']
-    if db_backend.find('postgresql') != -1:
+    if 'postgresql' in db_backend:
       db_backend = 'postgresql'
-    elif db_backend.find('sqlite') != -1:
+    elif 'sqlite' in db_backend:
       db_backend = 'sqlite'
-    elif db_backend.find('mysql') != -1:
+    elif 'mysql' in db_backend:
       db_backend = 'mysql'
     
     # Close the connection before continuing since the setup script will
