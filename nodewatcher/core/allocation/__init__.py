@@ -17,9 +17,7 @@ class AddressAllocator(models.Model):
   """
   class Meta:
     abstract = True
-  
-  usage = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#usage")
-  
+    
   def exactly_matches(self, other):
     """
     Returns true if this allocation request exactly matches the other. This
