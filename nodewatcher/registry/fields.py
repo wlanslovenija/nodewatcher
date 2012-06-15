@@ -342,10 +342,10 @@ south.modelsinspector.add_introspection_rules([
       "enum_id" : ["enum_id", {}],
     },
   ),
-], [r"^web\.registry\.fields\.SelectorKeyField$"]
+], [r"^nodewatcher\.registry\.fields\.SelectorKeyField$"]
 )
-south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.ModelSelectorKeyField$"])
-south.modelsinspector.add_introspection_rules([], [r"^web\.registry\.fields\.IntraRegistryForeignKey$"])
+south.modelsinspector.add_introspection_rules([], [r"^nodewatcher\.registry\.fields\.ModelSelectorKeyField$"])
+south.modelsinspector.add_introspection_rules([], [r"^nodewatcher\.registry\.fields\.IntraRegistryForeignKey$"])
 south.modelsinspector.add_introspection_rules([
   (
     [MACAddressField],
@@ -354,7 +354,7 @@ south.modelsinspector.add_introspection_rules([
       "auto_add" : ["auto_add", { "default" : False }],
     },
   ),
-], [r"^web\.registry\.fields\.MACAddressField$"]
+], [r"^nodewatcher\.registry\.fields\.MACAddressField$"]
 )
 south.modelsinspector.add_introspection_rules([
   (
@@ -365,6 +365,6 @@ south.modelsinspector.add_introspection_rules([
       "host_required" : ["host_required", { "default" : False }],
     },
   ),
-], [r"^web\.registry\.fields\.IPAddressField$"]
+], [r"^nodewatcher\.registry\.fields\.IPAddressField$"]
 )
 
