@@ -82,6 +82,15 @@ class PackageConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(PackageConfig)
 
+class RoutableInterface(models.Model):
+  class Meta:
+    abstract = True
+
+  routing_protocol = registry_fields.SelectorKeyField("node.config", "core.interfaces#routing_protocol",
+    default = "none")
+
+registration.point("node.config").register_choice("core.interfaces#routing_protocol", "none", _("None"))
+
 class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
   """
   Interface configuration.
@@ -98,7 +107,7 @@ class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(InterfaceConfig)
 
-class EthernetInterfaceConfig(InterfaceConfig):
+class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
   """
   An ethernet interface.
   """
@@ -187,7 +196,7 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
 registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
 registration.point("node.config").register_item(WifiInterfaceConfig)
 
-class VpnInterfaceConfig(InterfaceConfig):
+class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
   """
   VPN interface.
   """
@@ -273,9 +282,6 @@ class AllocatedNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorF
   class Meta:
     model = AllocatedNetworkConfig
 
-registration.point("node.config").register_choice("core.interfaces.network#usage", "auto", _("Routing and Clients"))
-registration.point("node.config").register_choice("core.interfaces.network#usage", "routing", _("Routing Loopback"))
-registration.point("node.config").register_choice("core.interfaces.network#usage", "clients", _("Clients"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
 registration.point("node.config").unregister_item(core_models.BasicAddressingConfig)
 registration.register_form_for_item(AllocatedNetworkConfig, AllocatedNetworkConfigForm)
