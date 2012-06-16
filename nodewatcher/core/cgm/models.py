@@ -196,6 +196,36 @@ class WifiRadioDeviceConfigForm(forms.ModelForm, core_antennas.AntennaReferencer
 registration.register_form_for_item(WifiRadioDeviceConfig, WifiRadioDeviceConfigForm)
 registration.point("node.config").register_item(WifiRadioDeviceConfig)
 
+class WifiInterfaceConfig(InterfaceConfig):
+  """
+  Wifi interface configuration.
+  """
+  device = registry_fields.IntraRegistryForeignKey(WifiRadioDeviceConfig,
+    editable = False, null = False, related_name = 'interfaces')
+  
+  mode = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_mode")
+  essid = models.CharField(max_length = 50, verbose_name = "ESSID")
+  bssid = registry_fields.MACAddressField(verbose_name = "BSSID")
+  
+  class RegistryMeta(InterfaceConfig.RegistryMeta):
+    form_order = 51
+    registry_name = _("Wireless Interface")
+    multiple = True
+    hidden = False
+
+class WifiInterfaceConfigForm(forms.ModelForm):
+  """
+  Wifi interface configuration form.
+  """
+  class Meta:
+    model = WifiInterfaceConfig
+
+registration.point("node.config").register_choice("core.interfaces#wifi_mode", "mesh", _("Mesh"))
+registration.point("node.config").register_choice("core.interfaces#wifi_mode", "ap", _("AP"))
+registration.point("node.config").register_choice("core.interfaces#wifi_mode", "sta", _("STA"))
+registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
+registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
+
 class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
   """
   VPN interface.
@@ -256,6 +286,7 @@ class StaticNetworkConfig(NetworkConfig):
 registration.point("node.config").register_choice("core.interfaces.network#ip_family", "ipv4", _("IPv4"))
 registration.point("node.config").register_choice("core.interfaces.network#ip_family", "ipv6", _("IPv6"))
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
+registration.point("node.config").register_subitem(WifiInterfaceConfig, StaticNetworkConfig)
 
 class DHCPNetworkConfig(NetworkConfig):
   """
@@ -283,6 +314,7 @@ class AllocatedNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorF
     model = AllocatedNetworkConfig
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
+registration.point("node.config").register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
 registration.point("node.config").unregister_item(core_models.BasicAddressingConfig)
 registration.register_form_for_item(AllocatedNetworkConfig, AllocatedNetworkConfigForm)
 
@@ -298,17 +330,19 @@ class PPPoENetworkConfig(NetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
+# TODO remove this
 class WifiNetworkConfig(NetworkConfig, allocation.IpAddressAllocator):
   """
   Configuration for a WiFi network.
   """
   role = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#role")
   essid = models.CharField(max_length = 50, verbose_name = "ESSID")
-  bssid = registry_fields.MACAddressField(verbose_name = "BSSID")
+  bssid = registry_fields.MACAddressField(verbose_name = "BSSID", blank = True)
   
   class RegistryMeta(NetworkConfig.RegistryMeta):
     registry_name = _("WiFi Network")
 
+# TODO remove this
 class WifiNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
   """
   General configuration form.
@@ -316,12 +350,8 @@ class WifiNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMi
   class Meta:
     model = WifiNetworkConfig
 
-registration.point("node.config").register_choice("core.interfaces.network#role", "mesh", _("Mesh"))
-registration.point("node.config").register_choice("core.interfaces.network#role", "endusers", _("Endusers"))
-registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-ap", _("Backbone-AP"))
-registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-sta", _("Backbone-STA"))
-registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiNetworkConfig)
-registration.register_form_for_item(WifiNetworkConfig, WifiNetworkConfigForm)
+#registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiNetworkConfig)
+#registration.register_form_for_item(WifiNetworkConfig, WifiNetworkConfigForm)
 
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
   """
