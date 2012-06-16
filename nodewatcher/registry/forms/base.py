@@ -516,7 +516,16 @@ def prepare_forms(context):
     # TODO is a deep copy really needed? shouldn't a shallow one suffice?
     context.items = copy.deepcopy(items)
     context.existing_items = set()
-    item_cls = context.items.values()[0].top_model()
+    
+    # Discover which class is the top-level class
+    if context.hierarchy_parent_cls is not None:
+      for item_cls in context.items.values():
+        if all([issubclass(x, item_cls) for x in context.items.values()]):
+          break
+      else:
+        item_cls = context.items.values()[0].top_model()
+    else:
+      item_cls = context.items.values()[0].top_model()
     cls_meta = item_cls.RegistryMeta
 
     if context.hierarchy_prefix is not None:
@@ -543,8 +552,18 @@ def prepare_forms(context):
       existing_models_qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
       
       if context.hierarchy_parent_cls is not None:
+        rel_field_name = item_cls._registry_object_parent_link.name
+        if item_cls != item_cls.top_model():
+          rel_field_name = "%s__%s" % (item_cls._meta.module_name, rel_field_name)
+          # We have to filter out completely unrelated items because if the parent object
+          # is set to None, the basic filter would also match those that aren't linked
+          # to the correct model at all.
+          existing_models_qs = existing_models_qs.exclude(
+            **{ item_cls._meta.module_name : None }
+          )
+        
         existing_models_qs = existing_models_qs.filter(
-          **{ item_cls._registry_object_parent_link.name : context.hierarchy_parent_obj }
+          **{ rel_field_name : context.hierarchy_parent_obj }
         )
       
       for mdl in existing_models_qs:
@@ -556,7 +575,11 @@ def prepare_forms(context):
            getattr(mdl, '_registry_object_parent', None) is not None:
           if getattr(mdl, mdl._registry_object_parent_link.name) is not None:
             continue
-
+        
+        # Skip items that should not be here
+        if mdl._meta.module_name not in context.items:
+          continue
+        
         context.existing_models[mdl.pk] = mdl
         context.existing_items.add(mdl.__class__)
     

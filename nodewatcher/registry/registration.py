@@ -163,8 +163,10 @@ class RegistrationPoint(object):
           parent.__dict__.get('_registry_object_children', django_datastructures.SortedDict()))
 
         # Setup the parent relation and verify that one doesn't already exist
-        if child.__dict__.get('_registry_object_parent', None) is not None:
-          raise ImproperlyConfigured("Registry item cannot have two object parents!")
+        existing_parent = child.__dict__.get('_registry_object_parent', None)
+        if existing_parent is not None and existing_parent.top_model() != parent.top_model():
+          raise ImproperlyConfigured("Registry item cannot have two object parents without a "
+            "common ancestor!")
         child._registry_object_parent = parent
         child._registry_object_parent_link = field
 
