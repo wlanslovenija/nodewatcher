@@ -6,6 +6,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("nodes", "0002_remove_pool"),
+    )
+
     def forwards(self, orm):
         
         # Adding field 'Pool.alloc_content_type'

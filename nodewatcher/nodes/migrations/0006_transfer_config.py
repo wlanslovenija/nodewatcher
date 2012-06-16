@@ -14,6 +14,10 @@ class Migration(DataMigration):
         ("solar", "0002_schema_refactor"),
         ("digitemp", "0002_schema_refactor"),
     )
+    needed_by = (
+        ("core", "0025_rt_announce_mt"),
+        ("cgm", "0018_fkey_details"),
+    )
     
     def get_content_type(self, orm, app_label, model):
       """
