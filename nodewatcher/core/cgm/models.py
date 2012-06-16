@@ -118,9 +118,9 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
 
 registration.point("node.config").register_item(EthernetInterfaceConfig)
 
-class WifiInterfaceConfig(InterfaceConfig):
+class WifiRadioDeviceConfig(InterfaceConfig):
   """
-  A wireless interface.
+  A wireless radio device.
   """
   wifi_radio = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_radio")
   protocol = models.CharField(max_length = 50)
@@ -132,12 +132,12 @@ class WifiInterfaceConfig(InterfaceConfig):
   class RegistryMeta(InterfaceConfig.RegistryMeta):
     registry_name = _("Wireless Radio")
 
-class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFormMixin):
+class WifiRadioDeviceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFormMixin):
   """
-  A wireless interface configuration form.
+  A wireless radio device configuration form.
   """
   class Meta:
-    model = WifiInterfaceConfig
+    model = WifiRadioDeviceConfig
   
   def regulatory_filter(self, request):
     """
@@ -151,7 +151,7 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
     """
     Handles dynamic protocol/channel selection.
     """
-    super(WifiInterfaceConfigForm, self).modify_to_context(item, cfg, request)
+    super(WifiRadioDeviceConfigForm, self).modify_to_context(item, cfg, request)
     radio = None
     try:
       radio = cgm_base.get_platform(cfg['core.general'][0].platform) \
@@ -193,8 +193,8 @@ class WifiInterfaceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFo
       # Create empty field on error
       self.fields['channel'] = registry_fields.SelectorFormField(label = _("Channel"), choices = BLANK_CHOICE_DASH)
 
-registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
-registration.point("node.config").register_item(WifiInterfaceConfig)
+registration.register_form_for_item(WifiRadioDeviceConfig, WifiRadioDeviceConfigForm)
+registration.point("node.config").register_item(WifiRadioDeviceConfig)
 
 class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
   """
@@ -320,7 +320,7 @@ registration.point("node.config").register_choice("core.interfaces.network#role"
 registration.point("node.config").register_choice("core.interfaces.network#role", "endusers", _("Endusers"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-ap", _("Backbone-AP"))
 registration.point("node.config").register_choice("core.interfaces.network#role", "backbone-sta", _("Backbone-STA"))
-registration.point("node.config").register_subitem(WifiInterfaceConfig, WifiNetworkConfig)
+registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiNetworkConfig)
 registration.register_form_for_item(WifiNetworkConfig, WifiNetworkConfigForm)
 
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
