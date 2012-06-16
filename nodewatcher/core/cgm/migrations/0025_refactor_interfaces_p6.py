@@ -1,56 +1,30 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
 
-    def get_content_type(self, orm, app_label, model):
-      """
-      A helper method to get or create content types.
-      """
-      try:
-        return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
-      except orm['contenttypes.ContentType'].DoesNotExist:
-        ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
-        ctype.save()
-        return ctype
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-      wifiiface_ctype = self.get_content_type(orm, app_label = 'cgm', model = 'wifiinterfaceconfig')
-      allocnet_ctype  = self.get_content_type(orm, app_label = 'cgm', model = 'allocatednetworkconfig')
-      
-      for wifi_net in orm['cgm.wifinetworkconfig'].objects.all():
-        # Create a new WifiInterfaceConfig, convert essid, bssid and mode
-        iface = orm['cgm.WifiInterfaceConfig'](root = wifi_net.root,
-          content_type = wifiiface_ctype)
-        iface.device = orm['cgm.WifiRadioDeviceConfig'].objects.get(pk = wifi_net.interface.pk)
-        iface.enabled = wifi_net.enabled
-        iface.essid = wifi_net.essid
-        iface.bssid = wifi_net.bssid
-        iface.mode = "mesh"
-        iface.save()
-
-        # Create a new AllocatedNetworkConfig, convert the rest
-        alloc_net = orm['cgm.AllocatedNetworkConfig'](root = wifi_net.root,
-          content_type = allocnet_ctype)
-        alloc_net.interface = iface
-        alloc_net.description = wifi_net.description
-        alloc_net.enabled = wifi_net.enabled
-        alloc_net.family = wifi_net.family
-        alloc_net.pool = wifi_net.pool
-        alloc_net.prefix_length = wifi_net.prefix_length
-        alloc_net.subnet_hint = wifi_net.subnet_hint
-        alloc_net.allocation = wifi_net.allocation
-        alloc_net.save()
-
-        # Remove the obsolete wifi network config object
-        wifi_net.delete()
+        # Deleting model 'WifiNetworkConfig'
+        db.delete_table('cgm_wifinetworkconfig')
 
     def backwards(self, orm):
-      raise RuntimeError("Cannot reverse this migration.")
-
+        # Adding model 'WifiNetworkConfig'
+        db.create_table('cgm_wifinetworkconfig', (
+            ('allocation', self.gf('django.db.models.fields.related.ForeignKey')(related_name='allocations_cgm_wifinetworkconfig', null=True, on_delete=models.PROTECT, to=orm['core.IpPool'])),
+            ('family', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#ip_family')),
+            ('role', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#role')),
+            ('essid', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('bssid', self.gf('nodewatcher.registry.fields.MACAddressField')(max_length=17, blank=True)),
+            ('networkconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.NetworkConfig'], unique=True, primary_key=True)),
+            ('prefix_length', self.gf('django.db.models.fields.IntegerField')(default=27)),
+            ('subnet_hint', self.gf('nodewatcher.registry.fields.IPAddressField')(host_required=True, null=True, blank=True)),
+            ('pool', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.IpPool'], on_delete=models.PROTECT)),
+        ))
+        db.send_create_signal('cgm', ['WifiNetworkConfig'])
 
     models = {
         'cgm.allocatednetworkconfig': {
@@ -168,18 +142,6 @@ class Migration(DataMigration):
             'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'mode': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_mode'"})
         },
-        'cgm.wifinetworkconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'WifiNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
-            'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_cgm_wifinetworkconfig'", 'null': 'True', 'on_delete': 'models.PROTECT', 'to': "orm['core.IpPool']"}),
-            'bssid': ('nodewatcher.registry.fields.MACAddressField', [], {'max_length': '17', 'blank': 'True'}),
-            'essid': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
-            'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'pool': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']", 'on_delete': 'models.PROTECT'}),
-            'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
-            'role': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"}),
-            'subnet_hint': ('nodewatcher.registry.fields.IPAddressField', [], {'host_required': 'True', 'null': 'True', 'blank': 'True'})
-        },
         'cgm.wifiradiodeviceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'WifiRadioDeviceConfig', '_ormbases': ['cgm.InterfaceConfig']},
             'antenna': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Antenna']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
@@ -258,4 +220,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['cgm']
-    symmetrical = True

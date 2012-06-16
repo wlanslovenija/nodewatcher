@@ -330,29 +330,6 @@ class PPPoENetworkConfig(NetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
-# TODO remove this
-class WifiNetworkConfig(NetworkConfig, allocation.IpAddressAllocator):
-  """
-  Configuration for a WiFi network.
-  """
-  role = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#role")
-  essid = models.CharField(max_length = 50, verbose_name = "ESSID")
-  bssid = registry_fields.MACAddressField(verbose_name = "BSSID", blank = True)
-  
-  class RegistryMeta(NetworkConfig.RegistryMeta):
-    registry_name = _("WiFi Network")
-
-# TODO remove this
-class WifiNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
-  """
-  General configuration form.
-  """
-  class Meta:
-    model = WifiNetworkConfig
-
-#registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiNetworkConfig)
-#registration.register_form_for_item(WifiNetworkConfig, WifiNetworkConfigForm)
-
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
   """
   Configuration of per-interface traffic limits.
