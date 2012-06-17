@@ -139,9 +139,10 @@ class UserChangeForm(AdminUserChangeForm):
   def __init__(self, *args, **kwargs):
     # This is here just because of the bug in Django which does not remove explicitly declared fields in parent class from
     # a subclass form when field is not declared in Meta.fields or even if it is defined in Meta.exclude
-    # So we remove such field (in this case username field) here ourselves
+    # So we remove such field (in this case username and password fields) here ourselves
     super(UserChangeForm, self).__init__(*args, **kwargs)
     del self.fields['username']
+    del self.fields['password']
     
     self.fields['email'].help_text = _('If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.')
   
