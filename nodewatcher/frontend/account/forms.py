@@ -33,6 +33,7 @@ def alter_user_form_fields(form):
     form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
   # We set it every time to be sure
   form.fields['username'].min_length = 4
+  form.fields['username'].help_text = _('Letters, digits and @/./+/-/_ only. Will be public.')
   
   # E-mail domain validation (we check it in a model field)
   emailfield = filter(lambda x: x.name == 'email', form.Meta.model._meta.fields)[0]
