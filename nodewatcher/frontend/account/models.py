@@ -15,6 +15,12 @@ from frontend.account import geo_fields
 from frontend.account import utils
 from frontend.nodes import models
 
+ATTRIBUTION_CHOICES = (
+  ('name', _("Use my full name")),
+  ('username', _("Use my username")),
+  ('nothing', _("Hide me")),
+)
+
 class UserProfileAndSettings(django_models.Model):
   """
   This class represents an user profile and settings.
@@ -26,6 +32,7 @@ class UserProfileAndSettings(django_models.Model):
   country = geo_fields.CountryField(_('country'), blank=True, help_text=_('Where are you from? It will be public.'))
   language = geo_fields.LanguageField(_('language'), help_text=_('Choose the language you wish this site to be in.'))
   default_project = django_models.ForeignKey(models.Project, default=models.project_default, null=True, verbose_name=_('default project'))
+  attribution = django_models.CharField(_('attribution'), max_length=8, choices=ATTRIBUTION_CHOICES, default=ATTRIBUTION_CHOICES[0][0], help_text=_('What to use when we want to give you public attribution for your participation and contribution?'))
 
   # AccountRegistrationForm and AccountChangeForm uses this
   fieldset = (
@@ -34,6 +41,9 @@ class UserProfileAndSettings(django_models.Model):
     }),
     (_('Settings'), {
       'fields': ('language', 'default_project'),
+    }),
+    (_('Privacy'), {
+      'fields': ('attribution',),
     }),
   )
 

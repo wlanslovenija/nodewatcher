@@ -44,7 +44,7 @@ def alter_user_form_fields(form):
   
   # We add in a form field as it is too late to add in model field
   form.fields['email'].help_text = _('Carefully enter your e-mail address as it will be used for account activation. It will be visible to other registered users.')
-  form.fields['first_name'].help_text = _('It will be visible only to network administrators.')
+  form.fields['first_name'].help_text = _('By default used for attribution. You can hide it to be visible only to network administrators in privacy section bellow.')
   form.fields['last_name'].help_text = form.fields['first_name'].help_text
   
   # We want those fields to be required (UserCreationForm.Meta.fields is made from user_add_fieldsets)
