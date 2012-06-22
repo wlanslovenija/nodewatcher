@@ -488,23 +488,40 @@ config interface digger0
         option ipaddr   {vpn_ip}
         option netmask  255.255.0.0
 
-config interface wan
-        option ifname   eth1
-        option proto    dhcp
-
 config switch eth0
         option enable_vlan      1
 
 config switch_vlan
         option device   eth0
         option vlan     1
-        option ports    "0 1 2 3 4"
+        option ports    "0 1 2 3 4"\n
 """.format(
         lan_ip = self.allocateIpForOlsr(),
         mesh_ip = self.ip,
         clients_mask = self.subnets[0]['mask'],
         vpn_ip = self.vpn['ip']
       ))
+      
+      # Configure WAN interface
+      wan_interface = {}
+      for iface in self.interfaces:
+        if iface['id'] == "wan":
+          wan_interface = iface
+          break
+      
+      if wan_interface.get('ip', None):
+        f.write("config interface wan\n")
+        f.write("        option ifname   eth1\n")
+        f.write("        option proto    static\n")
+        f.write("        option ipaddr   %s\n" % wan_interface['ip'])
+        f.write("        option netmask  %s\n" % wan_interface['mask'])
+        f.write("        option gateway  %s\n" % wan_interface['gateway'])
+      else:
+        f.write("config interface wan\n")
+        f.write("        option ifname   eth1\n")
+        f.write("        option proto    dhcp\n")
+      
+      f.write("\n")
       f.close()
       
       # Policy routing configuration
