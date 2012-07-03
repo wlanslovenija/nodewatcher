@@ -97,6 +97,7 @@ class NodeConfig(object):
   subnets = None
   vpn = None
   vpnServer = (("46.54.226.43", 9999), ("91.185.203.246", 9999), ("46.54.226.49", 9999))
+  tdServer = [("46.54.226.43", 53), ("91.185.203.240", 123)]
   dns = ("10.254.0.1", "10.254.0.2")
   ntp = ("10.254.0.1", "10.254.0.2")
   interfaces = None
@@ -482,12 +483,6 @@ config interface clients
         option ipaddr   {mesh_ip}
         option netmask  {clients_mask}
 
-config interface digger0
-        option ifname   digger0
-        option proto    static
-        option ipaddr   {vpn_ip}
-        option netmask  255.255.0.0
-
 config switch eth0
         option enable_vlan      1
 
@@ -501,6 +496,15 @@ config switch_vlan
         clients_mask = self.subnets[0]['mask'],
         vpn_ip = self.vpn['ip']
       ))
+      
+      # Configure tunneldigger interfaces
+      for idx in xrange(len(self.tdServer)):
+        f.write("config interface digger%d\n" % idx)
+        f.write("        option ifname   digger%d\n" % idx)
+        f.write("        option proto    static\n")
+        f.write("        option ipaddr   %s\n" % self.vpn['ip'])
+        f.write("        option netmask  255.255.0.0\n")
+        f.write("\n")
       
       # Configure WAN interface
       wan_interface = {}
@@ -531,7 +535,7 @@ config table mesh
         option id       20
 """)
 
-      for server, port in self.vpnServer:
+      for server, port in self.tdServer:
         f.write("""
 config policy
         option dest_ip  '{0}'
@@ -644,7 +648,7 @@ Interface "wlan0-1" "wlan1" "br-clients" {diggers}
         router_id = self.ip,
         hna_subnet = self.subnets[0]['subnet'],
         hna_mask = self.subnets[0]['mask'],
-        diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.vpnServer))])
+        diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.tdServer))])
       ))
       f.close()
       
@@ -684,7 +688,7 @@ config dhcp clients
         f = open(os.path.join(configPath, "tunneldigger"), 'w')
         iface = 0
         
-        for server, port in self.vpnServer:
+        for server, port in self.tdServer:
           f.write("""
 config broker
         option address          '{broker_ip}'
