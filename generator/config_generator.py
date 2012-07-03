@@ -491,18 +491,18 @@ config switch_vlan
         option vlan     1
         option ports    "0 1 2 3 4"\n
 """.format(
-        lan_ip = self.allocateIpForOlsr(),
         mesh_ip = self.ip,
         clients_mask = self.subnets[0]['mask'],
         vpn_ip = self.vpn['ip']
       ))
       
       # Configure tunneldigger interfaces
-      for idx in xrange(len(self.tdServer)):
+      ips = [self.vpn['ip']] + [self.allocateIpForOlsr() for _ in xrange(len(self.tdServer) - 1)]
+      for idx, ip in zip(xrange(len(self.tdServer)), ips):
         f.write("config interface digger%d\n" % idx)
         f.write("        option ifname   digger%d\n" % idx)
         f.write("        option proto    static\n")
-        f.write("        option ipaddr   %s\n" % self.vpn['ip'])
+        f.write("        option ipaddr   %s\n" % ip)
         f.write("        option netmask  255.255.0.0\n")
         f.write("\n")
       
@@ -692,11 +692,11 @@ config dhcp clients
           f.write("""
 config broker
         option address          '{broker_ip}'
-        option port             53
+        option port             {broker_port}
         option uuid             '{uuid}'
         option interface        'digger{iface}'
 
-""".format(broker_ip = server, uuid = self.uuid, iface = iface))
+""".format(broker_ip = server, broker_port = port, uuid = self.uuid, iface = iface))
           iface += 1
         
         f.close()
