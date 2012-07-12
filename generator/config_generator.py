@@ -97,7 +97,7 @@ class NodeConfig(object):
   subnets = None
   vpn = None
   vpnServer = (("46.54.226.43", 9999), ("91.185.203.246", 9999), ("46.54.226.49", 9999))
-  tdServer = [("46.54.226.43", 53), ("91.185.203.240", 123)]
+  tdServer = [("46.54.226.43", [8942, 53, 123]), ("91.185.203.240", [8942, 53, 123])]
   dns = ("10.254.0.1", "10.254.0.2")
   ntp = ("10.254.0.1", "10.254.0.2")
   interfaces = None
@@ -535,7 +535,7 @@ config table mesh
         option id       20
 """)
 
-      for server, port in self.tdServer:
+      for server, ports in self.tdServer:
         f.write("""
 config policy
         option dest_ip  '{0}'
@@ -688,15 +688,16 @@ config dhcp clients
         f = open(os.path.join(configPath, "tunneldigger"), 'w')
         iface = 0
         
-        for server, port in self.tdServer:
+        for server, ports in self.tdServer:
+          ports = "\n".join(["        list port               %d" % x for x in ports])
           f.write("""
 config broker
         option address          '{broker_ip}'
-        option port             {broker_port}
+{broker_ports}
         option uuid             '{uuid}'
         option interface        'digger{iface}'
 
-""".format(broker_ip = server, broker_port = port, uuid = self.uuid, iface = iface))
+""".format(broker_ip = server, broker_ports = ports, uuid = self.uuid, iface = iface))
           iface += 1
         
         f.close()
