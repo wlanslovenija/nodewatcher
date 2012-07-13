@@ -279,7 +279,12 @@ countries_cities = dict([(c[0], c[2]) for c in COUNTRIES[:-1]])
 
 CITIES = sorted(countries_cities.values())
 
-geoip_resolver = gis_utils.GeoIP()
+if gis_utils.HAS_GEOIP:
+    geoip_resolver = gis_utils.GeoIP()
+else:
+    geoip_resolver = None
+    import logging
+    logging.warning("GeoIP library not available.")
 
 def get_initial_country(request=None):
   """
@@ -287,7 +292,7 @@ def get_initial_country(request=None):
   """
   
   if request:
-    country = geoip_resolver.country_code(request.META['REMOTE_ADDR'])
+    country = geoip_resolver and geoip_resolver.country_code(request.META['REMOTE_ADDR'])
     if country and country.upper() in countries_cities:
       return country.upper()
   return settings.DEFAULT_COUNTRY
@@ -301,7 +306,7 @@ def get_initial_city(request=None):
   # Otherwise psycopg2 raises an "can't adapt" error: http://code.djangoproject.com/ticket/13965
 
   if request:
-    city = geoip_resolver.city(request.META['REMOTE_ADDR'])
+    city = geoip_resolver and geoip_resolver.city(request.META['REMOTE_ADDR'])
     if city and city.get('city'):
       return city['city']
     return utils_encoding.force_unicode(countries_cities[get_initial_country(request)]) or getattr(settings, 'DEFUALT_CITY', None)
