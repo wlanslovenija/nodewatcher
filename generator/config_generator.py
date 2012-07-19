@@ -1022,7 +1022,12 @@ config uhttpd main
         "tp-wr842nd" : "TLWR842",
       }
 
-      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe -wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger"' % profile_map[self.portLayout]
+      pkg_map = {
+        "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-serial-ti-usb"],
+      }
+      pkgs = " ".join(pkg_map.get(self.portLayout, []))
+
+      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe -wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger %s"' % (profile_map[self.portLayout], pkgs)
       os.chdir(path)
       os.system(buildString)
       return
