@@ -1017,7 +1017,12 @@ config uhttpd main
     if self.openwrtVersion == 'hardcoded-tpl-trunk':
       raise Exception("Cannot generate image for this version!")
     elif self.openwrtVersion == 'nextgen':
-      buildString = 'make image FILES="../files" PROFILE="TLWR741" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe -wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger"'
+      profile_map = {
+        "tp-wr741nd" : "TLWR741",
+        "tp-wr842nd" : "TLWR842",
+      }
+
+      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe -wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger"' % profile_map[self.portLayout]
       os.chdir(path)
       os.system(buildString)
       return
