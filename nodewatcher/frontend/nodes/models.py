@@ -139,7 +139,10 @@ def project_default(request=None):
   else:
     projects = Project.objects.all()
     if projects.exists():
-      return projects[0]
+      try:
+        return projects.get(name='test')
+      except Project.objects.DoesNotExist:
+        return projects[0]
     else:
       return None
 
