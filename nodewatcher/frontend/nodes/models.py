@@ -140,7 +140,8 @@ def project_default(request=None):
     projects = Project.objects.all()
     if projects.exists():
       try:
-        return projects.get(name='test')
+        # TODO: Should be probably a configuration option
+        return projects.get(name__iexact='test')
       except Project.DoesNotExist:
         return projects[0]
     else:
