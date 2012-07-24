@@ -336,7 +336,7 @@ def create_point(model, namespace):
     
     # Try to load the model; if it is already loaded this will work, but if
     # not, we will need to defer part of object creation
-    model = models.get_model(app_label, model_name, False)
+    model = models.get_model(app_label, model_name, seed_cache = False, only_installed = False)
     if model:
       augment_root_model(model)
     else:
