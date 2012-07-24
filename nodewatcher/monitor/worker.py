@@ -7,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.utils import importlib
 
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.monitor import processors as monitor_processors
 
 # Welcome banner
 BANNER = """
@@ -83,6 +83,21 @@ class Worker(object):
     self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS)
     logger.info("Ready with %d workers." % settings.MONITOR_WORKERS)
 
+  def prepare_data_archive(self):
+    """
+    Prepares the data archive backend.
+    """
+    archive_module = settings.MONITOR_DATA_ARCHIVE_BACKEND
+    i = archive_module.rfind(".")
+    module, attr = archive_module[:i], archive_module[i+1:]
+    try:
+      module = importlib.import_module(module)
+      processor = getattr(module, attr)
+    except (ImportError, AttributeError):
+      raise ImproperlyConfigured("Error importing monitor data archive backend %s!" % archive_module)
+
+    self.data_archive = module()
+
   @transaction.commit_manually
   def cycle(self):
     """
@@ -90,6 +105,7 @@ class Worker(object):
     """
     nodes = set()
     context = monitor_processors.ProcessorContext()
+    context.archive = self.data_archive
 
     for processor_list in self.processors:
       lead_proc = processor_list[0]
@@ -127,6 +143,9 @@ class Worker(object):
 
     logger.info("Loading processors...")
     self.prepare_processors()
+
+    logger.info("Loading data archive backend...")
+    self.prepare_data_archive()
 
     logger.info("Preparing the worker pool...")
     self.prepare_workers()

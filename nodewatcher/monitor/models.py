@@ -99,5 +99,6 @@ class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
 
   class RegistryMeta:
     registry_id = "system.status"
+    data_archive = [ "uptime" ]
 
 registration.point("node.monitoring").register_item(SystemStatusMonitor)

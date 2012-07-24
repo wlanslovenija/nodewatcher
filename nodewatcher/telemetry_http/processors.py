@@ -1,5 +1,5 @@
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.monitor import processors as monitor_processors
 from . import parser as telemetry_parser
 
 class HTTPTelemetryContext(monitor_processors.ProcessorContext):

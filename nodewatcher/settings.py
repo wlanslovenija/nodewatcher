@@ -240,6 +240,9 @@ MONITOR_PROCESSORS = (
   'nodewatcher.monitor.processors.PurgeInvalidNodes'
 )
 
+# Backend for the monitoring data archive
+MONITOR_DATA_ARCHIVE_BACKEND = 'nodewatcher.monitor.archive.NullDataArchive'
+
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface
 REGISTRY_FORM_PROCESSORS = {

@@ -3,7 +3,8 @@ import datetime
 from django.conf import settings
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.monitor import models as monitor_models
+from nodewatcher.monitor import processors as monitor_processors
 from nodewatcher.nodes import models as nodes_models
 from nodewatcher.routing_olsr import parser as olsr_parser
 from nodewatcher.routing_olsr import models as olsr_models
@@ -63,7 +64,7 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
           rid_cfg.family = "ipv4"
           rid_cfg.save()
 
-          status_mon = node.monitoring.core.status(create = core_models.StatusMonitor)
+          status_mon = node.monitoring.core.status(create = monitor_models.StatusMonitor)
           status_mon.status = "invalid"
           status_mon.save()
 
@@ -103,7 +104,7 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
 
         try:
           elink = rtm.links.get(peer = dst_node)
-        except core_models.TopologyLink.DoesNotExist:
+        except monitor_models.TopologyLink.DoesNotExist:
           elink = olsr_models.OlsrTopologyLink(monitor = rtm, peer = dst_node)
 
         elink.lq = link['lq']
@@ -124,7 +125,7 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
         network = announce['net'] if 'net' in announce else announce['alias']
         try:
           eannounce = existing_announces.get(network = network)
-        except core_models.RoutingAnnounceMonitor.DoesNotExist:
+        except monitor_models.RoutingAnnounceMonitor.DoesNotExist:
           eannounce = olsr_models.OlsrRoutingAnnounceMonitor(root = node, network = network)
 
         eannounce.status = "ok" if 'net' in announce else "alias"

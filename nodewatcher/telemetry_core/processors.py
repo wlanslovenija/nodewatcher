@@ -1,7 +1,7 @@
 import datetime
 
-from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.monitor import models as monitor_models
+from nodewatcher.monitor import processors as monitor_processors
 
 class SystemStatusCheck(monitor_processors.NodeProcessor):
   """
@@ -25,9 +25,12 @@ class SystemStatusCheck(monitor_processors.NodeProcessor):
       local_time = int(context.http.general.local_time)
 
       # Update the node's monitoring schema
-      status = node.monitoring.system.status(create = core_models.SystemStatusMonitor)
+      status = node.monitoring.system.status(create = monitor_models.SystemStatusMonitor)
       status.uptime = uptime
       status.local_time = datetime.datetime.fromtimestamp(local_time)
       status.save()
+
+      # Push to data archive
+      context.archive.insert(node, status)
 
     return context

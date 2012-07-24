@@ -43,6 +43,9 @@ class Node(models.Model):
   """
   uuid = models.CharField(max_length = 40, primary_key = True)  
 
+  def get_object_id(self):
+    return "node:%s" % self.uuid
+
   def save(self, **kwargs):
     """
     Override save so we can generate UUIDs.
