@@ -451,6 +451,7 @@ class OpenWrtConfig(NodeConfig):
 
       # Setup authorized public keys
       keyPath = os.path.join(directory, "dropbear")
+      os.mkdir(keyPath)
       self.__copyTemplate("keys/authorized_keys", os.path.join(keyPath, "authorized_keys"))
       
       # Write UUID to /etc/uuid
