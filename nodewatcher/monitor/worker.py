@@ -92,11 +92,11 @@ class Worker(object):
     module, attr = archive_module[:i], archive_module[i+1:]
     try:
       module = importlib.import_module(module)
-      processor = getattr(module, attr)
+      backend = getattr(module, attr)
     except (ImportError, AttributeError):
       raise ImproperlyConfigured("Error importing monitor data archive backend %s!" % archive_module)
 
-    self.data_archive = module()
+    self.data_archive = backend()
 
   @transaction.commit_manually
   def cycle(self):
