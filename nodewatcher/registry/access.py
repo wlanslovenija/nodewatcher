@@ -67,7 +67,17 @@ class RegistryResolver(object):
             return None
     else:
       raise UnknownRegistryIdentifier
-  
+
+  def __iter__(self):
+    """
+    Returns an iterator over all registry items that are present under
+    this registration point.
+    """
+    for obj in self._root._meta.get_all_related_objects():
+      if issubclass(obj.model, self._regpoint.item_base):
+        for model in getattr(self._root, obj.field.rel.related_name).all():
+          yield model
+
   def __getattr__(self, key):
     """
     Constructs hierarchical names by simulating attribute access.
