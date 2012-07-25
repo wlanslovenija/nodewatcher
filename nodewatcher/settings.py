@@ -208,6 +208,7 @@ INSTALLED_APPS = (
   'nodewatcher.core.cgm.packages.solar',
   'nodewatcher.core.cgm.packages.digitemp',
   'nodewatcher.monitor',
+  'nodewatcher.datastream',
   'nodewatcher.routing_olsr',
   'nodewatcher.telemetry_http',
   'nodewatcher.telemetry_core',
@@ -238,11 +239,12 @@ MONITOR_PROCESSORS = (
   'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
   'nodewatcher.telemetry_http.processors.HTTPTelemetry',
   'nodewatcher.telemetry_core.processors.SystemStatusCheck',
+  'nodewatcher.datastream.processors.DataStreamProcessor',
   'nodewatcher.monitor.processors.PurgeInvalidNodes'
 )
 
 # Backend for the monitoring data archive
-MONITOR_DATA_ARCHIVE_BACKEND = 'nodewatcher.monitor.archive.NullDataArchive'
+DATA_STREAM_BACKEND = 'nodewatcher.datastream.backends.null'
 
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface

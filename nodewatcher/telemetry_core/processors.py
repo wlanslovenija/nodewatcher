@@ -30,7 +30,4 @@ class SystemStatusCheck(monitor_processors.NodeProcessor):
       status.local_time = datetime.datetime.fromtimestamp(local_time)
       status.save()
 
-      # Push to data archive
-      context.archive.insert(node, status)
-
     return context
