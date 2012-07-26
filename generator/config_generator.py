@@ -488,18 +488,21 @@ config interface clients
         option ipaddr   {mesh_ip}
         option netmask  {clients_mask}
 
-config switch eth0
-        option enable_vlan      1
-
-config switch_vlan
-        option device   eth0
-        option vlan     1
-        option ports    "0 1 2 3 4"\n
 """.format(
         mesh_ip = self.ip,
         clients_mask = self.subnets[0]['mask'],
         vpn_ip = self.vpn['ip']
       ))
+      
+      if portLayouts.get(self.portLayout, None) is not None:
+        f.write("config switch eth0\n")
+        f.write("        option enable_vlan      1\n")
+        f.write("\n")
+        f.write("config switch_vlan\n")
+        f.write("        option device   eth0\n")
+        f.write("        option vlan     1\n")
+        f.write('        option ports    "0 1 2 3 4"\n')
+        f.write("\n")
       
       # Configure tunneldigger interfaces
       ips = [self.vpn['ip']] + [self.allocateIpForOlsr() for _ in xrange(len(self.tdServer) - 1)]
@@ -800,6 +803,7 @@ config uhttpd main
       profile_map = {
         "tp-wr741nd" : "TLWR741",
         "tp-wr842nd" : "TLWR842",
+        "fonera"     : "",
       }
 
       pkg_map = {
