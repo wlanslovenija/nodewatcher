@@ -63,6 +63,7 @@ IMAGEBUILDERS = (
   "imagebuilder.broadcom",
   "imagebuilder.ar71xx",
   "imagebuilder.nextgen.ar71xx",
+  "imagebuilder.nextgen.atheros",
 )
 
 def no_unicodes(x):
