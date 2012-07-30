@@ -283,12 +283,13 @@ class RegistrationPoint(object):
     """
     return iter(self.item_classes)
 
-def create_point(model, namespace):
+def create_point(model, namespace, mixins = None):
   """
   Creates a new registration point (= registry root).
   
-  @param model: Root model
-  @param namespace: Registration point namespace
+  :param model: Root model
+  :param namespace: Registration point namespace
+  :param mixins: Optional list of mixin classes for the top-level registry item
   """
   # Properly handle deferred root model names
   try:
@@ -307,11 +308,14 @@ def create_point(model, namespace):
     # Create a new top-level class
     class Meta(registry_models.RegistryItemBase.Meta):
       abstract = True
-    
+
+    if mixins is None:
+      mixins = []
+
     base_name = "{0}{1}RegistryItem".format(model_name, namespace.capitalize())
     item_base = type(
       base_name,
-      (registry_models.RegistryItemBase,),
+      (registry_models.RegistryItemBase,) + tuple(mixins),
       {
         '__module__' : 'nodewatcher.registry.models',
         'Meta' : Meta,
