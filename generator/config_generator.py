@@ -803,11 +803,18 @@ config uhttpd main
       profile_map = {
         "tp-wr741nd" : "TLWR741",
         "tp-wr842nd" : "TLWR842",
+        "tp-wr743nd" : "TLWR743",
+        "tp-wr841nd" : "TLWR841",
+        "tp-wr941nd" : "TLWR941",
+        "tp-wr1041nd" : "TLWR1041",
+        "tp-wr1043nd" : "TLWR1043",
+        
         "fonera"     : "",
       }
 
       pkg_map = {
         "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-serial-ti-usb"],
+        "tp-wr1043nd" : ["kmod-usb-serial", "kmod-usb-serial-ti-usb"],
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []))
 
