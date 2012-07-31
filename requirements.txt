@@ -7,3 +7,4 @@ django-phonenumber-field==0.2a3
 django-polymorphic==0.2
 django-registration==0.8
 dnspython==1.10.0
+mongoengine==0.6.18

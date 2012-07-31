@@ -244,7 +244,11 @@ MONITOR_PROCESSORS = (
 )
 
 # Backend for the monitoring data archive
-DATA_STREAM_BACKEND = 'nodewatcher.datastream.backends.null'
+DATA_STREAM_BACKEND = 'nodewatcher.datastream.backends.mongodb'
+# Each backend can have backend-specific configuration options that can be specified here
+DATA_STREAM_BACKEND_CONFIGURATION = {
+  "database" : "nodewatcher",
+}
 
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface

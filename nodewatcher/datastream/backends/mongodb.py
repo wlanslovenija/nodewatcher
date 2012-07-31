@@ -1,23 +1,26 @@
-import importlib
+import mongoengine
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-class DataStream(object):
-  def __init__(self):
-    """
-    Class constructor.
-    """
-    self.backend = None
+# Setup the database connection to MongoDB
+# TODO Add support for specifying host, username and password
+if "database" not in settings.DATA_STREAM_BACKEND_CONFIGURATION:
+  raise ImproperlyConfigured("MongoDB datastream backend requires configuration!")
 
-    # Load the backend as specified in configuration
-    if getattr(settings, "DATA_STREAM_BACKEND", None) is not None:
-      try:
-        module = importlib.import_module(settings.DATA_STREAM_BACKEND)
-        self.backend = getattr(module, "Backend")()
-      except (ImportError, AttributeError):
-        raise ImproperlyConfigured("Error importing data stream backend %s!" % settings.DATA_STREAM_BACKEND)
+mongoengine.connect(settings.DATA_STREAM_BACKEND_CONFIGURATION["database"], alias = "datastream")
 
+class MetricMap(mongoengine.Document):
+  id = mongoengine.SequenceField(primary_key = True)
+  tags = mongoengine.ListField(mongoengine.DictField())
+
+  meta = dict(
+    db_alias = "datastream",
+    collection = "metrics",
+    indexes = ["tags"]
+  )
+
+class Backend(object):
   def insert(self, metric_uri, tags, value):
     """
     Inserts a data point into the timestamped data stream.
@@ -26,10 +29,7 @@ class DataStream(object):
     :param tags: Metric tags
     :param value: Metric value
     """
-    if not self.backend:
-      return
-
-    return self.backend.insert(metric_uri, tags, value)
+    pass
 
   def get_data(self, metric_uri, granularity, start, end):
     """
@@ -42,10 +42,7 @@ class DataStream(object):
     :param end: End timestamp
     :return: A list of resulting datapoints, sorted by time
     """
-    if not self.backend:
-      return []
-
-    return self.backend.get_data(metric_uri, granularity, start, end)
+    return []
 
   def get_metrics(self, tags):
     """
@@ -54,9 +51,4 @@ class DataStream(object):
     :param tags: A dictionary of tags to match
     :return: A list of metrics
     """
-    if not self.backend:
-      return []
-
-    return self.backend.get_metrics(tags)
-
-stream = DataStream()
+    return []

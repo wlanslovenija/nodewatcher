@@ -13,19 +13,11 @@ class DataStreamProcessor(monitor_processors.NodeProcessor):
     @param node: Node that is being processed
     @return: A (possibly) modified context
     """
+    # TODO Should we enable addition of items that are not in the registry?
     for item in node.monitoring:
-      # If the monitoring registry item doesn't provide a data_stream attribute in
-      # RegistryMeta, we skip it as we don't know which fields to include
-      if getattr(item.RegistryMeta, "data_stream", None) is None:
+      # If the monitoring registry item doesn't provide a meta_datastream attribute,
+      # we skip it as we don't know which fields to include
+      if getattr(item, "meta_datastream", None) is None:
         continue
 
-      # Attempt to add every item into the data stream
-      for field_name in item.RegistryMeta.data_stream:
-        try:
-          field_name, alias = field_name
-          value = getattr(item, alias)
-        except ValueError:
-          value = getattr(item, field_name)
-
-        # Push data into the data stream
-        stream.insert(node, "%s.%s" % (item.RegistryMeta.registry_id, field_name), value)
+      item.meta_datastream.insert_to_stream(item, stream)
