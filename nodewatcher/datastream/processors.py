@@ -1,5 +1,5 @@
 from nodewatcher.monitor import processors as monitor_processors
-from nodewatcher.datastream.stream import stream
+from nodewatcher.datastream.api.stream import stream
 
 class DataStreamProcessor(monitor_processors.NodeProcessor):
   """
@@ -15,9 +15,9 @@ class DataStreamProcessor(monitor_processors.NodeProcessor):
     """
     # TODO Should we enable addition of items that are not in the registry?
     for item in node.monitoring:
-      # If the monitoring registry item doesn't provide a meta_datastream attribute,
+      # If the monitoring registry item doesn't provide a connect_datastream attribute,
       # we skip it as we don't know which fields to include
-      if getattr(item, "meta_datastream", None) is None:
+      if getattr(item, "connect_datastream", None) is None:
         continue
 
-      item.meta_datastream.insert_to_stream(item, stream)
+      item.connect_datastream.insert_to_stream(item, stream)

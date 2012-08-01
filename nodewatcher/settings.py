@@ -244,7 +244,7 @@ MONITOR_PROCESSORS = (
 )
 
 # Backend for the monitoring data archive
-DATA_STREAM_BACKEND = 'nodewatcher.datastream.backends.mongodb'
+DATA_STREAM_BACKEND = 'nodewatcher.datastream.api.backends.mongodb'
 # Each backend can have backend-specific configuration options that can be specified here
 DATA_STREAM_BACKEND_CONFIGURATION = {
   "database" : "nodewatcher",

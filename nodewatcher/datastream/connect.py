@@ -1,5 +1,5 @@
 
-class DatastreamMeta(object):
+class ConnectDatastream(object):
   def __init__(self, **kwargs):
     """
     Constructs datastream metadata descriptor. Keyword arguments should contain

@@ -1,8 +1,8 @@
-from .meta import DatastreamMeta
+from .connect import ConnectDatastream
 from .fields import Field, IntegerField, FloatField, RateField
 
 __all__ = [
-  "DatastreamMeta",
+  "ConnectDatastream",
   "Field",
   "IntegerField",
   "FloatField",

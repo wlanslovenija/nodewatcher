@@ -41,10 +41,7 @@ class Node(models.Model):
   """
   This class represents a single node in the network.
   """
-  uuid = models.CharField(max_length = 40, primary_key = True)  
-
-  def get_object_id(self):
-    return "node:%s" % self.uuid
+  uuid = models.CharField(max_length = 40, primary_key = True)
 
   def save(self, **kwargs):
     """

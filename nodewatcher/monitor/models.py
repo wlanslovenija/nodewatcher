@@ -95,7 +95,7 @@ class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
   uptime = models.PositiveIntegerField()
   local_time = models.DateTimeField()
 
-  meta_datastream = datastream.DatastreamMeta(
+  connect_datastream = datastream.ConnectDatastream(
     uptime = datastream.IntegerField()
   )
 
