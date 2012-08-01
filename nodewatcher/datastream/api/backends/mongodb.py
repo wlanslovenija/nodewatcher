@@ -387,7 +387,7 @@ class Backend(object):
     state = metric.downsample_state[granularity]
     if state.timestamp is not None:
       datapoints = datapoints.find({
-        "m" : metric.id, "_id__gte" : pymongo.objectid.ObjectId.from_datetime(state.timestamp)
+        "m" : metric.id, "_id" : { "$gte" : pymongo.objectid.ObjectId.from_datetime(state.timestamp) }
       })
     else:
       # All datapoints should be selected as we obviously haven't done any downsampling yet
