@@ -218,7 +218,7 @@ INSTALLED_APPS = (
 
 # Monitor configuration
 MONITOR_WORKERS = 20
-MONITOR_INTERVAL = 600
+MONITOR_INTERVAL = 300
 
 # Cache backend
 CACHE_BACKEND = "memcached://127.0.0.1:11211/"
