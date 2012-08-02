@@ -418,7 +418,7 @@ class Backend(object):
       "days"    : ["year", "month", "day"]
     }
 
-    return datetime.datetime(**{ atom : getattr(timestamp, atom) for atom in round_map[granularity]})
+    return datetime.datetime(**dict(((atom, getattr(timestamp, atom)) for atom in round_map[granularity])))
 
   def _downsample_check(self, metric, datum_timestamp, execute = False):
     """

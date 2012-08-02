@@ -81,7 +81,12 @@ class Worker(object):
     connection.close()
 
     # Prepare worker processes
-    self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS, maxtasksperchild = 1000)
+    try:
+      self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS, maxtasksperchild = 1000)
+    except TypeError:
+      # Compatibility with Python 2.6 that doesn't have the maxtasksperchild arument
+      self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS)
+    
     logger.info("Ready with %d workers." % settings.MONITOR_WORKERS)
 
   @transaction.commit_manually
