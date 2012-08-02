@@ -191,6 +191,12 @@ class Backend(object):
       ("std_dev",     Downsamplers.StdDev),
     ]
 
+    # Ensure indices on datapoints collections
+    db = mongoengine.connection.get_db("datastream")
+    for granularity in GRANULARITIES:
+      collection = getattr(db.datapoints, granularity)
+      collection.ensure_index([('m', pymongo.ASCENDING), ('_id', pymongo.ASCENDING)])
+
   def _process_tags(self, tags):
     """
     Checks that reserved tags are not used and converts dicts to their
@@ -228,7 +234,6 @@ class Backend(object):
       metric = Metric.objects.get(tags__all = query_tags)
     except Metric.DoesNotExist:
       # Create a new metric
-      # TODO This is a possible race condition since MongoDB doesn't have transactions
       metric = Metric()
 
       # Some downsampling functions don't need to be stored in the database but
@@ -305,8 +310,6 @@ class Backend(object):
     db = mongoengine.connection.get_db("datastream")
     collection = getattr(db.datapoints, metric.highest_granularity)
     id = collection.insert({ "m" : metric.id, "v" : value })
-    # TODO Should this index be ensured somewhere else, not on every insert?
-    collection.ensure_index([('m', pymongo.ASCENDING), ('_id', pymongo.ASCENDING)])
 
     # Check if we need to perform any downsampling
     if id:
