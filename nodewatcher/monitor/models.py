@@ -106,3 +106,50 @@ class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     registry_id = "system.status"
 
 registration.point("node.monitoring").register_item(SystemStatusMonitor)
+
+class GeneralResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
+  """
+  General resources such as load average, system memory and the number of processes.
+  """
+  loadavg_1min = models.FloatField()
+  loadavg_5min = models.FloatField()
+  loadavg_15min = models.FloatField()
+  memory_free = models.PositiveIntegerField()
+  memory_buffers = models.PositiveIntegerField()
+  memory_cache = models.PositiveIntegerField()
+  processes = models.PositiveIntegerField()
+
+  connect_datastream = datastream.ConnectDatastream(
+    loadavg_1min = datastream.FloatField(),
+    loadavg_5min = datastream.FloatField(),
+    loadavg_15min = datastream.FloatField(),
+    memory_free = datastream.IntegerField(),
+    memory_buffers = datastream.IntegerField(),
+    memory_cache = datastream.IntegerField(),
+    processes = datastream.IntegerField()
+  )
+
+  class RegistryMeta:
+    registry_id = "system.resources.general"
+
+registration.point("node.monitoring").register_item(GeneralResourcesMonitor)
+
+class NetworkResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
+  """
+  Network resources such as number of routes and number of tracked TCP and UDP
+  connections.
+  """
+  routes = models.IntegerField()
+  tcp_connections = models.IntegerField()
+  udp_connections = models.IntegerField()
+
+  connect_datastream = datastream.ConnectDatastream(
+    routes = datastream.IntegerField(),
+    tcp_connections = datastream.IntegerField(),
+    udp_connections = datastream.IntegerField()
+  )
+
+  class RegistryMeta:
+    registry_id = "system.resources.network"
+
+registration.point("node.monitoring").register_item(NetworkResourcesMonitor)
