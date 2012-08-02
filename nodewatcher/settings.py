@@ -217,18 +217,25 @@ INSTALLED_APPS = (
 )
 
 # Monitor configuration
-MONITOR_WORKERS = 20 # Should be increased to much more (like 20) if your database can support simultaneous connections (SQLite does not)
+MONITOR_WORKERS = 20
 
 # Cache backend
 CACHE_BACKEND = "memcached://127.0.0.1:11211/"
 
 # Celery
-BROKER_BACKEND = "mongodb"
-BROKER_HOST = "localhost"
-BROKER_PORT = 27017
-BROKER_VHOST = "nodewatcher"
+BROKER_URL = "mongodb://localhost/nodewatcher"
 CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
+
+import datetime
+CELERYBEAT_SCHEDULE = {
+  # Datastream downsampler needs to run every minute to check if any downsampling
+  # needs to be performed
+  "datastream_downsampler" : {
+    "task" : "nodewatcher.datastream.tasks.run_downsampling",
+    "schedule" : datetime.timedelta(minutes = 1),
+  }
+}
 
 # Monitoring processors configuration; this defines the order in which monitoring processors
 # will be called. Multiple consecutive node processors will be automatically grouped and

@@ -59,6 +59,18 @@ class DataStream(object):
 
     return self.backend.update_tags(metric_id, tags)
 
+  def find_metrics(self, query_tags):
+    """
+    Finds all metrics matching the specified query tags.
+
+    :param query_tags: Tags that should be matched to metrics
+    :return: A list of matched metric descriptors
+    """
+    if not self.backend:
+      return []
+
+    return self.backend.find_metrics(query_tags)
+
   def insert(self, metric_id, value):
     """
     Inserts a data point into the data stream.
@@ -70,5 +82,17 @@ class DataStream(object):
       return
 
     return self.backend.insert(metric_id, value)
+
+  def downsample_metrics(self, query_tags):
+    """
+    Requests the backend to downsample all metrics matching the specified
+    query tags.
+
+    :param query_tags: Tags that should be matched to metrics
+    """
+    if not self.backend:
+      return
+
+    return self.backend.downsample_metrics(query_tags)
 
 stream = DataStream()

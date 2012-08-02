@@ -42,7 +42,6 @@ RESERVED_TAGS = [
 ]
 
 class DownsampleState(mongoengine.EmbeddedDocument):
-  running_until = mongoengine.DateTimeField()
   timestamp = mongoengine.DateTimeField()
 
   meta = dict(
@@ -53,6 +52,7 @@ class Metric(mongoengine.Document):
   id = mongoengine.SequenceField(primary_key = True, db_alias = "datastream")
   downsamplers = mongoengine.ListField(mongoengine.StringField(choices = DOWNSAMPLERS))
   downsample_state = mongoengine.MapField(mongoengine.EmbeddedDocumentField(DownsampleState))
+  downsample_needed = mongoengine.BooleanField(default = False)
   highest_granularity = mongoengine.StringField(choices = GRANULARITIES)
   tags = mongoengine.ListField(mongoengine.DynamicField())
 
@@ -252,10 +252,9 @@ class Backend(object):
       metric.tags = list(self._process_tags(query_tags).union(self._process_tags(tags)))
 
       # Initialize downsample state
-      for granularity in GRANULARITIES[GRANULARITIES.index(highest_granularity) + 1:]:
-        state = DownsampleState()
-        state.running_until = datetime.datetime.utcnow() - datetime.timedelta(hours = 1)
-        metric.downsample_state[granularity] = state
+      if highest_granularity != GRANULARITIES[-1]:
+        for granularity in GRANULARITIES[GRANULARITIES.index(highest_granularity) + 1:]:
+          metric.downsample_state[granularity] = DownsampleState()
 
       metric.save()
     except mongoengine.ValidationError:
@@ -264,6 +263,18 @@ class Backend(object):
       raise stream_errors.MultipleMetricsReturned
 
     return metric.id
+
+  def _get_metric_tags(self, metric):
+    """
+    Returns a metric descriptor in the form of tags.
+    """
+    tags = metric.tags
+    tags += [
+        { "metric_id" : metric.id },
+        { "downsamplers" : metric.downsamplers },
+        { "highest_granularity" : metric.highest_granularity }
+    ]
+    return tags
 
   def get_tags(self, metric_id):
     """
@@ -274,12 +285,7 @@ class Backend(object):
     """
     try:
       metric = Metric.objects.get(id = metric_id)
-      tags = metric.tags
-      tags += [
-        { "metric_id" : metric.id },
-        { "downsamplers" : metric.downsamplers },
-        { "highest_granularity" : metric.highest_granularity }
-      ]
+      tags = self._get_metric_tags(metric)
     except Metric.DoesNotExist:
       raise stream_errors.MetricNotFound
 
@@ -293,6 +299,35 @@ class Backend(object):
     :param tags: A list of new tags
     """
     Metric.objects(id = metric_id).update(tags = list(self._process_tags(tags)))
+
+  def _get_metric_queryset(self, query_tags):
+    """
+    Returns a queryset that matches the specified metric tags.
+
+    :param query_tags: Tags that should be matched to metrics
+    :return: A filtered queryset
+    """
+    query_set = Metric.objects.all()
+    for tag in query_tags[:]:
+      if isinstance(tag, dict):
+        if "metric_id" in tag:
+          query_set = query_set.filter(id = tag["metric_id"])
+          query_tags.remove(tag)
+
+    if not query_tags:
+      return query_set
+    else:
+      return query_set.filter(tags__all = query_tags)
+
+  def find_metrics(self, query_tags):
+    """
+    Finds all metrics matching the specified query tags.
+
+    :param query_tags: Tags that should be matched to metrics
+    :return: A list of matched metric descriptors
+    """
+    query_set = self._get_metric_queryset(query_tags)
+    return [self._get_metric_tags(m) for m in query_set]
 
   def insert(self, metric_id, value):
     """
@@ -312,8 +347,21 @@ class Backend(object):
     id = collection.insert({ "m" : metric.id, "v" : value })
 
     # Check if we need to perform any downsampling
-    if id:
+    if id is not None and not metric.downsample_needed:
       self._downsample_check(metric, id.generation_time)
+
+  def downsample_metrics(self, query_tags):
+    """
+    Requests the backend to downsample all metrics matching the specified
+    query tags.
+
+    :param query_tags: Tags that should be matched to metrics
+    """
+    now = datetime.datetime.utcnow()
+    qs = self._get_metric_queryset(query_tags).filter(downsample_needed = True)
+
+    for metric in qs:
+      self._downsample_check(metric, now, execute = True)
 
   def _round_downsampled_timestamp(self, timestamp, granularity):
     """
@@ -333,19 +381,27 @@ class Backend(object):
 
     return datetime.datetime(**{ atom : getattr(timestamp, atom) for atom in round_map[granularity]})
 
-  def _downsample_check(self, metric, datum_timestamp):
+  def _downsample_check(self, metric, datum_timestamp, execute = False):
     """
     Checks if we need to perform any metric downsampling. In case it is needed,
-    downsample operations are automatically queued for later execution.
+    we raise a flag or perform downsampling, depending on the `execute` argument.
 
     :param metric: Metric instance
     :param datum_timestamp: Timestamp of the newly inserted datum
+    :param execute: If set to True, downsampling will be performed, otherwise
+      only a flag will be raised
     """
     for granularity in GRANULARITIES[GRANULARITIES.index(metric.highest_granularity) + 1:]:
       state = metric.downsample_state.get(granularity, None)
       rounded_timestamp = self._round_downsampled_timestamp(datum_timestamp, granularity)
       if state is None or rounded_timestamp != state.timestamp:
-        self._downsample(metric, granularity, rounded_timestamp)
+        if not execute:
+          metric.downsample_needed = True
+        else:
+          self._downsample(metric, granularity, rounded_timestamp)
+          metric.downsample_needed = False
+
+    metric.save()
 
   def _generate_timed_object_id(self, timestamp, metric_id):
     """
@@ -362,7 +418,6 @@ class Backend(object):
     oid += metric_id
     return pymongo.objectid.ObjectId(oid)
 
-  # TODO This should be executed in a celery job in the background
   def _downsample(self, metric, granularity, current_timestamp):
     """
     Performs downsampling on the given metric and granularity.
@@ -371,19 +426,7 @@ class Backend(object):
     :param granularity: Lower granularity to downsample into
     :param current_timestamp: Timestamp of the last inserted datapoint
     """
-    # Ensure that we are allowed to perform downsampling and atomically reserve our spot; note
-    # that nothing bad would happen if two downsamplers would run for the same metric and granularity
-    # at the same time, only processing time would be wasted, because the same values would get computed twice
-    now = datetime.datetime.utcnow()
     db = mongoengine.connection.get_db("datastream")
-    document = db.metrics.find_and_modify(
-      { "_id" : metric.id, "downsample_state.%s.running_until" % granularity : { "$lt" : now } },
-      { "$set" : { "downsample_state.%s.running_until" % granularity : now + datetime.timedelta(minutes = 1) } }
-    )
-    if not document:
-      return
-    else:
-      metric = Metric._from_son(document)
 
     # Determine the interval that needs downsampling
     datapoints = getattr(db.datapoints, metric.highest_granularity)
@@ -427,6 +470,8 @@ class Backend(object):
           upsert = True
         )
 
+      last_timestamp = rounded_timestamp
+
       # Abort when we reach the current rounded timestamp as we will process all further
       # datapoints in the next downsampling run; do not call finish on downsamplers as it
       # has already been called above when some datapoints exist
@@ -437,15 +482,5 @@ class Backend(object):
       for x in downsamplers:
         x.update(datapoint['v'])
 
-      last_timestamp = rounded_timestamp
-
     # At the end, update the current timestamp in downsample_state
-    db.metrics.update(
-      { "_id" : metric.id },
-      { "$set" : {
-        # Update downsample state timestamp
-        "downsample_state.%s.timestamp" % granularity : last_timestamp,
-        # Ensure that "downsample mutex" is invalidated
-        "downsample_state.%s.running_until" % granularity: now - datetime.timedelta(hours = 1)
-      }}
-    )
+    metric.downsample_state[granularity].timestamp = last_timestamp
