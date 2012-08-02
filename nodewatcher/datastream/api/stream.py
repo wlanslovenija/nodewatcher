@@ -83,6 +83,21 @@ class DataStream(object):
 
     return self.backend.insert(metric_id, value)
 
+  def get_data(self, metric_id, granularity, start, end):
+    """
+    Retrieves data from a certain time range and of a certain granularity.
+
+    :param metric_id: Metric identifier
+    :param granularity: Wanted granularity
+    :param start: Time range start
+    :param end: Time range end
+    :return: A list of datapoints
+    """
+    if not self.backend:
+      return []
+
+    return self.backend.get_data(metric_id, granularity, start, end)
+
   def downsample_metrics(self, query_tags):
     """
     Requests the backend to downsample all metrics matching the specified

@@ -353,6 +353,42 @@ class Backend(object):
     if id is not None and not metric.downsample_needed:
       self._downsample_check(metric, id.generation_time)
 
+  def get_data(self, metric_id, granularity, start, end):
+    """
+    Retrieves data from a certain time range and of a certain granularity.
+
+    :param metric_id: Metric identifier
+    :param granularity: Wanted granularity
+    :param start: Time range start
+    :param end: Time range end
+    :return: A list of datapoints
+    """
+    try:
+      metric = Metric.objects.get(external_id = metric_id)
+    except Metric.DoesNotExist:
+      raise stream_errors.MetricNotFound
+
+    # Validate specified granularity
+    try:
+      granularity_idx = GRANULARITIES.index(granularity)
+      max_granularity_idx = GRANULARITIES.index(metric.highest_granularity)
+      if granularity_idx < max_granularity_idx:
+        granularity = metric.highest_granularity
+    except IndexError:
+      raise stream_errors.UnsupportedGranularity
+
+    # Get the datapoints
+    db = mongoengine.connection.get_db("datastream")
+    collection = getattr(db.datapoints, granularity)
+    pts = collection.find({
+      "m" : metric.id, "_id" : {
+        "$gte" : pymongo.objectid.ObjectId.from_datetime(start),
+        "$lte" : pymongo.objectid.ObjectId.from_datetime(end)
+      }
+    }).sort("_id")
+
+    return [{ "t" : x["_id"].generation_time, "v" : x["v"] } for x in pts]
+
   def downsample_metrics(self, query_tags):
     """
     Requests the backend to downsample all metrics matching the specified
