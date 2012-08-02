@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import time
 import traceback
 
 from django.conf import settings
@@ -80,7 +81,7 @@ class Worker(object):
     connection.close()
 
     # Prepare worker processes
-    self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS)
+    self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS, maxtasksperchild = 1000)
     logger.info("Ready with %d workers." % settings.MONITOR_WORKERS)
 
   @transaction.commit_manually
@@ -133,8 +134,14 @@ class Worker(object):
 
     logger.info("Entering monitoring cycle...")
     try:
-      # TODO this should be run in a loop or something
-      self.cycle()
+      while True:
+        start = time.time()
+        self.cycle()
+
+        # Sleep for the right amount of time that cycles will be triggered
+        # on every MONITOR_INTERVAL seconds (but no less then 30 seconds apart)
+        cycle_duration = time.time() - start
+        time.sleep(max(30, settings.MONITOR_INTERVAL - cycle_duration))
     except KeyboardInterrupt:
       logger.info("Aborted by user.")
     finally:
