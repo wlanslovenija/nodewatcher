@@ -19,4 +19,3 @@ class ConnectDatastream(object):
     """
     for field in self.fields.values():
       field.to_stream(obj, stream)
-      # TODO
