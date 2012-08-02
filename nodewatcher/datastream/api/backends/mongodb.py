@@ -4,6 +4,7 @@ import pymongo
 import pymongo.objectid
 import struct
 import time
+import uuid
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -50,6 +51,7 @@ class DownsampleState(mongoengine.EmbeddedDocument):
 
 class Metric(mongoengine.Document):
   id = mongoengine.SequenceField(primary_key = True, db_alias = "datastream")
+  external_id = mongoengine.UUIDField()
   downsamplers = mongoengine.ListField(mongoengine.StringField(choices = DOWNSAMPLERS))
   downsample_state = mongoengine.MapField(mongoengine.EmbeddedDocumentField(DownsampleState))
   downsample_needed = mongoengine.BooleanField(default = False)
@@ -59,7 +61,7 @@ class Metric(mongoengine.Document):
   meta = dict(
     db_alias = "datastream",
     collection = "metrics",
-    indexes = ["tags"],
+    indexes = ["tags", "external_id"],
     allow_inheritance = False
   )
 
@@ -235,6 +237,7 @@ class Backend(object):
     except Metric.DoesNotExist:
       # Create a new metric
       metric = Metric()
+      metric.external_id = uuid.uuid4()
 
       # Some downsampling functions don't need to be stored in the database but
       # can be computed on the fly from other downsampled values
@@ -262,7 +265,7 @@ class Backend(object):
     except Metric.MultipleObjectsReturned:
       raise stream_errors.MultipleMetricsReturned
 
-    return metric.id
+    return unicode(metric.external_id)
 
   def _get_metric_tags(self, metric):
     """
@@ -270,7 +273,7 @@ class Backend(object):
     """
     tags = metric.tags
     tags += [
-        { "metric_id" : metric.id },
+        { "metric_id" : unicode(metric.external_id) },
         { "downsamplers" : metric.downsamplers },
         { "highest_granularity" : metric.highest_granularity }
     ]
@@ -284,7 +287,7 @@ class Backend(object):
     :return: A list of tags for the metric
     """
     try:
-      metric = Metric.objects.get(id = metric_id)
+      metric = Metric.objects.get(external_id = metric_id)
       tags = self._get_metric_tags(metric)
     except Metric.DoesNotExist:
       raise stream_errors.MetricNotFound
@@ -298,7 +301,7 @@ class Backend(object):
     :param metric_id: Metric identifier
     :param tags: A list of new tags
     """
-    Metric.objects(id = metric_id).update(tags = list(self._process_tags(tags)))
+    Metric.objects(external_id = metric_id).update(tags = list(self._process_tags(tags)))
 
   def _get_metric_queryset(self, query_tags):
     """
@@ -311,7 +314,7 @@ class Backend(object):
     for tag in query_tags[:]:
       if isinstance(tag, dict):
         if "metric_id" in tag:
-          query_set = query_set.filter(id = tag["metric_id"])
+          query_set = query_set.filter(external_id = tag["metric_id"])
           query_tags.remove(tag)
 
     if not query_tags:
@@ -337,7 +340,7 @@ class Backend(object):
     :param value: Metric value
     """
     try:
-      metric = Metric.objects.get(id = metric_id)
+      metric = Metric.objects.get(external_id = metric_id)
     except Metric.DoesNotExist:
       raise stream_errors.MetricNotFound
 
