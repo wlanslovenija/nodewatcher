@@ -1,6 +1,6 @@
 from celery.task import task as celery_task
 
-from nodewatcher.datastream.api.stream import stream
+from django_datastream import datastream
 
 @celery_task()
 def run_downsampling():
@@ -8,4 +8,4 @@ def run_downsampling():
   Executes the `downsample_metrics` API method on the datastream backend
   as some backends need this to be executed periodically.
   """
-  stream.downsample_metrics([])
+  datastream.downsample_metrics([])

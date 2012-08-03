@@ -197,6 +197,7 @@ INSTALLED_APPS = (
   'django.contrib.sitemaps',
   'django.contrib.gis',
   'djcelery',
+  'django_datastream',
   'nodewatcher.nodes',
   'nodewatcher.generator',
   'nodewatcher.account',
@@ -252,19 +253,19 @@ MONITOR_PROCESSORS = (
 )
 
 # Backend for the monitoring data archive
-DATA_STREAM_BACKEND = 'nodewatcher.datastream.api.backends.mongodb'
-# Each backend can have backend-specific configuration options that can be specified here
-DATA_STREAM_BACKEND_CONFIGURATION = {
-  "database" : "nodewatcher",
+DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
+# Each backend can have backend-specific settings that can be specified here
+DATASTREAM_BACKEND_SETTINGS = {
+  'database_name': 'nodewatcher',
 }
 
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface
 REGISTRY_FORM_PROCESSORS = {
-  'node.config' : [
+  'node.config': (
     'nodewatcher.core.allocation.processors.AutoPoolAllocator',
     'nodewatcher.core.cgm.processors.NodeCgmValidator',
-  ]
+  )
 }
 
 OLSRD_MONITOR_HOST = '127.0.0.1'
@@ -272,7 +273,7 @@ OLSRD_MONITOR_PORT = 2006
 
 # Registry
 REGISTRY_RULES_MODULES = {
-  'node.config' : 'nodewatcher.rules'
+  'node.config': 'nodewatcher.rules',
 }
 
 # Logging configuration

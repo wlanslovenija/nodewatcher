@@ -1,9 +1,10 @@
+from django_datastream import datastream
+
 from nodewatcher.monitor import processors as monitor_processors
-from nodewatcher.datastream.api.stream import stream
 
 class DataStreamProcessor(monitor_processors.NodeProcessor):
   """
-  A processor that stores all monitoring data into the data stream.
+  A processor that stores all monitoring data into the datastream.
   """
   def process(self, context, node):
     """
@@ -20,4 +21,4 @@ class DataStreamProcessor(monitor_processors.NodeProcessor):
       if getattr(item, "connect_datastream", None) is None:
         continue
 
-      item.connect_datastream.insert_to_stream(item, stream)
+      item.connect_datastream.insert_to_stream(item, datastream)
