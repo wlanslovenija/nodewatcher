@@ -9,3 +9,5 @@ django-registration==0.8
 dnspython==1.10.0
 mongoengine==0.6.18
 django-datastream=0.1
+python-memcached==1.48
+psycopg2==2.4.5
