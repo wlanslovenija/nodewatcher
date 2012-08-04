@@ -1,3 +1,5 @@
+import datastream
+
 from nodewatcher.registry import registration
 
 class MonitorRegistryItemMixin(object):
@@ -33,7 +35,7 @@ class MonitorRegistryItemMixin(object):
     Returns the highest granularity that should be used by default for
     all metrics derived from this object.
     """
-    return "minutes"
+    return datastream.Granularity.Minutes
 
 # Create registration point
 registration.create_point("nodes.Node", "monitoring", mixins = [MonitorRegistryItemMixin])

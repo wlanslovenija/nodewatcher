@@ -1,3 +1,4 @@
+import datastream
 
 class Field(object):
   """
@@ -67,7 +68,7 @@ class Field(object):
     if hasattr(obj, "get_metric_highest_granularity"):
       highest_granularity = obj.get_metric_highest_granularity()
     else:
-      highest_granularity = "seconds"
+      highest_granularity = datastream.Granularity.Seconds
 
     metric_id = stream.ensure_metric(query_tags, tags, downsamplers, highest_granularity)
     stream.insert(metric_id, value)
