@@ -61,7 +61,10 @@ portLayouts = {
   'fonera'      : None,
   'fonera+'     : True,
   'rb433'       : True, # ('1 5*',       '2 5')
-  'rb411'       : None
+  'rb411'       : None,
+
+  'tp-wr703n' : None,
+  'tp-mr3020' : None,
 }
 
 # Optional packages that should be removed when configuring a router-only node
@@ -494,7 +497,7 @@ config interface clients
         vpn_ip = self.vpn['ip']
       ))
       
-      if portLayouts.get(self.portLayout, None) is not None:
+      if self.portLayout not in portLayouts or portLayouts.get(self.portLayout) is not None:
         f.write("config switch eth0\n")
         f.write("        option enable_vlan      1\n")
         f.write("\n")
@@ -808,6 +811,8 @@ config uhttpd main
         "tp-wr941nd" : "TLWR941",
         "tp-wr1041nd" : "TLWR1041",
         "tp-wr1043nd" : "TLWR1043",
+        "tp-wr703n" : "TLWR703",
+        "tp-mr3020" : "TLMR3020",
         
         "fonera"     : "",
       }
@@ -815,6 +820,8 @@ config uhttpd main
       pkg_map = {
         "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wr1043nd" : ["kmod-usb-serial", "kmod-usb-acm"],
+        "tp-wr703n" : ["kmod-usb-serial", "kmod-usb-acm"],
+        "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm"],
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []))
 
