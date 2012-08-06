@@ -1,12 +1,25 @@
 #!/bin/bash -e
 
+PSQL_USER_ARG="-U postgres"
+PSQL_HOST="localhost"
+
 CONTRIB_DIR=""
-if [ -d /usr/share/postgresql/8.4/contrib ]; then
+POSTGIS_DIR=""
+POSTGIS_VER_DIR="postgis-1.5"
+if [ -d /usr/share/postgresql/8.4 ]; then
   CONTRIB_DIR="/usr/share/postgresql/8.4/contrib"
-elif [ -d /usr/share/postgresql/9.1/contrib ]; then
+  POSTGIS_DIR="/usr/share/postgresql/8.4/contrib"
+elif [ -d /usr/share/postgresql/9.1 ]; then
   CONTRIB_DIR="/usr/share/postgresql/9.1/contrib"
-elif [ -d /usr/share/postgresql-8.3/contrib ]; then
+  POSTGIS_DIR="/usr/share/postgresql/9.1/contrib"
+elif [ -d /usr/share/postgresql-8.3 ]; then
   CONTRIB_DIR="/usr/share/postgresql-8.3/contrib"
+  POSTGIS_DIR="/usr/share/postgresql-8.3/contrib"
+elif [ -d /usr/local/share/postgresql ]; then
+  CONTRIB_DIR="/usr/local/share/postgresql/contrib"
+  POSTGIS_DIR="/usr/local/share/postgis"
+  POSTGIS_VER_DIR="."
+  PSQL_USER_ARG=""
 else
   echo "!!! PostgreSQL contrib directory not found. Please edit"
   echo "!!! the database initialization script!"
@@ -14,15 +27,15 @@ else
 fi
 
 # Drop can fail if there is no database already defined
-dropdb -U postgres nodewatcher || true
-dropuser -U postgres nodewatcher || true
-createuser -U postgres -S -D -R nodewatcher || true
-createdb -U postgres -E UNICODE -T template0 -O nodewatcher nodewatcher
-psql -U postgres nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
-createlang -U postgres plpgsql nodewatcher || true
-psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/postgis.sql
-psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis_comments.sql
-psql -U postgres -d nodewatcher -f ${CONTRIB_DIR}/postgis-1.5/spatial_ref_sys.sql
-psql -U postgres -d nodewatcher -c "ALTER TABLE geometry_columns OWNER TO nodewatcher;"
-psql -U postgres -d nodewatcher -c "ALTER VIEW geography_columns OWNER TO nodewatcher;"
-psql -U postgres -d nodewatcher -c "ALTER TABLE spatial_ref_sys OWNER TO nodewatcher;"
+dropdb -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
+dropuser -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
+createuser -h ${PSQL_HOST} ${PSQL_USER_ARG} -S -D -R nodewatcher || true
+createdb -h ${PSQL_HOST} ${PSQL_USER_ARG} -E UNICODE -T template0 -O nodewatcher nodewatcher
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
+createlang -h ${PSQL_HOST} ${PSQL_USER_ARG} plpgsql nodewatcher || true
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/${POSTGIS_VER_DIR}/postgis.sql
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis_comments.sql
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/${POSTGIS_VER_DIR}/spatial_ref_sys.sql
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE geometry_columns OWNER TO nodewatcher;"
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER VIEW geography_columns OWNER TO nodewatcher;"
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE spatial_ref_sys OWNER TO nodewatcher;"
