@@ -5,20 +5,18 @@ PSQL_HOST="localhost"
 
 CONTRIB_DIR=""
 POSTGIS_DIR=""
-POSTGIS_VER_DIR="postgis-1.5"
 if [ -d /usr/share/postgresql/8.4 ]; then
   CONTRIB_DIR="/usr/share/postgresql/8.4/contrib"
-  POSTGIS_DIR="/usr/share/postgresql/8.4/contrib"
+  POSTGIS_DIR="/usr/share/postgresql/8.4/contrib/postgis-1.5"
 elif [ -d /usr/share/postgresql/9.1 ]; then
   CONTRIB_DIR="/usr/share/postgresql/9.1/contrib"
-  POSTGIS_DIR="/usr/share/postgresql/9.1/contrib"
+  POSTGIS_DIR="/usr/share/postgresql/9.1/contrib/postgis-1.5"
 elif [ -d /usr/share/postgresql-8.3 ]; then
   CONTRIB_DIR="/usr/share/postgresql-8.3/contrib"
-  POSTGIS_DIR="/usr/share/postgresql-8.3/contrib"
+  POSTGIS_DIR="/usr/share/postgresql-8.3/contrib/postgis-1.5"
 elif [ -d /usr/local/share/postgresql ]; then
   CONTRIB_DIR="/usr/local/share/postgresql/contrib"
   POSTGIS_DIR="/usr/local/share/postgis"
-  POSTGIS_VER_DIR="."
   PSQL_USER_ARG=""
 else
   echo "!!! PostgreSQL contrib directory not found. Please edit"
@@ -33,9 +31,8 @@ createuser -h ${PSQL_HOST} ${PSQL_USER_ARG} -S -D -R nodewatcher || true
 createdb -h ${PSQL_HOST} ${PSQL_USER_ARG} -E UNICODE -T template0 -O nodewatcher nodewatcher
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
 createlang -h ${PSQL_HOST} ${PSQL_USER_ARG} plpgsql nodewatcher || true
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/${POSTGIS_VER_DIR}/postgis.sql
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis_comments.sql
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/${POSTGIS_VER_DIR}/spatial_ref_sys.sql
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis.sql
+psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/spatial_ref_sys.sql
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE geometry_columns OWNER TO nodewatcher;"
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER VIEW geography_columns OWNER TO nodewatcher;"
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE spatial_ref_sys OWNER TO nodewatcher;"
