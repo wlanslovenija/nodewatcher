@@ -28,9 +28,6 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     registry_section = _("General Configuration")
     registry_name = _("Basic Configuration")
     lookup_proxies = []
-  
-  def __unicode__(self):
-    return self.name
 
 # TODO validate node name via regexp: NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
 
