@@ -207,11 +207,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 CSRF_FAILURE_VIEW = 'frontend.nodes.views.forbidden_view'
 
-# We support some common password formats to ease transition
 AUTHENTICATION_BACKENDS = (
   'frontend.account.auth.ModelBackend',
-  'frontend.account.auth.AprBackend',
-  'frontend.account.auth.CryptBackend',
 )
 
 # TODO: Convert to Django default after migration of all dependent systems to Django 1.4

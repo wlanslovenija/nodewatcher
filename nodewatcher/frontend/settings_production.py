@@ -30,6 +30,12 @@ DATABASES = {
 
 EMAIL_TO_CONSOLE = False
 
+# We support some common password formats to ease transition
+AUTHENTICATION_BACKENDS += (
+    'frontend.account.auth.AprBackend',
+    'frontend.account.auth.CryptBackend',
+)
+
 SITEMAPS_USE_HTTPS = True
 FEEDS_USE_HTTPS = True
 USE_HTTPS = True
