@@ -42,7 +42,7 @@ class Command(management_base.BaseCommand):
     
     # Transform a relative path into an absolute one
     dest_archive = args[0]
-    if dest_archive != '/':
+    if '/' not in dest_archive:
       dest_archive = os.path.join(os.getcwd(), dest_archive)
     
     # A hack to get dumpdata output
@@ -111,18 +111,19 @@ class Command(management_base.BaseCommand):
     out.close()
     json.close()
 
-    # Copy topology
-    ensure_success(subprocess.call([
+    if hasattr(settings, 'GRAPH_DIR'):
+      # Copy topology
+      ensure_success(subprocess.call([
         "mkdir",
         os.path.join(tmp_dir, "graphs"),
-    ]))
-    ensure_success(subprocess.call([
+      ]))
+      ensure_success(subprocess.call([
         "cp",
         os.path.join(settings.GRAPH_DIR, "network_topology.png"),
         os.path.join(settings.GRAPH_DIR, "network_topology.dot"),
         os.path.join(tmp_dir, "graphs"),
-    ]))
-    
+      ]))
+
     # Generate a tar.bz2 archive
     os.chdir(tmp_dir)
     ensure_success(subprocess.call(["tar cfj {0} *".format(dest_archive)], shell = True))
