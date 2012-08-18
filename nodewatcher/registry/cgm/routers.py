@@ -94,6 +94,12 @@ class InternalAntenna(object):
     self.angle_vertical = angle_vertical
     self.gain = gain
 
+class Features:
+  """
+  Represents features a router can have.
+  """
+  MultipleSSID = "multiple_ssid"
+
 # A list of attributes that are required to be defined
 REQUIRED_ROUTER_ATTRIBUTES = set([
   'identifier',
@@ -146,6 +152,7 @@ class RouterBase(object):
   An abstract router hardware descriptor.
   """
   __metaclass__ = RouterMeta
+  features = []
   
   @classmethod
   def register(cls, platform):

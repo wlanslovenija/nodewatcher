@@ -30,6 +30,9 @@ class TPLinkWR741ND(cgm_routers.RouterBase):
       gain = 2
     )
   ]
+  features = [
+    cgm_routers.Features.MultipleSSID,
+  ]
   
   @cgm_routers.register_module()
   def network(node, cfg):
