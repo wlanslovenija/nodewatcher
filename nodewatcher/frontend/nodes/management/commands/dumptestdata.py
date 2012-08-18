@@ -30,14 +30,14 @@ class Command(management_base.BaseCommand):
   This class defines a command for manage.py which generates a
   sanitized dump of the nodewatcher database.
   """
-  args = "<dump_archive>"
+  args = "<dump_archive> [appname appname.ModelName ...]"
   help = "Generates a sanitized dump of the nodewatcher database."
   
   def handle(self, *args, **options):
     """
     Generates a sanitized dump of the nodewatcher database.
     """
-    if len(args) != 1:
+    if len(args) == 0:
       raise management_base.CommandError('Missing dump archive argument!')
     
     # Transform a relative path into an absolute one
@@ -48,7 +48,7 @@ class Command(management_base.BaseCommand):
     # A hack to get dumpdata output
     json = string_io.StringIO()
     sys.stdout = json
-    management.call_command("dumpdata")
+    management.call_command("dumpdata", *args[1:], **options)
     sys.stdout = sys.__stdout__
     gc.collect()
     
