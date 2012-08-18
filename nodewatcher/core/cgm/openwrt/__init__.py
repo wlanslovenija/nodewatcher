@@ -159,9 +159,6 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 
-# Load all modules for this platform that are included in the core
-import nodewatcher.core.cgm.openwrt.general
-
 # Load all model-specific modules
 import nodewatcher.core.cgm.openwrt.fon
 import nodewatcher.core.cgm.openwrt.linksys

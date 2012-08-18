@@ -1,3 +1,7 @@
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.utils import importlib
+
 from nodewatcher.registry import registration
 from nodewatcher.registry.cgm import routers as cgm_routers
 
@@ -171,3 +175,12 @@ def iterate_routers():
     for router in platform._routers.values():
       yield router
 
+def load_modules():
+  """
+  Loads all configured modules containing CGMs.
+  """
+  for module in getattr(settings, 'CGM_MODULES', []):
+    try:
+      importlib.import_module(module)
+    except ImportError:
+      raise ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)

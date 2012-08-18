@@ -268,6 +268,11 @@ REGISTRY_FORM_PROCESSORS = {
   )
 }
 
+# Configuration generating modules for firmware images
+CGM_MODULES = (
+  "nodewatcher.core.cgm.openwrt",
+)
+
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
 

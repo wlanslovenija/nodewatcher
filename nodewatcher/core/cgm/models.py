@@ -394,3 +394,5 @@ class VpnServerConfigForm(forms.ModelForm):
 registration.point("node.config").register_item(VpnServerConfig)
 registration.register_form_for_item(VpnServerConfig, VpnServerConfigForm)
 
+# Ensure that all CGM modules are loaded
+cgm_base.load_modules()
