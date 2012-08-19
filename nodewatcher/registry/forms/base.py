@@ -204,16 +204,28 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
     """
     Class constructor.
     
-    @param forms: A list of form descriptors
+    :param forms: A list of form descriptors
     """
     super(RootRegistryRenderItem, self).__init__(None, None, forms)
-  
+    self.errors = []
+
+  def add_error(self, message):
+    """
+    Adds a global error message to be displayed.
+
+    :param message: Message string
+    """
+    self.errors.append(message)
+
   def __unicode__(self):
     """
     Renders this item.
     """
     t = template.loader.get_template(self.template)
-    args = { 'registry_forms' : self.children }
+    args = {
+      'registry_forms' : self.children,
+      'errors'         : self.errors
+    }
     return t.render(template.Context(args))
 
 class RegistryMetaForm(forms.Form):
@@ -813,8 +825,7 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
           processor.postprocess(root)
         except RegistryValidationError, e:
           context.validation_errors = True
-          # TODO Handle validation errors
-          raise
+          forms.add_error(e.message)
 
     if not context.validation_errors:
       transaction.savepoint_commit(sid)

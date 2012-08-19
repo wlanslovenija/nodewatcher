@@ -1,6 +1,16 @@
 {% load misc %}
 {% load i18n %}
 
+{% if errors %}
+<div class="error">
+  <b>{% trans "Errors while performing validation" %}</b><br/>
+  <br/>
+  {% for error in errors %}
+    {{ error }}<br/>
+  {% endfor %}
+</div>
+{% endif %}
+
 {% for descriptor in registry_forms %}
 {% heading 3 descriptor.name %}
   {% if descriptor.multiple %}
