@@ -40,7 +40,7 @@ class RegistryResolver(object):
       # Determine which class the root is using for configuration
       cfg, top_level = self._regpoint.get_top_level_queryset(self._root, path)
       if onlyclass is not None:
-        cfg.filter(content_type = ContentType.objects.get_for_model(onlyclass))
+        cfg = cfg.filter(content_type = ContentType.objects.get_for_model(onlyclass))
       if queryset:
         return cfg.all()
       
