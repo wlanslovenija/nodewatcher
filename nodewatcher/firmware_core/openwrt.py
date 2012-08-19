@@ -16,15 +16,13 @@ def general(node, cfg):
   # TODO timezone should probably not be hardcoded
   system.timezone = "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"
 
-def configure_network(cfg, network, section, routable = False):
+def configure_network(cfg, network, section):
   """
   A helper function to configure an interface's network.
 
   :param cfg: Platform configuration
   :param network: Network configuration
   :param section: UCI interface or alias section
-  :param routable: True if this interface has a routing protocol
-    configured
   """
   if isinstance(network, cgm_models.StaticNetworkConfig):
     section.proto = "static"
@@ -56,16 +54,7 @@ def configure_network(cfg, network, section, routable = False):
   elif isinstance(network, cgm_models.DHCPNetworkConfig):
     section.proto = "dhcp"
   else:
-    print network
     section.proto = "none"
-
-  # Mark the section as being the uplink for this node
-  if network.uplink:
-    section._uplink = True
-
-  # Mark the section as being routable when configured
-  if routable:
-    section._routable = True
 
 def configure_interface(cfg, interface, section, iface_name):
   """
@@ -76,10 +65,13 @@ def configure_interface(cfg, interface, section, iface_name):
   :param section: UCI interface section
   :param iface_name: Name of the UCI interface
   """
+  if interface.routing_protocol != "none":
+    section._routable = True
+
   networks = [x.cast() for x in interface.networks.all()]
   if networks:
     network = networks[0]
-    configure_network(cfg, network, section, routable = (interface.routing_protocol != "none"))
+    configure_network(cfg, network, section)
 
     # Additional network configurations are aliases
     for network in networks[1:]:
@@ -114,6 +106,9 @@ def network(node, cfg):
       if iface.ifname is None:
         raise cgm_base.ValidationError(_("No port remapping for port '%s' of router '%s' is available!") % \
           (interface.eth_port, router.name))
+
+      if interface.uplink:
+        iface._uplink = True
 
       configure_interface(cfg, interface, iface, interface.eth_port)
     elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):

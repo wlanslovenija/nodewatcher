@@ -7,15 +7,11 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        for cfg in orm['cgm.NetworkConfig'].objects.all():
-            try:
-                eth = cfg.interface.ethernetinterfaceconfig
-                # Assume all WAN ports are uplinks
-                if eth.eth_port.startswith("wan"):
-                    cfg.uplink = True
-                    cfg.save()
-            except orm['cgm.EthernetInterfaceConfig'].DoesNotExist:
-                pass
+        for cfg in orm['cgm.EthernetInterfaceConfig'].objects.all():
+            # Assume all WAN ports are uplinks
+            if cfg.eth_port.startswith("wan"):
+                cfg.uplink = True
+                cfg.save()
 
 
     def backwards(self, orm):
@@ -53,7 +49,8 @@ class Migration(DataMigration):
             'Meta': {'ordering': "['id']", 'object_name': 'EthernetInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
             'eth_port': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#eth_port'"}),
             'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'routing_protocol': ('nodewatcher.registry.fields.SelectorKeyField', [], {'default': "'none'", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#routing_protocol'"})
+            'routing_protocol': ('nodewatcher.registry.fields.SelectorKeyField', [], {'default': "'none'", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#routing_protocol'"}),
+            'uplink': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'cgm.interfaceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'InterfaceConfig'},
@@ -78,7 +75,6 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'interface': ('nodewatcher.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'networks'", 'to': "orm['cgm.InterfaceConfig']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_networkconfig'", 'to': "orm['nodes.Node']"}),
-            'uplink': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'cgm.packageconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'PackageConfig'},
