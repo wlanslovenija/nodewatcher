@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core.cgm import models as cgm_models
 from nodewatcher.registry.cgm import base as cgm_base
 from nodewatcher.registry.cgm import resources as cgm_resources
+from nodewatcher.registry.cgm import routers as cgm_routers
 
 @cgm_base.register_platform_module("openwrt", 10)
 def general(node, cfg):
@@ -66,6 +67,28 @@ def configure_network(cfg, network, section, routable = False):
   if routable:
     section._routable = True
 
+def configure_interface(cfg, interface, section, iface_name):
+  """
+  A helper function to configure an interface.
+
+  :param cfg: Platform configuration
+  :param interface: Interface configuration
+  :param section: UCI interface section
+  :param iface_name: Name of the UCI interface
+  """
+  networks = [x.cast() for x in interface.networks.all()]
+  if networks:
+    network = networks[0]
+    configure_network(cfg, network, section, routable = (interface.routing_protocol != "none"))
+
+    # Additional network configurations are aliases
+    for network in networks[1:]:
+      alias = cfg.network.add("alias")
+      alias.interface = iface_name
+      configure_network(cfg, network, alias)
+  else:
+    section.proto = "none"
+
 @cgm_base.register_platform_module("openwrt", 10)
 def network(node, cfg):
   """
@@ -92,17 +115,39 @@ def network(node, cfg):
         raise cgm_base.ValidationError(_("No port remapping for port '%s' of router '%s' is available!") % \
           (interface.eth_port, router.name))
 
-      # Configure network settings
-      networks = [x.cast() for x in interface.networks.all()]
-      if networks:
-        network = networks[0]
-        configure_network(cfg, network, iface, routable = (iface.routing_protocol != "none"))
+      configure_interface(cfg, interface, iface, interface.eth_port)
+    elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
+      # Configure virtual interfaces on top of the same radio device
+      interfaces = list(interface.interfaces.all())
+      if len(interfaces) > 1 and cgm_routers.Features.MultipleSSID not in router.features:
+        raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % router.name)
 
-        # Additional network configurations are aliases
-        for network in networks[1:]:
-          alias = cfg.network.add("alias")
-          alias.interface = interface.eth_port
-          configure_network(cfg, network, alias)
-      else:
-        iface.proto = "none"
-    #elif isinstance(interface, cgm_models.W)
+      wifi_radio = router.remap_port("openwrt", interface.wifi_radio)
+      radio = cfg.wireless.add(**{ "wifi-device" : wifi_radio })
+
+      dsc_radio = router.get_radio(interface.wifi_radio)
+      dsc_protocol = dsc_radio.get_protocol(interface.protocol)
+      dsc_channel = dsc_protocol.get_channel(interface.channel)
+      # TODO protocol details
+      radio.channel = dsc_channel.number
+
+      for index, vif in enumerate(interfaces):
+        wif = cfg.wireless.add("wifi-iface")
+        wif.device = wifi_radio
+        wif.encryption = "none"
+        wif.ssid = vif.essid
+
+        if vif.mode == "ap":
+          wif.mode = "ap"
+        elif vif.mode == "mesh":
+          wif.mode = "adhoc"
+          wif.bssid = vif.bssid
+        else:
+          raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
+
+        # Configure network interface for each vif, first being the primary network
+        vif_name = "%sv%d" % (wifi_radio, index)
+        iface = cfg.network.add(interface = vif_name)
+        wif.network = vif_name
+
+        configure_interface(cfg, vif, iface, vif_name)

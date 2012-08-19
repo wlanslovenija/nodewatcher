@@ -49,7 +49,7 @@ def olsr(node, cfg):
       # assigned as the daemon needs unique addresses on every routable interface
       try:
         iface.proto = "static"
-        iface.ipaddr = cfg.resources.get(cgm_resources.IpResource, family = "ipv4")
+        iface.ipaddr = cfg.resources.get(cgm_resources.IpResource, family = "ipv4").ip
         iface.netmask = "255.255.255.255"
       except cgm_resources.ResourceExhausted:
         raise cgm_base.ValidationError(_("Not enough IP space to allocate an address for OLSR interface!"))

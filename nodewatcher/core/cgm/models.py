@@ -202,7 +202,7 @@ class WifiRadioDeviceConfigForm(forms.ModelForm, core_antennas.AntennaReferencer
 registration.register_form_for_item(WifiRadioDeviceConfig, WifiRadioDeviceConfigForm)
 registration.point("node.config").register_item(WifiRadioDeviceConfig)
 
-class WifiInterfaceConfig(InterfaceConfig):
+class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
   """
   Wifi interface configuration.
   """

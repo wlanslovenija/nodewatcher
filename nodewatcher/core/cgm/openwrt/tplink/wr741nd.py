@@ -35,7 +35,7 @@ class TPLinkWR741ND(cgm_routers.RouterBase):
   ]
   port_map = {
     "openwrt": {
-      "wifi0" : "wlan0",
+      "wifi0" : "radio0",
       "wan0"  : "eth1",
       "lan0"  : "eth0",
     }
