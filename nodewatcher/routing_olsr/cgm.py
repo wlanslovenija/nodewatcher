@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core import models as core_models
 from nodewatcher.registry.cgm import base as cgm_base
 from nodewatcher.registry.cgm import resources as cgm_resources
+from nodewatcher.routing_olsr import models as olsr_models
 
 ROUTING_TABLE_ID = 20
 ROUTING_TABLE_NAME = "olsr"
@@ -38,10 +39,10 @@ def olsr(node, cfg):
 
   # Iterate through interfaces and decide which ones should be included
   # in the routing table; other modules must have previously set its
-  # "_routable" attribute to True
+  # "_routable" attribute to OLSR_PROTOCOL_NAME
   routable_ifaces = []
   for name, iface in cfg.network:
-    if not iface._routable:
+    if iface._routable != olsr_models.OLSR_PROTOCOL_NAME:
       continue
 
     if iface.proto == "none":

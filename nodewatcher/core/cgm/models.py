@@ -118,6 +118,7 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
   An ethernet interface.
   """
   eth_port = registry_fields.SelectorKeyField("node.config", "core.interfaces#eth_port")
+  uplink = models.BooleanField(default = False)
   
   class RegistryMeta(InterfaceConfig.RegistryMeta):
     registry_name = _("Ethernet Interface")
@@ -236,6 +237,8 @@ class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
   """
   VPN interface.
   """
+  protocol = registry_fields.SelectorKeyField("node.config", "core.interfaces#vpn_protocol",
+    verbose_name = _("VPN Protocol"))
   mac = registry_fields.MACAddressField(auto_add = True)
   
   class RegistryMeta(InterfaceConfig.RegistryMeta):
@@ -249,8 +252,7 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
   """
   interface = registry_fields.IntraRegistryForeignKey(InterfaceConfig, editable = False, null = False, related_name = 'networks')
   enabled = models.BooleanField(default = True)
-  description = models.CharField(max_length = 100)
-  uplink = models.BooleanField(default = False)
+  description = models.CharField(max_length = 100, blank = True)
   
   class RegistryMeta:
     form_order = 51
@@ -258,7 +260,6 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     registry_section = _("Network Configuration")
     registry_name = _("Generic Network Config")
     multiple = True
-    hidden = True
 
 registration.point("node.config").register_subitem(InterfaceConfig, NetworkConfig)
 
@@ -337,6 +338,28 @@ class PPPoENetworkConfig(NetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
+class VpnNetworkConfig(NetworkConfig):
+  """
+  Configuration for a VPN uplink.
+  """
+  address = registry_fields.IPAddressField(host_required = True)
+  port = models.IntegerField()
+
+  class RegistryMeta(NetworkConfig.RegistryMeta):
+    registry_name = _("VPN Server")
+
+class VpnNetworkConfigForm(forms.ModelForm):
+  """
+  VPN uplink configuration form.
+  """
+  port = forms.IntegerField(min_value = 1, max_value = 49151)
+
+  class Meta:
+    model = VpnNetworkConfig
+
+registration.point("node.config").register_subitem(VpnInterfaceConfig, VpnNetworkConfig)
+registration.register_form_for_item(VpnNetworkConfig, VpnNetworkConfigForm)
+
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
   """
   Configuration of per-interface traffic limits.
@@ -373,30 +396,3 @@ registration.point("node.config").register_choice("core.interfaces.limits#speeds
 registration.point("node.config").register_choice("core.interfaces.limits#speeds", "2mbit", _("2 Mbit/s"))
 registration.point("node.config").register_choice("core.interfaces.limits#speeds", "4mbit", _("4 Mbit/s"))
 registration.point("node.config").register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)
-
-class VpnServerConfig(registration.bases.NodeConfigRegistryItem):
-  """
-  Provides a VPN server specification that the nodes can use.
-  """
-  protocol = registry_fields.SelectorKeyField("node.config", "core.servers.vpn#protocol")
-  hostname = models.CharField(max_length = 100)
-  port = models.IntegerField()
-  
-  class RegistryMeta:
-    form_order = 20
-    registry_id = "core.servers.vpn"
-    registry_section = _("VPN Servers")
-    registry_name = _("VPN Server")
-    multiple = True
-
-class VpnServerConfigForm(forms.ModelForm):
-  """
-  VPN server configuration form.
-  """
-  port = forms.IntegerField(min_value = 1, max_value = 49151)
-  
-  class Meta:
-    model = VpnServerConfig
-
-registration.point("node.config").register_item(VpnServerConfig)
-registration.register_form_for_item(VpnServerConfig, VpnServerConfigForm)

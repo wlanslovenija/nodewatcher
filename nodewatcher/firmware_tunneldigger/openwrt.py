@@ -2,9 +2,10 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.registry import registration
 from nodewatcher.registry.cgm import base as cgm_base
+from nodewatcher.core.cgm import models as cgm_models
 
 # Register tunneldigger VPN protocol
-registration.point("node.config").register_choice("core.servers.vpn#protocol", "tunneldigger", _("Tunneldigger"))
+registration.point("node.config").register_choice("core.interfaces#vpn_protocol", "tunneldigger", _("Tunneldigger"))
 
 @cgm_base.register_platform_module("openwrt", 100)
 def tunneldigger(node, cfg):
@@ -21,31 +22,39 @@ def tunneldigger(node, cfg):
     return
 
   # Create tunneldigger configuration
-  brokers = {}
-  for server in node.config.core.servers.vpn(queryset = True).filter(protocol = "tunneldigger"):
-    brokers.setdefault(server.hostname, []).append(server.port)
+  for idx, interface in enumerate(node.config.core.interfaces(onlyclass = cgm_models.VpnInterfaceConfig)):
+    if interface.protocol != "tunneldigger":
+      continue
 
-  for idx, (address, ports) in enumerate(brokers.items()):
-    # Create tunneldigger configurations
-    broker = cfg.tunneldigger.add("broker")
-    broker.address = address
-    broker.port = ports
-    broker.uuid = node.uuid
-    broker.interface = "digger%d" % idx
-
-    # Create routing policy entries to ensure tunneldigger connections are not
-    # routed via the mesh
-    policy = cfg.routing.add("policy")
-    policy.dest_ip = address
-    policy.table = "main"
-    policy.priority = 500
+    ifname = "digger%d" % idx
 
     # Create interface configurations; note that addressing configuration is routing
     # daemon dependent and as such should not be filled in here
-    iface = cfg.network.add(interface = broker.interface)
-    iface.ifname = broker.interface
+    iface = cfg.network.add(interface = ifname)
+    iface.ifname = ifname
     iface.proto = "none"
-    iface._routable = True
+    iface._routable = interface.routing_protocol
+
+    # Add a broker for each configured interface
+    broker = cfg.tunneldigger.add("broker")
+    broker.address = []
+    unique_brokers = set()
+
+    for network in interface.networks.all():
+      network = network.cast()
+      broker.address.append("%s:%d" % (network.address.ip, network.port))
+      unique_brokers.add(network.address)
+
+    broker.uuid = node.uuid
+    broker.interface = ifname
+
+    # Create routing policy entries to ensure tunneldigger connections are not
+    # routed via the mesh
+    for broker in unique_brokers:
+      policy = cfg.routing.add("policy")
+      policy.dest_ip = broker.ip
+      policy.table = "main"
+      policy.priority = 500
 
   # Ensure that WAN traffic is routed via the main table
   policy = cfg.routing.add("policy")

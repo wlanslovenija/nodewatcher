@@ -4,8 +4,10 @@ from django.utils.translation import ugettext as _
 from nodewatcher.monitor import models as monitor_models
 from nodewatcher.registry import registration
 
+OLSR_PROTOCOL_NAME = "olsr"
+
 # Register the routing protocol option, so interfaces can use it
-registration.point("node.config").register_choice("core.interfaces#routing_protocol", "olsr", _("OLSR"))
+registration.point("node.config").register_choice("core.interfaces#routing_protocol", OLSR_PROTOCOL_NAME, _("OLSR"))
 
 class OlsrRoutingTopologyMonitor(monitor_models.RoutingTopologyMonitor):
   """

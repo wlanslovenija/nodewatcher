@@ -65,8 +65,7 @@ def configure_interface(cfg, interface, section, iface_name):
   :param section: UCI interface section
   :param iface_name: Name of the UCI interface
   """
-  if interface.routing_protocol != "none":
-    section._routable = True
+  section._routable = interface.routing_protocol
 
   networks = [x.cast() for x in interface.networks.all()]
   if networks:
