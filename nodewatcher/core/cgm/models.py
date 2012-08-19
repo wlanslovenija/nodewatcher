@@ -28,6 +28,12 @@ class CgmGeneralConfig(core_models.GeneralConfig):
     registry_name = _("CGM Configuration")
     hides_parent = True
 
+  def get_device(self):
+    """
+    Returns the device descriptor for the configured router.
+    """
+    return cgm_base.get_platform(self.platform).get_router(self.router)
+
 registration.point("node.config").register_item(CgmGeneralConfig)
 
 class AuthenticationConfig(registration.bases.NodeConfigRegistryItem):
@@ -244,6 +250,7 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
   interface = registry_fields.IntraRegistryForeignKey(InterfaceConfig, editable = False, null = False, related_name = 'networks')
   enabled = models.BooleanField(default = True)
   description = models.CharField(max_length = 100)
+  uplink = models.BooleanField(default = False)
   
   class RegistryMeta:
     form_order = 51
@@ -371,13 +378,13 @@ class VpnServerConfig(registration.bases.NodeConfigRegistryItem):
   """
   Provides a VPN server specification that the nodes can use.
   """
-  protocol = registry_fields.SelectorKeyField("node.config", "core.vpn.server#protocol")
+  protocol = registry_fields.SelectorKeyField("node.config", "core.servers.vpn#protocol")
   hostname = models.CharField(max_length = 100)
   port = models.IntegerField()
   
   class RegistryMeta:
     form_order = 20
-    registry_id = "core.vpn.server"
+    registry_id = "core.servers.vpn"
     registry_section = _("VPN Servers")
     registry_name = _("VPN Server")
     multiple = True
@@ -393,6 +400,3 @@ class VpnServerConfigForm(forms.ModelForm):
 
 registration.point("node.config").register_item(VpnServerConfig)
 registration.register_form_for_item(VpnServerConfig, VpnServerConfigForm)
-
-# Ensure that all CGM modules are loaded
-cgm_base.load_modules()

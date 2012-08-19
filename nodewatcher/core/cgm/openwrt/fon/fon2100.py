@@ -28,6 +28,12 @@ class Fonera(cgm_routers.RouterBase):
       gain = 2
     )
   ]
+  port_map = {
+    "openwrt": {
+      "wifi0" : "wlan0",
+      "wan0"  : "eth0",
+    }
+  }
   
   @cgm_routers.register_module()
   def network(node, cfg):

@@ -153,11 +153,14 @@ class RouterBase(object):
   """
   __metaclass__ = RouterMeta
   features = []
+  port_map = {}
   
   @classmethod
   def register(cls, platform):
     """
     Performs router model registration.
+
+    :param platform: Platform instance
     """
     # Register a new choice in the configuration registry
     registration.point("node.config").register_choice("core.general#router", cls.identifier, "%s :: %s" % (cls.manufacturer, cls.name),
@@ -187,6 +190,16 @@ class RouterBase(object):
           function,
           cls.identifier
         )
+
+  @classmethod
+  def remap_port(cls, platform, port):
+    """
+    Remaps a port according to the port mapping.
+
+    :param platform: Platform identifier
+    :param port: Port identifier
+    """
+    return cls.port_map.get(platform, {}).get(port, None)
   
   def __init__(self):
     """
@@ -211,7 +224,18 @@ class RouterBase(object):
       if radio.identifier == identifier:
         return radio
 
-def register_module(platform = None, order = 1):
+  @classmethod
+  def get_port(cls, identifier):
+    """
+    Returns a port descriptor with the specified identifier.
+
+    @param port: Port identifier
+    """
+    for port in cls.ports:
+      if port.identifier == identifier:
+        return port
+
+def register_module(platform = None, order = 50):
   """
   Marks a method to be registered as a CGM upon router registration.
   """

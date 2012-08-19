@@ -204,6 +204,7 @@ INSTALLED_APPS = (
   'nodewatcher.policy',
 
   'nodewatcher.registry',
+  'nodewatcher.registry.loader',
   'nodewatcher.core',
   'nodewatcher.core.cgm',
   'nodewatcher.core.cgm.packages.solar',
@@ -213,6 +214,8 @@ INSTALLED_APPS = (
   'nodewatcher.routing_olsr',
   'nodewatcher.telemetry_http',
   'nodewatcher.telemetry_core',
+  'nodewatcher.firmware_core',
+  'nodewatcher.firmware_tunneldigger',
   'guardian',
   'south',
 )
@@ -270,7 +273,10 @@ REGISTRY_FORM_PROCESSORS = {
 
 # Configuration generating modules for firmware images
 CGM_MODULES = (
-  "nodewatcher.core.cgm.openwrt",
+  'nodewatcher.core.cgm.openwrt',
+  'nodewatcher.firmware_core.openwrt',
+  'nodewatcher.firmware_tunneldigger.openwrt',
+  'nodewatcher.routing_olsr.cgm',
 )
 
 OLSRD_MONITOR_HOST = '127.0.0.1'

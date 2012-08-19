@@ -310,12 +310,16 @@ class Migration(DataMigration):
               
               # VPN servers
               vpn_servers = [
-                ("91.185.203.246", 9999),
-                ("91.185.199.246", 9999),
+                ("46.54.226.43", 8942),
+                ("46.54.226.43", 53),
+                ("46.54.226.43", 123),
+                ("91.175.203.240", 8942),
+                ("91.175.203.240", 53),
+                ("91.175.203.240", 123),
               ]
               for host, port in vpn_servers:
                 vpn_server = orm['cgm.VpnServerConfig'](root = node, content_type = vpnserver_ctype)
-                vpn_server.protocol = "openvpn"
+                vpn_server.protocol = "tunneldigger"
                 vpn_server.hostname = host
                 vpn_server.port = port
                 vpn_server.save()

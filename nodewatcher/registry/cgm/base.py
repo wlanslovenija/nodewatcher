@@ -4,6 +4,7 @@ from django.utils import importlib
 
 from nodewatcher.registry import registration
 from nodewatcher.registry.cgm import routers as cgm_routers
+from nodewatcher.registry.cgm import resources as cgm_resources
 
 # Registered platform modules
 PLATFORM_REGISTRY = {}
@@ -15,9 +16,14 @@ class PlatformConfiguration(object):
   """
   A flexible in-memory platform configuration store that is used
   by modules to make modifications and perform configuration. The
-  default implementation is empty as this is platform-specific.
+  default implementation only contains some platform-independent
+  methods.
   """
-  pass
+  def __init__(self):
+    """
+    Class constructor.
+    """
+    self.resources = cgm_resources.ResourceAllocator()
 
 class PlatformBase(object):
   """
@@ -183,4 +189,4 @@ def load_modules():
     try:
       importlib.import_module(module)
     except ImportError:
-      raise ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)
+      raise ImproperlyConfigured("Error importing CGM module '%s'!" % module)

@@ -29,8 +29,25 @@ class UCISection(object):
     """
     Returns a configuration attribute's value.
     """
-    return self._values[name]
-  
+    return self._values.get(name, None)
+
+  def get_type(self):
+    """
+    Returns the section type name.
+    """
+    return self._typ
+
+  def format_value(self, value):
+    """
+    Formats a value so it is suitable for insertion into UCI.
+    """
+    if isinstance(value, (list, tuple)):
+      return " ".join(self.format_value(x) for x in value)
+    elif isinstance(value, bool):
+      return int(value)
+
+    return str(value)
+
   def format(self, root, section, idx = None):
     """
     Formats the configuration tree so it is suitable for loading into UCI.
@@ -41,12 +58,16 @@ class UCISection(object):
       # Named sections
       output.append("{0}.{1}={2}".format(root, section, self._typ))
       for key, value in self._values.iteritems():
-        output.append("{0}.{1}.{2}={3}".format(root, section, key, value))
+        if key.startswith('_'):
+          continue
+        output.append("{0}.{1}.{2}={3}".format(root, section, key, self.format_value(value)))
     else:
       # Ordered sections
       output.append("{0}.@{1}[{2}]={1}".format(root, section, idx))
       for key, value in self._values.iteritems():
-        output.append("{0}.@{1}[{2}].{3}={4}".format(root, section, idx, key, value))
+        if key.startswith('_'):
+          continue
+        output.append("{0}.@{1}[{2}].{3}={4}".format(root, section, idx, key, self.format_value(value)))
     
     return output
 
@@ -91,7 +112,13 @@ class UCIRoot(object):
       self._ordered_sections.setdefault(args[0], []).append(section)
     
     return section
-  
+
+  def __iter__(self):
+    return iter(self._named_sections.iteritems())
+
+  def __contains__(self, section):
+    return section in self._named_sections or  section in self._ordered_sections
+
   def __getattr__(self, section):
     """
     Retrieves the wanted UCI section.
@@ -123,6 +150,7 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
     """
     Class constructor.
     """
+    super(UCIConfiguration, self).__init__()
     self._roots = {}
   
   def __getattr__(self, root):
@@ -165,4 +193,5 @@ import nodewatcher.core.cgm.openwrt.linksys
 import nodewatcher.core.cgm.openwrt.buffalo
 import nodewatcher.core.cgm.openwrt.mikrotik
 import nodewatcher.core.cgm.openwrt.asus
+import nodewatcher.core.cgm.openwrt.tplink
 

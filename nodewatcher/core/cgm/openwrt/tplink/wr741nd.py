@@ -33,13 +33,13 @@ class TPLinkWR741ND(cgm_routers.RouterBase):
   features = [
     cgm_routers.Features.MultipleSSID,
   ]
-  
-  @cgm_routers.register_module()
-  def network(node, cfg):
-    """
-    Network configuration CGM for TP-Link WR741ND.
-    """
-    pass
+  port_map = {
+    "openwrt": {
+      "wifi0" : "wlan0",
+      "wan0"  : "eth1",
+      "lan0"  : "eth0",
+    }
+  }
 
 # Register the TP-Link WR741ND router
 cgm_base.register_router("openwrt", TPLinkWR741ND)

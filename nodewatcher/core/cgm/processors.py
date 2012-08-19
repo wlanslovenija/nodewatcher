@@ -4,13 +4,6 @@ from nodewatcher.registry import cgm
 from nodewatcher.registry.cgm import base as cgm_base
 from nodewatcher.registry.forms import processors
 
-# Dependencies
-import nodewatcher.core
-
-# Load modules for all supported platforms
-import nodewatcher.core.cgm.openwrt
-import nodewatcher.core.cgm.ubnt
-
 class NodeCgmValidator(processors.RegistryFormProcessor):
   """
   A form processor that validates a node's firmware configuration via the

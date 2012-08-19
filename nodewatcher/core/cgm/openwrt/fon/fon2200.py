@@ -14,6 +14,13 @@ class FoneraPlus(fon2100.Fonera):
     cgm_routers.EthernetPort("wan0", "Wan0"),
     cgm_routers.EthernetPort("lan0", "Lan0")
   ]
+  port_map = {
+    "openwrt": {
+      "wifi0" : "wlan0",
+      "wan0"  : "eth1",
+      "lan0"  : "eth0",
+    }
+  }
   
   @cgm_routers.register_module()
   def network(node, cfg):

@@ -89,4 +89,3 @@ class RegistryItemBase(models.Model):
     if not getattr(self.RegistryMeta, 'multiple', False) and self.root:
       cfg, _ = self._registry_regpoint.get_top_level_queryset(self.root, self.RegistryMeta.registry_id)
       cfg.exclude(pk = self.pk).delete()
-

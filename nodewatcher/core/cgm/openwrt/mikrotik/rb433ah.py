@@ -24,6 +24,13 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
   ]
   antennas = [
   ]
+  port_map = {
+    "openwrt": {
+      "wifi0" : "wlan0",
+      "wan0"  : "eth1",
+      "lan0"  : "eth0",
+      }
+  }
   
   @cgm_routers.register_module()
   def network(node, cfg):
