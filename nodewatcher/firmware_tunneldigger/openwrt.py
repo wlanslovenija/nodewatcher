@@ -32,6 +32,7 @@ def tunneldigger(node, cfg):
     # daemon dependent and as such should not be filled in here
     iface = cfg.network.add(interface = ifname)
     iface.ifname = ifname
+    iface.macaddr = interface.mac
     iface.proto = "none"
     iface._routable = interface.routing_protocol
 
