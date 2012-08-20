@@ -70,7 +70,7 @@ class Rule(LazyObject):
     context.mark(self, condition)
     if condition == False:
       return
-    
+
     # Evaluate all subrules and execute subactions when something has changed
     changed = context.has_changed(self)
     for idx, action in enumerate(self.actions):
@@ -92,41 +92,44 @@ class LazyValue(LazyObject):
     @param op: A callable operation
     @param identifier: Optional identifier
     """
-    self.op = op
-    self.identifier = identifier
+    self.__op = op
+    self.__identifier = identifier
   
   def __lt__(self, other):
-    other = other(context) if isinstance(other, LazyValue) else other
-    return LazyValue(lambda context: self(context) < other)
+    return LazyValue(lambda context: self(context) < (other(context) if isinstance(other, LazyValue) else other))
   
   def __le__(self, other):
-    other = other(context) if isinstance(other, LazyValue) else other
-    return LazyValue(lambda context: self(context) <= other)
+    return LazyValue(lambda context: self(context) <= (other(context) if isinstance(other, LazyValue) else other))
   
   def __eq__(self, other):
-    other = other(context) if isinstance(other, LazyValue) else other
-    return LazyValue(lambda context: self(context) == other)
+    return LazyValue(lambda context: self(context) == (other(context) if isinstance(other, LazyValue) else other))
   
   def __ne__(self, other):
-    other = other(context) if isinstance(other, LazyValue) else other
-    return LazyValue(lambda context: self(context) != other)
+    return LazyValue(lambda context: self(context) != (other(context) if isinstance(other, LazyValue) else other))
   
   def __gt__(self, other):
-    other = other(context) if isinstance(other, LazyValue) else other
-    return LazyValue(lambda context: self(context) > other)
+    return LazyValue(lambda context: self(context) > (other(context) if isinstance(other, LazyValue) else other))
   
   def __ge__(self, other):
-    other = other(context) if isinstance(other, LazyValue) else other
-    return LazyValue(lambda context: self(context) >= other)
-  
+    return LazyValue(lambda context: self(context) >= (other(context) if isinstance(other, LazyValue) else other))
+
+  def __invert__(self):
+    return LazyValue(lambda context: not self(context))
+
+  def __getattr__(self, key):
+    return LazyValue(lambda context: getattr(self(context), key))
+
+  def __getitem__(self, key):
+    return LazyValue(lambda context: self(context)[key(context) if isinstance(key, LazyValue) else key])
+
   def __call__(self, context):
     """
     Evaluates the value.
     """
-    return self.op(context)
+    return self.__op(context)
   
   def __str__(self):
-    return self.identifier or "<LazyValue>"
+    return self.__identifier or "<LazyValue>"
 
 class RuleModifier(LazyObject):
   """
@@ -240,8 +243,14 @@ class EngineContext(object):
     """
     if rule.always_evaluate:
       return True
-    
-    return self.state.get(':' + self.current_level(), False) != self.new_state[':' + self.current_level()]
+
+    level_id = ':' + self.current_level()
+    if level_id not in self.state:
+      # The first time rules are evaluated (and there is no state yet), we must pretend
+      # all rules evaluate to false, otherwise we could overwrite existing configuration
+      return False
+
+    return self.state.get(level_id, False) != self.new_state[level_id]
   
   def has_value_changed(self, location, value):
     """
@@ -251,13 +260,19 @@ class EngineContext(object):
     @param value: New registry value
     """
     location = str(location)
+    self.new_state[location] = value
+
+    if not self.state:
+      # The first time rules are evaluated (and there is no state yet), we must pretend
+      # all rules evaluate to false, otherwise we could overwrite existing configuration
+      return False
+
     old_value = self.state.get(location)
     if old_value is None:
       return True
     
     if old_value == value:
       return False
-    
-    self.new_state[location] = value
+
     return True
 

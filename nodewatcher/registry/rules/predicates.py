@@ -12,9 +12,12 @@ __all__ = [
   'value',
   'router_descriptor',
   'count',
+  'foreach',
+  'loop_var',
+  'contains',
   'changed',
   'assign',
-  'clear_config',
+  'remove',
   'append',
 ]
 
@@ -71,62 +74,87 @@ def assign(location, index = 0, **kwargs):
   
   return Action(action_assign)
 
-def clear_config(location):
+def get_cfg_indices(cfg_items, _cls = None, **kwargs):
   """
-  Action that clears all config items for a specific location.
-  
-  @param location: Registry location
+  A helper method for filtering partial configuration items based on
+  specified criteria.
   """
-  def action_clear_config(context):
-    try:
-      tlc = context.regpoint.get_top_level_class(location)
-      if not getattr(tlc.RegistryMeta, 'multiple', False):
-        raise EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(location)) 
-    except registry_access.UnknownRegistryIdentifier:
-      raise EvaluationError("Registry location '{0}' is invalid!".format(location))
-    
-    context.partial_config[location] = []
-    context.results.setdefault(location, []).append(registry_forms.ClearFormsAction())
-  
-  return Action(action_clear_config)
+  indices = []
+  for idx, cfg in enumerate(cfg_items[:]):
+    # Filter based on specified class name
+    if _cls is not None and cfg.__class__.__name__ != _cls:
+      continue
 
-def append(location, **kwargs):
+    # Filter based on partial values
+    if kwargs:
+      match = True
+      for key, value in kwargs.iteritems():
+        if getattr(cfg, key, None) != value:
+          match = False
+          break
+
+      if not match:
+        continue
+
+    indices.append(idx)
+
+  return indices
+
+def remove(_item, _cls = None, **kwargs):
+  """
+  Action that removes specific configuration items.
+  """
+  def action_remove(context):
+    try:
+      tlc = context.regpoint.get_top_level_class(_item)
+      if not getattr(tlc.RegistryMeta, 'multiple', False):
+        raise EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(_item))
+    except registry_access.UnknownRegistryIdentifier:
+      raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
+
+    cfg_items = context.partial_config.get(_item, [])
+    indices = get_cfg_indices(cfg_items, _cls, **kwargs)
+    for cfg in [cfg_items[i] for i in indices]:
+      cfg_items.remove(cfg)
+
+    if indices:
+      context.results.setdefault(_item, []).append(registry_forms.RemoveFormAction(indices))
+  
+  return Action(action_remove)
+
+def append(_item, _cls = None, _parent = None, **kwargs):
   """
   Action that appends a config item to a specific location.
-  
-  @param location: Registry location
   """
   def action_append(context):
-    if '[' in location:
-      loc, cls_name = location.split('[')
-      cls_name = cls_name[:-1].lower()
-    else:
-      loc = location
-      cls_name = None
-    
+    cls_name = _cls
     try:
-      tlc = context.regpoint.get_top_level_class(loc)
+      tlc = context.regpoint.get_top_level_class(_item)
       if not getattr(tlc.RegistryMeta, 'multiple', False):
-        raise EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(loc))
+        raise EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(_item))
       if cls_name is None:
-        cls_name = tlc._meta.module_name 
+        cls_name = tlc._meta.module_name
     except registry_access.UnknownRegistryIdentifier:
-      raise EvaluationError("Registry location '{0}' is invalid!".format(loc))
+      raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
     
     # Resolve class name into the actual class
     cls = registry_access.get_model_class_by_name(cls_name)
     if not issubclass(cls, tlc):
-      raise EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, loc))
-    
+      raise EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, _item))
+
     try:
       mdl = cls()
-      for key, value in kwargs.iteritems():
+      for key, value in kwargs.items():
+        if callable(value):
+          value = value(context)
+          kwargs[key] = value
+
         setattr(mdl, key, value)
-      context.partial_config[location].append(mdl)
+      context.partial_config[_item].append(mdl)
     except KeyError:
       pass
     
-    context.results.setdefault(location, []).append(registry_forms.AppendFormAction(cls, kwargs))
+    context.results.setdefault(_item, []).append(registry_forms.AppendFormAction(cls, kwargs))
   
   return Action(action_append)
 
@@ -168,7 +196,7 @@ def router_descriptor(platform, router):
     
     def __setattr__(self, key, value):
       raise AttributeError
-  
+
   return LazyRouterModel(platform, router)
 
 def value(location):
@@ -225,3 +253,42 @@ def changed(location):
     lambda context: context.has_value_changed(location, value(location)(context))
   )
 
+def foreach(container, *args):
+  """
+  A loop predicate that loops over the specified container and executes
+  actions for each iteration. Current loop variable can be retrieved
+  by using `loop_var`.
+
+  Nesting of loops is currently not possible.
+
+  :param container: Lazy container
+  """
+  if not isinstance(container, LazyValue):
+    raise CompilationError("Foreach predicate container argument must be a lazy value!")
+
+  def loop(context):
+    for x in (container(context) or []):
+      context._loop_variable = x
+      for action in args:
+        action(context)
+
+  return Action(loop)
+
+def loop_var():
+  """
+  Returns the value of the current loop variable when executed.
+  """
+  return LazyValue(lambda context: getattr(context, '_loop_variable', None))
+
+def contains(container, value):
+  """
+  Contains predicate can be used to check if a specified lazy container
+  contains a given value.
+
+  :param container: Lazy container
+  :param value: Value that should be checked
+  """
+  if not isinstance(container, LazyValue):
+    raise CompilationError("Container argument must be a lazy value!")
+
+  return LazyValue(lambda context: value in (container(context) or []))
