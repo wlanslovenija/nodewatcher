@@ -41,7 +41,7 @@ def tunneldigger(node, cfg):
     broker.address = []
     unique_brokers = set()
 
-    for network in interface.networks.all():
+    for network in interface.networks.filter(enabled = True):
       network = network.cast()
       broker.address.append("%s:%d" % (network.address.ip, network.port))
       unique_brokers.add(network.address)
