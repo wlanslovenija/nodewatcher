@@ -4,6 +4,7 @@ from nodewatcher.core import models as core_models
 from nodewatcher.registry.cgm import base as cgm_base
 from nodewatcher.registry.cgm import resources as cgm_resources
 from nodewatcher.routing_olsr import models as olsr_models
+from nodewatcher.utils import ipaddr
 
 ROUTING_TABLE_ID = 20
 ROUTING_TABLE_NAME = "olsr"
@@ -35,13 +36,17 @@ def olsr(node, cfg):
   olsrd.SrcIpRoutes = "yes"
   olsrd.RtTable = ROUTING_TABLE_ID
 
-  # TODO HNA4
-
   # Iterate through interfaces and decide which ones should be included
   # in the routing table; other modules must have previously set its
   # "_routable" attribute to OLSR_PROTOCOL_NAME
   routable_ifaces = []
   for name, iface in cfg.network:
+    # All interfaces that are marked in _announce for this routing protocol should be added to HNA
+    if olsr_models.OLSR_PROTOCOL_NAME in (iface._announce or []):
+      hna = cfg.olsrd.add("Hna4")
+      hna.netaddr = ipaddr.IPNetwork("%s/%s" % (iface.ipaddr, iface.netmask)).network
+      hna.netmask = iface.netmask
+
     if iface._routable != olsr_models.OLSR_PROTOCOL_NAME:
       continue
 

@@ -6,8 +6,11 @@ from nodewatcher.registry import registration
 
 OLSR_PROTOCOL_NAME = "olsr"
 
-# Register the routing protocol option, so interfaces can use it
+# Register the routing protocol option so interfaces can use it
 registration.point("node.config").register_choice("core.interfaces#routing_protocol", OLSR_PROTOCOL_NAME, _("OLSR"))
+
+# Register the subnet announce option so interfaces can use it
+registration.point("node.config").register_choice("core.interfaces.network#routing_announce", OLSR_PROTOCOL_NAME, _("OLSR HNA"))
 
 class OlsrRoutingTopologyMonitor(monitor_models.RoutingTopologyMonitor):
   """

@@ -38,6 +38,10 @@ def configure_network(cfg, network, section):
   elif isinstance(network, cgm_models.AllocatedNetworkConfig):
     section.proto = "static"
 
+    # When network is marked to be announced, also specify it here
+    if network.routing_announce:
+      section._announce = [network.routing_announce]
+
     if network.family in ("ipv4", "ipv6"):
       # Make our subnet available to other modules as a resource
       res = cgm_resources.IpResource(network.family, network.allocation.ip_subnet, network)
