@@ -93,9 +93,7 @@ class RoutableInterface(models.Model):
     abstract = True
 
   routing_protocol = registry_fields.SelectorKeyField("node.config", "core.interfaces#routing_protocol",
-    default = "none")
-
-registration.point("node.config").register_choice("core.interfaces#routing_protocol", "none", _("None"))
+    blank = True, null = True)
 
 class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
   """
