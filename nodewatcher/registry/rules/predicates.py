@@ -100,7 +100,7 @@ def get_cfg_indices(cfg_items, _cls = None, **kwargs):
 
   return indices
 
-def remove(_item, _cls = None, **kwargs):
+def remove(_item, _cls = None, _parent = None, **kwargs):
   """
   Action that removes specific configuration items.
   """

@@ -51,19 +51,24 @@ class RemoveFormAction(RegistryFormAction):
   """
   An action that removes forms specified by index.
   """
-  def __init__(self, indices):
+  def __init__(self, indices, parent = None):
     """
     Class constructor.
 
     :param indices: Form indices to remove
+    :param parent: Optional partial parent item
     """
     self.indices = indices
+    self.parent = parent
 
   def modify_forms_after(self):
     """
     Removes specified forms.
     """
-    forms = [self.context.subforms[i] for i in self.indices if i < len(self.context.subforms)]
+    if self.parent != self.context.hierarchy_parent_current:
+      return False
+
+    forms = [self.context.subforms[i] for i in self.indices]
     for form in forms:
       self.context.subforms.remove(form)
 
@@ -124,20 +129,25 @@ class AssignToFormAction(RegistryFormAction):
   """
   An action that assigns to an existing form.
   """
-  def __init__(self, index, attributes):
+  def __init__(self, index, attributes, parent = None):
     """
     Class constructor.
     
-    @param index: Subform index
-    @param attributes: A dictionary of assigned
+    :param index: Subform index
+    :param attributes: A dictionary of attributes to assign
+    :param parent: Optional partial parent item
     """
     self.index = index
     self.attributes = attributes
+    self.parent = parent
   
   def modify_forms_before(self):
     """
     Assigns to an existing form.
     """
+    if self.parent != self.context.hierarchy_parent_current:
+      return False
+
     # TODO
     pass
 
