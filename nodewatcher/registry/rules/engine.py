@@ -74,11 +74,21 @@ class Rule(LazyObject):
     # Evaluate all subrules and execute subactions when something has changed
     changed = context.has_changed(self)
     for idx, action in enumerate(self.actions):
-      if isinstance(action, Action) and changed:
+      if isinstance(action, Action) and (changed or context.force_evaluate):
         action(context)
       elif isinstance(action, Rule):
         context.enter_sublevel("rule" + str(idx))
-        action(context)
+
+        if changed and not context.force_evaluate:
+          # Rule has evaluated to true and conditions have changed; all child
+          # rules depend on it, so they must be forced to re-evaluate even
+          # when they have not themselves changed
+          context.force_evaluate = True
+          action(context)
+          context.force_evaluate = False
+        else:
+          action(context)
+
         context.leave_sublevel()
 
 class LazyValue(LazyObject):
@@ -199,6 +209,8 @@ class EngineContext(object):
     self.new_state = copy.deepcopy(self.state)
     self.partial_config = partial_config
     self.results = {}
+    self.force_evaluate = False
+
     for idx, rule in enumerate(self._rules):
       self.enter_sublevel("rule" + str(idx))
       rule(self)
@@ -268,9 +280,6 @@ class EngineContext(object):
       return False
 
     old_value = self.state.get(location)
-    if old_value is None:
-      return True
-    
     if old_value == value:
       return False
 

@@ -33,6 +33,20 @@ rule(count(router.radios) == 0,
   remove("core.interfaces", "WifiRadioDeviceConfig")
 )
 
+# Project defaults for all projects that don't configure anything
+rule(changed("core.project#project.name"),
+  rule(contains(router.features, "multiple_ssid"),
+    assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "ap",
+      _set = dict(essid = "open.wlan-si.net")),
+    assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "mesh",
+      _set = dict(essid = "mesh.wlan-si.net"))
+  ),
+  rule(~contains(router.features, "multiple_ssid"),
+    assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "mesh",
+      _set = dict(essid = "open.wlan-si.net"))
+  )
+)
+
 # Per-project rules
 rule(project == "Ljubljana",
   rule(contains(router.features, "multiple_ssid"),
@@ -41,7 +55,7 @@ rule(project == "Ljubljana",
     assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "mesh",
       _set = dict(essid = "mesh.wlan-lj.net"))
   ),
-  rule (~contains(router.features, "multiple_ssid"),
+  rule(~contains(router.features, "multiple_ssid"),
     assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "mesh",
       _set = dict(essid = "open.wlan-lj.net"))
   )
