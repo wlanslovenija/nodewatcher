@@ -110,13 +110,17 @@ class AppendFormAction(RegistryFormAction):
       return False
 
     form_prefix = self.context.base_prefix + '_mu_' + str(len(self.context.subforms))
-    
+    item = self.item
+    if item is None:
+      item = create_config_item(self.context.default_item_cls, self.context.current_config, {},
+        parent = self.context.hierarchy_parent_current)
+
     self.context.subforms.append(generate_form_for_class(
       self.context,
       form_prefix,
       None,
       len(self.context.subforms),
-      instance = self.item,
+      instance = item,
       validate = True,
       force_selector_widget = self.context.force_selector_widget
     ))
