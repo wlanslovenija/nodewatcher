@@ -22,6 +22,8 @@ class RegistryFormAction(object):
   """
   An abstract action that can modify lists of registry forms.
   """
+  context = None
+
   def modify_forms_before(self):
     """
     Subclasses should provide action implementation in this method. It
@@ -90,17 +92,15 @@ class AppendFormAction(RegistryFormAction):
   """
   An action that appends a new form at the end of current subforms.
   """
-  def __init__(self, item_cls, attributes, parent = None):
+  def __init__(self, item, parent = None):
     """
     Class constructor.
     
-    :param item_cls: Item class
-    :param attributes: A dictionary of initial values
+    :param item: Configuration item that should be appended
     :param parent: Optional partial parent item
     """
-    self.item_cls = item_cls
+    self.item = item
     self.parent = parent
-    self.attributes = attributes
   
   def modify_forms_after(self):
     """
@@ -110,15 +110,13 @@ class AppendFormAction(RegistryFormAction):
       return False
 
     form_prefix = self.context.base_prefix + '_mu_' + str(len(self.context.subforms))
-    mdl = self.item_cls if self.item_cls is not None else self.context.default_item_cls
-    mdl = create_config_item(mdl, self.context, self.context.current_config, self.attributes)
     
     self.context.subforms.append(generate_form_for_class(
       self.context,
       form_prefix,
       None,
       len(self.context.subforms),
-      instance = mdl,
+      instance = self.item,
       validate = True,
       force_selector_widget = self.context.force_selector_widget
     ))
@@ -315,34 +313,34 @@ class RegistrySetMetaForm(forms.Form):
     widget = forms.HiddenInput
   )
 
-def create_config_item(cls, context, partial, attributes):
+def create_config_item(cls, partial, attributes, parent = None):
   """
   A helper function for creating a temporary virtual model in the partially
   validated configuration tree.
 
   :param cls: Configuration item class
-  :param context: Form context
   :param partial: Partial configuration dictionary
   :param attributes: Attributes dictionary to set for the new item
+  :param parent: Optional parent configuration item
   :return: Created virtual configuration item
   """
   config = cls()
   config._registry_virtual_model = True
-  if context.hierarchy_parent_partial is not None:
+  if parent is not None:
     setattr(
       config,
       cls._registry_object_parent_link.name,
-      context.hierarchy_parent_partial
+      parent
     )
 
     # Create a virtual reverse relation in the parent object
-    virtual_relation = getattr(context.hierarchy_parent_partial, '_registry_virtual_relation', {})
+    virtual_relation = getattr(parent, '_registry_virtual_relation', {})
     desc = getattr(
-      context.hierarchy_parent_partial.__class__,
+      parent.__class__,
       cls._registry_object_parent_link.rel.related_name
     )
     virtual_relation.setdefault(desc, []).append(config)
-    context.hierarchy_parent_partial._registry_virtual_relation = virtual_relation
+    parent._registry_virtual_relation = virtual_relation
 
   partial.setdefault(cls.RegistryMeta.registry_id, []).append(config)
 
@@ -497,7 +495,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       form.cleaned_data = {}
       form._errors = {}
       form._clean_fields()
-      config = create_config_item(selected_item, context, partial, form.cleaned_data)
+      config = create_config_item(selected_item, partial, form.cleaned_data, context.hierarchy_parent_partial)
   
   # Generate a new meta form, since the previous item has now changed
   meta_form = RegistryMetaForm(context, selected_item, prefix = prefix,

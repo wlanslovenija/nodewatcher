@@ -74,31 +74,70 @@ def assign(location, index = 0, **kwargs):
   
   return Action(action_assign)
 
-def get_cfg_indices(cfg_items, _cls = None, **kwargs):
+def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
   """
-  A helper method for filtering partial configuration items based on
+  A helper function for filtering partial configuration items based on
   specified criteria.
+
+  :param cfg_items: Partial configuration items
+  :param _cls: Optional class name filter
+  :param _parent: Optional parent instance filter
+  :return: A tuple (indices, items)
   """
   indices = []
-  for idx, cfg in enumerate(cfg_items[:]):
+  items = []
+  index = 0
+  for cfg in cfg_items[:]:
+    # Filter based on specified parent
+    if _parent is not None and (not hasattr(cfg.__class__, '_registry_object_parent_link') or
+                                getattr(cfg, cfg.__class__._registry_object_parent_link.name, None) != _parent):
+      continue
+
     # Filter based on specified class name
     if _cls is not None and cfg.__class__.__name__ != _cls:
+      index += 1
       continue
 
     # Filter based on partial values
     if kwargs:
       match = True
       for key, value in kwargs.iteritems():
-        if getattr(cfg, key, None) != value:
+        if not key.startswith('_') and getattr(cfg, key, None) != value:
           match = False
           break
 
       if not match:
         continue
 
-    indices.append(idx)
+    indices.append(index)
+    items.append(cfg)
+    index += 1
 
-  return indices
+  return indices, items
+
+def resolve_parent_item(context, parent):
+  """
+  A helper function for resolving the parent item in partial configuration.
+
+  :param context: Rules evaluation context
+  :param parent: Parent filter specified
+  :return: Parent partial configuration item
+  """
+  parent_cfg = None
+  if parent is not None:
+    if '_item' not in parent:
+      raise EvaluationError("Parent specifier must contain an '_item' entry!")
+
+    cfg_items = context.partial_config.get(parent['_item'], [])
+    item_index = parent.get('_index', 0)
+    indices, items = filter_cfg_items(cfg_items, **parent)
+
+    try:
+      parent_cfg = items[item_index]
+    except IndexError:
+      raise EvaluationError("Specified parent index does not exist!")
+
+  return parent_cfg
 
 def remove(_item, _cls = None, _parent = None, **kwargs):
   """
@@ -112,13 +151,16 @@ def remove(_item, _cls = None, _parent = None, **kwargs):
     except registry_access.UnknownRegistryIdentifier:
       raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
+    # Resolve parent item
+    parent_cfg = resolve_parent_item(context, _parent)
+
     cfg_items = context.partial_config.get(_item, [])
-    indices = get_cfg_indices(cfg_items, _cls, **kwargs)
-    for cfg in [cfg_items[i] for i in indices]:
+    indices, items = filter_cfg_items(cfg_items, _cls, parent_cfg, **kwargs)
+    for cfg in items:
       cfg_items.remove(cfg)
 
     if indices:
-      context.results.setdefault(_item, []).append(registry_forms.RemoveFormAction(indices))
+      context.results.setdefault(_item, []).append(registry_forms.RemoveFormAction(indices, parent = parent_cfg))
   
   return Action(action_remove)
 
@@ -142,19 +184,16 @@ def append(_item, _cls = None, _parent = None, **kwargs):
     if not issubclass(cls, tlc):
       raise EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, _item))
 
-    try:
-      mdl = cls()
-      for key, value in kwargs.items():
-        if callable(value):
-          value = value(context)
-          kwargs[key] = value
+    # Resolve parent item
+    parent_cfg = resolve_parent_item(context, _parent)
 
-        setattr(mdl, key, value)
-      context.partial_config[_item].append(mdl)
-    except KeyError:
-      pass
-    
-    context.results.setdefault(_item, []).append(registry_forms.AppendFormAction(cls, kwargs))
+    for key, value in kwargs.items():
+      if callable(value):
+        kwargs[key] = value(context)
+
+    # Create the partial model and action
+    mdl = registry_forms.create_config_item(cls, context.partial_config, kwargs, parent_cfg)
+    context.results.setdefault(_item, []).append(registry_forms.AppendFormAction(mdl, parent_cfg))
   
   return Action(action_append)
 
@@ -167,7 +206,7 @@ def count(value):
   if not isinstance(value, LazyValue):
     raise CompilationError("Count predicate argument must be a lazy value!")
   
-  return LazyValue(lambda context: len(value(context)))
+  return LazyValue(lambda context: len(value(context) or []))
 
 def router_descriptor(platform, router):
   """

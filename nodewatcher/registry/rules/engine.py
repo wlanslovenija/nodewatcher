@@ -245,7 +245,7 @@ class EngineContext(object):
       return True
 
     level_id = ':' + self.current_level()
-    if level_id not in self.state:
+    if not self.state:
       # The first time rules are evaluated (and there is no state yet), we must pretend
       # all rules evaluate to false, otherwise we could overwrite existing configuration
       return False
