@@ -106,7 +106,7 @@ class AppendFormAction(RegistryFormAction):
     """
     Appends a new form at the end of current subforms.
     """
-    if self.parent != self.context.hierarchy_parent_current:
+    if self.item is not None and self.parent != self.context.hierarchy_parent_current:
       return False
 
     form_prefix = self.context.base_prefix + '_mu_' + str(len(self.context.subforms))
