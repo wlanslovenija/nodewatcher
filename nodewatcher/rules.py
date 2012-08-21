@@ -1,7 +1,7 @@
 from registry.rules.scope import *
 
 # Variables
-project = value("core.general#project.name")
+project = value("core.project#project.name")
 router = router_descriptor("core.general#platform", "core.general#router")
 
 first_radio = dict(_item = "core.interfaces", _cls = "WifiRadioDeviceConfig", _index = 0)
@@ -31,4 +31,18 @@ rule(count(router.radios) == 1,
 
 rule(count(router.radios) == 0,
   remove("core.interfaces", "WifiRadioDeviceConfig")
+)
+
+# Per-project rules
+rule(project == "Ljubljana",
+  rule(contains(router.features, "multiple_ssid"),
+    assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "ap",
+      _set = dict(essid = "open.wlan-lj.net")),
+    assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "mesh",
+      _set = dict(essid = "mesh.wlan-lj.net"))
+  ),
+  rule (~contains(router.features, "multiple_ssid"),
+    assign("core.interfaces", "WifiInterfaceConfig", first_radio, mode = "mesh",
+      _set = dict(essid = "open.wlan-lj.net"))
+  )
 )

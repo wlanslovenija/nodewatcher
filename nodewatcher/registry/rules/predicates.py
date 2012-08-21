@@ -21,6 +21,9 @@ __all__ = [
   'append',
 ]
 
+class MissingValueError(EvaluationError):
+  pass
+
 def rule(condition, *args):
   """
   The rule predicate is used to define rules.
@@ -48,30 +51,41 @@ def rule(condition, *args):
   ctx._rules.append(new_rule)
   return new_rule
 
-def assign(location, index = 0, **kwargs):
+def assign(_item, _cls = None, _parent = None, _index = 0, _set = None, **kwargs):
   """
-  Action that assigns a dictionary of values to a specific location.
-  
-  @param location: Registry location
-  @param index: Optional array index
+  Assign predicate assigns values to existing configuration items.
   """
   def action_assign(context):
+    if _set is None:
+      return
+
     try:
-      tlc = context.regpoint.get_top_level_class(location)
-      if not getattr(tlc.RegistryMeta, 'multiple', False) and index > 0:
-        raise EvaluationError("Attempted to use assign predicate with index > 0 on singular registry item '{0}'!".format(location)) 
+      tlc = context.regpoint.get_top_level_class(_item)
     except registry_access.UnknownRegistryIdentifier:
-      raise EvaluationError("Registry location '{0}' is invalid!".format(location))
-    
+      raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
+
+    # Resolve parent item
     try:
-      mdl = context.partial_config[location][index]
-      for key, value in kwargs.iteritems():
-        setattr(mdl, key, value)
-    except (KeyError, IndexError):
-      pass
-    
-    context.results.setdefault(location, []).append(registry_forms.AssignToFormAction(index, kwargs))
-  
+      parent_cfg = resolve_parent_item(context, _parent)
+    except MissingValueError:
+      return
+
+    cfg_items = context.partial_config.get(_item, [])
+    indices, items = filter_cfg_items(cfg_items, _cls, parent_cfg, **kwargs)
+    try:
+      item = items[_index]
+    except IndexError:
+      return
+
+    for key, value in _set.items():
+      if callable(value):
+        value = _set[key] = value(context)
+
+      setattr(item, key, value)
+
+    context.results.setdefault(_item, []).append(registry_forms.AssignToFormAction(
+      item, indices[_index], _set, parent = parent_cfg))
+
   return Action(action_assign)
 
 def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
@@ -107,6 +121,7 @@ def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
           break
 
       if not match:
+        index += 1
         continue
 
     indices.append(index)
@@ -135,7 +150,7 @@ def resolve_parent_item(context, parent):
     try:
       parent_cfg = items[item_index]
     except IndexError:
-      raise EvaluationError("Specified parent index does not exist!")
+      raise MissingValueError
 
   return parent_cfg
 
@@ -152,7 +167,10 @@ def remove(_item, _cls = None, _parent = None, **kwargs):
       raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
     # Resolve parent item
-    parent_cfg = resolve_parent_item(context, _parent)
+    try:
+      parent_cfg = resolve_parent_item(context, _parent)
+    except MissingValueError:
+      return
 
     cfg_items = context.partial_config.get(_item, [])
     indices, items = filter_cfg_items(cfg_items, _cls, parent_cfg, **kwargs)
@@ -185,7 +203,10 @@ def append(_item, _cls = None, _parent = None, **kwargs):
       raise EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, _item))
 
     # Resolve parent item
-    parent_cfg = resolve_parent_item(context, _parent)
+    try:
+      parent_cfg = resolve_parent_item(context, _parent)
+    except MissingValueError:
+      return
 
     for key, value in kwargs.items():
       if callable(value):

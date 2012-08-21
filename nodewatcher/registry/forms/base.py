@@ -131,14 +131,16 @@ class AssignToFormAction(RegistryFormAction):
   """
   An action that assigns to an existing form.
   """
-  def __init__(self, index, attributes, parent = None):
+  def __init__(self, item, index, attributes, parent = None):
     """
     Class constructor.
-    
+
+    :param item: Configuration item
     :param index: Subform index
     :param attributes: A dictionary of attributes to assign
     :param parent: Optional partial parent item
     """
+    self.item = item
     self.index = index
     self.attributes = attributes
     self.parent = parent
@@ -150,8 +152,11 @@ class AssignToFormAction(RegistryFormAction):
     if self.parent != self.context.hierarchy_parent_current:
       return False
 
-    # TODO
-    pass
+    form_prefix = self.context.base_prefix + '_mu_' + str(self.index)
+    for field, value in self.attributes.iteritems():
+      self.context.data[form_prefix + '_' + self.item._meta.module_name + '-' + field] = value
+
+    return True
 
 class BasicRegistryRenderItem(object):
   """
@@ -729,13 +734,18 @@ def prepare_forms(context):
               prefix = context.base_prefix + '_sm',
               initial = { 'form_count' : 0 }
             )
-          
-          # TODO implement 'assign' action (its order is not relevant)
+
           # Merge user actions with rules actions
           context.item_actions = \
             context.actions.get(context.base_prefix, []) + \
             context.actions.get(cls_meta.registry_id, [])
           meta_modified = False
+
+          # Execute before actions
+          for action in context.item_actions:
+            action.context = context
+            if action.modify_forms_before():
+              meta_modified = True
           
           # Generate the right amount of forms
           for index in xrange(form_count):
