@@ -402,8 +402,9 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     pform._clean_fields()
     initial = {}
     for field in pform.cleaned_data.keys():
-      data[prefix + '_' + selected_item._meta.module_name + '-' + field] = \
-        data[prefix + '_' + previous_item._meta.module_name + '-' + field]
+      prev_item_field = prefix + '_' + previous_item._meta.module_name + '-' + field
+      if prev_item_field in data:
+        data[prefix + '_' + selected_item._meta.module_name + '-' + field] = data[prev_item_field]
   
   # When there is no instance, we should create one so we will be able to save somewhere
   if validate and partial is None and instance is None:
