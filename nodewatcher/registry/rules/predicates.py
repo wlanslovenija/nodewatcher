@@ -154,6 +154,40 @@ def resolve_parent_item(context, parent):
 
   return parent_cfg
 
+def record_remove_cfg_item(context, container, parent, item, index, index_tree, level = 0):
+  """
+  A helper function for removing an item from the partial configuration. It
+  doesn't actually remove any items, but records all operations that are
+  needed for a successfull removal.
+
+  :param context: Rules evaluation context
+  :param container: Container of partial configuration items
+  :param parent: Parent configuration item (or None)
+  :param item: The configuration item being removed
+  :param index: Item's index in the container
+  :param index_tree: A dictionary where operations will be recorded
+  """
+  reg_id = item.RegistryMeta.registry_id
+
+  # Record this removal into the index tree, but do not remove any items as this
+  # could change indices and this would cause subsequent removals to be wrong
+  _, instances, indices = index_tree.setdefault((level, reg_id, parent), (container, [], []))
+  instances.append(item)
+  indices.append(index)
+
+  # Discover which registry roots hold the item's children
+  registry_children = set()
+  if hasattr(item, '_registry_virtual_relation'):
+    for children in item._registry_virtual_relation.values():
+      for child in children:
+        registry_children.add(child.RegistryMeta.registry_id)
+
+  # Recursively remove all children
+  for rid in registry_children:
+    citems = context.partial_config[rid]
+    for index, child in zip(*filter_cfg_items(citems, _parent = item)):
+      record_remove_cfg_item(context, citems, item, child, index, index_tree, level + 1)
+
 def remove(_item, _cls = None, _parent = None, **kwargs):
   """
   Action that removes specific configuration items.
@@ -174,11 +208,18 @@ def remove(_item, _cls = None, _parent = None, **kwargs):
 
     cfg_items = context.partial_config.get(_item, [])
     indices, items = filter_cfg_items(cfg_items, _cls, parent_cfg, **kwargs)
-    for cfg in items:
-      cfg_items.remove(cfg)
+    index_tree = {}
+    for index, cfg in zip(indices, items):
+      record_remove_cfg_item(context, cfg_items, parent_cfg, cfg, index, index_tree)
 
-    if indices:
-      context.results.setdefault(_item, []).append(registry_forms.RemoveFormAction(indices, parent = parent_cfg))
+    # Perform actual removal of items - both in partial configuration and in forms (via actions)
+    #for (level, registry_root, parent), (container, items, indices) in index_tree.iteritems():
+    for level, registry_root, parent in sorted(index_tree.keys(), key = lambda x: x[0], reverse = True):
+      container, items, indices = index_tree[level, registry_root, parent]
+      for item in items:
+        container.remove(item)
+
+      context.results.setdefault(registry_root, []).append(registry_forms.RemoveFormAction(indices, parent = parent))
   
   return Action(action_remove)
 

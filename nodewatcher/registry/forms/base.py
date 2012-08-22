@@ -60,21 +60,45 @@ class RemoveFormAction(RegistryFormAction):
     :param indices: Form indices to remove
     :param parent: Optional partial parent item
     """
-    self.indices = indices
+    self.indices = sorted(indices)
     self.parent = parent
 
-  def modify_forms_after(self):
+  def modify_forms_before(self):
     """
-    Removes specified forms.
+    Removes specified subforms.
     """
-    if self.parent != self.context.hierarchy_parent_current:
+    if self.parent != self.context.hierarchy_parent_current or len(self.indices) < 1:
       return False
 
-    forms = [self.context.subforms[i] for i in self.indices]
-    for form in forms:
-      self.context.subforms.remove(form)
+    # Move form data as forms might be renumbered
+    form_prefix = self.context.base_prefix + '_mu_'
+    reduce_by = 0
+    for i in xrange(self.context.user_form_count):
+      if i in self.indices:
+        for key in self.context.data.keys():
+          if key.startswith(form_prefix + str(i) + "_") or key.startswith(form_prefix + str(i) + "-"):
+            del self.context.data[key]
 
-    return len(forms) > 0
+        reduce_by += 1
+        continue
+      elif not reduce_by:
+        continue
+
+      for key in self.context.data.keys():
+        postfix = None
+        if key.startswith(form_prefix + str(i) + "_"):
+          postfix = "_"
+        elif key.startswith(form_prefix + str(i) + "-"):
+          postfix = "-"
+
+        if postfix is not None:
+          new_key = key.replace(form_prefix + str(i) + postfix, form_prefix + str(i - reduce_by) + postfix)
+          self.context.data[new_key] = self.context.data[key]
+          del self.context.data[key]
+
+    # Reduce form count depending on how many forms have been removed
+    self.context.user_form_count -= len(self.indices)
+    return True
 
 class RemoveLastFormAction(RegistryFormAction):
   """
@@ -455,7 +479,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
       existing_config = context.regpoint.get_accessor(context.root).to_partial()
     else:
       existing_config = {}
-    
+
     item = current_config_item or instance
     cfg = context.current_config or existing_config
     obj.modify_to_context(item, cfg, context.request)
@@ -742,12 +766,19 @@ def prepare_forms(context):
             context.actions.get(cls_meta.registry_id, [])
           meta_modified = False
 
+          # Setup the expected number of forms if only user-supplied forms are counted;
+          # this might not be correct when rules have changed the partial configuration
+          context.user_form_count = form_count
+
           # Execute before actions
           for action in context.item_actions:
             action.context = context
             if action.modify_forms_before():
               meta_modified = True
-          
+
+          # Actions might have changed form count
+          form_count = context.user_form_count
+
           # Generate the right amount of forms
           for index in xrange(form_count):
             form_prefix = context.base_prefix + '_mu_' + str(index)
