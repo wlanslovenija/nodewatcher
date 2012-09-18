@@ -804,6 +804,7 @@ config uhttpd main
       raise Exception("Cannot generate image for this version!")
     elif self.openwrtVersion == 'nextgen':
       profile_map = {
+        "tp-wr740nd" : "TLWR740",
         "tp-wr741nd" : "TLWR741",
         "tp-wr842nd" : "TLWR842",
         "tp-wr743nd" : "TLWR743",
