@@ -700,7 +700,7 @@ config dhcp clients
         iface = 0
         
         for server, ports in self.tdServer:
-          ports = "\n".join(["        option address          '%s:%d'" % (server, x) for x in ports])
+          ports = "\n".join(["        list address          '%s:%d'" % (server, x) for x in ports])
           f.write("""
 config broker
 {broker_ports}
