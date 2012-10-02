@@ -818,10 +818,10 @@ config uhttpd main
       }
 
       pkg_map = {
-        "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-acm"],
+        "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-acm", "telemetryd"],
         "tp-wr1043nd" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wr703n" : ["kmod-usb-serial", "kmod-usb-acm"],
-        "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm"],
+        "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm", "telemetryd"],
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []))
 
