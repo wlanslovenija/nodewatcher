@@ -1,5 +1,5 @@
 # coding=utf-8
-import rrdtool
+#import rrdtool
 import time
 import os
 import subprocess
