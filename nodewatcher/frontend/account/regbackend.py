@@ -61,7 +61,6 @@ class ProfileBackend(backends_default.DefaultBackend):
         
     """
     return (request.GET.get('next', 'registration_complete'), (), {})
-
   
   def get_form_class(self, request):
     """
