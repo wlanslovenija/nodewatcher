@@ -37,6 +37,9 @@ account_patterns = patterns('',
   url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
       'backend': 'frontend.account.regbackend.ProfileBackend',
     }, name='registration_register'),
+  url(r'^register_autologin/$', decorators.anonymous_required(function=registration_views.register), {
+      'backend': 'frontend.account.regbackend.ProfileBackend',
+    }, name='registration_register_with_autologin'),
   url(r'^register/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
       'template': 'registration/registration_complete.html',
     }, name='registration_complete'),
