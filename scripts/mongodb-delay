@@ -1,0 +1,30 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          mongodb-delay
+# Required-Start:    $network $remote_fs $syslog mongodb
+# Required-Stop:     $network $remote_fs $syslog mongodb
+# Default-Start:     2 3 4 5
+# Default-Stop:      
+# Short-Description: Short delay after mongodb
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=mongodb-delay
+DESC=mongodb-delay
+
+set -e
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	sleep 15
+	echo "$NAME."        
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
