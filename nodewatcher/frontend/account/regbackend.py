@@ -1,4 +1,6 @@
 from django import dispatch
+from django.contrib import auth
+from django.core import urlresolvers
 from django.forms import models as forms_models
 
 from registration.backends import default as backends_default
@@ -44,8 +46,21 @@ class ProfileBackend(backends_default.DefaultBackend):
     profile.save()
     
     user_profile_registered.send(sender=self.__class__, user=user, profile=profile, request=request)
+
+    if request.path == urlresolvers.reverse('registration_register_with_autologin'):
+      new_user = auth.authenticate(username=kwargs['username'], password=kwargs['password1'])
+      auth.login(request, new_user)
     
     return user
+
+  def post_registration_redirect(self, request, user):
+    """
+    Return the URL or the name of the URL to redirect to after 
+    successful user registration.
+    Uses `next` argumen from GET, defaults to `registration_complete`.
+        
+    """
+    return (request.GET.get('next', 'registration_complete'), (), {})
   
   def get_form_class(self, request):
     """

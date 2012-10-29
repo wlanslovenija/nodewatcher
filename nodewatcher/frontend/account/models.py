@@ -29,6 +29,10 @@ class UserProfileAndSettings(django_models.Model):
   user = django_models.OneToOneField(auth_models.User, editable=False)
 
   phone_number = phonenumber_fields.PhoneNumberField(_('phone number'), help_text=_('Please enter your phone number in international format (e.g. +411234567) for use in emergency. It will be visible only to network administrators.'), null=True)
+  address = django_models.CharField(_('address'), max_length=200, blank=True)
+  address2 = django_models.CharField(_('address 2'), max_length=200, blank=True)
+  zip_code = django_models.IntegerField(_('zip code'), blank=True, null=True)
+  city = geo_fields.CityField(_('city'), blank=True)
   country = geo_fields.CountryField(_('country'), blank=True, help_text=_('Where are you from? It will be public.'))
   language = geo_fields.LanguageField(_('language'), help_text=_('Choose the language you wish this site to be in.'))
   default_project = django_models.ForeignKey(models.Project, default=models.project_default, null=True, verbose_name=_('default project'))
@@ -37,7 +41,7 @@ class UserProfileAndSettings(django_models.Model):
   # AccountRegistrationForm and AccountChangeForm uses this
   fieldset = (
     (_('Additional personal info'), {
-      'fields': ('phone_number', 'country'),
+      'fields': ('address', 'address2', 'zip_code', 'city', 'country', 'phone_number'),
     }),
     (_('Settings'), {
       'fields': ('language', 'default_project'),

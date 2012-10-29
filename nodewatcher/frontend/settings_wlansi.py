@@ -36,3 +36,5 @@ DOCUMENTATION_LINKS.update({
   'report_issue': 'http://dev.wlan-si.net/newticket',
   'solar': 'http://dev.wlan-si.net/wiki/Solar',
 })
+
+SESSION_COOKIE_DOMAIN = '.wlan-si.net'
