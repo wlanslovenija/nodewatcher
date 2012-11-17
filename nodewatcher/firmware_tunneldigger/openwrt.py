@@ -22,11 +22,13 @@ def tunneldigger(node, cfg):
     return
 
   # Create tunneldigger configuration
+  tunneldigger_enabled = False
   for idx, interface in enumerate(node.config.core.interfaces(onlyclass = cgm_models.VpnInterfaceConfig)):
     if interface.protocol != "tunneldigger":
       continue
 
     ifname = "digger%d" % idx
+    tunneldigger_enabled = True
 
     # Create interface configurations; note that addressing configuration is routing
     # daemon dependent and as such should not be filled in here
@@ -57,10 +59,12 @@ def tunneldigger(node, cfg):
       policy.table = "main"
       policy.priority = 500
 
-  # Ensure that WAN traffic is routed via the main table
-  policy = cfg.routing.add("policy")
-  policy.device = uplink_interface
-  policy.table = "main"
-  policy.priority = 500
+  if tunneldigger_enabled:
+    # Ensure that WAN traffic is routed via the main table
+    policy = cfg.routing.add("policy")
+    policy.device = uplink_interface
+    policy.table = "main"
+    policy.priority = 500
 
-# TODO also register the 'tunneldigger' and 'policy-routing' base packages for openwrt platform
+    # Register the "tunneldigger" and "policy-routing" packages
+    cfg.packages.update(["tunneldigger", "policy-routing"])
