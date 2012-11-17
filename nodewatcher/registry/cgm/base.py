@@ -24,6 +24,7 @@ class PlatformConfiguration(object):
     Class constructor.
     """
     self.resources = cgm_resources.ResourceAllocator()
+    self.packages = set()
 
 class PlatformBase(object):
   """
@@ -49,13 +50,13 @@ class PlatformBase(object):
     for _, module, router in sorted(self._modules):
       if router is None or router == node.config.core.general().router:
         module(node, cfg)
-    
-    # Process packages
+
+    # Process user-configured packages
     for name, cfgclass, package in self._packages:
       pkgcfg = node.config.core.packages(onlyclass = cfgclass)
       if [x for x in pkgcfg if x.enabled]:
         package(node, pkgcfg, cfg)
-        self.install_optional_package(name)
+        cfg.packages.add(name)
     
     return cfg
   
@@ -63,9 +64,6 @@ class PlatformBase(object):
     raise NotImplementedError
 
   def build(self):
-    raise NotImplementedError
-  
-  def install_optional_package(self, name):
     raise NotImplementedError
   
   def defer_format_build(self, node, cfg):
@@ -147,7 +145,7 @@ def get_platform(platform):
   except KeyError:
     raise KeyError, "Platform '{0}' does not exist!".format(platform)
 
-def register_platform_module(platform, order, router = None):
+def register_platform_module(platform, order = 999, router = None):
   """
   Registers a new platform module.
   """
