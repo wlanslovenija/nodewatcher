@@ -45,6 +45,7 @@ class RouterRadio(object):
     self.description = description
     self.protocols = protocols
     self.connectors = connectors
+    self.index = None
   
   def get_connector_choices(self):
     """
@@ -137,9 +138,13 @@ class RouterMeta(type):
       if len([x for x in new_class.ports if not isinstance(x, RouterPort)]):
         raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
       
-      # Validate that list of radios only contains RouterRadio instances
-      if len([x for x in new_class.radios if not isinstance(x, RouterRadio)]):
-        raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
+      # Validate that list of radios only contains RouterRadio instances and assign
+      # radio indices
+      for idx, radio in enumerate(new_class.radios):
+        if not isinstance(radio, RouterRadio):
+          raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
+
+        radio.index = idx
       
       # Validate that list of antennas only contains InternalAntenna instances
       if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):

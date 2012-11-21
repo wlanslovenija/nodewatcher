@@ -130,6 +130,7 @@ def network(node, cfg):
       dsc_protocol = dsc_radio.get_protocol(interface.protocol)
       dsc_channel = dsc_protocol.get_channel(interface.channel)
       # TODO protocol details
+      radio.phy = "phy%d" % dsc_radio.index
       radio.channel = dsc_channel.number
 
       for index, vif in enumerate(interfaces):
