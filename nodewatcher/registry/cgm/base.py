@@ -61,9 +61,23 @@ class PlatformBase(object):
     return cfg
   
   def format(self, cfg):
+    """
+    Formats the concrete configuration so that it is suitable for
+    inclusion directly into the firmware image.
+
+    :param cfg: Generated configuration (platform-dependent)
+    :return: Platform-dependent object
+    """
     raise NotImplementedError
 
-  def build(self):
+  def build(self, formatted_cfg):
+    """
+    Builds the firmware using a previously generated and properly
+    formatted configuration.
+
+    :param formatted_cfg: Formatted configuration (platform-dependent)
+    :return: Build process result
+    """
     raise NotImplementedError
   
   def defer_format_build(self, node, cfg):

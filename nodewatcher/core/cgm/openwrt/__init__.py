@@ -176,9 +176,31 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
   config_class = UCIConfiguration
   
   def format(self, cfg):
+    """
+    Formats the concrete configuration so that it is suitable for
+    inclusion directly into the firmware image.
+
+    :param cfg: Generated configuration (platform-dependent)
+    :return: Platform-dependent object
+    """
+    # TODO Split UCI configuration into files, return a dictionary
+    #      containing a mapping from file names to their contents
     raise NotImplementedError
 
-  def build(self):
+  def build(self, formatted_cfg):
+    """
+    Builds the firmware using a previously generated and properly
+    formatted configuration.
+
+    :param formatted_cfg: Formatted configuration (platform-dependent)
+    :return: Build process result
+    """
+    # TODO Setup the image builder fraemwork, write the formatted
+    #      configuration to the filesystem, use the proper builder
+    #      profile and build the firmware
+
+    # TODO How to define build profile? Modules should probably specify
+    #      that somehow (a special UCI configuration package called "build"?)
     raise NotImplementedError
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
