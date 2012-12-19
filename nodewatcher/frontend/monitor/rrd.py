@@ -434,7 +434,7 @@ class RRATemperature(RRAConfiguration):
     )
   ]
   graph = [
-    "LINE1:temp#33ADFF:Temperature [°C]",
+    "LINE1:temp#33ADFF:Measurement",
     r'GPRINT:temp:LAST:Current\:%8.2lf',
     r'GPRINT:temp:AVERAGE:Average\:%8.2lf',
     r'GPRINT:temp:MAX:Maximum\:%8.2lf\n'
