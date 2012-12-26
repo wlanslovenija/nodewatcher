@@ -211,8 +211,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'nodewatcher', u'nodewatcher Documentation',
-     [u'wlan slovenija'], 1)
+    ('index', 'nodewatcher', u'nodewatcher Documentation', [u'wlan slovenija'], 1)
 ]
 
 
