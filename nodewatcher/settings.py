@@ -26,10 +26,10 @@ MANAGERS = ADMINS
 DATABASES = {
   'default' : {
     'ENGINE'   : 'django.contrib.gis.db.backends.postgis',
-    'NAME'     : 'nodewatcher',
-    'USER'     : 'nodewatcher',
+    'NAME'     : 'nodewatcher', # createdb nodewatcher
+    'USER'     : '',            # Set to empty string to connect as current user.
     'PASSWORD' : '',
-    'HOST'     : '',            # Set to empty string for localhost.
+    'HOST'     : 'localhost',   # Set to empty string for localhost.
     'PORT'     : '',            # Set to empty string for default.
   },
 }
