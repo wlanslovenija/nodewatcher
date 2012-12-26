@@ -9,17 +9,17 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         if not db.dry_run:
-          orm['contenttypes.ContentType'].objects.filter(app_label = 'cgm',
-            model = 'wifiinterfaceconfig').update(model = 'wifiradiodeviceconfig',
-            name = 'wifi radio device config')
+            orm['contenttypes.ContentType'].objects.filter(app_label = 'cgm',
+              model = 'wifiinterfaceconfig').update(model = 'wifiradiodeviceconfig',
+              name = 'wifi radio device config')
 
         db.rename_table('cgm_wifiinterfaceconfig', 'cgm_wifiradiodeviceconfig')
 
     def backwards(self, orm):
         if not db.dry_run:
-          orm['contenttypes.ContentType'].objects.filter(app_label = 'cgm',
-            model = 'wifiradiodeviceconfig').update(model = 'wifiinterfaceconfig',
-            name = 'wifiinterfaceconfig')
+            orm['contenttypes.ContentType'].objects.filter(app_label = 'cgm',
+              model = 'wifiradiodeviceconfig').update(model = 'wifiinterfaceconfig',
+              name = 'wifiinterfaceconfig')
 
         db.rename_table('cgm_wifiradiodeviceconfig', 'cgm_wifiinterfaceconfig')
 

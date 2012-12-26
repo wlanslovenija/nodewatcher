@@ -5,22 +5,22 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'DHCPNetworkConfig'
         db.create_table('cgm_dhcpnetworkconfig', (
             ('cgmnetworkconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmNetworkConfig'], unique=True, primary_key=True)),
         ))
         db.send_create_signal('cgm', ['DHCPNetworkConfig'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'DHCPNetworkConfig'
         db.delete_table('cgm_dhcpnetworkconfig')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -287,5 +287,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

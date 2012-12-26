@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'BorderRouterRoleConfig'
         db.create_table('core_borderrouterroleconfig', (
             ('roleconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['core.RoleConfig'], unique=True, primary_key=True)),
@@ -36,10 +36,10 @@ class Migration(SchemaMigration):
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
         ))
         db.send_create_signal('core', ['RoleConfig'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'BorderRouterRoleConfig'
         db.delete_table('core_borderrouterroleconfig')
 
@@ -51,8 +51,8 @@ class Migration(SchemaMigration):
 
         # Deleting model 'RoleConfig'
         db.delete_table('core_roleconfig')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -258,5 +258,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

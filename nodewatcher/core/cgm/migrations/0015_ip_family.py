@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Changing field 'StaticNetworkConfig.family'
         db.alter_column('cgm_staticnetworkconfig', 'family', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#ip_family'))
 
@@ -19,7 +19,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Changing field 'StaticNetworkConfig.family'
         db.alter_column('cgm_staticnetworkconfig', 'family', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family'))
 

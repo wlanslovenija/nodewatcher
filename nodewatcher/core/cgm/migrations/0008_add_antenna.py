@@ -9,19 +9,19 @@ class Migration(SchemaMigration):
     depends_on = (
         ("core", "0009_add_antenna"),
     )
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'WifiInterfaceConfig.antenna'
         db.add_column('cgm_wifiinterfaceconfig', 'antenna', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.Antenna'], null=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'WifiInterfaceConfig.antenna'
         db.delete_column('cgm_wifiinterfaceconfig', 'antenna_id')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -305,5 +305,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

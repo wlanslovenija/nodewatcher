@@ -9,9 +9,9 @@ class Migration(SchemaMigration):
     depends_on = (
         ("nodes", "0001_initial"),
     )
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'GeneralConfig'
         db.create_table('core_generalconfig', (
             ('geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')()),
@@ -36,17 +36,17 @@ class Migration(SchemaMigration):
             ('pool', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool'])),
         ))
         db.send_create_signal('core', ['BasicAddressingConfig'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'GeneralConfig'
         db.delete_table('core_generalconfig')
 
         # Deleting model 'BasicAddressingConfig'
         db.delete_table('core_basicaddressingconfig')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -223,5 +223,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

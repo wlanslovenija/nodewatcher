@@ -9,11 +9,11 @@ class Migration(DataMigration):
     def forwards(self, orm):
         # Simply copy the allocations
         for allocation in orm['core.Allocation'].objects.all():
-          pool = allocation.pool
-          pool.alloc_content_type = allocation.content_type
-          pool.alloc_object_id = allocation.object_id
-          pool.alloc_timestamp = allocation.created_at
-          pool.save()
+            pool = allocation.pool
+            pool.alloc_content_type = allocation.content_type
+            pool.alloc_object_id = allocation.object_id
+            pool.alloc_timestamp = allocation.created_at
+            pool.save()
 
 
     def backwards(self, orm):

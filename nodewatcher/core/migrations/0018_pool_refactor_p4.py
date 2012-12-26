@@ -14,7 +14,7 @@ class Migration(SchemaMigration):
 
         # Renaming model 'Pool' to 'IpPool'
         db.rename_table('core_pool', 'core_ippool')
-        
+
         # Adding M2M table for field projects on 'IpPool'
         db.rename_table('nodes_project_pools', 'core_ippool_projects')
         db.rename_column('core_ippool_projects', 'pool_id', 'ippool_id')
@@ -27,7 +27,7 @@ class Migration(SchemaMigration):
 
         # Renaming model 'Pool' to 'IpPool'
         db.rename_table('core_ippool', 'core_pool')
-        
+
         # Removing M2M table for field projects on 'IpPool'
         db.rename_table('core_ippool_projects', 'nodes_project_pools')
         db.rename_column('nodes_project_pools', 'ippool_id', 'pool_id')

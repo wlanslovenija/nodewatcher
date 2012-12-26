@@ -7,49 +7,49 @@ from django.db import models
 class Migration(DataMigration):
 
     def get_content_type(self, orm, app_label, model):
-      """
-      A helper method to get or create content types.
-      """
-      try:
-        return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
-      except orm['contenttypes.ContentType'].DoesNotExist:
-        ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
-        ctype.save()
-        return ctype
+        """
+        A helper method to get or create content types.
+        """
+        try:
+            return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
+        except orm['contenttypes.ContentType'].DoesNotExist:
+            ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
+            ctype.save()
+            return ctype
 
     def forwards(self, orm):
-      wifiiface_ctype = self.get_content_type(orm, app_label = 'cgm', model = 'wifiinterfaceconfig')
-      allocnet_ctype  = self.get_content_type(orm, app_label = 'cgm', model = 'allocatednetworkconfig')
-      
-      for wifi_net in orm['cgm.wifinetworkconfig'].objects.all():
-        # Create a new WifiInterfaceConfig, convert essid, bssid and mode
-        iface = orm['cgm.WifiInterfaceConfig'](root = wifi_net.root,
-          content_type = wifiiface_ctype)
-        iface.device = orm['cgm.WifiRadioDeviceConfig'].objects.get(pk = wifi_net.interface.pk)
-        iface.enabled = wifi_net.enabled
-        iface.essid = wifi_net.essid
-        iface.bssid = wifi_net.bssid
-        iface.mode = "mesh"
-        iface.save()
+        wifiiface_ctype = self.get_content_type(orm, app_label = 'cgm', model = 'wifiinterfaceconfig')
+        allocnet_ctype  = self.get_content_type(orm, app_label = 'cgm', model = 'allocatednetworkconfig')
 
-        # Create a new AllocatedNetworkConfig, convert the rest
-        alloc_net = orm['cgm.AllocatedNetworkConfig'](root = wifi_net.root,
-          content_type = allocnet_ctype)
-        alloc_net.interface = iface
-        alloc_net.description = wifi_net.description
-        alloc_net.enabled = wifi_net.enabled
-        alloc_net.family = wifi_net.family
-        alloc_net.pool = wifi_net.pool
-        alloc_net.prefix_length = wifi_net.prefix_length
-        alloc_net.subnet_hint = wifi_net.subnet_hint
-        alloc_net.allocation = wifi_net.allocation
-        alloc_net.save()
+        for wifi_net in orm['cgm.wifinetworkconfig'].objects.all():
+            # Create a new WifiInterfaceConfig, convert essid, bssid and mode
+            iface = orm['cgm.WifiInterfaceConfig'](root = wifi_net.root,
+              content_type = wifiiface_ctype)
+            iface.device = orm['cgm.WifiRadioDeviceConfig'].objects.get(pk = wifi_net.interface.pk)
+            iface.enabled = wifi_net.enabled
+            iface.essid = wifi_net.essid
+            iface.bssid = wifi_net.bssid
+            iface.mode = "mesh"
+            iface.save()
 
-        # Remove the obsolete wifi network config object
-        wifi_net.delete()
+            # Create a new AllocatedNetworkConfig, convert the rest
+            alloc_net = orm['cgm.AllocatedNetworkConfig'](root = wifi_net.root,
+              content_type = allocnet_ctype)
+            alloc_net.interface = iface
+            alloc_net.description = wifi_net.description
+            alloc_net.enabled = wifi_net.enabled
+            alloc_net.family = wifi_net.family
+            alloc_net.pool = wifi_net.pool
+            alloc_net.prefix_length = wifi_net.prefix_length
+            alloc_net.subnet_hint = wifi_net.subnet_hint
+            alloc_net.allocation = wifi_net.allocation
+            alloc_net.save()
+
+            # Remove the obsolete wifi network config object
+            wifi_net.delete()
 
     def backwards(self, orm):
-      raise RuntimeError("Cannot reverse this migration.")
+        raise RuntimeError("Cannot reverse this migration.")
 
 
     models = {

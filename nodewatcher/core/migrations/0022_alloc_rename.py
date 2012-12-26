@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         db.rename_column('core_ippool', 'alloc_content_type_id', 'allocation_content_type_id')
         db.rename_column('core_ippool', 'alloc_object_id', 'allocation_object_id')
         db.rename_column('core_ippool', 'alloc_timestamp', 'allocation_timestamp')
@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
         db.rename_column('core_ippool', 'allocation_content_type_id', 'alloc_content_type_id')
         db.rename_column('core_ippool', 'allocation_object_id', 'alloc_object_id')
         db.rename_column('core_ippool', 'allocation_timestamp', 'alloc_timestamp')
-       
+
 
     models = {
         'auth.group': {

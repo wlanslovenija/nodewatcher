@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
     )
 
     def forwards(self, orm):
-        
+
         # Adding field 'Pool.alloc_content_type'
         db.add_column('core_pool', 'alloc_content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'], null=True), keep_default=False)
 
@@ -23,7 +23,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Deleting field 'Pool.alloc_content_type'
         db.delete_column('core_pool', 'alloc_content_type_id')
 

@@ -5,19 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'GeneralConfig.geolocation'
         db.alter_column('core_generalconfig', 'geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')(null=True))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'GeneralConfig.geolocation'
         db.alter_column('core_generalconfig', 'geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')())
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -244,5 +244,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

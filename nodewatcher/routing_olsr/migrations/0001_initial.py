@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
     )
 
     def forwards(self, orm):
-        
+
         # Adding model 'OlsrRoutingTopologyMonitor'
         db.create_table('routing_olsr_olsrroutingtopologymonitor', (
             ('routingtopologymonitor_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['core.RoutingTopologyMonitor'], unique=True, primary_key=True)),
@@ -29,7 +29,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Deleting model 'OlsrRoutingTopologyMonitor'
         db.delete_table('routing_olsr_olsrroutingtopologymonitor')
 

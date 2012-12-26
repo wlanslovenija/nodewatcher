@@ -5,25 +5,25 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'CgmInterfaceConfig.limit_in'
         db.add_column('cgm_cgminterfaceconfig', 'limit_in', self.gf('nodewatcher.registry.fields.SelectorKeyField')(default='', max_length=50, regpoint='node.config', enum_id='core.interfaces#traffic_limits', blank=True), keep_default=False)
 
         # Adding field 'CgmInterfaceConfig.limit_out'
         db.add_column('cgm_cgminterfaceconfig', 'limit_out', self.gf('nodewatcher.registry.fields.SelectorKeyField')(default='', max_length=50, regpoint='node.config', enum_id='core.interfaces#traffic_limits', blank=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'CgmInterfaceConfig.limit_in'
         db.delete_column('cgm_cgminterfaceconfig', 'limit_in')
 
         # Deleting field 'CgmInterfaceConfig.limit_out'
         db.delete_column('cgm_cgminterfaceconfig', 'limit_out')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -311,5 +311,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

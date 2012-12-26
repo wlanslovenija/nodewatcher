@@ -5,23 +5,23 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'RedundantNodeRoleConfig'
         db.create_table('core_redundantnoderoleconfig', (
             ('roleconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['core.RoleConfig'], unique=True, primary_key=True)),
             ('redundancy_required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
         ))
         db.send_create_signal('core', ['RedundantNodeRoleConfig'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'RedundantNodeRoleConfig'
         db.delete_table('core_redundantnoderoleconfig')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -235,5 +235,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

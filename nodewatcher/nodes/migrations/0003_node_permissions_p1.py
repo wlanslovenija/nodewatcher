@@ -5,21 +5,21 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
-    
+
     depends_on = (
         ("guardian", "0005_auto__chg_field_groupobjectpermission_object_pk__chg_field_userobjectp"),
     )
-    
+
     def forwards(self, orm):
         # Nothing here, see 0004_node_permissions_p2; this migration is needed so that the guardian
         # models are frozen and available in backwards migration (see http://south.aeracode.org/ticket/428#comment:1).
         pass
-    
+
     def backwards(self, orm):
         # Nothing here, see 0004_node_permissions_p2; this migration is needed so that the guardian
         # models are frozen and available in backwards migration (see http://south.aeracode.org/ticket/428#comment:1).
         pass
-    
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -318,5 +318,5 @@ class Migration(DataMigration):
             'registred_at': ('django.db.models.fields.DateTimeField', [], {})
         }
     }
-    
+
     complete_apps = ['guardian', 'nodes']

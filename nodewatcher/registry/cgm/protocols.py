@@ -1,45 +1,45 @@
 from django.utils.translation import ugettext as _
 
 class Channel(object):
-  """
-  Channel descriptor.
-  """
-  def __init__(self, identifier, number, frequency):
     """
-    Class constructor.
+    Channel descriptor.
     """
-    self.identifier = identifier
-    self.number = number
-    self.frequency = frequency 
+    def __init__(self, identifier, number, frequency):
+        """
+        Class constructor.
+        """
+        self.identifier = identifier
+        self.number = number
+        self.frequency = frequency
 
 class WirelessProtocol(object):
-  """
-  Wireless protocol descriptor.
-  """
-  def __init__(self, identifier, description, channels, bitrates):
     """
-    Class constructor.
+    Wireless protocol descriptor.
     """
-    self.identifier = identifier
-    self.description = description
-    self.channels = channels
-    self.bitrates = bitrates
-  
-  def get_channel_choices(self, regulatory_filter = None):
-    """
-    Returns a list of channel chocies.
-    """
-    for channel in self.channels:
-      if regulatory_filter is None or channel.frequency in regulatory_filter:
-        yield channel.identifier, channel.number
-  
-  def get_channel(self, identifier):
-    """
-    Returns a specific channel descriptor.
-    """
-    for channel in self.channels:
-      if channel.identifier == identifier:
-        return channel
+    def __init__(self, identifier, description, channels, bitrates):
+        """
+        Class constructor.
+        """
+        self.identifier = identifier
+        self.description = description
+        self.channels = channels
+        self.bitrates = bitrates
+
+    def get_channel_choices(self, regulatory_filter = None):
+        """
+        Returns a list of channel chocies.
+        """
+        for channel in self.channels:
+            if regulatory_filter is None or channel.frequency in regulatory_filter:
+                yield channel.identifier, channel.number
+
+    def get_channel(self, identifier):
+        """
+        Returns a specific channel descriptor.
+        """
+        for channel in self.channels:
+            if channel.identifier == identifier:
+                return channel
 
 #
 # IEEE 8022.11 B/G protocols
@@ -99,4 +99,3 @@ IEEE80211N = WirelessProtocol(
     54
   ]
 )
-

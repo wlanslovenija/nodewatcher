@@ -52,7 +52,7 @@ class Migration(SchemaMigration):
         db.send_create_signal('policy', ['Policy'])
 
     models = {
-        
+
     }
 
     complete_apps = ['policy']

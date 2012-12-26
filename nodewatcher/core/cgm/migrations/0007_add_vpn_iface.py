@@ -5,23 +5,23 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'VpnInterfaceConfig'
         db.create_table('cgm_vpninterfaceconfig', (
             ('mac', self.gf('nodewatcher.registry.fields.MACAddressField')(auto_add=True, max_length=17)),
             ('cgminterfaceconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmInterfaceConfig'], unique=True, primary_key=True)),
         ))
         db.send_create_signal('cgm', ['VpnInterfaceConfig'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'VpnInterfaceConfig'
         db.delete_table('cgm_vpninterfaceconfig')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -293,5 +293,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

@@ -11,13 +11,13 @@ class Migration(SchemaMigration):
     )
 
     def forwards(self, orm):
-        
+
         # Deleting field 'Project.pool'
         db.delete_column('nodes_project', 'pool_id')
 
 
     def backwards(self, orm):
-        
+
         # User chose to not deal with backwards NULL issues for 'Project.pool'
         raise RuntimeError("Cannot reverse this migration. 'Project.pool' and its values cannot be restored.")
 

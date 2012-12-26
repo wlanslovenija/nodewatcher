@@ -5,30 +5,30 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
-    
+
     depends_on = (
         ("guardian", "0005_auto__chg_field_groupobjectpermission_object_pk__chg_field_userobjectp"),
     )
-    
+
     def forwards(self, orm):
         # Assign change and remove permissions to node maintainers
         for node in orm['nodes.Node'].objects.filter(owner__isnull = False):
-          for perm in ("change_node", "delete_node"):
-            content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node')
-            permission = orm['auth.Permission'].objects.get(content_type = content_type, codename = perm)
-            
-            orm['guardian.UserObjectPermission'].objects.get_or_create(
-              content_type = content_type,
-              permission = permission,
-              object_pk = node.pk,
-              user = node.owner
-            )
-    
+            for perm in ("change_node", "delete_node"):
+                content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node')
+                permission = orm['auth.Permission'].objects.get(content_type = content_type, codename = perm)
+
+                orm['guardian.UserObjectPermission'].objects.get_or_create(
+                  content_type = content_type,
+                  permission = permission,
+                  object_pk = node.pk,
+                  user = node.owner
+                )
+
     def backwards(self, orm):
         # Remove all user object permissions for nodes
         content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node')
         orm['guardian.UserObjectPermission'].objects.filter(content_type = content_type).delete()
-    
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -327,5 +327,5 @@ class Migration(DataMigration):
             'registred_at': ('django.db.models.fields.DateTimeField', [], {})
         }
     }
-    
+
     complete_apps = ['guardian', 'nodes']

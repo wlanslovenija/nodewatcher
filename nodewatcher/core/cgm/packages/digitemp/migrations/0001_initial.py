@@ -14,7 +14,7 @@ class Migration(SchemaMigration):
     )
 
     def forwards(self, orm):
-        
+
         # Adding model 'CgmDigitempPackageConfig'
         db.create_table('digitemp_cgmdigitemppackageconfig', (
             ('cgmpackageconfig_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cgm.CgmPackageConfig'], unique=True, primary_key=True)),
@@ -23,7 +23,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Deleting model 'CgmDigitempPackageConfig'
         db.delete_table('digitemp_cgmdigitemppackageconfig')
 

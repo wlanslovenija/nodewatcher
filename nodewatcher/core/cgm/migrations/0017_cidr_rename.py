@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Deleting field 'WifiNetworkConfig.cidr'
         db.rename_column('cgm_wifinetworkconfig', 'cidr', 'prefix_length')
 
@@ -16,7 +16,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Deleting field 'WifiNetworkConfig.cidr'
         db.rename_column('cgm_wifinetworkconfig', 'prefix_length', 'cidr')
 

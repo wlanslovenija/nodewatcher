@@ -5,26 +5,26 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
-    
+
     def forwards(self, orm):
         # Copy data for allocated subnets from nodes.Subnet to core.Allocation with
         # proper core.Pool linkages
         for subnet in orm['nodes.Subnet'].objects.filter(allocated = True):
-          pool = orm['core.Pool'].objects.filter(network = subnet.subnet, cidr = subnet.cidr)
-          if not pool:
-            print "   ! Found inconsistent allocated subnet object:", subnet.subnet, subnet.cidr
-            continue
-          
-          orm.Allocation(
-            pool = pool[0],
-            content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node'),
-            object_id = subnet.node.pk
-          ).save()
-    
+            pool = orm['core.Pool'].objects.filter(network = subnet.subnet, cidr = subnet.cidr)
+            if not pool:
+                print "   ! Found inconsistent allocated subnet object:", subnet.subnet, subnet.cidr
+                continue
+
+            orm.Allocation(
+              pool = pool[0],
+              content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node'),
+              object_id = subnet.node.pk
+            ).save()
+
     def backwards(self, orm):
         # Clear all allocations
         orm.Allocation.objects.all().delete()
-    
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -328,5 +328,5 @@ class Migration(DataMigration):
             'registred_at': ('django.db.models.fields.DateTimeField', [], {})
         }
     }
-    
+
     complete_apps = ['nodes', 'core']

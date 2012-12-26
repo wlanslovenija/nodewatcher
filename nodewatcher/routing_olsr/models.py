@@ -13,25 +13,25 @@ registration.point("node.config").register_choice("core.interfaces#routing_proto
 registration.point("node.config").register_choice("core.interfaces.network#routing_announce", OLSR_PROTOCOL_NAME, _("OLSR HNA"))
 
 class OlsrRoutingTopologyMonitor(monitor_models.RoutingTopologyMonitor):
-  """
-  OLSR routing topology.
-  """
-  pass
+    """
+    OLSR routing topology.
+    """
+    pass
 
 registration.point("node.monitoring").register_item(OlsrRoutingTopologyMonitor)
 
 class OlsrTopologyLink(monitor_models.TopologyLink):
-  """
-  OLSR topology link.
-  """
-  lq = models.FloatField(default = 0.0)
-  ilq = models.FloatField(default = 0.0)
-  etx = models.FloatField(default = 0.0)
+    """
+    OLSR topology link.
+    """
+    lq = models.FloatField(default = 0.0)
+    ilq = models.FloatField(default = 0.0)
+    etx = models.FloatField(default = 0.0)
 
 class OlsrRoutingAnnounceMonitor(monitor_models.RoutingAnnounceMonitor):
-  """
-  OLSR network announces.
-  """
-  pass
+    """
+    OLSR network announces.
+    """
+    pass
 
 registration.point("node.monitoring").register_item(OlsrRoutingAnnounceMonitor)

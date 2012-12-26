@@ -9,19 +9,19 @@ class Migration(SchemaMigration):
     depends_on = (
         ("core", "0002_create_pool"),
     )
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Project.pool'
         db.alter_column('nodes_project', 'pool_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Pool']))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Project.pool'
         db.alter_column('nodes_project', 'pool_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['nodes.Pool']))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -296,5 +296,5 @@ class Migration(SchemaMigration):
             'registred_at': ('django.db.models.fields.DateTimeField', [], {})
         }
     }
-    
+
     complete_apps = ['nodes']

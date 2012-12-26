@@ -137,7 +137,7 @@ class Migration(SchemaMigration):
         db.send_create_signal('generator', ['ProfileAdaptationChain'])
 
     models = {
-        
+
     }
 
     complete_apps = ['generator']

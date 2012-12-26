@@ -8,8 +8,8 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         for pool in orm['core.IPPool'].objects.all():
-          pool.ip_subnet_2 = pool.ip_subnet
-          pool.save()
+            pool.ip_subnet_2 = pool.ip_subnet
+            pool.save()
 
     def backwards(self, orm):
         pass

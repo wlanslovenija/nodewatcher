@@ -18,20 +18,20 @@ class Migration(DataMigration):
         ("core", "0025_rt_announce_mt"),
         ("cgm", "0018_fkey_details"),
     )
-    
+
     def get_content_type(self, orm, app_label, model):
-      """
-      A helper method to get or create content types.
-      """
-      try:
-        return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
-      except orm['contenttypes.ContentType'].DoesNotExist:
-        ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
-        ctype.save()
-        return ctype
-    
+        """
+        A helper method to get or create content types.
+        """
+        try:
+            return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
+        except orm['contenttypes.ContentType'].DoesNotExist:
+            ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
+            ctype.save()
+            return ctype
+
     def forwards(self, orm):
-        # Transfer all node configuration from old schema to new one (ignoring Unknown nodes)
+            # Transfer all node configuration from old schema to new one (ignoring Unknown nodes)
         general_ctype         = self.get_content_type(orm, 'cgm', 'cgmgeneralconfig')
         project_ctype         = self.get_content_type(orm, app_label = 'core', model = 'projectconfig')
         loc_ctype             = self.get_content_type(orm, app_label = 'core', model = 'locationconfig')
@@ -53,291 +53,291 @@ class Migration(DataMigration):
         wifinetconf_ctype     = self.get_content_type(orm, app_label = 'cgm', model = 'wifinetworkconfig')
         solarpkg_ctype        = self.get_content_type(orm, app_label = 'solar', model = 'solarpackageconfig')
         digitemppkg_ctype     = self.get_content_type(orm, app_label = 'digitemp', model = 'digitemppackageconfig')
-        
+
         # Remove all invalid nodes
         orm.Node.objects.filter(status = 4).delete()
-        
+
         for node in orm.Node.objects.exclude(status = 4):
-          print "   > Migrating node:", node.name
-          
-          # core.general[CgmGeneralConfig]
-          general = orm['cgm.CgmGeneralConfig'](root = node, content_type = general_ctype)
-          general.name = node.name
-          
-          type_map = {
-            1 : "server",
-            2 : "wireless",
-            3 : "test",
-            5 : "mobile",
-            6 : "dead"
-          }
-          general.type = type_map[node.node_type]
-          
-          # core.project
-          projectcfg = orm['core.ProjectConfig'](root = node, content_type = project_ctype)
-          projectcfg.project = node.project
-          projectcfg.save()
-          
-          # core.location
-          loccfg = orm['core.LocationConfig'](root = node, content_type = loc_ctype)
-          loccfg.address = node.location
-          loccfg.city = "?"
-          loccfg.country = "?"
-          loccfg.altitude = 0
-          
-          if node.geo_lat is not None:
-            loccfg.geolocation = "POINT(%f %f)" % (node.geo_lat, node.geo_long)
-          else:
-            loccfg.geolocation = None
-          
-          loccfg.save()
-          
-          # core.description
-          dsccfg = orm['core.DescriptionConfig'](root = node, content_type = desc_ctype)
-          dsccfg.notes = node.notes
-          dsccfg.url = node.url or ""
-          dsccfg.save()
-          
-          try:
-            profile = orm['generator.Profile'].objects.get(node = node)
-          except orm['generator.Profile'].DoesNotExist:
-            profile = None
-          
-          general.version = "stable"
-          if profile is not None:
-            router_map = {
-              "wrt54gl" : "wrt54gl",
-              "wrt54gs" : "wrt54gs",
-              "whr-hp-g54" : "whr-hp-g54",
-              "fonera" : "fon-2100",
-              "foneraplus" : "fon-2200",
-              "wl-500gp-v1" : "wl500gpv1",
-              "wl-500gd" : "wl500gpv1",
-              "rb433ah" : "rb433ah",
-              "tp-wr741nd" : "wr741nd",
+            print "   > Migrating node:", node.name
+
+            # core.general[CgmGeneralConfig]
+            general = orm['cgm.CgmGeneralConfig'](root = node, content_type = general_ctype)
+            general.name = node.name
+
+            type_map = {
+              1 : "server",
+              2 : "wireless",
+              3 : "test",
+              5 : "mobile",
+              6 : "dead"
             }
-            general.router = router_map[profile.template.short_name]
-            general.platform = "openwrt"
-            
-            pwdcfg = orm['cgm.PasswordAuthenticationConfig'](root = node, content_type = pwdauth_ctype)
-            pwdcfg.password = profile.root_pass
-            pwdcfg.save()
-          else:
-            general.platform = ""
-            general.router = ""
-          
-          general.save()
-          
-          # core.roles
-          system_node_role = orm['core.SystemRoleConfig'](root = node, content_type = sys_role_ctype)
-          system_node_role.system = node.system_node
-          system_node_role.save()
-          
-          border_router_role = orm['core.BorderRouterRoleConfig'](root = node, content_type = brouter_role_ctype)
-          border_router_role.border_router = node.border_router
-          border_router_role.save()
-          
-          vpn_server_role = orm['core.VpnServerRoleConfig'](root = node, content_type = vpn_role_ctype)
-          vpn_server_role.vpn_server = node.vpn_server
-          vpn_server_role.save()
-          
-          redundant_node_role = orm['core.RedundantNodeRoleConfig'](root = node, content_type = redundant_role_ctype)
-          redundant_node_role.redundancy_required = node.redundancy_req
-          redundant_node_role.save()
-          
-          # core.routerid
-          print "     - Router-ID:", node.ip
-          routerid = orm['core.RouterIdConfig'](root = node, content_type = rid_ctype)
-          routerid.family = "ipv4"
-          routerid.router_id = node.ip
-          routerid.save()
-          
-          # core.interfaces + core.interfaces.network
-          if profile is not None:
-            # WiFi
-            wifi_iface = orm['cgm.WifiInterfaceConfig'](root = node, content_type = wifiiface_ctype)
-            wifi_iface.wifi_radio = "wifi0"
-            wifi_iface.protocol = "ieee-80211bg"
-            wifi_iface.channel = "ch%d" % profile.channel
-            wifi_iface.antenna_connector = "a1"
-            try:
-              antenna = orm['core.Antenna'].objects.filter(internal_for = general.router)[0]
-            except IndexError:
-              antenna = None
-            
-            if node.ant_external or antenna is None:
-              antenna = orm['core.Antenna']()
-              antenna.name = "Migrated Antenna for '{0}'".format(node.name)
-              antenna.manufacturer = "Unknown"
-              polarization_map = {
-                0 : "horizontal",
-                1 : "horizontal",
-                2 : "vertical",
-                3 : "circular",
-                4 : "dual",
-              }
-              antenna.polarization = polarization_map[node.ant_polarization]
-              angle_map = {
-                0 : (360, 75),
-                1 : (360, 75),
-                2 : (180, 75),
-                3 : (45, 45),
-              }
-              antenna.angle_horizontal, antenna.angle_vertical = angle_map[node.ant_type]
-              antenna.gain = 8
-              antenna.save()
-            
-            wifi_iface.antenna = antenna
-            wifi_iface.save()
-            
-            # Wireless network config
-            wifi_netconf = orm['cgm.WifiNetworkConfig'](root = node, content_type = wifinetconf_ctype)
-            wifi_netconf.interface = wifi_iface
-            wifi_netconf.enabled = True
-            wifi_netconf.description = "Mesh"
-            wifi_netconf.role = "mesh"
-            wifi_netconf.essid = node.project.ssid
-            wifi_netconf.bssid = "02:CA:FF:EE:BA:BE"
-            
-            wifi_subnet = node.subnet_set.get(gen_iface_type = 2, allocated = True)
-            pool = orm['core.IpPool'].objects.filter(network = wifi_subnet.subnet, prefix_length = wifi_subnet.cidr)
-            if not pool:
-              print "     - WARNING: Primary IP pool not found, skipping network configuration!"
-              continue
-            
-            wifi_netconf.allocation = pool = pool[0]
-            while pool.parent is not None:
-              pool = pool.parent
-            
-            wifi_netconf.family = "ipv4"
-            wifi_netconf.pool = pool
-            wifi_netconf.prefix_length = wifi_subnet.cidr
-            wifi_netconf.usage = "auto"
-            wifi_netconf.save()
-            
-            # WAN (wan0)
-            wan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
-            wan_iface.enabled = True
-            wan_iface.eth_port = "wan0"
-            wan_iface.save()
-            if profile.wan_dhcp:
-              # DHCP config
-              print "     - Detected DHCP WAN configuration."
-              dhcp_netconf = orm['cgm.DHCPNetworkConfig'](root = node, content_type = dhcpnetconf_ctype)
-              dhcp_netconf.interface = wan_iface
-              dhcp_netconf.enabled = True
-              dhcp_netconf.description = "Internet uplink"
-              dhcp_netconf.save()
+            general.type = type_map[node.node_type]
+
+            # core.project
+            projectcfg = orm['core.ProjectConfig'](root = node, content_type = project_ctype)
+            projectcfg.project = node.project
+            projectcfg.save()
+
+            # core.location
+            loccfg = orm['core.LocationConfig'](root = node, content_type = loc_ctype)
+            loccfg.address = node.location
+            loccfg.city = "?"
+            loccfg.country = "?"
+            loccfg.altitude = 0
+
+            if node.geo_lat is not None:
+                loccfg.geolocation = "POINT(%f %f)" % (node.geo_lat, node.geo_long)
             else:
-              # Static config
-              print "     - Detected static WAN configuration."
-              static_netconf = orm['cgm.StaticNetworkConfig'](root = node, content_type = staticnetconf_ctype)
-              static_netconf.interface = wan_iface
-              static_netconf.enabled = True
-              static_netconf.description = "Internet uplink"
-              static_netconf.family = "ipv4"
-              static_netconf.address = "{0}/{1}".format(profile.wan_ip, profile.wan_cidr)
-              static_netconf.gateway = profile.wan_gw
-              static_netconf.save()
-            
-            # LAN subnets (lan0)
-            lan_subnets = []
-            for subnet in node.subnet_set.filter(gen_iface_type = 0, allocated = True):
-              pool = orm['core.IpPool'].objects.filter(network = subnet.subnet, prefix_length = subnet.cidr)
-              if not pool:
-                continue
-              
-              alloc = pool = pool[0]
-              while pool.parent is not None:
-                pool = pool.parent
-              
-              lan_subnets.append({
-                'cidr' : subnet.cidr,
-                'pool' : pool,
-                'allocation' : alloc
-              })
-            
-            if lan_subnets:
-              # Create LAN configuration
-              print "     - Detected LAN subnets."
-              lan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
-              lan_iface.enabled = True
-              lan_iface.eth_port = "lan0"
-              lan_iface.save()
-              
-              # Create allocated network config for each subnet
-              for subnet in lan_subnets:
-                alloc_netconf = orm['cgm.AllocatedNetworkConfig'](root = node, content_type = allocnetconf_ctype)
-                alloc_netconf.interface = lan_iface
-                alloc_netconf.enabled = True
-                alloc_netconf.description = "LAN"
-                alloc_netconf.family = "ipv4"
-                alloc_netconf.pool = subnet['pool']
-                alloc_netconf.prefix_length = subnet['cidr']
-                alloc_netconf.usage = "clients"
-                alloc_netconf.allocation = subnet['allocation']
-                alloc_netconf.save()
-            
-            # VPN
-            if profile.use_vpn:
-              print "     - Detected VPN tunnel."
-              vpn_iface = orm['cgm.VpnInterfaceConfig'](root = node, content_type = vpniface_ctype)
-              vpn_iface.enabled = True
-              vpn_iface.mac = node.vpn_mac_conf
-              vpn_iface.save()
-              
-              # Interface limits
-              vpn_limit = orm['cgm.ThroughputInterfaceLimitConfig'](root = node, content_type = tpifacelimit_ctype)
-              vpn_limit.interface = vpn_iface
-              limit_map = {
-                128 : "128kbit",
-                256 : "256kbit",
-                512 : "512kbit",
-                1024 : "1mbit",
-                2048 : "2mbit",
-                4096 : "4mbit",
-              }
-              vpn_limit.limit_out = limit_map.get(profile.vpn_egress_limit, "")
-              try:
-                vpn_limit.limit_in = limit_map.get(node.gw_policy.get(addr = node.vpn_mac_conf, family = 1).tc_class.bandwidth, "")
-              except orm['policy.Policy'].DoesNotExist:
-                vpn_limit.limit_in = ""
-              vpn_limit.save()
-              
-              # NOTE: Server configuration below was hardcoded in previous versions of nodewatcher,
-              # so we need to hardcode it here when doing migrations. These servers are meant for
-              # use in the wlan slovenia network.
-              
-              # VPN servers
-              vpn_servers = [
-                ("46.54.226.43", 8942),
-                ("46.54.226.43", 53),
-                ("46.54.226.43", 123),
-                ("91.175.203.240", 8942),
-                ("91.175.203.240", 53),
-                ("91.175.203.240", 123),
-              ]
-              for host, port in vpn_servers:
-                vpn_server = orm['cgm.VpnServerConfig'](root = node, content_type = vpnserver_ctype)
-                vpn_server.protocol = "tunneldigger"
-                vpn_server.hostname = host
-                vpn_server.port = port
-                vpn_server.save()
-            
-            # core.packages
-            for package in profile.optional_packages.all():
-              if package.fancy_name == 'solar':
-                print "     - Found optional package: solar"
-                pkg = orm['solar.SolarPackageConfig'](root = node, content_type = solarpkg_ctype)
-                pkg.save()
-              elif package.fancy_name == 'digitemp':
-                print "     - Found optional package: digitemp"
-                pkg = orm['digitemp.DigitempPackageConfig'](root = node, content_type = digitemppkg_ctype)
-                pkg.save()
-          else:
-            # TODO Migrate nodes without profiles (we need to ensure proper interfaces)
-            print "     - Node has no profile configured."
-    
+                loccfg.geolocation = None
+
+            loccfg.save()
+
+            # core.description
+            dsccfg = orm['core.DescriptionConfig'](root = node, content_type = desc_ctype)
+            dsccfg.notes = node.notes
+            dsccfg.url = node.url or ""
+            dsccfg.save()
+
+            try:
+                profile = orm['generator.Profile'].objects.get(node = node)
+            except orm['generator.Profile'].DoesNotExist:
+                profile = None
+
+            general.version = "stable"
+            if profile is not None:
+                router_map = {
+                  "wrt54gl" : "wrt54gl",
+                  "wrt54gs" : "wrt54gs",
+                  "whr-hp-g54" : "whr-hp-g54",
+                  "fonera" : "fon-2100",
+                  "foneraplus" : "fon-2200",
+                  "wl-500gp-v1" : "wl500gpv1",
+                  "wl-500gd" : "wl500gpv1",
+                  "rb433ah" : "rb433ah",
+                  "tp-wr741nd" : "wr741nd",
+                }
+                general.router = router_map[profile.template.short_name]
+                general.platform = "openwrt"
+
+                pwdcfg = orm['cgm.PasswordAuthenticationConfig'](root = node, content_type = pwdauth_ctype)
+                pwdcfg.password = profile.root_pass
+                pwdcfg.save()
+            else:
+                general.platform = ""
+                general.router = ""
+
+            general.save()
+
+            # core.roles
+            system_node_role = orm['core.SystemRoleConfig'](root = node, content_type = sys_role_ctype)
+            system_node_role.system = node.system_node
+            system_node_role.save()
+
+            border_router_role = orm['core.BorderRouterRoleConfig'](root = node, content_type = brouter_role_ctype)
+            border_router_role.border_router = node.border_router
+            border_router_role.save()
+
+            vpn_server_role = orm['core.VpnServerRoleConfig'](root = node, content_type = vpn_role_ctype)
+            vpn_server_role.vpn_server = node.vpn_server
+            vpn_server_role.save()
+
+            redundant_node_role = orm['core.RedundantNodeRoleConfig'](root = node, content_type = redundant_role_ctype)
+            redundant_node_role.redundancy_required = node.redundancy_req
+            redundant_node_role.save()
+
+            # core.routerid
+            print "     - Router-ID:", node.ip
+            routerid = orm['core.RouterIdConfig'](root = node, content_type = rid_ctype)
+            routerid.family = "ipv4"
+            routerid.router_id = node.ip
+            routerid.save()
+
+            # core.interfaces + core.interfaces.network
+            if profile is not None:
+                # WiFi
+                wifi_iface = orm['cgm.WifiInterfaceConfig'](root = node, content_type = wifiiface_ctype)
+                wifi_iface.wifi_radio = "wifi0"
+                wifi_iface.protocol = "ieee-80211bg"
+                wifi_iface.channel = "ch%d" % profile.channel
+                wifi_iface.antenna_connector = "a1"
+                try:
+                    antenna = orm['core.Antenna'].objects.filter(internal_for = general.router)[0]
+                except IndexError:
+                    antenna = None
+
+                if node.ant_external or antenna is None:
+                    antenna = orm['core.Antenna']()
+                    antenna.name = "Migrated Antenna for '{0}'".format(node.name)
+                    antenna.manufacturer = "Unknown"
+                    polarization_map = {
+                      0 : "horizontal",
+                      1 : "horizontal",
+                      2 : "vertical",
+                      3 : "circular",
+                      4 : "dual",
+                    }
+                    antenna.polarization = polarization_map[node.ant_polarization]
+                    angle_map = {
+                      0 : (360, 75),
+                      1 : (360, 75),
+                      2 : (180, 75),
+                      3 : (45, 45),
+                    }
+                    antenna.angle_horizontal, antenna.angle_vertical = angle_map[node.ant_type]
+                    antenna.gain = 8
+                    antenna.save()
+
+                wifi_iface.antenna = antenna
+                wifi_iface.save()
+
+                # Wireless network config
+                wifi_netconf = orm['cgm.WifiNetworkConfig'](root = node, content_type = wifinetconf_ctype)
+                wifi_netconf.interface = wifi_iface
+                wifi_netconf.enabled = True
+                wifi_netconf.description = "Mesh"
+                wifi_netconf.role = "mesh"
+                wifi_netconf.essid = node.project.ssid
+                wifi_netconf.bssid = "02:CA:FF:EE:BA:BE"
+
+                wifi_subnet = node.subnet_set.get(gen_iface_type = 2, allocated = True)
+                pool = orm['core.IpPool'].objects.filter(network = wifi_subnet.subnet, prefix_length = wifi_subnet.cidr)
+                if not pool:
+                    print "     - WARNING: Primary IP pool not found, skipping network configuration!"
+                    continue
+
+                wifi_netconf.allocation = pool = pool[0]
+                while pool.parent is not None:
+                    pool = pool.parent
+
+                wifi_netconf.family = "ipv4"
+                wifi_netconf.pool = pool
+                wifi_netconf.prefix_length = wifi_subnet.cidr
+                wifi_netconf.usage = "auto"
+                wifi_netconf.save()
+
+                # WAN (wan0)
+                wan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
+                wan_iface.enabled = True
+                wan_iface.eth_port = "wan0"
+                wan_iface.save()
+                if profile.wan_dhcp:
+                    # DHCP config
+                    print "     - Detected DHCP WAN configuration."
+                    dhcp_netconf = orm['cgm.DHCPNetworkConfig'](root = node, content_type = dhcpnetconf_ctype)
+                    dhcp_netconf.interface = wan_iface
+                    dhcp_netconf.enabled = True
+                    dhcp_netconf.description = "Internet uplink"
+                    dhcp_netconf.save()
+                else:
+                    # Static config
+                    print "     - Detected static WAN configuration."
+                    static_netconf = orm['cgm.StaticNetworkConfig'](root = node, content_type = staticnetconf_ctype)
+                    static_netconf.interface = wan_iface
+                    static_netconf.enabled = True
+                    static_netconf.description = "Internet uplink"
+                    static_netconf.family = "ipv4"
+                    static_netconf.address = "{0}/{1}".format(profile.wan_ip, profile.wan_cidr)
+                    static_netconf.gateway = profile.wan_gw
+                    static_netconf.save()
+
+                # LAN subnets (lan0)
+                lan_subnets = []
+                for subnet in node.subnet_set.filter(gen_iface_type = 0, allocated = True):
+                    pool = orm['core.IpPool'].objects.filter(network = subnet.subnet, prefix_length = subnet.cidr)
+                    if not pool:
+                        continue
+
+                    alloc = pool = pool[0]
+                    while pool.parent is not None:
+                        pool = pool.parent
+
+                    lan_subnets.append({
+                      'cidr' : subnet.cidr,
+                      'pool' : pool,
+                      'allocation' : alloc
+                    })
+
+                if lan_subnets:
+                    # Create LAN configuration
+                    print "     - Detected LAN subnets."
+                    lan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
+                    lan_iface.enabled = True
+                    lan_iface.eth_port = "lan0"
+                    lan_iface.save()
+
+                    # Create allocated network config for each subnet
+                    for subnet in lan_subnets:
+                        alloc_netconf = orm['cgm.AllocatedNetworkConfig'](root = node, content_type = allocnetconf_ctype)
+                        alloc_netconf.interface = lan_iface
+                        alloc_netconf.enabled = True
+                        alloc_netconf.description = "LAN"
+                        alloc_netconf.family = "ipv4"
+                        alloc_netconf.pool = subnet['pool']
+                        alloc_netconf.prefix_length = subnet['cidr']
+                        alloc_netconf.usage = "clients"
+                        alloc_netconf.allocation = subnet['allocation']
+                        alloc_netconf.save()
+
+                # VPN
+                if profile.use_vpn:
+                    print "     - Detected VPN tunnel."
+                    vpn_iface = orm['cgm.VpnInterfaceConfig'](root = node, content_type = vpniface_ctype)
+                    vpn_iface.enabled = True
+                    vpn_iface.mac = node.vpn_mac_conf
+                    vpn_iface.save()
+
+                    # Interface limits
+                    vpn_limit = orm['cgm.ThroughputInterfaceLimitConfig'](root = node, content_type = tpifacelimit_ctype)
+                    vpn_limit.interface = vpn_iface
+                    limit_map = {
+                      128 : "128kbit",
+                      256 : "256kbit",
+                      512 : "512kbit",
+                      1024 : "1mbit",
+                      2048 : "2mbit",
+                      4096 : "4mbit",
+                    }
+                    vpn_limit.limit_out = limit_map.get(profile.vpn_egress_limit, "")
+                    try:
+                        vpn_limit.limit_in = limit_map.get(node.gw_policy.get(addr = node.vpn_mac_conf, family = 1).tc_class.bandwidth, "")
+                    except orm['policy.Policy'].DoesNotExist:
+                        vpn_limit.limit_in = ""
+                    vpn_limit.save()
+
+                    # NOTE: Server configuration below was hardcoded in previous versions of nodewatcher,
+                    # so we need to hardcode it here when doing migrations. These servers are meant for
+                    # use in the wlan slovenia network.
+
+                    # VPN servers
+                    vpn_servers = [
+                      ("46.54.226.43", 8942),
+                      ("46.54.226.43", 53),
+                      ("46.54.226.43", 123),
+                      ("91.175.203.240", 8942),
+                      ("91.175.203.240", 53),
+                      ("91.175.203.240", 123),
+                    ]
+                    for host, port in vpn_servers:
+                        vpn_server = orm['cgm.VpnServerConfig'](root = node, content_type = vpnserver_ctype)
+                        vpn_server.protocol = "tunneldigger"
+                        vpn_server.hostname = host
+                        vpn_server.port = port
+                        vpn_server.save()
+
+                # core.packages
+                for package in profile.optional_packages.all():
+                    if package.fancy_name == 'solar':
+                        print "     - Found optional package: solar"
+                        pkg = orm['solar.SolarPackageConfig'](root = node, content_type = solarpkg_ctype)
+                        pkg.save()
+                    elif package.fancy_name == 'digitemp':
+                        print "     - Found optional package: digitemp"
+                        pkg = orm['digitemp.DigitempPackageConfig'](root = node, content_type = digitemppkg_ctype)
+                        pkg.save()
+            else:
+                # TODO Migrate nodes without profiles (we need to ensure proper interfaces)
+                print "     - Node has no profile configured."
+
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")
 

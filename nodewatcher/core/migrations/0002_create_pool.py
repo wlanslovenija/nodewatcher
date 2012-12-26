@@ -5,25 +5,25 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Move model 'Pool'
         db.rename_table('nodes_pool', 'core_pool')
 
         # Changing field 'BasicAddressingConfig.pool'
         db.alter_column('core_basicaddressingconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.Pool']))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Move model 'Pool'
         db.rename_table('core_pool', 'nodes_pool')
 
         # Changing field 'BasicAddressingConfig.pool'
         db.alter_column('core_basicaddressingconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool']))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -200,5 +200,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

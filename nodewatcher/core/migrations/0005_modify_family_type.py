@@ -5,21 +5,21 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Pool.family'
         db.delete_column('core_pool', 'family')
         db.add_column('core_pool', 'family', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family', default='ipv4'))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Pool.family'
         db.delete_column('core_pool', 'family')
         db.add_column('core_pool', 'family', self.gf('django.db.models.fields.IntegerField')(default=4))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -204,5 +204,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

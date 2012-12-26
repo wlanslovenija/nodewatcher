@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
     )
 
     def forwards(self, orm):
-        
+
         # Changing field 'WifiNetworkConfig.pool'
         db.alter_column('cgm_wifinetworkconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.IpPool']))
 
@@ -20,7 +20,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Changing field 'WifiNetworkConfig.pool'
         db.alter_column('cgm_wifinetworkconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.Pool']))
 

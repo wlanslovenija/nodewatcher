@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'WifiNetworkConfig.family'
         db.add_column('cgm_wifinetworkconfig', 'family', self.gf('nodewatcher.registry.fields.SelectorKeyField')(default='ipv4', max_length=50, regpoint='node.config', enum_id='core.interfaces.network#family'), keep_default=False)
 
@@ -19,10 +19,10 @@ class Migration(SchemaMigration):
 
         # Adding field 'WifiNetworkConfig.pool'
         db.add_column('cgm_wifinetworkconfig', 'pool', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(default=1, to=orm['core.Pool']), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'WifiNetworkConfig.family'
         db.delete_column('cgm_wifinetworkconfig', 'family')
 
@@ -34,8 +34,8 @@ class Migration(SchemaMigration):
 
         # Deleting field 'WifiNetworkConfig.pool'
         db.delete_column('cgm_wifinetworkconfig', 'pool_id')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -285,5 +285,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

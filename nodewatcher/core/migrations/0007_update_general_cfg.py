@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'GeneralConfig.notes'
         db.add_column('core_generalconfig', 'notes', self.gf('django.db.models.fields.TextField')(default='', blank=True), keep_default=False)
 
@@ -16,10 +16,10 @@ class Migration(SchemaMigration):
 
         # Adding field 'GeneralConfig.type'
         db.add_column('core_generalconfig', 'type', self.gf('nodewatcher.registry.fields.SelectorKeyField')(default='wireless', max_length=50, regpoint='node.config', enum_id='core.general#type'), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'GeneralConfig.notes'
         db.delete_column('core_generalconfig', 'notes')
 
@@ -28,8 +28,8 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GeneralConfig.type'
         db.delete_column('core_generalconfig', 'type')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -238,5 +238,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Deleting field 'Node.bssid'
         db.delete_column('nodes_node', 'bssid')
 
@@ -178,7 +178,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Adding field 'Node.bssid'
         db.add_column('nodes_node', 'bssid', self.gf('django.db.models.fields.CharField')(max_length=50, null=True), keep_default=False)
 

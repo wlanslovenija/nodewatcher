@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'Project'
         db.create_table('nodes_project', (
             ('ssid_mobile', self.gf('django.db.models.fields.CharField')(max_length=50)),
@@ -275,10 +275,10 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(max_length=50, primary_key=True)),
         ))
         db.send_create_signal('nodes', ['NodeNames'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'Project'
         db.delete_table('nodes_project')
 
@@ -332,8 +332,8 @@ class Migration(SchemaMigration):
 
         # Deleting model 'NodeNames'
         db.delete_table('nodes_nodenames')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -608,5 +608,5 @@ class Migration(SchemaMigration):
             'registred_at': ('django.db.models.fields.DateTimeField', [], {})
         }
     }
-    
+
     complete_apps = ['nodes']

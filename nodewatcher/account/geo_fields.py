@@ -262,16 +262,16 @@ COUNTRIES = (
 )
 
 def sorted_countries(countries):
-  """
-  Sort countries for a given language.
-  
-  Assume ZZ is the last entry, keep it last.
-  """
-  
-  c = [c[0:2] for c in countries[:-1]]
-  c.sort(key=lambda x: x[1])
-  c.append(countries[-1][0:2])
-  return tuple(c)
+    """
+    Sort countries for a given language.
+
+    Assume ZZ is the last entry, keep it last.
+    """
+
+    c = [c[0:2] for c in countries[:-1]]
+    c.sort(key=lambda x: x[1])
+    c.append(countries[-1][0:2])
+    return tuple(c)
 
 countries_choices = sorted_countries(COUNTRIES)
 languages_choices = map(lambda (code, name): (code, _(name)), settings.LANGUAGES) # We have to translate names
@@ -282,68 +282,68 @@ CITIES = sorted(countries_cities.values())
 geoip_resolver = gis_utils.GeoIP()
 
 def get_initial_country(request=None):
-  """
-  Returns a contry code based on a client's remote address or settings.
-  """
-  
-  if request:
-    country = geoip_resolver.country_code(request.META['REMOTE_ADDR'])
-    if country and country.upper() in countries_cities:
-      return country.upper()
-  return settings.DEFAULT_COUNTRY
+    """
+    Returns a contry code based on a client's remote address or settings.
+    """
+
+    if request:
+        country = geoip_resolver.country_code(request.META['REMOTE_ADDR'])
+        if country and country.upper() in countries_cities:
+            return country.upper()
+    return settings.DEFAULT_COUNTRY
 
 def get_initial_city(request=None):
-  """
-  Returns a city name based on a client's remote address or a default city from her country.
-  """
-  
-  # We force unicode here so that default value in a field is a proper unicode string and not a lazy one
-  # Otherwise psycopg2 raises an "can't adapt" error: http://code.djangoproject.com/ticket/13965
+    """
+    Returns a city name based on a client's remote address or a default city from her country.
+    """
 
-  if request:
-    city = geoip_resolver.city(request.META['REMOTE_ADDR'])
-    if city and city.get('city'):
-      return city['city']
-    return utils_encoding.force_unicode(countries_cities[get_initial_country(request)]) or getattr(settings, 'DEFUALT_CITY', None)
-  return getattr(settings, 'DEFUALT_CITY', None) or utils_encoding.force_unicode(countries_cities[get_initial_country()])
+    # We force unicode here so that default value in a field is a proper unicode string and not a lazy one
+    # Otherwise psycopg2 raises an "can't adapt" error: http://code.djangoproject.com/ticket/13965
+
+    if request:
+        city = geoip_resolver.city(request.META['REMOTE_ADDR'])
+        if city and city.get('city'):
+            return city['city']
+        return utils_encoding.force_unicode(countries_cities[get_initial_country(request)]) or getattr(settings, 'DEFUALT_CITY', None)
+    return getattr(settings, 'DEFUALT_CITY', None) or utils_encoding.force_unicode(countries_cities[get_initial_country()])
 
 def get_initial_language(request=None):
-  """
-  Returns language code based on a request or settings.
-  """
-  
-  if request:
-    return translation.get_language_from_request(request)
-  return settings.LANGUAGE_CODE
+    """
+    Returns language code based on a request or settings.
+    """
+
+    if request:
+        return translation.get_language_from_request(request)
+    return settings.LANGUAGE_CODE
 
 class CountryField(fields.CharField):
-  def __init__(self, *args, **kwargs):
-    kwargs.setdefault('max_length', 2)
-    kwargs.setdefault('choices', countries_choices)
-    kwargs.setdefault('default', get_initial_country)
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('max_length', 2)
+        kwargs.setdefault('choices', countries_choices)
+        kwargs.setdefault('default', get_initial_country)
 
-    super(fields.CharField, self).__init__(*args, **kwargs)
+        super(fields.CharField, self).__init__(*args, **kwargs)
 
-  def get_internal_type(self):
-    return "CharField"
+    def get_internal_type(self):
+        return "CharField"
 
 class CityField(fields.CharField):
-  def __init__(self, *args, **kwargs):
-    kwargs.setdefault('max_length', 150)
-    kwargs.setdefault('default', get_initial_city)
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('max_length', 150)
+        kwargs.setdefault('default', get_initial_city)
 
-    super(fields.CharField, self).__init__(*args, **kwargs)
+        super(fields.CharField, self).__init__(*args, **kwargs)
 
-  def get_internal_type(self):
-    return "CharField"
+    def get_internal_type(self):
+        return "CharField"
 
 class LanguageField(fields.CharField):
-  def __init__(self, *args, **kwargs):
-    kwargs.setdefault('max_length', 5)
-    kwargs.setdefault('choices', languages_choices)
-    kwargs.setdefault('default', get_initial_language)
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('max_length', 5)
+        kwargs.setdefault('choices', languages_choices)
+        kwargs.setdefault('default', get_initial_language)
 
-    super(fields.CharField, self).__init__(*args, **kwargs)
+        super(fields.CharField, self).__init__(*args, **kwargs)
 
-  def get_internal_type(self):
-    return "CharField"
+    def get_internal_type(self):
+        return "CharField"

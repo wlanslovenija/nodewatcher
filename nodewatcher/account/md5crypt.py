@@ -17,9 +17,9 @@
 
 SYNOPSIS
 
-	import md5crypt.py
+        import md5crypt.py
 
-	cryptedpassword = md5crypt.md5crypt(password, salt);
+        cryptedpassword = md5crypt.md5crypt(password, salt);
 
 DESCRIPTION
 
@@ -38,7 +38,7 @@ apache_md5_crypt() provides a function compatible with Apache's
 
 """
 
-MAGIC = '$1$'			# Magic string
+MAGIC = '$1$'                   # Magic string
 ITOA64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 import hashlib
@@ -47,8 +47,8 @@ def to64 (v, n):
     ret = ''
     while (n - 1 >= 0):
         n = n - 1
-	ret = ret + ITOA64[v & 0x3f]
-	v = v >> 6
+        ret = ret + ITOA64[v & 0x3f]
+        v = v >> 6
     return ret
 
 
@@ -58,10 +58,10 @@ def apache_md5_crypt (pw, salt):
 
 
 def unix_md5_crypt(pw, salt, magic=None):
-    
+
     if magic==None:
         magic = MAGIC
-    
+
     pw = str(pw)
     salt = str(salt)
     magic = str(magic)
@@ -69,7 +69,7 @@ def unix_md5_crypt(pw, salt, magic=None):
     # Take care of the magic string if present
     if salt[:len(magic)] == magic:
         salt = salt[len(magic):]
-        
+
 
     # salt can have up to 8 characters:
     import string
@@ -98,9 +98,9 @@ def unix_md5_crypt(pw, salt, magic=None):
         i = i >> 1
 
     final = hashlib.md5(ctx).digest()
-    
+
     # The following is supposed to make
-    # things run slower. 
+    # things run slower.
 
     # my question: WTF???
 
@@ -121,13 +121,13 @@ def unix_md5_crypt(pw, salt, magic=None):
             ctx1 = ctx1 + final[:16]
         else:
             ctx1 = ctx1 + pw
-            
-            
+
+
         final = hashlib.md5(ctx1).digest()
 
 
     # Final xform
-                                
+
     passwd = ''
 
     passwd = passwd + to64((int(ord(final[0])) << 16)

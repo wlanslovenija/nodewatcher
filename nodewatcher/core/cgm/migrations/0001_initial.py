@@ -12,9 +12,9 @@ class Migration(SchemaMigration):
     needed_by = (
         ("core", "0002_create_pool"),
     )
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'CgmGeneralConfig'
         db.create_table('cgm_cgmgeneralconfig', (
             ('platform', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#platform')),
@@ -115,10 +115,10 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('cgm', ['VpnServerConfig'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'CgmGeneralConfig'
         db.delete_table('cgm_cgmgeneralconfig')
 
@@ -151,8 +151,8 @@ class Migration(SchemaMigration):
 
         # Deleting model 'VpnServerConfig'
         db.delete_table('cgm_vpnserverconfig')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -398,5 +398,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'Allocation'
         db.create_table('core_allocation', (
             ('pool', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Pool'])),
@@ -17,14 +17,14 @@ class Migration(SchemaMigration):
             ('object_id', self.gf('django.db.models.fields.CharField')(max_length=50)),
         ))
         db.send_create_signal('core', ['Allocation'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'Allocation'
         db.delete_table('core_allocation')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -209,5 +209,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

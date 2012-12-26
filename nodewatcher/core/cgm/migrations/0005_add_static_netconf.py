@@ -5,25 +5,25 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'StaticNetworkConfig.gateway'
         db.add_column('cgm_staticnetworkconfig', 'gateway', self.gf('nodewatcher.registry.fields.IPAddressField')(default='127.0.0.2', host_required=True), keep_default=False)
 
         # Adding field 'StaticNetworkConfig.address'
         db.add_column('cgm_staticnetworkconfig', 'address', self.gf('nodewatcher.registry.fields.IPAddressField')(default='127.0.0.1/8', subnet_required=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'StaticNetworkConfig.gateway'
         db.delete_column('cgm_staticnetworkconfig', 'gateway')
 
         # Deleting field 'StaticNetworkConfig.address'
         db.delete_column('cgm_staticnetworkconfig', 'address')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -286,5 +286,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

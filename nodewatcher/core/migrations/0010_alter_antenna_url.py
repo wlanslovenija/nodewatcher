@@ -5,19 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Antenna.url'
         db.alter_column('core_antenna', 'url', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Antenna.url'
         db.alter_column('core_antenna', 'url', self.gf('django.db.models.fields.URLField')(max_length=200))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -242,5 +242,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['core']

@@ -7,13 +7,13 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Deleting model 'Allocation'
         db.delete_table('core_allocation')
 
 
     def backwards(self, orm):
-        
+
         # Adding model 'Allocation'
         db.create_table('core_allocation', (
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),

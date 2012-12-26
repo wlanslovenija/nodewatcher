@@ -9,19 +9,19 @@ class Migration(SchemaMigration):
     depends_on = (
         ("core", "0002_create_pool"),
     )
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'AllocatedNetworkConfig.pool'
         db.alter_column('cgm_allocatednetworkconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.Pool']))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'AllocatedNetworkConfig.pool'
         db.alter_column('cgm_allocatednetworkconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool']))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -267,5 +267,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

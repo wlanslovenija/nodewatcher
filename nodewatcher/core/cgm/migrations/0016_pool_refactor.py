@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding field 'WifiNetworkConfig.allocation'
         db.add_column('cgm_wifinetworkconfig', 'allocation', self.gf('django.db.models.fields.related.ForeignKey')(related_name='allocations_cgm_wifinetworkconfig', null=True, to=orm['core.IpPool']), keep_default=False)
 
@@ -16,7 +16,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Deleting field 'WifiNetworkConfig.allocation'
         db.delete_column('cgm_wifinetworkconfig', 'allocation_id')
 

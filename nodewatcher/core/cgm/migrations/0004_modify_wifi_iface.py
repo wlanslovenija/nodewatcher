@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'WifiInterfaceConfig.channel'
         db.alter_column('cgm_wifiinterfaceconfig', 'channel', self.gf('django.db.models.fields.CharField')(max_length=50))
 
@@ -19,10 +19,10 @@ class Migration(SchemaMigration):
 
         # Changing field 'CgmGeneralConfig.router'
         db.alter_column('cgm_cgmgeneralconfig', 'router', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#router', blank=True))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'WifiInterfaceConfig.channel'
         db.alter_column('cgm_wifiinterfaceconfig', 'channel', self.gf('django.db.models.fields.IntegerField')())
 
@@ -34,8 +34,8 @@ class Migration(SchemaMigration):
 
         # Changing field 'CgmGeneralConfig.router'
         db.alter_column('cgm_cgmgeneralconfig', 'router', self.gf('nodewatcher.registry.fields.SelectorKeyField')(max_length=50, regpoint='node.config', enum_id='core.general#router'))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -296,5 +296,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']

@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'ImageFile'
         db.create_table('generator_imagefile', (
             ('type', self.gf('django.db.models.fields.CharField')(max_length=20, null=True)),
@@ -103,10 +103,10 @@ class Migration(SchemaMigration):
             ('optionalpackage', models.ForeignKey(orm['generator.optionalpackage'], null=False))
         ))
         db.create_unique('generator_profile_optional_packages', ['profile_id', 'optionalpackage_id'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'ImageFile'
         db.delete_table('generator_imagefile')
 
@@ -133,8 +133,8 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field optional_packages on 'Profile'
         db.delete_table('generator_profile_optional_packages')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -366,5 +366,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['generator']

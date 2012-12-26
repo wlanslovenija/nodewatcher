@@ -5,19 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'WifiInterfaceConfig.antenna_connector'
         db.add_column('cgm_wifiinterfaceconfig', 'antenna_connector', self.gf('django.db.models.fields.CharField')(max_length=50, null=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'WifiInterfaceConfig.antenna_connector'
         db.delete_column('cgm_wifiinterfaceconfig', 'antenna_connector')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -306,5 +306,5 @@ class Migration(SchemaMigration):
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         }
     }
-    
+
     complete_apps = ['cgm']
