@@ -70,8 +70,8 @@ class Field(object):
         else:
             highest_granularity = datastream.Granularity.Seconds
 
-        metric_id = stream.ensure_metric(query_tags, tags, downsamplers, highest_granularity)
-        stream.insert(metric_id, value)
+        metric_id = stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity)
+        stream.append(metric_id, value)
 
 class IntegerField(Field):
     """
