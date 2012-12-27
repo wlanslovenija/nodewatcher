@@ -1,6 +1,5 @@
-import datetime
-
 from django.conf import settings
+from django.utils import timezone
 
 from nodewatcher.core import models as core_models
 from nodewatcher.monitor import models as monitor_models
@@ -110,7 +109,7 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
                 elink.lq = link['lq']
                 elink.ilq = link['ilq']
                 elink.etx = link['etx']
-                elink.last_seen = datetime.datetime.now()
+                elink.last_seen = timezone.now()
                 elink.save()
                 visible_links.append(elink)
 
@@ -129,7 +128,7 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
                     eannounce = olsr_models.OlsrRoutingAnnounceMonitor(root = node, network = network)
 
                 eannounce.status = "ok" if 'net' in announce else "alias"
-                eannounce.last_seen = datetime.datetime.now()
+                eannounce.last_seen = timezone.now()
                 eannounce.save()
                 visible_announces.append(eannounce)
 
