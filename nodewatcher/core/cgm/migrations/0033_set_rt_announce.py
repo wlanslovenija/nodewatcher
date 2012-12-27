@@ -8,6 +8,7 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         orm['cgm.AllocatedNetworkConfig'].objects.all().update(routing_announce = "olsr")
+        orm['cgm.WifiInterfaceConfig'].objects.filter(mode = "mesh").update(routing_protocol = "olsr")
 
 
     def backwards(self, orm):
