@@ -24,14 +24,14 @@ ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
-  'default' : {
-    'ENGINE'   : 'django.contrib.gis.db.backends.postgis',
-    'NAME'     : 'nodewatcher', # createdb nodewatcher
-    'USER'     : '',            # Set to empty string to connect as current user.
-    'PASSWORD' : '',
-    'HOST'     : 'localhost',   # Set to empty string for localhost.
-    'PORT'     : '',            # Set to empty string for default.
-  },
+    'default' : {
+        'ENGINE'   : 'django.contrib.gis.db.backends.postgis',
+        'NAME'     : 'nodewatcher', # createdb nodewatcher
+        'USER'     : '',            # Set to empty string to connect as current user.
+        'PASSWORD' : '',
+        'HOST'     : 'localhost',   # Set to empty string for localhost.
+        'PORT'     : '',            # Set to empty string for default.
+    },
 }
 
 # For local development it is better to send all e-mails to console
@@ -63,11 +63,11 @@ LANGUAGE_CODE = 'en-us'
 
 _ = lambda s: s # Dummy function so that makemessages finds it
 LANGUAGES = (
-  ('en', _('English')),
+    ('en', _('English')),
 )
 
 LOCALE_PATHS = (
-  locale_dir,
+    locale_dir,
 )
 
 GEOIP_PATH = geoip_dir
@@ -77,9 +77,9 @@ URL_VALIDATOR_USER_AGENT = 'Django'
 
 # Date input formats below take as first argument day and then month in x/y/z format
 DATE_INPUT_FORMATS = (
-  '%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%b %d %Y',
-  '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
-  '%B %d, %Y', '%d %B %Y', '%d %B, %Y',
+    '%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%b %d %Y',
+    '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
+    '%B %d, %Y', '%d %B %Y', '%d %B, %Y',
 )
 
 # All those formats are only defaults and are localized for users
@@ -139,34 +139,34 @@ GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-  'django.template.loaders.filesystem.Loader',
-  'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-  'django.contrib.auth.context_processors.auth',
-  'django.core.context_processors.debug',
-  'django.core.context_processors.i18n',
-  'django.core.context_processors.media',
-  'django.contrib.messages.context_processors.messages',
-  'nodewatcher.nodes.context_processors.global_values',
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.contrib.messages.context_processors.messages',
+    'nodewatcher.nodes.context_processors.global_values',
 )
 
 MIDDLEWARE_CLASSES = (
-  'django.middleware.common.CommonMiddleware',
-  'django.contrib.sessions.middleware.SessionMiddleware',
-  'django.middleware.csrf.CsrfViewMiddleware',
-  'django.contrib.auth.middleware.AuthenticationMiddleware',
-  'django.middleware.transaction.TransactionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
 )
 
 ROOT_URLCONF = 'nodewatcher.urls'
 
 TEMPLATE_DIRS = (
-  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-  # Always use forward slashes, even on Windows.
-  # Don't forget to use absolute paths, not relative paths.
-  default_template_dir,
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    default_template_dir,
 )
 
 FORCE_SCRIPT_NAME = ''
@@ -183,41 +183,41 @@ REGISTRATION_OPEN = True
 ANONYMOUS_USER_ID = -1
 
 AUTHENTICATION_BACKENDS = (
-  'nodewatcher.account.auth.ModelBackend',
-  'nodewatcher.account.auth.AprBackend',
-  'nodewatcher.account.auth.CryptBackend',
-  'guardian.backends.ObjectPermissionBackend',
+    'nodewatcher.account.auth.ModelBackend',
+    'nodewatcher.account.auth.AprBackend',
+    'nodewatcher.account.auth.CryptBackend',
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 INSTALLED_APPS = (
-  'django.contrib.auth',
-  'django.contrib.contenttypes',
-  'django.contrib.sessions',
-  'django.contrib.sites',
-  'django.contrib.sitemaps',
-  'django.contrib.gis',
-  'djcelery',
-  'django_datastream',
-  'nodewatcher.nodes',
-  'nodewatcher.generator',
-  'nodewatcher.account',
-  'nodewatcher.policy',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
+    'django.contrib.gis',
+    'djcelery',
+    'django_datastream',
+    'nodewatcher.nodes',
+    'nodewatcher.generator',
+    'nodewatcher.account',
+    'nodewatcher.policy',
 
-  'nodewatcher.registry',
-  'nodewatcher.registry.loader',
-  'nodewatcher.core',
-  'nodewatcher.core.cgm',
-  'nodewatcher.core.cgm.packages.solar',
-  'nodewatcher.core.cgm.packages.digitemp',
-  'nodewatcher.monitor',
-  'nodewatcher.datastream',
-  'nodewatcher.routing_olsr',
-  'nodewatcher.telemetry_http',
-  'nodewatcher.telemetry_core',
-  'nodewatcher.firmware_core',
-  'nodewatcher.firmware_tunneldigger',
-  'guardian',
-  'south',
+    'nodewatcher.registry',
+    'nodewatcher.registry.loader',
+    'nodewatcher.core',
+    'nodewatcher.core.cgm',
+    'nodewatcher.core.cgm.packages.solar',
+    'nodewatcher.core.cgm.packages.digitemp',
+    'nodewatcher.monitor',
+    'nodewatcher.datastream',
+    'nodewatcher.routing_olsr',
+    'nodewatcher.telemetry_http',
+    'nodewatcher.telemetry_core',
+    'nodewatcher.firmware_core',
+    'nodewatcher.firmware_tunneldigger',
+    'guardian',
+    'south',
 )
 
 # Monitor configuration
@@ -234,12 +234,12 @@ CELERY_IGNORE_RESULT = True
 
 import datetime
 CELERYBEAT_SCHEDULE = {
-  # Datastream downsampler needs to run every minute to check if any downsampling
-  # needs to be performed
-  "datastream_downsampler" : {
-    "task" : "nodewatcher.datastream.tasks.run_downsampling",
-    "schedule" : datetime.timedelta(minutes = 1),
-  }
+    # Datastream downsampler needs to run every minute to check if any downsampling
+    # needs to be performed
+    "datastream_downsampler" : {
+        "task" : "nodewatcher.datastream.tasks.run_downsampling",
+        "schedule" : datetime.timedelta(minutes = 1),
+    }
 }
 
 # Monitoring processors configuration; this defines the order in which monitoring processors
@@ -247,36 +247,36 @@ CELERYBEAT_SCHEDULE = {
 # executed in parallel for all nodes that have been chosen so far by network processors. Only
 # processors that are specified here will be called.
 MONITOR_PROCESSORS = (
-  'nodewatcher.routing_olsr.processors.OLSRTopology',
-  'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
-  'nodewatcher.telemetry_http.processors.HTTPTelemetry',
-  'nodewatcher.telemetry_core.processors.SystemStatusCheck',
-  'nodewatcher.datastream.processors.DataStreamProcessor',
-  'nodewatcher.monitor.processors.PurgeInvalidNodes'
+    'nodewatcher.routing_olsr.processors.OLSRTopology',
+    'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
+    'nodewatcher.telemetry_http.processors.HTTPTelemetry',
+    'nodewatcher.telemetry_core.processors.SystemStatusCheck',
+    'nodewatcher.datastream.processors.DataStreamProcessor',
+    'nodewatcher.monitor.processors.PurgeInvalidNodes'
 )
 
 # Backend for the monitoring data archive
 DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
 # Each backend can have backend-specific settings that can be specified here
 DATASTREAM_BACKEND_SETTINGS = {
-  'database_name': 'nodewatcher',
+    'database_name': 'nodewatcher',
 }
 
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface
 REGISTRY_FORM_PROCESSORS = {
-  'node.config': (
-    'nodewatcher.core.allocation.processors.AutoPoolAllocator',
-    'nodewatcher.core.cgm.processors.NodeCgmValidator',
-  )
+    'node.config': (
+        'nodewatcher.core.allocation.processors.AutoPoolAllocator',
+        'nodewatcher.core.cgm.processors.NodeCgmValidator',
+    )
 }
 
 # Configuration generating modules for firmware images
 CGM_MODULES = (
-  'nodewatcher.core.cgm.openwrt',
-  'nodewatcher.firmware_core.openwrt',
-  'nodewatcher.firmware_tunneldigger.openwrt',
-  'nodewatcher.routing_olsr.cgm',
+    'nodewatcher.core.cgm.openwrt',
+    'nodewatcher.firmware_core.openwrt',
+    'nodewatcher.firmware_tunneldigger.openwrt',
+    'nodewatcher.routing_olsr.cgm',
 )
 
 OLSRD_MONITOR_HOST = '127.0.0.1'
@@ -284,52 +284,52 @@ OLSRD_MONITOR_PORT = 2006
 
 # Registry
 REGISTRY_RULES_MODULES = {
-  'node.config': 'nodewatcher.rules',
+    'node.config': 'nodewatcher.rules',
 }
 
 # Logging configuration
 LOGGING = {
-  'version': 1,
-  'disable_existing_loggers': True,
-  'formatters': {
-    'verbose': {
-      'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '[%(levelname)s/%(name)s] %(message)s'
+        },
     },
-    'simple': {
-      'format': '[%(levelname)s/%(name)s] %(message)s'
+    'filters': {
     },
-  },
-  'filters': {
-  },
-  'handlers': {
-    'null': {
-      'level':'DEBUG',
-      'class':'django.utils.log.NullHandler',
+    'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'console':{
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
     },
-    'console':{
-      'level':'DEBUG',
-      'class':'logging.StreamHandler',
-      'formatter': 'simple',
-    },
-    'mail_admins': {
-      'level': 'ERROR',
-      'class': 'django.utils.log.AdminEmailHandler',
+    'loggers': {
+        'django': {
+            'handlers':['null'],
+            'propagate': True,
+            'level':'INFO',
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'monitor': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
     }
-  },
-  'loggers': {
-    'django': {
-      'handlers':['null'],
-      'propagate': True,
-      'level':'INFO',
-    },
-    'django.request': {
-      'handlers': ['mail_admins'],
-      'level': 'ERROR',
-      'propagate': False,
-    },
-    'monitor': {
-      'handlers': ['console'],
-      'level': 'INFO',
-    }
-  }
 }

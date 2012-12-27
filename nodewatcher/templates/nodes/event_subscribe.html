@@ -1,74 +1,74 @@
 {% extends "my_base.html" %}
-{% load i18n %}
-{% load misc %}
+
+{% load i18n misc %}
 
 {% block title %}{% trans "Subscribe to Event" %}{% endblock %}
 
 {% block heading %}
-{% with _("Subscribe to Event") as heading %}
-{{ block.super }}
-{% endwith %}
+    {% with _("Subscribe to Event") as heading %}
+        {{ block.super }}
+    {% endwith %}
 {% endblock %}
 
 {% block my_content %}
-{% with "subscribe to event" as form_errors_context %}
-{% with "no-top-margin" as classes %}
-{% include "form_errors.html" %}
-{% endwith %}
-{% endwith %}
+    {% with "subscribe to event" as form_errors_context %}
+        {% with "no-top-margin" as classes %}
+            {% include "form_errors.html" %}
+        {% endwith %}
+    {% endwith %}
 
-{% if not user.email %}
-{% with "no-top-margin" as classes %}
-{% include "nodes/missing_email_error.html" %}
-{% endwith %}
-{% endif %}
+    {% if not user.email %}
+        {% with "no-top-margin" as classes %}
+            {% include "nodes/missing_email_error.html" %}
+        {% endwith %}
+    {% endif %}
 
-{% notice "" "no-top-margin" %}
-{% blocktrans %}Here you can subscribe to events in the network. For each event an e-mail can be send to your e-mail address
-informing you about the event in the network. You can specify different criteria for which events you are interested in.{% endblocktrans %}
-{% endnotice %}
+    {% notice "" "no-top-margin" %}
+        {% blocktrans %}Here you can subscribe to events in the network. For each event an e-mail can be send to your e-mail address
+        informing you about the event in the network. You can specify different criteria for which events you are interested in.{% endblocktrans %}
+    {% endnotice %}
 
-<form method="post" action="{% url my_events_subscribe %}">
-{% csrf_token %}
-<table border="0" width="700">
-  <tr>
-    <td>{{ form.type.label }}</td>
-    <td>{{ form.type }}</td>
-  </tr>
-  <tr class="single_node_subscribe">
-    <td>{{ form.node.label }}</td>
-    <td>{{ form.node }}</td>
-  </tr>
-  <tr>
-    <td>{{ form.code.label }}</td>
-    <td>{{ form.code }}</td>
-  </tr>
-</table>
-  <div class="buttons">
-      {% if user.email %}
-      <input type="submit" value="{% trans "Subscribe" %}" />&nbsp;
-      {% endif %}
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_events %}'" />
-    </div>
-</form>
+    <form method="post" action="{% url my_events_subscribe %}">
+        {% csrf_token %}
+        <table border="0" width="700">
+            <tr>
+                <td>{{ form.type.label }}</td>
+                <td>{{ form.type }}</td>
+            </tr>
+            <tr class="single_node_subscribe">
+                <td>{{ form.node.label }}</td>
+                <td>{{ form.node }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.code.label }}</td>
+                <td>{{ form.code }}</td>
+            </tr>
+        </table>
+        <div class="buttons">
+                {% if user.email %}
+                    <input type="submit" value="{% trans "Subscribe" %}" />&nbsp;
+                {% endif %}
+                <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url my_events %}'" />
+            </div>
+    </form>
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript">
-/* <![CDATA[ */
-function toggleSingleNode() {
-  if ($('#id_type').attr('value') == {{ single_node_type }}) {
-    $('.single_node_subscribe').css('display', '');
-  }
-  else {
-    $('.single_node_subscribe').css('display', 'none');
-  }
-}
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    function toggleSingleNode() {
+        if ($('#id_type').attr('value') == {{ single_node_type }}) {
+            $('.single_node_subscribe').css('display', '');
+        }
+        else {
+            $('.single_node_subscribe').css('display', 'none');
+        }
+    }
 
-$(document).ready(function () {
-  $('#id_type').change(function(event) { toggleSingleNode(); });
-  toggleSingleNode();
-});
-/* ]]> */
-</script>
+    $(document).ready(function () {
+        $('#id_type').change(function(event) { toggleSingleNode(); });
+        toggleSingleNode();
+    });
+    /* ]]> */
+    </script>
 {% endblock %}

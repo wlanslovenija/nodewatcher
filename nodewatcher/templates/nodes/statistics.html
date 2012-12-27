@@ -1,110 +1,112 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load nodestatus %}
-{% load graphs %}
-{% load misc %}
+
+{% load i18n nodestatus graphs misc %}
 
 {% block title %}{% trans "Network Statistics" %}{% endblock %}
 
 {% block heading %}
-{% with _("Network Statistics") as heading %}
-{{ block.super }}
-{% endwith %}
+    {% with _("Network Statistics") as heading %}
+        {{ block.super }}
+    {% endwith %}
 {% endblock %}
 
 {% block content %}
-<div class="networksummary">
-{% heading 2 _("Nodes") %}
-<table class="layout">
-<tr>
-{% for s in nodes_by_status %}
-<td class="node_status_{{ s.status }} nodes" style="width: {% widthratio 1 nodes_by_status|length 100 %}%;" ><img src="{{ MEDIA_URL }}images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}" /> {{ s.count }}</td>
-{% empty %}
-<td class="notice">
-  {% trans "There are currently no nodes registered/visible." %}
-</td>
-{% endfor %}
-</tr>
-</table>
+    <div class="networksummary">
+        {% heading 2 _("Nodes") %}
+        <table class="layout">
+            <tr>
+                {% for s in nodes_by_status %}
+                    <td class="node_status_{{ s.status }} nodes" style="width: {% widthratio 1 nodes_by_status|length 100 %}%;" ><img src="{{ MEDIA_URL }}images/status_{{ s.status }}_big.png" title="{{ s.status }} - {% statusdesc s.status %}" alt="{{ s.status }}" /> {{ s.count }}</td>
+                {% empty %}
+                    <td class="notice">
+                        {% trans "There are currently no nodes registered/visible." %}
+                    </td>
+                {% endfor %}
+            </tr>
+        </table>
 
-{% heading 3 _("Details") "folding closed" %}
-<div id="details_foldee">
-<ul>
-<li>{% trans "All registered/visible nodes:" %} {{ node_count }}</li>
-<li>{% trans "Nodes with warnings:" %} {{ nodes_warned }}</li>
-<li>{% trans "Nodes with an external antenna:" %} {{ external_ant }}</li>
-<li>{% trans "Test nodes:" %} {{ nodes_test }}</li>
-<li>{% trans "Dead nodes:" %} {{ nodes_dead }}</li>
-</ul>
-</div>
+        {% heading 3 _("Details") "folding closed" %}
+        <div id="details_foldee">
+            <ul>
+                <li>{% trans "All registered/visible nodes:" %} {{ node_count }}</li>
+                <li>{% trans "Nodes with warnings:" %} {{ nodes_warned }}</li>
+                <li>{% trans "Nodes with an external antenna:" %} {{ external_ant }}</li>
+                <li>{% trans "Test nodes:" %} {{ nodes_test }}</li>
+                <li>{% trans "Dead nodes:" %} {{ nodes_dead }}</li>
+            </ul>
+        </div>
 
-{% heading 3 _("Nodes by router type") "folding closed" %}
-  <div style="padding-left: 20px;" id="routers_foldee">
-    <table border="0" style="width: 90%; !important;" class="listing">
-    {% for t in template_usage %}
-    <tr class="{% cycle 'odd' 'even' %}">
-      <td>{% if t.special %}<i>{% endif %}{{ t.template }}{% if t.special %}</i>{% endif %}</td>
-      <td>{{ t.count }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td class="notice">
-        {% trans "There are currently no nodes registered/connected." %}
-      </td>
-    </tr>
-    {% endfor %}
-    </table>
-  </div>
+        {% heading 3 _("Nodes by router type") "folding closed" %}
+        <div style="padding-left: 20px;" id="routers_foldee">
+            <table border="0" style="width: 90%; !important;" class="listing">
+                {% for t in template_usage %}
+                    <tr class="{% cycle 'odd' 'even' %}">
+                        <td>{% if t.special %}<i>{% endif %}{{ t.template }}{% if t.special %}</i>{% endif %}</td>
+                        <td>{{ t.count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td class="notice">
+                            {% trans "There are currently no nodes registered/connected." %}
+                        </td>
+                    </tr>
+            {% endfor %}
+            </table>
+        </div>
 
-{% heading 3 _("Nodes by project") "folding closed" %}
-  <div style="padding-left: 20px;" id="projects_foldee">
-    <table border="0" style="width: 90%; !important;" class="listing">
-    {% for p in nodes_by_project %}
-    <tr class="{% cycle 'odd' 'even' %}">
-      <td>{% if p.special %}<i>{% endif %}{{ p.name }}{% if p.special %}</i>{% endif %}</td>
-      <td>{{ p.count }}{% if p.up_count %} ({{ p.up_count }} {% trans "up" %}){% endif %}</td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td class="notice">
-        {% trans "There are currently no nodes registered/connected." %}
-      </td>
-    </tr>
-    {% endfor %}
-    </table>
-  </div>
+        {% heading 3 _("Nodes by project") "folding closed" %}
+        <div style="padding-left: 20px;" id="projects_foldee">
+            <table border="0" style="width: 90%; !important;" class="listing">
+                {% for p in nodes_by_project %}
+                    <tr class="{% cycle 'odd' 'even' %}">
+                        <td>{% if p.special %}<i>{% endif %}{{ p.name }}{% if p.special %}</i>{% endif %}</td>
+                        <td>{{ p.count }}{% if p.up_count %} ({{ p.up_count }} {% trans "up" %}){% endif %}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td class="notice">
+                            {% trans "There are currently no nodes registered/connected." %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
 
-  {% heading 2 _("Clients") %}
-  {% trans "Clients (non-unique) connected so far" %}: {{ clients_ever }}<br/>
-  {% heading 2 _("Network") %}
-  {% trans "Number of subnets" %}: {{ subnet_count }}<br/>
-  {% trans "Average immediate neighbours (peers) per node" %}: {{ peers_avg }}<br/>
-</div>
-<div class="graphs">
-{% heading 2 _("Graphs") %}
-<div class="timespan">
-  {% for timespan in timespans reversed %}
-  <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_timespan = '{{ timespan }}'; graph_display_changed(); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>
-  {% endfor %}
-<script type="text/javascript">
-/* <![CDATA[ */
-  var graph_timespan = '{{ timespans|first }}';
-  function graph_display_changed() {
-    {% for graph in graphs %}
-    $('#graph-{{ graph.title|anchorify }}').attr('src', '/graphs/{{ graph.id }}/' + graph_timespan + '/');
-    {% endfor %}
-    $('a[id|=timespan_id]').removeClass('selected');
-    $('a#timespan_id-' + graph_timespan).addClass('selected');
-  }
-  $(document).ready(function() { graph_display_changed('{{ timespans|first }}'); $(".timespan").floater(); });
-/* ]]> */
-</script>
-</div>
-  {% for graph in graphs %}
-  {% show_full_graph graph %}<br/>
-  {% endfor %}
-</div>
+        {% heading 2 _("Clients") %}
+        {% trans "Clients (non-unique) connected so far" %}: {{ clients_ever }}<br/>
+        {% heading 2 _("Network") %}
+        {% trans "Number of subnets" %}: {{ subnet_count }}<br/>
+        {% trans "Average immediate neighbours (peers) per node" %}: {{ peers_avg }}<br/>
+    </div>
+    <div class="graphs">
+        {% heading 2 _("Graphs") %}
+        <div class="timespan">
+            {% for timespan in timespans reversed %}
+                <a href="#" id="timespan_id-{{ timespan }}" onclick="graph_timespan = '{{ timespan }}'; graph_display_changed(); return false;">{% blocktrans %}last {{ timespan }}{% endblocktrans %}</a>
+            {% endfor %}
+            <script type="text/javascript">
+            /* <![CDATA[ */
+                var graph_timespan = '{{ timespans|first }}';
+                function graph_display_changed() {
+                    {% for graph in graphs %}
+                        $('#graph-{{ graph.title|anchorify }}').attr('src', '/graphs/{{ graph.id }}/' + graph_timespan + '/');
+                    {% endfor %}
+                    $('a[id|=timespan_id]').removeClass('selected');
+                    $('a#timespan_id-' + graph_timespan).addClass('selected');
+                }
+                $(document).ready(function() {
+                    graph_display_changed('{{ timespans|first }}');
+                    $(".timespan").floater();
+                });
+            /* ]]> */
+            </script>
+        </div>
+        {% for graph in graphs %}
+            {% show_full_graph graph %}<br/>
+        {% endfor %}
+    </div>
 {% endblock %}
+
 {% block js %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.floater.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.floater.js"></script>
 {% endblock %}

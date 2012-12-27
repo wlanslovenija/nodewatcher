@@ -1,53 +1,53 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load misc %}
+
+{% load i18n misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Installed Packages for Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block heading %}
-{% setcontext as heading %}
-{% url view_node node.get_current_id as node_url %}
-{% blocktrans with node.name|default:_("unknown") as node_name %}Installed Packages for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
-{% endsetcontext %}
-{{ block.super }}
+    {% setcontext as heading %}
+        {% url view_node node.get_current_id as node_url %}
+        {% blocktrans with node.name|default:_("unknown") as node_name %}Installed Packages for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endsetcontext %}
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<table border="0" class="listing">
-<thead>
-  <tr>
-    <th style="width: 200px;"><b>{% trans "Package name" %}</b></th>
-    <th style="width: 250px;"><b>{% trans "Version" %}</b></th>
-    <th style="width: 200px;"><b>{% trans "Last check" %}</b></th>
-  </tr>
-</thead>
-<tbody>
-  {% for package in packages %}
-  <tr class="{% cycle 'odd' 'even' %}">
-    <td>{{ package.name }}</td>
-    <td>{{ package.version }}</td>
-    <td>{{ package.last_update|date:"DATETIME_FORMAT" }}</td>
-  </tr>
-  {% empty %}
-  <tr>
-    <td colspan="3" class="notice">
-      {% trans "No package information is available for this node." %}
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
-</table>
+    <table border="0" class="listing">
+        <thead>
+            <tr>
+                <th style="width: 200px;"><b>{% trans "Package name" %}</b></th>
+                <th style="width: 250px;"><b>{% trans "Version" %}</b></th>
+                <th style="width: 200px;"><b>{% trans "Last check" %}</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for package in packages %}
+                <tr class="{% cycle 'odd' 'even' %}">
+                    <td>{{ package.name }}</td>
+                    <td>{{ package.version }}</td>
+                    <td>{{ package.last_update|date:"DATETIME_FORMAT" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3" class="notice">
+                        {% trans "No package information is available for this node." %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript">
-/* <![CDATA[ */
-var tablesConfig = [
-  {
-    "entryName": "packages",
-    "sortColumn": [[0, "asc"]]
-  }
-];
-/* ]]> */
-</script>
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    var tablesConfig = [
+      {
+        "entryName": "packages",
+        "sortColumn": [[0, "asc"]]
+      }
+    ];
+    /* ]]> */
+    </script>
 {% endblock %}

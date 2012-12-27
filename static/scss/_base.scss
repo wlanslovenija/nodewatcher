@@ -1,6 +1,4 @@
-// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-
-
-
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*-
 
 input[type="text"], input[type="password"], input.textwidget {padding:0.25em 0.5em;}
 input[type="text"], input[type="password"], input.textwidget, textarea {border:1px solid #D7D7D7;}
@@ -15,10 +13,10 @@ input[type="reset"]:hover {
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
-  background: #EEEEEE none repeat scroll 0% 0%;
-  border:1px solid #CCCCCC;
-  color: #222222;
-  padding:0.1em 0.5em;   
+    background: #EEEEEE none repeat scroll 0% 0%;
+    border:1px solid #CCCCCC;
+    color: #222222;
+    padding:0.1em 0.5em;
 	@include border-radius($rounding);
 }
 
@@ -33,7 +31,7 @@ input[type="reset"] {
 
 
 .no-top-margin {
-  margin-top: 0px;
+    margin-top: 0px;
 }
 
 

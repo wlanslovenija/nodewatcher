@@ -7,25 +7,25 @@
 {% block extrahead %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
 {% block content %}
-<h1>Error: Forbidden</h1>
+    <h1>Error: Forbidden</h1>
 
-<div class="error">
-{% if no_referer %}
-  <p>You are seeing this message because this HTTPS site requires a 'Referer
-   header' to be sent by your Web browser, but none was sent. This header is
-   required for security reasons, to ensure that your browser is not being
-   hijacked by third parties.</p>
+    <div class="error">
+        {% if no_referer %}
+            <p>You are seeing this message because this HTTPS site requires a 'Referer
+            header' to be sent by your Web browser, but none was sent. This header is
+            required for security reasons, to ensure that your browser is not being
+            hijacked by third parties.</p>
 
-  <p>If you have configured your browser to disable 'Referer' headers, please
-   re-enable them, at least for this site, or for HTTPS connections, or for
-   'same-origin' requests.</p>
-{% else %}
-  <p>For accessing this site and using all features cookies in your browser have to be enabled.</p>
-{% endif %}
-</div>
-<br />
+            <p>If you have configured your browser to disable 'Referer' headers, please
+            re-enable them, at least for this site, or for HTTPS connections, or for
+            'same-origin' requests.</p>
+        {% else %}
+            <p>For accessing this site and using all features cookies in your browser have to be enabled.</p>
+        {% endif %}
+    </div>
+    <br />
 
-{% if DEBUG and reason %}<p>Reason: {{ reason }}</p>{% endif %}
+    {% if DEBUG and reason %}<p>Reason: {{ reason }}</p>{% endif %}
 
-<br /><br/><br/><br/><br/><br/>
+    <br /><br/><br/><br/><br/><br/>
 {% endblock %}

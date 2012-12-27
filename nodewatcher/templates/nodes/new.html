@@ -1,39 +1,38 @@
 {% extends "my_base.html" %}
-{% load i18n %}
-{% load gmap %}
-{% load misc %}
+
+{% load i18n gmap misc %}
 
 {% block title %}{% trans "New Node Registration" %}{% endblock %}
 
 {% block heading %}
-{% with _("New Node Registration") as heading %}
-{{ block.super }}
-{% endwith %}
+    {% with _("New Node Registration") as heading %}
+        {{ block.super }}
+    {% endwith %}
 {% endblock %}
 
 {% block my_content %}
-{% with "register a new node" as form_errors_context %}
-{% with "no-top-margin" as classes %}
-{% include "form_errors.html" %}
-{% endwith %}
-{% endwith %}
+    {% with "register a new node" as form_errors_context %}
+        {% with "no-top-margin" as classes %}
+            {% include "form_errors.html" %}
+        {% endwith %}
+    {% endwith %}
 
-{% notice "" "no-top-margin" %}
-{% url nodes_list as nodes_list %}{% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
-{% endnotice %}
+    {% notice "" "no-top-margin" %}
+        {% url nodes_list as nodes_list %}{% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
+    {% endnotice %}
 
-<form action="{% url new_node %}" method="post">
-{% csrf_token %}
-<div id="registry_forms">
-  {% include "registry/forms.html" %}
-</div>
+    <form action="{% url new_node %}" method="post">
+        {% csrf_token %}
+        <div id="registry_forms">
+            {% include "registry/forms.html" %}
+        </div>
 
-<div class="buttons"><input type="submit" value="{% trans "Register" %}" /></div>
-</form>
+        <div class="buttons"><input type="submit" value="{% trans "Register" %}" /></div>
+    </form>
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/n11n.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/unidecode.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11n.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/unidecode.js"></script>
 {% endblock %}

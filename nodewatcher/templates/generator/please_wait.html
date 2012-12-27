@@ -1,31 +1,30 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load misc %}
+
+{% load i18n misc %}
 
 {% block title %}{% trans "Image Generation" %}{% endblock %}
 
 {% block heading %}
-{% with _("Image Generation Request Queued") as heading %}
-{{ block.super }}
-{% endwith %}
+    {% with _("Image Generation Request Queued") as heading %}
+        {{ block.super }}
+    {% endwith %}
 {% endblock %}
 
 {% block content %}
-{% if image_generator_enabled and not image_generator_suspended %}
-{% notice %}
-{% blocktrans %}Your image generation request has been successfully queued in our system. You should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay).{% endblocktrans %}
-{% endnotice %}
-{% else %}
-<div class="error">
-{% if image_generator_suspended %}
-{% blocktrans %}<b>ERROR:</b> Image generation is temporary suspended by administrator. Please try again later and/or get into the contact with administrator.{% endblocktrans %}
-{% else %}
-{% blocktrans %}<b>ERROR:</b> The generator is disabled in settings so your image generation request was not queued. Enable it by setting IMAGE_GENERATOR_ENABLED to True.{% endblocktrans %}
-{% endif %}
-</div>
-{% endif %}
-<div class="buttons" style="text-align: center">
-  <input type="button" value="{% trans "Back to node" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
-</div>
-
+    {% if image_generator_enabled and not image_generator_suspended %}
+        {% notice %}
+            {% blocktrans %}Your image generation request has been successfully queued in our system. You should receive an email containing generated image download locations in a short while (though in times of many requests, there will be some delay).{% endblocktrans %}
+        {% endnotice %}
+    {% else %}
+        <div class="error">
+            {% if image_generator_suspended %}
+                {% blocktrans %}<b>ERROR:</b> Image generation is temporary suspended by administrator. Please try again later and/or get into the contact with administrator.{% endblocktrans %}
+            {% else %}
+                {% blocktrans %}<b>ERROR:</b> The generator is disabled in settings so your image generation request was not queued. Enable it by setting IMAGE_GENERATOR_ENABLED to True.{% endblocktrans %}
+            {% endif %}
+        </div>
+    {% endif %}
+    <div class="buttons" style="text-align: center">
+        <input type="button" value="{% trans "Back to node" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+    </div>
 {% endblock %}

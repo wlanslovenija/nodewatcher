@@ -1,105 +1,105 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load misc %}
+
+{% load i18n misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block heading %}
-{% setcontext as heading %}
-{% url view_node node.get_current_id as node_url %}
-{% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
-{% endsetcontext %}
-{{ block.super }}
+    {% setcontext as heading %}
+        {% url view_node node.get_current_id as node_url %}
+        {% blocktrans with node.name|default:_("unknown") as node_name %}Subnet Allocation for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endsetcontext %}
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}
-{% with "allocate a subnet" as form_errors_context %}
-{% include "form_errors.html" %}
-{% endwith %}
+    {% with "allocate a subnet" as form_errors_context %}
+        {% include "form_errors.html" %}
+    {% endwith %}
 
-{% notice %}
-{% blocktrans %}A new subnet will be allocated from the IP pool for your node as soon as you press <i>Allocate</i> below. Do not forget that you must <b>update the node's router configuration</b> to reflect subnet allocation changes. You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}
-{% endnotice %}
+    {% notice %}
+        {% blocktrans %}A new subnet will be allocated from the IP pool for your node as soon as you press <i>Allocate</i> below. Do not forget that you must <b>update the node's router configuration</b> to reflect subnet allocation changes. You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}
+    {% endnotice %}
 
-{% include "nodes/general_info.html" %}
+    {% include "nodes/general_info.html" %}
 
-{% heading 2 _("Subnet Information") %}
-<form method="post" action="{% url allocate_subnet node.pk %}">
-{% csrf_token %}
-<table border="0" class="layout proptable">
-  <tr>
-    <td class="proplabel">{{ form.pool.label }}</td>
-    <td class="propbody">{{ form.pool }}</td>
-  </tr>
-  <tr>
-    <td class="proplabel">{{ form.prefix_len.label }}</td>
-    <td class="propbody"><select name="prefix_len" id="id_prefix_len"></select></td>
-  </tr>
-  {% if user.is_staff %}
-  <tr>
-    <td class="proplabel">{{ form.network.label }}</td>
-    <td class="propbody"><label onclick="toggleManualNetworkInput();">
-        <input type="checkbox" id="id_allocate_manual" checked="checked" /> {% trans "Allocate automatically from the IP pool" %}
-      </label>
-      <span class="manual_opts">
-      <br />{{ form.network }}</span>
-    </td>
-  </tr>
-  {% endif %}
-  <tr>
-    <td class="proplabel">{{ form.description.label }}</td>
-    <td class="propbody">{{ form.description }}</td>
-  </tr>
-  <tr>
-    <td class="proplabel">{{ form.dhcp.label }}</td>
-    <td class="propbody">{{ form.dhcp }}</td>
-  </tr>
-</table>
-  <div class="buttons">
-      <input type="submit" value="{% trans "Allocate" %}" />&nbsp;
-      <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
-    </div>
-</form>
+    {% heading 2 _("Subnet Information") %}
+    <form method="post" action="{% url allocate_subnet node.pk %}">
+        {% csrf_token %}
+        <table border="0" class="layout proptable">
+            <tr>
+                <td class="proplabel">{{ form.pool.label }}</td>
+                <td class="propbody">{{ form.pool }}</td>
+            </tr>
+            <tr>
+                <td class="proplabel">{{ form.prefix_len.label }}</td>
+                <td class="propbody"><select name="prefix_len" id="id_prefix_len"></select></td>
+            </tr>
+            {% if user.is_staff %}
+            <tr>
+                <td class="proplabel">{{ form.network.label }}</td>
+                <td class="propbody"><label onclick="toggleManualNetworkInput();">
+                        <input type="checkbox" id="id_allocate_manual" checked="checked" /> {% trans "Allocate automatically from the IP pool" %}
+                    </label>
+                    <span class="manual_opts">
+                    <br />{{ form.network }}</span>
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td class="proplabel">{{ form.description.label }}</td>
+                <td class="propbody">{{ form.description }}</td>
+            </tr>
+            <tr>
+                <td class="proplabel">{{ form.dhcp.label }}</td>
+                <td class="propbody">{{ form.dhcp }}</td>
+            </tr>
+        </table>
+        <div class="buttons">
+                <input type="submit" value="{% trans "Allocate" %}" />&nbsp;
+                <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+            </div>
+    </form>
 
-<script type="text/javascript">
-/* <![CDATA[ */
-  var pool_prefix_lens = {
-    {% for pool in form.get_pools %}
-    {{ pool.id }} : {
-      'min' : {{ pool.min_prefix_len }},
-      'max' : {{ pool.max_prefix_len }},
-      'def' : {{ pool.default_prefix_len }}
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-  };
-  
-  function updatePrefixLens() {
-    var prefs = $('#id_prefix_len'); 
-    prefs.empty();
-    
-    pool = pool_prefix_lens[$('#id_pool').attr('value')];
-    for (var i = pool.min; i <= pool.max; i++) {
-      prefs.append('<option value="' + i + '">/' + i + '</option>');
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    var pool_prefix_lens = {
+        {% for pool in form.get_pools %}
+        {{ pool.id }} : {
+            'min' : {{ pool.min_prefix_len }},
+            'max' : {{ pool.max_prefix_len }},
+            'def' : {{ pool.default_prefix_len }}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    function updatePrefixLens() {
+        var prefs = $('#id_prefix_len');
+        prefs.empty();
+
+        pool = pool_prefix_lens[$('#id_pool').attr('value')];
+        for (var i = pool.min; i <= pool.max; i++) {
+            prefs.append('<option value="' + i + '">/' + i + '</option>');
+        }
+        prefs.attr('value', '' + pool.def);
     }
-    prefs.attr('value', '' + pool.def); 
-  }
 
-  function toggleManualNetworkInput() {
-    if ($('#id_allocate_manual').is(':checked')) {
-      $('#id_network').attr('value', '');
-      $('.manual_opts').css('display', 'none');
+    function toggleManualNetworkInput() {
+        if ($('#id_allocate_manual').is(':checked')) {
+            $('#id_network').attr('value', '');
+            $('.manual_opts').css('display', 'none');
+        }
+        else {
+            $('.manual_opts').css('display', '');
+        }
     }
-    else {
-      $('.manual_opts').css('display', '');
-    }
-  }
-  
-  $(document).ready(function () {
-    $('#id_pool').change(function(event) {
-        updatePrefixLens();
-        toggleManualNetworkInput();
-    }).change();
-  });
-/* ]]> */
-</script>
+
+    $(document).ready(function () {
+        $('#id_pool').change(function(event) {
+            updatePrefixLens();
+            toggleManualNetworkInput();
+        }).change();
+    });
+    /* ]]> */
+    </script>
 {% endblock %}

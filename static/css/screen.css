@@ -7,1066 +7,1066 @@ small, strike, strong, sub, sup, tt, var,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 100%;
-  font-family: inherit;
-  vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
 }
 
 /* line 17, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 body {
-  line-height: 1;
-  color: black;
-  background: white;
+    line-height: 1;
+    color: black;
+    background: white;
 }
 
 /* line 19, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 ol, ul {
-  list-style: none;
+    list-style: none;
 }
 
 /* line 21, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 table {
-  border-collapse: separate;
-  border-spacing: 0;
-  vertical-align: middle;
+    border-collapse: separate;
+    border-spacing: 0;
+    vertical-align: middle;
 }
 
 /* line 23, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 caption, th, td {
-  text-align: left;
-  font-weight: normal;
-  vertical-align: middle;
+    text-align: left;
+    font-weight: normal;
+    vertical-align: middle;
 }
 
 /* line 25, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 q, blockquote {
-  quotes: "" "";
+    quotes: "" "";
 }
 /* line 96, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 q:before, q:after, blockquote:before, blockquote:after {
-  content: "";
+    content: "";
 }
 
 /* line 27, ../../../../../../../usr/share/compass/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 a img {
-  border: none;
+    border: none;
 }
 
 /* line 35, ../scss/default/screen.scss */
 body {
-  margin: 0px;
-  color: #656565;
-  font-family: Verdana, Arial, 'Bitstream Vera Sans', Helvetica, sans-serif;
-  font-size: 13px;
+    margin: 0px;
+    color: #656565;
+    font-family: Verdana, Arial, 'Bitstream Vera Sans', Helvetica, sans-serif;
+    font-size: 13px;
 }
 
 /* line 43, ../scss/default/screen.scss */
 #header h1 {
-  padding: 40px 0 10px 10px;
-  color: #68ae2c;
-  overflow: hidden;
-  font-size: 2.125em;
-  margin: 0;
+    padding: 40px 0 10px 10px;
+    color: #68ae2c;
+    overflow: hidden;
+    font-size: 2.125em;
+    margin: 0;
 }
 /* line 44, ../scss/default/screen.scss */
 #header h2 {
-  padding: 0 0 10px 10px;
-  color: #656565;
-  margin: 0;
+    padding: 0 0 10px 10px;
+    color: #656565;
+    margin: 0;
 }
 /* line 45, ../scss/default/screen.scss */
 #header h1 a, #header h1 a:hover, #header h2 a, #header h2 a:hover {
-  text-decoration: none;
-  color: inherit;
+    text-decoration: none;
+    color: inherit;
 }
 
 /* line 48, ../scss/default/screen.scss */
 #metanav {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  width: auto;
-  text-align: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: auto;
+    text-align: right;
 }
 /* line 54, ../scss/default/screen.scss */
 #metanav ul {
-  margin: 0 0 0 10px;
-  font-size: 0.85em;
-  padding: 0px;
-  text-align: left;
-  width: 100%;
+    margin: 0 0 0 10px;
+    font-size: 0.85em;
+    padding: 0px;
+    text-align: left;
+    width: 100%;
 }
 /* line 60, ../scss/default/screen.scss */
 #metanav ul li {
-  padding: 0;
-  color: #656565;
+    padding: 0;
+    color: #656565;
 }
 /* line 61, ../scss/default/screen.scss */
 #metanav ul li:before {
-  content: " • ";
-  color: #eeeeee;
+    content: " • ";
+    color: #eeeeee;
 }
 /* line 62, ../scss/default/screen.scss */
 #metanav ul li.first:before {
-  content: none;
+    content: none;
 }
 /* line 63, ../scss/default/screen.scss */
 #metanav ul a {
-  color: #68ae2c;
+    color: #68ae2c;
 }
 
 /* line 67, ../scss/default/screen.scss */
 #main {
-  background: white;
-  margin-top: 0px;
-  min-height: 300px;
-  border-width: 0 1px;
+    background: white;
+    margin-top: 0px;
+    min-height: 300px;
+    border-width: 0 1px;
 }
 /* line 72, ../scss/default/screen.scss */
 #main h1 {
-  clear: none;
+    clear: none;
 }
 
 /* line 75, ../scss/default/screen.scss */
 #navigation {
-  height: 1em;
-  font-size: 0.977em;
-  padding: 5px 0 5px 0;
-  background: #eeeeee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAD0lEQVQImWNgwARStBAAABpPAIPQzAGMAAAAAElFTkSuQmCC) repeat top left;
-  font-weight: bold;
+    height: 1em;
+    font-size: 0.977em;
+    padding: 5px 0 5px 0;
+    background: #eeeeee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAD0lEQVQImWNgwARStBAAABpPAIPQzAGMAAAAAElFTkSuQmCC) repeat top left;
+    font-weight: bold;
 }
 /* line 81, ../scss/default/screen.scss */
 #navigation ul {
-  padding: 0;
-  display: inline;
-  margin: 0;
+    padding: 0;
+    display: inline;
+    margin: 0;
 }
 /* line 85, ../scss/default/screen.scss */
 #navigation ul li {
-  padding: 0;
-  color: #656565;
+    padding: 0;
+    color: #656565;
 }
 /* line 86, ../scss/default/screen.scss */
 #navigation ul li :link, #navigation ul li :visited {
-  padding: 0 10px;
-  color: #656565;
+    padding: 0 10px;
+    color: #656565;
 }
 /* line 87, ../scss/default/screen.scss */
 #navigation ul li a:hover {
-  text-decoration: none;
-  color: #68ae2c;
+    text-decoration: none;
+    color: #68ae2c;
 }
 
 /* line 93, ../scss/default/screen.scss */
 .nav li {
-  display: inline;
-  padding: 0 .75em;
-  white-space: nowrap;
+    display: inline;
+    padding: 0 .75em;
+    white-space: nowrap;
 }
 /* line 98, ../scss/default/screen.scss */
 .nav h2, .nav hr {
-  display: none;
+    display: none;
 }
 /* line 99, ../scss/default/screen.scss */
 .nav ul {
-  list-style: none;
-  margin: 0;
-  text-align: right;
+    list-style: none;
+    margin: 0;
+    text-align: right;
 }
 
 /* line 102, ../scss/default/screen.scss */
 #mynav {
-  height: 1em;
-  font-size: 0.85em;
-  margin-top: 10px;
-  padding: 5px 0 5px 0;
-  background-color: #eeeeee;
-  font-weight: bold;
-  text-align: left;
+    height: 1em;
+    font-size: 0.85em;
+    margin-top: 10px;
+    padding: 5px 0 5px 0;
+    background-color: #eeeeee;
+    font-weight: bold;
+    text-align: left;
 }
 /* line 110, ../scss/default/screen.scss */
 #mynav ul {
-  padding: 0;
-  display: inline;
-  margin: 0;
+    padding: 0;
+    display: inline;
+    margin: 0;
 }
 /* line 114, ../scss/default/screen.scss */
 #mynav ul li {
-  padding: 0;
-  color: #656565;
+    padding: 0;
+    color: #656565;
 }
 /* line 115, ../scss/default/screen.scss */
 #mynav ul li :link, #mynav ul li :visited {
-  padding: 0 10px;
-  color: #656565;
+    padding: 0 10px;
+    color: #656565;
 }
 /* line 116, ../scss/default/screen.scss */
 #mynav ul li a:hover {
-  text-decoration: none;
-  color: #68ae2c;
+    text-decoration: none;
+    color: #68ae2c;
 }
 
 /* line 120, ../scss/default/screen.scss */
 #altlinks {
-  clear: both;
-  text-align: center;
+    clear: both;
+    text-align: center;
 }
 /* line 122, ../scss/default/screen.scss */
 #altlinks h3 {
-  font-size: 1.02em;
-  letter-spacing: normal;
-  margin: 0;
+    font-size: 1.02em;
+    letter-spacing: normal;
+    margin: 0;
 }
 /* line 123, ../scss/default/screen.scss */
 #altlinks ul {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 1em;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 1em;
 }
 /* line 124, ../scss/default/screen.scss */
 #altlinks li {
-  display: inline;
-  font-size: 11px;
-  line-height: 1.5;
-  padding: 0 1em;
-  white-space: nowrap;
+    display: inline;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 0 1em;
+    white-space: nowrap;
 }
 /* line 131, ../scss/default/screen.scss */
 #altlinks li.last {
-  border-right: none;
+    border-right: none;
 }
 /* line 132, ../scss/default/screen.scss */
 #altlinks li :link, #altlinks #altlinks li :visited {
-  background-repeat: no-repeat;
-  color: #656565;
-  border: none;
-  padding: 0 0 2px;
+    background-repeat: no-repeat;
+    color: #656565;
+    border: none;
+    padding: 0 0 2px;
 }
 /* line 138, ../scss/default/screen.scss */
 #altlinks li a.rss {
-  background-image: url('/../images/feed.png?1319062292');
-  padding-left: 20px;
+    background-image: url('/../images/feed.png?1319062292');
+    padding-left: 20px;
 }
 
 /* line 141, ../scss/default/screen.scss */
 #footer {
-  padding: 30px 10px;
-  font-size: 0.765em;
-  text-align: center;
-  color: #6f6f6f;
+    padding: 30px 10px;
+    font-size: 0.765em;
+    text-align: center;
+    color: #6f6f6f;
 }
 /* line 146, ../scss/default/screen.scss */
 #footer a {
-  text-decoration: none;
+    text-decoration: none;
 }
 /* line 64, ../scss/_rapid.scss */
 #footer a:link {
-  color: #474747;
+    color: #474747;
 }
 /* line 69, ../scss/_rapid.scss */
 #footer a:visited {
-  color: #292929;
+    color: #292929;
 }
 /* line 73, ../scss/_rapid.scss */
 #footer a:link:hover, #footer a:visited:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 /* line 76, ../scss/_rapid.scss */
 #footer a h1 :link, #footer a h1 :visited, #footer a h2 :link, #footer a h2 :visited, #footer a h3 :link, #footer a h3 :visited,
 #footer a h4 :link, #footer a h4 :visited, #footer a h5 :link, #footer a h5 :visited, #footer a h6 :link, #footer a h6 :visited {
-  color: inherit;
+    color: inherit;
 }
 
 /* line 149, ../scss/default/screen.scss */
 #content {
-  margin: 20px;
-  clear: both;
+    margin: 20px;
+    clear: both;
 }
 /* line 153, ../scss/default/screen.scss */
 #content.nodes .node_details {
-  clear: both;
+    clear: both;
 }
 /* line 155, ../scss/default/screen.scss */
 #content.nodetopology #topology {
-  max-width: 900px;
+    max-width: 900px;
 }
 /* line 159, ../scss/default/screen.scss */
 #content.register, #content.login, #content.nodetopology, #content.nodes {
-  width: 900px;
-  margin: 20px auto;
+    width: 900px;
+    margin: 20px auto;
 }
 /* line 164, ../scss/default/screen.scss */
 #content .buttons {
-  text-align: right;
+    text-align: right;
 }
 
 /* General content */
 /* line 171, ../scss/default/screen.scss */
 a {
-  text-decoration: none;
+    text-decoration: none;
 }
 /* line 64, ../scss/_rapid.scss */
 a:link {
-  color: #68ae2c;
+    color: #68ae2c;
 }
 /* line 69, ../scss/_rapid.scss */
 a:visited {
-  color: #4a900e;
+    color: #4a900e;
 }
 /* line 73, ../scss/_rapid.scss */
 a:link:hover, a:visited:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 /* line 76, ../scss/_rapid.scss */
 a h1 :link, a h1 :visited, a h2 :link, a h2 :visited, a h3 :link, a h3 :visited,
 a h4 :link, a h4 :visited, a h5 :link, a h5 :visited, a h6 :link, a h6 :visited {
-  color: inherit;
+    color: inherit;
 }
 
 /* line 175, ../scss/default/screen.scss */
 abbr {
-  cursor: help;
-  border-bottom: 1px dotted __text__;
-  font-size: 0.68em;
-  text-transform: uppercase;
+    cursor: help;
+    border-bottom: 1px dotted __text__;
+    font-size: 0.68em;
+    text-transform: uppercase;
 }
 
 /* line 182, ../scss/default/screen.scss */
 * > .anchor:link, * > .anchor:visited {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 /* line 187, ../scss/default/screen.scss */
 h1:hover .anchor, h2:hover .anchor, h3:hover .anchor,
 h4:hover .anchor, h5:hover .anchor, h6:hover .anchor {
-  visibility: visible;
+    visibility: visible;
 }
 
 /* line 191, ../scss/default/screen.scss */
 h1, h2, h3, h4 {
-  font-weight: bold;
-  letter-spacing: -0.018em;
-  page-break-after: avoid;
+    font-weight: bold;
+    letter-spacing: -0.018em;
+    page-break-after: avoid;
 }
 
 /* line 196, ../scss/default/screen.scss */
 h1 {
-  font-size: 1.445em;
-  margin: .15em 0 0.5em 0;
-  vertical-align: bottom;
+    font-size: 1.445em;
+    margin: .15em 0 0.5em 0;
+    vertical-align: bottom;
 }
 
 /* line 197, ../scss/default/screen.scss */
 h2 {
-  font-size: 1.19em;
-  margin: .10em 0 0.4em 0;
+    font-size: 1.19em;
+    margin: .10em 0 0.4em 0;
 }
 
 /* line 198, ../scss/default/screen.scss */
 h3 {
-  font-size: 1.063em;
-  margin: .7em 0 0.2em 0;
+    font-size: 1.063em;
+    margin: .7em 0 0.2em 0;
 }
 
 /* line 199, ../scss/default/screen.scss */
 hr {
-  border: none;
-  border-top: 1px solid #ccb;
-  margin: 2em 0;
+    border: none;
+    border-top: 1px solid #ccb;
+    margin: 2em 0;
 }
 
 /* line 200, ../scss/default/screen.scss */
 address {
-  font-style: normal;
+    font-style: normal;
 }
 
 /* line 201, ../scss/default/screen.scss */
 img {
-  border: none;
+    border: none;
 }
 
 /* line 204, ../scss/default/screen.scss */
 .small_text {
-  font-size: 0.68em;
-  color: #838383;
+    font-size: 0.68em;
+    color: #838383;
 }
 
 /* Misc */
 /* line 211, ../scss/default/screen.scss */
 .permalink {
-  float: right;
-  margin-top: 0.4em;
+    float: right;
+    margin-top: 0.4em;
 }
 
 /* line 216, ../scss/default/screen.scss */
 tr.inner_header {
-  background-color: #F2FBE4;
-  font-weight: bold;
+    background-color: #F2FBE4;
+    font-weight: bold;
 }
 
 /* line 221, ../scss/default/screen.scss */
 .embedded {
-  float: right;
+    float: right;
 }
 /* line 223, ../scss/default/screen.scss */
 .embedded #gmap {
-  width: 300px;
-  height: 250px;
+    width: 300px;
+    height: 250px;
 }
 /* line 228, ../scss/default/screen.scss */
 .embedded .actions {
-  width: 300px;
+    width: 300px;
 }
 
 /* line 235, ../scss/default/screen.scss */
 .summary {
-  background: #ffd;
-  border: 1px outset #996;
-  margin-top: 1em;
-  padding: .5em 1em;
-  position: relative;
+    background: #ffd;
+    border: 1px outset #996;
+    margin-top: 1em;
+    padding: .5em 1em;
+    position: relative;
 }
 
 /* line 243, ../scss/default/screen.scss */
 .networksummary h2 {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 /* line 247, ../scss/default/screen.scss */
 .networksummary table.layout td.nodes {
-  text-align: center;
-  vertical-align: baseline;
-  font-size: 2em;
-  font-weight: bold;
+    text-align: center;
+    vertical-align: baseline;
+    font-size: 2em;
+    font-weight: bold;
 }
 
 /* line 254, ../scss/default/screen.scss */
 .optional_packages ul {
-  padding: 0 0 0 0;
+    padding: 0 0 0 0;
 }
 
 /* line 258, ../scss/default/screen.scss */
 .optional_packages ul li {
-  list-style-type: none;
+    list-style-type: none;
 }
 
 /* line 262, ../scss/default/screen.scss */
 .details .first_column_width {
-  width: 300px;
+    width: 300px;
 }
 
 /* line 266, ../scss/default/screen.scss */
 .first_column_width {
-  width: 200px;
+    width: 200px;
 }
 
 /* line 271, ../scss/default/screen.scss */
 .details_title {
-  clear: both;
+    clear: both;
 }
 
 /* line 275, ../scss/default/screen.scss */
 table.smallnodeinfo {
-  float: right;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -o-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  border-radius: 3px;
-  background-color: #F5F7F5;
-  border: medium none;
-  padding: 5px;
-  margin-right: 5px;
-  width: auto;
+    float: right;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #F5F7F5;
+    border: medium none;
+    padding: 5px;
+    margin-right: 5px;
+    width: auto;
 }
 
 /* line 285, ../scss/default/screen.scss */
 .smallnodeinfo .first_column_width {
-  width: 100px;
+    width: 100px;
 }
 
 /* line 289, ../scss/default/screen.scss */
 .smallnodeinfo td {
-  font-size: 60%;
+    font-size: 60%;
 }
 
 /* Table listing */
 /* line 295, ../scss/default/screen.scss */
 table.listing {
-  margin-top: 0px;
-  clear: both;
-  border-bottom: 1px solid #cccccc;
-  border-collapse: collapse;
-  border-spacing: 0;
-  width: 100%;
+    margin-top: 0px;
+    clear: both;
+    border-bottom: 1px solid #cccccc;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
 }
 /* line 88, ../scss/_rapid.scss */
 table.listing th {
-  text-align: left;
-  padding: 0 1em .1em 0;
-  font-size: 12px;
+    text-align: left;
+    padding: 0 1em .1em 0;
+    font-size: 12px;
 }
 /* line 93, ../scss/_rapid.scss */
 table.listing th.asc a, table.listing th.desc a {
-  font-weight: bold;
-  background-position: 100% 50%;
-  background-repeat: no-repeat;
+    font-weight: bold;
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
 }
 /* line 94, ../scss/_rapid.scss */
 table.listing th.asc a {
-  background-image: url(../asc.png);
+    background-image: url(../asc.png);
 }
 /* line 95, ../scss/_rapid.scss */
 table.listing th.desc a {
-  background-image: url(../desc.png);
+    background-image: url(../desc.png);
 }
 /* line 96, ../scss/_rapid.scss */
 table.listing td.center {
-  text-align: center;
+    text-align: center;
 }
 /* line 97, ../scss/_rapid.scss */
 table.listing thead {
-  background: #dadada;
+    background: #dadada;
 }
 /* line 98, ../scss/_rapid.scss */
 table.listing thead th {
-  border: 1px solid #c2c2c2;
-  border-bottom-color: #cccccc;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 2px .5em;
-  vertical-align: bottom;
+    border: 1px solid #c2c2c2;
+    border-bottom-color: #cccccc;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px .5em;
+    vertical-align: bottom;
 }
 /* line 105, ../scss/_rapid.scss */
 table.listing thead th :link:hover, table.listing thead th :visited:hover {
-  background-color: transparent;
+    background-color: transparent;
 }
 /* line 106, ../scss/_rapid.scss */
 table.listing thead th a {
-  border: none;
-  padding-right: 12px;
+    border: none;
+    padding-right: 12px;
 }
 /* line 110, ../scss/_rapid.scss */
 table.listing tbody tr {
-  border-top: 1px solid #cccccc;
+    border-top: 1px solid #cccccc;
 }
 /* line 111, ../scss/_rapid.scss */
 table.listing tbody tr.even {
-  background-color: #f3f3f3;
+    background-color: #f3f3f3;
 }
 /* line 112, ../scss/_rapid.scss */
 table.listing tbody tr.odd {
-  background-color: #e9e9e9;
+    background-color: #e9e9e9;
 }
 /* line 113, ../scss/_rapid.scss */
 table.listing tbody tr:hover {
-  background: #dfdfdf;
+    background: #dfdfdf;
 }
 /* line 114, ../scss/_rapid.scss */
 table.listing tbody tr.focus {
-  background: #dfdfdf;
+    background: #dfdfdf;
 }
 /* line 115, ../scss/_rapid.scss */
 table.listing tbody td, table.listing tbody th {
-  border: 1px dotted #d6d6d6;
-  padding: .3em .5em;
-  vertical-align: top;
+    border: 1px dotted #d6d6d6;
+    padding: .3em .5em;
+    vertical-align: top;
 }
 /* line 116, ../scss/_rapid.scss */
 table.listing tbody td, table.listing tbody td a:hover, table.listing tbody th a:hover {
-  background-color: transparent;
+    background-color: transparent;
 }
 /* line 118, ../scss/_rapid.scss */
 table.listing tfoot td {
-  background-color: #eeeeee;
-  padding: 5px;
-  text-align: center;
-  border: 1px solid #cccccc;
+    background-color: #eeeeee;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #cccccc;
 }
 /* line 298, ../scss/default/screen.scss */
 table.listing tbody tr.section_title:hover, table.listing tbody tr.section_title:focus, table.listing tbody tr.section_title {
-  background-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 /* line 299, ../scss/default/screen.scss */
 table.listing tbody tr.webclient {
-  background-color: #EEFFD6;
+    background-color: #EEFFD6;
 }
 /* line 300, ../scss/default/screen.scss */
 table.listing tbody tr.webclient td.name {
-  font-weight: bold;
+    font-weight: bold;
 }
 /* line 303, ../scss/default/screen.scss */
 table.listing tbody td.notice, table.listing tbody th.notice {
-  padding: 5px;
-  border: 1px solid #D7D7D7;
-  background-color: #E1FFB8;
-  color: #3D6744;
-  text-align: center;
+    padding: 5px;
+    border: 1px solid #D7D7D7;
+    background-color: #E1FFB8;
+    color: #3D6744;
+    text-align: center;
 }
 /* line 311, ../scss/default/screen.scss */
 table.listing .section_title td {
-  font-weight: bold;
+    font-weight: bold;
 }
 /* line 313, ../scss/default/screen.scss */
 table.listing .section_title td h3 {
-  margin: 0;
+    margin: 0;
 }
 /* line 316, ../scss/default/screen.scss */
 table.listing tbody td.center {
-  text-align: center;
+    text-align: center;
 }
 
 /* line 322, ../scss/default/screen.scss */
 .dataTables_wrapper {
-  clear: both;
+    clear: both;
 }
 /* line 324, ../scss/default/screen.scss */
 .dataTables_wrapper input {
-  font-size: 0.68em;
+    font-size: 0.68em;
 }
 
 /* line 327, ../scss/default/screen.scss */
 .dataTables_filter {
-  width: 50%;
-  float: right;
-  text-align: right;
-  color: #656565;
+    width: 50%;
+    float: right;
+    text-align: right;
+    color: #656565;
 }
 
 /* line 334, ../scss/default/screen.scss */
 .dataTables_info {
-  width: 40%;
-  float: left;
-  padding: 5px;
-  color: #656565;
+    width: 40%;
+    float: left;
+    padding: 5px;
+    color: #656565;
 }
 
 /* line 341, ../scss/default/screen.scss */
 .dataTables_empty {
-  text-align: center;
+    text-align: center;
 }
 
 /* line 345, ../scss/default/screen.scss */
 .sorting_asc {
-  cursor: pointer;
+    cursor: pointer;
 }
 /* line 346, ../scss/default/screen.scss */
 .sorting_asc:after {
-  content: "▲";
-  float: right;
-  color: #68ae2c;
+    content: "▲";
+    float: right;
+    color: #68ae2c;
 }
 
 /* line 350, ../scss/default/screen.scss */
 .sorting_desc {
-  cursor: pointer;
+    cursor: pointer;
 }
 /* line 351, ../scss/default/screen.scss */
 .sorting_desc:after {
-  content: "▼";
-  float: right;
-  color: #68ae2c;
+    content: "▼";
+    float: right;
+    color: #68ae2c;
 }
 
 /* line 355, ../scss/default/screen.scss */
 .sorting {
-  cursor: pointer;
+    cursor: pointer;
 }
 /* line 356, ../scss/default/screen.scss */
 .sorting:after {
-  content: "●";
-  float: right;
-  color: #656565;
+    content: "●";
+    float: right;
+    color: #656565;
 }
 /* line 357, ../scss/default/screen.scss */
 .sorting:hover:after {
-  content: "●";
-  float: right;
-  color: #68ae2c;
+    content: "●";
+    float: right;
+    color: #68ae2c;
 }
 
 /* line 361, ../scss/default/screen.scss */
 .sorting_asc_disabled {
-  cursor: pointer;
+    cursor: pointer;
 }
 /* line 362, ../scss/default/screen.scss */
 .sorting_asc_disabled:after {
-  content: "▲";
-  float: right;
-  color: #656565;
+    content: "▲";
+    float: right;
+    color: #656565;
 }
 /* line 363, ../scss/default/screen.scss */
 .sorting_asc_disabled:hover:after {
-  content: "▲";
-  float: right;
-  color: #68ae2c;
+    content: "▲";
+    float: right;
+    color: #68ae2c;
 }
 
 /* line 367, ../scss/default/screen.scss */
 .sorting_desc_disabled {
-  cursor: pointer;
+    cursor: pointer;
 }
 /* line 368, ../scss/default/screen.scss */
 .sorting_desc_disabled:after {
-  content: "▼";
-  float: right;
-  color: #656565;
+    content: "▼";
+    float: right;
+    color: #656565;
 }
 /* line 369, ../scss/default/screen.scss */
 .sorting_desc_disabled:hover:after {
-  content: "▼";
-  float: right;
-  color: #68ae2c;
+    content: "▼";
+    float: right;
+    color: #68ae2c;
 }
 
 /* line 373, ../scss/default/screen.scss */
 .dataTables_empty {
-  text-align: center;
+    text-align: center;
 }
 
 /* line 378, ../scss/default/screen.scss */
 tr.subnet td.status,
 tr.subnet td.timestamp {
-  text-align: center;
+    text-align: center;
 }
 
 /* line 382, ../scss/default/screen.scss */
 tr.subnet .description {
-  margin-left: 5px;
-  font-size: 10px;
-  color: #979797;
+    margin-left: 5px;
+    font-size: 10px;
+    color: #979797;
 }
 
 /* line 388, ../scss/default/screen.scss */
 tr.conflicting .identifier {
-  color: red;
-  font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 
 /* line 393, ../scss/default/screen.scss */
 tr.conflicting .conflict {
-  color: red;
-  font-size: 10px;
+    color: red;
+    font-size: 10px;
 }
 
 /* line 398, ../scss/default/screen.scss */
 tr.conflicting .conflict ul {
-  margin: 0px;
-  padding: 0px 10px;
+    margin: 0px;
+    padding: 0px 10px;
 }
 
 /* line 403, ../scss/default/screen.scss */
 tr.conflicting .conflict li {
-  list-style-type: none;
+    list-style-type: none;
 }
 
 /* line 407, ../scss/default/screen.scss */
 .nodelist table.listing td {
-  font-size: 12px;
+    font-size: 12px;
 }
 
 /* line 411, ../scss/default/screen.scss */
 .table_links {
-  text-align: center;
+    text-align: center;
 }
 
 /* line 413, ../scss/default/screen.scss */
 table.layout {
-  width: 100%;
+    width: 100%;
 }
 
 /* line 417, ../scss/default/screen.scss */
 .proptable {
-  width: 100%;
-  margin: 3px 0 15px 0;
-  clear: none;
+    width: 100%;
+    margin: 3px 0 15px 0;
+    clear: none;
 }
 /* line 421, ../scss/default/screen.scss */
 .proptable td {
-  padding: 5px;
-  vertical-align: top;
+    padding: 5px;
+    vertical-align: top;
 }
 /* line 422, ../scss/default/screen.scss */
 .proptable td.proplabel {
-  width: 33%;
-  background: #f5f5f5;
-  font-weight: bold;
+    width: 33%;
+    background: #f5f5f5;
+    font-weight: bold;
 }
 /* line 427, ../scss/default/screen.scss */
 .proptable td.propbody {
-  width: 65%;
+    width: 65%;
 }
 /* line 430, ../scss/default/screen.scss */
 .proptable .propdescription {
-  font-size: 0.722em;
-  color: #838383;
+    font-size: 0.722em;
+    color: #838383;
 }
 /* line 435, ../scss/default/screen.scss */
 .proptable.narrow {
-  /*font-size: $font-size * 1.5;*/
-  width: 600px;
+    /*font-size: $font-size * 1.5;*/
+    width: 600px;
 }
 /* line 438, ../scss/default/screen.scss */
 .proptable.narrow td.proplabel {
-  width: 180px;
-  background: none;
+    width: 180px;
+    background: none;
 }
 /* line 439, ../scss/default/screen.scss */
 .proptable.narrow td.propbody {
-  width: 420px;
+    width: 420px;
 }
 
 /* Legends */
 /* line 446, ../scss/default/screen.scss */
 .legend {
-  padding: 0px 10px;
+    padding: 0px 10px;
 }
 /* line 448, ../scss/default/screen.scss */
 .legend dl {
-  padding: 5px 2px 15px 2px;
+    padding: 5px 2px 15px 2px;
 }
 /* line 449, ../scss/default/screen.scss */
 .legend dt {
-  display: table-cell;
-  margin: 2px 0 5px 2px;
-  white-space: nowrap;
+    display: table-cell;
+    margin: 2px 0 5px 2px;
+    white-space: nowrap;
 }
 /* line 450, ../scss/default/screen.scss */
 .legend dt:after {
-  margin-left: 0.5em;
-  content: '–';
-  white-space: nowrap;
+    margin-left: 0.5em;
+    content: '–';
+    white-space: nowrap;
 }
 /* line 451, ../scss/default/screen.scss */
 .legend dl dt img {
-  vertical-align: middle;
+    vertical-align: middle;
 }
 /* line 452, ../scss/default/screen.scss */
 .legend dd {
-  display: table-cell;
-  padding-left: 0.5em;
+    display: table-cell;
+    padding-left: 0.5em;
 }
 /* line 453, ../scss/default/screen.scss */
 .legend dd.defintion_end {
-  display: block;
-  height: 3px;
+    display: block;
+    height: 3px;
 }
 /* line 454, ../scss/default/screen.scss */
 .legend dt span.node_status_gmap {
-  margin-left: 25px;
+    margin-left: 25px;
 }
 
 /* line 457, ../scss/default/screen.scss */
 .status_legend dt img {
-  position: absolute;
-  margin-left: -20px;
-  margin-top: -0.5em;
+    position: absolute;
+    margin-left: -20px;
+    margin-top: -0.5em;
 }
 
 /* line 463, ../scss/default/screen.scss */
 .status_legend dt {
-  padding-left: 2px;
-  padding-top: 0.25em;
-  padding-bottom: 0.25em;
+    padding-left: 2px;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
 }
 
 /* line 473, ../scss/default/screen.scss */
 .errornote {
-  width: 100%;
-  margin: 0;
-  padding: 5px 0;
-  background: #f2d3d3 none;
-  color: #8e1a1a;
-  text-align: center;
+    width: 100%;
+    margin: 0;
+    padding: 5px 0;
+    background: #f2d3d3 none;
+    color: #8e1a1a;
+    text-align: center;
 }
 
 /* line 483, ../scss/default/screen.scss */
 .warning {
-  width: 100%;
-  margin: 10px 0;
-  padding: 5px 0;
-  background-color: #FFEE99;
-  color: #FF9500;
-  text-align: center;
+    width: 100%;
+    margin: 10px 0;
+    padding: 5px 0;
+    background-color: #FFEE99;
+    color: #FF9500;
+    text-align: center;
 }
 /* line 492, ../scss/default/screen.scss */
 .warning table.warnings td {
-  padding: 5px;
-  vertical-align: top;
+    padding: 5px;
+    vertical-align: top;
 }
 /* line 496, ../scss/default/screen.scss */
 .warning table.warnings .help, .warning table.warnings .datetime {
-  font-size: 10px;
-  color: #FF9500;
+    font-size: 10px;
+    color: #FF9500;
 }
 /* line 500, ../scss/default/screen.scss */
 .warning table.warnings .icon {
-  width: 20px;
+    width: 20px;
 }
 
 /* line 506, ../scss/default/screen.scss */
 .notice, .messages {
-  margin: 10px 0;
-  padding: 5px;
-  background-color: #AABBEE;
-  color: #0022BB;
-  text-align: center;
+    margin: 10px 0;
+    padding: 5px;
+    background-color: #AABBEE;
+    color: #0022BB;
+    text-align: center;
 }
 
 /* Graphs */
 /* line 517, ../scss/default/screen.scss */
 .graphs {
-  text-align: center;
+    text-align: center;
 }
 /* line 518, ../scss/default/screen.scss */
 .graphs h2 {
-  text-align: left;
-  margin-top: 30px;
+    text-align: left;
+    margin-top: 30px;
 }
 /* line 523, ../scss/default/screen.scss */
 .graphs div.graph {
-  text-align: center;
-  clear: both;
-  margin-bottom: 10px;
+    text-align: center;
+    clear: both;
+    margin-bottom: 10px;
 }
 /* line 529, ../scss/default/screen.scss */
 .graphs .timespan {
-  padding: 3px 0 20px 0;
-  margin: 0 0 5px 0;
-  background: white url('/../images/timespan.png?1319062292') no-repeat bottom center;
-  width: 900px;
-  border-bottom: solid white 6px;
+    padding: 3px 0 20px 0;
+    margin: 0 0 5px 0;
+    background: white url('/../images/timespan.png?1319062292') no-repeat bottom center;
+    width: 900px;
+    border-bottom: solid white 6px;
 }
 /* line 535, ../scss/default/screen.scss */
 .graphs .timespan a {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -o-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  border-radius: 3px;
-  color: #999999;
-  padding: 2px 5px;
-  margin-left: 4px;
-  font-size: 90%;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    color: #999999;
+    padding: 2px 5px;
+    margin-left: 4px;
+    font-size: 90%;
 }
 /* line 542, ../scss/default/screen.scss */
 .graphs .timespan a:hover {
-  background-color: #EEEEEE;
-  text-decoration: none;
+    background-color: #EEEEEE;
+    text-decoration: none;
 }
 /* line 546, ../scss/default/screen.scss */
 .graphs .timespan a.selected, .graphs .timespan a.selected:hover {
-  background-color: #CCCCCC;
-  color: white;
-  text-decoration: none;
+    background-color: #CCCCCC;
+    color: white;
+    text-decoration: none;
 }
 
 /* line 554, ../scss/default/screen.scss */
 .graphmenu {
-  text-align: left;
-  margin: 0 auto;
-  width: 566px;
+    text-align: left;
+    margin: 0 auto;
+    width: 566px;
 }
 
 /* line 560, ../scss/default/screen.scss */
 .graphmenu .timespan {
-  float: right;
+    float: right;
 }
 
 /* line 564, ../scss/default/screen.scss */
 .graphdesc {
-  color: #656565;
-  font-size: 85%;
-  text-align: center;
-  clear: both;
-  margin-bottom: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 566px;
+    color: #656565;
+    font-size: 85%;
+    text-align: center;
+    clear: both;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 566px;
 }
 /* line 573, ../scss/default/screen.scss */
 .graphdesc ul {
-  padding: 0;
+    padding: 0;
 }
 /* line 575, ../scss/default/screen.scss */
 .graphdesc ul li {
-  list-style: none;
-  margin-left: 0;
+    list-style: none;
+    margin-left: 0;
 }
 
 /* Google Maps */
 /* line 584, ../scss/default/screen.scss */
 .gmap_wrapper #gmap {
-  border: 1px solid #D7D7D7;
-  width: 100%;
-  height: 600px;
+    border: 1px solid #D7D7D7;
+    width: 100%;
+    height: 600px;
 }
 /* line 590, ../scss/default/screen.scss */
 .gmap_wrapper #gmap_statusbar {
-  font-size: 0.68em;
-  color: #838383;
+    font-size: 0.68em;
+    color: #838383;
 }
 /* line 595, ../scss/default/screen.scss */
 .gmap_wrapper .projects {
-  width: 50%;
-  float: right;
-  text-align: right;
+    width: 50%;
+    float: right;
+    text-align: right;
 }
 /* line 599, ../scss/default/screen.scss */
 .gmap_wrapper .projects .projects_listing {
-  margin-bottom: 30px;
+    margin-bottom: 30px;
 }
 /* line 600, ../scss/default/screen.scss */
 .gmap_wrapper .projects .projects_listing .project {
-  display: inline-block;
-  width: 150px;
-  height: 30px;
-  text-align: left;
+    display: inline-block;
+    width: 150px;
+    height: 30px;
+    text-align: left;
 }
 /* line 607, ../scss/default/screen.scss */
 .gmap_wrapper .legend {
-  width: 50%;
+    width: 50%;
 }
 
 /* line 613, ../scss/default/screen.scss */
 .gmap_details {
-  font-size: 80%;
+    font-size: 80%;
 }
 
 /* Folding */
 /* line 619, ../scss/default/screen.scss */
 h3.folding {
-  cursor: pointer;
-  margin: 20px 2px 10px 2px;
-  border-top: 1px solid #CCCCCC;
-  padding-left: 2px;
-  padding-top: 5px;
+    cursor: pointer;
+    margin: 20px 2px 10px 2px;
+    border-top: 1px solid #CCCCCC;
+    padding-left: 2px;
+    padding-top: 5px;
 }
 /* line 626, ../scss/default/screen.scss */
 h3.folding:before {
-  content: "▼ ";
-  color: #656565;
+    content: "▼ ";
+    color: #656565;
 }
 /* line 627, ../scss/default/screen.scss */
 h3.folding.closed:before {
-  content: "▲ ";
-  color: #656565;
+    content: "▲ ";
+    color: #656565;
 }
 /* line 628, ../scss/default/screen.scss */
 h3.folding:hover:before {
-  content: "▼ ";
-  color: #68ae2c;
+    content: "▼ ";
+    color: #68ae2c;
 }
 /* line 629, ../scss/default/screen.scss */
 h3.folding.closed:hover:before {
-  content: "▲ ";
-  color: #68ae2c;
+    content: "▲ ";
+    color: #68ae2c;
 }

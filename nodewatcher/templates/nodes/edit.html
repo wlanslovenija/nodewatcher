@@ -1,33 +1,32 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load gmap %}
-{% load misc %}
+
+{% load i18n gmap misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block heading %}
-{% setcontext as heading %}
-{% url view_node node.get_current_id as node_url %}
-{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
-{% endsetcontext %}
-{{ block.super }}
+    {% setcontext as heading %}
+        {% url view_node node.get_current_id as node_url %}
+        {% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endsetcontext %}
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<form method="post" action="{% url edit_node node.pk %}">
-{% csrf_token %}
-<div id="registry_forms">
-  {% include "registry/forms.html" %}
-</div>
+    <form method="post" action="{% url edit_node node.pk %}">
+        {% csrf_token %}
+        <div id="registry_forms">
+            {% include "registry/forms.html" %}
+        </div>
 
-<div class="buttons"><input type="submit" value="{% trans "Update" %}" />
-  <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/'" />
-</div>
-</form>
+        <div class="buttons"><input type="submit" value="{% trans "Update" %}" />
+            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/'" />
+        </div>
+    </form>
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/n11n.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/unidecode.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11n.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/unidecode.js"></script>
 {% endblock %}
