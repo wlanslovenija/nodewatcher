@@ -106,15 +106,21 @@ class Migration(DataMigration):
             general.version = "stable"
             if profile is not None:
                 router_map = {
-                  "wrt54gl" : "wrt54gl",
-                  "wrt54gs" : "wrt54gs",
-                  "whr-hp-g54" : "whr-hp-g54",
-                  "fonera" : "fon-2100",
-                  "foneraplus" : "fon-2200",
-                  "wl-500gp-v1" : "wl500gpv1",
-                  "wl-500gd" : "wl500gpv1",
-                  "rb433ah" : "rb433ah",
-                  "tp-wr741nd" : "wr741nd",
+                    "wrt54g" : "wrt54gl",
+                    "wrt54gl" : "wrt54gl",
+                    "wrt54gs" : "wrt54gs",
+                    "whr-hp-g54" : "whr-hp-g54",
+                    "fonera" : "fon-2100",
+                    "foneraplus" : "fon-2200",
+                    "wl-500gp-v1" : "wl500gpv1",
+                    "wl-500gd" : "wl500gpv1",
+                    "rb433ah" : "rb433ah",
+                    "tp-wr741nd" : "wr741nd",
+                    "tp-wr740nd" : "wr740nd",
+                    "tp-wr842nd" : "wr842nd",
+                    "tp-mr3020"  : "mr3020",
+                    "tp-wr841nd" : "wr841nd",
+                    "tp-wr703n"  : "wr703n",
                 }
                 general.router = router_map[profile.template.short_name]
                 general.platform = "openwrt"
