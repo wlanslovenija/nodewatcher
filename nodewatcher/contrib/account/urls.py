@@ -16,7 +16,7 @@ from . import decorators, forms
 # authenticated access on purpose.
 # We use custom login and logout views which give messages to the user explaining what has happened with login
 # and logout. We do not assume the user understands what is happening behind the scenes.
-account_patterns = urls.patterns('',
+urlpatterns = urls.patterns('',
     urls.url(r'^activate/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
         'template': 'registration/activation_complete.html',
     }, name='registration_activation_complete'),

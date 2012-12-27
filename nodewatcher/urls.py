@@ -2,7 +2,7 @@ from django.conf import settings, urls
 
 urlpatterns = urls.patterns('',
     # Node lists
-    urls.urls.url(r'^$', 'nodewatcher.nodes.views.nodes', name = 'nodes_list'),
+    urls.url(r'^$', 'nodewatcher.nodes.views.nodes', name = 'nodes_list'),
 
     # Node maintainers
     urls.url(r'^my/new$', 'nodewatcher.nodes.views.node_new', name = 'new_node'),
