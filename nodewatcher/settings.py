@@ -138,6 +138,8 @@ STATICFILES_FINDERS = (
 #   'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+STATICFILES_STORAGE = 'nodewatcher.frontend.staticfiles.storage.SCSSStaticFilesStorage'
+
 GEOIP_PATH = os.path.abspath(os.path.join(settings_dir, '..', 'geoip'))
 DEFAULT_COUNTRY = 'SI'
 
@@ -233,6 +235,8 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.gis',
 

@@ -8,11 +8,11 @@ amqplib==1.0.2
 anyjson==0.3.3
 billiard==2.7.3.11
 celery==3.0.5
-datastream==0.1.1
+datastream==0.1.2
 distribute==0.6.27
 django-celery==3.0.4
 django-classy-tags==0.3.4.1
-django-datastream==0.1.1
+django-datastream==0.1.2
 django-guardian==1.0.4
 django-missing==0.1.11
 django-phonenumber-field==0.2a3
