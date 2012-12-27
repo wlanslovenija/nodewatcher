@@ -1,4 +1,5 @@
 import datetime
+import pytz
 
 from nodewatcher.monitor import models as monitor_models
 from nodewatcher.monitor import processors as monitor_processors
@@ -45,7 +46,7 @@ class SystemStatusCheck(monitor_processors.NodeProcessor):
         # Schema update for system status
         status = node.monitoring.system.status(create = monitor_models.SystemStatusMonitor)
         status.uptime = uptime
-        status.local_time = datetime.datetime.fromtimestamp(local_time)
+        status.local_time = datetime.datetime.fromtimestamp(local_time, pytz.utc)
         status.save()
 
         # Schema update for general resources
