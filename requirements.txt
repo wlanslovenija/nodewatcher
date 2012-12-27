@@ -11,11 +11,14 @@ celery==3.0.5
 datastream==0.1.1
 distribute==0.6.27
 django-celery==3.0.4
+django-classy-tags==0.3.4.1
 django-datastream==0.1.1
 django-guardian==1.0.4
+django-missing==0.1.11
 django-phonenumber-field==0.2a3
 django-polymorphic==0.2
 django-registration==0.8
+django-sekizai==0.6.1
 django-tastypie==0.9.11
 dnspython==1.10.0
 docutils==0.10

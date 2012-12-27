@@ -4,8 +4,7 @@ from django.forms import models as forms_models
 from registration.backends import default as backends_default
 from registration import signals as registration_signals
 
-from nodewatcher.account import forms
-from nodewatcher.account import utils
+from . import forms, utils
 
 user_profile_registered = dispatch.Signal(providing_args=["user", "profile", "request"])
 
@@ -15,7 +14,7 @@ class ProfileBackend(backends_default.DefaultBackend):
 
     It uses extended user creation form with fields for user profile data.
 
-    It sends `nodewatcher.account.regbackend.user_profile_registered` signal with `user`, `profile` and `request` arguments`
+    It sends `nodewatcher.contrib.account.regbackend.user_profile_registered` signal with `user`, `profile` and `request` arguments`
     after user profile object has been populated with registered data.
 
     It is an extension of `registration.backends.default.DefaultBackend` backend.
@@ -51,7 +50,7 @@ class ProfileBackend(backends_default.DefaultBackend):
         """
         Returns the default form class used for user registration.
 
-        It returns `nodewatcher.account.forms.AccountRegistrationForm` form which contains fields for both user and user profile objects.
+        It returns `nodewatcher.contrib.account.forms.AccountRegistrationForm` form which contains fields for both user and user profile objects.
         """
 
         return utils.initial_accepts_request(request, forms.AccountRegistrationForm)

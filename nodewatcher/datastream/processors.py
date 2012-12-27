@@ -2,7 +2,7 @@ from django_datastream import datastream
 
 from nodewatcher.monitor import processors as monitor_processors
 
-class DataStreamProcessor(monitor_processors.NodeProcessor):
+class DatastreamProcessor(monitor_processors.NodeProcessor):
     """
     A processor that stores all monitoring data into the datastream.
     """

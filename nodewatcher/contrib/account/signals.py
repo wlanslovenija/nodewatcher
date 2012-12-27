@@ -4,8 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from registration import signals as registration_signals
 
-from nodewatcher.account import regbackend
-from nodewatcher.account import utils
+from . import regbackend, utils
 
 # Argument is user which has logged in
 user_login = dispatch.Signal(providing_args=["request", "user"])

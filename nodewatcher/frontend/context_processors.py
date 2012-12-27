@@ -1,0 +1,41 @@
+from django.conf import settings
+from django.contrib import auth
+from django.contrib.sites import models as sites_models
+
+from nodewatcher.nodes import models
+
+def web_client_node(request):
+    """
+    Adds web_client_node variable to current template context
+    depending on whether the current client's IP address is from
+    a node's allocated subnet.
+    """
+    return {
+        'web_client_node': None
+    }
+
+def global_vars(request):
+    """
+    Adds some global variables to the context.
+    """
+    return {
+        'network': {
+            'name': settings.NETWORK_NAME,
+            'home': settings.NETWORK_HOME,
+            'contact': getattr(settings, 'NETWORK_CONTACT', None),
+            'contact_page': getattr(settings, 'NETWORK_CONTACT_PAGE', None),
+            'description': getattr(settings, 'NETWORK_DESCRIPTION', None),
+            'favicon_url': getattr(settings, 'NETWORK_FAVICON_URL', None),
+            'logo_url': getattr(settings, 'NETWORK_LOGO_URL', None),
+        },
+        'request' : {
+            'path': request.path,
+            'get_full_path': request.get_full_path(),
+        },
+        'site': sites_models.Site.objects.get_current() if sites_models.Site._meta.installed else sites_models.RequestSite(request),
+        'redirect_field_name': auth.REDIRECT_FIELD_NAME,
+        'context_processor_next': request.REQUEST.get(auth.REDIRECT_FIELD_NAME, ''),
+        'base_url': "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', sites_models.Site.objects.get_current().domain),
+        'images_bindist_url': getattr(settings, 'IMAGES_BINDIST_URL', None),
+        'documentation_links': getattr(settings, 'DOCUMENTATION_LINKS', {}),
+    }

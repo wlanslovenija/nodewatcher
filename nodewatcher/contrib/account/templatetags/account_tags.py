@@ -1,7 +1,7 @@
 from django import template
 from django.core.urlresolvers import resolve
 
-from nodewatcher.account import decorators
+from .. import decorators
 
 register = template.Library()
 

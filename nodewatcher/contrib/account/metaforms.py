@@ -2,7 +2,7 @@ from django.contrib.admin import util as admin_util
 from django.forms import forms
 from django.forms import models as forms_models
 
-from nodewatcher.account import utils
+from . import utils
 
 class ParentsIncludedModelFormMetaclass(forms_models.ModelFormMetaclass):
     """

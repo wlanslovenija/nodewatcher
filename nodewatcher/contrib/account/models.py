@@ -11,8 +11,7 @@ from registration import models as registration_models
 
 from phonenumber_field import modelfields as phonenumber_fields
 
-from nodewatcher.account import geo_fields
-from nodewatcher.account import utils
+from . import geo_fields, utils
 from nodewatcher.nodes import models
 
 class UserProfileAndSettings(django_models.Model):
@@ -113,7 +112,7 @@ registration_models.RegistrationProfile.activation_key_expired = activation_key_
 
 try:
     # So that signals are registred early on
-    import nodewatcher.account.signals
+    from . import signals
 except ImportError:
     # Probably circular imports
     pass

@@ -4,7 +4,7 @@ from django.contrib.auth import models as auth_models
 from django.db import transaction
 from django.db.models import signals as models_signals
 
-from nodewatcher.account import utils
+from ... import utils
 
 class Command(management_base.NoArgsCommand):
     """

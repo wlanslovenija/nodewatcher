@@ -11,9 +11,7 @@ from django.contrib.auth import models as auth_models
 from django.utils import text as utils_text
 from django.utils.translation import ugettext_lazy as _
 
-from nodewatcher.account import metaforms
-from nodewatcher.account import models
-from nodewatcher.account import validators
+from . import metaforms, models, validators
 
 user_add_fieldsets = list(auth_admin.UserAdmin.add_fieldsets)
 user_add_fieldsets.append(auth_admin.UserAdmin.fieldsets[1]) # UserAdmin.fieldsets[1] contains first name, last name and e-mail address
@@ -150,7 +148,7 @@ class UserChangeForm(AdminUserChangeForm):
 
 class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
     """
-    This class defines change form for `nodewatcher.account.models.UserProfileAndSettings` objects.
+    This class defines change form for `nodewatcher.contrib.account.models.UserProfileAndSettings` objects.
     """
 
     error_css_class = 'error'
@@ -161,7 +159,7 @@ class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
 
 class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
     """
-    This class defines combined form for `django.contrib.auth.models.User` and `nodewatcher.account.models.UserProfileAndSettings` objects.
+    This class defines combined form for `django.contrib.auth.models.User` and `nodewatcher.contrib.account.models.UserProfileAndSettings` objects.
     It is used for user registration.
     """
 
@@ -170,7 +168,7 @@ class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncl
     fieldset = UserCreationForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
 
     def save(self, commit=True):
-        # We disable save method as registration module (through `nodewatcher.account.regbackend.ProfileBackend` backend) takes
+        # We disable save method as registration module (through `nodewatcher.contrib.account.regbackend.ProfileBackend` backend) takes
         # care of user and user profile objects creation and we do not use it for changing data
         assert False
         return None
@@ -232,7 +230,7 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
 
 class AccountChangeForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
     """
-    This class defines combined change form for `django.contrib.auth.models.User` and `nodewatcher.account.models.UserProfileAndSettings` objects.
+    This class defines combined change form for `django.contrib.auth.models.User` and `nodewatcher.contrib.account.models.UserProfileAndSettings` objects.
     """
 
     error_css_class = 'error'
