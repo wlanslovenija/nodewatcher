@@ -81,11 +81,16 @@ class PlatformBase(object):
         raise NotImplementedError
 
     def defer_format_build(self, node, cfg):
-        # TODO Defer formatting and build process via Celery
+        """
+        Deferrs formatting and building to a background Celery job. The job
+        is responsible for calling proper format and build methods on this
+        platform.
 
-        # TODO Don't forget to add proper Celery routing so this doesn't
-        #      get routed to the workers for generating graphs!
-        pass
+        :param node: Node instance to generate the firmware for
+        :param cfg: Generated configuration (platform-dependent)
+        """
+        from . import tasks
+        tasks.format_and_build.delay(node, self, cfg)
 
     def register_module(self, order, module, router = None):
         """
