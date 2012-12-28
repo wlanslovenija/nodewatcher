@@ -213,13 +213,13 @@ INSTALLED_APPS = (
     # Ours are first so that we can override default templates in other apps.
     'nodewatcher.legacy.nodes',
     'nodewatcher.legacy.policy',
-    'nodewatcher.generator',
 
     'nodewatcher.contrib.account',
     'nodewatcher.registry',
     'nodewatcher.registry.loader',
     'nodewatcher.core',
     'nodewatcher.core.cgm',
+    'nodewatcher.core.generator',
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.core.frontend',
