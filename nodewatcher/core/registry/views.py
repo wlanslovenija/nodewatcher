@@ -67,7 +67,7 @@ def evaluate_forms(request, regpoint_id, root_id):
 
     # Render forms and return them
     return render_to_response(
-      'registry/forms.html',
+        'registry/forms.html',
       {
         'registry_forms' : forms,
         'eval_state' : safestring.mark_safe(json.dumps(actions["STATE"])),

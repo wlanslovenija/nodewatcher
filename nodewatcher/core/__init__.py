@@ -1,4 +1,4 @@
-from nodewatcher.registry import registration
+from .registry import registration
 
 # Create registration point
 registration.create_point("nodes.Node", "config")

@@ -1,6 +1,6 @@
 from django_datastream import datastream
 
-from nodewatcher.registry import registration
+from nodewatcher.core.registry import registration
 
 # To create node.monitoring registration point
 import nodewatcher.core.monitor

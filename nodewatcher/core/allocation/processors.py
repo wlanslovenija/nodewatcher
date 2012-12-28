@@ -1,8 +1,8 @@
 from nodewatcher.core import allocation as core_allocation
 from nodewatcher.core import models as core_models
 from nodewatcher.core.allocation import pool as pool_models
-from nodewatcher.registry import registration
-from nodewatcher.registry.forms import processors
+from ..registry import registration
+from ..registry.forms import processors
 
 class AutoPoolAllocator(processors.RegistryFormProcessor):
     """

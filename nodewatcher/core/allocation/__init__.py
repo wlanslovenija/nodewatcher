@@ -7,9 +7,9 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core.allocation import pool as pool_models
 # TODO project model should be moved to core
 from nodewatcher.legacy.nodes import models as nodes_models
-from nodewatcher.registry import fields as registry_fields
-from nodewatcher.registry import forms as registry_forms
-from nodewatcher.registry import registration, permissions
+from ..registry import fields as registry_fields
+from ..registry import forms as registry_forms
+from ..registry import registration, permissions
 
 class AddressAllocator(models.Model):
     """

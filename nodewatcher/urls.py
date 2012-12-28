@@ -2,7 +2,7 @@ from django.conf import urls
 
 urlpatterns = urls.patterns('',
     # Registry
-    urls.url(r'^registry/', urls.include('nodewatcher.registry.urls', namespace = 'registry')),
+    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace = 'registry')),
 
     # Accounts
     urls.url(r'account/', urls.include('nodewatcher.contrib.account.urls')),

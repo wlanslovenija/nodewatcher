@@ -215,8 +215,8 @@ INSTALLED_APPS = (
     'nodewatcher.legacy.policy',
 
     'nodewatcher.contrib.account',
-    'nodewatcher.registry',
-    'nodewatcher.registry.loader',
+    'nodewatcher.core.registry',
+    'nodewatcher.core.registry.loader',
     'nodewatcher.core',
     'nodewatcher.core.cgm',
     'nodewatcher.core.generator',

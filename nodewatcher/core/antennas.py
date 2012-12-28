@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import datastructures
 
-from nodewatcher.registry import fields as registry_fields
+from ..registry import fields as registry_fields
 
 class Antenna(models.Model):
     """

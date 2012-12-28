@@ -3,7 +3,7 @@ from django.contrib.contenttypes import generic
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from nodewatcher.registry import fields as registry_fields
+from ..registry import fields as registry_fields
 from nodewatcher.utils import ipaddr
 
 class PoolAllocationError(Exception):

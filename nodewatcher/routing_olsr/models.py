@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.monitor import models as monitor_models
-from nodewatcher.registry import registration
+from nodewatcher.core.registry import registration
 
 OLSR_PROTOCOL_NAME = "olsr"
 
