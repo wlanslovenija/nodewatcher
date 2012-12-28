@@ -283,6 +283,15 @@ class RegistrationPoint(object):
         """
         return iter(self.item_classes)
 
+    def add_mixins(self, *mixins):
+        """
+        Adds one or more mixins to the top-level registry item that is associated
+        with this registration point.
+
+        @param mixins: Mixin classes
+        """
+        self.item_base.__bases__ += tuple(mixins)
+
 def create_point(model, namespace, mixins = None):
     """
     Creates a new registration point (= registry root).
