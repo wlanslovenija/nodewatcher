@@ -229,7 +229,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.routing_olsr',
     'nodewatcher.firmware_core',
-    'nodewatcher.firmware_tunneldigger',
+    'nodewatcher.modules.vpn.tunneldigger',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -354,7 +354,7 @@ REGISTRY_FORM_PROCESSORS = {
 CGM_MODULES = (
     'nodewatcher.core.cgm.openwrt',
     'nodewatcher.firmware_core.openwrt',
-    'nodewatcher.firmware_tunneldigger.openwrt',
+    'nodewatcher.modules.vpn.tunneldigger.openwrt',
     'nodewatcher.routing_olsr.cgm',
 )
 
