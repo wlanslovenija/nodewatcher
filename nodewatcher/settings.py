@@ -211,7 +211,7 @@ AUTHENTICATION_BACKENDS = (
 
 INSTALLED_APPS = (
     # Ours are first so that we can override default templates in other apps.
-    'nodewatcher.nodes',
+    'nodewatcher.legacy.nodes',
     'nodewatcher.generator',
     'nodewatcher.policy',
     'nodewatcher.frontend',
@@ -224,10 +224,10 @@ INSTALLED_APPS = (
     'nodewatcher.core.cgm.packages.solar',
     'nodewatcher.core.cgm.packages.digitemp',
     'nodewatcher.monitor',
+    'nodewatcher.monitor.modules.http',
+    'nodewatcher.monitor.modules.simple',
     'nodewatcher.datastream',
     'nodewatcher.routing_olsr',
-    'nodewatcher.telemetry_http',
-    'nodewatcher.telemetry_core',
     'nodewatcher.firmware_core',
     'nodewatcher.firmware_tunneldigger',
 
@@ -328,8 +328,8 @@ MONITOR_INTERVAL = 300
 MONITOR_PROCESSORS = (
     'nodewatcher.routing_olsr.processors.OLSRTopology',
     'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
-    'nodewatcher.telemetry_http.processors.HTTPTelemetry',
-    'nodewatcher.telemetry_core.processors.SystemStatusCheck',
+    'nodewatcher.monitor.modules.http.processors.HTTPTelemetry',
+    'nodewatcher.monitor.modules.simple.processors.SystemStatusCheck',
     'nodewatcher.datastream.processors.DatastreamProcessor',
     'nodewatcher.monitor.processors.PurgeInvalidNodes'
 )

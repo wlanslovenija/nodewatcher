@@ -2,7 +2,7 @@ import contextlib
 import logging
 import traceback
 
-from nodewatcher.nodes import models as nodes_models
+from nodewatcher.legacy.nodes import models as nodes_models
 
 class ProcessorContext(dict):
     """

@@ -7,4 +7,4 @@ registration.create_point("nodes.Node", "config")
 from nodewatcher.core import allocation as core_allocation
 
 # Dependencies
-import nodewatcher.nodes
+import nodewatcher.legacy.nodes

@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from nodewatcher import datastream
-from nodewatcher.nodes import models as nodes_models
+from nodewatcher.legacy.nodes import models as nodes_models
 from nodewatcher.registry import fields as registry_fields
 from nodewatcher.registry import registration
 

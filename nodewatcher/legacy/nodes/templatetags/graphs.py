@@ -1,7 +1,7 @@
 from django import template
 from django.template import loader
 
-from nodewatcher.nodes import models
+from nodewatcher.legacy.nodes import models
 
 register = template.Library()
 

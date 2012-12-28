@@ -73,7 +73,7 @@ class Command(management_base.BaseCommand):
                 name = "%s.%s" % (object.__module__, object.__class__.__name__)
 
                 # Some objects need to be sanitized
-                if name == 'nodewatcher.nodes.models.Node':
+                if name == 'nodewatcher.legacy.nodes.models.Node':
                     if not object.is_dead():
                         # We do not clean notes for dead nodes as they explain death background
                         object.notes = ''

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core import allocation
 from nodewatcher.core import models as core_models
 from nodewatcher.core import antennas as core_antennas
-from nodewatcher.nodes import models as nodes_models
+from nodewatcher.legacy.nodes import models as nodes_models
 from nodewatcher.registry import fields as registry_fields
 from nodewatcher.registry import forms as registry_forms
 from nodewatcher.registry import registration, permissions

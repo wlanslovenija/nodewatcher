@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 
 from guardian.shortcuts import assign as assign_permission
 
-from nodewatcher.nodes.models import Node
+from nodewatcher.legacy.nodes.models import Node
 
 from nodewatcher.registry import forms as registry_forms
 

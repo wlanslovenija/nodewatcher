@@ -96,7 +96,7 @@ class NoticeNode(template.Node):
 
     def render(self, context):
         return loader.render_to_string(
-          'notice.html', {
+            'notice.html', {
             'type' : self.notice_type.resolve(context),
             'classes' : self.classes.resolve(context),
             'notice' : self.nodelist.render(context),
@@ -133,7 +133,7 @@ class DoclinkNode(template.Node):
 
     def render(self, context):
         html = loader.render_to_string(
-          'documentation_link.html', {
+            'documentation_link.html', {
             'url' : DOCUMENTATION_LINKS.get(self.tag),
             'link' : self.link.resolve(context),
           }, context).strip()

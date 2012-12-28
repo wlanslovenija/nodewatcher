@@ -6,8 +6,8 @@ from nodewatcher.monitor import processors as monitor_processors
 
 class SystemStatusCheck(monitor_processors.NodeProcessor):
     """
-    Stores system status telemetry data into the database. Will only run if HTTP
-    telemetry module has previously fetched data.
+    Stores system status monitor data into the database. Will only run if HTTP
+    monitor module has previously fetched data.
     """
     @monitor_processors.depends_on_context("http")
     def process(self, context, node):

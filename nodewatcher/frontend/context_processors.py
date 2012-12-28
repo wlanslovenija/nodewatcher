@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.sites import models as sites_models
 
-from nodewatcher.nodes import models
+from nodewatcher.legacy.nodes import models
 
 def web_client_node(request):
     """

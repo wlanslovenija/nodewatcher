@@ -12,7 +12,7 @@ from registration import models as registration_models
 from phonenumber_field import modelfields as phonenumber_fields
 
 from . import geo_fields, utils
-from nodewatcher.nodes import models
+from nodewatcher.legacy.nodes import models
 
 class UserProfileAndSettings(django_models.Model):
     """
