@@ -2,8 +2,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from nodewatcher.core import models as core_models
-from nodewatcher.monitor import models as monitor_models
-from nodewatcher.monitor import processors as monitor_processors
+from nodewatcher.core.monitor import models as monitor_models
+from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.legacy.nodes import models as nodes_models
 from nodewatcher.routing_olsr import parser as olsr_parser
 from nodewatcher.routing_olsr import models as olsr_models

@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.utils import importlib
 
-from nodewatcher.monitor import processors as monitor_processors
+from nodewatcher.core.monitor import processors as monitor_processors
 
 # Welcome banner
 BANNER = """

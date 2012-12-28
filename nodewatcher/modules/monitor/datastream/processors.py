@@ -1,6 +1,6 @@
 from django_datastream import datastream
 
-from nodewatcher.monitor import processors as monitor_processors
+from nodewatcher.core.monitor import processors as monitor_processors
 
 class DatastreamProcessor(monitor_processors.NodeProcessor):
     """

@@ -223,8 +223,8 @@ INSTALLED_APPS = (
     'nodewatcher.core.cgm',
     'nodewatcher.core.cgm.packages.solar',
     'nodewatcher.core.cgm.packages.digitemp',
-    'nodewatcher.monitor',
-    'nodewatcher.monitor.sources.http',
+    'nodewatcher.core.monitor',
+    'nodewatcher.core.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.routing_olsr',
     'nodewatcher.firmware_core',
@@ -292,7 +292,7 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'propagate': False,
         },
-        # TODO: "monitor" or "nodewatcher.monitor"?
+        # TODO: "monitor" or "nodewatcher.core.monitor"?
         'monitor': {
             'handlers': ['console'],
             'level': 'INFO',
@@ -327,10 +327,10 @@ MONITOR_INTERVAL = 300
 MONITOR_PROCESSORS = (
     'nodewatcher.routing_olsr.processors.OLSRTopology',
     'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
-    'nodewatcher.monitor.sources.http.processors.HTTPTelemetry',
-    'nodewatcher.monitor.sources.http.processors.SystemStatusCheck',
+    'nodewatcher.core.monitor.sources.http.processors.HTTPTelemetry',
+    'nodewatcher.core.monitor.sources.http.processors.SystemStatusCheck',
     'nodewatcher.datastream.processors.DatastreamProcessor',
-    'nodewatcher.monitor.processors.PurgeInvalidNodes'
+    'nodewatcher.core.monitor.processors.PurgeInvalidNodes'
 )
 
 # Backend for the monitoring data archive.
