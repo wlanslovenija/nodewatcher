@@ -2,7 +2,8 @@ import multiprocessing
 
 from django.db import transaction, connection
 from django.utils import unittest
-from core.allocation.pool import IpPool, IpPoolStatus
+
+from .allocation import pool
 
 @transaction.commit_on_success
 def _concurrent_allocation_worker(pool):
@@ -21,13 +22,13 @@ class IpPoolTestCase(unittest.TestCase):
         Prepare the IP pool test environment by creating some dummy IP
         pools.
         """
-        self.pool = IpPool.objects.create(
+        self.pool = pool.IpPool.objects.create(
           family = "ipv4",
           network = "10.10.0.0",
           prefix_length = 16,
         )
 
-        self.small_pool = IpPool.objects.create(
+        self.small_pool = pool.IpPool.objects.create(
           family = "ipv4",
           network = "192.168.1.0",
           prefix_length = 26,
@@ -54,9 +55,9 @@ class IpPoolTestCase(unittest.TestCase):
         self.assertEqual(len(networks), 3)
 
         # Test that statuses have been properly set
-        self.assertEqual(a.status, IpPoolStatus.Full)
-        self.assertEqual(b.status, IpPoolStatus.Full)
-        self.assertEqual(c.status, IpPoolStatus.Full)
+        self.assertEqual(a.status, pool.IpPoolStatus.Full)
+        self.assertEqual(b.status, pool.IpPoolStatus.Full)
+        self.assertEqual(c.status, pool.IpPoolStatus.Full)
 
     def test_allocation_failure(self):
         # Test that we can't allocate more than we have

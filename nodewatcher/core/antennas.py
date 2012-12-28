@@ -1,9 +1,7 @@
-from django.forms import models as model_forms
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.forms import models as model_forms
 from django.utils import datastructures
-
-from ..registry import fields as registry_fields
+from django.utils.translation import ugettext_lazy as _
 
 class Antenna(models.Model):
     """
