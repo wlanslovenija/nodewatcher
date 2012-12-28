@@ -225,7 +225,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.cgm.packages.digitemp',
     'nodewatcher.monitor',
     'nodewatcher.monitor.sources.http',
-    'nodewatcher.datastream',
+    'nodewatcher.modules.monitor.datastream',
     'nodewatcher.routing_olsr',
     'nodewatcher.firmware_core',
     'nodewatcher.firmware_tunneldigger',

@@ -1,4 +1,4 @@
-import datastream
+from django_datastream import datastream
 
 from nodewatcher.registry import registration
 

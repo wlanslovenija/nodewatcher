@@ -1,8 +1,8 @@
-from celery.task import task as celery_task
+from celery import task
 
 from django_datastream import datastream
 
-@celery_task()
+@task.task()
 def run_downsampling():
     """
     Executes the `downsample_streams` API method on the datastream backend
