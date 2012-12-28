@@ -9,7 +9,7 @@ from nodewatcher.core.allocation import pool as pool_models
 from nodewatcher.legacy.nodes import models as nodes_models
 from ..registry import fields as registry_fields
 from ..registry import forms as registry_forms
-from ..registry import registration, permissions
+from ..registry import permissions
 
 class AddressAllocator(models.Model):
     """

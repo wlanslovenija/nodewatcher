@@ -205,5 +205,5 @@ def load_modules():
     for module in getattr(settings, 'CGM_MODULES', []):
         try:
             importlib.import_module(module)
-        except ImportError:
-            raise ImproperlyConfigured("Error importing CGM module '%s'!" % module)
+        except ImportError, e:
+            raise ImproperlyConfigured("Error importing CGM module '%s': %s" % (module, e))
