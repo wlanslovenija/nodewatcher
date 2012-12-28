@@ -29,7 +29,6 @@ dropdb -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
 dropuser -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
 createuser -h ${PSQL_HOST} ${PSQL_USER_ARG} -S -D -R nodewatcher || true
 createdb -h ${PSQL_HOST} ${PSQL_USER_ARG} -E UNICODE -T template0 -O nodewatcher nodewatcher
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher -f ${CONTRIB_DIR}/ip4r.sql
 createlang -h ${PSQL_HOST} ${PSQL_USER_ARG} plpgsql nodewatcher || true
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis.sql
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/spatial_ref_sys.sql
