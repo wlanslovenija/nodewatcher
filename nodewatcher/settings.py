@@ -226,6 +226,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.monitor',
     'nodewatcher.core.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
+    'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.routing_olsr',
     'nodewatcher.firmware_core',
     'nodewatcher.firmware_tunneldigger',
@@ -328,7 +329,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.routing_olsr.processors.OLSRTopology',
     'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
     'nodewatcher.core.monitor.sources.http.processors.HTTPTelemetry',
-    'nodewatcher.core.monitor.sources.http.processors.SystemStatusCheck',
+    'nodewatcher.modules.monitor.http.resources.processors.SystemStatusCheck',
     'nodewatcher.datastream.processors.DatastreamProcessor',
     'nodewatcher.core.monitor.processors.PurgeInvalidNodes'
 )
