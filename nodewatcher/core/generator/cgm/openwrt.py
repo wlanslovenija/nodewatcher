@@ -216,7 +216,7 @@ def general(node, cfg):
     system.timezone = "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"
 
     # Setup base packages to be installed
-    # TODO: This should probably not be hardcoded
+    # TODO: This should probably not be hardcoded (or at least moved to modules)
     cfg.packages.update(["nodewatcher-core", "nodewatcher-watchdog"])
 
 def configure_network(cfg, network, section):
