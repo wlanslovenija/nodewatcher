@@ -2,7 +2,7 @@ from nodewatcher.core.registry.cgm import base as cgm_base
 from nodewatcher.core.registry.cgm import routers as cgm_routers
 from nodewatcher.core.registry.cgm import protocols as cgm_protocols
 
-from nodewatcher.core.generator.cgm.openwrt.fon import fon2100
+from . import fon2100
 
 class FoneraPlus(fon2100.Fonera):
     """

@@ -352,7 +352,7 @@ REGISTRY_FORM_PROCESSORS = {
 
 # Configuration generating modules for firmware images.
 CGM_MODULES = (
-    'nodewatcher.core.generator.cgm.openwrt',
+    'nodewatcher.modules.platforms.openwrt',
     'nodewatcher.firmware_core.openwrt',
     'nodewatcher.modules.vpn.tunneldigger.openwrt',
     'nodewatcher.modules.routing.olsr.cgm',

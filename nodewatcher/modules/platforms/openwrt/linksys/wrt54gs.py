@@ -2,7 +2,7 @@ from nodewatcher.core.registry.cgm import base as cgm_base
 from nodewatcher.core.registry.cgm import routers as cgm_routers
 from nodewatcher.core.registry.cgm import protocols as cgm_protocols
 
-from nodewatcher.core.generator.cgm.openwrt.linksys import wrt54gl
+from . import wrt54gl
 
 class LinksysWRT54GS(wrt54gl.LinksysWRT54GL):
     """

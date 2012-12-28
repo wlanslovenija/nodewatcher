@@ -183,8 +183,7 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         :param cfg: Generated configuration (platform-dependent)
         :return: Platform-dependent object
         """
-        # TODO Split UCI configuration into files, return a dictionary
-        #      containing a mapping from file names to their contents
+        # TODO: Split UCI configuration into files, return a dictionary containing a mapping from file names to their contents
         raise NotImplementedError
 
     def build(self, formatted_cfg):
@@ -195,20 +194,9 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         :param formatted_cfg: Formatted configuration (platform-dependent)
         :return: Build process result
         """
-        # TODO Setup the image builder fraemwork, write the formatted
-        #      configuration to the filesystem, use the proper builder
-        #      profile and build the firmware
+        # TODO: Setup the image builder fraemwork, write the formatted configuration to the filesystem, use the proper builder profile and build the firmware
 
-        # TODO How to define build profile? Modules should probably specify
-        #      that somehow (a special UCI configuration package called "build"?)
+        # TODO: How to define build profile? Modules should probably specify that somehow (a special UCI configuration package called "build"?)
         raise NotImplementedError
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
-
-# Load all model-specific modules
-import nodewatcher.core.generator.cgm.openwrt.fon
-import nodewatcher.core.generator.cgm.openwrt.linksys
-import nodewatcher.core.generator.cgm.openwrt.buffalo
-import nodewatcher.core.generator.cgm.openwrt.mikrotik
-import nodewatcher.core.generator.cgm.openwrt.asus
-import nodewatcher.core.generator.cgm.openwrt.tplink
