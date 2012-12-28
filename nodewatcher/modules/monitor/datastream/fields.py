@@ -1,4 +1,4 @@
-import datastream
+from django_datastream import datastream
 
 class Field(object):
     """

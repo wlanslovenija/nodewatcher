@@ -1,4 +1,3 @@
-
 class ConnectDatastream(object):
     def __init__(self, **kwargs):
         """
