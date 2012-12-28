@@ -206,9 +206,9 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 
 # Load all model-specific modules
-import nodewatcher.core.cgm.openwrt.fon
-import nodewatcher.core.cgm.openwrt.linksys
-import nodewatcher.core.cgm.openwrt.buffalo
-import nodewatcher.core.cgm.openwrt.mikrotik
-import nodewatcher.core.cgm.openwrt.asus
-import nodewatcher.core.cgm.openwrt.tplink
+import nodewatcher.core.generator.cgm.openwrt.fon
+import nodewatcher.core.generator.cgm.openwrt.linksys
+import nodewatcher.core.generator.cgm.openwrt.buffalo
+import nodewatcher.core.generator.cgm.openwrt.mikrotik
+import nodewatcher.core.generator.cgm.openwrt.asus
+import nodewatcher.core.generator.cgm.openwrt.tplink

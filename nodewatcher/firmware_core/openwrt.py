@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core.cgm import models as cgm_models
+from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.registry.cgm import base as cgm_base
 from nodewatcher.core.registry.cgm import resources as cgm_resources
 from nodewatcher.core.registry.cgm import routers as cgm_routers

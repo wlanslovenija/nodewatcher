@@ -218,7 +218,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.registry',
     'nodewatcher.core.registry.loader',
     'nodewatcher.core',
-    'nodewatcher.core.cgm',
+    'nodewatcher.core.generator.cgm',
     'nodewatcher.core.generator',
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.sensors.digitemp',
@@ -346,13 +346,13 @@ DATASTREAM_BACKEND_SETTINGS = {
 REGISTRY_FORM_PROCESSORS = {
     'node.config': (
         'nodewatcher.core.allocation.processors.AutoPoolAllocator',
-        'nodewatcher.core.cgm.processors.NodeCgmValidator',
+        'nodewatcher.core.generator.cgm.processors.NodeCgmValidator',
     )
 }
 
 # Configuration generating modules for firmware images.
 CGM_MODULES = (
-    'nodewatcher.core.cgm.openwrt',
+    'nodewatcher.core.generator.cgm.openwrt',
     'nodewatcher.firmware_core.openwrt',
     'nodewatcher.modules.vpn.tunneldigger.openwrt',
     'nodewatcher.modules.routing.olsr.cgm',
