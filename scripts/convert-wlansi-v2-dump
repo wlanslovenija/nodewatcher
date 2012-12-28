@@ -1,8 +1,13 @@
 #!/bin/bash
 
 DUMP="$1"
+if which gsed > /dev/null; then
+	SED="gsed"
+else
+	SED="sed"
+fi
 
-sed -f - -i ${DUMP} <<EOF
+$SED -f - -i ${DUMP} <<EOF
 s/public\.ip4r/character varying\(32\)/g
 s/wlansi_nw\./public./g
 s/wlansi_nw/nodewatcher/g
