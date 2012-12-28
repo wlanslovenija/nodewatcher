@@ -3,7 +3,7 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core import models as core_models
 from nodewatcher.core.registry.cgm import base as cgm_base
 from nodewatcher.core.registry.cgm import resources as cgm_resources
-from nodewatcher.routing_olsr import models as olsr_models
+from . import models as olsr_models
 from nodewatcher.utils import ipaddr
 
 ROUTING_TABLE_ID = 20

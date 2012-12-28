@@ -227,7 +227,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
-    'nodewatcher.routing_olsr',
+    'nodewatcher.modules.routing.olsr',
     'nodewatcher.firmware_core',
     'nodewatcher.modules.vpn.tunneldigger',
 
@@ -326,8 +326,8 @@ MONITOR_INTERVAL = 300
 # executed in parallel for all nodes that have been chosen so far by network processors. Only
 # processors that are specified here will be called.
 MONITOR_PROCESSORS = (
-    'nodewatcher.routing_olsr.processors.OLSRTopology',
-    'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
+    'nodewatcher.modules.routing.olsr.processors.OLSRTopology',
+    'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
     'nodewatcher.core.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatusCheck',
     'nodewatcher.datastream.processors.DatastreamProcessor',
@@ -355,7 +355,7 @@ CGM_MODULES = (
     'nodewatcher.core.cgm.openwrt',
     'nodewatcher.firmware_core.openwrt',
     'nodewatcher.modules.vpn.tunneldigger.openwrt',
-    'nodewatcher.routing_olsr.cgm',
+    'nodewatcher.modules.routing.olsr.cgm',
 )
 
 OLSRD_MONITOR_HOST = '127.0.0.1'

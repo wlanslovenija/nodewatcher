@@ -13,28 +13,28 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Adding model 'OlsrRoutingTopologyMonitor'
-        db.create_table('routing_olsr_olsrroutingtopologymonitor', (
+        db.create_table('olsr_olsrroutingtopologymonitor', (
             ('routingtopologymonitor_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['core.RoutingTopologyMonitor'], unique=True, primary_key=True)),
         ))
-        db.send_create_signal('routing_olsr', ['OlsrRoutingTopologyMonitor'])
+        db.send_create_signal('olsr', ['OlsrRoutingTopologyMonitor'])
 
         # Adding model 'OlsrTopologyLink'
-        db.create_table('routing_olsr_olsrtopologylink', (
+        db.create_table('olsr_olsrtopologylink', (
             ('topologylink_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['core.TopologyLink'], unique=True, primary_key=True)),
             ('lq', self.gf('django.db.models.fields.FloatField')(default=0.0)),
             ('ilq', self.gf('django.db.models.fields.FloatField')(default=0.0)),
             ('etx', self.gf('django.db.models.fields.FloatField')(default=0.0)),
         ))
-        db.send_create_signal('routing_olsr', ['OlsrTopologyLink'])
+        db.send_create_signal('olsr', ['OlsrTopologyLink'])
 
 
     def backwards(self, orm):
 
         # Deleting model 'OlsrRoutingTopologyMonitor'
-        db.delete_table('routing_olsr_olsrroutingtopologymonitor')
+        db.delete_table('olsr_olsrroutingtopologymonitor')
 
         # Deleting model 'OlsrTopologyLink'
-        db.delete_table('routing_olsr_olsrtopologylink')
+        db.delete_table('olsr_olsrtopologylink')
 
 
     models = {
@@ -188,11 +188,11 @@ class Migration(SchemaMigration):
             'sticker': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['dns.Zone']", 'null': 'True'})
         },
-        'routing_olsr.olsrroutingtopologymonitor': {
+        'olsr.olsrroutingtopologymonitor': {
             'Meta': {'ordering': "['id']", 'object_name': 'OlsrRoutingTopologyMonitor', '_ormbases': ['core.RoutingTopologyMonitor']},
             'routingtopologymonitor_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoutingTopologyMonitor']", 'unique': 'True', 'primary_key': 'True'})
         },
-        'routing_olsr.olsrtopologylink': {
+        'olsr.olsrtopologylink': {
             'Meta': {'object_name': 'OlsrTopologyLink', '_ormbases': ['core.TopologyLink']},
             'etx': ('django.db.models.fields.FloatField', [], {'default': '0.0'}),
             'ilq': ('django.db.models.fields.FloatField', [], {'default': '0.0'}),
@@ -201,4 +201,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['routing_olsr']
+    complete_apps = ['olsr']
