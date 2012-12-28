@@ -1,5 +1,5 @@
-from nodewatcher.legacy.nodes import models as nodes_models
 from nodewatcher.core.monitor import processors
+from nodewatcher.legacy.nodes import models as nodes_models
 
 class PurgeInvalidNodes(processors.NetworkProcessor):
     def process(self, context, nodes):

@@ -1,10 +1,6 @@
-from django import forms
-from django.db import models
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.generator.cgm import models as cgm_models
-from nodewatcher.core.registry import fields as registry_fields
-from nodewatcher.core.registry import forms as registry_forms
 from nodewatcher.core.registry import registration
 from nodewatcher.core.registry.cgm import base as cgm_base
 

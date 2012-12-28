@@ -2,11 +2,10 @@ from django.conf import settings
 from django.utils import timezone
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import models as monitor_models
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 from nodewatcher.legacy.nodes import models as nodes_models
-from . import parser as olsr_parser
-from . import models as olsr_models
+
+from . import models as olsr_models, parser as olsr_parser
 
 class OLSRTopology(monitor_processors.NetworkProcessor):
     """
