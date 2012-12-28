@@ -4,7 +4,7 @@ import pytz
 
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 
-class SystemStatusCheck(monitor_processors.NodeProcessor):
+class SystemStatus(monitor_processors.NodeProcessor):
     """
     Stores system status monitor data into the database. Will only run if HTTP
     monitor module has previously fetched data.

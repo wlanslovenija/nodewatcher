@@ -329,9 +329,9 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.routing.olsr.processors.OLSRTopology',
     'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
     'nodewatcher.core.monitor.sources.http.processors.HTTPTelemetry',
-    'nodewatcher.modules.monitor.http.resources.processors.SystemStatusCheck',
-    'nodewatcher.modules.monitor.datastream.processors.DatastreamProcessor',
-    'nodewatcher.core.monitor.processors.PurgeInvalidNodes'
+    'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
+    'nodewatcher.modules.monitor.datastream.processors.Datastream',
+    'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes'
 )
 
 # Backend for the monitoring data archive.
@@ -352,8 +352,8 @@ REGISTRY_FORM_PROCESSORS = {
 
 # Configuration generating modules for firmware images.
 CGM_MODULES = (
+    'nodewatcher.core.generator.cgm.openwrt',
     'nodewatcher.modules.platforms.openwrt',
-    'nodewatcher.generator.cgm.openwrt',
     'nodewatcher.modules.vpn.tunneldigger.cgm',
     'nodewatcher.modules.routing.olsr.cgm',
 )

@@ -2,8 +2,6 @@ import contextlib
 import logging
 import traceback
 
-from nodewatcher.legacy.nodes import models as nodes_models
-
 class ProcessorContext(dict):
     """
     A simple dictionary wrapper that supports automatic nesting
@@ -186,17 +184,3 @@ def depends_on_context(*keys):
         return wrapper
 
     return decorator
-
-class PurgeInvalidNodes(NetworkProcessor):
-    def process(self, context, nodes):
-        """
-        Finds nodes that haven't been claimed by any processor and are invalid. Such
-        nodes are removed from the database.
-        """
-        self.logger.info("Purging unclaimed stale nodes...")
-        for node in nodes_models.Node.objects.regpoint("monitoring") \
-          .filter(statusmonitor_status = "invalid") \
-          .exclude(pk__in = nodes):
-            node.delete()
-
-        return context, nodes
