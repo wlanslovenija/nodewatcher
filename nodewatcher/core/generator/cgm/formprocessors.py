@@ -2,7 +2,7 @@ from nodewatcher.core.registry import registration
 from nodewatcher.core.registry import forms as registry_forms
 from nodewatcher.core.registry import cgm
 from nodewatcher.core.registry.cgm import base as cgm_base
-from nodewatcher.core.registry.forms import processors
+from nodewatcher.core.registry.forms import formprocessors
 
 class NodeCgmValidator(processors.RegistryFormProcessor):
     """

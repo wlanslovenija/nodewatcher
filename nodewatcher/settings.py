@@ -211,25 +211,25 @@ AUTHENTICATION_BACKENDS = (
 
 INSTALLED_APPS = (
     # Ours are first so that we can override default templates in other apps.
-    'nodewatcher.legacy.nodes',
-    'nodewatcher.legacy.policy',
-
-    'nodewatcher.extra.account',
+    'nodewatcher.core',
+    'nodewatcher.core.frontend',
     'nodewatcher.core.registry',
     'nodewatcher.core.registry.loader',
-    'nodewatcher.core',
     'nodewatcher.core.generator.cgm',
     'nodewatcher.core.generator',
-    'nodewatcher.modules.sensors.solar',
-    'nodewatcher.modules.sensors.digitemp',
-    'nodewatcher.core.frontend',
     'nodewatcher.core.monitor',
     'nodewatcher.core.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.modules.routing.olsr',
-    'nodewatcher.firmware_core',
+    'nodewatcher.modules.sensors.digitemp',
+    'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
+    'nodewatcher.extra.account',
+
+    # Legacy apps for migrations.
+    'nodewatcher.legacy.nodes',
+    'nodewatcher.legacy.policy',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -330,7 +330,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
     'nodewatcher.core.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatusCheck',
-    'nodewatcher.datastream.processors.DatastreamProcessor',
+    'nodewatcher.modules.monitor.datastream.processors.DatastreamProcessor',
     'nodewatcher.core.monitor.processors.PurgeInvalidNodes'
 )
 
@@ -345,16 +345,16 @@ DATASTREAM_BACKEND_SETTINGS = {
 # performed by users via the forms user interface.
 REGISTRY_FORM_PROCESSORS = {
     'node.config': (
-        'nodewatcher.core.allocation.processors.AutoPoolAllocator',
-        'nodewatcher.core.generator.cgm.processors.NodeCgmValidator',
+        'nodewatcher.core.allocation.formprocessors.AutoPoolAllocator',
+        'nodewatcher.core.generator.cgm.formprocessors.NodeCgmValidator',
     )
 }
 
 # Configuration generating modules for firmware images.
 CGM_MODULES = (
     'nodewatcher.modules.platforms.openwrt',
-    'nodewatcher.firmware_core.openwrt',
-    'nodewatcher.modules.vpn.tunneldigger.openwrt',
+    'nodewatcher.generator.cgm.openwrt',
+    'nodewatcher.modules.vpn.tunneldigger.cgm',
     'nodewatcher.modules.routing.olsr.cgm',
 )
 

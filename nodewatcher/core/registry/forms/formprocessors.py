@@ -1,4 +1,3 @@
-
 class RegistryFormProcessor(object):
     """
     A registry form processor can be used to hook into the form validation
