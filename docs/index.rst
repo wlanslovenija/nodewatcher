@@ -16,6 +16,7 @@ Contents
    installation
    theming
    telemetry
+   registry
 
 Source Code and Issue Tracker
 -----------------------------
