@@ -224,8 +224,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.cgm.packages.solar',
     'nodewatcher.core.cgm.packages.digitemp',
     'nodewatcher.monitor',
-    'nodewatcher.monitor.modules.http',
-    'nodewatcher.monitor.modules.simple',
+    'nodewatcher.monitor.sources.http',
     'nodewatcher.datastream',
     'nodewatcher.routing_olsr',
     'nodewatcher.firmware_core',
@@ -328,8 +327,8 @@ MONITOR_INTERVAL = 300
 MONITOR_PROCESSORS = (
     'nodewatcher.routing_olsr.processors.OLSRTopology',
     'nodewatcher.routing_olsr.processors.OLSRNodePostprocess',
-    'nodewatcher.monitor.modules.http.processors.HTTPTelemetry',
-    'nodewatcher.monitor.modules.simple.processors.SystemStatusCheck',
+    'nodewatcher.monitor.sources.http.processors.HTTPTelemetry',
+    'nodewatcher.monitor.sources.http.processors.SystemStatusCheck',
     'nodewatcher.datastream.processors.DatastreamProcessor',
     'nodewatcher.monitor.processors.PurgeInvalidNodes'
 )
