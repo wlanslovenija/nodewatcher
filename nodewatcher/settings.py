@@ -138,7 +138,7 @@ STATICFILES_FINDERS = (
 #   'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-STATICFILES_STORAGE = 'nodewatcher.frontend.staticfiles.storage.SCSSStaticFilesStorage'
+STATICFILES_STORAGE = 'nodewatcher.core.frontend.staticfiles.storage.SCSSStaticFilesStorage'
 
 GEOIP_PATH = os.path.abspath(os.path.join(settings_dir, '..', 'geoip'))
 DEFAULT_COUNTRY = 'SI'
@@ -169,7 +169,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
-    'nodewatcher.frontend.context_processors.global_vars',
+    'nodewatcher.core.frontend.context_processors.global_vars',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -214,7 +214,6 @@ INSTALLED_APPS = (
     'nodewatcher.legacy.nodes',
     'nodewatcher.legacy.policy',
     'nodewatcher.generator',
-    'nodewatcher.frontend',
 
     'nodewatcher.contrib.account',
     'nodewatcher.registry',
@@ -223,6 +222,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.cgm',
     'nodewatcher.core.cgm.packages.solar',
     'nodewatcher.core.cgm.packages.digitemp',
+    'nodewatcher.core.frontend',
     'nodewatcher.core.monitor',
     'nodewatcher.core.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
