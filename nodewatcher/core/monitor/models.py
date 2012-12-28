@@ -3,7 +3,6 @@ import polymorphic
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from nodewatcher.modules.monitor import datastream
 from nodewatcher.legacy.nodes import models as nodes_models
 from nodewatcher.registry import fields as registry_fields
 from nodewatcher.registry import registration
@@ -12,6 +11,7 @@ class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     General monitored parameters about a node.
     """
+
     first_seen = models.DateTimeField(null = True)
     last_seen = models.DateTimeField(null = True)
 
@@ -27,6 +27,7 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Node's status.
     """
+
     status = registry_fields.SelectorKeyField("node.monitoring", "core.status#status")
     has_warnings = models.BooleanField(default = False)
 
@@ -47,6 +48,7 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Routing topology.
     """
+
     class Meta:
         app_label = "core"
 
@@ -60,6 +62,7 @@ class TopologyLink(polymorphic.PolymorphicModel):
     """
     Generic topology link not associated with any specific routing protocol.
     """
+
     monitor = models.ForeignKey(RoutingTopologyMonitor, related_name = 'links')
     peer = models.ForeignKey(nodes_models.Node, related_name = 'links')
     last_seen = models.DateTimeField()
@@ -71,6 +74,7 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Node's announced networks.
     """
+
     network = registry_fields.IPAddressField()
     status = registry_fields.SelectorKeyField("node.monitoring", "network.routing.announces#status")
     last_seen = models.DateTimeField()
@@ -92,12 +96,9 @@ class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Basic system status information like uptime and the local time.
     """
+
     uptime = models.PositiveIntegerField()
     local_time = models.DateTimeField()
-
-    connect_datastream = datastream.ConnectDatastream(
-      uptime = datastream.IntegerField()
-    )
 
     class Meta:
         app_label = "core"
@@ -111,6 +112,7 @@ class GeneralResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     General resources such as load average, system memory and the number of processes.
     """
+
     loadavg_1min = models.FloatField()
     loadavg_5min = models.FloatField()
     loadavg_15min = models.FloatField()
@@ -118,16 +120,6 @@ class GeneralResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     memory_buffers = models.PositiveIntegerField()
     memory_cache = models.PositiveIntegerField()
     processes = models.PositiveIntegerField()
-
-    connect_datastream = datastream.ConnectDatastream(
-      loadavg_1min = datastream.FloatField(),
-      loadavg_5min = datastream.FloatField(),
-      loadavg_15min = datastream.FloatField(),
-      memory_free = datastream.IntegerField(),
-      memory_buffers = datastream.IntegerField(),
-      memory_cache = datastream.IntegerField(),
-      processes = datastream.IntegerField()
-    )
 
     class RegistryMeta:
         registry_id = "system.resources.general"
@@ -139,15 +131,10 @@ class NetworkResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     Network resources such as number of routes and number of tracked TCP and UDP
     connections.
     """
+
     routes = models.IntegerField()
     tcp_connections = models.IntegerField()
     udp_connections = models.IntegerField()
-
-    connect_datastream = datastream.ConnectDatastream(
-      routes = datastream.IntegerField(),
-      tcp_connections = datastream.IntegerField(),
-      udp_connections = datastream.IntegerField()
-    )
 
     class RegistryMeta:
         registry_id = "system.resources.network"
