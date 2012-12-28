@@ -1,14 +1,11 @@
-## {{{ http://code.activestate.com/recipes/576694/ (r7)
 import collections
 
-KEY, PREV, NEXT = range(3)
-
+# Based on http://code.activestate.com/recipes/576694/ (r9)
 class OrderedSet(collections.MutableSet):
-
     def __init__(self, iterable=None):
         self.end = end = []
-        end += [None, end, end]         # sentinel node for doubly linked list
-        self.map = {}                   # key --> [key, prev, next]
+        end += [None, end, end] # sentinel node for doubly linked list
+        self.map = {} # key --> [key, prev, next]
         if iterable is not None:
             self |= iterable
 
@@ -21,33 +18,33 @@ class OrderedSet(collections.MutableSet):
     def add(self, key):
         if key not in self.map:
             end = self.end
-            curr = end[PREV]
-            curr[NEXT] = end[PREV] = self.map[key] = [key, curr, end]
+            curr = end[1]
+            curr[2] = end[1] = self.map[key] = [key, curr, end]
 
     def discard(self, key):
         if key in self.map:
             key, prev, next = self.map.pop(key)
-            prev[NEXT] = next
-            next[PREV] = prev
+            prev[2] = next
+            next[1] = prev
 
     def __iter__(self):
         end = self.end
-        curr = end[NEXT]
+        curr = end[2]
         while curr is not end:
-            yield curr[KEY]
-            curr = curr[NEXT]
+            yield curr[0]
+            curr = curr[2]
 
     def __reversed__(self):
         end = self.end
-        curr = end[PREV]
+        curr = end[1]
         while curr is not end:
-            yield curr[KEY]
-            curr = curr[PREV]
+            yield curr[0]
+            curr = curr[1]
 
     def pop(self, last=True):
         if not self:
             raise KeyError('set is empty')
-        key = next(reversed(self)) if last else next(iter(self))
+        key = self.end[1][0] if last else self.end[2][0]
         self.discard(key)
         return key
 
@@ -60,12 +57,3 @@ class OrderedSet(collections.MutableSet):
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
-
-    def __del__(self):
-        self.clear()                    # remove circular references
-
-
-if __name__ == '__main__':
-    print(OrderedSet('abracadaba'))
-    print(OrderedSet('simsalabim'))
-## end of http://code.activestate.com/recipes/576694/ }}}
