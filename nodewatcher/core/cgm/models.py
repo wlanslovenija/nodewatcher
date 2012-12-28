@@ -8,10 +8,10 @@ from nodewatcher.core import allocation
 from nodewatcher.core import models as core_models
 from nodewatcher.core import antennas as core_antennas
 from nodewatcher.legacy.nodes import models as nodes_models
-from nodewatcher.registry import fields as registry_fields
-from nodewatcher.registry import forms as registry_forms
-from nodewatcher.registry import registration, permissions
-from nodewatcher.registry.cgm import base as cgm_base
+from nodewatcher.core.registry import fields as registry_fields
+from nodewatcher.core.registry import forms as registry_forms
+from nodewatcher.core.registry import registration, permissions
+from nodewatcher.core.registry.cgm import base as cgm_base
 
 # Register a new firmware-generating permission
 permissions.register(nodes_models.Node, 'can_generate_firmware', "Can generate firmware")

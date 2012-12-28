@@ -8,8 +8,8 @@ from django.db import transaction
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 
-from nodewatcher.registry import rules as registry_rules
-from nodewatcher.registry import registration
+from nodewatcher.core.registry import rules as registry_rules
+from nodewatcher.core.registry import registration
 
 class RegistryValidationError(Exception):
     """

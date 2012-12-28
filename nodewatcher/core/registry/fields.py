@@ -12,8 +12,8 @@ from django.utils.translation import ugettext_lazy as _
 
 import south.modelsinspector
 
-from nodewatcher.registry import registration
-from nodewatcher.registry import models as registry_models
+from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import models as registry_models
 from nodewatcher.utils import ipaddr
 
 class SelectorFormField(form_fields.TypedChoiceField):

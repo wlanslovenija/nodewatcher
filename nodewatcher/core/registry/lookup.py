@@ -2,7 +2,7 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models.sql.constants import LOOKUP_SEP
 
-from nodewatcher.registry import access as registry_access
+from nodewatcher.core.registry import access as registry_access
 
 # Quote name
 qn = connection.ops.quote_name
@@ -24,7 +24,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         Switches to a different regpoint that determines the short attribute
         name.
         """
-        from nodewatcher.registry import registration
+        from nodewatcher.core.registry import registration
         clone = self._clone()
         try:
             name = "{0}.{1}".format(self.model._meta.module_name, name)

@@ -6,10 +6,10 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core import allocation, antennas
 # TODO project model should be moved to core
 from nodewatcher.legacy.nodes import models as nodes_models
-from nodewatcher.registry import fields as registry_fields
-from nodewatcher.registry import forms as registry_form
-from nodewatcher.registry import registration
-from nodewatcher.registry import widgets as registry_widgets
+from nodewatcher.core.registry import fields as registry_fields
+from nodewatcher.core.registry import forms as registry_form
+from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import widgets as registry_widgets
 
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """

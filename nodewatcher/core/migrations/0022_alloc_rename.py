@@ -74,12 +74,12 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'BasicAddressingConfig'},
             'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_core_basicaddressingconfig'", 'null': 'True', 'to': "orm['core.IpPool']"}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'pool': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']"}),
+            'pool': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']"}),
             'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
-            'usage': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+            'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'core.borderrouterroleconfig': {
             'Meta': {'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
@@ -100,7 +100,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
-            'type': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
+            'type': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
         },
         'core.ippool': {
             'Meta': {'object_name': 'IpPool'},
@@ -108,7 +108,7 @@ class Migration(SchemaMigration):
             'allocation_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
             'allocation_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'ip_subnet': ('django.db.models.fields.CharField', [], {'null': 'True'}),
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
@@ -135,7 +135,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ProjectConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'project': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
+            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
         },
         'core.redundantnoderoleconfig': {

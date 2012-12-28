@@ -1,4 +1,4 @@
-from nodewatcher.registry.cgm import base as cgm_base
+from nodewatcher.core.registry.cgm import base as cgm_base
 
 def generate_config(node, only_validate = False):
     """

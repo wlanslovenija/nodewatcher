@@ -10,13 +10,13 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'VpnInterfaceConfig.routing_protocol'
         db.add_column('cgm_vpninterfaceconfig', 'routing_protocol',
-                      self.gf('nodewatcher.registry.fields.SelectorKeyField')(default='none', max_length=50, regpoint='node.config', enum_id='core.interfaces#routing_protocol'),
+                      self.gf('nodewatcher.core.registry.fields.SelectorKeyField')(default='none', max_length=50, regpoint='node.config', enum_id='core.interfaces#routing_protocol'),
                       keep_default=False)
 
 
         # Adding field 'EthernetInterfaceConfig.routing_protocol'
         db.add_column('cgm_ethernetinterfaceconfig', 'routing_protocol',
-                      self.gf('nodewatcher.registry.fields.SelectorKeyField')(default='none', max_length=50, regpoint='node.config', enum_id='core.interfaces#routing_protocol'),
+                      self.gf('nodewatcher.core.registry.fields.SelectorKeyField')(default='none', max_length=50, regpoint='node.config', enum_id='core.interfaces#routing_protocol'),
                       keep_default=False)
 
 
@@ -33,12 +33,12 @@ class Migration(SchemaMigration):
         'cgm.allocatednetworkconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'AllocatedNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
             'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_cgm_allocatednetworkconfig'", 'null': 'True', 'on_delete': 'models.PROTECT', 'to': "orm['core.IpPool']"}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'pool': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']", 'on_delete': 'models.PROTECT'}),
+            'pool': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']", 'on_delete': 'models.PROTECT'}),
             'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
-            'subnet_hint': ('nodewatcher.registry.fields.IPAddressField', [], {'host_required': 'True', 'null': 'True', 'blank': 'True'}),
-            'usage': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+            'subnet_hint': ('nodewatcher.core.registry.fields.IPAddressField', [], {'host_required': 'True', 'null': 'True', 'blank': 'True'}),
+            'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'cgm.authenticationconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'AuthenticationConfig'},
@@ -49,8 +49,8 @@ class Migration(SchemaMigration):
         'cgm.cgmgeneralconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'CgmGeneralConfig', '_ormbases': ['core.GeneralConfig']},
             'generalconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.GeneralConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'platform': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#platform'", 'blank': 'True'}),
-            'router': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#router'", 'blank': 'True'}),
+            'platform': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#platform'", 'blank': 'True'}),
+            'router': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#router'", 'blank': 'True'}),
             'version': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'})
         },
         'cgm.dhcpnetworkconfig': {
@@ -59,9 +59,9 @@ class Migration(SchemaMigration):
         },
         'cgm.ethernetinterfaceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'EthernetInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
-            'eth_port': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#eth_port'"}),
+            'eth_port': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#eth_port'"}),
             'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'routing_protocol': ('nodewatcher.registry.fields.SelectorKeyField', [], {'default': "'none'", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#routing_protocol'"})
+            'routing_protocol': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'default': "'none'", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#routing_protocol'"})
         },
         'cgm.interfaceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'InterfaceConfig'},
@@ -75,7 +75,7 @@ class Migration(SchemaMigration):
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'interface': ('nodewatcher.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'limits'", 'to': "orm['cgm.InterfaceConfig']"}),
+            'interface': ('nodewatcher.core.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'limits'", 'to': "orm['cgm.InterfaceConfig']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_interfacelimitconfig'", 'to': "orm['nodes.Node']"})
         },
         'cgm.networkconfig': {
@@ -84,7 +84,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'interface': ('nodewatcher.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'networks'", 'to': "orm['cgm.InterfaceConfig']"}),
+            'interface': ('nodewatcher.core.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'networks'", 'to': "orm['cgm.InterfaceConfig']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_networkconfig'", 'to': "orm['nodes.Node']"})
         },
         'cgm.packageconfig': {
@@ -112,22 +112,22 @@ class Migration(SchemaMigration):
         },
         'cgm.staticnetworkconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'StaticNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
-            'address': ('nodewatcher.registry.fields.IPAddressField', [], {'subnet_required': 'True'}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
-            'gateway': ('nodewatcher.registry.fields.IPAddressField', [], {'host_required': 'True'}),
+            'address': ('nodewatcher.core.registry.fields.IPAddressField', [], {'subnet_required': 'True'}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
+            'gateway': ('nodewatcher.core.registry.fields.IPAddressField', [], {'host_required': 'True'}),
             'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'cgm.throughputinterfacelimitconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'ThroughputInterfaceLimitConfig', '_ormbases': ['cgm.InterfaceLimitConfig']},
             'interfacelimitconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceLimitConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'limit_in': ('nodewatcher.registry.fields.SelectorKeyField', [], {'default': "''", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.limits#speeds'", 'blank': 'True'}),
-            'limit_out': ('nodewatcher.registry.fields.SelectorKeyField', [], {'default': "''", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.limits#speeds'", 'blank': 'True'})
+            'limit_in': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'default': "''", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.limits#speeds'", 'blank': 'True'}),
+            'limit_out': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'default': "''", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.limits#speeds'", 'blank': 'True'})
         },
         'cgm.vpninterfaceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'VpnInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
             'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'mac': ('nodewatcher.registry.fields.MACAddressField', [], {'auto_add': 'True', 'max_length': '17'}),
-            'routing_protocol': ('nodewatcher.registry.fields.SelectorKeyField', [], {'default': "'none'", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#routing_protocol'"})
+            'mac': ('nodewatcher.core.registry.fields.MACAddressField', [], {'auto_add': 'True', 'max_length': '17'}),
+            'routing_protocol': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'default': "'none'", 'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#routing_protocol'"})
         },
         'cgm.vpnserverconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'VpnServerConfig'},
@@ -135,31 +135,31 @@ class Migration(SchemaMigration):
             'hostname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'port': ('django.db.models.fields.IntegerField', [], {}),
-            'protocol': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.vpn.server#protocol'"}),
+            'protocol': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.vpn.server#protocol'"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_cgm_vpnserverconfig'", 'to': "orm['nodes.Node']"})
         },
         'cgm.wifiinterfaceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'WifiInterfaceConfig', '_ormbases': ['cgm.InterfaceConfig']},
-            'antenna': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Antenna']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
+            'antenna': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Antenna']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
             'antenna_connector': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
             'bitrate': ('django.db.models.fields.IntegerField', [], {'default': '11'}),
             'channel': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'interfaceconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.InterfaceConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'protocol': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'wifi_radio': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_radio'"})
+            'wifi_radio': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_radio'"})
         },
         'cgm.wifinetworkconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'WifiNetworkConfig', '_ormbases': ['cgm.NetworkConfig']},
             'allocation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'allocations_cgm_wifinetworkconfig'", 'null': 'True', 'on_delete': 'models.PROTECT', 'to': "orm['core.IpPool']"}),
-            'bssid': ('nodewatcher.registry.fields.MACAddressField', [], {'max_length': '17'}),
+            'bssid': ('nodewatcher.core.registry.fields.MACAddressField', [], {'max_length': '17'}),
             'essid': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'networkconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.NetworkConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'pool': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']", 'on_delete': 'models.PROTECT'}),
+            'pool': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.IpPool']", 'on_delete': 'models.PROTECT'}),
             'prefix_length': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
-            'role': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"}),
-            'subnet_hint': ('nodewatcher.registry.fields.IPAddressField', [], {'host_required': 'True', 'null': 'True', 'blank': 'True'}),
-            'usage': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+            'role': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#role'"}),
+            'subnet_hint': ('nodewatcher.core.registry.fields.IPAddressField', [], {'host_required': 'True', 'null': 'True', 'blank': 'True'}),
+            'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -187,7 +187,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
-            'type': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
+            'type': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
         },
         'core.ippool': {
             'Meta': {'object_name': 'IpPool'},
@@ -195,9 +195,9 @@ class Migration(SchemaMigration):
             'allocation_object_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
             'allocation_timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#ip_family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip_subnet': ('nodewatcher.registry.fields.IPAddressField', [], {'null': 'True'}),
+            'ip_subnet': ('nodewatcher.core.registry.fields.IPAddressField', [], {'null': 'True'}),
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.IpPool']"}),
             'prefix_length': ('django.db.models.fields.IntegerField', [], {}),

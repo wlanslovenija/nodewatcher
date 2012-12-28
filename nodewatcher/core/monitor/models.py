@@ -4,8 +4,8 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from nodewatcher.legacy.nodes import models as nodes_models
-from nodewatcher.registry import fields as registry_fields
-from nodewatcher.registry import registration
+from nodewatcher.core.registry import fields as registry_fields
+from nodewatcher.core.registry import registration
 
 class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
     """

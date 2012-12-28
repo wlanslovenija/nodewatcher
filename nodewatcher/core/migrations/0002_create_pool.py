@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.rename_table('nodes_pool', 'core_pool')
 
         # Changing field 'BasicAddressingConfig.pool'
-        db.alter_column('core_basicaddressingconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['core.Pool']))
+        db.alter_column('core_basicaddressingconfig', 'pool_id', self.gf('nodewatcher.core.registry.fields.ModelSelectorKeyField')(to=orm['core.Pool']))
 
 
     def backwards(self, orm):
@@ -21,7 +21,7 @@ class Migration(SchemaMigration):
         db.rename_table('core_pool', 'nodes_pool')
 
         # Changing field 'BasicAddressingConfig.pool'
-        db.alter_column('core_basicaddressingconfig', 'pool_id', self.gf('nodewatcher.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool']))
+        db.alter_column('core_basicaddressingconfig', 'pool_id', self.gf('nodewatcher.core.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Pool']))
 
 
     models = {
@@ -65,11 +65,11 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'BasicAddressingConfig'},
             'cidr': ('django.db.models.fields.IntegerField', [], {'default': '27'}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'family': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
+            'family': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#family'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'pool': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Pool']"}),
+            'pool': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['core.Pool']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
-            'usage': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
+            'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
         'core.generalconfig': {
             'Meta': {'object_name': 'GeneralConfig'},
@@ -79,7 +79,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'project': ('nodewatcher.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
+            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"})
         },
         'core.pool': {

@@ -1,9 +1,9 @@
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.cgm import models as cgm_models
-from nodewatcher.registry.cgm import base as cgm_base
-from nodewatcher.registry.cgm import resources as cgm_resources
-from nodewatcher.registry.cgm import routers as cgm_routers
+from nodewatcher.core.registry.cgm import base as cgm_base
+from nodewatcher.core.registry.cgm import resources as cgm_resources
+from nodewatcher.core.registry.cgm import routers as cgm_routers
 
 @cgm_base.register_platform_module("openwrt", 10)
 def general(node, cfg):

@@ -2,9 +2,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import importlib
 
-from nodewatcher.registry import registration
-from nodewatcher.registry.cgm import routers as cgm_routers
-from nodewatcher.registry.cgm import resources as cgm_resources
+from nodewatcher.core.registry import registration
+from nodewatcher.core.registry.cgm import routers as cgm_routers
+from nodewatcher.core.registry.cgm import resources as cgm_resources
 
 # Registered platform modules
 PLATFORM_REGISTRY = {}

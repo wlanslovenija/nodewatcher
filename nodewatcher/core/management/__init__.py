@@ -5,7 +5,7 @@ from django.db import models
 from south import signals as south_signals
 
 from nodewatcher.core import antennas as core_antennas
-from nodewatcher.registry.cgm import base as cgm_base
+from nodewatcher.core.registry.cgm import base as cgm_base
 
 _core_migrated = False
 

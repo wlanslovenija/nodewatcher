@@ -15,7 +15,7 @@ from guardian.shortcuts import assign as assign_permission
 
 from nodewatcher.legacy.nodes.models import Node
 
-from nodewatcher.registry import forms as registry_forms
+from nodewatcher.core.registry import forms as registry_forms
 
 def nodes(request):
     """

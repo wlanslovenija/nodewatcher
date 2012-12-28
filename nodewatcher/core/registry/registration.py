@@ -4,10 +4,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils import datastructures as django_datastructures
 
-from nodewatcher.registry import state as registry_state
-from nodewatcher.registry import models as registry_models
-from nodewatcher.registry import lookup as registry_lookup
-from nodewatcher.registry import access as registry_access
+from nodewatcher.core.registry import state as registry_state
+from nodewatcher.core.registry import models as registry_models
+from nodewatcher.core.registry import lookup as registry_lookup
+from nodewatcher.core.registry import access as registry_access
 from nodewatcher.utils import datastructures as nw_datastructures
 
 bases = registry_state.bases
@@ -140,7 +140,7 @@ class RegistrationPoint(object):
         """
         Registers a registry item in a hierarchical relationship.
         """
-        from nodewatcher.registry import fields as registry_fields
+        from nodewatcher.core.registry import fields as registry_fields
 
         # Verify parent registration
         if parent not in self.item_classes:
@@ -326,7 +326,7 @@ def create_point(model, namespace, mixins = None):
           base_name,
           (registry_models.RegistryItemBase,) + tuple(mixins),
           {
-            '__module__' : 'nodewatcher.registry.models',
+            '__module__' : 'nodewatcher.core.registry.models',
             'Meta' : Meta,
             'root' : models.ForeignKey(
               model, null = False, editable = False, related_name = '{0}_%(app_label)s_%(class)s'.format(namespace)

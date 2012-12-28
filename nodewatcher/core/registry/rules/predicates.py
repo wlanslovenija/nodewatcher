@@ -1,10 +1,10 @@
 import hashlib
 import inspect
 
-from nodewatcher.registry import access as registry_access
-from nodewatcher.registry import forms as registry_forms
-from nodewatcher.registry.rules.engine import *
-from nodewatcher.registry.cgm import base as cgm_base
+from nodewatcher.core.registry import access as registry_access
+from nodewatcher.core.registry import forms as registry_forms
+from nodewatcher.core.registry.rules.engine import *
+from nodewatcher.core.registry.cgm import base as cgm_base
 
 # Exports
 __all__ = [

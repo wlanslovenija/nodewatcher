@@ -34,9 +34,9 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'RoutingAnnounceMonitor'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'network': ('nodewatcher.registry.fields.IPAddressField', [], {}),
+            'network': ('nodewatcher.core.registry.fields.IPAddressField', [], {}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_routingannouncemonitor'", 'to': "orm['nodes.Node']"}),
-            'status': ('nodewatcher.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.monitoring'", 'enum_id': "'network.routing.announces#status'"})
+            'status': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.monitoring'", 'enum_id': "'network.routing.announces#status'"})
         },
         'core.routingtopologymonitor': {
             'Meta': {'object_name': 'RoutingTopologyMonitor'},
