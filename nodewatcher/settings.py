@@ -205,7 +205,7 @@ REGISTRATION_OPEN = True
 ANONYMOUS_USER_ID = -1
 
 AUTHENTICATION_BACKENDS = (
-    'nodewatcher.contrib.account.auth.ModelBackend',
+    'nodewatcher.extra.account.auth.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
 
@@ -214,7 +214,7 @@ INSTALLED_APPS = (
     'nodewatcher.legacy.nodes',
     'nodewatcher.legacy.policy',
 
-    'nodewatcher.contrib.account',
+    'nodewatcher.extra.account',
     'nodewatcher.core.registry',
     'nodewatcher.core.registry.loader',
     'nodewatcher.core',

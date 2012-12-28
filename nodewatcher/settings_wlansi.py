@@ -20,5 +20,5 @@ IMAGE_GENERATOR_EMAIL = 'generator@wlan-si.net'
 # Add wlan slovenija specific things (templates, static files, etc.).
 # We add to the beginning so that we can override templates in other apps.
 INSTALLED_APPS = (
-    'nodewatcher.contrib.wlansi',
+    'nodewatcher.extra.wlansi',
 ) + INSTALLED_APPS

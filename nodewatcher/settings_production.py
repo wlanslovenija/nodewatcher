@@ -30,6 +30,6 @@ SESSION_COOKIE_SECURE = USE_HTTPS
 
 # We support some common password formats to ease transition.
 AUTHENTICATION_BACKENDS += (
-    'nodewatcher.contrib.account.auth.AprBackend',
-    'nodewatcher.contrib.account.auth.CryptBackend',
+    'nodewatcher.extra.account.auth.AprBackend',
+    'nodewatcher.extra.account.auth.CryptBackend',
 )

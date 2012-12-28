@@ -21,10 +21,10 @@ urlpatterns = urls.patterns('',
         'template': 'registration/activation_complete.html',
     }, name='registration_activation_complete'),
     urls.url(r'^activate/(?P<activation_key>\w+)/$', decorators.anonymous_required(function=registration_views.activate), {
-        'backend': 'nodewatcher.contrib.account.regbackend.ProfileBackend',
+        'backend': 'nodewatcher.extra.account.regbackend.ProfileBackend',
     }, name='registration_activate'),
     urls.url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
-        'backend': 'nodewatcher.contrib.account.regbackend.ProfileBackend',
+        'backend': 'nodewatcher.extra.account.regbackend.ProfileBackend',
     }, name='registration_register'),
     urls.url(r'^register/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
         'template': 'registration/registration_complete.html',
@@ -35,8 +35,8 @@ urlpatterns = urls.patterns('',
     urls.url(r'^email/change/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
         'template': 'registration/email_change_complete.html',
     }, name='email_change_complete'),
-    urls.url(r'^login/$', 'nodewatcher.contrib.account.views.login', name='auth_login'),
-    urls.url(r'^logout/$', 'nodewatcher.contrib.account.views.logout_redirect', name='auth_logout'),
+    urls.url(r'^login/$', 'nodewatcher.extra.account.views.login', name='auth_login'),
+    urls.url(r'^logout/$', 'nodewatcher.extra.account.views.logout_redirect', name='auth_logout'),
     urls.url(r'^password/change/$', decorators.authenticated_required(function=auth_views.password_change), {
         'post_change_redirect': functional_utils.lazy(urlresolvers.reverse, unicode)('auth_password_change_done'),
         'password_change_form': forms.PasswordChangeForm,
@@ -53,5 +53,5 @@ urlpatterns = urls.patterns('',
     }, name='auth_password_reset_confirm'),
     urls.url(r'^password/reset/complete/$', decorators.anonymous_required(function=auth_views.password_reset_complete), name='auth_password_reset_complete'),
     urls.url(r'^password/reset/done/$', decorators.anonymous_required(function=auth_views.password_reset_done), name='auth_password_reset_done'),
-    urls.url(r'^$', 'nodewatcher.contrib.account.views.account', name='user_account'),
+    urls.url(r'^$', 'nodewatcher.extra.account.views.account', name='user_account'),
 )

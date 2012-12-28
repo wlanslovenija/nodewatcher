@@ -148,7 +148,7 @@ class UserChangeForm(AdminUserChangeForm):
 
 class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
     """
-    This class defines change form for `nodewatcher.contrib.account.models.UserProfileAndSettings` objects.
+    This class defines change form for `nodewatcher.extra.account.models.UserProfileAndSettings` objects.
     """
 
     error_css_class = 'error'
@@ -159,7 +159,7 @@ class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
 
 class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
     """
-    This class defines combined form for `django.contrib.auth.models.User` and `nodewatcher.contrib.account.models.UserProfileAndSettings` objects.
+    This class defines combined form for `django.contrib.auth.models.User` and `nodewatcher.extra.account.models.UserProfileAndSettings` objects.
     It is used for user registration.
     """
 
@@ -168,7 +168,7 @@ class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncl
     fieldset = UserCreationForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
 
     def save(self, commit=True):
-        # We disable save method as registration module (through `nodewatcher.contrib.account.regbackend.ProfileBackend` backend) takes
+        # We disable save method as registration module (through `nodewatcher.extra.account.regbackend.ProfileBackend` backend) takes
         # care of user and user profile objects creation and we do not use it for changing data
         assert False
         return None
@@ -230,7 +230,7 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
 
 class AccountChangeForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
     """
-    This class defines combined change form for `django.contrib.auth.models.User` and `nodewatcher.contrib.account.models.UserProfileAndSettings` objects.
+    This class defines combined change form for `django.contrib.auth.models.User` and `nodewatcher.extra.account.models.UserProfileAndSettings` objects.
     """
 
     error_css_class = 'error'
