@@ -1,10 +1,10 @@
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes import generic, models as contenttypes_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from ..registry import fields as registry_fields
 from nodewatcher.utils import ipaddr
+
+from ..registry import fields as registry_fields
 
 class PoolAllocationError(Exception):
     pass
@@ -28,7 +28,7 @@ class PoolBase(models.Model):
     projects = models.ManyToManyField("nodes.Project", related_name = 'pools_%(app_label)s_%(class)s')
 
     # Bookkeeping for allocated pools
-    allocation_content_type = models.ForeignKey(ContentType, null = True)
+    allocation_content_type = models.ForeignKey(contenttypes_models.ContentType, null = True)
     allocation_object_id = models.CharField(max_length = 50, null = True)
     allocation_content_object = generic.GenericForeignKey('allocation_content_type', 'allocation_object_id')
     allocation_timestamp = models.DateTimeField(null = True)

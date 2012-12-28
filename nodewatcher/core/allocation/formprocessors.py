@@ -1,10 +1,8 @@
-from nodewatcher.core import allocation as core_allocation
-from nodewatcher.core import models as core_models
-from nodewatcher.core.allocation import pool as pool_models
+from .. import allocation as core_allocation, models as core_models
 from ..registry import registration
 from ..registry.forms import formprocessors
 
-class AutoPoolAllocator(processors.RegistryFormProcessor):
+class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
     """
     A form processor that attempts to automatically satisfy allocation
     requests defined by AddressAllocator config items.

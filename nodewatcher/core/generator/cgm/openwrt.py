@@ -1,9 +1,7 @@
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core.generator.cgm import models as cgm_models
-from nodewatcher.core.registry.cgm import base as cgm_base
-from nodewatcher.core.registry.cgm import resources as cgm_resources
-from nodewatcher.core.registry.cgm import routers as cgm_routers
+from . import models as cgm_models
+from ...registry.cgm import base as cgm_base, resources as cgm_resources, routers as cgm_routers
 
 class UCISection(object):
     """

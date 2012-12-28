@@ -1,11 +1,10 @@
-from django.conf import settings
 from django.contrib.auth.management import create_permissions
 from django.db import models
 
 from south import signals as south_signals
 
-from nodewatcher.core import antennas as core_antennas
-from nodewatcher.core.registry.cgm import base as cgm_base
+from .. import antennas as core_antennas
+from ..registry.cgm import base as cgm_base
 
 _core_migrated = False
 

@@ -1,5 +1,4 @@
-import copy
-import json
+import copy, json
 
 from django import forms, template
 from django.conf import settings

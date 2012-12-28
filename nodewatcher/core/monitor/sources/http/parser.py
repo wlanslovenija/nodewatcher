@@ -1,5 +1,4 @@
-import socket
-import urllib
+import socket, urllib
 
 class HttpTelemetryParseFailed(Exception):
     pass

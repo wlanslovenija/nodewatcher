@@ -1,5 +1,4 @@
-import copy
-import inspect
+import copy, inspect
 
 from django.core.exceptions import ImproperlyConfigured
 

@@ -1,1 +1,1 @@
-from nodewatcher.core.models.config import *
+from .config import *

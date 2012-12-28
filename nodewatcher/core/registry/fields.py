@@ -1,19 +1,16 @@
-import os
-import re
+import os, re
 
 from django.core import exceptions
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms import widgets
 from django.forms import fields as form_fields
-from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 import south.modelsinspector
 
 from nodewatcher.core.registry import registration
-from nodewatcher.core.registry import models as registry_models
 from nodewatcher.utils import ipaddr
 
 class SelectorFormField(form_fields.TypedChoiceField):

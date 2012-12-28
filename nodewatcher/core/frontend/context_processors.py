@@ -2,8 +2,6 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.sites import models as sites_models
 
-from nodewatcher.legacy.nodes import models
-
 def web_client_node(request):
     """
     Adds web_client_node variable to current template context

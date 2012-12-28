@@ -3,7 +3,7 @@ from django.utils import importlib
 
 # Exports
 __all__ = [
-  'evaluate'
+    'evaluate'
 ]
 
 def evaluate(regpoint, root, state, partial_config = None):
@@ -15,6 +15,7 @@ def evaluate(regpoint, root, state, partial_config = None):
     @param state: Current evaluation state
     @param partial_config: Optional partial updated configuration
     """
+
     if partial_config is None:
         partial_config = {}
 
@@ -24,4 +25,4 @@ def evaluate(regpoint, root, state, partial_config = None):
         rules.ctx.run(regpoint, root, state, partial_config)
         return rules.ctx.results
 
-    return { 'STATE' : {} }
+    return {'STATE': {}}

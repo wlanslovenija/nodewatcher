@@ -1,5 +1,3 @@
-from django.utils import datastructures
-
 # A dictionary containing all the registration points
 points = {}
 

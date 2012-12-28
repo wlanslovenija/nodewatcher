@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from nodewatcher.core.monitor import worker
+from ... import worker
 
 class Command(BaseCommand):
     help = "Runs the nodewatcher monitoring daemon."

@@ -1,7 +1,4 @@
-import logging
-import multiprocessing
-import time
-import traceback
+import logging, multiprocessing, time, traceback
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured

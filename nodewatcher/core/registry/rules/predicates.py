@@ -1,5 +1,4 @@
-import hashlib
-import inspect
+import hashlib, inspect
 
 from nodewatcher.core.registry import access as registry_access
 from nodewatcher.core.registry import forms as registry_forms

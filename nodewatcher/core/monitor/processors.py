@@ -1,6 +1,4 @@
-import contextlib
-import logging
-import traceback
+import contextlib, logging, traceback
 
 class ProcessorContext(dict):
     """

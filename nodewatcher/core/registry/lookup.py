@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models as gis_models
-from django.db import models, connection, connections, DEFAULT_DB_ALIAS
+from django.db import connection, connections, DEFAULT_DB_ALIAS
 from django.db.models.sql.constants import LOOKUP_SEP
 
 from nodewatcher.core.registry import access as registry_access

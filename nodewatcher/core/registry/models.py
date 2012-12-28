@@ -1,9 +1,7 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.db.models import signals as model_signals
-from django.utils import datastructures
 
 class RegistryItemBase(models.Model):
     """

@@ -5,11 +5,10 @@ from django.core import context_processors as core_context_processors
 from django.core.urlresolvers import reverse
 from django.db import transaction
 
-from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseServerError
+from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, loader
 from django.utils import safestring
-from django.utils.translation import ugettext as _
 
 from guardian.shortcuts import assign as assign_permission
 
