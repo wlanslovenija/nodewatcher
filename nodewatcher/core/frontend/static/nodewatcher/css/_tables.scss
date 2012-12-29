@@ -1,0 +1,149 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*-
+/* Table listing */
+
+table.listing {
+    @include rapid-table($font-color, #EEEEEE, #CCCCCC);
+    tbody {
+        tr.section_title:hover, tr.section_title:focus, tr.section_title {background-color: #FFFFFF;}
+        tr.webclient {background-color: #EEFFD6;}
+        tr.webclient td.name {font-weight: bold;}
+    }
+
+    tbody td.notice, tbody th.notice {
+        padding: 5px;
+        border: 1px solid #D7D7D7;
+        background-color: #E1FFB8;
+        color: #3D6744;
+        text-align: center;
+    }
+
+    .section_title td {
+        font-weight: bold;
+        h3 {margin: 0;}
+    }
+
+    tbody td.center {
+        text-align: center;
+    }
+}
+
+.dataTables_wrapper {
+    clear: both;
+    input {font-size: $font-size * 0.8;}
+}
+
+.dataTables_filter {
+    width: 50%;
+    float: right;
+    text-align: right;
+    color: $neutral;
+}
+
+.dataTables_info {
+    width: 40%;
+    float: left;
+    padding: 5px;
+    color: $neutral;
+}
+
+.dataTables_empty {
+    text-align: center;
+}
+
+.sorting_asc {
+    &:after {content: "&#x25B2;"; float: right; color: $primary;}
+    cursor: pointer;
+}
+
+.sorting_desc {
+    &:after {content: "&#x25BC;"; float: right; color: $primary;}
+    cursor: pointer;
+}
+
+.sorting {
+    &:after {content: "&#x25CF;"; float: right; color: $neutral;}
+    &:hover:after {content: "&#x25CF;"; float: right; color: $primary;}
+    cursor: pointer;
+}
+
+.sorting_asc_disabled {
+    &:after {content: "&#x25B2;"; float: right; color: $neutral;}
+    &:hover:after {content: "&#x25B2;"; float: right; color: $primary;}
+    cursor: pointer;
+}
+
+.sorting_desc_disabled {
+    &:after {content: "&#x25BC;"; float: right; color: $neutral;}
+    &:hover:after {content: "&#x25BC;"; float: right; color: $primary;}
+    cursor: pointer;
+}
+
+.dataTables_empty {
+    text-align: center;
+}
+
+tr.subnet td.status,
+tr.subnet td.timestamp {
+    text-align: center;
+}
+
+tr.subnet .description {
+    margin-left: 5px;
+    font-size: 10px;
+    color: #979797;
+}
+
+tr.conflicting .identifier {
+    color: red;
+    font-weight: bold;
+}
+
+tr.conflicting .conflict {
+    color: red;
+    font-size: 10px;
+}
+
+tr.conflicting .conflict ul {
+    margin: 0px;
+    padding: 0px 10px;
+}
+
+tr.conflicting .conflict li {
+    list-style-type: none;
+}
+
+.nodelist table.listing td {
+    font-size: 12px;
+}
+
+.table_links {text-align: center;}
+
+table.layout {
+    width: 100%;
+}
+
+.proptable {
+    width: 100%;
+    margin: 3px 0 15px 0;
+    clear: none;
+    td {padding: 5px; vertical-align: top;}
+    td.proplabel {
+        width: 33%;
+        background: $background_color - 10;
+        font-weight: bold;
+    }
+    td.propbody {
+        width: 65%;
+    }
+    .propdescription {
+        font-size: $font-size * 0.85;
+        color: $font-color + 30;
+    }
+
+    &.narrow {
+        /*font-size: $font-size * 1.5;*/
+        width: $content_fixed_width - 300px;
+        td.proplabel {width: ($content_fixed_width - 300px) * 0.3; background: none;}
+        td.propbody {width: ($content_fixed_width - 300px) * 0.7;}
+    }
+}

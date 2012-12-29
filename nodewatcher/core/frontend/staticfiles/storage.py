@@ -1,18 +1,67 @@
 import fnmatch, os
 
+from django.utils.datastructures import SortedDict
 from django.contrib.staticfiles import storage
 from django.core.files import base
 from django.utils import encoding
+from django.conf import settings
+
+import scss
+
+def relative_path(root, path):
+    """Returns the path of a file relative to the root."""
+    root = os.path.abspath(root)
+    path = os.path.abspath(path)
+    assert path.startswith(root)
+    relative = path[len(root):]
+    if relative.startswith(os.sep):
+        return relative[1:]
+    else:
+        return relative
 
 class SCSSFilesMixin(object):
     def __init__(self, *args, **kwargs):
         super(SCSSFilesMixin, self).__init__(*args, **kwargs)
+        # ASSETS_ROOT is where the pyScss outputs the generated files such as spritemaps
+        # and compile cache:
+        scss.ASSETS_ROOT = os.path.join(settings.STATIC_ROOT, 'assets/')
+        scss.ASSETS_URL = settings.STATIC_URL + 'assets/'
 
-        # TODO: Implement
+        scss.STATIC_ROOT = settings.STATIC_ROOT
+        scss.STATIC_URL = settings.STATIC_URL
+
+	self._scss_paths = []
+        self._scss_paths.extend(getattr(settings, 'SCSS_PATHS', []))
+	
+        # This creates the Scss object used to compile SCSS code. In this example,
+        # _scss_vars will hold the context variables:
+        self._scss_vars = {}
+        self._scss = scss.Scss(
+            scss_vars=self._scss_vars,
+            scss_opts={
+                'compress': not settings.DEBUG,
+                'debug_info': settings.DEBUG,
+            }
+        )
 
     def _scss_process(self, filename, file):
-        # TODO: Implement
-        return ''
+        root, name = os.path.split(os.path.join(settings.STATIC_ROOT, filename))
+        scss.LOAD_PATHS = []
+	scss.LOAD_PATHS.extend(self._scss_paths)
+	scss.LOAD_PATHS.append(root)
+
+        relative = relative_path(settings.STATIC_ROOT, root).replace(os.sep, '/')
+
+        scss.ASSETS_ROOT = os.path.join(root, 'assets/')
+        if not os.path.exists(scss.ASSETS_ROOT):
+            os.mkdir(scss.ASSETS_ROOT)
+
+        scss.ASSETS_URL = settings.STATIC_URL + 'assets/'
+
+        scss.STATIC_ROOT = root
+        scss.STATIC_URL = settings.STATIC_URL + relative + '/'
+
+        return self._scss.compile(file.read())
 
     def post_process(self, paths, dry_run=False, **options):
         """
