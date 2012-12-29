@@ -27,8 +27,8 @@ h3.folding {
 
     &:hover { color: $link_color; }
 
-    &:before {content: "&#x25BC; "; color: $font_color;}
-    &.closed:before {content: "&#x25B2; "; color: $font_color;}
-    &:hover:before {content: "&#x25BC; "; color: $link_color;}
-    &.closed:hover:before {content: "&#x25B2; "; color: $link_color;}
+    &:before {content: "▲ "; color: $font_color;}
+    &.closed:before {content: "▼ "; color: $font_color;}
+    &:hover:before {content: "▲ "; color: $link_color;}
+    &.closed:hover:before {content: "▼ "; color: $link_color;}
 }
