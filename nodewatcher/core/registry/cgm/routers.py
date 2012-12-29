@@ -62,7 +62,7 @@ class RouterRadio(object):
         """
         Returns the protocol descriptor for a given identifier.
 
-        @param identifier: Protocol descriptor
+        :param identifier: Protocol descriptor
         """
         for protocol in self.protocols:
             if protocol.identifier == identifier:
@@ -222,7 +222,7 @@ class RouterBase(object):
         """
         Returns a radio descriptor with the specified identifier.
 
-        @param identifier: Radio identifier
+        :param identifier: Radio identifier
         """
         for radio in cls.radios:
             if radio.identifier == identifier:
@@ -233,7 +233,7 @@ class RouterBase(object):
         """
         Returns a port descriptor with the specified identifier.
 
-        @param port: Port identifier
+        :param port: Port identifier
         """
         for port in cls.ports:
             if port.identifier == identifier:

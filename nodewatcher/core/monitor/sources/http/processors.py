@@ -14,8 +14,8 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
         Returns the active version of a telemetry module present on the remote
         node by checking the returned telemetry output.
 
-        @param module: Module name (dot-separated namespace)
-        @return: An integer representing the version or 0 if module is
+        :param module: Module name (dot-separated namespace)
+        :return: An integer representing the version or 0 if module is
           not installed/present
         """
         module = module.replace('.', '-')
@@ -40,9 +40,9 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
         """
         Called for every processed node.
 
-        @param context: Current context
-        @param node: Node that is being processed
-        @return: A (possibly) modified context
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
         """
         try:
             router_id = node.config.core.routerid(queryset = True).get(family = "ipv4").router_id

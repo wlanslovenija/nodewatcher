@@ -14,8 +14,8 @@ class OlsrInfo(object):
         """
         Class constructor.
 
-        @param host: olsrd-mod-txtinfo host
-        @param port: olsrd-mod-txtinfo port
+        :param host: olsrd-mod-txtinfo host
+        :param port: olsrd-mod-txtinfo port
         """
         self.host = host
         self.port = port

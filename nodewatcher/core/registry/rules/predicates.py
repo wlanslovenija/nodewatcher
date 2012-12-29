@@ -27,7 +27,7 @@ def rule(condition, *args):
     """
     The rule predicate is used to define rules.
 
-    @param condition: Lazy expression that represents a condition
+    :param condition: Lazy expression that represents a condition
     """
     if not isinstance(condition, (LazyValue, RuleModifier)):
         raise CompilationError("Rule conditions must be lazy values or rule modifiers!")
@@ -262,7 +262,7 @@ def count(value):
     """
     Lazy value that returns the number of elements of another lazy expression.
 
-    @param value: Lazy expression
+    :param value: Lazy expression
     """
     if not isinstance(value, LazyValue):
         raise CompilationError("Count predicate argument must be a lazy value!")
@@ -274,8 +274,8 @@ def router_descriptor(platform, router):
     Lazy value that returns the router descriptor for the specified
     router.
 
-    @param platform: Location of a platform identifier
-    @param router: Location of a router identifier
+    :param platform: Location of a platform identifier
+    :param router: Location of a router identifier
     """
     class LazyRouterModel(LazyObject):
         def __init__(self, platform, model):
@@ -303,7 +303,7 @@ def value(location):
     """
     Lazy value that returns the result of a registry query.
 
-    @param location: Registry location or LazyValue
+    :param location: Registry location or LazyValue
     """
     if isinstance(location, LazyValue):
         return location
@@ -346,7 +346,7 @@ def changed(location):
     A rule modifier predicate that will evaluate to True whenever a specific
     registry location has changed between rule evaluations.
 
-    @param location: Registry location or LazyValue
+    :param location: Registry location or LazyValue
     """
     return RuleModifier(
       lambda rule: setattr(rule, 'always_evaluate', True),

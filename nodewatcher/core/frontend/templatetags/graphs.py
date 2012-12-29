@@ -1,6 +1,7 @@
 from django import template
 from django.template import loader
 
+# TODO: Should not be imported in core
 from nodewatcher.legacy.nodes import models
 
 register = template.Library()

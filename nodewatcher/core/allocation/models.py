@@ -30,7 +30,7 @@ class AddressAllocator(models.Model):
         Attempts to satisfy this allocation request by obtaining a new allocation
         for the specified object.
 
-        @param obj: A valid Django model instance
+        :param obj: A valid Django model instance
         """
 
         raise NotImplementedError
@@ -39,8 +39,8 @@ class AddressAllocator(models.Model):
         """
         Attempts to satisfy this request by taking resources from an existing one.
 
-        @param other: AddressAllocator instance
-        @return: True if request has been satisfied, False otherwise
+        :param other: AddressAllocator instance
+        :return: True if request has been satisfied, False otherwise
         """
         raise NotImplementedError
 

@@ -100,8 +100,8 @@ class ProcessorContext(dict):
         """
         Starts a new namespace.
 
-        @param namespace: Namespace name
-        @param ctx_class: Optional context class to use for this namespace root (should
+        :param namespace: Namespace name
+        :param ctx_class: Optional context class to use for this namespace root (should
           be a subclass of `ProcessorContext`)
         """
         # Create a new instance
@@ -127,7 +127,7 @@ class MonitoringProcessor(object):
         """
         Reports an exception via the built-in logger.
 
-        @param msg: Message that should be included before the backtrace
+        :param msg: Message that should be included before the backtrace
         """
         if msg:
             self.logger.error(msg)
@@ -143,9 +143,9 @@ class NetworkProcessor(MonitoringProcessor):
         Performs network-wide processing and selects the nodes that will be processed
         in any following processors. Context is passed between network processors.
 
-        @param context: Current context
-        @param nodes: A set of nodes that are to be processed
-        @return: A (possibly) modified context and a (possibly) modified set of nodes
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
         """
         return context, nodes
 
@@ -159,9 +159,9 @@ class NodeProcessor(MonitoringProcessor):
         """
         Called for every processed node.
 
-        @param context: Current context
-        @param node: Node that is being processed
-        @return: A (possibly) modified context
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
         """
         return context
 

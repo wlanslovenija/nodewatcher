@@ -1,4 +1,6 @@
 from nodewatcher.core.monitor import processors
+
+# TODO: Should not be imported in core
 from nodewatcher.legacy.nodes import models as nodes_models
 
 class PurgeInvalidNodes(processors.NetworkProcessor):

@@ -14,9 +14,9 @@ class SystemStatus(monitor_processors.NodeProcessor):
         """
         Called for every processed node.
 
-        @param context: Current context
-        @param node: Node that is being processed
-        @return: A (possibly) modified context
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
         """
         version = context.http.get_module_version("core.general")
         if version >= 1:

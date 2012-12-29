@@ -11,7 +11,9 @@ from registration import models as registration_models
 
 from phonenumber_field import modelfields as phonenumber_fields
 
-from . import geo_fields, utils
+from . import geo_fields
+
+# TODO: Project should be moved to module out of legacy nodes
 from nodewatcher.legacy.nodes import models
 
 class UserProfileAndSettings(django_models.Model):
@@ -28,12 +30,12 @@ class UserProfileAndSettings(django_models.Model):
 
     # AccountRegistrationForm and AccountChangeForm uses this
     fieldset = (
-      (_('Additional personal info'), {
-        'fields': ('phone_number', 'country'),
-      }),
-      (_('Settings'), {
-        'fields': ('language', 'default_project'),
-      }),
+        (_('Additional personal info'), {
+            'fields': ('phone_number', 'country'),
+        }),
+        (_('Settings'), {
+            'fields': ('language', 'default_project'),
+        }),
     )
 
     class Meta:
@@ -70,20 +72,20 @@ def send_activation_email(instance, site, email_change=False):
     registration_activate_url = "%s%s" % (base_url, urlresolvers.reverse('registration_activate', args=(instance.activation_key,)))
 
     ctx_dict = {
-      'activation_key': instance.activation_key,
-      'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-      'site': site,
-      'base_url': base_url,
-      'protocol': protocol,
-      'network': {
-        'name': settings.NETWORK_NAME,
-        'home': settings.NETWORK_HOME,
-        'contact': settings.NETWORK_CONTACT,
-        'contact_page': settings.NETWORK_CONTACT_PAGE,
-        'description': getattr(settings, 'NETWORK_DESCRIPTION', None),
-      },
-      'email_change': email_change,
-      'registration_activate_url': registration_activate_url,
+        'activation_key': instance.activation_key,
+        'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+        'site': site,
+        'base_url': base_url,
+        'protocol': protocol,
+        'network': {
+            'name': settings.NETWORK_NAME,
+            'home': settings.NETWORK_HOME,
+            'contact': settings.NETWORK_CONTACT,
+            'contact_page': settings.NETWORK_CONTACT_PAGE,
+            'description': getattr(settings, 'NETWORK_DESCRIPTION', None),
+        },
+        'email_change': email_change,
+        'registration_activate_url': registration_activate_url,
     }
     subject = loader.render_to_string('registration/activation_email_subject.txt', ctx_dict)
     subject = ''.join(subject.splitlines())
@@ -111,7 +113,7 @@ activation_key_expired.boolean = True
 registration_models.RegistrationProfile.activation_key_expired = activation_key_expired
 
 try:
-    # So that signals are registred early on
+    # So that signals are registered early on
     from . import signals
 except ImportError:
     # Probably circular imports

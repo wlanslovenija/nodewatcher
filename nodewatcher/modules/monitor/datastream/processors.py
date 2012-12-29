@@ -10,9 +10,9 @@ class Datastream(monitor_processors.NodeProcessor):
         """
         Called for every processed node.
 
-        @param context: Current context
-        @param node: Node that is being processed
-        @return: A (possibly) modified context
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
         """
         # TODO Should we enable addition of items that are not in the registry?
         for item in node.monitoring:

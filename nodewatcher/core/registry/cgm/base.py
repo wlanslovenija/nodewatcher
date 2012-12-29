@@ -96,9 +96,9 @@ class PlatformBase(object):
         """
         Registers a new platform module.
 
-        @param order: Call order
-        @param module: Module implementation function
-        @param router: Optional router identifier
+        :param order: Call order
+        :param module: Module implementation function
+        :param router: Optional router identifier
         """
         if [x for x in self._modules if x[1] == module]:
             return
@@ -109,9 +109,9 @@ class PlatformBase(object):
         """
         Registers a new platform package.
 
-        @param name: Platform-dependent package name
-        @param config: Configuration class
-        @param package: Package implementation function
+        :param name: Platform-dependent package name
+        :param config: Configuration class
+        :param package: Package implementation function
         """
         if [x for x in self._packages if x[2] == package]:
             return
@@ -122,7 +122,7 @@ class PlatformBase(object):
         """
         Registers a new router with this platform.
 
-        @param router: A subclass of RouterBase
+        :param router: A subclass of RouterBase
         """
         if not issubclass(router, cgm_routers.RouterBase):
             raise TypeError("Router descriptor must be a subclass of RouterBase!")
@@ -134,7 +134,7 @@ class PlatformBase(object):
         """
         Returns a router descriptor.
 
-        @param router: Unique router identifier
+        :param router: Unique router identifier
         """
         return self._routers[router]
 
