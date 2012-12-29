@@ -20,9 +20,10 @@ class CgmGeneralConfig(core_models.GeneralConfig):
     """
     Extended general configuration that contains CGM-related options.
     """
-    platform = registry_fields.SelectorKeyField("node.config", "core.general#platform", blank = True)
-    router = registry_fields.SelectorKeyField("node.config", "core.general#router", blank = True)
-    version = models.CharField(max_length = 20, blank = True) # TODO fkey to versions (production, experimental, ...)
+
+    platform = registry_fields.SelectorKeyField('node.config', 'core.general#platform', blank = True)
+    router = registry_fields.SelectorKeyField('node.config', 'core.general#router', blank = True)
+    version = models.CharField(max_length = 20, blank = True) # TODO: fkey to versions (production, experimental, ...)
 
     class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
         registry_name = _("CGM Configuration")
@@ -32,17 +33,19 @@ class CgmGeneralConfig(core_models.GeneralConfig):
         """
         Returns the device descriptor for the configured router.
         """
+
         return cgm_base.get_platform(self.platform).get_router(self.router)
 
-registration.point("node.config").register_item(CgmGeneralConfig)
+registration.point('node.config').register_item(CgmGeneralConfig)
 
 class AuthenticationConfig(registration.bases.NodeConfigRegistryItem):
     """
     Configuration for different authentication mechanisms.
     """
+
     class RegistryMeta:
         form_order = 10
-        registry_id = "core.authentication"
+        registry_id = 'core.authentication'
         registry_section = _("Authentication")
         registry_name = _("Basic Authentication")
         multiple = True
@@ -54,80 +57,89 @@ class PasswordAuthenticationConfig(AuthenticationConfig):
     """
     Password authentication mechanism configuration.
     """
+
     password = models.CharField(max_length = 30)
 
     class RegistryMeta(AuthenticationConfig.RegistryMeta):
         registry_name = _("Password")
 
-registration.point("node.config").register_item(PasswordAuthenticationConfig)
+registration.point('node.config').register_item(PasswordAuthenticationConfig)
 
 class PublicKeyAuthenticationConfig(AuthenticationConfig):
     """
     Public key authentication mechanism configuration.
     """
+
     public_key = models.TextField()
 
     class RegistryMeta(AuthenticationConfig.RegistryMeta):
         registry_name = _("Public Key")
 
-registration.point("node.config").register_item(PublicKeyAuthenticationConfig)
+registration.point('node.config').register_item(PublicKeyAuthenticationConfig)
 
+# TODO: Should this go to OpenWrt module?
 class PackageConfig(registration.bases.NodeConfigRegistryItem):
     """
     Common configuration for CGM packages.
     """
+
     enabled = models.BooleanField(default = True)
 
     class RegistryMeta:
         form_order = 100
-        registry_id = "core.packages"
+        registry_id = 'core.packages'
         registry_section = _("Extra Packages")
         registry_name = _("Package Configuration")
         multiple = True
         hidden = True
 
-registration.point("node.config").register_item(PackageConfig)
+registration.point('node.config').register_item(PackageConfig)
 
 class RoutableInterface(models.Model):
     class Meta:
         abstract = True
 
-    routing_protocol = registry_fields.SelectorKeyField("node.config", "core.interfaces#routing_protocol",
-      blank = True, null = True)
+    routing_protocol = registry_fields.SelectorKeyField(
+        'node.config', 'core.interfaces#routing_protocol',
+        blank = True, null = True,
+    )
 
 class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
     """
     Interface configuration.
     """
+
     enabled = models.BooleanField(default = True)
 
     class RegistryMeta:
         form_order = 50
-        registry_id = "core.interfaces"
+        registry_id = 'core.interfaces'
         registry_section = _("Network Interface Configuration")
         registry_name = _("Generic Interface")
         multiple = True
         hidden = True
 
-registration.point("node.config").register_item(InterfaceConfig)
+registration.point('node.config').register_item(InterfaceConfig)
 
 class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
     """
     An ethernet interface.
     """
-    eth_port = registry_fields.SelectorKeyField("node.config", "core.interfaces#eth_port")
+
+    eth_port = registry_fields.SelectorKeyField('node.config', 'core.interfaces#eth_port')
     uplink = models.BooleanField(default = False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Ethernet Interface")
 
-registration.point("node.config").register_item(EthernetInterfaceConfig)
+registration.point('node.config').register_item(EthernetInterfaceConfig)
 
 class WifiRadioDeviceConfig(InterfaceConfig):
     """
     A wireless radio device.
     """
-    wifi_radio = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_radio")
+
+    wifi_radio = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_radio')
     protocol = models.CharField(max_length = 50)
     channel = models.CharField(max_length = 50)
     bitrate = models.IntegerField(default = 11)
@@ -139,7 +151,7 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Wireless Radio")
 
-registration.point("node.config").register_item(WifiRadioDeviceConfig)
+registration.point('node.config').register_item(WifiRadioDeviceConfig)
 
 class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
     """
@@ -149,7 +161,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         WifiRadioDeviceConfig, editable = False, null = False, related_name = 'interfaces'
     )
 
-    mode = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_mode")
+    mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode')
     essid = models.CharField(max_length = 50, verbose_name = "ESSID")
     bssid = registry_fields.MACAddressField(verbose_name = "BSSID")
 
@@ -159,46 +171,49 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         multiple = True
         hidden = False
 
-registration.point("node.config").register_choice("core.interfaces#wifi_mode", "mesh", _("Mesh"))
-registration.point("node.config").register_choice("core.interfaces#wifi_mode", "ap", _("AP"))
-registration.point("node.config").register_choice("core.interfaces#wifi_mode", "sta", _("STA"))
-registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', 'mesh', _("Mesh"))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', 'ap', _("AP"))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', 'sta', _("STA"))
+registration.point('node.config').register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
 
+# TODO: Is it important if it is tap or tun? Should we have separate configs for them? Or is this more general? Maybe better name then VirtualInterface, PseudoWire, or something?
 class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
     """
     VPN interface.
     """
-    protocol = registry_fields.SelectorKeyField("node.config", "core.interfaces#vpn_protocol",
-      verbose_name = _("VPN Protocol"))
+
+    protocol = registry_fields.SelectorKeyField('node.config', 'core.interfaces#vpn_protocol', verbose_name = _("VPN Protocol"))
     mac = registry_fields.MACAddressField(auto_add = True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("VPN Tunnel")
 
-registration.point("node.config").register_item(VpnInterfaceConfig)
+registration.point('node.config').register_item(VpnInterfaceConfig)
 
 class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     """
     Network configuration of an interface.
     """
+
     interface = registry_fields.IntraRegistryForeignKey(InterfaceConfig, editable = False, null = False, related_name = 'networks')
     enabled = models.BooleanField(default = True)
     description = models.CharField(max_length = 100, blank = True)
 
     class RegistryMeta:
         form_order = 51
-        registry_id = "core.interfaces.network"
+        registry_id = 'core.interfaces.network'
         registry_section = _("Network Configuration")
         registry_name = _("Generic Network Config")
         multiple = True
 
-registration.point("node.config").register_subitem(InterfaceConfig, NetworkConfig)
+registration.point('node.config').register_subitem(InterfaceConfig, NetworkConfig)
 
 class StaticNetworkConfig(NetworkConfig):
     """
     Static IP configuration.
     """
-    family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
+
+    family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
     address = registry_fields.IPAddressField(subnet_required = True)
     gateway = registry_fields.IPAddressField(host_required = True)
 
@@ -212,7 +227,7 @@ class StaticNetworkConfig(NetworkConfig):
         if not self.address or not self.gateway:
             return
 
-        family = 6 if self.family == "ipv6" else 4
+        family = 6 if self.family == 'ipv6' else 4
         if not (self.address.version == self.gateway.version == family):
             raise exceptions.ValidationError(_("You must specify IP addresses of the selected address family!"))
 
@@ -222,10 +237,10 @@ class StaticNetworkConfig(NetworkConfig):
         if self.gateway.ip == self.address.ip:
             raise exceptions.ValidationError(_("Host address and gateway address must be different!"))
 
-registration.point("node.config").register_choice("core.interfaces.network#ip_family", "ipv4", _("IPv4"))
-registration.point("node.config").register_choice("core.interfaces.network#ip_family", "ipv6", _("IPv6"))
-registration.point("node.config").register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
-registration.point("node.config").register_subitem(WifiInterfaceConfig, StaticNetworkConfig)
+registration.point('node.config').register_choice('core.interfaces.network#ip_family', 'ipv4', _("IPv4"))
+registration.point('node.config').register_choice('core.interfaces.network#ip_family', 'ipv6', _("IPv6"))
+registration.point('node.config').register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
+registration.point('node.config').register_subitem(WifiInterfaceConfig, StaticNetworkConfig)
 
 class DHCPNetworkConfig(NetworkConfig):
     """
@@ -236,80 +251,91 @@ class DHCPNetworkConfig(NetworkConfig):
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("DHCP")
 
-registration.point("node.config").register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
+registration.point('node.config').register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
 
 class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator):
     """
     IP configuration that gets allocated from a pool.
     """
-    routing_announce = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#routing_announce",
-      blank = True, null = True, verbose_name = _("Announce Via"))
+
+    routing_announce = registry_fields.SelectorKeyField(
+        'node.config', 'core.interfaces.network#routing_announce',
+        blank = True, null = True, verbose_name = _("Announce Via"),
+    )
 
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("Allocated Network")
 
-registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
-registration.point("node.config").register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
-registration.point("node.config").unregister_item(core_models.BasicAddressingConfig)
+registration.point('node.config').register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
+registration.point('node.config').register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
+registration.point('node.config').unregister_item(core_models.BasicAddressingConfig)
 
 class PPPoENetworkConfig(NetworkConfig):
     """
     Configuration for a WAN PPPoE uplink.
     """
+
     username = models.CharField(max_length = 50)
     password = models.CharField(max_length = 50)
 
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("PPPoE")
 
-registration.point("node.config").register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
+registration.point('node.config').register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
 class VpnNetworkConfig(NetworkConfig):
     """
     Configuration for a VPN uplink.
     """
+
     address = registry_fields.IPAddressField(host_required = True)
     port = models.IntegerField()
 
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("VPN Server")
 
-registration.point("node.config").register_subitem(VpnInterfaceConfig, VpnNetworkConfig)
+registration.point('node.config').register_subitem(VpnInterfaceConfig, VpnNetworkConfig)
 
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
     """
     Configuration of per-interface traffic limits.
     """
+
     interface = registry_fields.IntraRegistryForeignKey(InterfaceConfig, editable = False, null = False, related_name = 'limits')
     enabled = models.BooleanField(default = True)
 
     class RegistryMeta:
         form_order = 50
-        registry_id = "core.interfaces.limits"
+        registry_id = 'core.interfaces.limits'
         registry_section = _("Traffic Limits Configuration")
         registry_name = _("Generic Limits")
         multiple = True
         hidden = True
 
-registration.point("node.config").register_subitem(InterfaceConfig, InterfaceLimitConfig)
+registration.point('node.config').register_subitem(InterfaceConfig, InterfaceLimitConfig)
 
 class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
     """
     Throughput limit configuration.
     """
-    limit_out = registry_fields.SelectorKeyField("node.config", "core.interfaces.limits#speeds",
-      verbose_name = _("Limit OUT"), default = "", blank = True)
-    limit_in = registry_fields.SelectorKeyField("node.config", "core.interfaces.limits#speeds",
-      verbose_name = _("Limit IN"), default = "", blank = True)
+
+    limit_out = registry_fields.SelectorKeyField(
+        'node.config', 'core.interfaces.limits#speeds',
+        verbose_name = _("Limit OUT"), default = '', blank = True,
+    )
+    limit_in = registry_fields.SelectorKeyField(
+        'node.config', 'core.interfaces.limits#speeds',
+        verbose_name = _("Limit IN"), default = '', blank = True,
+    )
 
     class RegistryMeta(InterfaceLimitConfig.RegistryMeta):
         registry_name = _("Throughput Limit")
 
 # TODO: This probably shouldn't be hardcoded, it should be moved to modules.administration?
-registration.point("node.config").register_choice("core.interfaces.limits#speeds", "128kbit", _("128 Kbit/s"))
-registration.point("node.config").register_choice("core.interfaces.limits#speeds", "256kbit", _("256 Kbit/s"))
-registration.point("node.config").register_choice("core.interfaces.limits#speeds", "512kbit", _("512 Kbit/s"))
-registration.point("node.config").register_choice("core.interfaces.limits#speeds", "1mbit", _("1 Mbit/s"))
-registration.point("node.config").register_choice("core.interfaces.limits#speeds", "2mbit", _("2 Mbit/s"))
-registration.point("node.config").register_choice("core.interfaces.limits#speeds", "4mbit", _("4 Mbit/s"))
-registration.point("node.config").register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '128kbit', _("128 Kbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '256kbit', _("256 Kbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '512kbit', _("512 Kbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '1mbit', _("1 Mbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '2mbit', _("2 Mbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '4mbit', _("4 Mbit/s"))
+registration.point('node.config').register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)

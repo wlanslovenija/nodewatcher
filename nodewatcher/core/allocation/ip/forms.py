@@ -11,16 +11,18 @@ class IpAddressAllocatorFormMixin(object):
     """
     A mixin for address allocator forms.
     """
+
     def modify_to_context(self, item, cfg, request):
         """
         Dynamically modifies the form.
         """
+
         # Only display pools that are available to the selected project
         qs = self.fields['pool'].queryset
         try:
             qs = qs.filter(projects = cfg['core.project'][0].project)
             qs = qs.filter(family = item.family)
-            qs = qs.order_by("description", "ip_subnet")
+            qs = qs.order_by('description', 'ip_subnet')
         except (nodes_models.Project.DoesNotExist, KeyError, AttributeError):
             qs = qs.none()
 
@@ -32,12 +34,11 @@ class IpAddressAllocatorFormMixin(object):
             self.fields['prefix_length'] = registry_fields.SelectorFormField(
                 label = _("Prefix Length"),
                 choices = fields.BLANK_CHOICE_DASH + [
-                (plen, "/%s" % plen)
-                for plen in xrange(pool.prefix_length_minimum, pool.prefix_length_maximum + 1)
+                    (plen, '/%s' % plen) for plen in xrange(pool.prefix_length_minimum, pool.prefix_length_maximum + 1)
                 ],
                 initial = pool.prefix_length_default,
                 coerce = int,
-                empty_value = None
+                empty_value = None,
             )
         except (pool_models.IpPool.DoesNotExist, AttributeError):
             self.fields['prefix_length'] = registry_fields.SelectorFormField(label = _("Prefix Length"), choices = fields.BLANK_CHOICE_DASH)
