@@ -30,7 +30,7 @@ if [ -d /usr/local/Cellar/postgis15/1.5.8 ]; then
     POSTGIS_DIR="/usr/local/Cellar/postgis15/1.5.8/share/postgis"
 fi
 
-if  [[ -ne "$CONTRIB_DIR" && -ne "$POSTGIS_DIR" ]]; then
+if  [[ -z "$CONTRIB_DIR" || -z "$POSTGIS_DIR" ]]; then
     echo "!!! PostgreSQL or PostGIS contrib directories not found."
     echo "!!! Please edit the database initialization script!"
     exit 1
