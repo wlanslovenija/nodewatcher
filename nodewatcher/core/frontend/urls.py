@@ -1,4 +1,5 @@
 from django.conf import settings, urls
+from django.contrib.staticfiles import urls as staticfiles_urls
 
 urlpatterns = urls.patterns('',
     # Node lists
@@ -13,6 +14,9 @@ urlpatterns = urls.patterns('',
 
     # Node manipulation
     urls.url(r'^node/(?P<node>[^/]+)/edit$', 'nodewatcher.core.frontend.views.node_edit', name = 'edit_node'),
+
+    # Static files
+    urls.url(r'^', urls.include('django.contrib.staticfiles.urls')),
 )
 
 handler404 = 'django.views.defaults.page_not_found'
@@ -21,19 +25,4 @@ if getattr(settings, 'DEBUG', False):
     urlpatterns += urls.patterns('',
         (r'^404/$', handler404),
         (r'^500/$', handler500),
-    )
-
-if getattr(settings, 'DEBUG', None) and not settings.MEDIA_URL.startswith('http'):
-    # Server static files with Django when running in debug mode and MEDIA_URL is local
-    static_patterns = urls.patterns('',
-        urls.url(
-            r'^(?P<path>(?:common|css|graphs|images|js|site|stickers|wlanlj|wlansi)/.*)$',
-            'django.views.static.serve',
-            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}
-        ),
-    )
-
-    media_url = settings.MEDIA_URL.lstrip('/')
-    urlpatterns += urls.patterns('',
-        (r'^%s' % media_url, urls.include(static_patterns)),
     )
