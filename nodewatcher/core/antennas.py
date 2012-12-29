@@ -8,10 +8,10 @@ class Antenna(models.Model):
     Antenna descriptor.
     """
     POLARIZATION_CHOICES = (
-      ('horizontal', _("Horizontal")),
-      ('vertical', _("Vertical")),
-      ('circular', _("Circular")),
-      ('dual', _("Dual")),
+        ('horizontal', _("Horizontal")),
+        ('vertical', _("Vertical")),
+        ('circular', _("Circular")),
+        ('dual', _("Dual")),
     )
 
     name = models.CharField(max_length = 100, verbose_name = _("Name"))

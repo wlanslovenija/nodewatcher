@@ -7,17 +7,17 @@ from nodewatcher.core.registry.cgm import base as cgm_base
 
 # Exports
 __all__ = [
-  'rule',
-  'value',
-  'router_descriptor',
-  'count',
-  'foreach',
-  'loop_var',
-  'contains',
-  'changed',
-  'assign',
-  'remove',
-  'append',
+    'rule',
+    'value',
+    'router_descriptor',
+    'count',
+    'foreach',
+    'loop_var',
+    'contains',
+    'changed',
+    'assign',
+    'remove',
+    'append',
 ]
 
 class MissingValueError(EvaluationError):
