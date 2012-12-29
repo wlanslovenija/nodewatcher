@@ -118,6 +118,11 @@ STATIC_ROOT = os.path.abspath(os.path.join(settings_dir, '..', 'static'))
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
+SCSS_PATHS = [
+   os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'compass', 'stylesheets')),
+   os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'blueprint', 'stylesheets')),
+]
+
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
@@ -297,6 +302,10 @@ LOGGING = {
         'monitor': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'scss': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
         }
     }
 }

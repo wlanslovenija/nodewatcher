@@ -33,3 +33,4 @@ python-dateutil==1.5
 python-memcached==1.48
 pytz==2012h
 wsgiref==0.1.2
+pyScss==1.1.4
