@@ -140,7 +140,7 @@ STATICFILES_FINDERS = (
 
 STATICFILES_STORAGE = 'nodewatcher.core.frontend.staticfiles.storage.SCSSStaticFilesStorage'
 
-GEOIP_PATH = os.path.abspath(os.path.join(settings_dir, '..', 'geoip'))
+GEOIP_PATH = os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'geoip'))
 DEFAULT_COUNTRY = 'SI'
 
 # Make this unique, and don't share it with anybody.
