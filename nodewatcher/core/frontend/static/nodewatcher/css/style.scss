@@ -1,0 +1,39 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*-
+@import "compass/reset"; 
+@import "compass/typography/lists/horizontal-list";
+@import "compass/typography/lists/bullets";
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/opacity";
+@import "compass/css3/transform";
+@import "blueprint/typography";
+@import "blueprint/form";
+
+@import "defs";
+
+body {
+    margin: 0px;
+    color: $font-color;
+    font-family: Verdana, Arial, 'Bitstream Vera Sans', Helvetica, sans-serif;
+    font-size:13px; 
+}
+
+@import "common";
+@import "nodes";
+@import "forms";
+@import "tables"; 
+
+h3.folding {
+	cursor: pointer;
+	margin: 20px 2px 10px 2px;
+	border-top: 1px solid #CCCCCC;
+	padding-left: 2px;
+	padding-top: 5px;
+    color: $font_color;
+
+    &:hover { color: $link_color; }
+
+    &:before {content: "&#x25BC; "; color: $font_color;}
+    &.closed:before {content: "&#x25B2; "; color: $font_color;}
+    &:hover:before {content: "&#x25BC; "; color: $link_color;}
+    &.closed:hover:before {content: "&#x25B2; "; color: $link_color;}
+}
