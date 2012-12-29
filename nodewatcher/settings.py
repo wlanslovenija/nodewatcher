@@ -216,7 +216,10 @@ AUTHENTICATION_BACKENDS = (
 )
 
 INSTALLED_APPS = (
-    # Ours are first so that we can override default templates in other apps.
+    # We override staticfiles runserver with default Django runserver in nodewatcher.core.frontend.
+    'django.contrib.staticfiles',
+
+    # Ours are at the beginning so that we can override default templates in other apps.
     'nodewatcher.core',
     'nodewatcher.core.allocation',
     'nodewatcher.core.allocation.ip',
@@ -245,7 +248,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.gis',
 

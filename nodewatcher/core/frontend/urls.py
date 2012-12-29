@@ -1,5 +1,5 @@
 from django.conf import settings, urls
-from django.contrib.staticfiles import urls as staticfiles_urls
+from django.conf.urls import static
 
 urlpatterns = urls.patterns('',
     # Node lists
@@ -14,15 +14,16 @@ urlpatterns = urls.patterns('',
 
     # Node manipulation
     urls.url(r'^node/(?P<node>[^/]+)/edit$', 'nodewatcher.core.frontend.views.node_edit', name = 'edit_node'),
-
-    # Static files
-    urls.url(r'^', urls.include('django.contrib.staticfiles.urls')),
 )
 
 handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
-if getattr(settings, 'DEBUG', False):
+if settings.DEBUG:
     urlpatterns += urls.patterns('',
         (r'^404/$', handler404),
         (r'^500/$', handler500),
     )
+
+if settings.DEBUG:
+    # Serve static files in DEBUG mode
+    urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
