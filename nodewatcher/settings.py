@@ -118,9 +118,10 @@ STATIC_ROOT = os.path.abspath(os.path.join(settings_dir, '..', 'static'))
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
+# SCSS libraries to include in SCSSStaticFilesStorage.
 SCSS_PATHS = [
-   os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'compass', 'stylesheets')),
-   os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'blueprint', 'stylesheets')),
+    os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'compass', 'stylesheets')),
+    os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'blueprint', 'stylesheets')),
 ]
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
