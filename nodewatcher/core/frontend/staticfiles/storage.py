@@ -1,6 +1,5 @@
 import fnmatch, os
 
-from django.utils.datastructures import SortedDict
 from django.contrib.staticfiles import storage
 from django.core.files import base
 from django.utils import encoding
@@ -22,20 +21,22 @@ def relative_path(root, path):
 class SCSSFilesMixin(object):
     def __init__(self, *args, **kwargs):
         super(SCSSFilesMixin, self).__init__(*args, **kwargs)
-        # ASSETS_ROOT is where the pyScss outputs the generated files such as spritemaps
-        # and compile cache:
-        scss.ASSETS_ROOT = os.path.join(settings.STATIC_ROOT, 'assets/')
-        scss.ASSETS_URL = settings.STATIC_URL + 'assets/'
+
+        # ASSETS_ROOT is where the pyScss outputs the generated files such
+        # as spritemaps and compile cache
+        # TODO: This should be improved if some non-local-filesystem storage is used for static files
+        scss.ASSETS_ROOT = os.path.join(settings.STATIC_ROOT, 'nodewatcher', 'assets')
+        scss.ASSETS_URL = settings.STATIC_URL + 'nodewatcher/assets/'
 
         scss.STATIC_ROOT = settings.STATIC_ROOT
         scss.STATIC_URL = settings.STATIC_URL
 
-	self._scss_paths = []
+        self._scss_paths = []
         self._scss_paths.extend(getattr(settings, 'SCSS_PATHS', []))
 	
-        # This creates the Scss object used to compile SCSS code. In this example,
-        # _scss_vars will hold the context variables:
+        # _scss_vars hold the context variables
         self._scss_vars = {}
+        # This creates the Scss object used to compile SCSS code
         self._scss = scss.Scss(
             scss_vars=self._scss_vars,
             scss_opts={
@@ -47,19 +48,8 @@ class SCSSFilesMixin(object):
     def _scss_process(self, filename, file):
         root, name = os.path.split(os.path.join(settings.STATIC_ROOT, filename))
         scss.LOAD_PATHS = []
-	scss.LOAD_PATHS.extend(self._scss_paths)
-	scss.LOAD_PATHS.append(root)
-
-        relative = relative_path(settings.STATIC_ROOT, root).replace(os.sep, '/')
-
-        scss.ASSETS_ROOT = os.path.join(root, 'assets/')
-        if not os.path.exists(scss.ASSETS_ROOT):
-            os.mkdir(scss.ASSETS_ROOT)
-
-        scss.ASSETS_URL = settings.STATIC_URL + 'assets/'
-
-        scss.STATIC_ROOT = root
-        scss.STATIC_URL = settings.STATIC_URL + relative + '/'
+        scss.LOAD_PATHS.extend(self._scss_paths)
+        scss.LOAD_PATHS.append(root)
 
         return self._scss.compile(file.read())
 
@@ -68,8 +58,7 @@ class SCSSFilesMixin(object):
         Post process the given list of files (called from collectstatic).
 
         Processing finds all SCSS files (*.scss, not starting with ``_``) and
-        compiles them into CSS files and afterwards deletes them. Furthermore, it
-        deletes all files which have in their path any directory starting with ``_``.
+        compiles them into CSS files and afterwards deletes them.
         """
 
         # Don't even dare to process the files if we're in dry run mode
@@ -79,7 +68,7 @@ class SCSSFilesMixin(object):
         # Build a list of SCSS files
         all_scss_files = [path for path in paths if fnmatch.fnmatchcase(path, '*.scss')]
 
-        #Tthen sort the files by the directory level
+        # Then sort the files by the directory level
         path_level = lambda name: len(name.split(os.sep))
         for name in sorted(all_scss_files, key=path_level, reverse=True):
             if os.path.basename(name).startswith('_'):
@@ -111,14 +100,6 @@ class SCSSFilesMixin(object):
             if self.exists(name):
                 self.delete(name)
                 yield name, '<deleted>', True
-
-        # Deletes all files which have in their path any directory starting with ``_``
-        for name in sorted(paths.keys(), key=path_level, reverse=True):
-            for part in name.split(os.sep):
-                if part.startswith('_'):
-                    if self.exists(name):
-                        self.delete(name)
-                        yield name, '<deleted>', True
 
 class SCSSStaticFilesStorage(SCSSFilesMixin, storage.StaticFilesStorage):
     """
