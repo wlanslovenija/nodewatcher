@@ -3,9 +3,11 @@ import polymorphic
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from nodewatcher.legacy.nodes import models as nodes_models
 from nodewatcher.core.registry import fields as registry_fields
 from nodewatcher.core.registry import registration
+
+# TODO: Should not be imported in core
+from nodewatcher.legacy.nodes import models as nodes_models
 
 class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
     """

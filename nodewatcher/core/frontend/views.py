@@ -12,6 +12,7 @@ from django.utils import safestring
 
 from guardian.shortcuts import assign as assign_permission
 
+# TODO: Should not be imported in core
 from nodewatcher.legacy.nodes.models import Node
 
 from nodewatcher.core.registry import forms as registry_forms
