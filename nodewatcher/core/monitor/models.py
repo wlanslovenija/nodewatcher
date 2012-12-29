@@ -37,6 +37,7 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     class RegistryMeta:
         registry_id = "core.status"
 
+# TODO: This should not be hard-coded? Should be moved to modules?
 registration.point("node.monitoring").register_choice("core.status#status", "up", _("Up"))
 registration.point("node.monitoring").register_choice("core.status#status", "down", _("Down"))
 registration.point("node.monitoring").register_choice("core.status#status", "invalid", _("Invalid"))
@@ -86,6 +87,7 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
         registry_id = "network.routing.announces"
         multiple = True
 
+# TODO: Does this depend on routing protocol?
 registration.point("node.monitoring").register_choice("network.routing.announces#status", "ok", _("Ok"))
 registration.point("node.monitoring").register_choice("network.routing.announces#status", "alias", _("Alias"))
 registration.point("node.monitoring").register_choice("network.routing.announces#status", "unallocated", _("Unallocated"))

@@ -2,14 +2,14 @@ import copy
 
 # Exports
 __all__ = [
-  'EngineContext',
-  'Rule',
-  'RuleModifier',
-  'Action',
-  'LazyObject',
-  'LazyValue',
-  'CompilationError',
-  'EvaluationError',
+    'EngineContext',
+    'Rule',
+    'RuleModifier',
+    'Action',
+    'LazyObject',
+    'LazyValue',
+    'CompilationError',
+    'EvaluationError',
 ]
 
 class CompilationError(Exception):
