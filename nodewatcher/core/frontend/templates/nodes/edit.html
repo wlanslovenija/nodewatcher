@@ -19,14 +19,14 @@
             {% include "registry/forms.html" %}
         </div>
 
-        <div class="buttons"><input type="submit" value="{% trans "Update" %}" />
-            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='/'" />
+        <div class="buttons"><button role="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-primary"><span class="ui-button-text">{% trans "Update" %}</span></button>
+            <button role="button" onclick="document.location='/'" class="ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-button-text">{% trans "Cancel" %}</span></button>
         </div>
     </form>
 {% endblock %}
 
 {% block js %}
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11n.js"></script>
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/unidecode.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/n11ndata.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/n11n.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/unidecode.js"></script>
 {% endblock %}

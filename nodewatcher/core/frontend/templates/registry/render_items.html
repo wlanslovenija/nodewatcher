@@ -14,8 +14,10 @@
     {% heading 3 descriptor.name %}
     {% if descriptor.multiple %}
         {% if not descriptor.hide_multiple_controls %}
-            <input type="button" value="{% trans 'Add' %}" name="{{ descriptor.prefix }}" class="regact_adder">
-            <input type="button" value="{% trans 'Remove Last' %}" name="{{ descriptor.prefix }}" class="regact_remover">
+        <div class="buttons">
+            <button role="button" name="{{ descriptor.prefix }}" class="regact_adder ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-icon ui-icon-plusthick"></span><span class="ui-button-text">{% trans 'Add' %}</span></button>
+            <button role="button" name="{{ descriptor.prefix }}" class="regact_remover ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-icon ui-icon-minusthick"></span><span class="ui-button-text">{% trans 'Remove Last' %}</span></button>
+        </div>
         {% endif %}
         {{ descriptor.submeta }}
         <div id="{{ descriptor.prefix }}_mu_container">
@@ -23,6 +25,10 @@
     
     {% for subform in descriptor.subforms %}
         {{ subform }}
+    {% empty %}
+        <div class="ui-widget">
+            <div class="registry_nested_empty ui-state-highlight ui-corner-all">{% trans 'This category is currently empty.' %}</div>
+        </div>
     {% endfor %}
     
     {% if descriptor.multiple %}

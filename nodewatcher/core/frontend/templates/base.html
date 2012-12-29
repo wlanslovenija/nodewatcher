@@ -5,23 +5,24 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
         <link rel="shortcut icon" href="{{ MEDIA_URL }}css/images/favicon.ico" type="image/x-icon" />
         <link rel="icon" href="{{ MEDIA_URL }}css/images/favicon.ico" type="image/x-icon" />
-        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.4.4.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/jquery-1.4.4.min.js"></script>
         <!--[if lt IE 7]>
         <script type="text/javascript" src="{{ MEDIA_URL }}wlanlj/common/js/ie_pre7_hacks.js"></script>
         <![endif]-->
         <!--[if IE]>
         <script type="text/javascript" src="{{ MEDIA_URL }}js/ie_hacks.js"></script>
         <![endif]-->
-        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/screen.css" media="screen, projection" />
-        <link rel='stylesheet' type='text/css' href="{{ MEDIA_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.12.custom.css" />
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}nodewatcher/css/style.css" media="screen, projection" />
+        <!--link rel='stylesheet' type='text/css' href="{{ STATIC_URL }}nodewatcher/css/jquery-ui/bootstrap/bootstrap.css" /-->
+        <link rel='stylesheet' type='text/css' href="{{ STATIC_URL }}nodewatcher/css/jquery-ui/bootstrap/jquery-ui-1.8.16.custom.css" />
         {% block head_permalink %}{% if permalink %}<link rel="bookmark" href="{{ permalink }}" />{% endif %}{% endblock %}
-        <script type="text/javascript" src="{{ MEDIA_URL }}js/common.js"></script>
-        <script type="text/javascript" src="{{ MEDIA_URL }}js/csrf.js"></script>
-        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
-        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.12.custom.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/jquery-ui-1.8.12.custom.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/common.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/csrf.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/jquery.dataTables.js"></script>
         {{ form.media }}
         {% block js %}{% endblock %}
-            <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.init.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/jquery.dataTables.init.js"></script>
         {% block rss %}{% endblock %}
     </head>
 
@@ -41,7 +42,7 @@
             {% block permalink %}{% if permalink %}<div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>{% endif %}{% endblock %}
             {% block heading %}{% if heading %}{% heading 1 heading %}{% endif %}{% endblock %}
                 {% if messages %}
-                    <div id="messages">
+                    <div id="messages" class="ui-state-highlight ui-corner-all">
                         <ul>
                             {% for message in messages %}
                                 <li>{{ message }}</li>

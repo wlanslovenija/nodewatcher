@@ -2,7 +2,7 @@
 /* Table listing */
 
 table.listing {
-    @include rapid-table($font-color, #EEEEEE, #CCCCCC);
+    @include common-table($font-color, #EEEEEE, #CCCCCC);
     tbody {
         tr.section_title:hover, tr.section_title:focus, tr.section_title {background-color: #FFFFFF;}
         tr.webclient {background-color: #EEFFD6;}

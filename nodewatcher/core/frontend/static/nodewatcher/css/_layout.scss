@@ -1,0 +1,17 @@
+// -*- Mode: css; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*-
+
+@import "blueprint/typography";
+@import "compass/typography/links/link-colors";
+
+body {
+    margin: 0px;
+}
+
+#content {
+    padding: 20px;
+}
+
+.buttons {
+    margin: 5px 0;
+    text-align: right;
+}

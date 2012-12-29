@@ -2,22 +2,17 @@
 @import "compass/reset"; 
 @import "compass/typography/lists/horizontal-list";
 @import "compass/typography/lists/bullets";
+@import "compass/typography/text";
 @import "compass/utilities/general/clearfix";
 @import "compass/css3/opacity";
 @import "compass/css3/transform";
-@import "blueprint/typography";
+@import "blueprint/colors";
 @import "blueprint/form";
 
 @import "defs";
-
-body {
-    margin: 0px;
-    color: $font-color;
-    font-family: Verdana, Arial, 'Bitstream Vera Sans', Helvetica, sans-serif;
-    font-size:13px; 
-}
-
 @import "common";
+@import "typography"; 
+@import "layout"; 
 @import "nodes";
 @import "forms";
 @import "tables"; 

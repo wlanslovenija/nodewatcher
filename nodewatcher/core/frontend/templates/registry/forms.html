@@ -11,7 +11,7 @@
 </div>
 
 <input type="hidden" name="STATE" id="reg_eval_state" value='{{ eval_state }}' />
-<script type="text/javascript"    src="{{ MEDIA_URL }}js/registry.js"></script>
+<script type="text/javascript"    src="{{ STATIC_URL }}nodewatcher/js/registry.js"></script>
 <script type="text/javascript">
     registry.regpoint_id = "{{ registry_regpoint }}";
     registry.root_id = "{{ registry_root.pk }}";

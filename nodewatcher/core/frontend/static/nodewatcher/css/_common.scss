@@ -64,7 +64,7 @@
     } 
 }
 
-@mixin rapid-links($color, $visited_color: $color - 30) {
+@mixin common-links($color, $visited_color: $color - 30) {
     text-decoration: none;
 
     &:link {
@@ -83,7 +83,7 @@
     }
 }
 
-@mixin rapid-table($font-color, $background-color, $border-color) {
+@mixin common-table($font-color, $background-color, $border-color) {
     margin-top: 0px;
     clear: both;
     border-bottom: 1px solid $border-color;
@@ -95,9 +95,6 @@
         padding: 0 1em .1em 0;
         font-size: 12px;
     }
-    th.asc a, th.desc a {font-weight: bold; background-position: 100% 50%; background-repeat: no-repeat;}
-    th.asc a {background-image: url(../asc.png);}
-    th.desc a {background-image: url(../desc.png);}
     td.center {text-align: center;}
     thead {
         background: $background-color - 20;
