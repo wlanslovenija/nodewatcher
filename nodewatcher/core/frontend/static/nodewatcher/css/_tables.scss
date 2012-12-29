@@ -51,30 +51,30 @@ table.listing {
 }
 
 .sorting_asc {
-    &:after {content: "&#x25B2;"; float: right; color: $primary;}
+    &:after {content: "▲"; float: right; color: $primary;}
     cursor: pointer;
 }
 
 .sorting_desc {
-    &:after {content: "&#x25BC;"; float: right; color: $primary;}
+    &:after {content: "▼"; float: right; color: $primary;}
     cursor: pointer;
 }
 
 .sorting {
-    &:after {content: "&#x25CF;"; float: right; color: $neutral;}
-    &:hover:after {content: "&#x25CF;"; float: right; color: $primary;}
+    &:after {content: "●"; float: right; color: $neutral;}
+    &:hover:after {content: "●"; float: right; color: $primary;}
     cursor: pointer;
 }
 
 .sorting_asc_disabled {
-    &:after {content: "&#x25B2;"; float: right; color: $neutral;}
-    &:hover:after {content: "&#x25B2;"; float: right; color: $primary;}
+    &:after {content: "▲"; float: right; color: $neutral;}
+    &:hover:after {content: "▲"; float: right; color: $primary;}
     cursor: pointer;
 }
 
 .sorting_desc_disabled {
-    &:after {content: "&#x25BC;"; float: right; color: $neutral;}
-    &:hover:after {content: "&#x25BC;"; float: right; color: $primary;}
+    &:after {content: "▼"; float: right; color: $neutral;}
+    &:hover:after {content: "▼"; float: right; color: $primary;}
     cursor: pointer;
 }
 
