@@ -192,8 +192,8 @@ class BasicRegistryRenderItem(object):
         """
         Class constructor.
 
-        @param form: Form containing the fields
-        @param meta_form: Form containing selected item metadata
+        :param form: Form containing the fields
+        :param meta_form: Form containing selected item metadata
         """
         self.form = form
         self.meta_form = meta_form
@@ -232,9 +232,9 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
         """
         Class constructor.
 
-        @param form: Form containing the fields
-        @param meta_form: Form containing selected item metadata
-        @param children: A list of child form descriptors
+        :param form: Form containing the fields
+        :param meta_form: Form containing selected item metadata
+        :param children: A list of child form descriptors
         """
         super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms = children)
         self.children = children
@@ -853,15 +853,15 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
     Prepares a list of configuration forms for use on a regpoint root's
     configuration page.
 
-    @param regpoint: Registration point name or instance
-    @param request: Request instance
-    @param root: Registration point root instance for which to generate forms
-    @param data: User-supplied POST data
-    @param save: Are we performing a save or rendering an initial form
-    @param only_rules: Should only rules be evaluated and a partial config generated
-    @param also_rules: Should rules be evaluated (use only for initial state)
-    @param actions: A list of actions that can modify forms
-    @param current_config: An existing partial config dictionary
+    :param regpoint: Registration point name or instance
+    :param request: Request instance
+    :param root: Registration point root instance for which to generate forms
+    :param data: User-supplied POST data
+    :param save: Are we performing a save or rendering an initial form
+    :param only_rules: Should only rules be evaluated and a partial config generated
+    :param also_rules: Should rules be evaluated (use only for initial state)
+    :param actions: A list of actions that can modify forms
+    :param current_config: An existing partial config dictionary
     """
     if save and only_rules:
         raise ValueError("You cannot use save and only_rules at the same time!")

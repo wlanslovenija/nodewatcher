@@ -237,8 +237,8 @@ class IPAddressField(models.Field):
         """
         Class constructor.
 
-        @param subnet_required: Set to True when a subnet must be entered
-        @param host_required: Set to True when a host must be entered
+        :param subnet_required: Set to True when a subnet must be entered
+        :param host_required: Set to True when a host must be entered
         """
         if subnet_required and host_required:
             raise ValueError("subnet_required and host_required options are mutually exclusive!")

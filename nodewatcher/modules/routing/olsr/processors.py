@@ -18,9 +18,9 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
         Performs network-wide processing and selects the nodes that will be processed
         in any following processors.
 
-        @param context: Current context
-        @param nodes: A set of nodes that are to be processed
-        @return: A (possibly) modified context and a (possibly) modified set of nodes
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
         """
         with context.in_namespace("routing"):
             with context.in_namespace("olsr"):
@@ -75,9 +75,9 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
         """
         Called for every processed node.
 
-        @param context: Current context
-        @param node: Node that is being processed
-        @return: A (possibly) modified context
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
         """
         try:
             router_id = node.config.core.routerid(queryset = True).get(family = "ipv4").router_id

@@ -4,8 +4,8 @@ def generate_config(node, only_validate = False):
     """
     Generates configuration and/or firmware for the specified node.
 
-    @param node: Node instance
-    @param only_validate: True if only validation should be performed
+    :param node: Node instance
+    :param only_validate: True if only validation should be performed
     """
     # Determine the destination platform
     try:

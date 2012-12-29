@@ -18,9 +18,9 @@ class LocationWidget(forms.widgets.TextInput):
         """
         Class constructor.
 
-        @param map_width: Map width in pixels
-        @param map_height: Map height in pixels
-        @param default_location: A tuple (lat, lng, zoom) describing the default location
+        :param map_width: Map width in pixels
+        :param map_height: Map height in pixels
+        :param default_location: A tuple (lat, lng, zoom) describing the default location
         """
         super(LocationWidget, self).__init__(*args, **kwargs)
         self.map_width = map_width

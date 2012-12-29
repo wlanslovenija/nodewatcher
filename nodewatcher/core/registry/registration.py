@@ -182,7 +182,7 @@ class RegistrationPoint(object):
         """
         A helper method for unregistering a single item.
 
-        @param item_cls: Registry item class
+        :param item_cls: Registry item class
         """
         parent = item_cls.__base__
         if getattr(item_cls.RegistryMeta, 'hides_parent', False) and parent != self.item_base:
@@ -196,7 +196,7 @@ class RegistrationPoint(object):
         Unregisters a previously registered item or subitem. If the specified item
         defines the top-level schema item, all child items of this type will be unregistered.
 
-        @param item_cls: Registry item class
+        :param item_cls: Registry item class
         """
         if not issubclass(item_cls, self.item_base):
             raise TypeError("Specified class is not a valid registry item!")
@@ -239,9 +239,9 @@ class RegistrationPoint(object):
         Returns the queryset for fetching top-level items for the specific registry
         identifier.
 
-        @param root: Instance of root class
-        @param registry_id: A valid registry identifier
-        @return: A tuple (queryset, top_class)
+        :param root: Instance of root class
+        :param registry_id: A valid registry identifier
+        :return: A tuple (queryset, top_class)
         """
         assert isinstance(root, self.model)
         top_level = self.item_registry[registry_id]
@@ -251,7 +251,7 @@ class RegistrationPoint(object):
         """
         Returns a top-level registry item class for a specific identifier.
 
-        @param registry_id: A valid registry identifier
+        :param registry_id: A valid registry identifier
         """
         try:
             return self.item_registry[registry_id]
@@ -288,7 +288,7 @@ class RegistrationPoint(object):
         Adds one or more mixins to the top-level registry item that is associated
         with this registration point.
 
-        @param mixins: Mixin classes
+        :parma mixins: Mixin classes
         """
         self.item_base.__bases__ += tuple(mixins)
 
@@ -370,7 +370,7 @@ def point(name):
     """
     Returns an existing registration point.
 
-    @param name: Registration point name
+    :param name: Registration point name
     """
     return registry_state.points[name]
 
@@ -378,8 +378,8 @@ def register_form_for_item(item, form_class):
     """
     Registers a form for use with the specified registry item.
 
-    @param item: Registry item class
-    @param form_class: Form class
+    :param item: Registry item class
+    :param form_class: Form class
     """
     if not hasattr(item, '_forms'):
         item._forms = {}

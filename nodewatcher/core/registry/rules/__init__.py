@@ -10,10 +10,10 @@ def evaluate(regpoint, root, state, partial_config = None):
     """
     Evaluates the rules.
 
-    @param regpoint: Registration point instance
-    @param root: Regpoint root instance to evaluate the rules for
-    @param state: Current evaluation state
-    @param partial_config: Optional partial updated configuration
+    :param regpoint: Registration point instance
+    :param root: Regpoint root instance to evaluate the rules for
+    :param state: Current evaluation state
+    :param partial_config: Optional partial updated configuration
     """
 
     if partial_config is None:

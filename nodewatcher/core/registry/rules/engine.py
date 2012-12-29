@@ -32,7 +32,7 @@ class LazyObject(object):
         """
         Subclasses must implement this method to evaluate the object.
 
-        @param context: Evaluation context (EngineContext instance)
+        :param context: Evaluation context (EngineContext instance)
         """
         raise NotImplementedError
 
@@ -48,8 +48,8 @@ class Rule(LazyObject):
         """
         Class constructor.
 
-        @param condition: A lazy expression
-        @param actions: A list of actions
+        :param condition: A lazy expression
+        :param actions: A list of actions
         """
         self.condition = condition
         self.actions = actions
@@ -98,8 +98,8 @@ class LazyValue(LazyObject):
         """
         Class constructor.
 
-        @param op: A callable operation
-        @param identifier: Optional identifier
+        :param op: A callable operation
+        :param identifier: Optional identifier
         """
         self.__op = op
         self.__identifier = identifier
@@ -149,8 +149,8 @@ class RuleModifier(LazyObject):
         """
         Class constructor.
 
-        @param modifier: A callable that may modify the rule
-        @param condition: A lazy expression that is the condition
+        :param modifier: A callable that may modify the rule
+        :param condition: A lazy expression that is the condition
         """
         self.modifier = modifier
         self.condition = condition
@@ -170,7 +170,7 @@ class Action(LazyObject):
         """
         Class constructor.
 
-        @param op: A callable that gets executed for this action
+        :param op: A callable that gets executed for this action
         """
         self.op = op
 
@@ -188,7 +188,7 @@ class EngineContext(object):
         """
         Class constructor.
 
-        @param state: Old state dictionary
+        :param state: Old state dictionary
         """
         self._levels = []
         self._rules = []
@@ -197,10 +197,10 @@ class EngineContext(object):
         """
         Evaluates rules on a specific regpoint root object.
 
-        @param regpoint: Registration point instance
-        @param root: Regpoint root object to evaluate the rules on
-        @param state: Current evaluation state
-        @param partial_config: Optional partial updated configuration
+        :param regpoint: Registration point instance
+        :param root: Regpoint root object to evaluate the rules on
+        :param state: Current evaluation state
+        :param partial_config: Optional partial updated configuration
         """
         self.regpoint = regpoint
         self.root = root
@@ -239,8 +239,8 @@ class EngineContext(object):
         """
         Marks current rule's condition evaluation result for later comparison.
 
-        @param rule: Rule instance
-        @param value: Condition evaluation result
+        :param rule: Rule instance
+        :param value: Condition evaluation result
         """
         self.new_state[':' + self.current_level()] = value
 
@@ -249,8 +249,8 @@ class EngineContext(object):
         Returns True if current rule's condition evaluation result has changed
         since last evaluation.
 
-        @param rule: Rule instance
-        @return: True if the condition evaluation result has changed
+        :param rule: Rule instance
+        :return: True if the condition evaluation result has changed
         """
         if rule.always_evaluate:
             return True
@@ -267,8 +267,8 @@ class EngineContext(object):
         """
         Returns True if some registry value has changed since last evaluation.
 
-        @param location: Registry location
-        @param value: New registry value
+        :param location: Registry location
+        :param value: New registry value
         """
         location = str(location)
         self.new_state[location] = value

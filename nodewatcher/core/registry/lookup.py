@@ -148,7 +148,7 @@ class RegistryLookupManager(gis_models.GeoManager):
         """
         Class constructor.
 
-        @param regpoint: Registration point instance
+        :param regpoint: Registration point instance
         """
         self._regpoint = regpoint
         super(RegistryLookupManager, self).__init__()

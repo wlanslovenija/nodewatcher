@@ -70,9 +70,9 @@ class IpPool(allocation_models.PoolBase):
         Attempts to reserve a specific subnet in the allocation pool. The subnet
         must be a valid subnet and must be allocatable.
 
-        @param network: Subnet address
-        @param prefix_len: Subnet prefix length
-        @param check_only: Should only a check be performed and no actual allocation
+        :param network: Subnet address
+        :param prefix_len: Subnet prefix length
+        :param check_only: Should only a check be performed and no actual allocation
         """
 
         if prefix_len == 31:
@@ -130,10 +130,10 @@ class IpPool(allocation_models.PoolBase):
         operation may split existing free pools into smaller ones to accomodate the
         new allocation.
 
-        WARNING: This method must be called on an object that is locked for
-        updates using `select_for_update`. Otherwise this will cause corruptions.
+        .. warning:: This method must be called on an object that is locked for
+           updates using `select_for_update`. Otherwise this will cause corruptions.
 
-        @param prefix_len: Wanted prefix length
+        :param prefix_len: Wanted prefix length
         """
 
         if self.prefix_length > prefix_len:
@@ -248,8 +248,8 @@ class IpPool(allocation_models.PoolBase):
         """
         Attempts to allocate a subnet from this pool.
 
-        @param prefix_len: Wanted prefix length
-        @return: A valid IpPool instance of the allocated subpool
+        :param prefix_len: Wanted prefix length
+        :return: A valid IpPool instance of the allocated subpool
         """
 
         if not prefix_len:
@@ -300,8 +300,8 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         """
         Attempts to satisfy this request by taking resources from an existing one.
 
-        @param other: AddressAllocator instance
-        @return: True if request has been satisfied, False otherwise
+        :param other: AddressAllocator instance
+        :return: True if request has been satisfied, False otherwise
         """
 
         if not other.is_satisfied():
@@ -350,7 +350,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         Attempts to satisfy this allocation request by obtaining a new allocation
         for the specified object.
 
-        @param obj: A valid Django model instance
+        :param obj: A valid Django model instance
         """
 
         if self.subnet_hint is not None:

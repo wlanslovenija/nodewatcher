@@ -81,7 +81,7 @@ class UCIRoot(object):
         """
         Class constructor.
 
-        @param root: Root name
+        :param root: Root name
         """
         self._root = root
         self._named_sections = {}
@@ -92,7 +92,7 @@ class UCIRoot(object):
         Creates a new UCI section. An ordered section should be specified by using
         a single argument and a named section by using a single keyword argument.
 
-        @return: The newly created UCISection
+        :return: The newly created UCISection
         """
         if len(args) > 1 or len(kwargs) > 1 or len(args) == len(kwargs):
             raise ValueError

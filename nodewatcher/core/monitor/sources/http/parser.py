@@ -11,8 +11,8 @@ class HttpTelemetryParser(object):
         """
         Class constructor.
 
-        @param host: Target host
-        @param port: Target port
+        :param host: Target host
+        :param port: Target port
         """
         self.host = host
         self.port = port
@@ -21,8 +21,8 @@ class HttpTelemetryParser(object):
         """
         Fetches and parses data from the daemon via HTTP.
 
-        @param tree: Target dictionary where data should be parsed into
-        @return: Dictionary with parsed data
+        :param tree: Target dictionary where data should be parsed into
+        :return: Dictionary with parsed data
         """
         try:
             socket.setdefaulttimeout(15)

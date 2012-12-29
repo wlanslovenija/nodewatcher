@@ -14,9 +14,9 @@ class RegistryResolver(object):
         """
         Class constructor.
 
-        @param regpoint: Registration point
-        @param root: Root model instance
-        @param path: Current path in the hierarhcy
+        :param regpoint: Registration point
+        :param root: Root model instance
+        :param path: Current path in the hierarhcy
         """
         self._regpoint = regpoint
         self._root = root
@@ -108,7 +108,7 @@ def get_model_class_by_name(name):
     """
     Returns the model class identified by its name.
 
-    @param name: Model class name
+    :param name: Model class name
     """
     name = name.lower()
     try:
