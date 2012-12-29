@@ -1,20 +1,20 @@
-from django import forms
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from .. import allocation
-from ..registry import fields as registry_fields, registration, widgets as registry_widgets
+from .registry import fields as registry_fields, registration
 
-# TODO project model should be moved to core
-from nodewatcher.legacy.nodes import models as nodes_models
+# Create registration point
+registration.create_point('nodes.Node', 'config')
 
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """
     General node configuration containing basic parameters about the
     node.
     """
+
     name = models.CharField(max_length = 30)
+    # TODO: This should be moved to modules.administration.types
     type = registry_fields.SelectorKeyField("node.config", "core.general#type")
 
     class Meta:
@@ -27,8 +27,9 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
         registry_name = _("Basic Configuration")
         lookup_proxies = ["name"]
 
-# TODO validate node name via regexp: NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
+# TODO: Validate node name via regexp: NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
 
+# TODO: This should be moved to modules.administration.types
 registration.point("node.config").register_choice("core.general#type", "wireless", _("Wireless"))
 registration.point("node.config").register_choice("core.general#type", "server", _("Server"))
 registration.point("node.config").register_choice("core.general#type", "mobile", _("Mobile"))
@@ -37,6 +38,7 @@ registration.point("node.config").register_choice("core.general#type", "dead", _
 registration.point("node.config").register_choice("core.general#type", "unknown", _("Unknown"))
 registration.point("node.config").register_item(GeneralConfig)
 
+# TODO: This should be moved to modules.administration.projects
 class ProjectConfig(registration.bases.NodeConfigRegistryItem):
     """
     Describes the project a node belongs to.
@@ -54,6 +56,7 @@ class ProjectConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(ProjectConfig)
 
+# TODO: This should be moved to modules.administration.location
 class LocationConfig(registration.bases.NodeConfigRegistryItem):
     """
     Describes the location of a node.
@@ -73,38 +76,9 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
         registry_section = _("Location")
         registry_name = _("Basic Location")
 
-class LocationConfigForm(forms.ModelForm):
-    """
-    Location configuration form.
-    """
-    class Meta:
-        model = LocationConfig
-        widgets = {
-          'geolocation' : registry_widgets.LocationWidget(
-            map_width = 400,
-            map_height = 300
-          )
-        }
-
-    def modify_to_context(self, item, cfg, request):
-        """
-        Dynamically modifies the form.
-        """
-        # Update the location widget's coordinates accoording to project
-        try:
-            project = cfg['core.project'][0].project
-
-            self.fields['geolocation'].widget.default_location = [
-              project.geo_lat,
-              project.geo_long,
-              project.geo_zoom
-            ]
-        except (nodes_models.Project.DoesNotExist, AttributeError, KeyError, IndexError):
-            pass
-
 registration.point("node.config").register_item(LocationConfig)
-registration.register_form_for_item(LocationConfig, LocationConfigForm)
 
+# TODO: Move to modules.administration.description
 class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
     """
     Textual description of a node.
@@ -123,27 +97,11 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(DescriptionConfig)
 
-class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    Router identifier configuration.
-    """
-    router_id = models.CharField(max_length = 100)
-    family = registry_fields.SelectorKeyField("node.config", "core.routerid#family")
+# TODO: Move together with the rest to modules.administration.addressing
+from .allocation.ip import models as ip_models
 
-    class Meta:
-        app_label = "core"
-
-    class RegistryMeta:
-        form_order = 100
-        registry_id = "core.routerid"
-        multiple = True
-        hidden = True
-
-registration.point("node.config").register_choice("core.routerid#family", "ipv4", _("IPv4"))
-registration.point("node.config").register_choice("core.routerid#family", "ipv6", _("IPv6"))
-registration.point("node.config").register_item(RouterIdConfig)
-
-class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocation.IpAddressAllocator):
+# TODO: Move to modules.administration.addressing
+class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, ip_models.IpAddressAllocator):
     """
     Enables allocation of subnets for the node without the need to define any interfaces.
     """
@@ -157,16 +115,9 @@ class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, allocatio
         registry_name = _("Subnet")
         multiple = True
 
-class BasicAddressingConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
-    """
-    General configuration form.
-    """
-    class Meta:
-        model = BasicAddressingConfig
-
 registration.point("node.config").register_item(BasicAddressingConfig)
-registration.register_form_for_item(BasicAddressingConfig, BasicAddressingConfigForm)
 
+# TODO: Move to modules.administration.roles
 class RoleConfig(registration.bases.NodeConfigRegistryItem):
     """
     Describes a single node's role.
@@ -185,6 +136,7 @@ class RoleConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(RoleConfig)
 
+# TODO: Move to modules.administration.roles
 class SystemRoleConfig(RoleConfig):
     """
     Describes the "system" role.
@@ -199,6 +151,7 @@ class SystemRoleConfig(RoleConfig):
 
 registration.point("node.config").register_item(SystemRoleConfig)
 
+# TODO: Move to modules.administration.roles
 class BorderRouterRoleConfig(RoleConfig):
     """
     Describes the "border router" role.
@@ -213,6 +166,7 @@ class BorderRouterRoleConfig(RoleConfig):
 
 registration.point("node.config").register_item(BorderRouterRoleConfig)
 
+# TODO: Move to modules.administration.roles
 class VpnServerRoleConfig(RoleConfig):
     """
     Describes the "vpn server" role.
@@ -227,6 +181,7 @@ class VpnServerRoleConfig(RoleConfig):
 
 registration.point("node.config").register_item(VpnServerRoleConfig)
 
+# TODO: Move to modules.administration.roles
 class RedundantNodeRoleConfig(RoleConfig):
     """
     Describes the "redundant node" role.

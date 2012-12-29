@@ -1,18 +1,20 @@
-from django import forms
 from django.core import exceptions
 from django.db import models
-from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext as _
 
+# TODO: Should not be imported in core
 from nodewatcher.legacy.nodes import models as nodes_models
 
-from ... import allocation, antennas as core_antennas, models as core_models
-from ...registry import fields as registry_fields
-from ...registry import registration, permissions
+from ... import models as core_models
+from ...allocation.ip import models as ip_models
+from ...registry import fields as registry_fields, registration, permissions
 from ...registry.cgm import base as cgm_base
 
+# TODO: Should not be imported in core
+from ....modules.equipment.antennas import models as antennas_models
+
 # Register a new firmware-generating permission
-permissions.register(nodes_models.Node, 'can_generate_firmware', "Can generate firmware")
+permissions.register(nodes_models.Node, 'can_generate_firmware', _("Can generate firmware"))
 
 class CgmGeneralConfig(core_models.GeneralConfig):
     """
@@ -130,81 +132,22 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     channel = models.CharField(max_length = 50)
     bitrate = models.IntegerField(default = 11)
     antenna_connector = models.CharField(max_length = 50, null = True)
-    antenna = registry_fields.ModelSelectorKeyField(core_antennas.Antenna, null = True)
+
+    # TODO: This should not be required by the config in core
+    antenna = registry_fields.ModelSelectorKeyField(antennas_models.Antenna, null = True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Wireless Radio")
 
-class WifiRadioDeviceConfigForm(forms.ModelForm, core_antennas.AntennaReferencerFormMixin):
-    """
-    A wireless radio device configuration form.
-    """
-    class Meta:
-        model = WifiRadioDeviceConfig
-
-    def regulatory_filter(self, request):
-        """
-        Subclasses may override this method to filter the channels accoording to a
-        filter for a regulatory domain. It should return a list of frequencies that
-        are allowed.
-        """
-        return None
-
-    def modify_to_context(self, item, cfg, request):
-        """
-        Handles dynamic protocol/channel selection.
-        """
-        super(WifiRadioDeviceConfigForm, self).modify_to_context(item, cfg, request)
-        radio = None
-        try:
-            radio = cgm_base.get_platform(cfg['core.general'][0].platform) \
-                            .get_router(cfg['core.general'][0].router) \
-                            .get_radio(item.wifi_radio)
-
-            # Protocols
-            self.fields['protocol'] = registry_fields.SelectorFormField(
-              label = _("Protocol"),
-              choices = BLANK_CHOICE_DASH + list(radio.get_protocol_choices()),
-              coerce = str,
-              empty_value = None
-            )
-
-            # Antenna connectors
-            self.fields['antenna_connector'] = registry_fields.SelectorFormField(
-              label = _("Connector"),
-              choices = [("", _("[auto-select]"))] + list(radio.get_connector_choices()),
-              coerce = str,
-              empty_value = None,
-              required = False
-            )
-        except (KeyError, IndexError, AttributeError):
-            # Create empty fields on error
-            self.fields['protocol'] = registry_fields.SelectorFormField(label = _("Protocol"), choices = BLANK_CHOICE_DASH)
-            self.fields['channel'] = registry_fields.SelectorFormField(label = _("Channel"), choices = BLANK_CHOICE_DASH)
-            self.fields['antenna_connector'] = registry_fields.SelectorFormField(label = _("Connector"), choices = BLANK_CHOICE_DASH)
-            return
-
-        # Channels
-        try:
-            self.fields['channel'] = registry_fields.SelectorFormField(
-              label = _("Channel"),
-              choices = BLANK_CHOICE_DASH + list(radio.get_protocol(item.protocol).get_channel_choices(self.regulatory_filter(request))),
-              coerce = str,
-              empty_value = None
-            )
-        except (KeyError, AttributeError):
-            # Create empty field on error
-            self.fields['channel'] = registry_fields.SelectorFormField(label = _("Channel"), choices = BLANK_CHOICE_DASH)
-
-registration.register_form_for_item(WifiRadioDeviceConfig, WifiRadioDeviceConfigForm)
 registration.point("node.config").register_item(WifiRadioDeviceConfig)
 
 class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
     """
     Wifi interface configuration.
     """
-    device = registry_fields.IntraRegistryForeignKey(WifiRadioDeviceConfig,
-      editable = False, null = False, related_name = 'interfaces')
+    device = registry_fields.IntraRegistryForeignKey(
+        WifiRadioDeviceConfig, editable = False, null = False, related_name = 'interfaces'
+    )
 
     mode = registry_fields.SelectorKeyField("node.config", "core.interfaces#wifi_mode")
     essid = models.CharField(max_length = 50, verbose_name = "ESSID")
@@ -216,17 +159,9 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         multiple = True
         hidden = False
 
-class WifiInterfaceConfigForm(forms.ModelForm):
-    """
-    Wifi interface configuration form.
-    """
-    class Meta:
-        model = WifiInterfaceConfig
-
 registration.point("node.config").register_choice("core.interfaces#wifi_mode", "mesh", _("Mesh"))
 registration.point("node.config").register_choice("core.interfaces#wifi_mode", "ap", _("AP"))
 registration.point("node.config").register_choice("core.interfaces#wifi_mode", "sta", _("STA"))
-registration.register_form_for_item(WifiInterfaceConfig, WifiInterfaceConfigForm)
 registration.point("node.config").register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
 
 class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
@@ -303,7 +238,7 @@ class DHCPNetworkConfig(NetworkConfig):
 
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
 
-class AllocatedNetworkConfig(NetworkConfig, allocation.IpAddressAllocator):
+class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator):
     """
     IP configuration that gets allocated from a pool.
     """
@@ -313,17 +248,9 @@ class AllocatedNetworkConfig(NetworkConfig, allocation.IpAddressAllocator):
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("Allocated Network")
 
-class AllocatedNetworkConfigForm(forms.ModelForm, allocation.IpAddressAllocatorFormMixin):
-    """
-    General configuration form.
-    """
-    class Meta:
-        model = AllocatedNetworkConfig
-
 registration.point("node.config").register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
 registration.point("node.config").register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
 registration.point("node.config").unregister_item(core_models.BasicAddressingConfig)
-registration.register_form_for_item(AllocatedNetworkConfig, AllocatedNetworkConfigForm)
 
 class PPPoENetworkConfig(NetworkConfig):
     """
@@ -347,17 +274,7 @@ class VpnNetworkConfig(NetworkConfig):
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("VPN Server")
 
-class VpnNetworkConfigForm(forms.ModelForm):
-    """
-    VPN uplink configuration form.
-    """
-    port = forms.IntegerField(min_value = 1, max_value = 49151)
-
-    class Meta:
-        model = VpnNetworkConfig
-
 registration.point("node.config").register_subitem(VpnInterfaceConfig, VpnNetworkConfig)
-registration.register_form_for_item(VpnNetworkConfig, VpnNetworkConfigForm)
 
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
     """
@@ -388,6 +305,7 @@ class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
     class RegistryMeta(InterfaceLimitConfig.RegistryMeta):
         registry_name = _("Throughput Limit")
 
+# TODO: This probably shouldn't be hardcoded, it should be moved to modules.administration?
 registration.point("node.config").register_choice("core.interfaces.limits#speeds", "128kbit", _("128 Kbit/s"))
 registration.point("node.config").register_choice("core.interfaces.limits#speeds", "256kbit", _("256 Kbit/s"))
 registration.point("node.config").register_choice("core.interfaces.limits#speeds", "512kbit", _("512 Kbit/s"))

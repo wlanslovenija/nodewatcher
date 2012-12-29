@@ -1,69 +1,28 @@
-from django.contrib.contenttypes import generic, models as contenttypes_models
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from django.utils.translation import ugettext as _
 
-from nodewatcher.utils import ipaddr
+from .. import models as allocation_models
+from ...registry import fields as registry_fields, forms as registry_forms, permissions
+from ....utils import ipaddr
 
-from ..registry import fields as registry_fields
-
-class PoolAllocationError(Exception):
-    pass
-
-class IpPoolStatus:
+class IpPoolStatus(object):
     """
     Possible pools states.
     """
+
     Free = 0
     Full = 1
     Partial = 2
 
-class PoolBase(models.Model):
-    """
-    An abstract base class for all pool implementations.
-    """
-    class Meta:
-        abstract = True
-
-    parent = models.ForeignKey('self', null = True, related_name = 'children')
-    projects = models.ManyToManyField("nodes.Project", related_name = 'pools_%(app_label)s_%(class)s')
-
-    # Bookkeeping for allocated pools
-    allocation_content_type = models.ForeignKey(contenttypes_models.ContentType, null = True)
-    allocation_object_id = models.CharField(max_length = 50, null = True)
-    allocation_content_object = generic.GenericForeignKey('allocation_content_type', 'allocation_object_id')
-    allocation_timestamp = models.DateTimeField(null = True)
-
-    @classmethod
-    def modifies_pool(cls, f):
-        def decorator(self, *args, **kwargs):
-            # Lock our own instance
-            locked_instance = self.__class__.objects.select_for_update().get(pk = self.pk)
-            return f(locked_instance, *args, **kwargs)
-
-        return decorator
-
-    def top_level(self):
-        """
-        Returns the root of this pool tree.
-        """
-        if self.parent:
-            return self.parent.top_level()
-
-        return self
-
-    def free(self):
-        """
-        Frees this allocated item and returns it to the parent pool.
-        """
-        raise NotImplementedError
-
-class IpPool(PoolBase):
+class IpPool(allocation_models.PoolBase):
     """
     This class represents an IP pool - that is a subnet available for
     allocation purpuses. Every IP block that is allocated is represented
     as an IpPool instance with proper parent pool reference.
     """
-    family = registry_fields.SelectorKeyField("node.config", "core.interfaces.network#ip_family")
+
+    family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
     network = models.CharField(max_length = 50)
     prefix_length = models.IntegerField()
     status = models.IntegerField(default = IpPoolStatus.Free)
@@ -74,12 +33,13 @@ class IpPool(PoolBase):
     ip_subnet = registry_fields.IPAddressField(null = True)
 
     class Meta:
-        app_label = "core"
+        app_label = 'core'
 
     def save(self, **kwargs):
         """
         Saves the model.
         """
+
         self.ip_subnet = '%s/%s' % (self.network, self.prefix_length)
         super(IpPool, self).save(**kwargs)
 
@@ -90,7 +50,8 @@ class IpPool(PoolBase):
         WARNING: This method must be called on an object that is locked for
         updates using `select_for_update`. Otherwise this will cause corruptions.
         """
-        net = ipaddr.IPNetwork("%s/%d" % (self.network, self.prefix_length))
+
+        net = ipaddr.IPNetwork('%s/%d' % (self.network, self.prefix_length))
         net0, net1 = net.subnet()
 
         left = IpPool(parent = self, family = self.family, network = str(net0.network), prefix_length = net0.prefixlen)
@@ -103,7 +64,7 @@ class IpPool(PoolBase):
 
         return left, right
 
-    @PoolBase.modifies_pool
+    @allocation_models.PoolBase.modifies_pool
     def reserve_subnet(self, network, prefix_len, check_only = False):
         """
         Attempts to reserve a specific subnet in the allocation pool. The subnet
@@ -113,13 +74,14 @@ class IpPool(PoolBase):
         @param prefix_len: Subnet prefix length
         @param check_only: Should only a check be performed and no actual allocation
         """
+
         if prefix_len == 31:
             return None
 
         if not self.parent and (prefix_len < self.prefix_length_minimum or prefix_len > self.prefix_length_maximum):
             return None
 
-        if ipaddr.IPNetwork("%s/%d" % (network, prefix_len)) not in self.to_ip_network():
+        if ipaddr.IPNetwork('%s/%d' % (network, prefix_len)) not in self.to_ip_network():
             # We don't contain this network, so there is nothing to be done
             return None
 
@@ -173,6 +135,7 @@ class IpPool(PoolBase):
 
         @param prefix_len: Wanted prefix length
         """
+
         if self.prefix_length > prefix_len:
             # We have gone too far, allocation has failed
             return None
@@ -205,11 +168,12 @@ class IpPool(PoolBase):
 
         return alloc
 
-    @PoolBase.modifies_pool
+    @allocation_models.PoolBase.modifies_pool
     def reclaim_pools(self):
         """
         Coalesces free children back into one if possible.
         """
+
         if self.status == IpPoolStatus.Free:
             return self.parent.reclaim_pools() if self.parent else None
 
@@ -232,11 +196,12 @@ class IpPool(PoolBase):
                 self.save()
                 return self.parent.reclaim_pools() if self.parent else None
 
-    @PoolBase.modifies_pool
+    @allocation_models.PoolBase.modifies_pool
     def free(self):
         """
         Frees this allocated item and returns it to the parent pool.
         """
+
         self.status = IpPoolStatus.Free
         self.allocation_content_object = None
         self.allocation_timestamp = None
@@ -247,13 +212,15 @@ class IpPool(PoolBase):
         """
         Returns true if this pool has no children.
         """
+
         return self.children.all().count() == 0
 
     def family_as_string(self):
         """
         Returns this pool's address family as a string.
         """
-        for enum, desc in self._meta.get_field_by_name("family")[0].choices:
+
+        for enum, desc in self._meta.get_field_by_name('family')[0].choices:
             if enum == self.family:
                 return desc
 
@@ -263,6 +230,7 @@ class IpPool(PoolBase):
         """
         Returns a string representation of this pool.
         """
+
         if self.description:
             return u"%s [%s/%d]" % (self.description, self.network, self.prefix_length)
         else:
@@ -272,9 +240,10 @@ class IpPool(PoolBase):
         """
         Returns the allocation as an ipaddr.IPNetwork instance.
         """
-        return ipaddr.IPNetwork("%s/%d" % (self.network, self.prefix_length))
 
-    @PoolBase.modifies_pool
+        return ipaddr.IPNetwork('%s/%d' % (self.network, self.prefix_length))
+
+    @allocation_models.PoolBase.modifies_pool
     def allocate_subnet(self, prefix_len = None):
         """
         Attempts to allocate a subnet from this pool.
@@ -282,6 +251,7 @@ class IpPool(PoolBase):
         @param prefix_len: Wanted prefix length
         @return: A valid IpPool instance of the allocated subpool
         """
+
         if not prefix_len:
             prefix_len = self.prefix_length_default
 
@@ -293,3 +263,135 @@ class IpPool(PoolBase):
 
         pool = self._allocate_buddy(prefix_len)
         return pool
+
+# Register a new manual pool allocation permission
+permissions.register(IpPool, 'can_allocate_manually', "Can allocate manually")
+
+class IpAddressAllocator(allocation_models.AddressAllocator):
+    """
+    An abstract class defining an API for IP address allocator items.
+    """
+
+    family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
+    pool = registry_fields.ModelSelectorKeyField(IpPool, limit_choices_to = { 'parent' : None })
+    prefix_length = models.IntegerField(default = 27)
+    subnet_hint = registry_fields.IPAddressField(null = True, blank = True, host_required = True)
+    allocation = models.ForeignKey(
+        IpPool, editable = False, null = True,
+        on_delete = models.PROTECT, related_name = 'allocations_%(app_label)s_%(class)s',
+    )
+
+    class Meta:
+        abstract = True
+
+    def exactly_matches(self, other):
+        """
+        Returns true if this allocation request exactly matches the other. This
+        should only return true if both requests share the same allocated
+        resource.
+        """
+
+        if not self.is_satisfied() or not other.is_satisfied():
+            return False
+
+        return self.allocation == other.allocation
+
+    def satisfy_from(self, other):
+        """
+        Attempts to satisfy this request by taking resources from an existing one.
+
+        @param other: AddressAllocator instance
+        @return: True if request has been satisfied, False otherwise
+        """
+
+        if not other.is_satisfied():
+            return False
+
+        if other.family != self.family:
+            return False
+
+        if other.prefix_length != self.prefix_length:
+            return False
+
+        if other.pool != self.pool:
+            return False
+
+        if other.subnet_hint != self.subnet_hint:
+            return False
+
+        self.allocation = other.allocation
+        self.save()
+        return True
+
+    def is_satisfied(self):
+        """
+        Returns true if this allocation request is satisfied.
+        """
+
+        if self.allocation is None:
+            return False
+
+        if self.allocation.family != self.family:
+            return False
+
+        if self.allocation.prefix_length != self.prefix_length:
+            return False
+
+        if self.subnet_hint is not None and self.allocation.network != str(self.subnet_hint.network):
+            return False
+
+        if self.allocation.top_level() != self.pool:
+            return False
+
+        return True
+
+    def satisfy(self, obj):
+        """
+        Attempts to satisfy this allocation request by obtaining a new allocation
+        for the specified object.
+
+        @param obj: A valid Django model instance
+        """
+
+        if self.subnet_hint is not None:
+            self.allocation = self.pool.reserve_subnet(str(self.subnet_hint.network), self.prefix_length)
+        else:
+            self.allocation = self.pool.allocate_subnet(self.prefix_length)
+
+        if self.allocation is not None:
+            self.allocation.allocation_content_object = obj
+            self.allocation.allocation_timestamp = timezone.now()
+            self.allocation.save()
+            self.save()
+        else:
+            raise registry_forms.RegistryValidationError(
+                _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
+                    'prefix' : self.prefix_length, 'pool' : unicode(self.pool),
+                }
+            )
+
+    def free(self):
+        """
+        Frees this allocation.
+        """
+
+        if self.allocation is None:
+            return
+
+        self.allocation.free()
+        self.allocation = None
+        self.save()
+
+    def get_routerid_family(self):
+        """
+        Returns the router-id family identifier for this allocator.
+        """
+
+        return self.family
+
+    def get_routerid(self):
+        """
+        Generates and returns a router-id from this allocation.
+        """
+
+        return str(self.allocation.to_ip_network()[1])

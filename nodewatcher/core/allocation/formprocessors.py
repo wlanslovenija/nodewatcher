@@ -1,4 +1,5 @@
-from .. import allocation as core_allocation, models as core_models
+from . import models
+from .. import models as core_models
 from ..registry import registration
 from ..registry.forms import formprocessors
 
@@ -7,6 +8,7 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
     A form processor that attempts to automatically satisfy allocation
     requests defined by AddressAllocator config items.
     """
+
     def __init__(self):
         """
         Class constructor.
@@ -17,15 +19,15 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         """
         Performs preprocessing of allocations for `node`.
         """
+
         if node is None:
             # A new node is being registered, so we have nothing to add here
             return
 
         # Automatically discover currently available allocation sources
         allocation_sources = [
-          item
-          for item in registration.point("node.config").config_items()
-          if issubclass(item, core_allocation.AddressAllocator)
+            item for item in registration.point('node.config').config_items()
+                if issubclass(item, models.AddressAllocator)
         ]
 
         for src in allocation_sources:
@@ -37,11 +39,11 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         """
         Automatically satisfy allocation requests for `node`.
         """
+
         # Automatically discover currently available allocation sources
         allocation_sources = [
-          item
-          for item in registration.point("node.config").config_items()
-          if issubclass(item, core_allocation.AddressAllocator)
+            item for item in registration.point('node.config').config_items()
+                if issubclass(item, models.AddressAllocator)
         ]
 
         routerid_requests = {}
@@ -81,12 +83,12 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
                     self.allocations.remove(request)
 
         # Free existing unused resources
-        # TODO Do this only when saving for real, not on validation runs
+        # TODO: Do this only when saving for real, not on validation runs
         for unused in self.allocations:
             unused.free()
 
         # Recompute router identifiers
-        # TODO Do this only when saving for real, not on validation runs
+        # TODO: Do this only when saving for real, not on validation runs
         for family, request in routerid_requests.iteritems():
             try:
                 rid = node.config.core.routerid(queryset = True).get(family = family)

@@ -1,10 +1,14 @@
+# Here we augment South migrations
+
 from django.contrib.auth.management import create_permissions
 from django.db import models
 
 from south import signals as south_signals
 
-from .. import antennas as core_antennas
 from ..registry.cgm import base as cgm_base
+
+# TODO: Should not be imported in core
+from ...modules.equipment.antennas import models as antennas_models
 
 _core_migrated = False
 
@@ -20,11 +24,12 @@ def install_router_fixtures(sender, **kwargs):
         return
 
     for router in cgm_base.iterate_routers():
+        # TODO: This should be moved to modules.equipment.antennas
         for antenna in router.antennas:
             try:
-                mdl = core_antennas.Antenna.objects.get(internal_for = router.identifier, internal_id = antenna.identifier)
-            except core_antennas.Antenna.DoesNotExist:
-                mdl = core_antennas.Antenna(internal_for = router.identifier, internal_id = antenna.identifier)
+                mdl = antennas_models.Antenna.objects.get(internal_for = router.identifier, internal_id = antenna.identifier)
+            except antennas_models.Antenna.DoesNotExist:
+                mdl = antennas_models.Antenna(internal_for = router.identifier, internal_id = antenna.identifier)
 
             # Update antenna model
             mdl.name = router.name

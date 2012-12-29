@@ -102,14 +102,14 @@ class Features:
 
 # A list of attributes that are required to be defined
 REQUIRED_ROUTER_ATTRIBUTES = set([
-  'identifier',
-  'name',
-  'manufacturer',
-  'url',
-  'architecture',
-  'radios',
-  'ports',
-  'antennas',
+    'identifier',
+    'name',
+    'manufacturer',
+    'url',
+    'architecture',
+    'radios',
+    'ports',
+    'antennas',
 ])
 
 class RouterMeta(type):

@@ -1,5 +1,6 @@
 from celery.task import task as celery_task
 
+# TODO: This app probably needs models.py and to be added to INSTALLED_APPS for this task to be self-discovered
 @celery_task()
 def format_and_build(node, platform, cfg):
     """
