@@ -1,4 +1,5 @@
-from nodewatcher.core.registry.cgm import base as cgm_base
+from . import base as cgm_base
+from .. import loader
 
 def generate_config(node, only_validate = False):
     """
@@ -7,6 +8,9 @@ def generate_config(node, only_validate = False):
     :param node: Node instance
     :param only_validate: True if only validation should be performed
     """
+    # Ensure that all CGMs are registred
+    loader.load_modules("cgm")
+
     # Determine the destination platform
     try:
         platform = cgm_base.get_platform(node.config.core.general().platform)

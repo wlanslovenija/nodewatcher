@@ -229,9 +229,9 @@ INSTALLED_APPS = (
     'nodewatcher.core.monitor',
     'nodewatcher.core.monitor.sources.http',
     'nodewatcher.core.registry',
-    'nodewatcher.core.registry.loader',
     'nodewatcher.modules.administration.types',
     'nodewatcher.modules.equipment.antennas',
+    'nodewatcher.modules.platforms.openwrt',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.modules.routing.olsr',
@@ -365,14 +365,6 @@ REGISTRY_FORM_PROCESSORS = {
         'nodewatcher.core.generator.cgm.formprocessors.NodeCgmValidator',
     )
 }
-
-# Configuration generating modules for firmware images.
-CGM_MODULES = (
-    'nodewatcher.core.generator.cgm.openwrt',
-    'nodewatcher.modules.platforms.openwrt',
-    'nodewatcher.modules.vpn.tunneldigger.cgm',
-    'nodewatcher.modules.routing.olsr.cgm',
-)
 
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006

@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 
-from . import models as cgm_models
-from ...registry.cgm import base as cgm_base, resources as cgm_resources, routers as cgm_routers
+from nodewatcher.core.generator.cgm import models as cgm_models
+from nodewatcher.core.registry.cgm import base as cgm_base, resources as cgm_resources, routers as cgm_routers
 
 class UCISection(object):
     """
@@ -201,6 +201,9 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         raise NotImplementedError
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
+
+# Load supported routers
+from . import fon, linksys, buffalo, mikrotik, asus, tplink
 
 @cgm_base.register_platform_module("openwrt", 10)
 def general(node, cfg):
