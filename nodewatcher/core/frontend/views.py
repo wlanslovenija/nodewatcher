@@ -27,7 +27,7 @@ def nodes(request):
     return render_to_response('nodes/list.html', {
         'nodes' : Node.objects.regpoint("config").registry_fields(
             name = 'GeneralConfig.name',
-            type = 'GeneralConfig.type',
+            type = 'TypeConfig.type',
             router_id = 'RouterIdConfig.router_id',
             status = 'StatusMonitor.status',
         ).order_by('type', 'router_id')
