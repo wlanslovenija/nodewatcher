@@ -14,8 +14,6 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     name = models.CharField(max_length = 30)
-    # TODO: This should be moved to modules.administration.types
-    type = registry_fields.SelectorKeyField('node.config', 'core.general#type')
 
     class Meta:
         app_label = 'core'
@@ -29,13 +27,6 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
 
 # TODO: Validate node name via regexp: NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
 
-# TODO: This should be moved to modules.administration.types
-registration.point('node.config').register_choice('core.general#type', 'wireless', _("Wireless"))
-registration.point('node.config').register_choice('core.general#type', 'server', _("Server"))
-registration.point('node.config').register_choice('core.general#type', 'mobile', _("Mobile"))
-registration.point('node.config').register_choice('core.general#type', 'test', _("Test"))
-registration.point('node.config').register_choice('core.general#type', 'dead', _("Dead"))
-registration.point('node.config').register_choice('core.general#type', 'unknown', _("Unknown"))
 registration.point('node.config').register_item(GeneralConfig)
 
 class RouterIdConfig(registration.bases.NodeConfigRegistryItem):

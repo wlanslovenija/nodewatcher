@@ -230,6 +230,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.monitor.sources.http',
     'nodewatcher.core.registry',
     'nodewatcher.core.registry.loader',
+    'nodewatcher.modules.administration.types',
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
