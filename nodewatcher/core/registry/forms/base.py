@@ -7,8 +7,8 @@ from django.db import transaction
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 
-from nodewatcher.core.registry import rules as registry_rules
-from nodewatcher.core.registry import registration
+from .. import rules as registry_rules, registration
+from ..loader import loader
 
 class RegistryValidationError(Exception):
     """
@@ -863,6 +863,9 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
     :param actions: A list of actions that can modify forms
     :param current_config: An existing partial config dictionary
     """
+    # Ensure that all registry forms are registered
+    loader.load_modules("forms")
+
     if save and only_rules:
         raise ValueError("You cannot use save and only_rules at the same time!")
 
