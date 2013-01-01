@@ -2,7 +2,7 @@ import copy, inspect
 
 from django.core.exceptions import ImproperlyConfigured
 
-from nodewatcher.core.registry import registration
+from ...registry import registration
 
 class RouterPort(object):
     """

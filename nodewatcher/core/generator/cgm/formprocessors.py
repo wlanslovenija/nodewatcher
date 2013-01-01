@@ -1,5 +1,5 @@
-from ...registry import cgm, forms as registry_forms
-from ...registry.cgm import base as cgm_base
+from ...registry import forms as registry_forms
+from . import base as cgm_base
 from ...registry.forms import formprocessors
 
 class NodeCgmValidator(formprocessors.RegistryFormProcessor):
@@ -17,6 +17,6 @@ class NodeCgmValidator(formprocessors.RegistryFormProcessor):
         """
 
         try:
-            cgm.generate_config(node, only_validate = True)
+            cgm_base.generate_config(node, only_validate = True)
         except cgm_base.ValidationError, e:
             raise registry_forms.RegistryValidationError(*e.args)

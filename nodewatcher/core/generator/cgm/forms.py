@@ -2,10 +2,9 @@ from django import forms
 from django.db.models import fields
 from django.utils.translation import ugettext as _
 
-from . import models
+from . import models, base as cgm_base
 from ...allocation.ip import forms as ip_forms
 from ...registry import fields as registry_fields, registration
-from ...registry.cgm import base as cgm_base
 
 # TODO: Should not be imported in core
 from ....modules.equipment.antennas import forms as antennas_forms

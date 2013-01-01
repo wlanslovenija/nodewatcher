@@ -1,4 +1,5 @@
 from nodewatcher.core.registry.rules.scope import *
+from nodewatcher.core.generator.cgm.predicates import *
 
 # Variables
 project = value("core.project#project.name")

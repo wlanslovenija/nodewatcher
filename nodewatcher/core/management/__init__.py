@@ -5,7 +5,7 @@ from django.db import models
 
 from south import signals as south_signals
 
-from ..registry.cgm import base as cgm_base
+from ..generator.cgm import base as cgm_base
 
 # TODO: Should not be imported in core
 from ...modules.equipment.antennas import models as antennas_models

@@ -1,4 +1,4 @@
-from nodewatcher.core.registry.cgm import base as cgm_base
+from nodewatcher.core.generator.cgm import base as cgm_base
 
 from . import models
 

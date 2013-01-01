@@ -1,4 +1,4 @@
-from nodewatcher.core.registry.cgm import base as cgm_base, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, routers as cgm_routers
 
 from . import fon2100
 

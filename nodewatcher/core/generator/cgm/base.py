@@ -2,9 +2,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import importlib
 
-from nodewatcher.core.registry import registration
-from nodewatcher.core.registry.cgm import routers as cgm_routers
-from nodewatcher.core.registry.cgm import resources as cgm_resources
+from ...registry import registration, loader
+from . import routers as cgm_routers, resources as cgm_resources
 
 # Registered platform modules
 PLATFORM_REGISTRY = {}
@@ -198,12 +197,24 @@ def iterate_routers():
         for router in platform._routers.values():
             yield router
 
-def load_modules():
+def generate_config(node, only_validate = False):
     """
-    Loads all configured modules containing CGMs.
+    Generates configuration and/or firmware for the specified node.
+
+    :param node: Node instance
+    :param only_validate: True if only validation should be performed
     """
-    for module in getattr(settings, 'CGM_MODULES', []):
-        try:
-            importlib.import_module(module)
-        except ImportError, e:
-            raise ImproperlyConfigured("Error importing CGM module '%s': %s" % (module, e))
+    # Ensure that all CGMs are registred
+    loader.load_modules("cgm")
+
+    # Determine the destination platform
+    try:
+        platform = get_platform(node.config.core.general().platform)
+    except (AttributeError, KeyError):
+        return None
+
+    cfg = platform.generate(node)
+    if not only_validate:
+        platform.defer_format_build(node, cfg)
+
+    return cfg

@@ -1,15 +1,13 @@
-import hashlib, inspect
+import inspect
 
 from nodewatcher.core.registry import access as registry_access
 from nodewatcher.core.registry import forms as registry_forms
 from nodewatcher.core.registry.rules.engine import *
-from nodewatcher.core.registry.cgm import base as cgm_base
 
 # Exports
 __all__ = [
     'rule',
     'value',
-    'router_descriptor',
     'count',
     'foreach',
     'loop_var',
@@ -268,36 +266,6 @@ def count(value):
         raise CompilationError("Count predicate argument must be a lazy value!")
 
     return LazyValue(lambda context: len(value(context) or []))
-
-def router_descriptor(platform, router):
-    """
-    Lazy value that returns the router descriptor for the specified
-    router.
-
-    :param platform: Location of a platform identifier
-    :param router: Location of a router identifier
-    """
-    class LazyRouterModel(LazyObject):
-        def __init__(self, platform, model):
-            self.__dict__['platform'] = platform
-            self.__dict__['router'] = model
-
-        def __call__(self, context):
-            pass
-
-        def __getattr__(self, key):
-            def resolve_attribute(context):
-                try:
-                    return getattr(cgm_base.get_platform(value(self.platform)(context)).get_router(value(self.router)(context)), key, None)
-                except KeyError:
-                    return None
-
-            return LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.router).hexdigest() + '-' + key)
-
-        def __setattr__(self, key, value):
-            raise AttributeError
-
-    return LazyRouterModel(platform, router)
 
 def value(location):
     """

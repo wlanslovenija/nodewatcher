@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.registry.cgm import base as cgm_base, resources as cgm_resources
+from nodewatcher.core.generator.cgm import base as cgm_base, resources as cgm_resources
 from nodewatcher.utils import ipaddr
 
 from . import models as olsr_models

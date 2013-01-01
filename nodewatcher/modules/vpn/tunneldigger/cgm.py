@@ -1,8 +1,7 @@
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import registration
-from nodewatcher.core.registry.cgm import base as cgm_base
-from nodewatcher.core.generator.cgm import models as cgm_models
+from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base
 
 # Register tunneldigger VPN protocol
 registration.point("node.config").register_choice("core.interfaces#vpn_protocol", "tunneldigger", _("Tunneldigger"))

@@ -8,7 +8,7 @@ from nodewatcher.legacy.nodes import models as nodes_models
 from ... import models as core_models
 from ...allocation.ip import models as ip_models
 from ...registry import fields as registry_fields, registration, permissions
-from ...registry.cgm import base as cgm_base
+from . import base as cgm_base
 
 # TODO: Should not be imported in core
 from ....modules.equipment.antennas import models as antennas_models

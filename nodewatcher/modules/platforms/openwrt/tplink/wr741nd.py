@@ -1,4 +1,4 @@
-from nodewatcher.core.registry.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 class TPLinkWR741ND(cgm_routers.RouterBase):
     """
