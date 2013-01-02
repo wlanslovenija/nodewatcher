@@ -31,15 +31,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('core', ['LocationConfig'])
 
-        # Adding model 'ProjectConfig'
-        db.create_table('core_projectconfig', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='config_core_projectconfig', to=orm['nodes.Node'])),
-            ('project', self.gf('nodewatcher.core.registry.fields.ModelSelectorKeyField')(to=orm['nodes.Project'])),
-        ))
-        db.send_create_signal('core', ['ProjectConfig'])
-
         # Deleting field 'GeneralConfig.geolocation'
         db.delete_column('core_generalconfig', 'geolocation')
 
@@ -66,9 +57,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'LocationConfig'
         db.delete_table('core_locationconfig')
-
-        # Deleting model 'ProjectConfig'
-        db.delete_table('core_projectconfig')
 
         # Adding field 'GeneralConfig.geolocation'
         db.add_column('core_generalconfig', 'geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')(null=True), keep_default=False)
@@ -202,13 +190,6 @@ class Migration(SchemaMigration):
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.Pool']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        'core.projectconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'ProjectConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
         },
         'core.redundantnoderoleconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},

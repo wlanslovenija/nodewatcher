@@ -150,13 +150,6 @@ class Migration(SchemaMigration):
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.Pool']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        'core.projectconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'ProjectConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
-        },
         'core.redundantnoderoleconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
             'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),

@@ -135,13 +135,6 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
         },
-        'core.projectconfig': {
-            'Meta': {'object_name': 'ProjectConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']", 'on_delete': 'models.PROTECT'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
-        },
         'core.redundantnoderoleconfig': {
             'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
             'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),

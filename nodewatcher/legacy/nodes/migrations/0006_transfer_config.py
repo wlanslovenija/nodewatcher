@@ -31,9 +31,9 @@ class Migration(DataMigration):
             return ctype
 
     def forwards(self, orm):
-            # Transfer all node configuration from old schema to new one (ignoring Unknown nodes)
+        # Transfer all node configuration from old schema to new one (ignoring Unknown nodes)
         general_ctype         = self.get_content_type(orm, 'cgm', 'cgmgeneralconfig')
-        project_ctype         = self.get_content_type(orm, app_label = 'core', model = 'projectconfig')
+        project_ctype         = self.get_content_type(orm, app_label = 'projects', model = 'projectconfig')
         loc_ctype             = self.get_content_type(orm, app_label = 'core', model = 'locationconfig')
         desc_ctype            = self.get_content_type(orm, app_label = 'core', model = 'descriptionconfig')
         pwdauth_ctype         = self.get_content_type(orm, app_label = 'cgm', model = 'passwordauthenticationconfig')
@@ -74,7 +74,7 @@ class Migration(DataMigration):
             general.type = type_map[node.node_type]
 
             # core.project
-            projectcfg = orm['core.ProjectConfig'](root = node, content_type = project_ctype)
+            projectcfg = orm['projects.ProjectConfig'](root = node, content_type = project_ctype)
             projectcfg.project = node.project
             projectcfg.save()
 
@@ -594,13 +594,6 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
         },
-        'core.projectconfig': {
-            'Meta': {'object_name': 'ProjectConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']"}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_projectconfig'", 'to': "orm['nodes.Node']"})
-        },
         'core.redundantnoderoleconfig': {
             'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
             'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -969,7 +962,14 @@ class Migration(DataMigration):
         'solar.solarpackageconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'SolarPackageConfig', '_ormbases': ['cgm.PackageConfig']},
             'packageconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cgm.PackageConfig']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'projects.projectconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'ProjectConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']", 'on_delete': 'models.PROTECT'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_projects_projectconfig'", 'to': "orm['nodes.Node']"})
         }
     }
 
-    complete_apps = ['core', 'cgm', 'solar', 'digitemp', 'generator', 'policy', 'nodes', 'nodes']
+    complete_apps = ['core', 'cgm', 'solar', 'digitemp', 'generator', 'policy', 'nodes']

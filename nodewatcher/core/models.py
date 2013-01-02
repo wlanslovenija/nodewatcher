@@ -50,25 +50,6 @@ registration.point('node.config').register_choice('core.routerid#family', 'ipv4'
 registration.point('node.config').register_choice('core.routerid#family', 'ipv6', _("IPv6"))
 registration.point('node.config').register_item(RouterIdConfig)
 
-# TODO: This should be moved to modules.administration.projects
-class ProjectConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    Describes the project a node belongs to.
-    """
-
-    project = registry_fields.ModelSelectorKeyField('nodes.Project')
-
-    class Meta:
-        app_label = 'core'
-
-    class RegistryMeta:
-        form_order = 2
-        registry_id = 'core.project'
-        registry_section = _("Project")
-        registry_name = _("Basic Project")
-
-registration.point('node.config').register_item(ProjectConfig)
-
 # TODO: This should be moved to modules.administration.location
 class LocationConfig(registration.bases.NodeConfigRegistryItem):
     """
