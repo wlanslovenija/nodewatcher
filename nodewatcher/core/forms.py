@@ -1,11 +1,9 @@
 from django import forms
+from django.core import exceptions as django_exceptions
 
 from . import models
 from .allocation.ip import forms as ip_forms
 from .registry import registration, widgets as registry_widgets
-
-# TODO: Project model should be moved to core
-from nodewatcher.legacy.nodes import models as nodes_models
 
 class LocationConfigForm(forms.ModelForm):
     """
@@ -35,7 +33,9 @@ class LocationConfigForm(forms.ModelForm):
                 project.geo_long,
                 project.geo_zoom
             ]
-        except (nodes_models.Project.DoesNotExist, AttributeError, KeyError, IndexError):
+        except (django_exceptions.ObjectDoesNotExist, AttributeError, KeyError, IndexError):
+            # Projects are not supported or not specified - in this case we fallback
+            # to default coordinates specified in general configuration for the widget
             pass
 
 registration.register_form_for_item(models.LocationConfig, LocationConfigForm)
