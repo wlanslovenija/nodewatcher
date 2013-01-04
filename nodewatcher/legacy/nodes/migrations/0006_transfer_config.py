@@ -37,10 +37,10 @@ class Migration(DataMigration):
         loc_ctype             = self.get_content_type(orm, app_label = 'location', model = 'locationconfig')
         desc_ctype            = self.get_content_type(orm, app_label = 'description', model = 'descriptionconfig')
         pwdauth_ctype         = self.get_content_type(orm, app_label = 'cgm', model = 'passwordauthenticationconfig')
-        sys_role_ctype        = self.get_content_type(orm, app_label = 'core', model = 'systemroleconfig')
-        brouter_role_ctype    = self.get_content_type(orm, app_label = 'core', model = 'borderrouterroleconfig')
-        vpn_role_ctype        = self.get_content_type(orm, app_label = 'core', model = 'vpnserverroleconfig')
-        redundant_role_ctype  = self.get_content_type(orm, app_label = 'core', model = 'redundantnoderoleconfig')
+        sys_role_ctype        = self.get_content_type(orm, app_label = 'roles', model = 'systemroleconfig')
+        brouter_role_ctype    = self.get_content_type(orm, app_label = 'roles', model = 'borderrouterroleconfig')
+        vpn_role_ctype        = self.get_content_type(orm, app_label = 'roles', model = 'vpnserverroleconfig')
+        redundant_role_ctype  = self.get_content_type(orm, app_label = 'roles', model = 'redundantnoderoleconfig')
         rid_ctype             = self.get_content_type(orm, app_label = 'core', model = 'routeridconfig')
         ethiface_ctype        = self.get_content_type(orm, app_label = 'cgm', model = 'ethernetinterfaceconfig')
         dhcpnetconf_ctype     = self.get_content_type(orm, app_label = 'cgm', model = 'dhcpnetworkconfig')
@@ -135,19 +135,19 @@ class Migration(DataMigration):
             general.save()
 
             # core.roles
-            system_node_role = orm['core.SystemRoleConfig'](root = node, content_type = sys_role_ctype)
+            system_node_role = orm['roles.SystemRoleConfig'](root = node, content_type = sys_role_ctype)
             system_node_role.system = node.system_node
             system_node_role.save()
 
-            border_router_role = orm['core.BorderRouterRoleConfig'](root = node, content_type = brouter_role_ctype)
+            border_router_role = orm['roles.BorderRouterRoleConfig'](root = node, content_type = brouter_role_ctype)
             border_router_role.border_router = node.border_router
             border_router_role.save()
 
-            vpn_server_role = orm['core.VpnServerRoleConfig'](root = node, content_type = vpn_role_ctype)
+            vpn_server_role = orm['roles.VpnServerRoleConfig'](root = node, content_type = vpn_role_ctype)
             vpn_server_role.vpn_server = node.vpn_server
             vpn_server_role.save()
 
-            redundant_node_role = orm['core.RedundantNodeRoleConfig'](root = node, content_type = redundant_role_ctype)
+            redundant_node_role = orm['roles.RedundantNodeRoleConfig'](root = node, content_type = redundant_role_ctype)
             redundant_node_role.redundancy_required = node.redundancy_req
             redundant_node_role.save()
 
@@ -536,10 +536,10 @@ class Migration(DataMigration):
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
             'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
-        'core.borderrouterroleconfig': {
-            'Meta': {'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
+        'roles.borderrouterroleconfig': {
+            'Meta': {'object_name': 'BorderRouterRoleConfig', '_ormbases': ['roles.RoleConfig']},
             'border_router': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['roles.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
         'core.generalconfig': {
             'Meta': {'object_name': 'GeneralConfig'},
@@ -586,12 +586,12 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
         },
-        'core.redundantnoderoleconfig': {
-            'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
+        'roles.redundantnoderoleconfig': {
+            'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['roles.RoleConfig']},
             'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['roles.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
-        'core.roleconfig': {
+        'roles.roleconfig': {
             'Meta': {'object_name': 'RoleConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -619,9 +619,9 @@ class Migration(DataMigration):
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_statusmonitor'", 'to': "orm['nodes.Node']"}),
             'status': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.monitoring'", 'enum_id': "'core.status#status'"})
         },
-        'core.systemroleconfig': {
-            'Meta': {'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
+        'roles.systemroleconfig': {
+            'Meta': {'object_name': 'SystemRoleConfig', '_ormbases': ['roles.RoleConfig']},
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['roles.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'system': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'core.topologylink': {
@@ -631,9 +631,9 @@ class Migration(DataMigration):
             'peer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['nodes.Node']"}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'polymorphic_core.topologylink_set'", 'null': 'True', 'to': "orm['contenttypes.ContentType']"})
         },
-        'core.vpnserverroleconfig': {
-            'Meta': {'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
+        'roles.vpnserverroleconfig': {
+            'Meta': {'object_name': 'VpnServerRoleConfig', '_ormbases': ['roles.RoleConfig']},
+            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['roles.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
             'vpn_server': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'digitemp.digitemppackageconfig': {

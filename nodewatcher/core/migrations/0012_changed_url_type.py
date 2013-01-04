@@ -86,11 +86,6 @@ class Migration(SchemaMigration):
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_basicaddressingconfig'", 'to': "orm['nodes.Node']"}),
             'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
-        'core.borderrouterroleconfig': {
-            'Meta': {'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'border_router': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
-        },
         'core.generalconfig': {
             'Meta': {'object_name': 'GeneralConfig'},
             'altitude': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -118,27 +113,6 @@ class Migration(SchemaMigration):
             'network': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['core.Pool']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        'core.redundantnoderoleconfig': {
-            'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        'core.roleconfig': {
-            'Meta': {'object_name': 'RoleConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_roleconfig'", 'to': "orm['nodes.Node']"})
-        },
-        'core.systemroleconfig': {
-            'Meta': {'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'system': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'})
-        },
-        'core.vpnserverroleconfig': {
-            'Meta': {'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'vpn_server': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'})
         },
         'dns.zone': {
             'Meta': {'object_name': 'Zone'},

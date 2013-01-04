@@ -83,11 +83,6 @@ class Migration(SchemaMigration):
             'subnet_hint': ('nodewatcher.core.registry.fields.IPAddressField', [], {'host_required': 'True', 'null': 'True', 'blank': 'True'}),
             'usage': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces.network#usage'"})
         },
-        'core.borderrouterroleconfig': {
-            'Meta': {'object_name': 'BorderRouterRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'border_router': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
-        },
         'core.generalconfig': {
             'Meta': {'object_name': 'GeneralConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
@@ -122,17 +117,6 @@ class Migration(SchemaMigration):
             'projects': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'pools_core_ippool'", 'symmetrical': 'False', 'to': "orm['nodes.Project']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        'core.redundantnoderoleconfig': {
-            'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        'core.roleconfig': {
-            'Meta': {'object_name': 'RoleConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_roleconfig'", 'to': "orm['nodes.Node']"})
-        },
         'core.routeridconfig': {
             'Meta': {'object_name': 'RouterIdConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
@@ -164,11 +148,6 @@ class Migration(SchemaMigration):
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_core_statusmonitor'", 'to': "orm['nodes.Node']"}),
             'status': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.monitoring'", 'enum_id': "'core.status#status'"})
         },
-        'core.systemroleconfig': {
-            'Meta': {'object_name': 'SystemRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'system': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
         'core.systemstatusmonitor': {
             'Meta': {'object_name': 'SystemStatusMonitor'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
@@ -184,11 +163,6 @@ class Migration(SchemaMigration):
             'monitor': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['core.RoutingTopologyMonitor']"}),
             'peer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'links'", 'to': "orm['nodes.Node']"}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'polymorphic_core.topologylink_set'", 'null': 'True', 'to': "orm['contenttypes.ContentType']"})
-        },
-        'core.vpnserverroleconfig': {
-            'Meta': {'object_name': 'VpnServerRoleConfig', '_ormbases': ['core.RoleConfig']},
-            'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'}),
-            'vpn_server': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'dns.zone': {
             'Meta': {'object_name': 'Zone'},
