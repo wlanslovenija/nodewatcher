@@ -35,7 +35,7 @@ class Migration(DataMigration):
         general_ctype         = self.get_content_type(orm, 'cgm', 'cgmgeneralconfig')
         project_ctype         = self.get_content_type(orm, app_label = 'projects', model = 'projectconfig')
         loc_ctype             = self.get_content_type(orm, app_label = 'location', model = 'locationconfig')
-        desc_ctype            = self.get_content_type(orm, app_label = 'core', model = 'descriptionconfig')
+        desc_ctype            = self.get_content_type(orm, app_label = 'description', model = 'descriptionconfig')
         pwdauth_ctype         = self.get_content_type(orm, app_label = 'cgm', model = 'passwordauthenticationconfig')
         sys_role_ctype        = self.get_content_type(orm, app_label = 'core', model = 'systemroleconfig')
         brouter_role_ctype    = self.get_content_type(orm, app_label = 'core', model = 'borderrouterroleconfig')
@@ -93,7 +93,7 @@ class Migration(DataMigration):
             loccfg.save()
 
             # core.description
-            dsccfg = orm['core.DescriptionConfig'](root = node, content_type = desc_ctype)
+            dsccfg = orm['description.DescriptionConfig'](root = node, content_type = desc_ctype)
             dsccfg.notes = node.notes
             dsccfg.url = node.url or ""
             dsccfg.save()
@@ -541,14 +541,6 @@ class Migration(DataMigration):
             'border_router': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'roleconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.RoleConfig']", 'unique': 'True', 'primary_key': 'True'})
         },
-        'core.descriptionconfig': {
-            'Meta': {'object_name': 'DescriptionConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_descriptionconfig'", 'to': "orm['nodes.Node']"}),
-            'url': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'})
-        },
         'core.generalconfig': {
             'Meta': {'object_name': 'GeneralConfig'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
@@ -969,6 +961,14 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'project': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['nodes.Project']", 'on_delete': 'models.PROTECT'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_projects_projectconfig'", 'to': "orm['nodes.Node']"})
+        },
+        'description.descriptionconfig': {
+            'Meta': {'ordering': "['id']", 'object_name': 'DescriptionConfig'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_descriptionconfig'", 'to': "orm['nodes.Node']"}),
+            'url': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'})
         }
     }
 

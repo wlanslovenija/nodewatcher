@@ -1,4 +1,3 @@
-from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -49,26 +48,6 @@ class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_choice('core.routerid#family', 'ipv4', _("IPv4"))
 registration.point('node.config').register_choice('core.routerid#family', 'ipv6', _("IPv6"))
 registration.point('node.config').register_item(RouterIdConfig)
-
-# TODO: Move to modules.administration.description
-class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    Textual description of a node.
-    """
-
-    notes = models.TextField(blank = True, default = '')
-    url = models.URLField(verify_exists = False, blank = True, default = '', verbose_name = _("URL"))
-
-    class Meta:
-        app_label = 'core'
-
-    class RegistryMeta:
-        form_order = 4
-        registry_id = 'core.description'
-        registry_section = _("Description")
-        registry_name = _("Basic Description")
-
-registration.point('node.config').register_item(DescriptionConfig)
 
 # TODO: Move together with the rest to modules.administration.addressing
 from .allocation.ip import models as ip_models
