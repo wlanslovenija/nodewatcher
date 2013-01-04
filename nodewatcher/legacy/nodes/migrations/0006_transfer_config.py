@@ -34,7 +34,7 @@ class Migration(DataMigration):
         # Transfer all node configuration from old schema to new one (ignoring Unknown nodes)
         general_ctype         = self.get_content_type(orm, 'cgm', 'cgmgeneralconfig')
         project_ctype         = self.get_content_type(orm, app_label = 'projects', model = 'projectconfig')
-        loc_ctype             = self.get_content_type(orm, app_label = 'core', model = 'locationconfig')
+        loc_ctype             = self.get_content_type(orm, app_label = 'location', model = 'locationconfig')
         desc_ctype            = self.get_content_type(orm, app_label = 'core', model = 'descriptionconfig')
         pwdauth_ctype         = self.get_content_type(orm, app_label = 'cgm', model = 'passwordauthenticationconfig')
         sys_role_ctype        = self.get_content_type(orm, app_label = 'core', model = 'systemroleconfig')
@@ -79,7 +79,7 @@ class Migration(DataMigration):
             projectcfg.save()
 
             # core.location
-            loccfg = orm['core.LocationConfig'](root = node, content_type = loc_ctype)
+            loccfg = orm['location.LocationConfig'](root = node, content_type = loc_ctype)
             loccfg.address = node.location
             loccfg.city = "?"
             loccfg.country = "?"
@@ -583,7 +583,7 @@ class Migration(DataMigration):
             'projects': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'pools_core_ippool'", 'symmetrical': 'False', 'to': "orm['nodes.Project']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        'core.locationconfig': {
+        'location.locationconfig': {
             'Meta': {'object_name': 'LocationConfig'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'altitude': ('django.db.models.fields.FloatField', [], {'default': '0'}),

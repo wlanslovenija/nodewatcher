@@ -18,19 +18,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('core', ['DescriptionConfig'])
 
-        # Adding model 'LocationConfig'
-        db.create_table('core_locationconfig', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('root', self.gf('django.db.models.fields.related.ForeignKey')(related_name='config_core_locationconfig', to=orm['nodes.Node'])),
-            ('address', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('city', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('country', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')(null=True)),
-            ('altitude', self.gf('django.db.models.fields.FloatField')(default=0)),
-        ))
-        db.send_create_signal('core', ['LocationConfig'])
-
         # Deleting field 'GeneralConfig.geolocation'
         db.delete_column('core_generalconfig', 'geolocation')
 
@@ -54,9 +41,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'DescriptionConfig'
         db.delete_table('core_descriptionconfig')
-
-        # Deleting model 'LocationConfig'
-        db.delete_table('core_locationconfig')
 
         # Adding field 'GeneralConfig.geolocation'
         db.add_column('core_generalconfig', 'geolocation', self.gf('django.contrib.gis.db.models.fields.PointField')(null=True), keep_default=False)
@@ -165,17 +149,6 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_generalconfig'", 'to': "orm['nodes.Node']"}),
             'type': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.general#type'"})
-        },
-        'core.locationconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'LocationConfig'},
-            'address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'altitude': ('django.db.models.fields.FloatField', [], {}),
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
         },
         'core.pool': {
             'Meta': {'object_name': 'Pool'},

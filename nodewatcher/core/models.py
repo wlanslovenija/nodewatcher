@@ -50,29 +50,6 @@ registration.point('node.config').register_choice('core.routerid#family', 'ipv4'
 registration.point('node.config').register_choice('core.routerid#family', 'ipv6', _("IPv6"))
 registration.point('node.config').register_item(RouterIdConfig)
 
-# TODO: This should be moved to modules.administration.location
-class LocationConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    Describes the location of a node.
-    """
-
-    address = models.CharField(max_length = 100)
-    city = models.CharField(max_length = 100) # TODO city field?
-    country = models.CharField(max_length = 100) # TODO country field?
-    geolocation = gis_models.PointField(null = True)
-    altitude = models.FloatField(default = 0)
-
-    class Meta:
-        app_label = 'core'
-
-    class RegistryMeta:
-        form_order = 3
-        registry_id = 'core.location'
-        registry_section = _("Location")
-        registry_name = _("Basic Location")
-
-registration.point('node.config').register_item(LocationConfig)
-
 # TODO: Move to modules.administration.description
 class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
     """

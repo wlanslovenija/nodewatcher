@@ -108,17 +108,6 @@ class Migration(DataMigration):
             'projects': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'pools_core_ippool'", 'symmetrical': 'False', 'to': "orm['nodes.Project']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        'core.locationconfig': {
-            'Meta': {'object_name': 'LocationConfig'},
-            'address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'altitude': ('django.db.models.fields.FloatField', [], {'default': '0'}),
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
-        },
         'core.redundantnoderoleconfig': {
             'Meta': {'object_name': 'RedundantNodeRoleConfig', '_ormbases': ['core.RoleConfig']},
             'redundancy_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
