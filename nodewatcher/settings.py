@@ -234,6 +234,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.administration.location',
     'nodewatcher.modules.administration.description',
     'nodewatcher.modules.administration.roles',
+    'nodewatcher.modules.equipment',
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.platforms.openwrt',
     'nodewatcher.modules.monitor.datastream',

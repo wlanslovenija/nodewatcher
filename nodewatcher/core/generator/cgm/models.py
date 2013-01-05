@@ -10,9 +10,6 @@ from ...allocation.ip import models as ip_models
 from ...registry import fields as registry_fields, registration, permissions
 from . import base as cgm_base
 
-# TODO: Should not be imported in core
-from ....modules.equipment.antennas import models as antennas_models
-
 # Register a new firmware-generating permission
 permissions.register(nodes_models.Node, 'can_generate_firmware', _("Can generate firmware"))
 
@@ -144,9 +141,6 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     channel = models.CharField(max_length = 50)
     bitrate = models.IntegerField(default = 11)
     antenna_connector = models.CharField(max_length = 50, null = True)
-
-    # TODO: This should not be required by the config in core
-    antenna = registry_fields.ModelSelectorKeyField(antennas_models.Antenna, null = True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Wireless Radio")

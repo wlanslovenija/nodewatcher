@@ -1,6 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from nodewatcher.core.generator.cgm import models as cgm_models
+from nodewatcher.core.registry import fields as registry_fields, registration
+from nodewatcher.modules.equipment import models as equipment_models
+
 class Antenna(models.Model):
     """
     Antenna descriptor.
@@ -23,9 +27,6 @@ class Antenna(models.Model):
     angle_vertical = models.IntegerField(default = 360, verbose_name = _("Vertical angle"))
     gain = models.IntegerField(verbose_name = _("Gain (dBi)"))
 
-    class Meta:
-        app_label = "core"
-
     def __unicode__(self):
         """
         Returns a string representation of this model.
@@ -35,3 +36,18 @@ class Antenna(models.Model):
             return _("[%s internal antenna]") % self.internal_for
         else:
             return "%s :: %s" % (self.manufacturer, self.name)
+
+class AntennaEquipmentConfig(equipment_models.WifiRadioEquipmentConfig):
+    """
+    Antenna that can be added to a wireless radio as equipment.
+    """
+
+    antenna = registry_fields.ModelSelectorKeyField(Antenna)
+    azimuth = models.FloatField(null = True)
+    elevation_angle = models.FloatField(null = True)
+    rotation = models.FloatField(null = True)
+
+    class RegistryMeta(equipment_models.WifiRadioEquipmentConfig.RegistryMeta):
+        registry_name = _("Antenna Equipment")
+
+registration.point('node.config').register_subitem(cgm_models.WifiRadioDeviceConfig, AntennaEquipmentConfig)

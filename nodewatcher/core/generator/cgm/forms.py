@@ -6,9 +6,6 @@ from . import models, base as cgm_base
 from ...allocation.ip import forms as ip_forms
 from ...registry import fields as registry_fields, registration
 
-# TODO: Should not be imported in core
-from ....modules.equipment.antennas import forms as antennas_forms
-
 class WifiInterfaceConfigForm(forms.ModelForm):
     """
     Wifi interface configuration form.
@@ -38,8 +35,7 @@ class VpnNetworkConfigForm(forms.ModelForm):
 
 registration.register_form_for_item(models.VpnNetworkConfig, VpnNetworkConfigForm)
 
-# TODO: The antenna part should not be required in core
-class WifiRadioDeviceConfigForm(forms.ModelForm, antennas_forms.AntennaReferencerFormMixin):
+class WifiRadioDeviceConfigForm(forms.ModelForm):
     """
     A wireless radio device configuration form.
     """
@@ -58,7 +54,6 @@ class WifiRadioDeviceConfigForm(forms.ModelForm, antennas_forms.AntennaReference
         """
         Handles dynamic protocol/channel selection.
         """
-        super(WifiRadioDeviceConfigForm, self).modify_to_context(item, cfg, request)
         radio = None
         try:
             radio = cgm_base.get_platform(cfg['core.general'][0].platform)\

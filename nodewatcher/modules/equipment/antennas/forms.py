@@ -1,52 +1,37 @@
+from django import forms
 from django.forms import models as model_forms
 from django.utils import datastructures
 from django.utils.translation import ugettext_lazy as _
 
+from nodewatcher.core.registry import registration
 from . import models
 
 ANTENNA_FORM_FIELD_PREFIX = 'antenna_'
 
-def save_mixin_decorator(f):
-    """
-    Augments the save method to install a hook just before the save method
-    is called.
-    """
-
-    def save(self, *args, **kwargs):
-        self._save_antenna_referencer_mixin()
-        if f is not None:
-            f(self, *args, **kwargs)
-        else:
-            super(self.__class__, self).save(*args, **kwargs)
-
-    return save
-
-class AntennaReferencerFormMixinMeta(model_forms.ModelFormMetaclass):
+class AntennaEquipmentConfigFormMeta(model_forms.ModelFormMetaclass):
     def __new__(cls, name, bases, attrs):
-        if name == 'AntennaReferencerFormMixin':
-            return type.__new__(cls, name, bases, attrs)
-
         # Prepare fields for our model
         fields = datastructures.SortedDict()
-        for name, field in model_forms.fields_for_model(models.Antenna).items():
-            fields['%s%s' % (ANTENNA_FORM_FIELD_PREFIX, name)] = field
+        for fname, field in model_forms.fields_for_model(models.Antenna).items():
+            fields['%s%s' % (ANTENNA_FORM_FIELD_PREFIX, fname)] = field
         attrs['_antenna_fields'] = fields
+        return model_forms.ModelFormMetaclass.__new__(cls, name, bases, attrs)
 
-        # Mixin our save method
-        attrs['save'] = save_mixin_decorator(attrs.get('save', None))
-        return type.__new__(cls, name, bases, attrs)
-
-class AntennaReferencerFormMixin(object):
+class AntennaEquipmentConfigForm(forms.ModelForm):
     """
-    A mixin for forms that would like to display antenna selection.
+    Antenna equipment configuration form.
     """
 
-    __metaclass__ = AntennaReferencerFormMixinMeta
+    class Meta:
+        model = models.AntennaEquipmentConfig
+
+    __metaclass__ = AntennaEquipmentConfigFormMeta
 
     def modify_to_context(self, item, cfg, request):
         """
         Dynamically displays fields for entering new antenna information.
         """
+
         self.fields['antenna'].empty_label = _("[Add new antenna]")
         try:
             qs = self.fields['antenna'].queryset
@@ -68,23 +53,25 @@ class AntennaReferencerFormMixin(object):
         self._creating_antenna = True
         self.fields['antenna'].required = False
 
-    def _save_antenna_referencer_mixin(self):
+    def save(self):
         """
         Creates a new antenna descriptor instance and saves it into the model.
         """
 
-        if not self._creating_antenna:
-            return
+        if self._creating_antenna:
+            # Prepare just the prefixed fields
+            orig_cleaned_data = self.cleaned_data
+            self.cleaned_data = {}
+            for key, value in orig_cleaned_data.items():
+                if key.startswith(ANTENNA_FORM_FIELD_PREFIX):
+                    self.cleaned_data[key[len(ANTENNA_FORM_FIELD_PREFIX):]] = value
 
-        # Prepare just the prefixed fields
-        orig_cleaned_data = self.cleaned_data
-        self.cleaned_data = {}
-        for key, value in orig_cleaned_data.items():
-            if key.startswith(ANTENNA_FORM_FIELD_PREFIX):
-                self.cleaned_data[key[len(ANTENNA_FORM_FIELD_PREFIX):]] = value
+            # Create and save the new antenna instance
+            antenna = models.Antenna()
+            model_forms.save_instance(self, antenna, fail_message = 'created')
+            self.cleaned_data = orig_cleaned_data
+            self.instance.antenna = antenna
 
-        # Create and save the new antenna instance
-        antenna = models.Antenna()
-        model_forms.save_instance(self, antenna, fail_message = 'created')
-        self.cleaned_data = orig_cleaned_data
-        self.instance.antenna = antenna
+        return super(AntennaEquipmentConfigForm, self).save()
+
+registration.register_form_for_item(models.AntennaEquipmentConfig, AntennaEquipmentConfigForm)
