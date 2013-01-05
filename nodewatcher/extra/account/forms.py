@@ -31,6 +31,7 @@ def alter_user_form_fields(form):
         form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
     # We set it every time to be sure
     form.fields['username'].min_length = 4
+    form.fields['username'].help_text = _('Letters, digits and @/./+/-/_ only. Will be public.')
 
     # E-mail domain validation (we check it in a model field)
     emailfield = filter(lambda x: x.name == 'email', form.Meta.model._meta.fields)[0]
@@ -42,7 +43,7 @@ def alter_user_form_fields(form):
 
     # We add in a form field as it is too late to add in model field
     form.fields['email'].help_text = _('Carefully enter your e-mail address as it will be used for account activation. It will be visible to other registered users.')
-    form.fields['first_name'].help_text = _('It will be visible only to network administrators.')
+    form.fields['first_name'].help_text = _('By default used for attribution. You can hide it to be visible only to network administrators in privacy section bellow.')
     form.fields['last_name'].help_text = form.fields['first_name'].help_text
 
     # We want those fields to be required (UserCreationForm.Meta.fields is made from user_add_fieldsets)
@@ -137,9 +138,10 @@ class UserChangeForm(AdminUserChangeForm):
     def __init__(self, *args, **kwargs):
         # This is here just because of the bug in Django which does not remove explicitly declared fields in parent class from
         # a subclass form when field is not declared in Meta.fields or even if it is defined in Meta.exclude
-        # So we remove such field (in this case username field) here ourselves
+        # So we remove such field (in this case username and password fields) here ourselves
         super(UserChangeForm, self).__init__(*args, **kwargs)
         del self.fields['username']
+        del self.fields['password']
 
         self.fields['email'].help_text = _('If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.')
 
