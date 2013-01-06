@@ -3,7 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.registry import fields as registry_fields, registration
-from nodewatcher.modules.equipment import models as equipment_models
 
 class Antenna(models.Model):
     """
@@ -37,17 +36,24 @@ class Antenna(models.Model):
         else:
             return "%s :: %s" % (self.manufacturer, self.name)
 
-class AntennaEquipmentConfig(equipment_models.WifiRadioEquipmentConfig):
+class AntennaEquipmentConfig(registration.bases.NodeConfigRegistryItem):
     """
-    Antenna that can be added to a wireless radio as equipment.
+    Antenna that can be added to a wireless radio.
     """
 
+    device = registry_fields.IntraRegistryForeignKey(
+        cgm_models.WifiRadioDeviceConfig, editable = False, null = False, related_name = 'antennas'
+    )
     antenna = registry_fields.ModelSelectorKeyField(Antenna)
-    azimuth = models.FloatField(null = True)
-    elevation_angle = models.FloatField(null = True)
-    rotation = models.FloatField(null = True)
+    azimuth = models.FloatField(null = True, blank = True)
+    elevation_angle = models.FloatField(null = True, blank = True)
+    rotation = models.FloatField(null = True, blank = True)
 
-    class RegistryMeta(equipment_models.WifiRadioEquipmentConfig.RegistryMeta):
-        registry_name = _("Antenna Equipment")
+    class RegistryMeta:
+        form_order = 50
+        registry_id = 'core.equipment.antenna'
+        registry_section = _("Antennas")
+        registry_name = _("Antenna")
+        multiple = True
 
 registration.point('node.config').register_subitem(cgm_models.WifiRadioDeviceConfig, AntennaEquipmentConfig)

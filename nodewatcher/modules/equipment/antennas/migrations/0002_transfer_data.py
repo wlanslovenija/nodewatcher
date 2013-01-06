@@ -48,12 +48,15 @@ class Migration(DataMigration):
             'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
         },
         'antennas.antennaequipmentconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'AntennaEquipmentConfig', '_ormbases': ['equipment.WifiRadioEquipmentConfig']},
+            'Meta': {'ordering': "['id']", 'object_name': 'AntennaEquipmentConfig'},
             'antenna': ('nodewatcher.core.registry.fields.ModelSelectorKeyField', [], {'to': "orm['antennas.Antenna']", 'on_delete': 'models.PROTECT'}),
             'azimuth': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'device': ('nodewatcher.core.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'antennas'", 'to': "orm['cgm.WifiRadioDeviceConfig']"}),
             'elevation_angle': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
-            'rotation': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
-            'wifiradioequipmentconfig_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['equipment.WifiRadioEquipmentConfig']", 'unique': 'True', 'primary_key': 'True'})
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_antennas_antennaequipmentconfig'", 'to': "orm['nodes.Node']"}),
+            'rotation': ('django.db.models.fields.FloatField', [], {'null': 'True'})
         },
         'cgm.interfaceconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'InterfaceConfig'},
@@ -78,13 +81,6 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'equipment.wifiradioequipmentconfig': {
-            'Meta': {'ordering': "['id']", 'object_name': 'WifiRadioEquipmentConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'device': ('nodewatcher.core.registry.fields.IntraRegistryForeignKey', [], {'related_name': "'equipment'", 'to': "orm['cgm.WifiRadioDeviceConfig']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_equipment_wifiradioequipmentconfig'", 'to': "orm['nodes.Node']"})
         },
         'nodes.node': {
             'Meta': {'object_name': 'Node'},
