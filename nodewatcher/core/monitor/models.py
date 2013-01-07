@@ -3,11 +3,12 @@ import polymorphic
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from nodewatcher.core import models as core_models
 from nodewatcher.core.registry import fields as registry_fields
 from nodewatcher.core.registry import registration
 
-# TODO: Should not be imported in core
-from nodewatcher.legacy.nodes import models as nodes_models
+# Creates monitoring registration point
+registration.create_point(core_models.Node, 'monitoring')
 
 class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
@@ -67,7 +68,7 @@ class TopologyLink(polymorphic.PolymorphicModel):
     """
 
     monitor = models.ForeignKey(RoutingTopologyMonitor, related_name = 'links')
-    peer = models.ForeignKey(nodes_models.Node, related_name = 'links')
+    peer = models.ForeignKey(core_models.Node, related_name = 'links')
     last_seen = models.DateTimeField()
 
     class Meta:

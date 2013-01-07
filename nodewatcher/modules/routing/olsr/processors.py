@@ -4,9 +4,6 @@ from django.utils import timezone
 from nodewatcher.core import models as core_models
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 
-# TODO: Should not be imported in core
-from nodewatcher.legacy.nodes import models as nodes_models
-
 from . import models as olsr_models, parser as olsr_parser
 
 class OLSRTopology(monitor_processors.NetworkProcessor):
@@ -41,7 +38,7 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
                 visible_routers = set(context.topology.keys())
                 registered_routers = set()
                 context.router_id_map = {}
-                for node in nodes_models.Node.objects.regpoint("config")\
+                for node in core_models.Node.objects.regpoint("config")\
                 .registry_fields(router_id = "RouterIdConfig.router_id")\
                 .filter(
                   routeridconfig_family = "ipv4",
@@ -54,7 +51,7 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
                 self.logger.info("Creating unknown node instances...")
                 for router_id in visible_routers.difference(registered_routers):
                     # Create an invalid node for each unknown router id seen by olsrd
-                    node = nodes_models.Node()
+                    node = core_models.Node()
                     node.save()
                     nodes.add(node)
                     context.router_id_map[router_id] = node

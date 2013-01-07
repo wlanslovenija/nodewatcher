@@ -2,16 +2,13 @@ from django.core import exceptions
 from django.db import models
 from django.utils.translation import ugettext as _
 
-# TODO: Should not be imported in core
-from nodewatcher.legacy.nodes import models as nodes_models
-
 from ... import models as core_models
 from ...allocation.ip import models as ip_models
 from ...registry import fields as registry_fields, registration, permissions
 from . import base as cgm_base
 
 # Register a new firmware-generating permission
-permissions.register(nodes_models.Node, 'can_generate_firmware', _("Can generate firmware"))
+permissions.register(core_models.Node, 'can_generate_firmware', _("Can generate firmware"))
 
 class CgmGeneralConfig(core_models.GeneralConfig):
     """

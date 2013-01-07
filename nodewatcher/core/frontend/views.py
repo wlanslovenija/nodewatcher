@@ -12,9 +12,7 @@ from django.utils import safestring
 
 from guardian.shortcuts import assign as assign_permission
 
-# TODO: Should not be imported in core
-from nodewatcher.legacy.nodes.models import Node
-
+from nodewatcher.core import models as core_models
 from nodewatcher.core.registry import forms as registry_forms
 
 from . import context_processors
@@ -25,7 +23,7 @@ def nodes(request):
     """
 
     return render_to_response('nodes/list.html', {
-        'nodes' : Node.objects.regpoint("config").registry_fields(
+        'nodes' : core_models.Node.objects.regpoint("config").registry_fields(
             name = 'GeneralConfig.name',
             type = 'TypeConfig.type',
             router_id = 'RouterIdConfig.router_id',
@@ -42,7 +40,7 @@ def node_new(request):
     if request.method == 'POST':
         try:
             sid = transaction.savepoint()
-            node = Node()
+            node = core_models.Node()
             node.save()
 
             actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
@@ -97,7 +95,7 @@ def node_edit(request, node):
     Display a form for registering a new node.
     """
 
-    node = get_object_or_404(Node, pk = node)
+    node = get_object_or_404(core_models.Node, pk = node)
     # XXX needs port to permissions
     #if not node.is_current_owner(request):
     #  raise Http404
