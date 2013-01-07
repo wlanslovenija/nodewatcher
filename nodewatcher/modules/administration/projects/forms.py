@@ -1,19 +1,21 @@
-from nodewatcher.utils import hookable
-from nodewatcher.core.allocation.ip import forms as ip_forms
+from django.dispatch import receiver
+
+from nodewatcher.core.allocation.ip import signals
 from . import models
 
-class ProjectIpAddressAllocatorMixin(hookable.HookHandler):
+@receiver(signals.filter_pools)
+def filter_pools(sender, **kwargs):
     """
     Project-based pool selection.
     """
 
-    def filter_pools(self, item, cfg, request):
-        try:
-            # Only list the pools that are available for the selected project
-            self.fields['pool'].queryset = self.fields['pool'].queryset.filter(
-                projects = cfg['core.project'][0].project
-            )
-        except (models.Project.DoesNotExist, KeyError, AttributeError):
-            pass
+    pool = kwargs['pool']
+    cfg = kwargs['cfg']
 
-ip_forms.IpAddressAllocatorFormMixin.register_hooks(ProjectIpAddressAllocatorMixin)
+    try:
+        # Only list the pools that are available for the selected project
+        pool.queryset = pool.queryset.filter(
+            projects = cfg['core.project'][0].project
+        )
+    except (models.Project.DoesNotExist, KeyError, AttributeError):
+        pass

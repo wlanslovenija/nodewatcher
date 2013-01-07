@@ -1,18 +1,13 @@
 from django.db.models import fields
 from django.utils.translation import ugettext as _
 
-from . import models as pool_models
+from . import models as pool_models, signals
 from ...registry import fields as registry_fields
-from ....utils import hookable
 
-class IpAddressAllocatorFormMixin(hookable.Hookable):
+class IpAddressAllocatorFormMixin(object):
     """
     A mixin for address allocator forms.
     """
-
-    @hookable.hook
-    def filter_pools(self, item, cfg, request):
-        pass
 
     def modify_to_context(self, item, cfg, request):
         """
@@ -26,7 +21,8 @@ class IpAddressAllocatorFormMixin(hookable.Hookable):
         self.fields['pool'].queryset = qs
 
         # Enable other modules to further filter the pools per some other attributes
-        self.filter_pools(item, cfg, request)
+        signals.filter_pools.send(sender = self, pool = self.fields['pool'], item = item,
+            cfg = cfg, request = request)
 
         # Only display prefix length range that is available for the selected pool
         try:
