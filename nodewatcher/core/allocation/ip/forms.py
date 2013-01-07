@@ -21,8 +21,10 @@ class IpAddressAllocatorFormMixin(object):
         self.fields['pool'].queryset = qs
 
         # Enable other modules to further filter the pools per some other attributes
-        signals.filter_pools.send(sender = self, pool = self.fields['pool'], item = item,
-            cfg = cfg, request = request)
+        signals.filter_pools.send(
+            sender = self, pool = self.fields['pool'], item = item,
+            cfg = cfg, request = request
+        )
 
         # Only display prefix length range that is available for the selected pool
         try:
