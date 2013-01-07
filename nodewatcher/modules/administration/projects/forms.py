@@ -4,13 +4,10 @@ from nodewatcher.core.allocation.ip import signals
 from . import models
 
 @receiver(signals.filter_pools)
-def filter_pools(sender, **kwargs):
+def filter_pools(sender, pool, cfg, **kwargs):
     """
     Project-based pool selection.
     """
-
-    pool = kwargs['pool']
-    cfg = kwargs['cfg']
 
     try:
         # Only list the pools that are available for the selected project
