@@ -13,6 +13,7 @@ class Migration(DataMigration):
         ("cgm", "0017_cidr_rename"),
         ("solar", "0002_schema_refactor"),
         ("digitemp", "0002_schema_refactor"),
+        ("projects", "0001_initial_p1"),
     )
     needed_by = (
         ("core", "0025_rt_announce_mt"),

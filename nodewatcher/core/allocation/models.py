@@ -77,8 +77,6 @@ class PoolBase(models.Model):
         abstract = True
 
     parent = models.ForeignKey('self', null = True, related_name = 'children')
-    # TODO: Should not be in core?
-    projects = models.ManyToManyField('nodes.Project', related_name = 'pools_%(app_label)s_%(class)s')
 
     # Bookkeeping for allocated pools
     allocation_content_type = models.ForeignKey(contenttypes_models.ContentType, null = True)

@@ -3,30 +3,30 @@ from django.utils.translation import ugettext as _
 
 from . import models as pool_models
 from ...registry import fields as registry_fields
+from ....utils import hookable
 
-# TODO: Project model should be moved to core
-from nodewatcher.legacy.nodes import models as nodes_models
-
-class IpAddressAllocatorFormMixin(object):
+class IpAddressAllocatorFormMixin(hookable.Hookable):
     """
     A mixin for address allocator forms.
     """
+
+    @hookable.hook
+    def filter_pools(self, item, cfg, request):
+        pass
 
     def modify_to_context(self, item, cfg, request):
         """
         Dynamically modifies the form.
         """
 
-        # Only display pools that are available to the selected project
+        # Only display pools that are available
         qs = self.fields['pool'].queryset
-        try:
-            qs = qs.filter(projects = cfg['core.project'][0].project)
-            qs = qs.filter(family = item.family)
-            qs = qs.order_by('description', 'ip_subnet')
-        except (nodes_models.Project.DoesNotExist, KeyError, AttributeError):
-            qs = qs.none()
-
+        qs = qs.filter(family = item.family)
+        qs = qs.order_by('description', 'ip_subnet')
         self.fields['pool'].queryset = qs
+
+        # Enable other modules to further filter the pools per some other attributes
+        self.filter_pools(item, cfg, request)
 
         # Only display prefix length range that is available for the selected pool
         try:

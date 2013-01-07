@@ -13,8 +13,7 @@ from phonenumber_field import modelfields as phonenumber_fields
 
 from . import geo_fields
 
-# TODO: Project should be moved to module out of legacy nodes
-from nodewatcher.legacy.nodes import models
+from nodewatcher.modules.administration.projects import models
 
 ATTRIBUTION_CHOICES = (
     ('name', _("Use my full name")),
