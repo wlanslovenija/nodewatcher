@@ -36,6 +36,7 @@ class RouterRadio(object):
     """
     An abstract descriptor of a router radio.
     """
+
     def __init__(self, identifier, description, protocols, connectors):
         """
         Class constructor.
