@@ -55,6 +55,7 @@ class RegistrationPoint(object):
         self.name = point_id
         self.item_registry = {}
         self.item_classes = set()
+        self.item_classes_name = {}
         self.item_object_toplevel = django_datastructures.SortedDict()
         self.choices_registry = {}
         self.flat_lookup_proxies = {}
@@ -83,6 +84,7 @@ class RegistrationPoint(object):
             return False
         else:
             self.item_classes.add(item)
+            self.item_classes_name["%s.%s" % (item._meta.app_label, item._meta.module_name)] = item
 
         # Record the item in object hierarchy so we know which items don't depend on any other items in the
         # object (runtime editable) hierarchy
@@ -190,6 +192,19 @@ class RegistrationPoint(object):
 
         item_cls._registry_endpoint = None
         self.item_classes.remove(item_cls)
+
+    def unregister_item_by_name(self, cls_name):
+        """
+        Unregisters a previously registered item or subitem. If the class doesn't exist,
+        this is silently ignored. See also `unregister_item`.
+
+        :param cls_name: Registry item class name (with app label)
+        """
+        cls = self.item_classes_name.get(cls_name.lower(), None)
+        if cls is None:
+            return
+
+        self.unregister_item(cls)
 
     def unregister_item(self, item_cls):
         """

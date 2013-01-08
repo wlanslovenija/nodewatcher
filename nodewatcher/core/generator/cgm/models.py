@@ -259,7 +259,7 @@ class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator):
 
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
 registration.point('node.config').register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
-registration.point('node.config').unregister_item(core_models.BasicAddressingConfig)
+registration.point('node.config').unregister_item_by_name("core.BasicAddressingConfig")
 
 class PPPoENetworkConfig(NetworkConfig):
     """
