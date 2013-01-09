@@ -26,64 +26,75 @@ class Capability(object):
 
         self.identifier = identifier
 
+class WirelessProtocolMeta(type):
+    def __new__(cls, name, bases, attrs):
+        new_class = type.__new__(cls, name, bases, attrs)
+        if cls == "WirelessProtocol":
+            return new_class
+
+        for base in bases:
+            if not hasattr(base, 'identifier'):
+                continue
+
+            # Merge channels from base classes
+            new_class.channels = base.channels + new_class.channels
+            # Merge capabilities from base classes
+            new_class.capabilities = \
+                tuple(getattr(base, 'capabilities', ())) + \
+                getattr(new_class, 'capabilities', ())
+
+        new_class.capabilities = set(getattr(new_class, 'capabilities', []))
+        new_class.available_capabilities = set()
+        
+        for capability in new_class.capabilities:
+            setattr(new_class, capability.identifier.replace('-', '_').upper(), capability)
+
+        return new_class
+
 class WirelessProtocol(object):
     """
     Wireless protocol descriptor.
     """
-    def __init__(self, identifier, description, channels, bitrates, capabilities = None):
-        """
-        Class constructor.
-        """
-        self.identifier = identifier
-        self.description = description
-        self.channels = channels
-        self.bitrates = bitrates
-        self.all_capabilities = set()
-        self.available_capabilities = set()
 
-        if capabilities is not None:
-            self.all_capabilities.update(capabilities)
-            
-            for capability in capabilities:
-                setattr(self, capability.identifier.replace('-', '_').upper(), capability)
+    __metaclass__ = WirelessProtocolMeta
 
-    def get_channel_choices(self, regulatory_filter = None):
+    @classmethod
+    def get_channel_choices(cls, regulatory_filter = None):
         """
         Returns a list of channel chocies.
         """
-        for channel in self.channels:
+
+        for channel in cls.channels:
             if regulatory_filter is None or channel.frequency in regulatory_filter:
                 yield channel.identifier, channel.number
 
-    def get_channel(self, identifier):
+    @classmethod
+    def get_channel(cls, identifier):
         """
         Returns a specific channel descriptor.
         """
-        for channel in self.channels:
+
+        for channel in cls.channels:
             if channel.identifier == identifier:
                 return channel
 
-    def __call__(self, *capabilities):
+    def __init__(self, *capabilities):
         """
         Sets up available capabilities for this protocol.
 
         :param capabilities: A list of capabilities
-        :return: A copy of this protocol with added capabilities
         """
-        capabilities = self.all_capabilities.intersection(capabilities)
-        if not capabilities:
-            return self
 
-        protocol = copy.deepcopy(self)
-        protocol.available_capabilities.update(capabilities)
-        return protocol
+        capabilities = self.capabilities.intersection(capabilities)
+        self.available_capabilities.update(capabilities)
 
-#
-# IEEE 8022.11 B/G protocols
-#
-IEEE80211BG = WirelessProtocol(
-    identifier = "ieee-80211bg",
-    description = _("IEEE 802.11BG"),
+class IEEE80211BG(WirelessProtocol):
+    """
+    IEEE 8022.11 B/G protocols.
+    """
+
+    identifier = "ieee-80211bg"
+    description = _("IEEE 802.11BG")
     channels = (
         Channel("ch1", 1, 2412),
         Channel("ch2", 2, 2417),
@@ -98,19 +109,19 @@ IEEE80211BG = WirelessProtocol(
         Channel("ch11", 11, 2462),
         Channel("ch12", 12, 2467),
         Channel("ch13", 13, 2472),
-    ),
+    )
     bitrates = (
         11,
         54,
     )
-)
 
-#
-# IEEE 802.11 N protocol
-#
-IEEE80211N = WirelessProtocol(
-    identifier = "ieee-80211n",
-    description = _("IEEE 802.11N"),
+class IEEE80211N(IEEE80211BG):
+    """
+    IEEE 802.11 N protocol
+    """
+
+    identifier = "ieee-80211n"
+    description = _("IEEE 802.11N")
     channels = (
         Channel("ch36", 36, 5180),
         Channel("ch40", 40, 5200),
@@ -130,11 +141,11 @@ IEEE80211N = WirelessProtocol(
         Channel("ch132", 132, 5660),
         Channel("ch136", 136, 5680),
         Channel("ch140", 140, 5700),
-    ),
+    )
     bitrates = (
         11,
         54,
-    ),
+    )
     capabilities = (
         Capability("LDPC"),
         Capability("GF"),
@@ -147,4 +158,3 @@ IEEE80211N = WirelessProtocol(
         Capability("RX-STBC123"),
         Capability("DSSS_CCK-40"),
     )
-)

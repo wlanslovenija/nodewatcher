@@ -162,9 +162,27 @@ class Migration(DataMigration):
             # core.interfaces + core.interfaces.network
             if profile is not None:
                 # WiFi
+                proto_map = {
+                    "wrt54g" : "ieee-80211bg",
+                    "wrt54gl" : "ieee-80211bg",
+                    "wrt54gs" : "ieee-80211bg",
+                    "whr-hp-g54" : "ieee-80211bg",
+                    "fonera" : "ieee-80211bg",
+                    "foneraplus" : "ieee-80211bg",
+                    "wl-500gp-v1" : "ieee-80211bg",
+                    "wl-500gd" : "ieee-80211bg",
+                    "rb433ah" : "ieee-80211bg",
+                    "tp-wr741nd" : "ieee-80211n",
+                    "tp-wr740nd" : "ieee-80211n",
+                    "tp-wr842nd" : "ieee-80211n",
+                    "tp-mr3020"  : "ieee-80211n",
+                    "tp-wr841nd" : "ieee-80211n",
+                    "tp-wr703n"  : "ieee-80211n",
+                }
+
                 wifi_iface = orm['cgm.WifiInterfaceConfig'](root = node, content_type = wifiiface_ctype)
                 wifi_iface.wifi_radio = "wifi0"
-                wifi_iface.protocol = "ieee-80211bg"
+                wifi_iface.protocol = proto_map[profile.template.short_name]
                 wifi_iface.channel = "ch%d" % profile.channel
                 wifi_iface.antenna_connector = "a1"
                 try:

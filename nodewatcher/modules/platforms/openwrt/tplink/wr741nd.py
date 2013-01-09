@@ -12,7 +12,6 @@ class TPLinkWR741ND(cgm_routers.RouterBase):
     architecture = "ar71xx"
     radios = [
         cgm_routers.IntegratedRadio("wifi0", "Wifi0", [
-            cgm_protocols.IEEE80211BG,
             cgm_protocols.IEEE80211N(
                 cgm_protocols.IEEE80211N.SHORT_GI_20,
                 cgm_protocols.IEEE80211N.SHORT_GI_40,
