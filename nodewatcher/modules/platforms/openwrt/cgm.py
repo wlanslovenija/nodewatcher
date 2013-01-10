@@ -2,6 +2,16 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, routers as cgm_routers
 
+class UCIFormat:
+    """
+    Available UCI export formats.
+    """
+
+    # UCI dump
+    DUMP = 1
+    # UCI in multiple files
+    FILES = 2
+
 class UCISection(object):
     """
     Represents a configuration section in UCI.
@@ -37,37 +47,63 @@ class UCISection(object):
         """
         return self._typ
 
-    def format_value(self, value):
+    def format_value(self, key, value, root, section, idx = None, fmt = UCIFormat.DUMP):
         """
         Formats a value so it is suitable for insertion into UCI.
         """
-        if isinstance(value, (list, tuple)):
-            return " ".join(self.format_value(x) for x in value)
-        elif isinstance(value, bool):
-            return int(value)
+
+        if fmt == UCIFormat.DUMP:
+            if isinstance(value, (list, tuple)):
+                value = " ".join(str(x) for x in value)
+            elif isinstance(value, bool):
+                value = int(value)
+            else:
+                value = str(value)
+
+            if self._typ is not None:
+                return ["{0}.{1}.{2}={3}".format(root, section, key, value)]
+            else:
+                return ["{0}.@{1}[{2}].{3}={4}".format(root, section, idx, key, value)]
+        elif fmt == UCIFormat.FILES:
+            if isinstance(value, (list, tuple)):
+                return ['\tlist %s \'%s\'' % (key, item) for item in value]
+            elif isinstance(value, bool):
+                return ['\toption %s \'%s\'' % (key, int(value))]
+            else:
+                return ['\toption %s \'%s\'' % (key, value)]
 
         return str(value)
 
-    def format(self, root, section, idx = None):
+    def format(self, root, section, idx = None, fmt = UCIFormat.DUMP):
         """
         Formats the configuration tree so it is suitable for loading into UCI.
         """
         output = []
 
+        
+        # Output section header
         if self._typ is not None:
             # Named sections
-            output.append("{0}.{1}={2}".format(root, section, self._typ))
-            for key, value in self._values.iteritems():
-                if key.startswith('_'):
-                    continue
-                output.append("{0}.{1}.{2}={3}".format(root, section, key, self.format_value(value)))
+            if fmt == UCIFormat.DUMP:
+                output.append("{0}.{1}={2}".format(root, section, self._typ))
+            elif fmt == UCIFormat.FILES:
+                output.append('config %s \'%s\'' % (self._typ, section))
         else:
             # Ordered sections
-            output.append("{0}.@{1}[{2}]={1}".format(root, section, idx))
-            for key, value in self._values.iteritems():
-                if key.startswith('_'):
-                    continue
-                output.append("{0}.@{1}[{2}].{3}={4}".format(root, section, idx, key, self.format_value(value)))
+            if fmt == UCIFormat.DUMP:
+                output.append("{0}.@{1}[{2}]={1}".format(root, section, idx))
+            elif fmt == UCIFormat.FILES:
+                output.append('config %s' % section)
+
+        # Output section values
+        for key, value in self._values.iteritems():
+            if key.startswith('_'):
+                continue
+            output += self.format_value(key, value, root, section, idx, fmt)
+        
+        # Output section footer
+        if fmt == UCIFormat.FILES:
+            output.append('')
 
         return output
 
@@ -128,17 +164,20 @@ class UCIRoot(object):
         except KeyError:
             return self._ordered_sections[section]
 
-    def format(self):
+    def format(self, fmt = UCIFormat.DUMP):
         """
         Formats the configuration tree so it is suitable for loading into UCI.
+
+        :param fmt: Wanted export format
         """
+
         output = []
         for name, section in self._named_sections.iteritems():
-            output += section.format(self._root, name)
+            output += section.format(self._root, name, fmt = fmt)
 
         for name, sections in self._ordered_sections.iteritems():
             for idx, section in enumerate(sections):
-                output += section.format(self._root, name, idx)
+                output += section.format(self._root, name, idx, fmt = fmt)
 
         return output
 
@@ -146,6 +185,7 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
     """
     An in-memory implementation of UCI configuration.
     """
+
     def __init__(self):
         """
         Class constructor.
@@ -159,13 +199,23 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         """
         return self._roots.setdefault(root, UCIRoot(root))
 
-    def format(self):
+    def format(self, fmt = UCIFormat.DUMP):
         """
         Formats the configuration tree so it is suitable for loading into UCI.
+
+        :param fmt: Wanted export format
         """
-        output = []
-        for name, root in self._roots.iteritems():
-            output += root.format()
+
+        if fmt == UCIFormat.DUMP:
+            # UCI dump format
+            output = []
+            for name, root in self._roots.iteritems():
+                output += root.format(fmt = fmt)
+        elif fmt == UCIFormat.FILES:
+            # UCI split into multiple files
+            output = {}
+            for name, root in self._roots.iteritems():
+                output[name] = "\n".join(root.format(fmt = fmt))
 
         return output
 
@@ -183,8 +233,7 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         :param cfg: Generated configuration (platform-dependent)
         :return: Platform-dependent object
         """
-        # TODO: Split UCI configuration into files, return a dictionary containing a mapping from file names to their contents
-        raise NotImplementedError
+        return cfg.format(fmt = UCIFormat.FILES)
 
     def build(self, formatted_cfg):
         """
