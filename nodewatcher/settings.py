@@ -336,6 +336,16 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
+CELERY_DEFAULT_QUEUE = "default"
+
+CELERY_QUEUES = {
+    "default": { "exchange": "default", "binding_key": "default" },
+    "generator": { "exchange": "generator", "binding_key": "generator" },
+}
+
+CELERY_ROUTES =  {
+    "core.generator.cgm.tasks" : { "queue" : "generator" },
+}
 
 # Monitor configuration.
 MONITOR_WORKERS = 20
