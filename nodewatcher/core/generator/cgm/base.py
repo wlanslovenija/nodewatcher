@@ -11,6 +11,9 @@ PLATFORM_REGISTRY = {}
 class ValidationError(Exception):
     pass
 
+class BuildError(Exception):
+    pass
+
 class PlatformConfiguration(object):
     """
     A flexible in-memory platform configuration store that is used
@@ -24,6 +27,13 @@ class PlatformConfiguration(object):
         """
         self.resources = cgm_resources.ResourceAllocator()
         self.packages = set()
+
+    def __getstate__(self):
+        self.__dict__.pop('resources', None)
+        return self.__dict__
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
 class PlatformBase(object):
     """
@@ -59,27 +69,18 @@ class PlatformBase(object):
 
         return cfg
 
-    def format(self, cfg):
-        """
-        Formats the concrete configuration so that it is suitable for
-        inclusion directly into the firmware image.
-
-        :param cfg: Generated configuration (platform-dependent)
-        :return: Platform-dependent object
-        """
-        raise NotImplementedError
-
-    def build(self, formatted_cfg):
+    def build(self, node, cfg):
         """
         Builds the firmware using a previously generated and properly
         formatted configuration.
 
-        :param formatted_cfg: Formatted configuration (platform-dependent)
-        :return: Build process result
+        :param node: Node instance to build the firmware for
+        :param cfg: Generated configuration (platform-dependent)
+        :return: A list of generated firmware files
         """
         raise NotImplementedError
 
-    def defer_format_build(self, node, cfg):
+    def defer_build(self, node, cfg):
         """
         Deferrs formatting and building to a background Celery job. The job
         is responsible for calling proper format and build methods on this
@@ -89,7 +90,7 @@ class PlatformBase(object):
         :param cfg: Generated configuration (platform-dependent)
         """
         from . import tasks
-        tasks.format_and_build.delay(node, self, cfg)
+        tasks.background_build.delay(node, self.name, cfg)
 
     def register_module(self, order, module, router = None):
         """
@@ -215,6 +216,6 @@ def generate_config(node, only_validate = False):
 
     cfg = platform.generate(node)
     if not only_validate:
-        platform.defer_format_build(node, cfg)
+        platform.defer_build(node, cfg)
 
     return cfg

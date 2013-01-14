@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, routers as cgm_routers
+from . import builder as openwrt_builder
 
 class UCIFormat:
     """
@@ -39,6 +40,10 @@ class UCISection(object):
         """
         Returns a configuration attribute's value.
         """
+
+        if name.startswith('__') and name.endswith('__'):
+            raise AttributeError(name)
+
         return self._values.get(name, None)
 
     def get_type(self):
@@ -159,10 +164,17 @@ class UCIRoot(object):
         """
         Retrieves the wanted UCI section.
         """
+
+        if section.startswith('__') and section.endswith('__'):
+            raise AttributeError(section)
+
         try:
             return self._named_sections[section]
         except KeyError:
-            return self._ordered_sections[section]
+            try:
+                return self._ordered_sections[section]
+            except KeyError:
+                raise AttributeError(section)
 
     def format(self, fmt = UCIFormat.DUMP):
         """
@@ -197,6 +209,10 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         """
         Returns the desired UCI root (config file).
         """
+
+        if root.startswith('__') and root.endswith('__'):
+            raise AttributeError(root)
+
         return self._roots.setdefault(root, UCIRoot(root))
 
     def format(self, fmt = UCIFormat.DUMP):
@@ -225,28 +241,22 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
     """
     config_class = UCIConfiguration
 
-    def format(self, cfg):
-        """
-        Formats the concrete configuration so that it is suitable for
-        inclusion directly into the firmware image.
-
-        :param cfg: Generated configuration (platform-dependent)
-        :return: Platform-dependent object
-        """
-        return cfg.format(fmt = UCIFormat.FILES)
-
-    def build(self, formatted_cfg):
+    def build(self, node, cfg):
         """
         Builds the firmware using a previously generated and properly
         formatted configuration.
 
-        :param formatted_cfg: Formatted configuration (platform-dependent)
-        :return: Build process result
+        :param node: Node instance to build the firmware for
+        :param cfg: Generated configuration (platform-dependent)
+        :return: A list of generated firmware files
         """
-        # TODO: Setup the image builder fraemwork, write the formatted configuration to the filesystem, use the proper builder profile and build the firmware
+        # Extract the router descriptor to get architecture and profile
+        router = node.config.core.general().get_device()
+        profile = router.profiles['openwrt']
 
-        # TODO: How to define build profile? Modules should probably specify that somehow (a special UCI configuration package called "build"?)
-        raise NotImplementedError
+        # Format UCI configuration and start the build process
+        formatted_cfg = cfg.format(fmt = UCIFormat.FILES)
+        return openwrt_builder.build_image(formatted_cfg, router.architecture, profile, cfg.packages)
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 

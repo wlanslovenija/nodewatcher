@@ -46,6 +46,16 @@ class TPLinkWR741ND(cgm_routers.RouterBase):
             "lan0"  : "eth0",
         }
     }
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR741",
+            "files": [
+                "openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin",
+                "openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin",
+                "openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin"
+            ]
+        }
+    }
 
 # Register the TP-Link WR741ND router
 cgm_base.register_router("openwrt", TPLinkWR741ND)

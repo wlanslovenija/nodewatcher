@@ -340,11 +340,12 @@ CELERY_DEFAULT_QUEUE = "default"
 
 CELERY_QUEUES = {
     "default": { "exchange": "default", "binding_key": "default" },
+    # NOTE: Only one worker can run for processing the "generator" jobs!
     "generator": { "exchange": "generator", "binding_key": "generator" },
 }
 
 CELERY_ROUTES =  {
-    "core.generator.cgm.tasks" : { "queue" : "generator" },
+    "core.generator.cgm.tasks.background_build" : { "queue" : "generator" },
 }
 
 # Monitor configuration.
@@ -382,6 +383,10 @@ REGISTRY_FORM_PROCESSORS = {
 
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
+
+# This is the directory that contains image builders for all platforms. Each
+# must be in a subdirectory named by the platform (eg. ar71xx).
+GENERATOR_OPENWRT_BUILDER_DIR = os.path.abspath(os.path.join(settings_dir, '..', 'builder', 'openwrt'))
 
 # Registry.
 REGISTRY_RULES_MODULES = {
