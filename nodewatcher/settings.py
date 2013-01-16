@@ -96,7 +96,7 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-#MEDIA_ROOT = os.path.join(settings_dir, 'media')
+MEDIA_ROOT = os.path.abspath(os.path.join(settings_dir, '..', 'media'))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to always
 # use a trailing slash.
@@ -384,6 +384,8 @@ REGISTRY_FORM_PROCESSORS = {
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
 
+# Storage for generated firmware images.
+GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'
 # This is the directory that contains image builders for all platforms. Each
 # must be in a subdirectory named by the platform (eg. ar71xx).
 GENERATOR_OPENWRT_BUILDER_DIR = os.path.abspath(os.path.join(settings_dir, '..', 'builder', 'openwrt'))

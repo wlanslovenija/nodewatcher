@@ -6,6 +6,8 @@
 /nodewatcher/*.json
 /docs/_build/
 /static/
+/media/
+/builder/
 *.swp
 .idea
 *.sublime-*
