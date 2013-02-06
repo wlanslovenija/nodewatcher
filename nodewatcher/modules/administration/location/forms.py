@@ -1,5 +1,6 @@
 from django import forms
 from django.core import exceptions as django_exceptions
+from django.conf import settings
 
 from nodewatcher.core.registry import registration, widgets as registry_widgets
 
@@ -29,9 +30,9 @@ class LocationConfigForm(forms.ModelForm):
             project = cfg['core.project'][0].project
 
             self.fields['geolocation'].widget.default_location = [
-                project.geo_lat,
-                project.geo_long,
-                project.geo_zoom
+                project.geo_lat or settings.GOOGLE_MAPS_DEFAULT_LAT,
+                project.geo_long or settings.GOOGLE_MAPS_DEFAULT_LONG,
+                project.geo_zoom or settings.GOOGLE_MAPS_DEFAULT_NODE_ZOOM
             ]
         except (django_exceptions.ObjectDoesNotExist, AttributeError, KeyError, IndexError):
             # Projects are not supported or not specified - in this case we fallback
