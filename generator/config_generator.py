@@ -586,6 +586,8 @@ START=39
 start() {{
       uci delete wireless.radio0.disabled
       uci set wireless.radio0.channel=8
+      uci set wireless.radio0.country=SI
+      uci set wireless.radio0.txpower=20
       
       uci set wireless.@wifi-iface[0].device=radio0
       uci set wireless.@wifi-iface[0].network=clients
