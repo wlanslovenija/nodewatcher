@@ -723,6 +723,7 @@ config uhttpd main
         option script_timeout   60
         option network_timeout  30
         option tcp_keepalive    1
+        option no_dirlists      1
 """.format(
         router_ip = self.ip
       ))
