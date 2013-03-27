@@ -539,6 +539,64 @@ config interface clients
       f.write("\n")
       f.close()
       
+      # Firewall configuration
+      f = open(os.path.join(configPath, "firewall"), 'w')
+      f.write("""
+config defaults
+        option syn_flood        1
+        option input            ACCEPT
+        option output           ACCEPT
+        option forward          ACCEPT
+
+config zone
+        option name     wan
+        option network  wan
+        option input    ACCEPT
+        option output   ACCEPT
+        option forward  REJECT
+
+config zone
+        option name     mesh
+        option network  mesh
+        option input    ACCEPT
+        option output   ACCEPT
+        option forward  ACCEPT
+        option mtu_fix  1
+
+config zone
+        option name     clients
+        option network  clients
+        option input    ACCEPT
+        option output   ACCEPT
+        option forward  ACCEPT
+        option mtu_fix  1
+
+config zone
+        option name     vpn
+        option network  '{diggers}'
+        option input    ACCEPT
+        option output   ACCEPT
+        option forward  ACCEPT
+        option mtu_fix  1
+
+config rule
+        option src      mesh
+        option dest     wan
+        option target   REJECT
+
+config rule
+        option src      clients
+        option dest     wan
+        option target   REJECT
+
+config rule
+        option src      vpn
+        option dest     wan
+        option target   REJECT
+""".format(diggers = " ".join(['digger%d' % x for x in xrange(len(self.tdServer))])))
+
+      f.close()
+      
       # Policy routing configuration
       f = open(os.path.join(configPath, "routing"), 'w')
       f.write("""
@@ -581,7 +639,7 @@ config policy
       os.mkdir(os.path.join(directory, "init.d"))
       f = open(inituci_path, 'w')
       f.write("""#!/bin/sh /etc/rc.common
-START=39
+START=15
 
 start() {{
       uci delete wireless.radio0.disabled
@@ -605,8 +663,6 @@ start() {{
       
       uci commit
       /etc/init.d/inituci disable
-      /etc/init.d/firewall disable
-      /etc/init.d/firewall stop
       /sbin/wifi up
 }}
 """.format(ssid = self.ssid, mesh_ssid = self.ssid.replace('open', 'mesh')))
