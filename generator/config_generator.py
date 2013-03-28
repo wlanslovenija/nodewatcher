@@ -65,6 +65,8 @@ portLayouts = {
 
   'tp-wr703n' : None,
   'tp-mr3020' : None,
+  'ub-bullet' : None,
+  'ub-nano'   : None,
 }
 
 # Optional packages that should be removed when configuring a router-only node
