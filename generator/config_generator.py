@@ -873,6 +873,9 @@ config uhttpd main
         "tp-wr703n" : "TLWR703",
         "tp-mr3020" : "TLMR3020",
         
+        "ub-bullet" : "UBNT",
+        "ub-nano" : "UBNT",
+        
         "fonera"     : "",
       }
 
