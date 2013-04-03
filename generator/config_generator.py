@@ -645,7 +645,7 @@ START=15
 
 start() {{
       uci delete wireless.radio0.disabled
-      uci set wireless.radio0.channel=8
+      uci set wireless.radio0.channel={channel}
       uci set wireless.radio0.country=SI
       uci set wireless.radio0.txpower=20
       
@@ -667,7 +667,7 @@ start() {{
       /etc/init.d/inituci disable
       /sbin/wifi up
 }}
-""".format(ssid = self.ssid, mesh_ssid = self.ssid.replace('open', 'mesh')))
+""".format(ssid = self.ssid, mesh_ssid = self.ssid.replace('open', 'mesh'), channel = self.wifiChannel))
       f.close()
       os.chmod(inituci_path, 0755)
  
