@@ -1,6 +1,7 @@
 from frontend.nodes.models import Node
 from frontend.generator.models import IfaceTemplate
 from frontend.generator.types import IfaceType
+from frontend.policy.models import PolicyFamily
 from django.conf import settings
 
 if getattr(settings, 'IMAGE_GENERATOR_ENABLED', None):
@@ -50,7 +51,8 @@ def queue_generator_job(node, email_user, config_only = False):
     'tx_ant'          : node.profile.antenna,
     'root_pass'       : node.profile.root_pass,
     'vpn'             : node.profile.use_vpn,
-    'vpn_limit'       : node.profile.vpn_egress_limit,
+    'vpn_limit_down'  : node.gw_policy.get(addr = node.vpn_mac_conf, family = PolicyFamily.Ethernet).tc_class.bandwidth,
+    'vpn_limit_up'    : node.profile.vpn_egress_limit,
     'captive_portal'  : node.project.captive_portal,
     'wan_dhcp'        : node.profile.wan_dhcp,
     'wan_ip'          : node.profile.wan_ip,

@@ -372,7 +372,7 @@ class NodeConfig(object):
     self.usedOlsrIps += 1
     return ip
 
-  def setVpn(self, username, password, mac = None, limit = None):
+  def setVpn(self, username, password, mac = None, limit_down = None, limit_up = None):
     """
     Sets VPN parameters.
     
@@ -393,7 +393,8 @@ class NodeConfig(object):
     self.vpn = { 'username' : username,
                  'password' : password,
                  'mac'      : mac,
-                 'limit'    : limit,
+                 'limit_down' : limit_down,
+                 'limit_up'   : limit_up,
                  'ip'       : self.allocateIpForOlsr() }
   
   def setCaptivePortal(self, value):
@@ -766,8 +767,9 @@ config broker
 {broker_ports}
         option uuid             '{uuid}'
         option interface        'digger{iface}'
+        option limit_bw_down    '{limit_bw_down}'
 
-""".format(broker_ports = ports, uuid = self.uuid, iface = iface))
+""".format(broker_ports = ports, uuid = self.uuid, iface = iface, limit_bw_down = self.vpn['limit_down']))
           iface += 1
         
         f.close()
@@ -1008,11 +1010,11 @@ config uhttpd main
       f.write('  openvpn --mktun --dev tap0\n')
       f.write('  ifconfig tap0 hw ether %s\n' % self.vpn['mac'])
       
-      if self.vpn['limit']:
+      if self.vpn['limit_up']:
         f.write('\n')
         f.write('  # Setup egress limiting on VPN interface\n')
         f.write('  insmod sch_tbf\n')
-        f.write('  tc qdisc add dev tap0 root tbf rate %skbit latency 50ms burst 5120\n' % self.vpn['limit'])
+        f.write('  tc qdisc add dev tap0 root tbf rate %skbit latency 50ms burst 5120\n' % self.vpn['limit_up'])
 
       f.write('}\n')
       f.close()

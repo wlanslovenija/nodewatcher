@@ -110,7 +110,7 @@ def generate_image(d):
 
   x.setCaptivePortal(d['captive_portal'])
   if d['vpn']:
-    x.setVpn(d['vpn_username'], d['vpn_password'], d['vpn_mac'], d['vpn_limit'])
+    x.setVpn(d['vpn_username'], d['vpn_password'], d['vpn_mac'], d['vpn_limit_down'], d['vpn_limit_up'])
   
   if d['lan_wifi_bridge']:
     x.enableLanWifiBridge()
