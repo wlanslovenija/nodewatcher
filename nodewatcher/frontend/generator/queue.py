@@ -36,6 +36,12 @@ def queue_generator_job(node, email_user, config_only = False):
       'iface'       : iface.ifname,
       'dhcp'        : subnet.gen_dhcp
     })
+
+  vpn_limit_down = None
+  try:
+    vpn_limit_down = node.gw_policy.get(addr = node.vpn_mac_conf, family = PolicyFamily.Ethernet).tc_class.bandwidth
+  except:
+    pass
   
   data = {
     'uuid'            : node.uuid,
@@ -51,7 +57,7 @@ def queue_generator_job(node, email_user, config_only = False):
     'tx_ant'          : node.profile.antenna,
     'root_pass'       : node.profile.root_pass,
     'vpn'             : node.profile.use_vpn,
-    'vpn_limit_down'  : node.gw_policy.get(addr = node.vpn_mac_conf, family = PolicyFamily.Ethernet).tc_class.bandwidth,
+    'vpn_limit_down'  : vpn_limit_down,
     'vpn_limit_up'    : node.profile.vpn_egress_limit,
     'captive_portal'  : node.project.captive_portal,
     'wan_dhcp'        : node.profile.wan_dhcp,

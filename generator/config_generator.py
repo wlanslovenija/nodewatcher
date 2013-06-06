@@ -767,9 +767,10 @@ config broker
 {broker_ports}
         option uuid             '{uuid}'
         option interface        'digger{iface}'
-        option limit_bw_down    '{limit_bw_down}'
-
-""".format(broker_ports = ports, uuid = self.uuid, iface = iface, limit_bw_down = self.vpn['limit_down']))
+""".format(broker_ports = ports, uuid = self.uuid, iface = iface))
+          if self.vpn['limit_down']:
+            f.write("        option limit_bw_down    '%s'" % self.vpn['limit_down'])
+          f.write('\n')
           iface += 1
         
         f.close()
