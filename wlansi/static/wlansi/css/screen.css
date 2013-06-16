@@ -13,14 +13,20 @@
 	font-size: 10px;
 }
 
-#footer-license, #footer-links {
+
+#footer-license, #footer-cookies, #footer-links {
 	margin: 1.3em 0;
 }
 
 #footer-license {
 	margin-top: 0;
+	margin-bottom: 0.3em;
 }
 
 #footer-links {
 	margin-bottom: 0;
+}
+
+#footer-cookies {
+	margin-top: 0.3em;
 }
