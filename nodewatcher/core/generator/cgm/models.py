@@ -320,12 +320,13 @@ class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
 
     class RegistryMeta(InterfaceLimitConfig.RegistryMeta):
         registry_name = _("Throughput Limit")
+        hidden = False
 
 # TODO: This probably shouldn't be hardcoded, it should be moved to modules.administration?
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '128kbit', _("128 Kbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '256kbit', _("256 Kbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '512kbit', _("512 Kbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '1mbit', _("1 Mbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '2mbit', _("2 Mbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '4mbit', _("4 Mbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '128', _("128 Kbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '256', _("256 Kbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '512', _("512 Kbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '1024', _("1 Mbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '2048', _("2 Mbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', '4096', _("4 Mbit/s"))
 registration.point('node.config').register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)
