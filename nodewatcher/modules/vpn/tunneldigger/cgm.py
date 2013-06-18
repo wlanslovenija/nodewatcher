@@ -58,6 +58,13 @@ def tunneldigger(node, cfg):
                 # far as tunneldigger is concerned
                 continue
 
+            if limit.limit_out:
+                # Configure upload limit via local QoS
+                qos = cfg.qos.add(interface = ifname)
+                qos.enabled = True
+                qos.classgroup = 'Default'
+                qos.upload = limit.limit_out
+
             if limit.limit_in:
                 broker.limit_bw_down = limit.limit_in
                 # Only take the first bandwidth limit into account and ignore the rest
