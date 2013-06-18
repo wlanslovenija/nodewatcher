@@ -51,7 +51,7 @@ def tunneldigger(node, cfg):
         broker.interface = ifname
 
         # Configure downstream limits if any are defined for this interface
-        for limit in interface.limits.all():
+        for limit in interface.limits.filter(enabled = True):
             limit = limit.cast()
             if not isinstance(limit, cgm_models.ThroughputInterfaceLimitConfig):
                 # We currently only support bandwidth limits, others are ignored as
@@ -60,6 +60,8 @@ def tunneldigger(node, cfg):
 
             if limit.limit_in:
                 broker.limit_bw_down = limit.limit_in
+                # Only take the first bandwidth limit into account and ignore the rest
+                break
 
         # Create routing policy entries to ensure tunneldigger connections are not
         # routed via the mesh
