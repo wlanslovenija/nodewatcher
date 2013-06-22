@@ -21,6 +21,42 @@ class EthernetPort(RouterPort):
     """
     pass
 
+class SwitchedEthernetPort(EthernetPort):
+    """
+    Describes a router's ethernet port attached to a configurable
+    switch.
+    """
+    def __init__(self, identifier, description, switch, vlan, ports):
+        """
+        Class constructor.
+        """
+        super(SwitchedEthernetPort, self).__init__(identifier, description)
+        self.switch = switch
+        self.vlan = vlan
+        self.ports = ports
+
+    def validate(self, router):
+        """
+        Ensure that the switch that the port refers to actually exists.
+        """
+        switch = router.get_switch(self.switch)
+        if switch is None:
+            raise ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" %
+                (self.identifier, self.switch))
+
+        if not (0 <= self.vlan < switch.vlans):
+            raise ImproperlyConfigured("Switched ethernet port '%s' VLAN (%s) out of range!" %
+                (self.identifier, self.vlan))
+
+        if switch.cpu_port not in self.ports:
+            raise ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" %
+                (self.identifier))
+
+        for port in self.ports:
+            if not (0 <= port < switch.ports):
+                raise ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" %
+                    (self.identifier, port))
+
 class AntennaConnector(object):
     """
     An antenna connector that is present on a specific radio.
@@ -145,13 +181,25 @@ class RouterMeta(type):
                 if getattr(new_class, attr, None) is None:
                     raise ImproperlyConfigured("Attribute '{0}' is required for router descriptor specification!".format(attr))
 
+            # Validate that list of switches only contains Switch instances
+            if len([x for x in new_class.switches if not isinstance(x, Switch)]):
+                raise ImproperlyConfigured("List of router switches may only contain Switch instances!")
+
             # Router ports and radios cannot both be empty
             if not len(new_class.radios) and not len(new_class.ports):
                 raise ImproperlyConfigured("A router cannot be without radios and ports!")
 
-            # Validate that list of ports only contains RouterPort instances
-            if len([x for x in new_class.ports if not isinstance(x, RouterPort)]):
-                raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
+            # Validate that list of ports only contains RouterPort instances and validate
+            # that switched ports refer to valid switches
+            for port in new_class.ports:
+                if not isinstance(port, RouterPort):
+                    raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
+
+                if hasattr(port, 'validate'):
+                    port.validate(new_class)
+
+            #if len([x for x in new_class.ports if not isinstance(x, RouterPort)]):
+                #raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
 
             # Validate that list of radios only contains RouterRadio instances and assign
             # radio indices
@@ -160,10 +208,6 @@ class RouterMeta(type):
                     raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
 
                 radio.index = idx
-
-            # Validate that list of switches only contains Switch instances
-            if len([x for x in new_class.ports if not isinstance(x, Switch)]):
-                raise ImproperlyConfigured("List of router switches may only contain Switch instances!")
 
             # Validate that list of antennas only contains InternalAntenna instances
             if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):
@@ -249,11 +293,22 @@ class RouterBase(object):
                 return radio
 
     @classmethod
+    def get_switch(cls, identifier):
+        """
+        Returns a switch descriptor with the specified identifier.
+
+        :param identifier: Port identifier
+        """
+        for switch in cls.switches:
+            if switch.identifier == identifier:
+                return switch
+
+    @classmethod
     def get_port(cls, identifier):
         """
         Returns a port descriptor with the specified identifier.
 
-        :param port: Port identifier
+        :param identifier: Port identifier
         """
         for port in cls.ports:
             if port.identifier == identifier:

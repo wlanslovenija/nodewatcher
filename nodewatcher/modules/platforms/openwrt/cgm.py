@@ -365,6 +365,37 @@ def configure_interface(cfg, interface, section, iface_name):
         # Only take the first bandwidth limit into account and ignore the rest
         break
 
+def configure_switch(cfg, router, port):
+    """
+    Configures a switch port.
+
+    :param cfg: Platform configuration
+    :param router: Router descriptor
+    :param port: Port descriptor
+    """
+    switch = router.get_switch(port.switch)
+    switch_iface = router.remap_port("openwrt", port.switch)
+
+    # Enable switch if not yet enabled
+    try:
+        sw = cfg.network.add(switch = switch_iface)
+        sw.enable_vlan = True
+    except ValueError:
+        # Switch is already enabled
+        pass
+
+    # Check if wanted VLAN is already configured
+    if 'switch_vlan' in cfg.network:
+        for vlan in cfg.network.switch_vlan:
+            if vlan.vlan == port.vlan:
+                raise cgm_base.ValidationError(_("VLAN assignment conflict while trying to configure switch!"))
+
+    # Configure VLAN
+    vlan = cfg.network.add("switch_vlan")
+    vlan.device = switch_iface
+    vlan.vlan = port.vlan
+    vlan.ports = " ".join([str(x) for x in port.ports])
+
 @cgm_base.register_platform_module("openwrt", 10)
 def network(node, cfg):
     """
@@ -395,6 +426,11 @@ def network(node, cfg):
                 iface._uplink = True
 
             configure_interface(cfg, interface, iface, interface.eth_port)
+
+            # Check if we need to configure the switch
+            port = router.get_port(interface.eth_port)
+            if isinstance(port, cgm_routers.SwitchedEthernetPort):
+                configure_switch(cfg, router, port)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
             # Configure virtual interfaces on top of the same radio device
             interfaces = list(interface.interfaces.all())

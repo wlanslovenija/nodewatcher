@@ -30,7 +30,11 @@ class TPLinkWR703N(cgm_routers.RouterBase):
     ]
     ports = [
         cgm_routers.EthernetPort("wan0", "Wan0"),
-        cgm_routers.EthernetPort("lan0", "Lan0")
+        cgm_routers.SwitchedEthernetPort("lan0", "Lan0",
+            switch = "sw0",
+            vlan = 1,
+            ports = [0, 1, 2, 3, 4]
+        )
     ]
     antennas = [
         # TODO this information is probably not correct
