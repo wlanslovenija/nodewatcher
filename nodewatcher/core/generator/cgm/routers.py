@@ -95,6 +95,20 @@ class InternalAntenna(object):
         self.angle_vertical = angle_vertical
         self.gain = gain
 
+class Switch(object):
+    """
+    Describes an ethernet switch that a router has.
+    """
+    def __init__(self, identifier, description, ports, cpu_port, vlans):
+        """
+        Class constructor.
+        """
+        self.identifier = identifier
+        self.description = description
+        self.ports = ports
+        self.cpu_port = cpu_port
+        self.vlans = vlans
+
 class Features:
     """
     Represents features a router can have.
@@ -109,6 +123,7 @@ REQUIRED_ROUTER_ATTRIBUTES = set([
     'url',
     'architecture',
     'radios',
+    'switches',
     'ports',
     'antennas',
 ])
@@ -145,6 +160,10 @@ class RouterMeta(type):
                     raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
 
                 radio.index = idx
+
+            # Validate that list of switches only contains Switch instances
+            if len([x for x in new_class.ports if not isinstance(x, Switch)]):
+                raise ImproperlyConfigured("List of router switches may only contain Switch instances!")
 
             # Validate that list of antennas only contains InternalAntenna instances
             if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):

@@ -15,6 +15,14 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
         cgm_routers.AntennaConnector("a1", "Antenna0")
       ])
     ]
+    switches = [
+        # FIXME this information is possibly not correct
+        cgm_routers.Switch("sw0", "Switch0",
+            ports = 5,
+            cpu_port = 0,
+            vlans = 16
+        )
+    ]
     ports = [
       # FIXME this information is possibly not correct
       cgm_routers.EthernetPort("wan0", "Wan0"),
@@ -25,6 +33,7 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
     port_map = {
       "openwrt": {
         "wifi0" : "wlan0",
+        "sw0"   : "eth0",
         "wan0"  : "eth1",
         "lan0"  : "eth0",
         }

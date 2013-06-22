@@ -15,6 +15,13 @@ class LinksysWRT54GL(cgm_routers.RouterBase):
         cgm_routers.AntennaConnector("a2", "Antenna1")
       ])
     ]
+    switches = [
+        cgm_routers.Switch("sw0", "Switch0",
+            ports = 5,
+            cpu_port = 0,
+            vlans = 16
+        )
+    ]
     ports = [
       cgm_routers.EthernetPort("wan0", "Wan0"),
       cgm_routers.EthernetPort("lan0", "Lan0")
@@ -32,6 +39,7 @@ class LinksysWRT54GL(cgm_routers.RouterBase):
     port_map = {
       "openwrt": {
         "wifi0" : "wlan0",
+        "sw0"   : "eth0",
         "wan0"  : "eth1",
         "lan0"  : "eth0",
       }

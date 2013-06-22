@@ -22,6 +22,7 @@ class UBNTNano(cgm_routers.RouterBase):
             cgm_routers.AntennaConnector("a1", "Antenna0")
         ])
     ]
+    switches = []
     ports = [
         cgm_routers.EthernetPort("lan0", "Lan0")
     ]

@@ -14,6 +14,7 @@ class Fonera(cgm_routers.RouterBase):
         cgm_routers.AntennaConnector("a1", "Antenna0")
       ])
     ]
+    switches = []
     ports = [
       cgm_routers.EthernetPort("wan0", "Ethernet0")
     ]
