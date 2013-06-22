@@ -198,9 +198,6 @@ class RouterMeta(type):
                 if hasattr(port, 'validate'):
                     port.validate(new_class)
 
-            #if len([x for x in new_class.ports if not isinstance(x, RouterPort)]):
-                #raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
-
             # Validate that list of radios only contains RouterRadio instances and assign
             # radio indices
             for idx, radio in enumerate(new_class.radios):
