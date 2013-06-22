@@ -494,6 +494,12 @@ config interface clients
         option ipaddr   {mesh_ip}
         option netmask  {clients_mask}
 
+config alias
+        option interface  clients
+        option proto      static
+        option ipaddr     {mesh_ip}
+        option netmask    255.255.0.0
+
 """.format(
         mesh_ip = self.ip,
         clients_mask = self.subnets[0]['mask'],
