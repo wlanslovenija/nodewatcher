@@ -372,8 +372,8 @@ def create_config_item(cls, partial, attributes, parent = None):
         )
         virtual_relation.setdefault(desc, []).append(config)
         parent._registry_virtual_relation = virtual_relation
-
-    partial.setdefault(cls.RegistryMeta.registry_id, []).append(config)
+    else:
+        partial.setdefault(cls.RegistryMeta.registry_id, []).append(config)
 
     for field, value in attributes.iteritems():
         try:
