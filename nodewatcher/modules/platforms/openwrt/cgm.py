@@ -261,7 +261,7 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 
 # Load supported routers
-from . import fon, linksys, buffalo, mikrotik, asus, tplink
+from . import fon, linksys, buffalo, mikrotik, asus, tplink, ubnt
 
 @cgm_base.register_platform_module("openwrt", 10)
 def general(node, cfg):

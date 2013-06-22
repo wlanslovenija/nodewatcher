@@ -1,11 +1,12 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
-class TPLinkMR3020(cgm_routers.RouterBase):
+class TPLinkWR941NDv2(cgm_routers.RouterBase):
     """
-    TP-Link MR3020 device descriptor.
+    TP-Link WR941NDv2 device descriptor.
     """
-    identifier = "tp-mr3020"
-    name = "MR3020"
+
+    identifier = "tp-wr941ndv2"
+    name = "WR941ND (v2)"
     manufacturer = "TP-Link"
     url = "http://www.tp-link.com/"
     architecture = "ar71xx"
@@ -45,6 +46,48 @@ class TPLinkMR3020(cgm_routers.RouterBase):
             "lan0"  : "eth0",
         }
     }
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR941",
+            "files": [
+                "openwrt-ar71xx-generic-tl-wr941nd-v2-squashfs-factory.bin"
+            ]
+        }
+    }
 
-# Register the TP-Link MR3020 router
-cgm_base.register_router("openwrt", TPLinkMR3020)
+class TPLinkWR941NDv3(TPLinkWR941NDv2):
+    """
+    TP-Link WR941NDv3 device descriptor.
+    """
+
+    identifier = "tp-wr941ndv2"
+    name = "WR941ND (v2)"
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR941",
+            "files": [
+                "openwrt-ar71xx-generic-tl-wr941nd-v3-squashfs-factory.bin"
+            ]
+        }
+    }
+
+class TPLinkWR941NDv4(TPLinkWR941NDv2):
+    """
+    TP-Link WR941NDv4 device descriptor.
+    """
+
+    identifier = "tp-wr941ndv4"
+    name = "WR941ND (v4)"
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR941",
+            "files": [
+                "openwrt-ar71xx-generic-tl-wr941nd-v4-squashfs-factory.bin"
+            ]
+        }
+    }
+
+# Register the TP-Link WR941ND router
+cgm_base.register_router("openwrt", TPLinkWR941NDv2)
+cgm_base.register_router("openwrt", TPLinkWR941NDv3)
+cgm_base.register_router("openwrt", TPLinkWR941NDv4)

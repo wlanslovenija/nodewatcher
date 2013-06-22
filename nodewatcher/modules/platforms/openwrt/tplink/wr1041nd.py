@@ -1,11 +1,12 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
-class TPLinkMR3020(cgm_routers.RouterBase):
+class TPLinkWR1041NDv2(cgm_routers.RouterBase):
     """
-    TP-Link MR3020 device descriptor.
+    TP-Link WR1041NDv2 device descriptor.
     """
-    identifier = "tp-mr3020"
-    name = "MR3020"
+
+    identifier = "tp-wr1041ndv2"
+    name = "WR1041ND (v2)"
     manufacturer = "TP-Link"
     url = "http://www.tp-link.com/"
     architecture = "ar71xx"
@@ -45,6 +46,14 @@ class TPLinkMR3020(cgm_routers.RouterBase):
             "lan0"  : "eth0",
         }
     }
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR1041",
+            "files": [
+                "openwrt-ar71xx-generic-tl-wr1041n-v2-squashfs-factory.bin"
+            ]
+        }
+    }
 
-# Register the TP-Link MR3020 router
-cgm_base.register_router("openwrt", TPLinkMR3020)
+# Register the TP-Link WR1041ND router
+cgm_base.register_router("openwrt", TPLinkWR1041NDv2)

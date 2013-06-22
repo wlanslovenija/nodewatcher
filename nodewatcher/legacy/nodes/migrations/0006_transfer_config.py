@@ -116,12 +116,17 @@ class Migration(DataMigration):
                     "wl-500gp-v1" : "wl500gpv1",
                     "wl-500gd" : "wl500gpv1",
                     "rb433ah" : "rb433ah",
-                    "tp-wr741nd" : "wr741nd",
-                    "tp-wr740nd" : "wr740nd",
-                    "tp-wr842nd" : "wr842nd",
-                    "tp-mr3020"  : "mr3020",
-                    "tp-wr841nd" : "wr841nd",
-                    "tp-wr703n"  : "wr703n",
+                    "tp-wr741nd" : "tp-wr741ndv4",
+                    "tp-wr740nd" : "tp-wr740nd",
+                    "tp-wr842nd" : "tp-wr842nd",
+                    "tp-mr3020"  : "tp-mr3020",
+                    "tp-wr841nd" : "tp-wr841nd",
+                    "tp-wr703n"  : "tp-wr703n",
+                    "ub-bullet" : "ub-bullet",
+                    "ub-nano" : "ub-nano",
+                    "tp-wr941nd" : "tp-wr941ndv4",
+                    "tp-wr1041nd" : "tp-wr1041ndv2",
+                    "tp-wr1043nd" : "tp-wr1043ndv1",
                 }
                 general.router = router_map[profile.template.short_name]
                 general.platform = "openwrt"
@@ -178,6 +183,11 @@ class Migration(DataMigration):
                     "tp-mr3020"  : "ieee-80211n",
                     "tp-wr841nd" : "ieee-80211n",
                     "tp-wr703n"  : "ieee-80211n",
+                    "tp-wr941nd" : "ieee-80211n",
+                    "tp-wr1041nd" : "ieee-80211n",
+                    "tp-wr1043nd" : "ieee-80211n",
+                    "ub-bullet" : "ieee-80211n",
+                    "ub-nano" : "ieee-80211n",
                 }
 
                 wifi_iface = orm['cgm.WifiInterfaceConfig'](root = node, content_type = wifiiface_ctype)
@@ -315,12 +325,12 @@ class Migration(DataMigration):
                     vpn_limit = orm['cgm.ThroughputInterfaceLimitConfig'](root = node, content_type = tpifacelimit_ctype)
                     vpn_limit.interface = vpn_iface
                     limit_map = {
-                      128 : "128kbit",
-                      256 : "256kbit",
-                      512 : "512kbit",
-                      1024 : "1mbit",
-                      2048 : "2mbit",
-                      4096 : "4mbit",
+                      128 : "128",
+                      256 : "256",
+                      512 : "512",
+                      1024 : "1024",
+                      2048 : "2048",
+                      4096 : "4096",
                     }
                     vpn_limit.limit_out = limit_map.get(profile.vpn_egress_limit, "")
                     try:

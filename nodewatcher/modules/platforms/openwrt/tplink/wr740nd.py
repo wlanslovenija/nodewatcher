@@ -4,7 +4,7 @@ class TPLinkWR740ND(cgm_routers.RouterBase):
     """
     TP-Link WR740ND device descriptor.
     """
-    identifier = "wr740nd"
+    identifier = "tp-wr740nd"
     name = "WR740ND"
     manufacturer = "TP-Link"
     url = "http://www.tp-link.com/"

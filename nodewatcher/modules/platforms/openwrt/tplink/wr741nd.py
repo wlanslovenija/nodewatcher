@@ -1,12 +1,12 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
-class TPLinkWR741ND(cgm_routers.RouterBase):
+class TPLinkWR741NDv1(cgm_routers.RouterBase):
     """
-    TP-Link WR741ND device descriptor.
+    TP-Link WR741NDv1 device descriptor.
     """
 
-    identifier = "wr741nd"
-    name = "WR741ND"
+    identifier = "tp-wr741ndv1"
+    name = "WR741ND (v1)"
     manufacturer = "TP-Link"
     url = "http://www.tp-link.com/"
     architecture = "ar71xx"
@@ -50,12 +50,44 @@ class TPLinkWR741ND(cgm_routers.RouterBase):
         "openwrt": {
             "name" : "TLWR741",
             "files": [
-                "openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin",
-                "openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin",
+                "openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin"
+            ]
+        }
+    }
+
+class TPLinkWR741NDv2(TPLinkWR741NDv1):
+    """
+    TP-Link WR741NDv2 device descriptor.
+    """
+
+    identifier = "tp-wr741ndv2"
+    name = "WR741ND (v2)"
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR741",
+            "files": [
+                "openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin"
+            ]
+        }
+    }
+
+class TPLinkWR741NDv4(TPLinkWR741NDv1):
+    """
+    TP-Link WR741NDv4 device descriptor.
+    """
+
+    identifier = "tp-wr741ndv4"
+    name = "WR741ND (v4)"
+    profiles = {
+        "openwrt": {
+            "name" : "TLWR741",
+            "files": [
                 "openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin"
             ]
         }
     }
 
 # Register the TP-Link WR741ND router
-cgm_base.register_router("openwrt", TPLinkWR741ND)
+cgm_base.register_router("openwrt", TPLinkWR741NDv1)
+cgm_base.register_router("openwrt", TPLinkWR741NDv2)
+cgm_base.register_router("openwrt", TPLinkWR741NDv4)

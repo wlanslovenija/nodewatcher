@@ -1,13 +1,14 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
-class TPLinkMR3020(cgm_routers.RouterBase):
+class UBNTNano(cgm_routers.RouterBase):
     """
-    TP-Link MR3020 device descriptor.
+    UBNT Nano device descriptor.
     """
-    identifier = "tp-mr3020"
-    name = "MR3020"
-    manufacturer = "TP-Link"
-    url = "http://www.tp-link.com/"
+
+    identifier = "ub-nano"
+    name = "Nano"
+    manufacturer = "Ubiquity"
+    url = "http://www.ubnt.com/"
     architecture = "ar71xx"
     radios = [
         cgm_routers.IntegratedRadio("wifi0", "Wifi0", [
@@ -22,7 +23,6 @@ class TPLinkMR3020(cgm_routers.RouterBase):
         ])
     ]
     ports = [
-        cgm_routers.EthernetPort("wan0", "Wan0"),
         cgm_routers.EthernetPort("lan0", "Lan0")
     ]
     antennas = [
@@ -41,10 +41,17 @@ class TPLinkMR3020(cgm_routers.RouterBase):
     port_map = {
         "openwrt": {
             "wifi0" : "radio0",
-            "wan0"  : "eth1",
             "lan0"  : "eth0",
         }
     }
+    profiles = {
+        "openwrt": {
+            "name" : "UBNT",
+            "files": [
+                "openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin"
+            ]
+        }
+    }
 
-# Register the TP-Link MR3020 router
-cgm_base.register_router("openwrt", TPLinkMR3020)
+# Register the UBNT Nano router
+cgm_base.register_router("openwrt", UBNTNano)

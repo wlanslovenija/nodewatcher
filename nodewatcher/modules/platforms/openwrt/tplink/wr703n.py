@@ -4,7 +4,7 @@ class TPLinkWR703N(cgm_routers.RouterBase):
     """
     TP-Link WR703N device descriptor.
     """
-    identifier = "wr703n"
+    identifier = "tp-wr703n"
     name = "WR703N"
     manufacturer = "TP-Link"
     url = "http://www.tp-link.com/"
