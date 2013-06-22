@@ -416,7 +416,12 @@ def network(node, cfg):
             continue
 
         if isinstance(interface, cgm_models.EthernetInterfaceConfig):
-            iface = cfg.network.add(interface = interface.eth_port)
+            try:
+                iface = cfg.network.add(interface = interface.eth_port)
+            except ValueError:
+                raise cgm_base.ValidationError(_("Duplicate interface definition for port '%s'!") %
+                                               interface.eth_port)
+
             iface.ifname = router.remap_port("openwrt", interface.eth_port)
             if iface.ifname is None:
                 raise cgm_base.ValidationError(_("No port remapping for port '%s' of router '%s' is available!") %\
@@ -438,7 +443,11 @@ def network(node, cfg):
                 raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % router.name)
 
             wifi_radio = router.remap_port("openwrt", interface.wifi_radio)
-            radio = cfg.wireless.add(**{ "wifi-device" : wifi_radio })
+            try:
+                radio = cfg.wireless.add(**{ "wifi-device" : wifi_radio })
+            except ValueError:
+                raise cgm_base.ValidationError(_("Duplicate radio definition for radio '%s'!") %
+                                               interface.wifi_radio)
 
             dsc_radio = router.get_radio(interface.wifi_radio)
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
