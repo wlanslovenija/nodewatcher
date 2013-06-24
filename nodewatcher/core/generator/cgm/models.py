@@ -145,6 +145,7 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     channel = models.CharField(max_length = 50)
     bitrate = models.IntegerField(default = 11)
     antenna_connector = models.CharField(max_length = 50, null = True)
+    ack_distance = models.IntegerField(null = True, verbose_name = _("ACK Distance"))
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Wireless Radio")

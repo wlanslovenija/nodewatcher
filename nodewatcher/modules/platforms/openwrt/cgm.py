@@ -467,6 +467,8 @@ def network(node, cfg):
 
             radio.phy = "phy%d" % dsc_radio.index
             radio.channel = dsc_channel.number
+            if interface.ack_distance:
+                radio.distance = interface.ack_distance
 
             for index, vif in enumerate(interfaces):
                 wif = cfg.wireless.add("wifi-iface")
