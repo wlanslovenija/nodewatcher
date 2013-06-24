@@ -450,6 +450,12 @@ def network(node, cfg):
                 raise cgm_base.ValidationError(_("Duplicate radio definition for radio '%s'!") %
                                                interface.wifi_radio)
 
+            try:
+                radio.type = router.drivers["openwrt"][interface.wifi_radio]
+            except KeyError:
+                raise cgm_base.ValidationError(_("Radio driver for '%s' not defined on OpenWRT!") %
+                                               interface.wifi_radio)
+
             dsc_radio = router.get_radio(interface.wifi_radio)
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
             dsc_channel = dsc_protocol.get_channel(interface.channel)

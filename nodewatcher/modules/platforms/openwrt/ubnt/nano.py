@@ -45,6 +45,11 @@ class UBNTNano(cgm_routers.RouterBase):
             "lan0"  : "eth0",
         }
     }
+    drivers = {
+        "openwrt": {
+            "wifi0": "mac80211"
+        }
+    }
     profiles = {
         "openwrt": {
             "name" : "UBNT",
