@@ -219,6 +219,8 @@ class RouterBase(object):
     __metaclass__ = RouterMeta
     features = []
     port_map = {}
+    drivers = {}
+    profiles = {}
 
     @classmethod
     def register(cls, platform):
