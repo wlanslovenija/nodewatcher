@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core import exceptions
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -17,7 +18,7 @@ class CgmGeneralConfig(core_models.GeneralConfig):
 
     platform = registry_fields.SelectorKeyField('node.config', 'core.general#platform', blank = True)
     router = registry_fields.SelectorKeyField('node.config', 'core.general#router', blank = True)
-    version = models.CharField(max_length = 20, blank = True) # TODO: fkey to versions (production, experimental, ...)
+    version = registry_fields.SelectorKeyField('node.config', 'core.general#version', blank = True)
 
     class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
         registry_name = _("CGM Configuration")
@@ -29,6 +30,12 @@ class CgmGeneralConfig(core_models.GeneralConfig):
         """
 
         return cgm_base.get_platform(self.platform).get_router(self.router)
+
+# Register all configured versions
+for platform, cfg in settings.GENERATOR_BUILDERS.items():
+    for version, (builder, name) in cfg['versions'].items():
+        registration.point('node.config').register_choice('core.general#version', version, name,
+            limited_to = ('core.general#platform', platform))
 
 registration.point('node.config').register_item(CgmGeneralConfig)
 

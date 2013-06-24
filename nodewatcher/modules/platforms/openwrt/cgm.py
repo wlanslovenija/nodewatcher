@@ -253,10 +253,11 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         # Extract the router descriptor to get architecture and profile
         router = node.config.core.general().get_device()
         profile = router.profiles['openwrt']
+        version = node.config.core.general().version
 
         # Format UCI configuration and start the build process
         formatted_cfg = cfg.format(fmt = UCIFormat.FILES)
-        return openwrt_builder.build_image(formatted_cfg, router.architecture, profile, cfg.packages)
+        return openwrt_builder.build_image(formatted_cfg, router.architecture, version, profile, cfg.packages)
 
 cgm_base.register_platform("openwrt", _("OpenWRT"), PlatformOpenWRT())
 

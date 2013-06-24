@@ -386,9 +386,21 @@ OLSRD_MONITOR_PORT = 2006
 
 # Storage for generated firmware images.
 GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'
-# This is the directory that contains image builders for all platforms. Each
-# must be in a subdirectory named by the platform (eg. ar71xx).
-GENERATOR_OPENWRT_BUILDER_DIR = os.path.abspath(os.path.join(settings_dir, '..', 'builder', 'openwrt'))
+GENERATOR_BUILDERS = {
+    'openwrt': {
+        # This is the directory that contains image builders for all platforms. Directory
+        # should contain subdirectories for each version specified below.
+        'directory': os.path.abspath(os.path.join(settings_dir, '..', 'builder', 'openwrt')),
+        # Keys should be the same as subdirectories. Each subdirectory should contain
+        # multiple folders, one for each CPU platform (for example ar71xx). These versions
+        # are saved in node configuration, so take this into account when modifying them
+        # (removing versions may cause firmware generation for some nodes to fail).
+        'versions': {
+            'stable': ('stable', _("Stable")),
+            'experimental': ('experimental', _("Experimental"))
+        }
+    }
+}
 
 # Registry.
 REGISTRY_RULES_MODULES = {
