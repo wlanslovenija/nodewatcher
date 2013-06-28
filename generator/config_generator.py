@@ -649,7 +649,33 @@ config policy
       inituci_path = os.path.join(directory, "init.d", "inituci")
       os.mkdir(os.path.join(directory, "init.d"))
       f = open(inituci_path, 'w')
-      f.write("""#!/bin/sh /etc/rc.common
+
+      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5'):
+        f.write("""#!/bin/sh /etc/rc.common
+START=15
+
+start() {{
+      uci delete wireless.radio0.disabled
+      uci set wireless.radio0.channel=100
+      uci set wireless.radio0.country=US
+      uci set wireless.radio0.txpower=22
+      uci set wireless.radio0.distance=1000
+      
+      uci add wireless wifi-iface
+      uci set wireless.@wifi-iface[1].device=radio0
+      uci set wireless.@wifi-iface[1].network=mesh
+      uci set wireless.@wifi-iface[1].mode=adhoc
+      uci set wireless.@wifi-iface[1].ssid=backbone.wlan-si.net
+      uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[1].encryption=none
+      
+      uci commit
+      /etc/init.d/inituci disable
+      /sbin/wifi up
+}}
+""")
+      else:
+        f.write("""#!/bin/sh /etc/rc.common
 START=15
 
 start() {{
@@ -677,6 +703,7 @@ start() {{
       /sbin/wifi up
 }}
 """.format(ssid = self.ssid, mesh_ssid = self.ssid.replace('open', 'mesh'), channel = self.wifiChannel))
+
       f.close()
       os.chmod(inituci_path, 0755)
  
@@ -687,6 +714,11 @@ config olsrd
         option config_file      '/etc/olsrd.conf'
 """)
       f.close()
+
+      # Hack config for UBNT
+      extra = ""
+      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5'):
+        extra = '"wlan0"'
       
       f = open(os.path.join(directory, 'olsrd.conf'), 'w')
       f.write("""
@@ -712,7 +744,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0-1" "wlan1" "br-clients" {diggers}
+Interface "wlan0-1" "wlan1" "br-clients" {diggers} {extra}
 {{
   IPv4Multicast 255.255.255.255
   HelloInterval 5.0
@@ -728,7 +760,8 @@ Interface "wlan0-1" "wlan1" "br-clients" {diggers}
         router_id = self.ip,
         hna_subnet = self.subnets[0]['subnet'],
         hna_mask = self.subnets[0]['mask'],
-        diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.tdServer))])
+        diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.tdServer))]),
+        extra = extra
       ))
       f.close()
       
