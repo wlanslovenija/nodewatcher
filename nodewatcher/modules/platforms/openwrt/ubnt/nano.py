@@ -13,8 +13,8 @@ class UBNTNano(cgm_routers.RouterBase):
     radios = [
         cgm_routers.IntegratedRadio("wifi0", "Wifi0", [
             cgm_protocols.IEEE80211N(
-                cgm_protocols.IEEE80211N.SHORT_GI_20,
                 cgm_protocols.IEEE80211N.SHORT_GI_40,
+                cgm_protocols.IEEE80211N.TX_STBC1,
                 cgm_protocols.IEEE80211N.RX_STBC1,
                 cgm_protocols.IEEE80211N.DSSS_CCK_40,
             )

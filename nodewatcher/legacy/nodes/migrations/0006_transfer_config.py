@@ -124,6 +124,8 @@ class Migration(DataMigration):
                     "tp-wr703n"  : "tp-wr703n",
                     "ub-bullet" : "ub-bullet",
                     "ub-nano" : "ub-nano",
+                    "ub-bullet-m5" : "ub-bullet-m5",
+                    "ub-rocket-m5" : "ub-rocket-m5",
                     "tp-wr941nd" : "tp-wr941ndv4",
                     "tp-wr1041nd" : "tp-wr1041ndv2",
                     "tp-wr1043nd" : "tp-wr1043ndv1",
@@ -188,6 +190,8 @@ class Migration(DataMigration):
                     "tp-wr1043nd" : "ieee-80211n",
                     "ub-bullet" : "ieee-80211n",
                     "ub-nano" : "ieee-80211n",
+                    "ub-bullet-m5" : "ieee-80211n",
+                    "ub-rocket-m5" : "ieee-80211n",
                 }
 
                 wifi_iface = orm['cgm.WifiInterfaceConfig'](root = node, content_type = wifiiface_ctype)

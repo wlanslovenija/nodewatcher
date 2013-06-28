@@ -1,12 +1,12 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
-class UBNTBullet(cgm_routers.RouterBase):
+class UBNTRocketM5(cgm_routers.RouterBase):
     """
-    UBNT Bullet device descriptor.
+    UBNT Rocket M5 device descriptor.
     """
 
-    identifier = "ub-bullet"
-    name = "Bullet"
+    identifier = "ub-rocket-m5"
+    name = "Rocket"
     manufacturer = "Ubiquity"
     url = "http://www.ubnt.com/"
     architecture = "ar71xx"
@@ -54,19 +54,10 @@ class UBNTBullet(cgm_routers.RouterBase):
         "openwrt": {
             "name" : "UBNT",
             "files": [
-                "openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-factory.bin"
+                "openwrt-ar71xx-generic-ubnt-rocket-m-squashfs-factory.bin"
             ]
         }
     }
 
-class UBNTBulletM5(UBNTBullet):
-    """
-    UBNT Bullet M5 device descriptor.
-    """
-
-    identifier = "ub-bullet-m5"
-    name = "Bullet M5"
-
-# Register the UBNT Bullet router
-cgm_base.register_router("openwrt", UBNTBullet)
-cgm_base.register_router("openwrt", UBNTBulletM5)
+# Register the UBNT Rocket router
+cgm_base.register_router("openwrt", UBNTRocketM5)
