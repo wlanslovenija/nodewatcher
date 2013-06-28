@@ -662,12 +662,12 @@ start() {{
       uci set wireless.radio0.distance=1000
       
       uci add wireless wifi-iface
-      uci set wireless.@wifi-iface[1].device=radio0
-      uci set wireless.@wifi-iface[1].network=mesh
-      uci set wireless.@wifi-iface[1].mode=adhoc
-      uci set wireless.@wifi-iface[1].ssid=backbone.wlan-si.net
-      uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
-      uci set wireless.@wifi-iface[1].encryption=none
+      uci set wireless.@wifi-iface[0].device=radio0
+      uci set wireless.@wifi-iface[0].network=mesh
+      uci set wireless.@wifi-iface[0].mode=adhoc
+      uci set wireless.@wifi-iface[0].ssid=backbone.wlan-si.net
+      uci set wireless.@wifi-iface[0].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[0].encryption=none
       
       uci commit
       /etc/init.d/inituci disable
