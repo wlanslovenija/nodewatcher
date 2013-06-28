@@ -67,6 +67,8 @@ portLayouts = {
   'tp-mr3020' : None,
   'ub-bullet' : None,
   'ub-nano'   : None,
+  'ub-bullet-m5' : None,
+  'ub-rocket-m5' : None,
 }
 
 # Optional packages that should be removed when configuring a router-only node
@@ -972,6 +974,8 @@ config uhttpd main
         
         "ub-bullet" : "UBNT",
         "ub-nano" : "UBNT",
+        "ub-bullet-m5" : "UBNT",
+        "ub-rocket-m5" : "UBNT",
         
         "fonera"     : "",
       }
