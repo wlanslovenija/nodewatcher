@@ -459,11 +459,36 @@ def network(node, cfg):
             dsc_radio = router.get_radio(interface.wifi_radio)
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
             dsc_channel = dsc_protocol.get_channel(interface.channel)
+            dsc_channel_width = dsc_protocol.get_channel_width(interface.channel_width)
             if dsc_protocol.identifier == "ieee-80211bg":
                 radio.hwmode = '11g'
+                if dsc_channel_width.identifier == "nw5":
+                    radio.chanbw = 5
+                elif dsc_channel_width.identifier == "nw10":
+                    radio.chanbw = 10
+                elif dsc_channel_width.identifier == "ht20":
+                    radio.chanbw = 20
+                else:
+                    raise cgm_base.ValidationError(_("Unsupported OpenWRT channel width '%s'!") % dsc_channel_width.identifier)
             elif dsc_protocol.identifier == "ieee-80211n":
                 radio.hwmode = '11ng'
-                radio.htmode = 'HT20' # TODO: Should band width be made configurable?
+                if dsc_channel_width.identifier == "nw5":
+                    radio.htmode = 'HT20'
+                    radio.chanbw = 5
+                elif dsc_channel_width.identifier == "nw10":
+                    radio.htmode = 'HT20'
+                    radio.chanbw = 10
+                elif dsc_channel_width.identifier == "ht20":
+                    radio.htmode = 'HT20'
+                    radio.chanbw = 20
+                elif dsc_channel_width.identifier == "ht20":
+                    radio.htmode = 'HT20'
+                elif dsc_channel_width.identifier == "ht40l":
+                    radio.htmode = 'HT40-'
+                elif dsc_channel_width.identifier == "ht40u":
+                    radio.htmode = 'HT40+'
+                else:
+                    raise cgm_base.ValidationError(_("Unsupported OpenWRT channel width '%s'!") % dsc_channel_width.identifier)
                 radio.ht_capab = []
 
                 for capability in dsc_protocol.available_capabilities:

@@ -14,6 +14,19 @@ class Channel(object):
         self.number = number
         self.frequency = frequency
 
+class ChannelWidth(object):
+    """
+    Channel width descriptor.
+    """
+    def __init__(self, identifier, description, width, limit_channels = None):
+        """
+        Class constructor.
+        """
+        self.identifier = identifier
+        self.description = description
+        self.width = width
+        self.limit_channels = limit_channels
+
 class Capability(object):
     """
     A wireless protocol capability.
@@ -38,6 +51,8 @@ class WirelessProtocolMeta(type):
 
             # Merge channels from base classes
             new_class.channels = base.channels + new_class.channels
+            # Merge channel widths from base classes
+            new_class.widths = base.widths + new_class.widths
             # Merge capabilities from base classes
             new_class.capabilities = \
                 tuple(getattr(base, 'capabilities', ())) + \
@@ -59,13 +74,18 @@ class WirelessProtocol(object):
     __metaclass__ = WirelessProtocolMeta
 
     @classmethod
-    def get_channel_choices(cls, regulatory_filter = None):
+    def get_channel_choices(cls, width, regulatory_filter = None):
         """
         Returns a list of channel chocies.
         """
 
+        # No channels are available until channel width is known
+        if width is None:
+            return
+
         for channel in cls.channels:
-            if regulatory_filter is None or channel.frequency in regulatory_filter:
+            if (regulatory_filter is None or channel.frequency in regulatory_filter) and \
+                (width.limit_channels is None or width.limit_channels(cls, channel)):
                 yield channel.identifier, channel.number
 
     @classmethod
@@ -77,6 +97,35 @@ class WirelessProtocol(object):
         for channel in cls.channels:
             if channel.identifier == identifier:
                 return channel
+
+    @classmethod
+    def get_channel_number(cls, number):
+        """
+        Returns a specific channel descriptor.
+        """
+
+        for channel in cls.channels:
+            if channel.number == number:
+                return channel
+
+    @classmethod
+    def get_channel_width_choices(cls):
+        """
+        Returns a list of channel width choices.
+        """
+
+        for width in cls.widths:
+            yield width.identifier, width.description
+
+    @classmethod
+    def get_channel_width(cls, identifier):
+        """
+        Returns a specific channel width descriptor.
+        """
+
+        for width in cls.widths:
+            if width.identifier == identifier:
+                return width
 
     def __init__(self, *capabilities):
         """
@@ -113,6 +162,11 @@ class IEEE80211BG(WirelessProtocol):
     bitrates = (
         11,
         54,
+    )
+    widths = (
+        ChannelWidth("nw5", _("5 MHz"), 5),
+        ChannelWidth("nw10", _("10 MHz"), 10),
+        ChannelWidth("ht20", _("20 MHz"), 20),
     )
 
 class IEEE80211N(IEEE80211BG):
@@ -151,10 +205,23 @@ class IEEE80211N(IEEE80211BG):
         Capability("GF"),
         Capability("SHORT-GI-20"),
         Capability("SHORT-GI-40"),
-        Capability("SHORT-GI-20"),
         Capability("TX-STBC"),
+        Capability("TX-STBC1"),
         Capability("RX-STBC1"),
         Capability("RX-STBC12"),
         Capability("RX-STBC123"),
         Capability("DSSS_CCK-40"),
+    )
+    widths = (
+        # Limit 40 MHz channels in 2.4 GHz band to sensible choices
+        ChannelWidth("ht40l", _("40 MHz (or 2x20 MHz, secondary is lower)"), 40,
+            limit_channels = lambda proto, channel: \
+                channel.frequency >= 5180 or \
+                proto.get_channel_number(channel.number - 4) is not None
+        ),
+        ChannelWidth("ht40u", _("40 MHz (or 2x20 MHz, secondary is upper)"), 40,
+            limit_channels = lambda proto, channel: \
+                channel.frequency >= 5180 or \
+                proto.get_channel_number(channel.number + 4) is not None
+        )
     )
