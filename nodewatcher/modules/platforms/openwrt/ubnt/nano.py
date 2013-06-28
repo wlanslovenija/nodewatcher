@@ -59,5 +59,14 @@ class UBNTNano(cgm_routers.RouterBase):
         }
     }
 
+class UBNTNanoM5(UBNTNano):
+    """
+    UBNT Nano M5 device descriptor.
+    """
+
+    identifier = "ub-nano-m5"
+    name = "Nano M5"
+
 # Register the UBNT Nano router
 cgm_base.register_router("openwrt", UBNTNano)
+cgm_base.register_router("openwrt", UBNTNanoM5)
