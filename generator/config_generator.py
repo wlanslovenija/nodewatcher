@@ -654,7 +654,7 @@ config policy
         f.write("""#!/bin/sh /etc/rc.common
 START=15
 
-start() {{
+start() {
       uci delete wireless.radio0.disabled
       uci set wireless.radio0.channel=100
       uci set wireless.radio0.country=US
@@ -672,7 +672,7 @@ start() {{
       uci commit
       /etc/init.d/inituci disable
       /sbin/wifi up
-}}
+}
 """)
       else:
         f.write("""#!/bin/sh /etc/rc.common
