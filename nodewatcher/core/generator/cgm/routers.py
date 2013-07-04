@@ -53,7 +53,7 @@ class SwitchedEthernetPort(EthernetPort):
                 (self.identifier))
 
         for port in self.ports:
-            if not (0 <= port < switch.ports):
+            if port not in switch.ports:
                 raise ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" %
                     (self.identifier, port))
 
@@ -141,7 +141,15 @@ class Switch(object):
         """
         self.identifier = identifier
         self.description = description
+        
+        if isinstance(ports, int):
+            ports = range(ports)
+        
         self.ports = ports
+        if cpu_port not in ports:
+            raise ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" %
+                (self.identifier, cpu_port))
+
         self.cpu_port = cpu_port
         self.vlans = vlans
 
