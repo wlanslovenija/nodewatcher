@@ -1,16 +1,15 @@
-{% extends "base.html" %}
+{% extends "plain.html" %}
 
-{% block title %}Error: Not Found{% endblock %}
+{% load i18n %}
 
-{% block ctxtnav %}{% endblock %}
+{% block title %}{% trans "404 Not Found" %}{% endblock %}
+
+{% block extrahead %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
 {% block content %}
-    <h1>Error: Not Found</h1>
+    <h2>{% trans "404 Not Found" %}</h2>
 
     <div class="error">
-        <p>The page you requested cannot be found.</p>
+        <p>{% trans "The page you requested cannot be found." %}</p>
     </div>
-    <br />
-
-    <br /><br/><br/><br/><br/><br/>
 {% endblock %}
