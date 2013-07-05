@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.sites import models as sites_models
 
+# TODO: Move to middleware and set a value on request object
 def web_client_node(request):
     """
     Adds web_client_node variable to current template context

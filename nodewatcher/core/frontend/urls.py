@@ -1,5 +1,4 @@
 from django.conf import settings, urls
-from django.conf.urls import static
 
 urlpatterns = urls.patterns('',
     # Node lists
@@ -23,7 +22,3 @@ if settings.DEBUG:
         (r'^404/$', handler404),
         (r'^500/$', handler500),
     )
-
-if settings.DEBUG:
-    # Serve static files in DEBUG mode
-    urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

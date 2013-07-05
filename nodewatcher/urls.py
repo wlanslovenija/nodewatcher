@@ -1,4 +1,5 @@
-from django.conf import urls
+from django.conf import settings, urls
+from django.conf.urls import static
 
 urlpatterns = urls.patterns('',
     # Registry
@@ -11,3 +12,8 @@ urlpatterns = urls.patterns('',
     # Frontend
     urls.url(r'^', urls.include('nodewatcher.core.frontend.urls')),
 )
+
+if settings.DEBUG:
+    # Serve static files in DEBUG mode
+    urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

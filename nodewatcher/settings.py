@@ -98,11 +98,6 @@ USE_L10N = True
 # Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = os.path.abspath(os.path.join(settings_dir, '..', 'media'))
 
-# URL that handles the media served from MEDIA_ROOT. Make sure to always
-# use a trailing slash.
-# Examples: "http://media.lawrence.com/", "http://example.net/media/"
-MEDIA_URL = '/'
-
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
@@ -409,6 +404,7 @@ REGISTRY_RULES_MODULES = {
 }
 
 # In general, use https when constructing full URLs to nodewatcher?
+# Django's is_secure is used in the code as well. See SECURE_PROXY_SSL_HEADER configuration option.
 USE_HTTPS = False
 
 # Google Maps API key for 127.0.0.1.
