@@ -1,7 +1,8 @@
 import inspect
 
 from .. import access as registry_access, forms as registry_forms
-from ..rules import engine
+
+from . import engine
 
 # Exports
 __all__ = [
