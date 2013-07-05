@@ -1,8 +1,7 @@
 import inspect
 
-from nodewatcher.core.registry import access as registry_access
-from nodewatcher.core.registry import forms as registry_forms
-from nodewatcher.core.registry.rules.engine import *
+from .. import access as registry_access, forms as registry_forms
+from ..rules import engine
 
 # Exports
 __all__ = [
@@ -18,7 +17,7 @@ __all__ = [
     'append',
 ]
 
-class MissingValueError(EvaluationError):
+class MissingValueError(engine.EvaluationError):
     pass
 
 def rule(condition, *args):
@@ -27,24 +26,24 @@ def rule(condition, *args):
 
     :param condition: Lazy expression that represents a condition
     """
-    if not isinstance(condition, (LazyValue, RuleModifier)):
-        raise CompilationError("Rule conditions must be lazy values or rule modifiers!")
+    if not isinstance(condition, (engine.LazyValue, engine.RuleModifier)):
+        raise engine.CompilationError("Rule conditions must be lazy values or rule modifiers!")
 
     ctx = inspect.stack()[1][0].f_locals.get('ctx')
-    if not isinstance(ctx, EngineContext):
-        raise CompilationError("Expecting engine context as 'ctx' variable in parent local scope!")
+    if not isinstance(ctx, engine.EngineContext):
+        raise engine.CompilationError("Expecting engine context as 'ctx' variable in parent local scope!")
 
     for x in args:
-        if not isinstance(x, (Action, Rule)):
-            raise CompilationError("Rule actions must be Action or Rule instances!")
+        if not isinstance(x, (engine.Action, engine.Rule)):
+            raise engine.CompilationError("Rule actions must be Action or Rule instances!")
 
         # Since the rule predicate calls can be nested we must ensure that only top-level
         # rules remain in the context list; this is especially a problem since rule predicates
         # are first executed in sublevels by the Python interpreter
-        if isinstance(x, Rule):
+        if isinstance(x, engine.Rule):
             ctx._rules.remove(x)
 
-    new_rule = Rule(condition, args)
+    new_rule = engine.Rule(condition, args)
     ctx._rules.append(new_rule)
     return new_rule
 
@@ -59,7 +58,7 @@ def assign(_item, _cls = None, _parent = None, _index = 0, _set = None, **kwargs
         try:
             tlc = context.regpoint.get_top_level_class(_item)
         except registry_access.UnknownRegistryIdentifier:
-            raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
+            raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve parent item
         try:
@@ -83,7 +82,7 @@ def assign(_item, _cls = None, _parent = None, _index = 0, _set = None, **kwargs
         context.results.setdefault(_item, []).append(registry_forms.AssignToFormAction(
           item, indices[_index], _set, parent = parent_cfg))
 
-    return Action(action_assign)
+    return engine.Action(action_assign)
 
 def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
     """
@@ -138,7 +137,7 @@ def resolve_parent_item(context, parent):
     parent_cfg = None
     if parent is not None:
         if '_item' not in parent:
-            raise EvaluationError("Parent specifier must contain an '_item' entry!")
+            raise engine.EvaluationError("Parent specifier must contain an '_item' entry!")
 
         cfg_items = context.partial_config.get(parent['_item'], [])
         item_index = parent.get('_index', 0)
@@ -193,9 +192,9 @@ def remove(_item, _cls = None, _parent = None, **kwargs):
         try:
             tlc = context.regpoint.get_top_level_class(_item)
             if not getattr(tlc.RegistryMeta, 'multiple', False):
-                raise EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(_item))
+                raise engine.EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(_item))
         except registry_access.UnknownRegistryIdentifier:
-            raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
+            raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve parent item
         try:
@@ -218,7 +217,7 @@ def remove(_item, _cls = None, _parent = None, **kwargs):
 
             context.results.setdefault(registry_root, []).append(registry_forms.RemoveFormAction(indices, parent = parent))
 
-    return Action(action_remove)
+    return engine.Action(action_remove)
 
 def append(_item, _cls = None, _parent = None, **kwargs):
     """
@@ -229,16 +228,16 @@ def append(_item, _cls = None, _parent = None, **kwargs):
         try:
             tlc = context.regpoint.get_top_level_class(_item)
             if not getattr(tlc.RegistryMeta, 'multiple', False):
-                raise EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(_item))
+                raise engine.EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(_item))
             if cls_name is None:
                 cls_name = tlc._meta.module_name
         except registry_access.UnknownRegistryIdentifier:
-            raise EvaluationError("Registry location '{0}' is invalid!".format(_item))
+            raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve class name into the actual class
         cls = registry_access.get_model_class_by_name(cls_name)
         if not issubclass(cls, tlc):
-            raise EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, _item))
+            raise engine.EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, _item))
 
         # Resolve parent item
         try:
@@ -254,7 +253,7 @@ def append(_item, _cls = None, _parent = None, **kwargs):
         mdl = registry_forms.create_config_item(cls, context.partial_config, kwargs, parent_cfg)
         context.results.setdefault(_item, []).append(registry_forms.AppendFormAction(mdl, parent_cfg))
 
-    return Action(action_append)
+    return engine.Action(action_append)
 
 def count(value):
     """
@@ -262,10 +261,10 @@ def count(value):
 
     :param value: Lazy expression
     """
-    if not isinstance(value, LazyValue):
-        raise CompilationError("Count predicate argument must be a lazy value!")
+    if not isinstance(value, engine.LazyValue):
+        raise engine.CompilationError("Count predicate argument must be a lazy value!")
 
-    return LazyValue(lambda context: len(value(context) or []))
+    return engine.LazyValue(lambda context: len(value(context) or []))
 
 def value(location):
     """
@@ -273,7 +272,7 @@ def value(location):
 
     :param location: Registry location or LazyValue
     """
-    if isinstance(location, LazyValue):
+    if isinstance(location, engine.LazyValue):
         return location
 
     def location_resolver(context):
@@ -283,7 +282,7 @@ def value(location):
         if path in context.partial_config and attribute is not None:
             obj = context.partial_config[path]
             if len(obj) > 1:
-                raise EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
+                raise engine.EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
 
             try:
                 return reduce(getattr, attribute.split('.'), obj[0])
@@ -298,7 +297,7 @@ def value(location):
             return [] if attribute is None else None
         elif attribute is not None:
             if isinstance(obj, list):
-                raise EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
+                raise engine.EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
 
             try:
                 return reduce(getattr, attribute.split('.'), obj)
@@ -307,7 +306,7 @@ def value(location):
         else:
             return obj
 
-    return LazyValue(location_resolver)
+    return engine.LazyValue(location_resolver)
 
 def changed(location):
     """
@@ -316,9 +315,9 @@ def changed(location):
 
     :param location: Registry location or LazyValue
     """
-    return RuleModifier(
-      lambda rule: setattr(rule, 'always_evaluate', True),
-      lambda context: context.has_value_changed(location, value(location)(context))
+    return engine.RuleModifier(
+        lambda rule: setattr(rule, 'always_evaluate', True),
+        lambda context: context.has_value_changed(location, value(location)(context))
     )
 
 def foreach(container, *args):
@@ -331,8 +330,8 @@ def foreach(container, *args):
 
     :param container: Lazy container
     """
-    if not isinstance(container, LazyValue):
-        raise CompilationError("Foreach predicate container argument must be a lazy value!")
+    if not isinstance(container, engine.LazyValue):
+        raise engine.CompilationError("Foreach predicate container argument must be a lazy value!")
 
     def loop(context):
         for x in (container(context) or []):
@@ -340,13 +339,13 @@ def foreach(container, *args):
             for action in args:
                 action(context)
 
-    return Action(loop)
+    return engine.Action(loop)
 
 def loop_var():
     """
     Returns the value of the current loop variable when executed.
     """
-    return LazyValue(lambda context: getattr(context, '_loop_variable', None))
+    return engine.LazyValue(lambda context: getattr(context, '_loop_variable', None))
 
 def contains(container, value):
     """
@@ -356,7 +355,7 @@ def contains(container, value):
     :param container: Lazy container
     :param value: Value that should be checked
     """
-    if not isinstance(container, LazyValue):
-        raise CompilationError("Container argument must be a lazy value!")
+    if not isinstance(container, engine.LazyValue):
+        raise engine.CompilationError("Container argument must be a lazy value!")
 
-    return LazyValue(lambda context: value in (container(context) or []))
+    return engine.LazyValue(lambda context: value in (container(context) or []))

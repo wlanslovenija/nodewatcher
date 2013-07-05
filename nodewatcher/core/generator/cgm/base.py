@@ -1,8 +1,5 @@
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils import importlib
-
 from ...registry import registration, loader
+
 from . import routers as cgm_routers, resources as cgm_resources
 
 # Registered platform modules

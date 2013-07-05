@@ -2,16 +2,16 @@ import os, re
 
 from django.core import exceptions
 from django.db import models
-from django.db.models.fields import BLANK_CHOICE_DASH
-from django.forms import widgets
-from django.forms import fields as form_fields
-from django.utils.text import capfirst
+from django.db.models import fields
+from django.forms import fields as form_fields, widgets
+from django.utils import text
 from django.utils.translation import ugettext_lazy as _
 
 import south.modelsinspector
 
-from nodewatcher.core.registry import registration
-from nodewatcher.utils import ipaddr
+from ...utils import ipaddr
+
+from . import registration
 
 class SelectorFormField(form_fields.TypedChoiceField):
     """
@@ -44,7 +44,7 @@ class SelectorFormField(form_fields.TypedChoiceField):
             except (KeyError, IndexError, AttributeError):
                 return None
 
-        self.choices = BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
+        self.choices = fields.BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
 
 class SelectorKeyField(models.CharField):
     """
@@ -68,7 +68,7 @@ class SelectorKeyField(models.CharField):
         """
         defaults = {
           'required' : not self.blank,
-          'label' : capfirst(self.verbose_name),
+          'label' : text.capfirst(self.verbose_name),
           'help_text' : self.help_text,
           'rp_choices' : self._rp_choices
         }
@@ -331,36 +331,33 @@ class IPAddressFormField(form_fields.CharField):
 
 # Add South introspection for our fields
 south.modelsinspector.add_introspection_rules([
-  (
-    [SelectorKeyField],
-    [],
-    {
-      "regpoint" : ["regpoint", {}],
-      "enum_id" : ["enum_id", {}],
-    },
-  ),
-], [r"^nodewatcher\.core\.registry\.fields\.SelectorKeyField$"]
-)
+    (
+        [SelectorKeyField],
+        [],
+        {
+            "regpoint" : ["regpoint", {}],
+            "enum_id" : ["enum_id", {}],
+        },
+    ),
+], [r"^nodewatcher\.core\.registry\.fields\.SelectorKeyField$"])
 south.modelsinspector.add_introspection_rules([], [r"^nodewatcher\.core\.registry\.fields\.ModelSelectorKeyField$"])
 south.modelsinspector.add_introspection_rules([], [r"^nodewatcher\.core\.registry\.fields\.IntraRegistryForeignKey$"])
 south.modelsinspector.add_introspection_rules([
-  (
-    [MACAddressField],
-    [],
-    {
-      "auto_add" : ["auto_add", { "default" : False }],
-    },
-  ),
-], [r"^nodewatcher\.core\.registry\.fields\.MACAddressField$"]
-)
+    (
+        [MACAddressField],
+        [],
+        {
+            "auto_add" : ["auto_add", { "default" : False }],
+        },
+    ),
+], [r"^nodewatcher\.core\.registry\.fields\.MACAddressField$"])
 south.modelsinspector.add_introspection_rules([
-  (
-    [IPAddressField],
-    [],
-    {
-      "subnet_required" : ["subnet_required", { "default" : False }],
-      "host_required" : ["host_required", { "default" : False }],
-    },
-  ),
-], [r"^nodewatcher\.core\.registry\.fields\.IPAddressField$"]
-)
+    (
+        [IPAddressField],
+        [],
+        {
+            "subnet_required" : ["subnet_required", { "default" : False }],
+            "host_required" : ["host_required", { "default" : False }],
+        },
+    ),
+], [r"^nodewatcher\.core\.registry\.fields\.IPAddressField$"])

@@ -1,8 +1,9 @@
 from django.db.models import fields
 from django.utils.translation import ugettext as _
 
-from . import models as pool_models, signals
 from ...registry import fields as registry_fields
+
+from . import models as pool_models, signals
 
 class IpAddressAllocatorFormMixin(object):
     """

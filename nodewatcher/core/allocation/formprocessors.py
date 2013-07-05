@@ -1,7 +1,8 @@
-from . import models
 from .. import models as core_models
 from ..registry import registration
 from ..registry.forms import formprocessors
+
+from . import models
 
 class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
     """

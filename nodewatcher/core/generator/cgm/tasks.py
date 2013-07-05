@@ -6,8 +6,9 @@ from django.conf import settings
 from django.core import files as django_files
 from django.core.files import storage as django_storage
 
-from nodewatcher.core.registry import loader
-from nodewatcher.core.generator.cgm import base as cgm_base
+from ...registry import loader
+from ...generator.cgm import base as cgm_base
+
 from . import signals
 
 @celery_task()

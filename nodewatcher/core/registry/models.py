@@ -1,13 +1,13 @@
 from django import forms
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured
+from django.contrib.contenttypes import models as contenttypes_models
+from django.core import exceptions
 from django.db import models
 
 class RegistryItemBase(models.Model):
     """
     An abstract registry configuration item.
     """
-    content_type = models.ForeignKey(ContentType, editable = False)
+    content_type = models.ForeignKey(contenttypes_models.ContentType, editable = False)
 
     class Meta:
         abstract = True
@@ -38,7 +38,7 @@ class RegistryItemBase(models.Model):
         if cls.__base__ == cls._registry_regpoint.item_base:
             return cls._registry_regpoint.namespace + '_' + cls._meta.app_label + '_' + cls._meta.module_name
         else:
-            return lookup_path(cls.__base__) + '__' + cls._meta.module_name
+            return cls.lookup_path(cls.__base__) + '__' + cls._meta.module_name
 
     @classmethod
     def top_model(cls):
@@ -56,11 +56,11 @@ class RegistryItemBase(models.Model):
         Returns True if the user has permissions to add this registry item.
         """
         return user.has_perm(
-          "%(app_label)s.add_%(module_name)s" % {
-            "app_label" : cls._meta.app_label,
-            "module_name" : cls._meta.module_name
-         }
-       )
+            "%(app_label)s.add_%(module_name)s" % {
+                "app_label" : cls._meta.app_label,
+                "module_name" : cls._meta.module_name,
+            }
+        )
 
     def cast(self):
         """
@@ -70,7 +70,7 @@ class RegistryItemBase(models.Model):
         if mdl == self.__class__:
             return self
         elif mdl is None:
-            raise ImproperlyConfigured("This configuration object ({0}) is of a class that is not available anymore! If you have recently removed any registry modules, convert your database or reinstall them.".format(self.RegistryMeta.registry_id))
+            raise exceptions.ImproperlyConfigured("This configuration object ({0}) is of a class that is not available anymore! If you have recently removed any registry modules, convert your database or reinstall them.".format(self.RegistryMeta.registry_id))
 
         return mdl.objects.get(pk = self.pk)
 
@@ -79,7 +79,7 @@ class RegistryItemBase(models.Model):
         Sets up and saves the configuration item.
         """
         # Set class identifier
-        self.content_type = ContentType.objects.get_for_model(self.__class__)
+        self.content_type = contenttypes_models.ContentType.objects.get_for_model(self.__class__)
         super(RegistryItemBase, self).save(*args, **kwargs)
 
         # If only one configuration instance should be allowed, we

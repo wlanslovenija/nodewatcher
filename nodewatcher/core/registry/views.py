@@ -1,29 +1,26 @@
 import json
 
-from django.contrib.auth.decorators import login_required
+from django import http, shortcuts, template
+from django.contrib.auth import decorators as auth_decorators
 from django.db import transaction
-from django.http import HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
 from django.utils import safestring
 
-from nodewatcher.core.registry import forms as registry_forms
-from nodewatcher.core.registry import registration
+from . import forms as registry_forms, registration
 
-@login_required
+@auth_decorators.login_required
 def evaluate_forms(request, regpoint_id, root_id):
     """
     This view gets called via an AJAX request to evaluate rules.
     """
     if request.method != 'POST':
-        return HttpResponse('')
+        return http.HttpResponse('')
 
     regpoint = registration.point(regpoint_id)
-    root = get_object_or_404(regpoint.model, pk = root_id) if root_id else None
+    root = shortcuts.get_object_or_404(regpoint.model, pk = root_id) if root_id else None
     temp_root = False
 
+    sid = transaction.savepoint()
     try:
-        sid = transaction.savepoint()
         if root is None:
             # Create a fake temporary root (will not be saved because the transaction will
             # be rolled back)
@@ -33,11 +30,11 @@ def evaluate_forms(request, regpoint_id, root_id):
 
         # First perform partial validation and rule evaluation
         actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
-          regpoint,
-          request,
-          root,
-          request.POST,
-          only_rules = True
+            regpoint,
+            request,
+            root,
+            request.POST,
+            only_rules = True,
         )
 
         # Merge in client actions when available
@@ -54,25 +51,25 @@ def evaluate_forms(request, regpoint_id, root_id):
 
         # Apply rules and fully validate processed forms
         _, forms = registry_forms.prepare_forms_for_regpoint_root(
-          regpoint,
-          request,
-          root,
-          request.POST,
-          save = True,
-          actions = actions,
-          current_config = partial_config
+            regpoint,
+            request,
+            root,
+            request.POST,
+            save = True,
+            actions = actions,
+            current_config = partial_config,
         )
     finally:
         transaction.savepoint_rollback(sid)
 
     # Render forms and return them
-    return render_to_response(
+    return shortcuts.render_to_response(
         'registry/forms.html',
-      {
-        'registry_forms' : forms,
-        'eval_state' : safestring.mark_safe(json.dumps(actions["STATE"])),
-        'registry_root' : root if not temp_root else None,
-        'registry_regpoint' : regpoint_id
-      },
-      context_instance = RequestContext(request)
+        {
+            'registry_forms' : forms,
+            'eval_state' : safestring.mark_safe(json.dumps(actions["STATE"])),
+            'registry_root' : root if not temp_root else None,
+            'registry_regpoint' : regpoint_id,
+        },
+        context_instance = template.RequestContext(request)
     )

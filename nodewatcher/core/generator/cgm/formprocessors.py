@@ -1,6 +1,7 @@
 from ...registry import forms as registry_forms
-from . import base as cgm_base
 from ...registry.forms import formprocessors
+
+from . import base as cgm_base
 
 class NodeCgmValidator(formprocessors.RegistryFormProcessor):
     """

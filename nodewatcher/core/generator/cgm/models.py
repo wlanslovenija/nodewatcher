@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from ... import models as core_models
 from ...allocation.ip import models as ip_models
 from ...registry import fields as registry_fields, registration, permissions
+
 from . import base as cgm_base
 
 # Register a new firmware-generating permission

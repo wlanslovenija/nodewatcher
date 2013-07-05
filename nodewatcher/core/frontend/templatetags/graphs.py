@@ -1,9 +1,6 @@
 from django import template
 from django.template import loader
 
-# TODO: Should not be imported in core
-from nodewatcher.legacy.nodes import models
-
 register = template.Library()
 
 @register.inclusion_tag('graph.html', takes_context=True)
@@ -24,9 +21,12 @@ class FullGraphNode(template.Node):
         try:
             graph = self.graph.resolve(context)
             return loader.render_to_string(
-              'graphs/%s.html' % models.GraphType.as_string(graph.type), {
-                'graph' : graph,
-              }, context)
+                # TODO: models.GraphType does not exist anymore
+                'graphs/%s.html' % models.GraphType.as_string(graph.type), {
+                    'graph' : graph,
+                },
+                context,
+            )
         except template.VariableDoesNotExist:
             return ''
 
@@ -34,5 +34,5 @@ class FullGraphNode(template.Node):
 def show_full_graph(parser, token):
     args = token.split_contents()
     if len(args) != 2:
-        raise TemplateSyntaxError("'show_full_graph' tag requires exactly one argument.")
+        raise template.TemplateSyntaxError("'show_full_graph' tag requires exactly one argument.")
     return FullGraphNode(args[1])

@@ -1,11 +1,11 @@
 from django.contrib.gis.db import models as gis_models
-from django.db import connection, connections, DEFAULT_DB_ALIAS
-from django.db.models.sql.constants import LOOKUP_SEP
+from django import db
+from django.db.models.sql import constants
 
-from nodewatcher.core.registry import access as registry_access
+from . import access as registry_access
 
 # Quote name
-qn = connection.ops.quote_name
+qn = db.connection.ops.quote_name
 
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
     """
@@ -24,7 +24,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         Switches to a different regpoint that determines the short attribute
         name.
         """
-        from nodewatcher.core.registry import registration
+        from . import registration
         clone = self._clone()
         try:
             name = "{0}.{1}".format(self.model._meta.module_name, name)
@@ -97,22 +97,22 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             # Join with top-level item
             top_model = dst_model.top_model()
             clone.query.join(
-              (self.model._meta.db_table, top_model._meta.db_table, self.model._meta.pk.column, 'root_id'),
-              promote = True
+                (self.model._meta.db_table, top_model._meta.db_table, self.model._meta.pk.column, 'root_id'),
+                promote = True,
             )
 
             if top_model != dst_model:
                 # Join with lower-level item
                 clone.query.join(
-                  (top_model._meta.db_table, dst_model._meta.db_table, top_model._meta.pk.column, dst_model._meta.pk.column),
-                  promote = True
+                    (top_model._meta.db_table, dst_model._meta.db_table, top_model._meta.pk.column, dst_model._meta.pk.column),
+                    promote = True,
                 )
 
             if dst_related is not None:
                 dst_field_model = dst_field.rel.to
                 clone.query.join(
-                  (dst_model._meta.db_table, dst_field_model._meta.db_table, dst_field.column, dst_field_model._meta.pk.column),
-                  promote = True
+                    (dst_model._meta.db_table, dst_field_model._meta.db_table, dst_field.column, dst_field_model._meta.pk.column),
+                    promote = True,
                 )
 
         return clone
@@ -121,10 +121,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         """
         Performs a lookup on inet fields.
         """
-        connection = connections[self._db or DEFAULT_DB_ALIAS]
+        connection = db.connections[self._db or db.DEFAULT_DB_ALIAS]
         where_opts = []
         for key, value in kwargs.iteritems():
-            field, op = key.split(LOOKUP_SEP)
+            field, op = key.split(constants.LOOKUP_SEP)
             field_obj = self.model._meta.get_field_by_name(field)[0]
             value = field_obj.get_db_prep_lookup('exact', value, connection = connection)[0]
             field = "%s.%s" % (self.model._meta.db_table, field)

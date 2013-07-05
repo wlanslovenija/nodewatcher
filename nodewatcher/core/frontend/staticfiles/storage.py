@@ -5,7 +5,7 @@ from django.core.files import base
 from django.utils import encoding
 from django.conf import settings
 
-import scss, scss.config
+import scss
 
 def relative_path(root, path):
     """Returns the path of a file relative to the root."""

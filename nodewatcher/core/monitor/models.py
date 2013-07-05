@@ -3,9 +3,9 @@ import polymorphic
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core import models as core_models
-from nodewatcher.core.registry import fields as registry_fields
-from nodewatcher.core.registry import registration
+from .. import models as core_models
+from ..registry import fields as registry_fields
+from ..registry import registration
 
 # Creates monitoring registration point
 registration.create_point(core_models.Node, 'monitoring')

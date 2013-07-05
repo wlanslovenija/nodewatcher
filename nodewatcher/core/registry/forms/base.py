@@ -4,8 +4,7 @@ from django import forms, template
 from django.conf import settings
 from django.core import exceptions
 from django.db import transaction
-from django.utils import importlib
-from django.utils.datastructures import SortedDict
+from django.utils import datastructures, importlib
 
 from .. import rules as registry_rules, registration, loader
 
@@ -641,7 +640,7 @@ def prepare_forms(context):
                 continue
 
         # Fetch existing models for this item
-        context.existing_models = SortedDict()
+        context.existing_models = datastructures.SortedDict()
         if context.root is not None:
             existing_models_qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
 

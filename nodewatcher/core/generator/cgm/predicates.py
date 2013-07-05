@@ -1,7 +1,8 @@
 import hashlib
 
-from ...registry.rules.engine import *
+from ...registry.rules import engine
 from ...registry.rules.predicates import value
+
 from . import base as cgm_base
 
 # Exports
@@ -18,7 +19,7 @@ def router_descriptor(platform, router):
     :param router: Location of a router identifier
     """
 
-    class LazyRouterModel(LazyObject):
+    class LazyRouterModel(engine.LazyObject):
         def __init__(self, platform, model):
             self.__dict__['platform'] = platform
             self.__dict__['router'] = model
@@ -33,7 +34,7 @@ def router_descriptor(platform, router):
                 except KeyError:
                     return None
 
-            return LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.router).hexdigest() + '-' + key)
+            return engine.LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.router).hexdigest() + '-' + key)
 
         def __setattr__(self, key, value):
             raise AttributeError

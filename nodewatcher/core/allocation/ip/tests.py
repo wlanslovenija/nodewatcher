@@ -23,15 +23,15 @@ class IpPoolTestCase(unittest.TestCase):
         pools.
         """
         self.pool = models.IpPool.objects.create(
-          family = "ipv4",
-          network = "10.10.0.0",
-          prefix_length = 16,
+            family = "ipv4",
+            network = "10.10.0.0",
+            prefix_length = 16,
         )
 
         self.small_pool = models.IpPool.objects.create(
-          family = "ipv4",
-          network = "192.168.1.0",
-          prefix_length = 26,
+            family = "ipv4",
+            network = "192.168.1.0",
+            prefix_length = 26,
         )
 
     def test_basic_allocation(self):

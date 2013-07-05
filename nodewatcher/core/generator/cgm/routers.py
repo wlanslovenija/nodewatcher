@@ -1,6 +1,6 @@
 import copy, inspect
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core import exceptions
 
 from ...registry import registration
 
@@ -41,20 +41,20 @@ class SwitchedEthernetPort(EthernetPort):
         """
         switch = router.get_switch(self.switch)
         if switch is None:
-            raise ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" %
+            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" %
                 (self.identifier, self.switch))
 
         if not (0 <= self.vlan < switch.vlans):
-            raise ImproperlyConfigured("Switched ethernet port '%s' VLAN (%s) out of range!" %
+            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' VLAN (%s) out of range!" %
                 (self.identifier, self.vlan))
 
         if switch.cpu_port not in self.ports:
-            raise ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" %
+            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" %
                 (self.identifier))
 
         for port in self.ports:
             if port not in switch.ports:
-                raise ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" %
+                raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" %
                     (self.identifier, port))
 
 class AntennaConnector(object):
@@ -147,7 +147,7 @@ class Switch(object):
         
         self.ports = ports
         if cpu_port not in ports:
-            raise ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" %
+            raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" %
                 (self.identifier, cpu_port))
 
         self.cpu_port = cpu_port
@@ -187,21 +187,21 @@ class RouterMeta(type):
             required_attrs = copy.deepcopy(REQUIRED_ROUTER_ATTRIBUTES)
             for attr in REQUIRED_ROUTER_ATTRIBUTES:
                 if getattr(new_class, attr, None) is None:
-                    raise ImproperlyConfigured("Attribute '{0}' is required for router descriptor specification!".format(attr))
+                    raise exceptions.ImproperlyConfigured("Attribute '{0}' is required for router descriptor specification!".format(attr))
 
             # Validate that list of switches only contains Switch instances
             if len([x for x in new_class.switches if not isinstance(x, Switch)]):
-                raise ImproperlyConfigured("List of router switches may only contain Switch instances!")
+                raise exceptions.ImproperlyConfigured("List of router switches may only contain Switch instances!")
 
             # Router ports and radios cannot both be empty
             if not len(new_class.radios) and not len(new_class.ports):
-                raise ImproperlyConfigured("A router cannot be without radios and ports!")
+                raise exceptions.ImproperlyConfigured("A router cannot be without radios and ports!")
 
             # Validate that list of ports only contains RouterPort instances and validate
             # that switched ports refer to valid switches
             for port in new_class.ports:
                 if not isinstance(port, RouterPort):
-                    raise ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
+                    raise exceptions.ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
 
                 if hasattr(port, 'validate'):
                     port.validate(new_class)
@@ -210,13 +210,13 @@ class RouterMeta(type):
             # radio indices
             for idx, radio in enumerate(new_class.radios):
                 if not isinstance(radio, RouterRadio):
-                    raise ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
+                    raise exceptions.ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
 
                 radio.index = idx
 
             # Validate that list of antennas only contains InternalAntenna instances
             if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):
-                raise ImproperlyConfigured("List of router antennas may only contain InternalAntenna instances!")
+                raise exceptions.ImproperlyConfigured("List of router antennas may only contain InternalAntenna instances!")
 
         return new_class
 

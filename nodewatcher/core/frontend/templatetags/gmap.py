@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.template import Library
+from django import template
 
-register = Library()
+register = template.Library()
 
 @register.inclusion_tag('gmap.js', takes_context=True)
 def do_gmap(context, callback=None, click_callback=None, full=False, marker_lat=None, marker_long=None, clickable=True, status='up'):
@@ -17,17 +17,17 @@ def do_gmap(context, callback=None, click_callback=None, full=False, marker_lat=
     :param status: Status of optional marker
     """
     context.update({
-      'google_key': settings.GOOGLE_MAPS_API_KEY,
-      'lat': settings.GOOGLE_MAPS_DEFAULT_LAT,
-      'long': settings.GOOGLE_MAPS_DEFAULT_LONG,
-      'zoom': settings.GOOGLE_MAPS_DEFAULT_ZOOM,
-      'node_zoom': settings.GOOGLE_MAPS_DEFAULT_NODE_ZOOM,
-      'marker_lat': marker_lat,
-      'marker_long': marker_long,
-      'clickable': clickable,
-      'full': full,
-      'callback': callback,
-      'click_callback': click_callback,
-      'status': status
+        'google_key': settings.GOOGLE_MAPS_API_KEY,
+        'lat': settings.GOOGLE_MAPS_DEFAULT_LAT,
+        'long': settings.GOOGLE_MAPS_DEFAULT_LONG,
+        'zoom': settings.GOOGLE_MAPS_DEFAULT_ZOOM,
+        'node_zoom': settings.GOOGLE_MAPS_DEFAULT_NODE_ZOOM,
+        'marker_lat': marker_lat,
+        'marker_long': marker_long,
+        'clickable': clickable,
+        'full': full,
+        'callback': callback,
+        'click_callback': click_callback,
+        'status': status,
     })
     return context

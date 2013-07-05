@@ -4,16 +4,14 @@ import re
 
 from django import template
 from django.conf import settings
-from django.template import loader, defaultfilters
-from django.utils import safestring
-from django.utils import text
+from django.utils import safestring, text
 
 register = template.Library()
 
 DASH_START_END_RE = re.compile(r'^-+|-+$')
 HEADING_REPLACE = (
-  (u'đ', u'd'),
-  (u'Đ', u'D'),
+    (u'đ', u'd'),
+    (u'Đ', u'D'),
 )
 DOCUMENTATION_LINKS = getattr(settings, 'DOCUMENTATION_LINKS', {})
 
@@ -29,11 +27,11 @@ def anchorify(anchor):
     """
     Convert string to suitable for anchor id.
     """
-    anchor = defaultfilters.striptags(anchor)
+    anchor = template.defaultfilters.striptags(anchor)
     anchor = text.unescape_entities(anchor)
     for a, b in HEADING_REPLACE:
         anchor = anchor.replace(a, b)
-    anchor = defaultfilters.slugify(anchor)
+    anchor = template.defaultfilters.slugify(anchor)
     anchor = DASH_START_END_RE.sub('', anchor)
     if not anchor or not anchor[0].isalpha():
         anchor = 'a' + anchor
@@ -51,10 +49,10 @@ def heading(context, level, heading, classes=None):
         i += 1
     context.render_context[anchor] = True
     return {
-      'level'   : level,
-      'heading' : heading,
-      'id'      : anchor,
-      'classes' : classes,
+        'level'   : level,
+        'heading' : heading,
+        'id'      : anchor,
+        'classes' : classes,
     }
 
 class SetContextNode(template.Node):
@@ -95,12 +93,14 @@ class NoticeNode(template.Node):
         self.classes = classes
 
     def render(self, context):
-        return loader.render_to_string(
+        return template.loader.render_to_string(
             'notice.html', {
-            'type' : self.notice_type.resolve(context),
-            'classes' : self.classes.resolve(context),
-            'notice' : self.nodelist.render(context),
-          }, context)
+              'type' : self.notice_type.resolve(context),
+              'classes' : self.classes.resolve(context),
+              'notice' : self.nodelist.render(context),
+            },
+            context,
+        )
 
 @register.tag
 def notice(parser, token):
@@ -132,11 +132,13 @@ class DoclinkNode(template.Node):
         self.var_name = var_name
 
     def render(self, context):
-        html = loader.render_to_string(
+        html = template.loader.render_to_string(
             'documentation_link.html', {
-            'url' : DOCUMENTATION_LINKS.get(self.tag),
-            'link' : self.link.resolve(context),
-          }, context).strip()
+                'url' : DOCUMENTATION_LINKS.get(self.tag),
+                'link' : self.link.resolve(context),
+            },
+            context,
+        ).strip()
 
         if self.var_name:
             context[self.var_name] = safestring.mark_safe(html)

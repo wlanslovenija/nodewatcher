@@ -1,4 +1,4 @@
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import models as contenttypes_models
 
 class UnknownRegistryIdentifier(Exception):
     pass
@@ -40,7 +40,7 @@ class RegistryResolver(object):
             # Determine which class the root is using for configuration
             cfg, top_level = self._regpoint.get_top_level_queryset(self._root, path)
             if onlyclass is not None:
-                cfg = cfg.filter(content_type = ContentType.objects.get_for_model(onlyclass))
+                cfg = cfg.filter(content_type = contenttypes_models.ContentType.objects.get_for_model(onlyclass))
             if queryset:
                 return cfg.all()
 
@@ -115,8 +115,8 @@ def get_model_class_by_name(name):
         ctype = CTYPE_CACHE[name]
     except KeyError:
         try:
-            ctype = ContentType.objects.get(model = name).model_class()
-        except ContentType.DoesNotExist:
+            ctype = contenttypes_models.ContentType.objects.get(model = name).model_class()
+        except contenttypes_models.ContentType.DoesNotExist:
             raise UnknownRegistryClass
 
         CTYPE_CACHE[name] = ctype

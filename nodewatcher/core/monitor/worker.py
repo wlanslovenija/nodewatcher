@@ -1,11 +1,11 @@
 import logging, multiprocessing, time, traceback
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core import exceptions
 from django.db import connection, transaction
 from django.utils import importlib
 
-from nodewatcher.core.monitor import processors as monitor_processors
+from . import processors as monitor_processors
 
 # Welcome banner
 BANNER = """
@@ -52,7 +52,7 @@ class Worker(object):
                 module = importlib.import_module(module)
                 processor = getattr(module, attr)
             except (ImportError, AttributeError):
-                raise ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)
+                raise exceptions.ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)
 
             if not self.processors:
                 self.processors.append([processor])

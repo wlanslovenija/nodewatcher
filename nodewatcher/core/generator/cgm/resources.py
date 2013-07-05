@@ -1,4 +1,4 @@
-from nodewatcher.utils import ipaddr
+from ....utils import ipaddr
 
 class ResourceExhausted(Exception):
     pass
