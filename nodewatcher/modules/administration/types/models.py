@@ -1,4 +1,3 @@
-from django.db import models
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import fields as registry_fields, registration

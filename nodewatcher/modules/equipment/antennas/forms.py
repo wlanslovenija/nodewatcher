@@ -5,6 +5,7 @@ from django.utils import datastructures
 from django.utils.translation import ugettext_lazy as _
 
 from nodewatcher.core.registry import registration
+
 from . import models as antenna_models
 
 ANTENNA_FORM_FIELD_PREFIX = 'antenna_'

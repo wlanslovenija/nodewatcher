@@ -10,8 +10,8 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     address = models.CharField(max_length = 100)
-    city = models.CharField(max_length = 100) # TODO city field?
-    country = models.CharField(max_length = 100) # TODO country field?
+    city = models.CharField(max_length = 100) # TODO: City field?
+    country = models.CharField(max_length = 100) # TODO: Country field?
     geolocation = gis_models.PointField(null = True)
     altitude = models.FloatField(default = 0)
 

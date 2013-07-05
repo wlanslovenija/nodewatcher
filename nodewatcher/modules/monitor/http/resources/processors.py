@@ -1,6 +1,4 @@
-import datetime
-
-import pytz
+import datetime, pytz
 
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 

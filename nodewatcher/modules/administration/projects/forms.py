@@ -1,6 +1,7 @@
 from django.dispatch import receiver
 
 from nodewatcher.core.allocation.ip import signals
+
 from . import models
 
 @receiver(signals.filter_pools)

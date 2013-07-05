@@ -1,4 +1,3 @@
-
 class ConnectDatastream(object):
     """
     Specifies datastream field metadata.
