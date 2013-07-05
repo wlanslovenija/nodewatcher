@@ -14,11 +14,3 @@ urlpatterns = urls.patterns('',
     # Node manipulation
     urls.url(r'^node/(?P<node>[^/]+)/edit$', 'nodewatcher.core.frontend.views.node_edit', name = 'edit_node'),
 )
-
-handler404 = 'django.views.defaults.page_not_found'
-handler500 = 'django.views.defaults.server_error'
-if settings.DEBUG:
-    urlpatterns += urls.patterns('',
-        (r'^404/$', handler404),
-        (r'^500/$', handler500),
-    )

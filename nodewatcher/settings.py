@@ -194,6 +194,9 @@ TEMPLATE_DIRS = (
 #   os.path.join(settings_dir, 'templates'),
 )
 
+# See handler403 in urls.py as well.
+CSRF_FAILURE_VIEW = 'missing.views.forbidden_view'
+
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/account/login/'
 LOGOUT_URL = '/account/logout/'
