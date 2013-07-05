@@ -56,12 +56,12 @@ def authenticated_required(function=None, message_func=lambda u: _("You have to 
     """
 
     actual_decorator = user_test_required(
-      lambda u: u.is_authenticated(),
-      message_func=message_func,
-      message_level_func=message_level_func,
-      redirect_url_func=redirect_url_func,
-      redirect_field_name=redirect_field_name,
-      decorator_id=id(authenticated_required),
+        lambda u: u.is_authenticated(),
+        message_func=message_func,
+        message_level_func=message_level_func,
+        redirect_url_func=redirect_url_func,
+        redirect_field_name=redirect_field_name,
+        decorator_id=id(authenticated_required),
     )
 
     if function:
@@ -79,12 +79,12 @@ def anonymous_required(function=None, message_func=lambda u: _("You should not b
     """
 
     actual_decorator = user_test_required(
-      lambda u: u.is_anonymous(),
-      message_func=message_func,
-      message_level_func=message_level_func,
-      redirect_url_func=redirect_url_func,
-      redirect_field_name=redirect_field_name,
-      decorator_id=id(anonymous_required),
+        lambda u: u.is_anonymous(),
+        message_func=message_func,
+        message_level_func=message_level_func,
+        redirect_url_func=redirect_url_func,
+        redirect_field_name=redirect_field_name,
+        decorator_id=id(anonymous_required),
     )
 
     if function:
@@ -102,7 +102,7 @@ def permission_required(perm, message_func=lambda u: _("You do not have necessar
     one used.
     """
 
-    return user_passes_test(lambda u: u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(permission_required))
+    return decorators.user_passes_test(lambda u: u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(permission_required))
 
 def authenticated_permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page.") if u.is_authenticated() else _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL if u.is_authenticated() else settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """
@@ -115,4 +115,4 @@ def authenticated_permission_required(perm, message_func=lambda u: _("You do not
     one used.
     """
 
-    return user_passes_test(lambda u: u.is_authenticated() and u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(authenticated_permission_required))
+    return decorators.user_passes_test(lambda u: u.is_authenticated() and u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(authenticated_permission_required))
