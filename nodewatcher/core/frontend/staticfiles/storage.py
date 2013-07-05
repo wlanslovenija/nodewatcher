@@ -5,7 +5,7 @@ from django.core.files import base
 from django.utils import encoding
 from django.conf import settings
 
-import scss
+import scss, scss.config
 
 def relative_path(root, path):
     """Returns the path of a file relative to the root."""
@@ -25,15 +25,15 @@ class SCSSFilesMixin(object):
         # ASSETS_ROOT is where the pyScss outputs the generated files such
         # as spritemaps and compile cache
         # TODO: This should be improved if some non-local-filesystem storage is used for static files
-        scss.ASSETS_ROOT = os.path.join(settings.STATIC_ROOT, 'nodewatcher', 'assets')
-        scss.ASSETS_URL = settings.STATIC_URL + 'nodewatcher/assets/'
+        scss.config.ASSETS_ROOT = os.path.join(settings.STATIC_ROOT, 'nodewatcher', 'assets')
+        scss.config.ASSETS_URL = settings.STATIC_URL + 'nodewatcher/assets/'
 
-        scss.STATIC_ROOT = settings.STATIC_ROOT
-        scss.STATIC_URL = settings.STATIC_URL
+        scss.config.STATIC_ROOT = settings.STATIC_ROOT
+        scss.config.STATIC_URL = settings.STATIC_URL
 
         self._scss_paths = []
         self._scss_paths.extend(getattr(settings, 'SCSS_PATHS', []))
-	
+
         # _scss_vars hold the context variables
         self._scss_vars = {}
         # This creates the Scss object used to compile SCSS code
@@ -47,9 +47,9 @@ class SCSSFilesMixin(object):
 
     def _scss_process(self, filename, file):
         root, name = os.path.split(os.path.join(settings.STATIC_ROOT, filename))
-        scss.LOAD_PATHS = []
-        scss.LOAD_PATHS.extend(self._scss_paths)
-        scss.LOAD_PATHS.append(root)
+        scss.config.LOAD_PATHS = []
+        scss.config.LOAD_PATHS.extend(self._scss_paths)
+        scss.config.LOAD_PATHS.append(root)
 
         return self._scss.compile(file.read())
 
