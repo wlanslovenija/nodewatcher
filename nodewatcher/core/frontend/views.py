@@ -2,7 +2,7 @@ import json
 
 from django import http, shortcuts, template
 from django.contrib.auth import decorators as auth_decorators
-from django.core import context_processors as core_context_processors, urlresolvers
+from django.core import urlresolvers
 from django.db import transaction
 from django.utils import safestring
 
@@ -10,8 +10,6 @@ from guardian.shortcuts import assign as assign_permission
 
 from .. import models as core_models
 from ..registry import forms as registry_forms
-
-from . import context_processors
 
 def nodes(request):
     """
@@ -133,17 +131,3 @@ def node_edit(request, node):
         'registry_regpoint' : 'node.config',
         'eval_state' : safestring.mark_safe(json.dumps(eval_state)),
     }, context_instance = template.RequestContext(request))
-
-def server_error(request, template_name='500.html'):
-    """
-    500 error handler with some request processors.
-
-    Templates: `500.html`
-    Context: None
-    """
-
-    t = template.loader.get_template(template_name) # You need to create a 500.html template.
-    context = {}
-    for proc in (core_context_processors.media, context_processors.global_values):
-        context.update(proc(request))
-    return http.HttpResponseServerError(t.render(template.Context(context)))
