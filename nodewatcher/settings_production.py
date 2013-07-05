@@ -27,6 +27,7 @@ USE_HTTPS = True
 
 CSRF_COOKIE_SECURE = USE_HTTPS
 SESSION_COOKIE_SECURE = USE_HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTPS', 'on')
 
 # We support some common password formats to ease transition.
 AUTHENTICATION_BACKENDS += (

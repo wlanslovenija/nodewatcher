@@ -175,6 +175,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
+    'nodewatcher.core.frontend.context_processors.web_client_node',
     'nodewatcher.core.frontend.context_processors.global_vars',
 )
 

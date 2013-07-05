@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block rss %}
-    <link rel="alternate" href="{% url events_feed user.username %}" title="{{ network.name }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
+    <link rel="alternate" href="{% url events_feed user.username %}" title="{{ NETWORK.NAME }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}

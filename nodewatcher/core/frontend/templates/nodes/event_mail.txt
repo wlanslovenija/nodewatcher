@@ -1,4 +1,4 @@
-Hello {{ user.username }}!
+{% load url_tags %}Hello {{ user.username }}!
 
 You have requested to be notified when certain events occur in the network.
 This is an automated notification of the event.
@@ -18,7 +18,7 @@ Additional data:
 
 You may configure event subscriptions via settings available by going to
 the following URL:
-  {{ base_url }}{% url my_events %}
+  {% url my_events as my_events_url %}{% fullurl my_events_url %}
 
 Best regards,
-{{ network.name }} network <{{ network.contact }}>
+{{ NETWORK.NAME }} network <{{ NETWORK.CONTACT }}>

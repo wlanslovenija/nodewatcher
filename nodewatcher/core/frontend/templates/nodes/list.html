@@ -22,7 +22,7 @@
 {% block content %}
     {% if web_client_node %}
         {% notice webclient %}
-            <b>You are visiting this page through the <i>{{ network.name }}</i> network.</b><br />
+            <b>You are visiting this page through the <i>{{ NETWORK.NAME }}</i> network.</b><br />
             <br />
             You are using the <a href="{% url view_node web_client_node.get_current_id %}">{{ web_client_node.name|default:_("unknown") }}</a> node to connect to the network.
         {% endnotice %}

@@ -70,7 +70,7 @@
 
     {% if node.pk == web_client_node.pk %}
         {% notice %}
-            {% blocktrans with network.name as network_name %}You are using this node to connect to the <i>{{ network_name }}</i> network.{% endblocktrans %}
+            {% blocktrans with NETWORK.NAME as network_name %}You are using this node to connect to the <i>{{ network_name }}</i> network.{% endblocktrans %}
         {% endnotice %}
     {% endif %}
 

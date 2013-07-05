@@ -1,9 +1,9 @@
 {% load i18n %}{% load misc %}<div id="header">
     {% include "account.html" %}
-    {% if network.logo_url %}
-        <a href="{% url nodes_list %}"><img src="{{ network.logo_url }}" alt="{{ network.name }}" title="{{ network.description|default:network.name }}" /></a>
+    {% if NETWORK.LOGO_URL %}
+        <a href="{% url nodes_list %}"><img src="{{ NETWORK.LOGO_URL }}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
     {% else %}
-        <h1><a href="{% url nodes_list %}">{{ network.name }}</a></h1>
-        {% if network.description %}<h2><a href="{% url nodes_list %}">{{ network.description }}</a></h2>{% endif %}
+        <h1><a href="{% url nodes_list %}">{{ NETWORK.NAME }}</a></h1>
+        {% if NETWORK.DESCRIPTION %}<h2><a href="{% url nodes_list %}">{{ NETWORK.DESCRIPTION }}</a></h2>{% endif %}
     {% endif %}
 </div>

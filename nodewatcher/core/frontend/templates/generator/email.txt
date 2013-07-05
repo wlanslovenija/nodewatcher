@@ -8,7 +8,7 @@ The generated files for your node are available here:{% endblocktrans %}
   {{ images_bindist_url }}{{ file.name }}
   MD5: {{ file.checksum }}
 {% endfor %}
-{% blocktrans with network.name as network_name and network.contact as network_contact %}Note that these files could be removed after some time. In this case you
+{% blocktrans with NETWORK.NAME as network_name and NETWORK.CONTACT as network_contact %}Note that these files could be removed after some time. In this case you
 will have to request them again.
 
 Thank you for your participation in the project!

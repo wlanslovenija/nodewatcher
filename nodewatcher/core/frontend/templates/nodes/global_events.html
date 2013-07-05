@@ -13,7 +13,7 @@
 {% block contenttype %}prefs{% endblock %}
 
 {% block rss %}
-    <link rel="alternate" href="{% url events_feed %}" title="{{ network.name }} – Latest network events" type="application/rss+xml" />
+    <link rel="alternate" href="{% url events_feed %}" title="{{ NETWORK.NAME }} – Latest network events" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}

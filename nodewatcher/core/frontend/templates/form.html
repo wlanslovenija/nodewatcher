@@ -4,7 +4,7 @@
     Template which uses `form` (form object), `form_submit` (submit button label) and `form_action` (form action URL) from
     the context.
 
-    We use `next` from the context or use `context_processor_next`, which is set to `next` from request arguments, to set
+    We use `next` from the context or use `request_get_next`, which is set to `next` from request arguments, to set
     where the form should redirect after submission.
     {% endcomment %}
     {% if form %}
@@ -18,7 +18,7 @@
             {{ form.non_field_errors }}
         {% endif %}
             {% csrf_token %}
-            {% if next|default:context_processor_next %}<div style='display:none'><input type="hidden" name="{{ redirect_field_name }}" value="{{ next|default:context_processor_next }}" /></div>{% endif %}
+            {% if next|default:request_get_next %}<div style='display:none'><input type="hidden" name="{{ REDIRECT_FIELD_NAME }}" value="{{ next|default:request_get_next }}" /></div>{% endif %}
             {% for field in form.hidden_fields %}
                 <div style='display:none'>{{ field }}</div>
             {% endfor %}

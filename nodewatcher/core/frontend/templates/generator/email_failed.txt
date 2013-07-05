@@ -1,4 +1,4 @@
-{% load i18n %}{% blocktrans with network.name as network_name and network.contact as network_contact %}Hello {{ username }}!
+{% load i18n %}{% blocktrans with NETWORK.NAME as network_name and NETWORK.CONTACT as network_contact %}Hello {{ username }}!
 
 There has been an error in image/config generation for {{ hostname }}/{{ ip }}.
 Please try again later or report this if the problem persists.

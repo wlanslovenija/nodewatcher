@@ -8,7 +8,9 @@ def web_client_node(request):
     depending on whether the current client's IP address is from
     a node's allocated subnet.
     """
+
     return {
+        # TODO: Implement
         'web_client_node': None
     }
 
@@ -16,24 +18,19 @@ def global_vars(request):
     """
     Adds some global variables to the context.
     """
+
     return {
-        'network': {
-            'name': settings.NETWORK_NAME,
-            'home': settings.NETWORK_HOME,
-            'contact': getattr(settings, 'NETWORK_CONTACT', None),
-            'contact_page': getattr(settings, 'NETWORK_CONTACT_PAGE', None),
-            'description': getattr(settings, 'NETWORK_DESCRIPTION', None),
-            'favicon_url': getattr(settings, 'NETWORK_FAVICON_URL', None),
-            'logo_url': getattr(settings, 'NETWORK_LOGO_URL', None),
+        'NETWORK': {
+            'NAME': settings.NETWORK_NAME,
+            'HOME': settings.NETWORK_HOME,
+            'CONTACT': getattr(settings, 'NETWORK_CONTACT', None),
+            'CONTACT_PAGE': getattr(settings, 'NETWORK_CONTACT_PAGE', None),
+            'DESCRIPTION': getattr(settings, 'NETWORK_DESCRIPTION', None),
+            'FAVICON_URL': getattr(settings, 'NETWORK_FAVICON_URL', None),
+            'LOGO_URL': getattr(settings, 'NETWORK_LOGO_URL', None),
         },
-        'request' : {
-            'path': request.path,
-            'get_full_path': request.get_full_path(),
-        },
-        'site': sites_models.Site.objects.get_current() if sites_models.Site._meta.installed else sites_models.RequestSite(request),
-        'redirect_field_name': auth.REDIRECT_FIELD_NAME,
-        'context_processor_next': request.REQUEST.get(auth.REDIRECT_FIELD_NAME, ''),
-        'base_url': "%s://%s" % ('https' if getattr(settings, 'USE_HTTPS', None) else 'http', sites_models.Site.objects.get_current().domain),
-        'images_bindist_url': getattr(settings, 'IMAGES_BINDIST_URL', None),
-        'documentation_links': getattr(settings, 'DOCUMENTATION_LINKS', {}),
+        'REDIRECT_FIELD_NAME': auth.REDIRECT_FIELD_NAME,
+
+        'site': sites_models.get_current_site(request),
+        'request_get_next': request.REQUEST.get(auth.REDIRECT_FIELD_NAME, ''),
     }
