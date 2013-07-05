@@ -4,8 +4,7 @@
 from django.conf import settings
 from django.contrib.gis import utils as gis_utils
 from django.db.models import fields
-from django.utils import encoding as utils_encoding
-from django.utils import translation
+from django.utils import encoding as utils_encoding, translation
 from django.utils.translation import ugettext_lazy as _
 
 # Countries list - ISO 3166-1

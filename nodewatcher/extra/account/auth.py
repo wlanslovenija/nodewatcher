@@ -1,9 +1,6 @@
-from django.contrib.auth import models as auth_models
-from django.contrib.auth import backends as auth_backends
-from django.contrib.sessions import models as sessions_models
+import crypt, md5crypt
 
-import crypt
-import md5crypt
+from django.contrib.auth import backends as auth_backends, models as auth_models
 
 try:
     import aprmd5

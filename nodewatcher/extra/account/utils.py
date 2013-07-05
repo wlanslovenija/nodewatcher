@@ -1,12 +1,9 @@
-import random
-import inspect
-import string
+import inspect, random, string
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import exceptions
 from django.db import models
-from django.forms import models as forms_models
 
 def generate_random_password(length=8):
     """

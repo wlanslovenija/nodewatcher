@@ -1,9 +1,7 @@
-from django import http
 from django import shortcuts
 from django import template
 from django.conf import settings
-from django.contrib import auth
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.contrib.auth import views as auth_views
 from django.contrib.sites import models as sites_models
 from django.core import urlresolvers

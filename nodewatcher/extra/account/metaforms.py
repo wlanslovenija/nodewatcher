@@ -1,6 +1,5 @@
 from django.contrib.admin import util as admin_util
-from django.forms import forms
-from django.forms import models as forms_models
+from django.forms import forms, models as forms_models
 
 from . import utils
 

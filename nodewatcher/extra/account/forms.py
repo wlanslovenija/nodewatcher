@@ -1,14 +1,7 @@
-import datetime
-
 from django.core import validators as core_validators
-from django.forms import forms
-from django.forms import models as forms_models
-from django.forms.extras import widgets
+from django.forms import forms, models as forms_models
 from django.contrib.admin import util as admin_util
-from django.contrib.auth import admin as auth_admin
-from django.contrib.auth import forms as auth_forms
-from django.contrib.auth import models as auth_models
-from django.utils import text as utils_text
+from django.contrib.auth import admin as auth_admin, forms as auth_forms, models as auth_models
 from django.utils.translation import ugettext_lazy as _
 
 from . import metaforms, models, validators

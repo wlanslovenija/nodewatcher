@@ -2,7 +2,6 @@ from django import dispatch
 from django.forms import models as forms_models
 
 from registration.backends import default as backends_default
-from registration import signals as registration_signals
 
 from . import forms, utils
 
