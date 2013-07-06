@@ -50,7 +50,7 @@
             </tfoot>
         {% endif %}
         <tbody>
-            {% for node in object_list %}
+            {% for node in nodes %}
                 {% ifchanged node.node_type %}
                 <tr class="section_title">
                     <td colspan="8">{% heading 3 node.node_type_as_string_plural %}</td>

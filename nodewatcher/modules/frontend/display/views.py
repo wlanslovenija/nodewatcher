@@ -1,4 +1,4 @@
-from django.views.generic import base
+from django.views import generic
 
-class DisplayNode(base.TemplateView):
+class DisplayNode(generic.TemplateView):
     template_name = 'nodes/display.html'

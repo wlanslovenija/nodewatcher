@@ -11,7 +11,7 @@ class EditorComponent(components.FrontendComponent):
     def get_urls(cls):
         return super(EditorComponent, cls).get_urls() + urls.patterns('',
             urls.url(r'^my/new/$', views.NewNode.as_view(), name='new'),
-            urls.url(r'^node/(?P<node>[^/]+)/edit/$', views.EditNode.as_view(), name='edit'),
+            urls.url(r'^node/(?P<pk>[^/]+)/edit/$', views.EditNode.as_view(), name='edit'),
         )
 
 components.pool.register(EditorComponent)
