@@ -145,7 +145,6 @@ class Menus(object):
         return self._menus.itervalues()
 
     def get_menu(self, menu_name):
-        print menu_name, self._menus[menu_name].get_entries()
         try:
             return self._menus[menu_name]
         except KeyError:
