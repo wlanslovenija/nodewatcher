@@ -6,13 +6,13 @@ from . import base, exceptions
 
 class FrontendComponentsPool(object):
     def __init__(self):
-        self.components = datastructures.SortedDict()
-        self.discovered = False
+        self._components = datastructures.SortedDict()
+        self._discovered = False
 
     def discover_components(self):
-        if self.discovered:
+        if self._discovered:
             return
-        self.discovered = True
+        self._discovered = True
 
         for app in settings.INSTALLED_APPS:
             try:
@@ -35,10 +35,10 @@ class FrontendComponentsPool(object):
             if '.' in component_name or '/' in component_name:
                 raise exceptions.FrontendComponentHasInvalidName("A frontend component '%s' has invalid name" % component_name)
 
-            if component_name in self.components:
+            if component_name in self._components:
                 raise exceptions.FrontendComponentAlreadyRegistered("A frontend component with name '%s' is already registered" % component_name)
 
-            self.components[component_name] = component
+            self._components[component_name] = component
 
     def unregister(self, component_or_iterable):
         if not hasattr(component_or_iterable, '__iter__'):
@@ -47,28 +47,28 @@ class FrontendComponentsPool(object):
         for component in component_or_iterable:
             component_name = component.get_name()
 
-            if component_name not in self.components:
+            if component_name not in self._components:
                 raise exceptions.FrontendComponentNotRegistered("No frontend component with name '%s' is registered" % component_name)
 
-            del self.components[component_name]
+            del self._components[component_name]
 
     def get_all_components(self):
         self.discover_components()
 
-        return self.components.itervalues()
+        return self._components.values()
 
     def get_component(self, component_name):
         self.discover_components()
 
         try:
-            return self.components[component_name]
+            return self._components[component_name]
         except KeyError:
             raise exceptions.FrontendComponentNotRegistered("No frontend component with name '%s' is registered" % component_name)
 
     def has_component(self, component_name):
         self.discover_components()
 
-        return component_name in self.components
+        return component_name in self._components
 
     def get_main(self):
         """

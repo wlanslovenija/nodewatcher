@@ -241,8 +241,8 @@ INSTALLED_APPS = (
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
-    'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.display',
+    'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
     'nodewatcher.extra.account',
 

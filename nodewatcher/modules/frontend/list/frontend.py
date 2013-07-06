@@ -1,6 +1,6 @@
 from django.core import urlresolvers
 
-from nodewatcher.core.frontend import components, menus
+from nodewatcher.core.frontend import components
 
 from . import views
 
@@ -15,7 +15,7 @@ class ListComponent(components.FrontendComponent):
 
 components.pool.register(ListComponent)
 
-menus.main_menu.add(components.MenuEntry(
+components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Node List"),
     url=urlresolvers.reverse_lazy('list:list'),
 ))

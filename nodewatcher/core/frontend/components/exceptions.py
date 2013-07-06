@@ -28,11 +28,20 @@ class MenuEntryException(Exception):
 class MenuEntryHasInvalidLabel(MenuEntryException):
     pass
 
+class MenuEntryHasInvalidBase(MenuEntryException):
+    pass
+
 class MenuException(Exception):
     pass
 
-class MenuHasInvalidBase(FrontendComponentException):
+class MenuHasInvalidName(MenuException):
     pass
 
-class MenuHasInvalidName(MenuException):
+class MenuAlreadyRegistered(MenuException):
+    pass
+
+class MenuNotRegistered(MenuException):
+    pass
+
+class MenuHasInvalidBase(MenuException):
     pass

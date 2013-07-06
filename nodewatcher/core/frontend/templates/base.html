@@ -35,7 +35,7 @@
                     <div id="ctxtnav" class="nav">
                         <ul>
                             {% for menu_entry in main_menu %}
-                                <li class="{% css_classes "first" "last" "odd" "even" %}"><a href="{{ menu_entry.url }}">{{ menu_entry.label }}</a></li>
+                                <li class="{% css_classes "first" "last" "odd" "even" %}"><a href="{{ menu_entry.get_url }}">{{ menu_entry.get_label }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>

@@ -8,7 +8,7 @@ __all__ = [
 class FrontendComponent(object):
     name = None
     dependencies = ()
-    urls = []
+    urls = None
 
     def __init__(self):
         # To prevent import cycle
@@ -44,4 +44,4 @@ class FrontendComponent(object):
 
     @classmethod
     def get_urls(cls):
-        return cls.urls
+        return cls.urls or []
