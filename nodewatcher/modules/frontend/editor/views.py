@@ -33,7 +33,7 @@ class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
 
         context['registry_forms'] = self.dynamic_forms
         context['registry_regpoint'] = 'node.config'
-        context['eval_state'] = safestring.mark_safe(json.dumps(self.eval_state))
+        context['eval_state'] = json.dumps(self.eval_state)
 
         return context
 
@@ -109,7 +109,7 @@ class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.Detail
         context['registry_forms'] = self.dynamic_forms
         context['registry_root'] = self.object
         context['registry_regpoint'] = 'node.config'
-        context['eval_state'] = safestring.mark_safe(json.dumps(self.eval_state))
+        context['eval_state'] = json.dumps(self.eval_state)
 
         return context
 

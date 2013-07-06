@@ -18,7 +18,8 @@ var registry = {
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
         
         // Disable the form and display a nifty dialog
-        $('#registry_forms *').attr('disabled', 'disabled');
+        // TODO: We cannot just disable everything because then the form is not submitted correctly
+        //$('#registry_forms *').attr('disabled', 'disabled');
         $('#reg_loading_dialog').dialog('open');
         
         $.ajax({
@@ -34,7 +35,7 @@ var registry = {
             error: function(jqXHR, textStatus, errorThrown) {
                 // TODO handle errors, give the option to retry
                 alert('errrror! ' + textStatus + ' ' + errorThrown);
-            },
+            }
         });
     },
     
@@ -72,7 +73,7 @@ var registry = {
     state: function(new_state)
     {
         $('#reg_eval_state').val(new_state);
-    },
+    }
 };
 
 // Initialize registry functions
