@@ -3,7 +3,6 @@ from . import exceptions
 # Exports
 __all__ = [
     'FrontendComponent',
-    'Menu',
 ]
 
 class FrontendComponent(object):
@@ -46,6 +45,3 @@ class FrontendComponent(object):
     @classmethod
     def get_urls(cls):
         return cls.urls
-
-class Menu(object):
-    pass

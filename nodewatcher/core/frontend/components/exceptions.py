@@ -21,3 +21,18 @@ class FrontendComponentDependencyNotRegistered(FrontendComponentException):
 
 class FrontendComponentWithoutMain(FrontendComponentException):
     pass
+
+class MenuEntryException(Exception):
+    pass
+
+class MenuEntryHasInvalidLabel(MenuEntryException):
+    pass
+
+class MenuException(Exception):
+    pass
+
+class MenuHasInvalidBase(FrontendComponentException):
+    pass
+
+class MenuHasInvalidName(MenuException):
+    pass
