@@ -2,19 +2,6 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.sites import models as sites_models
 
-# TODO: Move to middleware and set a value on request object
-def web_client_node(request):
-    """
-    Adds web_client_node variable to current template context
-    depending on whether the current client's IP address is from
-    a node's allocated subnet.
-    """
-
-    return {
-        # TODO: Implement
-        'web_client_node': None
-    }
-
 def global_vars(request):
     """
     Adds some global variables to the context.
