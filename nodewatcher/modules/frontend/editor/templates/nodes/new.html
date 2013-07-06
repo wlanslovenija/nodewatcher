@@ -18,10 +18,10 @@
     {% endwith %}
 
     {% notice "" "no-top-margin" %}
-        {% url nodes_list as nodes_list %}{% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
+        {% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
     {% endnotice %}
 
-    <form action="{% url new_node %}" method="post">
+    <form action="{% url editor:new %}" method="post">
         {% csrf_token %}
         <div id="registry_forms">
             {% include "registry/forms.html" %}

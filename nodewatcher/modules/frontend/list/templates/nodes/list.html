@@ -44,13 +44,13 @@
             <tfoot>
                 <tr>
                     <td class="table_menu" colspan="8">
-                        <a href="{% url new_node %}">{% trans "Add new node" %}</a>
+                        <a href="{% url editor:new %}">{% trans "Add new node" %}</a>
                     </td>
                 </tr>
             </tfoot>
         {% endif %}
         <tbody>
-            {% for node in nodes %}
+            {% for node in object_list %}
                 {% ifchanged node.node_type %}
                 <tr class="section_title">
                     <td colspan="8">{% heading 3 node.node_type_as_string_plural %}</td>
@@ -64,7 +64,7 @@
                             </a>
                         {% endif %}
                     </td>
-                    <td class="name"><a href="{% url edit_node node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+                    <td class="name"><a href="{% url editor:edit node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
                     <td>{{ node.router_id }}</td>
                     {% if node.last_seen %}
                         <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>

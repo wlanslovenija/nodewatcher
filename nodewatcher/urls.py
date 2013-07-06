@@ -3,7 +3,7 @@ from django.conf.urls import static
 
 urlpatterns = urls.patterns('',
     # Registry
-    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace='registry')),
+    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', app_name='registry')),
 
     # Accounts
     urls.url(r'account/', urls.include('nodewatcher.extra.account.urls')),

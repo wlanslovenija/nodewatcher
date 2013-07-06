@@ -241,6 +241,9 @@ INSTALLED_APPS = (
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
+    'nodewatcher.modules.frontend.editor',
+    'nodewatcher.modules.frontend.display',
+    'nodewatcher.modules.frontend.list',
     'nodewatcher.extra.account',
 
     # Legacy apps for migrations.
@@ -428,3 +431,5 @@ NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
 
 EVENTS_EMAIL = DEFAULT_FROM_EMAIL
 IMAGE_GENERATOR_EMAIL = DEFAULT_FROM_EMAIL
+
+FRONTEND_MAIN_COMPONENT = 'list'
