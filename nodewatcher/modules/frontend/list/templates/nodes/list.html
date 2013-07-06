@@ -20,11 +20,11 @@
 {% endblock %}
 
 {% block content %}
-    {% if web_client_node %}
+    {% if request.node %}
         {% notice webclient %}
             <b>You are visiting this page through the <i>{{ NETWORK.NAME }}</i> network.</b><br />
             <br />
-            You are using the <a href="{% url view_node web_client_node.get_current_id %}">{{ web_client_node.name|default:_("unknown") }}</a> node to connect to the network.
+            You are using the <a href="{% url view_node request.node.get_current_id %}">{{ request.node.name|default:_("unknown") }}</a> node to connect to the network.
         {% endnotice %}
     {% endif %}
     <table border="0" width="100%" class="listing">
