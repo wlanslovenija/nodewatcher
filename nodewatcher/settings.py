@@ -222,6 +222,7 @@ INSTALLED_APPS = (
     'nodewatcher.core',
     'nodewatcher.core.allocation',
     'nodewatcher.core.allocation.ip',
+    'nodewatcher.core.events',
     'nodewatcher.core.frontend',
     'nodewatcher.core.generator.cgm',
     'nodewatcher.core.generator',
@@ -408,6 +409,11 @@ GENERATOR_BUILDERS = {
 REGISTRY_RULES_MODULES = {
     'node.config': 'nodewatcher.rules',
 }
+
+# Disable South migrations during unit tests as they will fail.
+SOUTH_TESTS_MIGRATE = False
+# Disable South's own unit tests.
+SKIP_SOUTH_TESTS = True
 
 # In general, use https when constructing full URLs to nodewatcher?
 # Django's is_secure is used in the code as well. See SECURE_PROXY_SSL_HEADER configuration option.
