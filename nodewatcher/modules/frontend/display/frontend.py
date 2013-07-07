@@ -8,7 +8,7 @@ class DisplayComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
         return super(DisplayComponent, cls).get_urls() + urls.patterns('',
-            urls.url(r'^node/(?P<node>[^/]+)/$', views.DisplayNode.as_view(), name='node'),
+            urls.url(r'^node/(?P<pk>[^/]+)/$', views.DisplayNode.as_view(), name='node'),
         )
 
 components.pool.register(DisplayComponent)
