@@ -659,7 +659,7 @@ start() {
       uci set wireless.radio0.channel=100
       uci set wireless.radio0.country=US
       uci set wireless.radio0.txpower=22
-      uci set wireless.radio0.distance=1000
+      uci set wireless.radio0.distance=20000
       
       uci set wireless.@wifi-iface[0].device=radio0
       uci set wireless.@wifi-iface[0].network=mesh
