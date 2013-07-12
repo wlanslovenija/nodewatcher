@@ -670,6 +670,7 @@ start() {
       
       uci commit
       /etc/init.d/inituci disable
+      /etc/init.d/dnsmasq disable
       /sbin/wifi up
 }
 """)
