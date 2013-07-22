@@ -24,6 +24,7 @@ dnspython==1.10.0
 docutils==0.10
 kombu==2.5.12
 mimeparse==0.1.3
+mock==1.0.1
 mongoengine==0.6.18
 phonenumbers==5.6b1
 psycopg2==2.5.1
