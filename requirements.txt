@@ -20,7 +20,7 @@ django-polymorphic==0.5
 django-registration==0.8
 django-sekizai==0.7
 django-tastypie==0.9.15
-dnspython==1.10.0
+dnspython==1.11.0
 docutils==0.10
 kombu==2.5.12
 mimeparse==0.1.3
