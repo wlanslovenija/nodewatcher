@@ -43,7 +43,7 @@ class EventSinkPool(object):
             # Attempt to import the sink class
             sink = self._import_class(sink, exceptions.EventSinkNotFound, "Error importing event sink %s!")
             if not issubclass(sink, base.EventSink):
-                raise exceptions.InvalidEventSink("Event sinks should be EventSink subclasses!")
+                raise exceptions.InvalidEventSink("Event sink '%s' is not a subclass of nodewatcher.core.events.base.EventSink!")
 
             # Attempt to import any filters and register them on the sink
             sink = sink()

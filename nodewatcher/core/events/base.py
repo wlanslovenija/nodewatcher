@@ -39,7 +39,7 @@ class EventFilter(object):
         :return: True if the event should be delivered, False otherwise
         """
 
-        return True
+        raise NotImplementedError
 
 class EventSink(object):
     def __init__(self):
@@ -56,8 +56,9 @@ class EventSink(object):
         :param filter: Filter class to add
         """
 
-        if not hasattr(filter, "filter"):
-            raise exceptions.InvalidEventFilter("Filter must have a 'filter' method defined!")
+        if not isinstance(filter, EventFilter):
+            raise exceptions.InvalidEventFilter("Event filter '%s' is not a subclass of nodewatcher.core.events.base.EventFilter!" %
+                filter.__class__.__name__)
 
         self._filters.append(filter)
 
