@@ -1,12 +1,15 @@
 
-class EventSinkNotFound(Exception):
+class EventException(Exception):
     pass
 
-class InvalidEventSink(TypeError):
+class EventSinkNotFound(EventException):
     pass
 
-class EventFilterNotFound(Exception):
+class InvalidEventSink(EventException, TypeError):
     pass
 
-class InvalidEventFilter(TypeError):
+class EventFilterNotFound(EventException):
+    pass
+
+class InvalidEventFilter(EventException, TypeError):
     pass
