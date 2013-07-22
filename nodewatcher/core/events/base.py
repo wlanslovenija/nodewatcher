@@ -8,11 +8,27 @@ __all__ = [
     'EventRecord',
     'EventFilter',
     'EventSink',
-    'post',
 ]
 
 class EventRecord(object):
-    pass
+    """
+    An event record.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Class constructor. Any keyword arguments are saved into the event record.
+        """
+        self.timestamp = timezone.now()
+        self.__dict__.update(kwargs)
+
+    def post(self):
+        """
+        Posts an event to subscribed sinks.
+        """
+        # Post event to sinks
+        for sink in pool.get_all_sinks():
+            sink.post(self)
 
 class EventFilter(object):
     def filter(self, event):
@@ -67,18 +83,3 @@ class EventSink(object):
         """
 
         raise NotImplementedError
-
-def post(**kwargs):
-    """
-    Posts an event. Any keyword arguments are saved into the event record.
-    """
-
-    # Create an event record
-    event = EventRecord()
-    # TODO: Should we support registration of custom default attributes?
-    event.timestamp = timezone.now()
-    event.__dict__.update(kwargs)
-
-    # Post event to all sinks
-    for sink in pool.get_all_sinks():
-        sink.post(event)

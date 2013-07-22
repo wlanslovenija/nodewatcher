@@ -37,10 +37,10 @@ class EventsTestCase(unittest.TestCase):
         pool._discovered = False
 
     def test_event_processing(self):
-        base.post(a=1, b=2, message="Hello event world!")
-        base.post(a=3, b=4, message="Hello event world!")
-        base.post(a=5, b=6, c=True, message="Hello event world!")
-        base.post(a=7, b=8, message="Hello event world!")
+        base.EventRecord(a=1, b=2, message="Hello event world!").post()
+        base.EventRecord(a=3, b=4, message="Hello event world!").post()
+        base.EventRecord(a=5, b=6, c=True, message="Hello event world!").post()
+        base.EventRecord(a=7, b=8, message="Hello event world!").post()
 
         sink = pool.get_sink('test')
         self.assertEqual(len(sink.events), 3)
@@ -66,7 +66,7 @@ class InvalidEventsTestCase1(unittest.TestCase):
 
     def test_exceptions(self):
         with self.assertRaises(exceptions.EventSinkNotFound):
-            base.post(a=1, b=2, message="Hello event world!")
+            base.EventRecord(a=1, b=2, message="Hello event world!").post()
 
 class InvalidEventsTestCase2(unittest.TestCase):
     def setUp(self):
@@ -84,7 +84,7 @@ class InvalidEventsTestCase2(unittest.TestCase):
 
     def test_exceptions(self):
         with self.assertRaises(exceptions.EventFilterNotFound):
-            base.post(a=1, b=2, message="Hello event world!")
+            base.EventRecord(a=1, b=2, message="Hello event world!").post()
 
 class InvalidEventsTestCase3(unittest.TestCase):
     def setUp(self):
@@ -99,7 +99,7 @@ class InvalidEventsTestCase3(unittest.TestCase):
 
     def test_exceptions(self):
         with self.assertRaises(exceptions.InvalidEventSink):
-            base.post(a=1, b=2, message="Hello event world!")
+            base.EventRecord(a=1, b=2, message="Hello event world!").post()
 
 
 class InvalidEventsTestCase4(unittest.TestCase):
@@ -118,4 +118,4 @@ class InvalidEventsTestCase4(unittest.TestCase):
 
     def test_exceptions(self):
         with self.assertRaises(exceptions.InvalidEventFilter):
-            base.post(a=1, b=2, message="Hello event world!")
+            base.EventRecord(a=1, b=2, message="Hello event world!").post()
