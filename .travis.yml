@@ -1,0 +1,9 @@
+language: python
+python: "2.7"
+services:
+ - mongodb
+ - postgres
+install: "pip install -r requirements.txt --use-mirrors"
+before_script:
+  - psql -c 'create database test_nodewatcher;' -U postgres
+script: "./manage.py test"
