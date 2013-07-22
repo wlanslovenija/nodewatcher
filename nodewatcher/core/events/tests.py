@@ -26,9 +26,9 @@ class EventsTestCase(unittest.TestCase):
     def setUp(self):
         # Fake some sink configuration
         settings.EVENT_SINKS = {
-            'test' : {
-                'sink' : 'nodewatcher.core.events.tests.TestEventSink',
-                'filters' : (
+            'test': {
+                'sink': 'nodewatcher.core.events.tests.TestEventSink',
+                'filters': (
                     'nodewatcher.core.events.tests.TestEventFilter',
                 )
             }
@@ -57,8 +57,8 @@ class InvalidEventsTestCase1(unittest.TestCase):
     def setUp(self):
         # Fake some invalid sink configuration
         settings.EVENT_SINKS = {
-            'test' : {
-                'sink' : 'nodewatcher.core.events.tests.TestEventSinkInvalid',
+            'test': {
+                'sink': 'nodewatcher.core.events.tests.TestEventSinkInvalid',
             }
         }
         # Force re-discovery
@@ -72,9 +72,9 @@ class InvalidEventsTestCase2(unittest.TestCase):
     def setUp(self):
         # Fake some invalid sink configuration
         settings.EVENT_SINKS = {
-            'test' : {
-                'sink' : 'nodewatcher.core.events.tests.TestEventSink',
-                'filters' : (
+            'test': {
+                'sink': 'nodewatcher.core.events.tests.TestEventSink',
+                'filters': (
                     'this.is.an.invalid.filter.Spec',
                 )
             }
@@ -90,8 +90,8 @@ class InvalidEventsTestCase3(unittest.TestCase):
     def setUp(self):
         # Fake some invalid sink configuration
         settings.EVENT_SINKS = {
-            'test' : {
-                'sink' : 'nodewatcher.core.events.tests.TestInvalidSubclass',
+            'test': {
+                'sink': 'nodewatcher.core.events.tests.TestInvalidSubclass',
             }
         }
         # Force re-discovery
@@ -106,9 +106,9 @@ class InvalidEventsTestCase4(unittest.TestCase):
     def setUp(self):
         # Fake some invalid sink configuration
         settings.EVENT_SINKS = {
-            'test' : {
-                'sink' : 'nodewatcher.core.events.tests.TestEventSink',
-                'filters' : (
+            'test': {
+                'sink': 'nodewatcher.core.events.tests.TestEventSink',
+                'filters': (
                     'nodewatcher.core.events.tests.TestInvalidSubclass',
                 )
             }
