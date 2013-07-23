@@ -11,6 +11,7 @@ from ...generator.cgm import base as cgm_base
 
 from . import signals
 
+
 @celery_task()
 def background_build(node, platform, cfg):
     """
@@ -27,14 +28,14 @@ def background_build(node, platform, cfg):
     platform = cgm_base.get_platform(platform)
 
     # Dispatch pre-build signal
-    signals.pre_firmware_build.send(sender = None, node = node, platform = platform, cfg = cfg)
+    signals.pre_firmware_build.send(sender=None, node=node, platform=platform, cfg=cfg)
 
     # Build the firmware and obtain firmware files
     try:
         files = platform.build(node, cfg)
     except cgm_base.BuildError:
         # Dispatch error signal
-        signals.fail_firmware_build.send(sender = None, node = node, platform = platform, cfg = cfg)
+        signals.fail_firmware_build.send(sender=None, node=node, platform=platform, cfg=cfg)
         return
 
     # Copy firmware files to proper location
@@ -46,14 +47,14 @@ def background_build(node, platform, cfg):
 
     # Dispatch signal that can be used to modify files
     signals.post_firmware_build.send(
-        sender = None, node = node, platform = platform, cfg = cfg,
-        files = fw_files,
-        storage = storage
+        sender=None, node=node, platform=platform, cfg=cfg,
+        files=fw_files,
+        storage=storage
     )
 
     # Dispatch finalize signal
     signals.finalize_firmware_build.send(
-        sender = None, node = node, platform = platform, cfg = cfg,
-        files = fw_files,
-        storage = storage
+        sender=None, node=node, platform=platform, cfg=cfg,
+        files=fw_files,
+        storage=storage
     )

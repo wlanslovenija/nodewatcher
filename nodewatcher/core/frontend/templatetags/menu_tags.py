@@ -5,6 +5,7 @@ from .. import components
 
 register = template.Library()
 
+
 @register.assignment_tag(takes_context=True)
 def get_menu(context, menu_name):
     try:

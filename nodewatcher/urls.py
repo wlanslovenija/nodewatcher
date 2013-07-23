@@ -1,7 +1,9 @@
 from django.conf import settings, urls
 from django.conf.urls import static
 
-urlpatterns = urls.patterns('',
+urlpatterns = urls.patterns(
+    '',
+
     # Registry
     urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', app_name='registry')),
 
@@ -19,7 +21,9 @@ handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
 
 if settings.DEBUG:
-    urlpatterns += urls.patterns('',
+    urlpatterns += urls.patterns(
+        '',
+
         (r'^403/$', handler403),
         (r'^404/$', handler404),
         (r'^500/$', handler500),

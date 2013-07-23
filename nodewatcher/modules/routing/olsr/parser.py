@@ -2,14 +2,17 @@ import urllib
 
 from nodewatcher.utils import ipaddr
 
+
 class OlsrParseFailed(Exception):
     pass
+
 
 class OlsrInfo(object):
     """
     A simple class for obtaining OLSR routing information from olsrd via
     mod-txtinfo plugin.
     """
+
     def __init__(self, host, port):
         """
         Class constructor.
@@ -17,6 +20,7 @@ class OlsrInfo(object):
         :param host: olsrd-mod-txtinfo host
         :param port: olsrd-mod-txtinfo port
         """
+
         self.host = host
         self.port = port
         self._tables = None
@@ -25,18 +29,20 @@ class OlsrInfo(object):
         """
         Fetches and parses data from the daemon via HTTP.
         """
+
         try:
-            data = urllib.urlopen("http://{host}:{port}/".format(host = self.host,
-              port = self.port)).read()
+            data = urllib.urlopen(
+                'http://{host}:{port}/'.format(host=self.host, port=self.port)
+            ).read()
         except:
             raise OlsrParseFailed
 
         try:
-            tables = data.split("Table: ")[1:]
+            tables = data.split('Table: ')[1:]
             self._tables = {}
             for table in tables:
                 table = table.strip().split('\n')
-                self._tables[table[0].strip().lower()] = [tuple(x.strip().split("\t")) for x in table[2:]]
+                self._tables[table[0].strip().lower()] = [tuple(x.strip().split('\t')) for x in table[2:]]
         except (ValueError, IndexError):
             raise OlsrParseFailed
 
@@ -44,6 +50,7 @@ class OlsrInfo(object):
         """
         Returns topology information.
         """
+
         if self._tables is None:
             self._fetch_data()
 
@@ -53,10 +60,10 @@ class OlsrInfo(object):
             dst, src, lq, ilq, etx = topo_entry[:5]
             try:
                 topology.setdefault(src, []).append({
-                  "dst" : ipaddr.IPAddress(dst),
-                  "lq"  : float(lq),
-                  "ilq" : float(ilq),
-                  "etx" : float(etx),
+                    'dst': ipaddr.IPAddress(dst),
+                    'lq': float(lq),
+                    'ilq': float(ilq),
+                    'etx': float(etx),
                 })
             except ValueError:
                 # Skip entries with INFINITE ETX value
@@ -68,6 +75,7 @@ class OlsrInfo(object):
         """
         Returns node announces information.
         """
+
         if self._tables is None:
             self._fetch_data()
 
@@ -76,7 +84,7 @@ class OlsrInfo(object):
         for hna_entry in self._tables.get('hna', []):
             net, router_id = hna_entry[:2]
             announces.setdefault(router_id, []).append({
-              "net" : ipaddr.IPNetwork(net),
+                'net': ipaddr.IPNetwork(net),
             })
 
         return announces
@@ -85,6 +93,7 @@ class OlsrInfo(object):
         """
         Returns node announces information.
         """
+
         if self._tables is None:
             self._fetch_data()
 
@@ -94,8 +103,7 @@ class OlsrInfo(object):
             router_id, alias = mid_entry[:2]
             tmp = aliases.setdefault(router_id, [])
             tmp += [
-              { "alias" : ipaddr.IPAddress(x) }
-              for x in alias.split(';')
+                {'alias': ipaddr.IPAddress(x)} for x in alias.split(';')
             ]
 
         return aliases

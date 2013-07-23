@@ -4,6 +4,7 @@ from django.utils import importlib, datastructures
 
 from . import base, exceptions
 
+
 class FrontendComponentsPool(object):
     def __init__(self):
         self._components = datastructures.SortedDict()

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
+
 def load_modules(*types):
     """
     Loads the per-application specific modules that must always be loaded
@@ -13,7 +14,7 @@ def load_modules(*types):
 
     for app in settings.INSTALLED_APPS:
         mod = import_module(app)
-        
+
         for type in types:
             # Attempt to import the submodule if it exists
             if module_has_submodule(mod, type):

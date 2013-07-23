@@ -4,6 +4,7 @@ from ..registry.forms import formprocessors
 
 from . import models
 
+
 class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
     """
     A form processor that attempts to automatically satisfy allocation
@@ -14,6 +15,7 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         """
         Class constructor.
         """
+
         self.allocations = set()
 
     def preprocess(self, node):
@@ -27,8 +29,7 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
 
         # Automatically discover currently available allocation sources
         allocation_sources = [
-            item for item in registration.point('node.config').config_items()
-                if issubclass(item, models.AddressAllocator)
+            item for item in registration.point('node.config').config_items() if issubclass(item, models.AddressAllocator)
         ]
 
         for src in allocation_sources:
@@ -43,8 +44,7 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
 
         # Automatically discover currently available allocation sources
         allocation_sources = [
-            item for item in registration.point('node.config').config_items()
-                if issubclass(item, models.AddressAllocator)
+            item for item in registration.point('node.config').config_items() if issubclass(item, models.AddressAllocator)
         ]
 
         routerid_requests = {}
@@ -92,9 +92,9 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         # TODO: Do this only when saving for real, not on validation runs
         for family, request in routerid_requests.iteritems():
             try:
-                rid = node.config.core.routerid(queryset = True).get(family = family)
+                rid = node.config.core.routerid(queryset=True).get(family=family)
             except core_models.RouterIdConfig.DoesNotExist:
-                rid = node.config.core.routerid(create = core_models.RouterIdConfig)
+                rid = node.config.core.routerid(create=core_models.RouterIdConfig)
 
             rid.router_id = request.get_routerid()
             rid.save()

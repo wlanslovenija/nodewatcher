@@ -7,6 +7,7 @@ from . import forms, utils
 
 user_profile_registered = dispatch.Signal(providing_args=["user", "profile", "request"])
 
+
 class ProfileBackend(backends_default.DefaultBackend):
     """
     This class defines a registration backend with support for user profiles.

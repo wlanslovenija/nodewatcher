@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import fields as registry_fields, registration
 
+
 class TypeConfig(registration.bases.NodeConfigRegistryItem):
     """
     Type configuration determines the type of the node.

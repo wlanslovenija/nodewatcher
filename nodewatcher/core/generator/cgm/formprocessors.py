@@ -3,6 +3,7 @@ from ...registry.forms import formprocessors
 
 from . import base as cgm_base
 
+
 class NodeCgmValidator(formprocessors.RegistryFormProcessor):
     """
     A form processor that validates a node's firmware configuration via the
@@ -18,6 +19,6 @@ class NodeCgmValidator(formprocessors.RegistryFormProcessor):
         """
 
         try:
-            cgm_base.generate_config(node, only_validate = True)
+            cgm_base.generate_config(node, only_validate=True)
         except cgm_base.ValidationError, e:
             raise registry_forms.RegistryValidationError(*e.args)

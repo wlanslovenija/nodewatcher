@@ -11,6 +11,7 @@ from django.utils import decorators
 from django.utils import http as utils_http
 from django.utils.translation import ugettext_lazy as _
 
+
 def user_test_required(test_func, message_func=None, message_level_func=lambda u: messages.INFO, redirect_url_func=lambda u: None, redirect_field_name=auth.REDIRECT_FIELD_NAME, decorator_id=None):
     """
     Decorator for views that checks that the user passes the given test, redirecting if necessary (by default to the profile page).
@@ -45,6 +46,7 @@ def user_test_required(test_func, message_func=None, message_level_func=lambda u
 
     return decorator
 
+
 def authenticated_required(function=None, message_func=lambda u: _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """
     Decorator for views that checks that the user is logged in, redirecting if necessary (by default to the log-in page).
@@ -67,6 +69,7 @@ def authenticated_required(function=None, message_func=lambda u: _("You have to 
     if function:
         return actual_decorator(function)
     return actual_decorator
+
 
 def anonymous_required(function=None, message_func=lambda u: _("You should not be logged in while accessing the previous page."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """
@@ -91,6 +94,7 @@ def anonymous_required(function=None, message_func=lambda u: _("You should not b
         return actual_decorator(function)
     return actual_decorator
 
+
 def permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """
     Decorator for views that checks whether the user has a particular permission enabled, redirecting if necessary (by default
@@ -103,6 +107,7 @@ def permission_required(perm, message_func=lambda u: _("You do not have necessar
     """
 
     return decorators.user_passes_test(lambda u: u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(permission_required))
+
 
 def authenticated_permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page.") if u.is_authenticated() else _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL if u.is_authenticated() else settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """

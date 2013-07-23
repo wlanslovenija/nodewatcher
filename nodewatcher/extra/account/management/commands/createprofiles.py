@@ -6,6 +6,7 @@ from django.db.models import signals as models_signals
 
 from ... import utils
 
+
 class Command(management_base.NoArgsCommand):
     """
     This class defines an action for manage.py which populates database with user profiles for all users missing them.
@@ -26,6 +27,7 @@ class Command(management_base.NoArgsCommand):
                 # TODO: Change to self.stdout.write
                 print 'Created %s.' % profile
         transaction.commit_unless_managed()
+
 
 def command_signal(sender, app, created_models, **kwargs):
     if utils.get_profile_model() in created_models:

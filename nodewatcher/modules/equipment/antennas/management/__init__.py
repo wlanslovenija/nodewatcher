@@ -9,6 +9,7 @@ from .. import models as antennas_models
 
 _core_migrated = False
 
+
 def install_antenna_fixtures(sender, **kwargs):
     """
     Installs fixtures for all registered internal antennas.
@@ -27,9 +28,9 @@ def install_antenna_fixtures(sender, **kwargs):
     for router in cgm_base.iterate_routers():
         for antenna in router.antennas:
             try:
-                mdl = antennas_models.Antenna.objects.get(internal_for = router.identifier, internal_id = antenna.identifier)
+                mdl = antennas_models.Antenna.objects.get(internal_for=router.identifier, internal_id=antenna.identifier)
             except antennas_models.Antenna.DoesNotExist:
-                mdl = antennas_models.Antenna(internal_for = router.identifier, internal_id = antenna.identifier)
+                mdl = antennas_models.Antenna(internal_for=router.identifier, internal_id=antenna.identifier)
 
             # Update antenna model
             mdl.name = router.name

@@ -10,6 +10,7 @@ from . import models as antenna_models
 
 ANTENNA_FORM_FIELD_PREFIX = 'antenna_'
 
+
 class AntennaEquipmentConfigFormMeta(model_forms.ModelFormMetaclass):
     def __new__(cls, name, bases, attrs):
         # Prepare fields for our model
@@ -18,6 +19,7 @@ class AntennaEquipmentConfigFormMeta(model_forms.ModelFormMetaclass):
             fields['%s%s' % (ANTENNA_FORM_FIELD_PREFIX, fname)] = field
         attrs['_antenna_fields'] = fields
         return model_forms.ModelFormMetaclass.__new__(cls, name, bases, attrs)
+
 
 class AntennaEquipmentConfigForm(forms.ModelForm):
     """
@@ -37,7 +39,7 @@ class AntennaEquipmentConfigForm(forms.ModelForm):
         self.fields['antenna'].empty_label = _("[Add new antenna]")
         try:
             qs = self.fields['antenna'].queryset
-            qs = qs.filter(models.Q(internal_for = cfg['core.general'][0].router) | models.Q(internal_for = None))
+            qs = qs.filter(models.Q(internal_for=cfg['core.general'][0].router) | models.Q(internal_for=None))
             qs = qs.order_by("internal_for", "internal_id", "name")
             self.fields['antenna'].queryset = qs
         except (IndexError, KeyError, AttributeError):
@@ -70,7 +72,7 @@ class AntennaEquipmentConfigForm(forms.ModelForm):
 
             # Create and save the new antenna instance
             antenna = antenna_models.Antenna()
-            model_forms.save_instance(self, antenna, fail_message = 'created')
+            model_forms.save_instance(self, antenna, fail_message='created')
             self.cleaned_data = orig_cleaned_data
             self.instance.antenna = antenna
 

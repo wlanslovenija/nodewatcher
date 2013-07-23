@@ -1,8 +1,12 @@
-import os, tempfile, shutil, subprocess
+import os
+import shutil
+import subprocess
+import tempfile
 
 from django.conf import settings
 
 from nodewatcher.core.generator.cgm import base as cgm_base
+
 
 def build_image(cfg, arch, version, profile, packages):
     """

@@ -9,6 +9,7 @@ from ...utils import datastructures as nw_datastructures
 
 bases = registry_state.bases
 
+
 class LazyChoiceList(collections.Sequence):
     def __init__(self):
         super(LazyChoiceList, self).__init__()
@@ -34,6 +35,7 @@ class LazyChoiceList(collections.Sequence):
         self._dependent_choices.add((limited_to, choice))
         self._list.add(choice)
 
+
 class RegistrationPoint(object):
     """
     Registration point is a state holder for registry operations. There can be
@@ -43,10 +45,12 @@ class RegistrationPoint(object):
       - class hierarchy (static)
       - object hierarchy (runtime editable)
     """
+
     def __init__(self, model, namespace, point_id):
         """
         Class constructor.
         """
+
         self.model = model
         self.namespace = namespace
         self.name = point_id
@@ -61,14 +65,15 @@ class RegistrationPoint(object):
         item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
         item_dict[item._meta.module_name] = item
         return django_datastructures.SortedDict(
-            sorted(container.items(), key = lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_order', 0))
+            sorted(container.items(), key=lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_order', 0))
         )
 
-    def _register_item(self, item, object_toplevel = True):
+    def _register_item(self, item, object_toplevel=True):
         """
         Common functions for registering an item for both simple items and hierarchical
         ones.
         """
+
         if not issubclass(item, self.item_base):
             raise TypeError("Not a valid registry item class!")
 
@@ -81,7 +86,7 @@ class RegistrationPoint(object):
             return False
         else:
             self.item_classes.add(item)
-            self.item_classes_name["%s.%s" % (item._meta.app_label, item._meta.module_name)] = item
+            self.item_classes_name['%s.%s' % (item._meta.app_label, item._meta.module_name)] = item
 
         # Record the item in object hierarchy so we know which items don't depend on any other items in the
         # object (runtime editable) hierarchy
@@ -114,6 +119,7 @@ class RegistrationPoint(object):
         """
         Registers a new item to this registration point.
         """
+
         if not self._register_item(item):
             return
 
@@ -140,6 +146,7 @@ class RegistrationPoint(object):
         """
         Registers a registry item in a hierarchical relationship.
         """
+
         from . import fields as registry_fields
 
         # Verify parent registration
@@ -159,8 +166,10 @@ class RegistrationPoint(object):
 
                 # We have to use __dict__.get instead of getattr to prevent propagation of attribute access
                 # to parent classes where these subitems might not be registered
-                parent._registry_object_children = self._register_item_to_container(child,
-                  parent.__dict__.get('_registry_object_children', django_datastructures.SortedDict()))
+                parent._registry_object_children = self._register_item_to_container(
+                    child,
+                    parent.__dict__.get('_registry_object_children', django_datastructures.SortedDict()),
+                )
 
                 # Setup the parent relation and verify that one doesn't already exist
                 existing_parent = child.__dict__.get('_registry_object_parent', None)
@@ -183,6 +192,7 @@ class RegistrationPoint(object):
 
         :param item_cls: Registry item class
         """
+
         parent = item_cls.__base__
         if getattr(item_cls.RegistryMeta, 'hides_parent', False) and parent != self.item_base:
             parent._registry_hide_requests -= 1
@@ -197,6 +207,7 @@ class RegistrationPoint(object):
 
         :param cls_name: Registry item class name (with app label)
         """
+
         cls = self.item_classes_name.get(cls_name.lower(), None)
         if cls is None:
             return
@@ -210,6 +221,7 @@ class RegistrationPoint(object):
 
         :param item_cls: Registry item class
         """
+
         if not issubclass(item_cls, self.item_base):
             raise TypeError("Specified class is not a valid registry item!")
 
@@ -232,7 +244,7 @@ class RegistrationPoint(object):
             assert len(self.item_object_toplevel[registry_id]) > 0
             self._unregister_item(item_cls)
 
-    def get_children(self, parent = None):
+    def get_children(self, parent=None):
         """
         Returns the child registry item classes that are available under the given
         parent registry item (via internal foreign key relationships). If None is
@@ -241,6 +253,7 @@ class RegistrationPoint(object):
 
         :param parent: Parent registry item class or None
         """
+
         if parent is None:
             return self.item_object_toplevel.values()
         else:
@@ -255,9 +268,10 @@ class RegistrationPoint(object):
         :param registry_id: A valid registry identifier
         :return: A tuple (queryset, top_class)
         """
+
         assert isinstance(root, self.model)
         top_level = self.item_registry[registry_id]
-        return getattr(root, "{0}_{1}_{2}".format(self.namespace, top_level._meta.app_label, top_level._meta.module_name)), top_level
+        return getattr(root, '{0}_{1}_{2}'.format(self.namespace, top_level._meta.app_label, top_level._meta.module_name)), top_level
 
     def get_top_level_class(self, registry_id):
         """
@@ -265,6 +279,7 @@ class RegistrationPoint(object):
 
         :param registry_id: A valid registry identifier
         """
+
         try:
             return self.item_registry[registry_id]
         except KeyError:
@@ -274,6 +289,7 @@ class RegistrationPoint(object):
         """
         Returns the registry accessor for the specified root.
         """
+
         assert isinstance(root, self.model)
         return getattr(root, self.namespace)
 
@@ -281,18 +297,21 @@ class RegistrationPoint(object):
         """
         Returns a list of previously registered choices.
         """
+
         return self.choices_registry.setdefault(choices_id, LazyChoiceList())
 
-    def register_choice(self, choices_id, enum, text, limited_to = None):
+    def register_choice(self, choices_id, enum, text, limited_to=None):
         """
         Registers a new choice/enumeration.
         """
+
         self.get_registered_choices(choices_id).add_choice((enum, text), limited_to)
 
     def config_items(self):
         """
         A generator that iterates through registered items.
         """
+
         return iter(self.item_classes)
 
     def add_mixins(self, *mixins):
@@ -302,9 +321,11 @@ class RegistrationPoint(object):
 
         :parma mixins: Mixin classes
         """
+
         self.item_base.__bases__ += tuple(mixins)
 
-def create_point(model, namespace, mixins = None):
+
+def create_point(model, namespace, mixins=None):
     """
     Creates a new registration point (= registry root).
 
@@ -312,16 +333,17 @@ def create_point(model, namespace, mixins = None):
     :param namespace: Registration point namespace
     :param mixins: Optional list of mixin classes for the top-level registry item
     """
+
     # Properly handle deferred root model names
     try:
-        app_label, model_name = model.split(".")
+        app_label, model_name = model.split('.')
     except ValueError:
         raise ValueError("Deferred root model names must be of the form app_label.model_name!")
     except AttributeError:
         app_label = model._meta.app_label
         model_name = model._meta.object_name
 
-    point_id = "%s.%s" % (model_name.lower(), namespace)
+    point_id = '%s.%s' % (model_name.lower(), namespace)
     if point_id not in registry_state.points:
         point = RegistrationPoint(model, namespace, point_id)
         registry_state.points[point_id] = point
@@ -333,17 +355,17 @@ def create_point(model, namespace, mixins = None):
         if mixins is None:
             mixins = []
 
-        base_name = "{0}{1}RegistryItem".format(model_name, namespace.capitalize())
+        base_name = '{0}{1}RegistryItem'.format(model_name, namespace.capitalize())
         item_base = type(
-          base_name,
-          (registry_models.RegistryItemBase,) + tuple(mixins),
-          {
-            '__module__' : 'nodewatcher.core.registry.models',
-            'Meta' : Meta,
-            'root' : models.ForeignKey(
-              model, null = False, editable = False, related_name = '{0}_%(app_label)s_%(class)s'.format(namespace)
-            )
-          }
+            base_name,
+            (registry_models.RegistryItemBase,) + tuple(mixins),
+            {
+                '__module__': 'nodewatcher.core.registry.models',
+                'Meta': Meta,
+                'root': models.ForeignKey(
+                    model, null=False, editable=False, related_name='{0}_%(app_label)s_%(class)s'.format(namespace)
+                )
+            }
         )
         point.item_base = item_base
         setattr(bases, base_name, item_base)
@@ -361,16 +383,18 @@ def create_point(model, namespace, mixins = None):
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation
-        model = models.get_model(app_label, model_name, seed_cache = False, only_installed = False)
+        model = models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
         if model:
             augment_root_model(model)
         else:
             registry_state.deferred_roots.setdefault((app_label, model_name), []).append(augment_root_model)
 
+
 def handle_deferred_root(sender, **kwargs):
     """
     Finalizes any deferred root registrations.
     """
+
     key = (sender._meta.app_label, sender._meta.object_name)
     if key in registry_state.deferred_roots:
         for callback in registry_state.deferred_roots.pop(key, []):
@@ -378,13 +402,16 @@ def handle_deferred_root(sender, **kwargs):
 
 models.signals.class_prepared.connect(handle_deferred_root)
 
+
 def point(name):
     """
     Returns an existing registration point.
 
     :param name: Registration point name
     """
+
     return registry_state.points[name]
+
 
 def register_form_for_item(item, form_class):
     """
@@ -393,6 +420,7 @@ def register_form_for_item(item, form_class):
     :param item: Registry item class
     :param form_class: Form class
     """
+
     if not hasattr(item, '_forms'):
         item._forms = {}
 

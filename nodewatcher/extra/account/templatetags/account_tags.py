@@ -5,6 +5,7 @@ from .. import decorators
 
 register = template.Library()
 
+
 @register.filter
 def anonymous_required(value):
     """
@@ -21,6 +22,7 @@ def anonymous_required(value):
     if not hasattr(view, 'decorators'):
         return False
     return id(decorators.anonymous_required) in view.decorators
+
 
 @register.filter
 def authenticated_required(value):

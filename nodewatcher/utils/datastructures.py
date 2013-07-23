@@ -1,5 +1,6 @@
 import collections
 
+
 # Based on http://code.activestate.com/recipes/576694/ (r9)
 class OrderedSet(collections.MutableSet):
     def __init__(self, iterable=None):

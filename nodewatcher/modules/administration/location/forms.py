@@ -6,6 +6,7 @@ from nodewatcher.core.registry import registration, widgets as registry_widgets
 
 from . import models
 
+
 class LocationConfigForm(forms.ModelForm):
     """
     Location configuration form.
@@ -14,9 +15,9 @@ class LocationConfigForm(forms.ModelForm):
     class Meta:
         model = models.LocationConfig
         widgets = {
-            'geolocation' : registry_widgets.LocationWidget(
-                map_width = 400,
-                map_height = 300
+            'geolocation': registry_widgets.LocationWidget(
+                map_width=400,
+                map_height=300
             )
         }
 

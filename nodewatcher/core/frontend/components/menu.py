@@ -13,10 +13,12 @@ __all__ = [
     'menus'
 ]
 
+
 def ugettext_lazy(message):
     translated = translation.ugettext_lazy(message)
     translated.message = message
     return translated
+
 
 class MenuEntry(object):
     def __init__(self, label=None, url=None, permission_check=None, order=0):
@@ -53,6 +55,7 @@ class MenuEntry(object):
         with_context = copy.copy(self)
         with_context._context = context
         return with_context
+
 
 class Menu(object):
     def __init__(self, name):
@@ -109,6 +112,7 @@ class Menu(object):
 
         # Sort entries by settings, entry order, or name
         self._entries.sort(key=sort_key, reverse=True)
+
 
 class Menus(object):
     def __init__(self):

@@ -12,6 +12,7 @@ user_login = dispatch.Signal(providing_args=["request", "user"])
 # Arugment is user which has logged out if any
 user_logout = dispatch.Signal(providing_args=["request", "user"])
 
+
 def user_login_message(sender, request, user, **kwargs):
     """
     Gives a success login message to the user.
@@ -20,6 +21,7 @@ def user_login_message(sender, request, user, **kwargs):
     messages.success(request, _("You have been successfully logged in."), fail_silently=True)
 
 user_login.connect(user_login_message, dispatch_uid=__name__ + '.user_login_message')
+
 
 def set_language(sender, request, user, **kwargs):
     """
@@ -30,6 +32,7 @@ def set_language(sender, request, user, **kwargs):
 
 user_login.connect(set_language, dispatch_uid=__name__ + '.set_language')
 
+
 def user_logout_message(sender, request, user, **kwargs):
     """
     Gives a success logout message to the user.
@@ -38,6 +41,7 @@ def user_logout_message(sender, request, user, **kwargs):
     messages.success(request, _("You have been successfully logged out."), fail_silently=True)
 
 user_logout.connect(user_logout_message, dispatch_uid=__name__ + '.user_logout_message')
+
 
 def cleanup_registration_profile(user, request, **kwargs):
     """

@@ -5,16 +5,18 @@ from django.utils import unittest
 
 from . import models
 
+
 @transaction.commit_on_success
 def _concurrent_allocation_worker(pool):
     try:
-        alloc = pool.allocate_subnet(prefix_len = 27)
+        alloc = pool.allocate_subnet(prefix_len=27)
         alloc.free()
-        alloc = pool.allocate_subnet(prefix_len = 27)
+        alloc = pool.allocate_subnet(prefix_len=27)
     except:
         return None
 
     return (alloc.network, alloc.prefix_length)
+
 
 class IpPoolTestCase(unittest.TestCase):
     def setUp(self):
@@ -22,23 +24,24 @@ class IpPoolTestCase(unittest.TestCase):
         Prepare the IP pool test environment by creating some dummy IP
         pools.
         """
+
         self.pool = models.IpPool.objects.create(
-            family = "ipv4",
-            network = "10.10.0.0",
-            prefix_length = 16,
+            family='ipv4',
+            network='10.10.0.0',
+            prefix_length=16,
         )
 
         self.small_pool = models.IpPool.objects.create(
-            family = "ipv4",
-            network = "192.168.1.0",
-            prefix_length = 26,
+            family='ipv4',
+            network='192.168.1.0',
+            prefix_length=26,
         )
 
     def test_basic_allocation(self):
         # Test that we really get properly allocated objects
-        a = self.pool.allocate_subnet(prefix_len = 27)
-        b = self.pool.allocate_subnet(prefix_len = 27)
-        c = self.pool.allocate_subnet(prefix_len = 26)
+        a = self.pool.allocate_subnet(prefix_len=27)
+        b = self.pool.allocate_subnet(prefix_len=27)
+        c = self.pool.allocate_subnet(prefix_len=26)
 
         # Test that something has been allocated
         self.assertNotEqual(a, None)
@@ -61,23 +64,23 @@ class IpPoolTestCase(unittest.TestCase):
 
     def test_allocation_failure(self):
         # Test that we can't allocate more than we have
-        a = self.small_pool.allocate_subnet(prefix_len = 24)
+        a = self.small_pool.allocate_subnet(prefix_len=24)
         self.assertEqual(a, None)
 
         # Test that we fail to get an allocation when the pool is exhausted
-        a = self.small_pool.allocate_subnet(prefix_len = 27)
-        b = self.small_pool.allocate_subnet(prefix_len = 27)
-        c = self.small_pool.allocate_subnet(prefix_len = 27)
+        a = self.small_pool.allocate_subnet(prefix_len=27)
+        b = self.small_pool.allocate_subnet(prefix_len=27)
+        c = self.small_pool.allocate_subnet(prefix_len=27)
         self.assertNotEqual(a, None)
         self.assertNotEqual(b, None)
         self.assertEqual(c, None)
 
     def test_freeing(self):
         # Test that free works as expected
-        a = self.pool.allocate_subnet(prefix_len = 26)
-        b = self.pool.allocate_subnet(prefix_len = 27)
+        a = self.pool.allocate_subnet(prefix_len=26)
+        b = self.pool.allocate_subnet(prefix_len=27)
         a.free()
-        c = self.pool.allocate_subnet(prefix_len = 26)
+        c = self.pool.allocate_subnet(prefix_len=26)
         self.assertEqual(c.network, a.network)
         self.assertEqual(c.prefix_length, a.prefix_length)
 

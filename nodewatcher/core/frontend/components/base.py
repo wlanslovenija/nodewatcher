@@ -5,6 +5,7 @@ __all__ = [
     'FrontendComponent',
 ]
 
+
 class FrontendComponent(object):
     name = None
     dependencies = ()

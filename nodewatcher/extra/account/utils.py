@@ -1,9 +1,12 @@
-import inspect, random, string
+import inspect
+import random
+import string
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import exceptions
 from django.db import models
+
 
 def generate_random_password(length=8):
     """
@@ -23,6 +26,7 @@ def generate_random_password(length=8):
         x += random.choice(string.ascii_letters + string.digits)
 
     return x
+
 
 def get_profile_model():
     """
@@ -45,6 +49,7 @@ def get_profile_model():
         raise auth_models.SiteProfileNotAvailable
     return model
 
+
 def user_activation_cleanup(user):
     """
     Some additinal clenaup after user activation.
@@ -64,6 +69,7 @@ def user_activation_cleanup(user):
         # Not really sure why we would have to leave it as RegistrationProfile.ACTIVATED
         user.registrationprofile_set.all().delete()
 
+
 def intersect(a, b):
     """
     Finds the intersection of two dictionaries.
@@ -73,6 +79,7 @@ def intersect(a, b):
     """
 
     return dict(filter(lambda (x, y): x in a, b.items()))
+
 
 def initial_accepts_request(request, form_class):
     """

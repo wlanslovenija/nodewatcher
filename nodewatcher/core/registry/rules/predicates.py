@@ -18,8 +18,10 @@ __all__ = [
     'append',
 ]
 
+
 class MissingValueError(engine.EvaluationError):
     pass
+
 
 def rule(condition, *args):
     """
@@ -27,6 +29,7 @@ def rule(condition, *args):
 
     :param condition: Lazy expression that represents a condition
     """
+
     if not isinstance(condition, (engine.LazyValue, engine.RuleModifier)):
         raise engine.CompilationError("Rule conditions must be lazy values or rule modifiers!")
 
@@ -48,10 +51,12 @@ def rule(condition, *args):
     ctx._rules.append(new_rule)
     return new_rule
 
-def assign(_item, _cls = None, _parent = None, _index = 0, _set = None, **kwargs):
+
+def assign(_item, _cls=None, _parent=None, _index=0, _set=None, **kwargs):
     """
     Assign predicate assigns values to existing configuration items.
     """
+
     def action_assign(context):
         if _set is None:
             return
@@ -81,11 +86,13 @@ def assign(_item, _cls = None, _parent = None, _index = 0, _set = None, **kwargs
             setattr(item, key, value)
 
         context.results.setdefault(_item, []).append(registry_forms.AssignToFormAction(
-          item, indices[_index], _set, parent = parent_cfg))
+            item, indices[_index], _set, parent=parent_cfg,
+        ))
 
     return engine.Action(action_assign)
 
-def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
+
+def filter_cfg_items(cfg_items, _cls=None, _parent=None, **kwargs):
     """
     A helper function for filtering partial configuration items based on
     specified criteria.
@@ -95,9 +102,11 @@ def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
     :param _parent: Optional parent instance filter
     :return: A tuple (indices, items)
     """
+
     indices = []
     items = []
     index = 0
+
     for cfg in cfg_items[:]:
         # Filter based on specified parent
         if _parent is not None and (not hasattr(cfg.__class__, '_registry_object_parent_link') or
@@ -127,6 +136,7 @@ def filter_cfg_items(cfg_items, _cls = None, _parent = None, **kwargs):
 
     return indices, items
 
+
 def resolve_parent_item(context, parent):
     """
     A helper function for resolving the parent item in partial configuration.
@@ -135,6 +145,7 @@ def resolve_parent_item(context, parent):
     :param parent: Parent filter specified
     :return: Parent partial configuration item
     """
+
     parent_cfg = None
     if parent is not None:
         if '_item' not in parent:
@@ -151,7 +162,8 @@ def resolve_parent_item(context, parent):
 
     return parent_cfg
 
-def record_remove_cfg_item(context, container, parent, item, index, index_tree, level = 0):
+
+def record_remove_cfg_item(context, container, parent, item, index, index_tree, level=0):
     """
     A helper function for removing an item from the partial configuration. It
     doesn't actually remove any items, but records all operations that are
@@ -164,6 +176,7 @@ def record_remove_cfg_item(context, container, parent, item, index, index_tree, 
     :param index: Item's index in the container
     :param index_tree: A dictionary where operations will be recorded
     """
+
     reg_id = item.RegistryMeta.registry_id
 
     # Record this removal into the index tree, but do not remove any items as this
@@ -182,13 +195,15 @@ def record_remove_cfg_item(context, container, parent, item, index, index_tree, 
     # Recursively remove all children
     for rid in registry_children:
         citems = context.partial_config[rid]
-        for index, child in zip(*filter_cfg_items(citems, _parent = item)):
+        for index, child in zip(*filter_cfg_items(citems, _parent=item)):
             record_remove_cfg_item(context, citems, item, child, index, index_tree, level + 1)
 
-def remove(_item, _cls = None, _parent = None, **kwargs):
+
+def remove(_item, _cls=None, _parent=None, **kwargs):
     """
     Action that removes specific configuration items.
     """
+
     def action_remove(context):
         try:
             tlc = context.regpoint.get_top_level_class(_item)
@@ -211,19 +226,21 @@ def remove(_item, _cls = None, _parent = None, **kwargs):
 
         # Perform actual removal of items - both in partial configuration and in forms (via actions)
         #for (level, registry_root, parent), (container, items, indices) in index_tree.iteritems():
-        for level, registry_root, parent in sorted(index_tree.keys(), key = lambda x: x[0], reverse = True):
+        for level, registry_root, parent in sorted(index_tree.keys(), key=lambda x: x[0], reverse=True):
             container, items, indices = index_tree[level, registry_root, parent]
             for item in items:
                 container.remove(item)
 
-            context.results.setdefault(registry_root, []).append(registry_forms.RemoveFormAction(indices, parent = parent))
+            context.results.setdefault(registry_root, []).append(registry_forms.RemoveFormAction(indices, parent=parent))
 
     return engine.Action(action_remove)
 
-def append(_item, _cls = None, _parent = None, **kwargs):
+
+def append(_item, _cls=None, _parent=None, **kwargs):
     """
     Action that appends a config item to a specific location.
     """
+
     def action_append(context):
         cls_name = _cls
         try:
@@ -256,16 +273,19 @@ def append(_item, _cls = None, _parent = None, **kwargs):
 
     return engine.Action(action_append)
 
+
 def count(value):
     """
     Lazy value that returns the number of elements of another lazy expression.
 
     :param value: Lazy expression
     """
+
     if not isinstance(value, engine.LazyValue):
         raise engine.CompilationError("Count predicate argument must be a lazy value!")
 
     return engine.LazyValue(lambda context: len(value(context) or []))
+
 
 def value(location):
     """
@@ -273,6 +293,7 @@ def value(location):
 
     :param location: Registry location or LazyValue
     """
+
     if isinstance(location, engine.LazyValue):
         return location
 
@@ -309,6 +330,7 @@ def value(location):
 
     return engine.LazyValue(location_resolver)
 
+
 def changed(location):
     """
     A rule modifier predicate that will evaluate to True whenever a specific
@@ -316,10 +338,12 @@ def changed(location):
 
     :param location: Registry location or LazyValue
     """
+
     return engine.RuleModifier(
         lambda rule: setattr(rule, 'always_evaluate', True),
         lambda context: context.has_value_changed(location, value(location)(context))
     )
+
 
 def foreach(container, *args):
     """
@@ -331,6 +355,7 @@ def foreach(container, *args):
 
     :param container: Lazy container
     """
+
     if not isinstance(container, engine.LazyValue):
         raise engine.CompilationError("Foreach predicate container argument must be a lazy value!")
 
@@ -342,11 +367,14 @@ def foreach(container, *args):
 
     return engine.Action(loop)
 
+
 def loop_var():
     """
     Returns the value of the current loop variable when executed.
     """
+
     return engine.LazyValue(lambda context: getattr(context, '_loop_variable', None))
+
 
 def contains(container, value):
     """
@@ -356,6 +384,7 @@ def contains(container, value):
     :param container: Lazy container
     :param value: Value that should be checked
     """
+
     if not isinstance(container, engine.LazyValue):
         raise engine.CompilationError("Container argument must be a lazy value!")
 

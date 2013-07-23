@@ -6,10 +6,12 @@ from nodewatcher.core.monitor import models as monitor_models, processors as mon
 
 from . import models as olsr_models, parser as olsr_parser
 
+
 class OLSRTopology(monitor_processors.NetworkProcessor):
     """
     Processor that handles monitoring of olsrd routing daemon.
     """
+
     def process(self, context, nodes):
         """
         Performs network-wide processing and selects the nodes that will be processed
@@ -19,11 +21,14 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
         :param nodes: A set of nodes that are to be processed
         :return: A (possibly) modified context and a (possibly) modified set of nodes
         """
-        with context.in_namespace("routing"):
-            with context.in_namespace("olsr"):
+
+        with context.in_namespace('routing'):
+            with context.in_namespace('olsr'):
                 self.logger.info("Parsing olsrd information...")
-                olsr_info = olsr_parser.OlsrInfo(host = settings.OLSRD_MONITOR_HOST,
-                                                 port = settings.OLSRD_MONITOR_PORT)
+                olsr_info = olsr_parser.OlsrInfo(
+                    host=settings.OLSRD_MONITOR_HOST,
+                    port=settings.OLSRD_MONITOR_PORT,
+                )
 
                 try:
                     context.topology = olsr_info.get_topology()
@@ -38,11 +43,11 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
                 visible_routers = set(context.topology.keys())
                 registered_routers = set()
                 context.router_id_map = {}
-                for node in core_models.Node.objects.regpoint("config")\
-                .registry_fields(router_id = "RouterIdConfig.router_id")\
-                .filter(
-                  routeridconfig_family = "ipv4",
-                  routeridconfig_router_id__in = visible_routers
+                for node in core_models.Node.objects.regpoint('config').registry_fields(
+                    router_id='RouterIdConfig.router_id'
+                ).filter(
+                    routeridconfig_family='ipv4',
+                    routeridconfig_router_id__in=visible_routers,
                 ):
                     context.router_id_map[node.router_id] = node
                     registered_routers.add(node.router_id)
@@ -56,16 +61,17 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
                     nodes.add(node)
                     context.router_id_map[router_id] = node
 
-                    rid_cfg = node.config.core.routerid(create = core_models.RouterIdConfig)
+                    rid_cfg = node.config.core.routerid(create=core_models.RouterIdConfig)
                     rid_cfg.router_id = router_id
-                    rid_cfg.family = "ipv4"
+                    rid_cfg.family = 'ipv4'
                     rid_cfg.save()
 
-                    status_mon = node.monitoring.core.status(create = monitor_models.StatusMonitor)
-                    status_mon.status = "invalid"
+                    status_mon = node.monitoring.core.status(create=monitor_models.StatusMonitor)
+                    status_mon.status = 'invalid'
                     status_mon.save()
 
         return context, nodes
+
 
 class OLSRNodePostprocess(monitor_processors.NodeProcessor):
     def process(self, context, node):
@@ -76,17 +82,18 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
         :param node: Node that is being processed
         :return: A (possibly) modified context
         """
+
         try:
-            router_id = node.config.core.routerid(queryset = True).get(family = "ipv4").router_id
+            router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
             topology = context.routing.olsr.topology.get(router_id, [])
             announces = context.routing.olsr.announces.get(router_id, [])
             aliases = context.routing.olsr.aliases.get(router_id, [])
 
             # Setup links in topology tables
             try:
-                rtm = node.monitoring.network.routing.topology(onlyclass = olsr_models.OlsrRoutingTopologyMonitor)[0]
+                rtm = node.monitoring.network.routing.topology(onlyclass=olsr_models.OlsrRoutingTopologyMonitor)[0]
             except IndexError:
-                rtm = node.monitoring.network.routing.topology(create = olsr_models.OlsrRoutingTopologyMonitor)
+                rtm = node.monitoring.network.routing.topology(create=olsr_models.OlsrRoutingTopologyMonitor)
                 rtm.save()
 
             if not topology:
@@ -100,9 +107,9 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
                     continue
 
                 try:
-                    elink = rtm.links.get(peer = dst_node)
+                    elink = rtm.links.get(peer=dst_node)
                 except monitor_models.TopologyLink.DoesNotExist:
-                    elink = olsr_models.OlsrTopologyLink(monitor = rtm, peer = dst_node)
+                    elink = olsr_models.OlsrTopologyLink(monitor=rtm, peer=dst_node)
 
                 elink.lq = link['lq']
                 elink.ilq = link['ilq']
@@ -112,18 +119,19 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
                 visible_links.append(elink)
 
             # Remove all links that do not exist anymore
-            rtm.links.exclude(pk__in = [x.pk for x in visible_links]).delete()
+            rtm.links.exclude(pk__in=[x.pk for x in visible_links]).delete()
 
             # Setup networks in announce tables
             visible_announces = []
             existing_announces = node.monitoring.network.routing.announces(
-              onlyclass = olsr_models.OlsrRoutingAnnounceMonitor, queryset = True)
+                onlyclass=olsr_models.OlsrRoutingAnnounceMonitor, queryset=True
+            )
             for announce in announces + aliases:
                 network = announce['net'] if 'net' in announce else announce['alias']
                 try:
-                    eannounce = existing_announces.get(network = network)
+                    eannounce = existing_announces.get(network=network)
                 except monitor_models.RoutingAnnounceMonitor.DoesNotExist:
-                    eannounce = olsr_models.OlsrRoutingAnnounceMonitor(root = node, network = network)
+                    eannounce = olsr_models.OlsrRoutingAnnounceMonitor(root=node, network=network)
 
                 eannounce.status = "ok" if 'net' in announce else "alias"
                 eannounce.last_seen = timezone.now()
@@ -131,7 +139,7 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
                 visible_announces.append(eannounce)
 
             # Remove all announces that do not exist anymore
-            existing_announces.exclude(pk__in = [x.pk for x in visible_announces]).delete()
+            existing_announces.exclude(pk__in=[x.pk for x in visible_announces]).delete()
         except core_models.RouterIdConfig.DoesNotExist:
             # No router-id for this node can be found for IPv4; this means
             # that we have nothing to do here

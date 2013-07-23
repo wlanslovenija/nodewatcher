@@ -1,4 +1,5 @@
-import crypt, md5crypt
+import crypt
+import md5crypt
 
 from django.contrib.auth import backends as auth_backends, models as auth_models
 
@@ -7,6 +8,7 @@ try:
     APR_ENABLED = True
 except ImportError:
     APR_ENABLED = False
+
 
 class AprBackend(object):
     supports_object_permissions = False
@@ -37,10 +39,12 @@ class AprBackend(object):
         """
         Translates the user ID into the User object.
         """
+
         try:
             return auth_models.User.objects.get(pk=user_id)
         except auth_models.User.DoesNotExist:
             return None
+
 
 class CryptBackend(object):
     supports_object_permissions = False
@@ -51,6 +55,7 @@ class CryptBackend(object):
         """
         Authenticates against the database using crypt hash function.
         """
+
         try:
             user = auth_models.User.objects.get(username__iexact=username)
             if crypt.crypt(password, user.password) == user.password or md5crypt.md5crypt(password, user.password) == user.password:
@@ -67,16 +72,19 @@ class CryptBackend(object):
         """
         Translates the user ID into the User object.
         """
+
         try:
             return auth_models.User.objects.get(pk=user_id)
         except auth_models.User.DoesNotExist:
             return None
+
 
 class ModelBackend(auth_backends.ModelBackend):
     def authenticate(self, username=None, password=None):
         """
         Authenticates against the database using official implementation but catches exceptions and does it in case-insensitive manner.
         """
+
         try:
             user = auth_models.User.objects.get(username__iexact=username)
             if user.check_password(password):

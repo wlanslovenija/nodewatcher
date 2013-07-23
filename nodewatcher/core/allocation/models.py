@@ -1,6 +1,7 @@
 from django.contrib.contenttypes import generic, models as contenttypes_models
 from django.db import models
 
+
 class AddressAllocator(models.Model):
     """
     An abstract class defining an API for address allocator items.
@@ -42,6 +43,7 @@ class AddressAllocator(models.Model):
         :param other: AddressAllocator instance
         :return: True if request has been satisfied, False otherwise
         """
+
         raise NotImplementedError
 
     def free(self):
@@ -65,8 +67,10 @@ class AddressAllocator(models.Model):
 
         raise NotImplementedError
 
+
 class PoolAllocationError(Exception):
     pass
+
 
 class PoolBase(models.Model):
     """
@@ -76,19 +80,19 @@ class PoolBase(models.Model):
     class Meta:
         abstract = True
 
-    parent = models.ForeignKey('self', null = True, related_name = 'children')
+    parent = models.ForeignKey('self', null=True, related_name='children')
 
     # Bookkeeping for allocated pools
-    allocation_content_type = models.ForeignKey(contenttypes_models.ContentType, null = True)
-    allocation_object_id = models.CharField(max_length = 50, null = True)
+    allocation_content_type = models.ForeignKey(contenttypes_models.ContentType, null=True)
+    allocation_object_id = models.CharField(max_length=50, null=True)
     allocation_content_object = generic.GenericForeignKey('allocation_content_type', 'allocation_object_id')
-    allocation_timestamp = models.DateTimeField(null = True)
+    allocation_timestamp = models.DateTimeField(null=True)
 
     @classmethod
     def modifies_pool(cls, f):
         def decorator(self, *args, **kwargs):
             # Lock our own instance
-            locked_instance = self.__class__.objects.select_for_update().get(pk = self.pk)
+            locked_instance = self.__class__.objects.select_for_update().get(pk=self.pk)
             return f(locked_instance, *args, **kwargs)
 
         return decorator

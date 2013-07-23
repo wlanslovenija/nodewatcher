@@ -3,12 +3,14 @@ from .... import models as core_models
 
 from . import parser as telemetry_parser
 
+
 class HTTPTelemetryContext(monitor_processors.ProcessorContext):
     """
     Augmented context for HTTP telemetry information that can be used
     by store/analyze modules for some common functionality like checking
     module presence/versions.
     """
+
     def get_module_version(self, module):
         """
         Returns the active version of a telemetry module present on the remote
@@ -18,6 +20,7 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
         :return: An integer representing the version or 0 if module is
           not installed/present
         """
+
         module = module.replace('.', '-')
         metadata = self.META.modules.get(module)
         if metadata:
@@ -30,12 +33,14 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
 
         return 0
 
+
 class HTTPTelemetry(monitor_processors.NodeProcessor):
     """
     Implements fetching and parsing of nodewatcher HTTP telemetry data. It
     does not do any further processing, the processing must be done by
     individual modules in their store/analyze methods.
     """
+
     def process(self, context, node):
         """
         Called for every processed node.
@@ -44,8 +49,9 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
         :param node: Node that is being processed
         :return: A (possibly) modified context
         """
+
         try:
-            router_id = node.config.core.routerid(queryset = True).get(family = "ipv4").router_id
+            router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
             parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
 
             # Fetch information from the router and merge it into local context

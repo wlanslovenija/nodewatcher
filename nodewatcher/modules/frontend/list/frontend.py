@@ -4,6 +4,7 @@ from nodewatcher.core.frontend import components
 
 from . import views
 
+
 class ListComponent(components.FrontendComponent):
     @classmethod
     def get_main_url(cls):

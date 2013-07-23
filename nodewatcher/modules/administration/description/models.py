@@ -3,13 +3,14 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import registration
 
+
 class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
     """
     Textual description of a node.
     """
 
-    notes = models.TextField(blank = True, default = '')
-    url = models.URLField(verify_exists = False, blank = True, default = '', verbose_name = _("URL"))
+    notes = models.TextField(blank=True, default='')
+    url = models.URLField(verify_exists=False, blank=True, default='', verbose_name=_("URL"))
 
     class RegistryMeta:
         form_order = 4

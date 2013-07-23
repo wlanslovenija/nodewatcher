@@ -3,6 +3,7 @@ from django.forms import forms, models as forms_models
 
 from . import utils
 
+
 class ParentsIncludedModelFormMetaclass(forms_models.ModelFormMetaclass):
     """
     `django.forms.models.ModelFormMetaclass` produces only all declared fields of the current and parent clasess combined with
@@ -33,6 +34,7 @@ class ParentsIncludedModelFormMetaclass(forms_models.ModelFormMetaclass):
         fields_without_current_model = forms.get_declared_fields(bases, attrs_copy, True)
         new_class.base_fields.update(fields_without_current_model)
         return new_class
+
 
 class ParentsIncludedModelFormMixin(object):
     """
@@ -128,6 +130,7 @@ class ParentsIncludedModelFormMixin(object):
 
     save.alters_data = True
 
+
 class FieldsetBoundField(forms.BoundField):
     """
     This class extends `django.forms.forms import.BoundField` to also carry information about the fieldset this field is in.
@@ -136,6 +139,7 @@ class FieldsetBoundField(forms.BoundField):
     def __init__(self, form, field, name, fieldset):
         super(FieldsetBoundField, self).__init__(form, field, name)
         self.fieldset = fieldset
+
 
 class FieldsetFormMixin(object):
     """

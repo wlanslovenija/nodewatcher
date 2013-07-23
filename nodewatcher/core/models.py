@@ -5,16 +5,19 @@ from django.utils.translation import ugettext_lazy as _
 
 from .registry import fields as registry_fields, registration
 
+
 class Node(models.Model):
     """
     This class represents a single node in the network.
     """
-    uuid = models.CharField(max_length = 40, primary_key = True)
+
+    uuid = models.CharField(max_length=40, primary_key=True)
 
     def save(self, **kwargs):
         """
         Override save so we can generate UUIDs.
         """
+
         if not self.uuid:
             self.pk = str(uuid.uuid4())
 
@@ -24,10 +27,12 @@ class Node(models.Model):
         """
         Returns a string representation of this node.
         """
+
         return self.uuid
 
 # Create registration point
 registration.create_point(Node, 'config')
+
 
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """
@@ -35,7 +40,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     node.
     """
 
-    name = models.CharField(max_length = 30)
+    name = models.CharField(max_length=30)
 
     class Meta:
         app_label = 'core'
@@ -51,12 +56,13 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point('node.config').register_item(GeneralConfig)
 
+
 class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
     """
     Router identifier configuration.
     """
 
-    router_id = models.CharField(max_length = 100)
+    router_id = models.CharField(max_length=100)
     family = registry_fields.SelectorKeyField('node.config', 'core.routerid#family')
 
     class Meta:

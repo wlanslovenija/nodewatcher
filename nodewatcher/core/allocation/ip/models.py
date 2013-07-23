@@ -6,6 +6,7 @@ from .. import models as allocation_models
 from ...registry import fields as registry_fields, forms as registry_forms, permissions
 from ....utils import ipaddr
 
+
 class IpPoolStatus(object):
     """
     Possible pools states.
@@ -15,6 +16,7 @@ class IpPoolStatus(object):
     Full = 1
     Partial = 2
 
+
 class IpPool(allocation_models.PoolBase):
     """
     This class represents an IP pool - that is a subnet available for
@@ -23,14 +25,14 @@ class IpPool(allocation_models.PoolBase):
     """
 
     family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
-    network = models.CharField(max_length = 50)
+    network = models.CharField(max_length=50)
     prefix_length = models.IntegerField()
-    status = models.IntegerField(default = IpPoolStatus.Free)
-    description = models.CharField(max_length = 200, null = True)
-    prefix_length_default = models.IntegerField(null = True)
-    prefix_length_minimum = models.IntegerField(default = 24, null = True)
-    prefix_length_maximum = models.IntegerField(default = 28, null = True)
-    ip_subnet = registry_fields.IPAddressField(null = True)
+    status = models.IntegerField(default=IpPoolStatus.Free)
+    description = models.CharField(max_length=200, null=True)
+    prefix_length_default = models.IntegerField(null=True)
+    prefix_length_minimum = models.IntegerField(default=24, null=True)
+    prefix_length_maximum = models.IntegerField(default=28, null=True)
+    ip_subnet = registry_fields.IPAddressField(null=True)
 
     class Meta:
         app_label = 'core'
@@ -54,8 +56,8 @@ class IpPool(allocation_models.PoolBase):
         net = ipaddr.IPNetwork('%s/%d' % (self.network, self.prefix_length))
         net0, net1 = net.subnet()
 
-        left = IpPool(parent = self, family = self.family, network = str(net0.network), prefix_length = net0.prefixlen)
-        right = IpPool(parent = self, family = self.family, network = str(net1.network), prefix_length = net1.prefixlen)
+        left = IpPool(parent=self, family=self.family, network=str(net0.network), prefix_length=net0.prefixlen)
+        right = IpPool(parent=self, family=self.family, network=str(net1.network), prefix_length=net1.prefixlen)
         left.save()
         right.save()
 
@@ -65,7 +67,7 @@ class IpPool(allocation_models.PoolBase):
         return left, right
 
     @allocation_models.PoolBase.modifies_pool
-    def reserve_subnet(self, network, prefix_len, check_only = False):
+    def reserve_subnet(self, network, prefix_len, check_only=False):
         """
         Attempts to reserve a specific subnet in the allocation pool. The subnet
         must be a valid subnet and must be allocatable.
@@ -97,7 +99,7 @@ class IpPool(allocation_models.PoolBase):
         # Find the proper network between our children
         alloc = None
         if self.children.count() > 0:
-            for child in self.children.exclude(status = IpPoolStatus.Full).select_for_update():
+            for child in self.children.exclude(status=IpPoolStatus.Full).select_for_update():
                 alloc = child.reserve_subnet(network, prefix_len, check_only)
                 if alloc:
                     break
@@ -105,7 +107,7 @@ class IpPool(allocation_models.PoolBase):
                 return None
 
             # Something has been allocated, update our status
-            if self.children.filter(status = IpPoolStatus.Full).count() == 2 and not check_only:
+            if self.children.filter(status=IpPoolStatus.Full).count() == 2 and not check_only:
                 self.status = IpPoolStatus.Full
                 self.save()
         else:
@@ -150,7 +152,7 @@ class IpPool(allocation_models.PoolBase):
         # and traverse the left one
         alloc = None
         if self.children.count() > 0:
-            for child in self.children.exclude(status = IpPoolStatus.Full).order_by("ip_subnet").select_for_update():
+            for child in self.children.exclude(status=IpPoolStatus.Full).order_by("ip_subnet").select_for_update():
                 alloc = child._allocate_buddy(prefix_len)
                 if alloc:
                     break
@@ -158,7 +160,7 @@ class IpPool(allocation_models.PoolBase):
                 return None
 
             # Something has been allocated, update our status
-            if self.children.filter(status = IpPoolStatus.Full).count() == 2:
+            if self.children.filter(status=IpPoolStatus.Full).count() == 2:
                 self.status = IpPoolStatus.Full
                 self.save()
         else:
@@ -179,8 +181,8 @@ class IpPool(allocation_models.PoolBase):
 
         # When all children are free, we don't need them anymore; when only some
         # are free, we mark this pool as partially free
-        free_children = self.children.filter(status = IpPoolStatus.Free).count()
-        if  free_children == 2:
+        free_children = self.children.filter(status=IpPoolStatus.Free).count()
+        if free_children == 2:
             self.children.all().delete()
             self.status = IpPoolStatus.Free
             self.save()
@@ -191,7 +193,7 @@ class IpPool(allocation_models.PoolBase):
             return self.parent.reclaim_pools() if self.parent else None
         else:
             # If any of the children are partial, we are partial as well
-            if self.children.filter(status = IpPoolStatus.Partial).count() > 0:
+            if self.children.filter(status=IpPoolStatus.Partial).count() > 0:
                 self.status = IpPoolStatus.Partial
                 self.save()
                 return self.parent.reclaim_pools() if self.parent else None
@@ -244,7 +246,7 @@ class IpPool(allocation_models.PoolBase):
         return ipaddr.IPNetwork('%s/%d' % (self.network, self.prefix_length))
 
     @allocation_models.PoolBase.modifies_pool
-    def allocate_subnet(self, prefix_len = None):
+    def allocate_subnet(self, prefix_len=None):
         """
         Attempts to allocate a subnet from this pool.
 
@@ -267,18 +269,19 @@ class IpPool(allocation_models.PoolBase):
 # Register a new manual pool allocation permission
 permissions.register(IpPool, 'can_allocate_manually', "Can allocate manually")
 
+
 class IpAddressAllocator(allocation_models.AddressAllocator):
     """
     An abstract class defining an API for IP address allocator items.
     """
 
     family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
-    pool = registry_fields.ModelSelectorKeyField(IpPool, limit_choices_to = { 'parent' : None })
-    prefix_length = models.IntegerField(default = 27)
-    subnet_hint = registry_fields.IPAddressField(null = True, blank = True, host_required = True)
+    pool = registry_fields.ModelSelectorKeyField(IpPool, limit_choices_to={'parent': None})
+    prefix_length = models.IntegerField(default=27)
+    subnet_hint = registry_fields.IPAddressField(null=True, blank=True, host_required=True)
     allocation = models.ForeignKey(
-        IpPool, editable = False, null = True,
-        on_delete = models.PROTECT, related_name = 'allocations_%(app_label)s_%(class)s',
+        IpPool, editable=False, null=True,
+        on_delete=models.PROTECT, related_name='allocations_%(app_label)s_%(class)s',
     )
 
     class Meta:
@@ -366,7 +369,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         else:
             raise registry_forms.RegistryValidationError(
                 _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
-                    'prefix' : self.prefix_length, 'pool' : unicode(self.pool),
+                    'prefix': self.prefix_length, 'pool': unicode(self.pool),
                 }
             )
 

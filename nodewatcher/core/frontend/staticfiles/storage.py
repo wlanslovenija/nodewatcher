@@ -1,4 +1,5 @@
-import fnmatch, os
+import fnmatch
+import os
 
 from django.contrib.staticfiles import storage
 from django.core.files import base
@@ -6,6 +7,7 @@ from django.utils import encoding
 from django.conf import settings
 
 import scss
+
 
 def relative_path(root, path):
     """Returns the path of a file relative to the root."""
@@ -17,6 +19,7 @@ def relative_path(root, path):
         return relative[1:]
     else:
         return relative
+
 
 class SCSSFilesMixin(object):
     def __init__(self, *args, **kwargs):
@@ -100,6 +103,7 @@ class SCSSFilesMixin(object):
             if self.exists(name):
                 self.delete(name)
                 yield name, '<deleted>', True
+
 
 class SCSSStaticFilesStorage(SCSSFilesMixin, storage.StaticFilesStorage):
     """

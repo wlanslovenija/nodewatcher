@@ -8,6 +8,7 @@ from nodewatcher.core.monitor import models
 
 from . import connect, fields
 
+
 class MonitorRegistryItemMixin(object):
     """
     A mixin for all monitoring-related registry items that adds datastream
@@ -52,19 +53,19 @@ registration.point('node.monitoring').add_mixins(MonitorRegistryItemMixin)
 
 # Adds mappings between monitoring registry items attributes and datastream fields
 models.SystemStatusMonitor.connect_datastream = connect.ConnectDatastream(
-    uptime = fields.IntegerField()
+    uptime=fields.IntegerField()
 )
 models.GeneralResourcesMonitor.connect_datastream = connect.ConnectDatastream(
-    loadavg_1min = fields.FloatField(),
-    loadavg_5min = fields.FloatField(),
-    loadavg_15min = fields.FloatField(),
-    memory_free = fields.IntegerField(),
-    memory_buffers = fields.IntegerField(),
-    memory_cache = fields.IntegerField(),
-    processes = fields.IntegerField()
+    loadavg_1min=fields.FloatField(),
+    loadavg_5min=fields.FloatField(),
+    loadavg_15min=fields.FloatField(),
+    memory_free=fields.IntegerField(),
+    memory_buffers=fields.IntegerField(),
+    memory_cache=fields.IntegerField(),
+    processes=fields.IntegerField()
 )
 models.NetworkResourcesMonitor.connect_datastream = connect.ConnectDatastream(
-    routes = fields.IntegerField(),
-    tcp_connections = fields.IntegerField(),
-    udp_connections = fields.IntegerField()
+    routes=fields.IntegerField(),
+    tcp_connections=fields.IntegerField(),
+    udp_connections=fields.IntegerField()
 )
