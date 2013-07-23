@@ -3,6 +3,7 @@ from django.utils import importlib
 
 from . import exceptions
 
+
 class EventSinkPool(object):
     def __init__(self):
         """
@@ -18,7 +19,7 @@ class EventSinkPool(object):
         """
 
         i = path.rfind(".")
-        module, attr = path[:i], path[i+1:]
+        module, attr = path[:i], path[i + 1:]
         try:
             module = importlib.import_module(module)
             return getattr(module, attr)

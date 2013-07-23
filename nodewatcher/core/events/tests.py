@@ -4,6 +4,7 @@ from django.utils import unittest
 from . import base, exceptions
 from .pool import pool
 
+
 class TestEventSink(base.EventSink):
     def __init__(self):
         super(TestEventSink, self).__init__()
@@ -12,15 +13,18 @@ class TestEventSink(base.EventSink):
     def deliver(self, event):
         self.events.append(event)
 
+
 class TestEventFilter(base.EventFilter):
     def filter(self, event):
-        if getattr(event, 'c', None) == True:
+        if getattr(event, 'c', None) is True:
             return False
 
         return True
 
+
 class TestInvalidSubclass(object):
     pass
+
 
 class EventsTestCase(unittest.TestCase):
     def setUp(self):
@@ -53,6 +57,7 @@ class EventsTestCase(unittest.TestCase):
         self.assertEqual(sink.events[2].a, 7)
         self.assertEqual(sink.events[2].b, 8)
 
+
 class InvalidEventsTestCase1(unittest.TestCase):
     def setUp(self):
         # Fake some invalid sink configuration
@@ -67,6 +72,7 @@ class InvalidEventsTestCase1(unittest.TestCase):
     def test_exceptions(self):
         with self.assertRaises(exceptions.EventSinkNotFound):
             base.EventRecord(a=1, b=2, message="Hello event world!").post()
+
 
 class InvalidEventsTestCase2(unittest.TestCase):
     def setUp(self):
@@ -85,6 +91,7 @@ class InvalidEventsTestCase2(unittest.TestCase):
     def test_exceptions(self):
         with self.assertRaises(exceptions.EventFilterNotFound):
             base.EventRecord(a=1, b=2, message="Hello event world!").post()
+
 
 class InvalidEventsTestCase3(unittest.TestCase):
     def setUp(self):

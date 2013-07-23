@@ -10,6 +10,7 @@ __all__ = [
     'EventSink',
 ]
 
+
 class EventRecord(object):
     """
     An event record.
@@ -30,6 +31,7 @@ class EventRecord(object):
         for sink in pool.get_all_sinks():
             sink.post(self)
 
+
 class EventFilter(object):
     def filter(self, event):
         """
@@ -40,6 +42,7 @@ class EventFilter(object):
         """
 
         raise NotImplementedError
+
 
 class EventSink(object):
     def __init__(self):
@@ -57,8 +60,9 @@ class EventSink(object):
         """
 
         if not isinstance(filter, EventFilter):
-            raise exceptions.InvalidEventFilter("Event filter '%s' is not a subclass of nodewatcher.core.events.base.EventFilter!" %
-                filter.__class__.__name__)
+            raise exceptions.InvalidEventFilter(
+                "Event filter '%s' is not a subclass of nodewatcher.core.events.base.EventFilter!" % filter.__class__.__name__
+            )
 
         self._filters.append(filter)
 
