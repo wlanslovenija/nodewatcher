@@ -6,7 +6,8 @@ __all__ = [
     'evaluate'
 ]
 
-def evaluate(regpoint, root, state, partial_config = None):
+
+def evaluate(regpoint, root, state, partial_config=None):
     """
     Evaluates the rules.
 

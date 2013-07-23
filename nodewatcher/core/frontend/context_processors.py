@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.sites import models as sites_models
 
+
 def global_vars(request):
     """
     Adds some global variables to the context.

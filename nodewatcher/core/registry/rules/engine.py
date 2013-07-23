@@ -12,29 +12,37 @@ __all__ = [
     'EvaluationError',
 ]
 
+
 class CompilationError(Exception):
     """
     Exceptions that get raised at rule compile time.
     """
+
     pass
+
 
 class EvaluationError(Exception):
     """
     Exceptions that get raised while evaluating rules.
     """
+
     pass
+
 
 class LazyObject(object):
     """
     Represents a callable object that is used for lazy evaluation.
     """
+
     def __call__(self, context):
         """
         Subclasses must implement this method to evaluate the object.
 
         :param context: Evaluation context (EngineContext instance)
         """
+
         raise NotImplementedError
+
 
 class Rule(LazyObject):
     """
@@ -42,6 +50,7 @@ class Rule(LazyObject):
     """
     # Set to true to evaluate the rule even when condition is unchanged from
     # last rule evaluation
+
     always_evaluate = False
 
     def __init__(self, condition, actions):
@@ -51,6 +60,7 @@ class Rule(LazyObject):
         :param condition: A lazy expression
         :param actions: A list of actions
         """
+
         self.condition = condition
         self.actions = actions
 
@@ -58,6 +68,7 @@ class Rule(LazyObject):
         """
         Evaluates the rule.
         """
+
         if isinstance(self.condition, RuleModifier):
             self.condition.modifier(self)
 
@@ -67,7 +78,7 @@ class Rule(LazyObject):
 
         # Remember condition value so we don't reevaluate rules unless conditions change
         context.mark(self, condition)
-        if condition == False:
+        if condition is False:
             return
 
         # Evaluate all subrules and execute subactions when something has changed
@@ -90,17 +101,20 @@ class Rule(LazyObject):
 
                 context.leave_sublevel()
 
+
 class LazyValue(LazyObject):
     """
     An abstract lazy value that can be used for building lazy expressions.
     """
-    def __init__(self, op, identifier = None):
+
+    def __init__(self, op, identifier=None):
         """
         Class constructor.
 
         :param op: A callable operation
         :param identifier: Optional identifier
         """
+
         self.__op = op
         self.__identifier = identifier
 
@@ -135,16 +149,19 @@ class LazyValue(LazyObject):
         """
         Evaluates the value.
         """
+
         return self.__op(context)
 
     def __str__(self):
         return self.__identifier or "<LazyValue>"
+
 
 class RuleModifier(LazyObject):
     """
     Rule modifier is a special object that can be used as a rule condition and
     can modify rule's properties before the condition is evaluated.
     """
+
     def __init__(self, modifier, condition):
         """
         Class constructor.
@@ -152,6 +169,7 @@ class RuleModifier(LazyObject):
         :param modifier: A callable that may modify the rule
         :param condition: A lazy expression that is the condition
         """
+
         self.modifier = modifier
         self.condition = condition
 
@@ -159,37 +177,45 @@ class RuleModifier(LazyObject):
         """
         Evaluates the condition.
         """
+
         return self.condition(context)
+
 
 class Action(LazyObject):
     """
     Actions are callables that are executed in case a rule's condition is satisified
     and the condition has changed.
     """
+
     def __init__(self, op):
         """
         Class constructor.
 
         :param op: A callable that gets executed for this action
         """
+
         self.op = op
 
     def __call__(self, context):
         """
         Executes this action.
         """
+
         self.op(context)
+
 
 class EngineContext(object):
     """
     Engine context holds state for a particular evaluation.
     """
-    def __init__(self, state = None):
+
+    def __init__(self, state=None):
         """
         Class constructor.
 
         :param state: Old state dictionary
         """
+
         self._levels = []
         self._rules = []
 
@@ -202,6 +228,7 @@ class EngineContext(object):
         :param state: Current evaluation state
         :param partial_config: Optional partial updated configuration
         """
+
         self.regpoint = regpoint
         self.root = root
         self.state = state or {}
@@ -221,18 +248,21 @@ class EngineContext(object):
         """
         Enters a sublevel in the rules hierarchy.
         """
+
         self._levels.append(name)
 
     def leave_sublevel(self):
         """
         Leaves the current sublevel in the rules hierarchy.
         """
+
         self._levels.pop()
 
     def current_level(self):
         """
         Returns an identifier that represents the current sublevel.
         """
+
         return ".".join(self._levels)
 
     def mark(self, rule, value):
@@ -242,6 +272,7 @@ class EngineContext(object):
         :param rule: Rule instance
         :param value: Condition evaluation result
         """
+
         self.new_state[':' + self.current_level()] = value
 
     def has_changed(self, rule):
@@ -252,6 +283,7 @@ class EngineContext(object):
         :param rule: Rule instance
         :return: True if the condition evaluation result has changed
         """
+
         if rule.always_evaluate:
             return True
 
@@ -270,6 +302,7 @@ class EngineContext(object):
         :param location: Registry location
         :param value: New registry value
         """
+
         location = str(location)
         self.new_state[location] = value
 

@@ -5,6 +5,7 @@ from nodewatcher.core.registry import registration
 
 from . import models
 
+
 class BasicAddressingConfigForm(forms.ModelForm, ip_forms.IpAddressAllocatorFormMixin):
     """
     General configuration form.

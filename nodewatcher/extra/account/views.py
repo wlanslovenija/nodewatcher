@@ -12,14 +12,16 @@ from registration import models as registration_models
 
 from . import decorators, forms, signals
 
+
 def user(request, username):
     """
     This view displays a public page for a given user.
     """
 
     return shortcuts.render_to_response("users/user.html", {
-      'username': username,
+        'username': username,
     }, context_instance=template.RequestContext(request))
+
 
 @decorators.authenticated_required
 def account(request):
@@ -65,8 +67,9 @@ def account(request):
         form = forms.AccountChangeForm(instance=[request.user, request.user.get_profile()])
 
     return shortcuts.render_to_response("users/account.html", {
-      'form': form,
+        'form': form,
     }, context_instance=template.RequestContext(request))
+
 
 def logout_redirect(request, *args, **kwargs):
     """
@@ -83,6 +86,7 @@ def logout_redirect(request, *args, **kwargs):
     res = auth_views.logout(request, *args, **kwargs)
     signals.user_logout.send(sender=logout_redirect, request=request, user=user)
     return res
+
 
 @decorators.anonymous_required
 def login(request, *args, **kwargs):

@@ -21,6 +21,7 @@ ATTRIBUTION_CHOICES = (
     ('nothing', _("Hide me")),
 )
 
+
 class UserProfileAndSettings(django_models.Model):
     """
     This class represents an user profile and settings.
@@ -58,6 +59,7 @@ class UserProfileAndSettings(django_models.Model):
     def get_absolute_url(self):
         return ('user_account',)
 
+
 def create_profile_and_settings(sender, instance, created, **kwargs):
     if created:
         try:
@@ -68,8 +70,8 @@ def create_profile_and_settings(sender, instance, created, **kwargs):
 
 signals.post_save.connect(create_profile_and_settings, sender=auth_models.User)
 
-# Monkey patach registration_models.RegistrationProfile
 
+# Monkey patach registration_models.RegistrationProfile
 def send_activation_email(instance, site, email_change=False):
     """
     Based on `registration.models.RegistrationProfile.send_activation_email` to extend activation e-mail template context with
@@ -105,6 +107,8 @@ def send_activation_email(instance, site, email_change=False):
 registration_models.RegistrationProfile.send_activation_email = send_activation_email
 
 orig_activation_key_expired = registration_models.RegistrationProfile.activation_key_expired
+
+
 def activation_key_expired(instance):
     """
     Determines whether this `RegistrationProfile`'s activation key has expired.

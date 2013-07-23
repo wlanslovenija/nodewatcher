@@ -10,6 +10,7 @@ __all__ = [
     'router_descriptor',
 ]
 
+
 def router_descriptor(platform, router):
     """
     Lazy value that returns the router descriptor for the specified
@@ -34,7 +35,7 @@ def router_descriptor(platform, router):
                 except KeyError:
                     return None
 
-            return engine.LazyValue(resolve_attribute, identifier = hashlib.md5(self.platform + self.router).hexdigest() + '-' + key)
+            return engine.LazyValue(resolve_attribute, identifier=hashlib.md5(self.platform + self.router).hexdigest() + '-' + key)
 
         def __setattr__(self, key, value):
             raise AttributeError

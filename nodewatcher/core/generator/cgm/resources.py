@@ -1,23 +1,28 @@
 from ....utils import ipaddr
 
+
 class ResourceExhausted(Exception):
     pass
+
 
 class ResourceAllocator(object):
     """
     The micro allocations class is used to track resource allocations
     between CGMs.
     """
+
     def __init__(self):
         """
         Class constructor.
         """
+
         self.resources = {}
 
     def add(self, resource):
         """
         Adds another resource that can be used for allocations.
         """
+
         self.resources.setdefault(resource.__class__, []).append(resource)
 
     def get(self, resource_cls, **kwargs):
@@ -26,6 +31,7 @@ class ResourceAllocator(object):
 
         :param resource_cls: Resource class
         """
+
         try:
             resources = self.resources[resource_cls]
             for resource in resources:
@@ -38,20 +44,25 @@ class ResourceAllocator(object):
         except KeyError:
             raise ResourceExhausted
 
+
 class Resource(object):
     """
     Abstract resource.
     """
+
     def allocate(self, **kwargs):
         """
         Allocates one instance of this resource.
         """
+
         raise NotImplementedError
+
 
 class IpResource(Resource):
     """
     An IP subnet resource.
     """
+
     def __init__(self, family, subnet, config):
         """
         Class constructor.
@@ -61,15 +72,17 @@ class IpResource(Resource):
         :param config: Configuration object this resource has been
           created from
         """
+
         self.family = family
         self.subnet = subnet
         self.config = config
         self.allocation = self.subnet.iterhosts()
 
-    def allocate(self, family = None):
+    def allocate(self, family=None):
         """
         Allocates the next host on the list.
         """
+
         if family is not None and family != self.family:
             raise ResourceExhausted
 

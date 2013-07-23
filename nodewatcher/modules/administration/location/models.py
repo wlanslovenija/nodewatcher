@@ -4,16 +4,17 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import registration
 
+
 class LocationConfig(registration.bases.NodeConfigRegistryItem):
     """
     Describes the location of a node.
     """
 
-    address = models.CharField(max_length = 100)
-    city = models.CharField(max_length = 100) # TODO: City field?
-    country = models.CharField(max_length = 100) # TODO: Country field?
-    geolocation = gis_models.PointField(null = True)
-    altitude = models.FloatField(default = 0)
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=100) # TODO: City field?
+    country = models.CharField(max_length=100) # TODO: Country field?
+    geolocation = gis_models.PointField(null=True)
+    altitude = models.FloatField(default=0)
 
     class RegistryMeta:
         form_order = 3

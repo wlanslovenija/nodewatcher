@@ -1,13 +1,16 @@
-import copy, inspect
+import copy
+import inspect
 
 from django.core import exceptions
 
 from ...registry import registration
 
+
 class RouterPort(object):
     """
     An abstract descriptor of a router port.
     """
+
     def __init__(self, identifier, description):
         """
         Class constructor.
@@ -15,21 +18,26 @@ class RouterPort(object):
         self.identifier = identifier
         self.description = description
 
+
 class EthernetPort(RouterPort):
     """
     Describes a router's ethernet port.
     """
+
     pass
+
 
 class SwitchedEthernetPort(EthernetPort):
     """
     Describes a router's ethernet port attached to a configurable
     switch.
     """
+
     def __init__(self, identifier, description, switch, vlan, ports):
         """
         Class constructor.
         """
+
         super(SwitchedEthernetPort, self).__init__(identifier, description)
         self.switch = switch
         self.vlan = vlan
@@ -39,34 +47,42 @@ class SwitchedEthernetPort(EthernetPort):
         """
         Ensure that the switch that the port refers to actually exists.
         """
+
         switch = router.get_switch(self.switch)
         if switch is None:
-            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" %
-                (self.identifier, self.switch))
+            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" % (
+                self.identifier, self.switch
+            ))
 
         if not (0 <= self.vlan < switch.vlans):
-            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' VLAN (%s) out of range!" %
-                (self.identifier, self.vlan))
+            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' VLAN (%s) out of range!" % (
+                self.identifier, self.vlan
+            ))
 
         if switch.cpu_port not in self.ports:
-            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" %
-                (self.identifier))
+            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" % (
+                self.identifier
+            ))
 
         for port in self.ports:
             if port not in switch.ports:
-                raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" %
-                    (self.identifier, port))
+                raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" % (
+                    self.identifier, port
+                ))
+
 
 class AntennaConnector(object):
     """
     An antenna connector that is present on a specific radio.
     """
+
     def __init__(self, identifier, description):
         """
         Class constructor.
         """
         self.identifier = identifier
         self.description = description
+
 
 class RouterRadio(object):
     """
@@ -77,6 +93,7 @@ class RouterRadio(object):
         """
         Class constructor.
         """
+
         self.identifier = identifier
         self.description = description
         self.protocols = protocols
@@ -87,12 +104,14 @@ class RouterRadio(object):
         """
         Returns a list of antenna connector choices for this radio.
         """
+
         return ((c.identifier, c.description) for c in self.connectors)
 
     def get_protocol_choices(self):
         """
         Returns a list of protocol choices for this radio.
         """
+
         return ((p.identifier, p.description) for p in self.protocols)
 
     def get_protocol(self, identifier):
@@ -101,66 +120,80 @@ class RouterRadio(object):
 
         :param identifier: Protocol descriptor
         """
+
         for protocol in self.protocols:
             if protocol.identifier == identifier:
                 return protocol
+
 
 class IntegratedRadio(RouterRadio):
     """
     Describes a router's integrated radio.
     """
+
     pass
+
 
 class MiniPCIRadio(RouterRadio):
     """
     Describes a router's MiniPCI slot for a radio.
     """
+
     pass
+
 
 class InternalAntenna(object):
     """
     Describes an antenna that comes with the router by default.
     """
+
     def __init__(self, identifier, polarization, angle_horizontal, angle_vertical, gain):
         """
         Class constructor.
         """
+
         self.identifier = identifier
         self.polarization = polarization
         self.angle_horizontal = angle_horizontal
         self.angle_vertical = angle_vertical
         self.gain = gain
 
+
 class Switch(object):
     """
     Describes an ethernet switch that a router has.
     """
+
     def __init__(self, identifier, description, ports, cpu_port, vlans):
         """
         Class constructor.
         """
+
         self.identifier = identifier
         self.description = description
-        
+
         if isinstance(ports, int):
             ports = range(ports)
-        
+
         self.ports = ports
         if cpu_port not in ports:
-            raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" %
-                (self.identifier, cpu_port))
+            raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" % (
+                self.identifier, cpu_port
+            ))
 
         self.cpu_port = cpu_port
         self.vlans = vlans
 
-class Features:
+
+class Features(object):
     """
     Represents features a router can have.
     """
+
     MultipleSSID = "multiple_ssid"
 
 # A list of attributes that are required to be defined
-REQUIRED_ROUTER_ATTRIBUTES = set([
+REQUIRED_ROUTER_ATTRIBUTES = {
     'identifier',
     'name',
     'manufacturer',
@@ -170,12 +203,14 @@ REQUIRED_ROUTER_ATTRIBUTES = set([
     'switches',
     'ports',
     'antennas',
-])
+}
+
 
 class RouterMeta(type):
     """
     Type for router descriptors.
     """
+
     def __new__(cls, name, bases, attrs):
         """
         Creates a new RouterBase class.
@@ -220,11 +255,14 @@ class RouterMeta(type):
 
         return new_class
 
+
 class RouterBase(object):
     """
     An abstract router hardware descriptor.
     """
+
     __metaclass__ = RouterMeta
+
     features = []
     port_map = {}
     drivers = {}
@@ -237,21 +275,31 @@ class RouterBase(object):
 
         :param platform: Platform instance
         """
+
         # Register a new choice in the configuration registry
-        registration.point("node.config").register_choice("core.general#router", cls.identifier, "%s :: %s" % (cls.manufacturer, cls.name),
-          limited_to = ("core.general#platform", platform.name)
+        registration.point('node.config').register_choice(
+            'core.general#router',
+            cls.identifier,
+            '%s :: %s' % (cls.manufacturer, cls.name),
+            limited_to=('core.general#platform', platform.name),
         )
 
         # Register a new choice for available router ports
         for port in cls.ports:
-            registration.point("node.config").register_choice("core.interfaces#eth_port", port.identifier, port.description,
-              limited_to = ("core.general#router", cls.identifier)
+            registration.point('node.config').register_choice(
+                'core.interfaces#eth_port',
+                port.identifier,
+                port.description,
+                limited_to=('core.general#router', cls.identifier),
             )
 
         # Register a new choice for available router radios
         for radio in cls.radios:
-            registration.point("node.config").register_choice("core.interfaces#wifi_radio", radio.identifier, radio.description,
-              limited_to = ("core.general#router", cls.identifier)
+            registration.point('node.config').register_choice(
+                'core.interfaces#wifi_radio',
+                radio.identifier,
+                radio.description,
+                limited_to=('core.general#router', cls.identifier),
             )
 
         # Register CGM methods
@@ -261,9 +309,9 @@ class RouterBase(object):
 
             if function.cgm_module_platform is None or function.cgm_module_platform == platform.name:
                 platform.register_module(
-                  function.cgm_module_order,
-                  function,
-                  cls.identifier
+                    function.cgm_module_order,
+                    function,
+                    cls.identifier,
                 )
 
     @classmethod
@@ -274,18 +322,21 @@ class RouterBase(object):
         :param platform: Platform identifier
         :param port: Port identifier
         """
+
         return cls.port_map.get(platform, {}).get(port, None)
 
     def __init__(self):
         """
         Prevent instantiation of this class.
         """
+
         raise TypeError("Router model descriptors are non-instantiable!")
 
     def __setattr__(self, key, value):
         """
         Prevent modification of router model descriptors.
         """
+
         raise AttributeError("Router model descriptors are immutable!")
 
     @classmethod
@@ -295,6 +346,7 @@ class RouterBase(object):
 
         :param identifier: Radio identifier
         """
+
         for radio in cls.radios:
             if radio.identifier == identifier:
                 return radio
@@ -306,6 +358,7 @@ class RouterBase(object):
 
         :param identifier: Port identifier
         """
+
         for switch in cls.switches:
             if switch.identifier == identifier:
                 return switch
@@ -317,14 +370,17 @@ class RouterBase(object):
 
         :param identifier: Port identifier
         """
+
         for port in cls.ports:
             if port.identifier == identifier:
                 return port
 
-def register_module(platform = None, order = 50):
+
+def register_module(platform=None, order=50):
     """
     Marks a method to be registered as a CGM upon router registration.
     """
+
     def wrapper(f):
         f.cgm_module = True
         f.cgm_module_order = order

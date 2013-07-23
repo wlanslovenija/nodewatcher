@@ -11,6 +11,7 @@ user_add_fieldsets.append(auth_admin.UserAdmin.fieldsets[1]) # UserAdmin.fieldse
 
 user_change_fieldsets = [auth_admin.UserAdmin.fieldsets[1]] # UserAdmin.fieldsets[1] contains first name, last name and e-mail address
 
+
 def alter_user_form_fields(form):
     """
     This function marks first name, last name and e-mail address fields as required in the given form. It validates
@@ -46,6 +47,7 @@ def alter_user_form_fields(form):
         if field in form.fields:
             form.fields[field].required = True
 
+
 def check_password_length(form):
     """
     This function sets minimal length on the password field in the given form.
@@ -62,6 +64,7 @@ def check_password_length(form):
     form.fields[fieldname1].min_length = 6
     form.fields[fieldname1].help_text = _('Minimal password length is 6.')
     form.fields[fieldname2].help_text = _('Enter the same password as above, for verification.')
+
 
 class UserCreationForm(auth_forms.UserCreationForm):
     """
@@ -103,6 +106,7 @@ class UserCreationForm(auth_forms.UserCreationForm):
             return username
         raise forms.ValidationError(_("A user with that username already exists."))
 
+
 class AdminUserChangeForm(auth_forms.UserChangeForm):
     """
     This class defines change form for `django.contrib.auth.models.User` objects for admin inteface.
@@ -117,6 +121,7 @@ class AdminUserChangeForm(auth_forms.UserChangeForm):
     def __init__(self, *args, **kwargs):
         super(AdminUserChangeForm, self).__init__(*args, **kwargs)
         alter_user_form_fields(self)
+
 
 class UserChangeForm(AdminUserChangeForm):
     """
@@ -141,6 +146,7 @@ class UserChangeForm(AdminUserChangeForm):
     class Meta(AdminUserChangeForm.Meta):
         fields = admin_util.flatten_fieldsets(user_change_fieldsets)
 
+
 class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
     """
     This class defines change form for `nodewatcher.extra.account.models.UserProfileAndSettings` objects.
@@ -151,6 +157,7 @@ class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
 
     class Meta:
         model = models.UserProfileAndSettings
+
 
 class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
     """
@@ -169,6 +176,7 @@ class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncl
         return None
 
     __metaclass__ = metaforms.ParentsIncludedModelFormMetaclass
+
 
 class AuthenticationForm(auth_forms.AuthenticationForm):
     """
@@ -189,6 +197,7 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
                 raise
         return self.cleaned_data
 
+
 class PasswordResetForm(auth_forms.PasswordResetForm):
     """
     This class adds CSS classes to `django.contrib.auth.forms.PasswordResetForm` form.
@@ -196,6 +205,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
     error_css_class = 'error'
     required_css_class = 'required'
+
 
 class SetPasswordForm(auth_forms.SetPasswordForm):
     """
@@ -210,6 +220,7 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
         super(SetPasswordForm, self).__init__(*args, **kwargs)
         check_password_length(self)
 
+
 class PasswordChangeForm(auth_forms.PasswordChangeForm):
     """
     This class adds CSS classes to `django.contrib.auth.forms.PasswordChangeForm` form. It sets minimal length and help text
@@ -222,6 +233,7 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super(PasswordChangeForm, self).__init__(*args, **kwargs)
         check_password_length(self)
+
 
 class AccountChangeForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
     """

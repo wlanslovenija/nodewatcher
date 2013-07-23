@@ -2,6 +2,7 @@ from celery import task
 
 from django_datastream import datastream
 
+
 @task.task()
 def run_downsampling():
     """

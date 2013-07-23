@@ -260,6 +260,7 @@ COUNTRIES = (
     ('ZZ', _('Unknown or unspecified country'), ''),
 )
 
+
 def sorted_countries(countries):
     """
     Sort countries for a given language.
@@ -280,6 +281,7 @@ CITIES = sorted(countries_cities.values())
 
 geoip_resolver = gis_utils.GeoIP()
 
+
 def get_initial_country(request=None):
     """
     Returns a contry code based on a client's remote address or settings.
@@ -290,6 +292,7 @@ def get_initial_country(request=None):
         if country and country.upper() in countries_cities:
             return country.upper()
     return settings.DEFAULT_COUNTRY
+
 
 def get_initial_city(request=None):
     """
@@ -306,6 +309,7 @@ def get_initial_city(request=None):
         return utils_encoding.force_unicode(countries_cities[get_initial_country(request)]) or getattr(settings, 'DEFUALT_CITY', None)
     return getattr(settings, 'DEFUALT_CITY', None) or utils_encoding.force_unicode(countries_cities[get_initial_country()])
 
+
 def get_initial_language(request=None):
     """
     Returns language code based on a request or settings.
@@ -314,6 +318,7 @@ def get_initial_language(request=None):
     if request:
         return translation.get_language_from_request(request)
     return settings.LANGUAGE_CODE
+
 
 class CountryField(fields.CharField):
     def __init__(self, *args, **kwargs):
@@ -326,6 +331,7 @@ class CountryField(fields.CharField):
     def get_internal_type(self):
         return "CharField"
 
+
 class CityField(fields.CharField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 150)
@@ -335,6 +341,7 @@ class CityField(fields.CharField):
 
     def get_internal_type(self):
         return "CharField"
+
 
 class LanguageField(fields.CharField):
     def __init__(self, *args, **kwargs):

@@ -1,16 +1,20 @@
 from django.contrib.contenttypes import models as contenttypes_models
 
+
 class UnknownRegistryIdentifier(Exception):
     pass
 
+
 class UnknownRegistryClass(Exception):
     pass
+
 
 class RegistryResolver(object):
     """
     Resolves registry identifiers in a hierarchical manner.
     """
-    def __init__(self, regpoint, root, path = None):
+
+    def __init__(self, regpoint, root, path=None):
         """
         Class constructor.
 
@@ -18,6 +22,7 @@ class RegistryResolver(object):
         :param root: Root model instance
         :param path: Current path in the hierarhcy
         """
+
         self._regpoint = regpoint
         self._root = root
         self._path = path
@@ -26,21 +31,23 @@ class RegistryResolver(object):
         """
         Formats the root's registry hierarchy to partial config format.
         """
+
         partial = {}
         for path, _ in self._regpoint.item_registry.iteritems():
-            partial[path] = [x.cast() for x in self.by_path(path, queryset = True)]
+            partial[path] = [x.cast() for x in self.by_path(path, queryset=True)]
 
         return partial
 
-    def by_path(self, path, create = None, queryset = False, onlyclass = None):
+    def by_path(self, path, create=None, queryset=False, onlyclass=None):
         """
         Resolves the registry hierarchy.
         """
+
         if path in self._regpoint.item_registry:
             # Determine which class the root is using for configuration
             cfg, top_level = self._regpoint.get_top_level_queryset(self._root, path)
             if onlyclass is not None:
-                cfg = cfg.filter(content_type = contenttypes_models.ContentType.objects.get_for_model(onlyclass))
+                cfg = cfg.filter(content_type=contenttypes_models.ContentType.objects.get_for_model(onlyclass))
             if queryset:
                 return cfg.all()
 
@@ -48,9 +55,9 @@ class RegistryResolver(object):
                 # Model supports multiple configuration options of this type
                 if create is not None:
                     if not issubclass(create, top_level):
-                        raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
+                        raise TypeError("Not a valid registry item class for '{0}'!".format(path))
 
-                    return create(root = self._root)
+                    return create(root=self._root)
                 else:
                     return map(lambda x: x.cast(), cfg.all())
             else:
@@ -60,9 +67,9 @@ class RegistryResolver(object):
                 except (IndexError, top_level.DoesNotExist):
                     if create is not None:
                         if not issubclass(create, top_level):
-                            raise TypeError, "Not a valid registry item class for '{0}'!".format(path)
+                            raise TypeError("Not a valid registry item class for '{0}'!".format(path))
 
-                        return create(root = self._root)
+                        return create(root=self._root)
                     else:
                         return None
         else:
@@ -73,6 +80,7 @@ class RegistryResolver(object):
         Returns an iterator over all registry items that are present under
         this registration point.
         """
+
         for obj in self._root._meta.get_all_related_objects():
             if issubclass(obj.model, self._regpoint.item_base):
                 for model in getattr(self._root, obj.field.rel.related_name).all():
@@ -82,19 +90,23 @@ class RegistryResolver(object):
         """
         Constructs hierarchical names by simulating attribute access.
         """
-        key = key if self._path is None else "{0}.{1}".format(self._path, key)
+
+        key = key if self._path is None else '{0}.{1}'.format(self._path, key)
         return RegistryResolver(self._regpoint, self._root, key)
 
     def __call__(self, **kwargs):
         """
         Resolves the registry hierarchy.
         """
+
         return self.by_path(self._path, **kwargs)
+
 
 class RegistryAccessor(object):
     """
     A convenience class for accessing the registry via root models.
     """
+
     def __init__(self, regpoint):
         self.regpoint = regpoint
 
@@ -104,18 +116,20 @@ class RegistryAccessor(object):
 # Cache for class resolutions
 CTYPE_CACHE = {}
 
+
 def get_model_class_by_name(name):
     """
     Returns the model class identified by its name.
 
     :param name: Model class name
     """
+
     name = name.lower()
     try:
         ctype = CTYPE_CACHE[name]
     except KeyError:
         try:
-            ctype = contenttypes_models.ContentType.objects.get(model = name).model_class()
+            ctype = contenttypes_models.ContentType.objects.get(model=name).model_class()
         except contenttypes_models.ContentType.DoesNotExist:
             raise UnknownRegistryClass
 

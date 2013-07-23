@@ -1,4 +1,7 @@
-import logging, multiprocessing, time, traceback
+import logging
+import multiprocessing
+import time
+import traceback
 
 from django.conf import settings
 from django.core import exceptions
@@ -15,13 +18,15 @@ BANNER = """
 """
 
 # Logger instance
-logger = logging.getLogger("monitor.worker")
+logger = logging.getLogger('monitor.worker')
+
 
 @transaction.commit_manually
 def stage_worker(args):
     """
     Runs a list of (node) processors on a given node.
     """
+
     context, node, processors = args
     for p in processors:
         try:
@@ -35,19 +40,22 @@ def stage_worker(args):
             logger.error("Processor has failed with exception:")
             logger.error(traceback.format_exc())
 
+
 class Worker(object):
     """
     Monitoring daemon.
     """
+
     def prepare_processors(self):
         """
         Loads all processors as specified in configuration and groups them
         accoording to their types.
         """
+
         self.processors = []
         for proc_module in settings.MONITOR_PROCESSORS:
-            i = proc_module.rfind(".")
-            module, attr = proc_module[:i], proc_module[i+1:]
+            i = proc_module.rfind('.')
+            module, attr = proc_module[:i], proc_module[i + 1:]
             try:
                 module = importlib.import_module(module)
                 processor = getattr(module, attr)
@@ -62,8 +70,7 @@ class Worker(object):
 
                 # Consecutive node processors are grouped together so they will all be run in parallel
                 # on the list of nodes that has been prepared by recent network processor invocations
-                if issubclass(prev_class, monitor_processors.NodeProcessor) and \
-                  issubclass(curr_class, monitor_processors.NodeProcessor):
+                if issubclass(prev_class, monitor_processors.NodeProcessor) and issubclass(curr_class, monitor_processors.NodeProcessor):
                     self.processors[-1].append(processor)
                 else:
                     self.processors.append([processor])
@@ -73,13 +80,14 @@ class Worker(object):
         Prepares a pool of worker processes that will be used for parallel
         execution of node processors.
         """
+
         # Close the connection before forking the workers as otherwise resources will be
         # shared and chaos will ensue
         connection.close()
 
         # Prepare worker processes
         try:
-            self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS, maxtasksperchild = 1000)
+            self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS, maxtasksperchild=1000)
         except TypeError:
             # Compatibility with Python 2.6 that doesn't have the maxtasksperchild arument
             self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS)
@@ -91,6 +99,7 @@ class Worker(object):
         """
         Performs a single monitoring cycle.
         """
+
         nodes = set()
         context = monitor_processors.ProcessorContext()
 
@@ -125,6 +134,7 @@ class Worker(object):
         """
         Runs the monitoring process.
         """
+
         # Show the welcome banner
         print BANNER
 

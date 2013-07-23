@@ -1,6 +1,7 @@
 NAME = 'nodewatcher'
 VERSION = (3, 0, 0, 'beta', 0)
 
+
 def get_version(version=None):
     """
     Derives a PEP386-compliant version number from VERSION.
@@ -27,9 +28,10 @@ def get_version(version=None):
 
     return main + sub
 
+
 __version__ = get_version()
 __author__ = 'wlan slovenija'
 __contact__ = 'nodewatcher@wlan-si.net'
 __homepage__ = 'http://dev.wlan-si.net/wiki/Nodewatcher'
 __docformat__ = 'restructuredtext'
-__copyright__ = '2009-2012'
+__copyright__ = '2009-2013'

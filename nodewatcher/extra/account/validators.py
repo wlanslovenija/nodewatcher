@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import dns.resolver
 
+
 def validate_email_with_hostname(value):
     """
     Validator for e-mail addresses which does not only check for valid format but also checks for existence of e-mail address' hostname.

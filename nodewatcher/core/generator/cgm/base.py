@@ -5,11 +5,14 @@ from . import routers as cgm_routers, resources as cgm_resources
 # Registered platform modules
 PLATFORM_REGISTRY = {}
 
+
 class ValidationError(Exception):
     pass
 
+
 class BuildError(Exception):
     pass
+
 
 class PlatformConfiguration(object):
     """
@@ -18,10 +21,12 @@ class PlatformConfiguration(object):
     default implementation only contains some platform-independent
     methods.
     """
+
     def __init__(self):
         """
         Class constructor.
         """
+
         self.resources = cgm_resources.ResourceAllocator()
         self.packages = set()
 
@@ -32,10 +37,12 @@ class PlatformConfiguration(object):
     def __setstate__(self, state):
         self.__dict__.update(state)
 
+
 class PlatformBase(object):
     """
     An abstract base class for all platform implementations.
     """
+
     config_class = PlatformConfiguration
 
     def __init__(self):
@@ -50,6 +57,7 @@ class PlatformBase(object):
         """
         Generates a concrete configuration for this platform.
         """
+
         cfg = self.config_class()
 
         # Execute the module chain in order
@@ -59,7 +67,7 @@ class PlatformBase(object):
 
         # Process user-configured packages
         for name, cfgclass, package in self._packages:
-            pkgcfg = node.config.core.packages(onlyclass = cfgclass)
+            pkgcfg = node.config.core.packages(onlyclass=cfgclass)
             if [x for x in pkgcfg if x.enabled]:
                 package(node, pkgcfg, cfg)
                 cfg.packages.add(name)
@@ -75,6 +83,7 @@ class PlatformBase(object):
         :param cfg: Generated configuration (platform-dependent)
         :return: A list of generated firmware files
         """
+
         raise NotImplementedError
 
     def defer_build(self, node, cfg):
@@ -86,10 +95,11 @@ class PlatformBase(object):
         :param node: Node instance to generate the firmware for
         :param cfg: Generated configuration (platform-dependent)
         """
+
         from . import tasks
         tasks.background_build.delay(node, self.name, cfg)
 
-    def register_module(self, order, module, router = None):
+    def register_module(self, order, module, router=None):
         """
         Registers a new platform module.
 
@@ -97,6 +107,7 @@ class PlatformBase(object):
         :param module: Module implementation function
         :param router: Optional router identifier
         """
+
         if [x for x in self._modules if x[1] == module]:
             return
 
@@ -110,6 +121,7 @@ class PlatformBase(object):
         :param config: Configuration class
         :param package: Package implementation function
         """
+
         if [x for x in self._packages if x[2] == package]:
             return
 
@@ -121,6 +133,7 @@ class PlatformBase(object):
 
         :param router: A subclass of RouterBase
         """
+
         if not issubclass(router, cgm_routers.RouterBase):
             raise TypeError("Router descriptor must be a subclass of RouterBase!")
 
@@ -133,18 +146,21 @@ class PlatformBase(object):
 
         :param router: Unique router identifier
         """
+
         return self._routers[router]
+
 
 def register_platform(enum, text, platform):
     """
     Registers a new platform with the Configuration Generation Modules
     system.
     """
+
     if not isinstance(platform, PlatformBase):
-        raise TypeError, "Platform formatter/builder implementation must be a PlatformBase instance!"
+        raise TypeError("Platform formatter/builder implementation must be a PlatformBase instance!")
 
     if enum in PLATFORM_REGISTRY:
-        raise ValueError, "Platform '{0}' is already registered!".format(enum)
+        raise ValueError("Platform '{0}' is already registered!".format(enum))
 
     PLATFORM_REGISTRY[enum] = platform
     platform.name = enum
@@ -152,56 +168,68 @@ def register_platform(enum, text, platform):
     # Register the choice in configuration registry
     registration.point("node.config").register_choice("core.general#platform", enum, text)
 
+
 def get_platform(platform):
     """
     Returns the given platform implementation.
     """
+
     try:
         return PLATFORM_REGISTRY[platform]
     except KeyError:
-        raise KeyError, "Platform '{0}' does not exist!".format(platform)
+        raise KeyError("Platform '{0}' does not exist!".format(platform))
 
-def register_platform_module(platform, order = 999, router = None):
+
+def register_platform_module(platform, order=999, router=None):
     """
     Registers a new platform module.
     """
+
     def wrapper(f):
-        get_platform(platform).register_module(order, f, router = router)
+        get_platform(platform).register_module(order, f, router=router)
         return f
 
     return wrapper
+
 
 def register_platform_package(platform, name, cfgclass):
     """
     Registers a new platform package.
     """
+
     def wrapper(f):
         get_platform(platform).register_package(name, cfgclass, f)
         return f
 
     return wrapper
 
+
 def register_router(platform, router):
     """
     Registers a new router.
     """
+
     get_platform(platform).register_router(router)
+
 
 def iterate_routers():
     """
     Iterates over all registered routers.
     """
+
     for platform in PLATFORM_REGISTRY.values():
         for router in platform._routers.values():
             yield router
 
-def generate_config(node, only_validate = False):
+
+def generate_config(node, only_validate=False):
     """
     Generates configuration and/or firmware for the specified node.
 
     :param node: Node instance
     :param only_validate: True if only validation should be performed
     """
+
     # Ensure that all CGMs are registred
     loader.load_modules("cgm")
 

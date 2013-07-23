@@ -1,9 +1,11 @@
 from django.utils.translation import ugettext as _
 
+
 class Channel(object):
     """
     Channel descriptor.
     """
+
     def __init__(self, identifier, number, frequency):
         """
         Class constructor.
@@ -12,11 +14,13 @@ class Channel(object):
         self.number = number
         self.frequency = frequency
 
+
 class ChannelWidth(object):
     """
     Channel width descriptor.
     """
-    def __init__(self, identifier, description, width, limit_channels = None):
+
+    def __init__(self, identifier, description, width, limit_channels=None):
         """
         Class constructor.
         """
@@ -24,6 +28,7 @@ class ChannelWidth(object):
         self.description = description
         self.width = width
         self.limit_channels = limit_channels
+
 
 class Capability(object):
     """
@@ -37,7 +42,8 @@ class Capability(object):
 
         self.identifier = identifier
 
-class WirelessProtocolMeta(type):
+
+class WirelessProtocolMetaclass(type):
     def __new__(cls, name, bases, attrs):
         new_class = type.__new__(cls, name, bases, attrs)
         if cls == "WirelessProtocol":
@@ -58,21 +64,22 @@ class WirelessProtocolMeta(type):
 
         new_class.capabilities = set(getattr(new_class, 'capabilities', []))
         new_class.available_capabilities = set()
-        
+
         for capability in new_class.capabilities:
             setattr(new_class, capability.identifier.replace('-', '_').upper(), capability)
 
         return new_class
+
 
 class WirelessProtocol(object):
     """
     Wireless protocol descriptor.
     """
 
-    __metaclass__ = WirelessProtocolMeta
+    __metaclass__ = WirelessProtocolMetaclass
 
     @classmethod
-    def get_channel_choices(cls, width, regulatory_filter = None):
+    def get_channel_choices(cls, width, regulatory_filter=None):
         """
         Returns a list of channel chocies.
         """
@@ -83,7 +90,7 @@ class WirelessProtocol(object):
 
         for channel in cls.channels:
             if (regulatory_filter is None or channel.frequency in regulatory_filter) and \
-                (width.limit_channels is None or width.limit_channels(cls, channel)):
+                    (width.limit_channels is None or width.limit_channels(cls, channel)):
                 yield channel.identifier, channel.number
 
     @classmethod
@@ -135,6 +142,7 @@ class WirelessProtocol(object):
         capabilities = self.capabilities.intersection(capabilities)
         self.available_capabilities.update(capabilities)
 
+
 class IEEE80211BG(WirelessProtocol):
     """
     IEEE 8022.11 B/G protocols.
@@ -166,6 +174,7 @@ class IEEE80211BG(WirelessProtocol):
         ChannelWidth("nw10", _("10 MHz"), 10),
         ChannelWidth("ht20", _("20 MHz"), 20),
     )
+
 
 class IEEE80211N(IEEE80211BG):
     """
@@ -212,14 +221,16 @@ class IEEE80211N(IEEE80211BG):
     )
     widths = (
         # Limit 40 MHz channels in 2.4 GHz band to sensible choices
-        ChannelWidth("ht40l", _("40 MHz (or 2x20 MHz, secondary is lower)"), 40,
-            limit_channels = lambda proto, channel: \
-                channel.frequency >= 5180 or \
-                proto.get_channel_number(channel.number - 4) is not None
+        ChannelWidth(
+            "ht40l",
+            _("40 MHz (or 2x20 MHz, secondary is lower)"),
+            40,
+            limit_channels=lambda proto, channel: channel.frequency >= 5180 or proto.get_channel_number(channel.number - 4) is not None,
         ),
-        ChannelWidth("ht40u", _("40 MHz (or 2x20 MHz, secondary is upper)"), 40,
-            limit_channels = lambda proto, channel: \
-                channel.frequency >= 5180 or \
-                proto.get_channel_number(channel.number + 4) is not None
+        ChannelWidth(
+            "ht40u",
+            _("40 MHz (or 2x20 MHz, secondary is upper)"),
+            40,
+            limit_channels=lambda proto, channel: channel.frequency >= 5180 or proto.get_channel_number(channel.number + 4) is not None,
         )
     )

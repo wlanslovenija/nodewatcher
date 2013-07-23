@@ -7,16 +7,18 @@ from django.utils import safestring
 
 from . import forms as registry_forms, registration
 
+
 @auth_decorators.login_required
 def evaluate_forms(request, regpoint_id, root_id):
     """
     This view gets called via an AJAX request to evaluate rules.
     """
+
     if request.method != 'POST':
         return http.HttpResponse('')
 
     regpoint = registration.point(regpoint_id)
-    root = shortcuts.get_object_or_404(regpoint.model, pk = root_id) if root_id else None
+    root = shortcuts.get_object_or_404(regpoint.model, pk=root_id) if root_id else None
     temp_root = False
 
     sid = transaction.savepoint()
@@ -34,7 +36,7 @@ def evaluate_forms(request, regpoint_id, root_id):
             request,
             root,
             request.POST,
-            only_rules = True,
+            only_rules=True,
         )
 
         # Merge in client actions when available
@@ -55,9 +57,9 @@ def evaluate_forms(request, regpoint_id, root_id):
             request,
             root,
             request.POST,
-            save = True,
-            actions = actions,
-            current_config = partial_config,
+            save=True,
+            actions=actions,
+            current_config=partial_config,
         )
     finally:
         transaction.savepoint_rollback(sid)
@@ -66,10 +68,10 @@ def evaluate_forms(request, regpoint_id, root_id):
     return shortcuts.render_to_response(
         'registry/forms.html',
         {
-            'registry_forms' : forms,
-            'eval_state' : safestring.mark_safe(json.dumps(actions["STATE"])),
-            'registry_root' : root if not temp_root else None,
-            'registry_regpoint' : regpoint_id,
+            'registry_forms': forms,
+            'eval_state': safestring.mark_safe(json.dumps(actions["STATE"])),
+            'registry_root': root if not temp_root else None,
+            'registry_regpoint': regpoint_id,
         },
-        context_instance = template.RequestContext(request)
+        context_instance=template.RequestContext(request),
     )

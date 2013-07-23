@@ -4,17 +4,19 @@ from django import forms
 from django.conf import settings
 from django.utils import safestring
 
+
 class LocationWidget(forms.widgets.TextInput):
     """
     A location widget that enables input via Google Maps.
     """
+
     class Media:
         js = (
             'nodewatcher/js/gmap.js',
             '//maps.google.com/maps?file=api&amp;v=2&amp;key=' + settings.GOOGLE_MAPS_API_KEY,
         )
 
-    def __init__(self, map_width = 300, map_height = 200, default_location = None, *args, **kwargs):
+    def __init__(self, map_width=300, map_height=200, default_location=None, *args, **kwargs):
         """
         Class constructor.
 
@@ -22,6 +24,7 @@ class LocationWidget(forms.widgets.TextInput):
         :param map_height: Map height in pixels
         :param default_location: A tuple (lat, lng, zoom) describing the default location
         """
+
         super(LocationWidget, self).__init__(*args, **kwargs)
         self.map_width = map_width
         self.map_height = map_height
@@ -41,6 +44,7 @@ class LocationWidget(forms.widgets.TextInput):
         """
         Renders the map widget.
         """
+
         if value is None:
             lat, lng = None, None
         else:
@@ -109,19 +113,19 @@ class LocationWidget(forms.widgets.TextInput):
                 $(document).ready(function() { map_load_%(js_name)s(); });
             </script>
         ''' % {
-            'name' : name,
-            'js_name' : js_name,
-            'def_lat' : self.default_location[0],
-            'def_lng' : self.default_location[1],
-            'def_zoom' : self.default_location[2],
-            'marker_lat' : lat,
-            'marker_lng' : lng,
+            'name': name,
+            'js_name': js_name,
+            'def_lat': self.default_location[0],
+            'def_lng': self.default_location[1],
+            'def_zoom': self.default_location[2],
+            'marker_lat': lat,
+            'marker_lng': lng,
         }
 
         if lat is None:
-            html = self.inner_widget.render("%s" % name, "", { 'id' : 'id_%s' % name })
+            html = self.inner_widget.render("%s" % name, "", {'id': 'id_%s' % name})
         else:
-            html = self.inner_widget.render("%s" % name, "POINT(%f %f)" % (lat, lng), { 'id' : 'id_%s' % name })
+            html = self.inner_widget.render("%s" % name, "POINT(%f %f)" % (lat, lng), {'id': 'id_%s' % name})
 
         html += '<div id="gmap_%s" style="width: %dpx; height: %dpx"></div>' % (name, self.map_width, self.map_height)
         return safestring.mark_safe(js + html)

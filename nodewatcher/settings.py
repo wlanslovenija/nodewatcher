@@ -24,14 +24,14 @@ ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default' : {
+    'default': {
         # Follow https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/ to install GeoDjango.
-        'ENGINE'   : 'django.contrib.gis.db.backends.postgis',
-        'NAME'     : 'nodewatcher', # Use: createdb nodewatcher
-        'USER'     : 'nodewatcher', # Set to empty string to connect as current user.
-        'PASSWORD' : '',
-        'HOST'     : 'localhost',   # Set to empty string for socket.
-        'PORT'     : '',            # Set to empty string for default.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'nodewatcher', # Use: createdb nodewatcher
+        'USER': 'nodewatcher', # Set to empty string to connect as current user.
+        'PASSWORD': '',
+        'HOST': 'localhost', # Set to empty string for socket.
+        'PORT': '', # Set to empty string for default.
     },
 }
 
@@ -56,7 +56,7 @@ LANGUAGES = (
 )
 
 LOCALE_PATHS = (
-#   os.path.join(settings_dir, 'locale'),
+    #os.path.join(settings_dir, 'locale'),
 )
 
 URL_VALIDATOR_USER_AGENT = 'nodewatcher'
@@ -136,7 +136,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#   'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 STATICFILES_STORAGE = 'nodewatcher.core.frontend.staticfiles.storage.SCSSStaticFilesStorage'
@@ -158,7 +158,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#   'django.template.loaders.eggs.Loader',
+    #'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -191,7 +191,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-#   os.path.join(settings_dir, 'templates'),
+    #os.path.join(settings_dir, 'templates'),
 )
 
 # See handler403 in urls.py as well.
@@ -286,12 +286,12 @@ LOGGING = {
     },
     'handlers': {
         'null': {
-            'level':'DEBUG',
-            'class':'django.utils.log.NullHandler',
-            },
-        'console':{
-            'level':'DEBUG',
-            'class':'logging.StreamHandler',
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
         'mail_admins': {
@@ -338,16 +338,24 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 CELERYD_PREFETCH_MULTIPLIER = 15
 CELERY_IGNORE_RESULT = True
-CELERY_DEFAULT_QUEUE = "default"
+CELERY_DEFAULT_QUEUE = 'default'
 
 CELERY_QUEUES = {
-    "default": { "exchange": "default", "binding_key": "default" },
-    # NOTE: Only one worker can run for processing the "generator" jobs!
-    "generator": { "exchange": "generator", "binding_key": "generator" },
+    'default': {
+        'exchange': 'default',
+        'binding_key': 'default',
+    },
+    # NOTE: Only one worker can run for processing the 'generator' jobs!
+    'generator': {
+        'exchange': 'generator',
+        'binding_key': 'generator',
+    },
 }
 
-CELERY_ROUTES =  {
-    "core.generator.cgm.tasks.background_build" : { "queue" : "generator" },
+CELERY_ROUTES = {
+    'core.generator.cgm.tasks.background_build': {
+        'queue': 'generator',
+    },
 }
 
 # Monitor configuration.

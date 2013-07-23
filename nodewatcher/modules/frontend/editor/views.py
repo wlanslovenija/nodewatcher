@@ -9,6 +9,7 @@ from guardian import mixins, shortcuts
 from nodewatcher.core import models as core_models
 from nodewatcher.core.registry import forms as registry_forms
 
+
 class RegistryFormMixin(object):
     success_url = None
 
@@ -24,6 +25,7 @@ class RegistryFormMixin(object):
 
     def form_invalid(self):
         return self.render_to_response(self.get_context_data(object=self.object))
+
 
 class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
     template_name = 'nodes/new.html'
@@ -96,6 +98,7 @@ class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
 
     def get_success_url(self):
         return urlresolvers.reverse('display:node', kwargs={'pk': self.object.pk})
+
 
 class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailView):
     template_name = 'nodes/edit.html'

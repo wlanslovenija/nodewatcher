@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import registration
 
+
 class RoleConfig(registration.bases.NodeConfigRegistryItem):
     """
     Describes a single node's role.
@@ -19,48 +20,52 @@ class RoleConfig(registration.bases.NodeConfigRegistryItem):
 
 registration.point("node.config").register_item(RoleConfig)
 
+
 class SystemRoleConfig(RoleConfig):
     """
     Describes the "system" role.
     """
 
-    system = models.BooleanField(default = False)
+    system = models.BooleanField(default=False)
 
     class RegistryMeta(RoleConfig.RegistryMeta):
         registry_name = _("System Role")
 
 registration.point('node.config').register_item(SystemRoleConfig)
 
+
 class BorderRouterRoleConfig(RoleConfig):
     """
     Describes the "border router" role.
     """
 
-    border_router = models.BooleanField(default = False)
+    border_router = models.BooleanField(default=False)
 
     class RegistryMeta(RoleConfig.RegistryMeta):
         registry_name = _("Border Router Role")
 
 registration.point('node.config').register_item(BorderRouterRoleConfig)
 
+
 class VpnServerRoleConfig(RoleConfig):
     """
     Describes the "vpn server" role.
     """
 
-    vpn_server = models.BooleanField(default = False)
+    vpn_server = models.BooleanField(default=False)
 
     class RegistryMeta(RoleConfig.RegistryMeta):
         registry_name = _("VPN Server Role")
 
 registration.point('node.config').register_item(VpnServerRoleConfig)
 
+
 class RedundantNodeRoleConfig(RoleConfig):
     """
     Describes the "redundant node" role.
     """
 
-    redundancy_required = models.BooleanField(default = False)
+    redundancy_required = models.BooleanField(default=False)
 
     class RegistryMeta(RoleConfig.RegistryMeta):
         registry_name = _("Redundant Node Role")

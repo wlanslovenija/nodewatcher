@@ -1,4 +1,5 @@
-import copy, json
+import copy
+import json
 
 from django import forms, template
 from django.conf import settings
@@ -8,17 +9,21 @@ from django.utils import datastructures, importlib
 
 from .. import rules as registry_rules, registration, loader
 
+
 class RegistryValidationError(Exception):
     """
     This exception can be raised by registry point validation hooks to
     notify the API that validation has failed.
     """
+
     pass
+
 
 class RegistryFormAction(object):
     """
     An abstract action that can modify lists of registry forms.
     """
+
     context = None
 
     def modify_forms_before(self):
@@ -26,6 +31,7 @@ class RegistryFormAction(object):
         Subclasses should provide action implementation in this method. It
         will be executed before the subforms are generated.
         """
+
         pass
 
     def modify_forms_after(self):
@@ -33,30 +39,37 @@ class RegistryFormAction(object):
         Subclasses should provide action implementation in this method. It
         will be executed after the subforms are generated.
         """
+
         pass
+
 
 class ClearFormsAction(RegistryFormAction):
     """
     An action that clears all subforms for the specified registry class.
     """
+
     def modify_forms_after(self):
         """
         Clears all subforms.
         """
+
         self.context.subforms = []
         return True
+
 
 class RemoveFormAction(RegistryFormAction):
     """
     An action that removes forms specified by index.
     """
-    def __init__(self, indices, parent = None):
+
+    def __init__(self, indices, parent=None):
         """
         Class constructor.
 
         :param indices: Form indices to remove
         :param parent: Optional partial parent item
         """
+
         self.indices = sorted(indices)
         self.parent = parent
 
@@ -64,6 +77,7 @@ class RemoveFormAction(RegistryFormAction):
         """
         Removes specified subforms.
         """
+
         if self.parent != self.context.hierarchy_parent_current or len(self.indices) < 1:
             return False
 
@@ -73,7 +87,7 @@ class RemoveFormAction(RegistryFormAction):
         for i in xrange(self.context.user_form_count):
             if i in self.indices:
                 for key in self.context.data.keys():
-                    if key.startswith(form_prefix + str(i) + "_") or key.startswith(form_prefix + str(i) + "-"):
+                    if key.startswith(form_prefix + str(i) + '_') or key.startswith(form_prefix + str(i) + '-'):
                         del self.context.data[key]
 
                 reduce_by += 1
@@ -83,10 +97,10 @@ class RemoveFormAction(RegistryFormAction):
 
             for key in self.context.data.keys():
                 postfix = None
-                if key.startswith(form_prefix + str(i) + "_"):
-                    postfix = "_"
-                elif key.startswith(form_prefix + str(i) + "-"):
-                    postfix = "-"
+                if key.startswith(form_prefix + str(i) + '_'):
+                    postfix = '_'
+                elif key.startswith(form_prefix + str(i) + '-'):
+                    postfix = '-'
 
                 if postfix is not None:
                     new_key = key.replace(form_prefix + str(i) + postfix, form_prefix + str(i - reduce_by) + postfix)
@@ -97,29 +111,35 @@ class RemoveFormAction(RegistryFormAction):
         self.context.user_form_count -= len(self.indices)
         return True
 
+
 class RemoveLastFormAction(RegistryFormAction):
     """
     An action that removes the last subform.
     """
+
     def modify_forms_after(self):
         """
         Removes the last subform.
         """
+
         if len(self.context.subforms) > 0:
             self.context.subforms.pop()
             return True
+
 
 class AppendFormAction(RegistryFormAction):
     """
     An action that appends a new form at the end of current subforms.
     """
-    def __init__(self, item, parent = None):
+
+    def __init__(self, item, parent=None):
         """
         Class constructor.
 
         :param item: Configuration item that should be appended
         :param parent: Optional partial parent item
         """
+
         self.item = item
         self.parent = parent
 
@@ -127,32 +147,37 @@ class AppendFormAction(RegistryFormAction):
         """
         Appends a new form at the end of current subforms.
         """
+
         if self.item is not None and self.parent != self.context.hierarchy_parent_current:
             return False
 
         form_prefix = self.context.base_prefix + '_mu_' + str(len(self.context.subforms))
         item = self.item
         if item is None:
-            item = create_config_item(self.context.default_item_cls, self.context.current_config, {},
-              parent = self.context.hierarchy_parent_current)
+            item = create_config_item(
+                self.context.default_item_cls, self.context.current_config, {},
+                parent=self.context.hierarchy_parent_current,
+            )
 
         self.context.subforms.append(generate_form_for_class(
-          self.context,
-          form_prefix,
-          None,
-          len(self.context.subforms),
-          instance = item,
-          validate = True,
-          force_selector_widget = self.context.force_selector_widget
+            self.context,
+            form_prefix,
+            None,
+            len(self.context.subforms),
+            instance=item,
+            validate=True,
+            force_selector_widget=self.context.force_selector_widget,
         ))
 
         return True
+
 
 class AssignToFormAction(RegistryFormAction):
     """
     An action that assigns to an existing form.
     """
-    def __init__(self, item, index, attributes, parent = None):
+
+    def __init__(self, item, index, attributes, parent=None):
         """
         Class constructor.
 
@@ -161,6 +186,7 @@ class AssignToFormAction(RegistryFormAction):
         :param attributes: A dictionary of attributes to assign
         :param parent: Optional partial parent item
         """
+
         self.item = item
         self.index = index
         self.attributes = attributes
@@ -170,6 +196,7 @@ class AssignToFormAction(RegistryFormAction):
         """
         Assigns to an existing form.
         """
+
         if self.parent != self.context.hierarchy_parent_current:
             return False
 
@@ -179,11 +206,13 @@ class AssignToFormAction(RegistryFormAction):
 
         return True
 
+
 class BasicRegistryRenderItem(object):
     """
     A simple registry render item that includes a form with fields and
     an item class selector when needed.
     """
+
     template = 'registry/basic_render_item.html'
 
     def __init__(self, form, meta_form, **kwargs):
@@ -193,6 +222,7 @@ class BasicRegistryRenderItem(object):
         :param form: Form containing the fields
         :param meta_form: Form containing selected item metadata
         """
+
         self.form = form
         self.meta_form = meta_form
         self.args = kwargs
@@ -202,6 +232,7 @@ class BasicRegistryRenderItem(object):
         """
         Returns the form Media object for this render item.
         """
+
         if self.form is not None and self.meta_form is not None:
             return self.form.media + self.meta_form.media
         else:
@@ -211,19 +242,22 @@ class BasicRegistryRenderItem(object):
         """
         Renders this item.
         """
+
         t = template.loader.get_template(self.template)
         args = {
-          'form' : self.form,
-          'meta' : self.meta_form
+            'form': self.form,
+            'meta': self.meta_form,
         }
         args.update(self.args)
         return t.render(template.Context(args))
+
 
 class NestedRegistryRenderItem(BasicRegistryRenderItem):
     """
     A registry renderer item that augments the basic form with support for
     nested forms.
     """
+
     template = 'registry/nested_render_item.html'
 
     def __init__(self, form, meta_form, children):
@@ -234,7 +268,8 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
         :param meta_form: Form containing selected item metadata
         :param children: A list of child form descriptors
         """
-        super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms = children)
+
+        super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms=children)
         self.children = children
 
     @property
@@ -242,6 +277,7 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
         """
         Returns the form Media object for this render item.
         """
+
         base_media = super(NestedRegistryRenderItem, self).media
 
         for child in self.children:
@@ -258,11 +294,13 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
 
         return base_media
 
+
 class RootRegistryRenderItem(NestedRegistryRenderItem):
     """
     A registry render item that is returned as the root of the render
     tree. It contains and renders all top-level forms.
     """
+
     template = 'registry/render_items.html'
 
     def __init__(self, forms):
@@ -271,6 +309,7 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
 
         :param forms: A list of form descriptors
         """
+
         super(RootRegistryRenderItem, self).__init__(None, None, forms)
         self.errors = []
 
@@ -280,28 +319,32 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
 
         :param message: Message string
         """
+
         self.errors.append(message)
 
     def __unicode__(self):
         """
         Renders this item.
         """
+
         t = template.loader.get_template(self.template)
         args = {
-          'registry_forms' : self.children,
-          'errors'         : self.errors
+            'registry_forms': self.children,
+            'errors': self.errors,
         }
         return t.render(template.Context(args))
+
 
 class RegistryMetaForm(forms.Form):
     """
     Form for selecting which item should be displayed.
     """
-    def __init__(self, context, selected_item = None, force_selector_widget = False, static = False,
-      instance_mid = 0, *args, **kwargs):
+
+    def __init__(self, context, selected_item=None, force_selector_widget=False, static=False, instance_mid=0, *args, **kwargs):
         """
         Class constructor.
         """
+
         super(RegistryMetaForm, self).__init__(*args, **kwargs)
 
         # Choose a default item in case one is not set
@@ -310,7 +353,7 @@ class RegistryMetaForm(forms.Form):
         selected_item = selected_item._meta.module_name
 
         if not static and (len(context.items) > 1 or force_selector_widget):
-            item_widget = forms.Select(attrs = { 'class' : 'regact_item_chooser' })
+            item_widget = forms.Select(attrs={'class': 'regact_item_chooser'})
         else:
             item_widget = forms.HiddenInput
 
@@ -318,32 +361,34 @@ class RegistryMetaForm(forms.Form):
         item_choices = [(name, item.RegistryMeta.registry_name) for name, item in context.items.iteritems()]
 
         self.fields['item'] = forms.TypedChoiceField(
-          choices = item_choices,
-          coerce = str,
-          initial = selected_item,
-          widget = item_widget
+            choices=item_choices,
+            coerce=str,
+            initial=selected_item,
+            widget=item_widget,
         )
         self.fields['prev_item'] = forms.TypedChoiceField(
-          choices = item_choices,
-          coerce = str,
-          initial = selected_item,
-          widget = forms.HiddenInput
+            choices=item_choices,
+            coerce=str,
+            initial=selected_item,
+            widget=forms.HiddenInput,
         )
 
         # Existing model identifier
         self.fields['mid'] = forms.IntegerField(
-          initial = instance_mid,
-          widget = forms.HiddenInput
+            initial=instance_mid,
+            widget=forms.HiddenInput,
         )
+
 
 class RegistrySetMetaForm(forms.Form):
     form_count = forms.IntegerField(
-      min_value = 0,
-      max_value = 10,
-      widget = forms.HiddenInput
+        min_value=0,
+        max_value=10,
+        widget=forms.HiddenInput,
     )
 
-def create_config_item(cls, partial, attributes, parent = None):
+
+def create_config_item(cls, partial, attributes, parent=None):
     """
     A helper function for creating a temporary virtual model in the partially
     validated configuration tree.
@@ -354,20 +399,21 @@ def create_config_item(cls, partial, attributes, parent = None):
     :param parent: Optional parent configuration item
     :return: Created virtual configuration item
     """
+
     config = cls()
     config._registry_virtual_model = True
     if parent is not None:
         setattr(
-          config,
-          cls._registry_object_parent_link.name,
-          parent
+            config,
+            cls._registry_object_parent_link.name,
+            parent,
         )
 
         # Create a virtual reverse relation in the parent object
         virtual_relation = getattr(parent, '_registry_virtual_relation', {})
         desc = getattr(
-          parent.__class__,
-          cls._registry_object_parent_link.rel.related_name
+            parent.__class__,
+            cls._registry_object_parent_link.rel.related_name,
         )
         virtual_relation.setdefault(desc, []).append(config)
         parent._registry_virtual_relation = virtual_relation
@@ -382,19 +428,22 @@ def create_config_item(cls, partial, attributes, parent = None):
 
     return config
 
-def generate_form_for_class(context, prefix, data, index, instance = None, validate = False, partial = None,
-                            force_selector_widget = False, static = False):
+
+def generate_form_for_class(context, prefix, data, index, instance=None, validate=False, partial=None,
+                            force_selector_widget=False, static=False):
     """
     A helper function for generating a form for a specific registry item class.
     """
+
     selected_item = instance.__class__ if instance is not None else None
     previous_item = None
     existing_mid = (instance.pk if instance is not None else 0) or 0
 
     # Parse a form that holds the item selector
-    meta_form = RegistryMetaForm(context, selected_item, data = data, prefix = prefix,
-      force_selector_widget = force_selector_widget,
-      static = static, instance_mid = existing_mid
+    meta_form = RegistryMetaForm(
+        context, selected_item, data=data, prefix=prefix,
+        force_selector_widget=force_selector_widget,
+        static=static, instance_mid=existing_mid,
     )
     if validate and not static:
         if not meta_form.is_valid():
@@ -413,8 +462,8 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
     # previous form to the new one
     if previous_item is not None and selected_item != previous_item and not static:
         pform = previous_item.get_form()(
-          data,
-          prefix = prefix + '_' + previous_item._meta.module_name
+            data,
+            prefix=prefix + '_' + previous_item._meta.module_name,
         )
 
         # Perform a partial clean and copy all valid fields to the new form
@@ -435,20 +484,20 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
             instance = existing_instance
             instance._skip_delete = True
         else:
-            instance = selected_item(root = context.root)
+            instance = selected_item(root=context.root)
             if context.hierarchy_parent_cls is not None:
                 setattr(
-                  instance,
-                  selected_item._registry_object_parent_link.name,
-                  context.hierarchy_parent_obj
+                    instance,
+                    selected_item._registry_object_parent_link.name,
+                    context.hierarchy_parent_obj,
                 )
 
     # Now generate a form for the selected item
     form_prefix = prefix + '_' + selected_item._meta.module_name
     form = selected_item.get_form()(
-      data,
-      instance = instance,
-      prefix = form_prefix
+        data,
+        instance=instance,
+        prefix=form_prefix,
     )
 
     # Discover the current item model in the partially validated config hierarchy
@@ -458,8 +507,8 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
         try:
             if context.hierarchy_parent_current is not None:
                 current_config_item = getattr(
-                  context.hierarchy_parent_current,
-                  selected_item._registry_object_parent_link.rel.related_name
+                    context.hierarchy_parent_current,
+                    selected_item._registry_object_parent_link.rel.related_name,
                 )[index]
             else:
                 current_config_item = context.current_config[selected_item.RegistryMeta.registry_id][index]
@@ -529,30 +578,31 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
             config = create_config_item(selected_item, partial, form.cleaned_data, context.hierarchy_parent_partial)
 
     # Generate a new meta form, since the previous item has now changed
-    meta_form = RegistryMetaForm(context, selected_item, prefix = prefix,
-      force_selector_widget = force_selector_widget,
-      static = static, instance_mid = existing_mid
+    meta_form = RegistryMetaForm(
+        context, selected_item, prefix=prefix,
+        force_selector_widget=force_selector_widget,
+        static=static, instance_mid=existing_mid,
     )
 
     # Pack forms into a proper abstract representation
     if hasattr(selected_item, '_registry_has_children'):
         sub_context = RegistryFormContext(
-          regpoint = context.regpoint,
-          request = context.request,
-          root = context.root,
-          data = context.data,
-          save = context.save,
-          only_rules = context.only_rules,
-          also_rules = context.also_rules,
-          actions = context.actions,
-          current_config = context.current_config,
-          partial_config = context.partial_config,
-          hierarchy_prefix = form_prefix,
-          hierarchy_parent_cls = selected_item,
-          hierarchy_parent_obj = instance,
-          hierarchy_parent_partial = config,
-          hierarchy_parent_current = current_config_item,
-          validation_errors = False
+            regpoint=context.regpoint,
+            request=context.request,
+            root=context.root,
+            data=context.data,
+            save=context.save,
+            only_rules=context.only_rules,
+            also_rules=context.also_rules,
+            actions=context.actions,
+            current_config=context.current_config,
+            partial_config=context.partial_config,
+            hierarchy_prefix=form_prefix,
+            hierarchy_parent_cls=selected_item,
+            hierarchy_parent_obj=instance,
+            hierarchy_parent_partial=config,
+            hierarchy_parent_current=current_config_item,
+            validation_errors=False,
         )
 
         forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context))
@@ -564,6 +614,7 @@ def generate_form_for_class(context, prefix, data, index, instance = None, valid
         forms = BasicRegistryRenderItem(form, meta_form)
 
     return forms
+
 
 class RegistryFormContext(object):
     """
@@ -600,10 +651,12 @@ class RegistryFormContext(object):
         """
         self.__dict__.update(kwargs)
 
+
 def prepare_forms(context):
     """
     Prepares forms for some registry items.
     """
+
     forms = []
     for items in context.regpoint.get_children(context.hierarchy_parent_cls):
         # TODO is a deep copy really needed? shouldn't a shallow one suffice?
@@ -624,7 +677,7 @@ def prepare_forms(context):
         if context.hierarchy_prefix is not None:
             context.base_prefix = context.hierarchy_prefix + '_' + cls_meta.registry_id.replace('.', '_')
         else:
-            context.base_prefix = "reg_" + cls_meta.registry_id.replace('.', '_')
+            context.base_prefix = 'reg_' + cls_meta.registry_id.replace('.', '_')
 
         context.subforms = []
         context.force_selector_widget = False
@@ -642,7 +695,7 @@ def prepare_forms(context):
         # Fetch existing models for this item
         context.existing_models = datastructures.SortedDict()
         if context.root is not None:
-            existing_models_qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset = True)
+            existing_models_qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset=True)
 
             if context.hierarchy_parent_cls is not None:
                 rel_field_name = item_cls._registry_object_parent_link.name
@@ -652,11 +705,11 @@ def prepare_forms(context):
                     # is set to None, the basic filter would also match those that aren't linked
                     # to the correct model at all.
                     existing_models_qs = existing_models_qs.exclude(
-                      **{ item_cls._meta.module_name : None }
+                        **{item_cls._meta.module_name: None}
                     )
 
                 existing_models_qs = existing_models_qs.filter(
-                  **{ rel_field_name : context.hierarchy_parent_obj }
+                    **{rel_field_name: context.hierarchy_parent_obj}
                 )
 
             for mdl in existing_models_qs:
@@ -705,20 +758,20 @@ def prepare_forms(context):
                             break
                     else:
                         if context.root is not None:
-                            mdl = item(root = context.root)
+                            mdl = item(root=context.root)
                         else:
                             mdl = item()
 
                     form_prefix = context.base_prefix + '_mu_' + str(index)
                     context.subforms.append(generate_form_for_class(
-                      context,
-                      form_prefix,
-                      context.data,
-                      index,
-                      instance = mdl,
-                      validate = context.save or context.only_rules,
-                      partial = context.partial_config,
-                      static = True
+                        context,
+                        form_prefix,
+                        context.data,
+                        index,
+                        instance=mdl,
+                        validate=context.save or context.only_rules,
+                        partial=context.partial_config,
+                        static=True,
                     ))
             else:
                 # Dynamically modifiable multiple objects
@@ -728,39 +781,37 @@ def prepare_forms(context):
                     for index, mdl in enumerate(context.existing_models.values()):
                         form_prefix = context.base_prefix + '_mu_' + str(index)
                         context.subforms.append(generate_form_for_class(
-                          context,
-                          form_prefix,
-                          None,
-                          index,
-                          instance = mdl,
-                          force_selector_widget = context.force_selector_widget
+                            context,
+                            form_prefix,
+                            None,
+                            index,
+                            instance=mdl,
+                            force_selector_widget=context.force_selector_widget,
                         ))
 
                     # Create the form that contains metadata for this formset
                     submeta = RegistrySetMetaForm(
-                      context.data,
-                      prefix = context.base_prefix + '_sm',
-                      initial = { 'form_count' : len(context.subforms) }
+                        context.data,
+                        prefix=context.base_prefix + '_sm',
+                        initial={'form_count': len(context.subforms)},
                     )
                 else:
                     # We are saving or preparing to evaluate rules
                     submeta = RegistrySetMetaForm(
-                      context.data,
-                      prefix = context.base_prefix + '_sm'
+                        context.data,
+                        prefix=context.base_prefix + '_sm',
                     )
                     form_count = 0
                     if submeta.is_valid():
                         form_count = submeta.cleaned_data['form_count']
                     else:
                         submeta = RegistrySetMetaForm(
-                          prefix = context.base_prefix + '_sm',
-                          initial = { 'form_count' : 0 }
+                            prefix=context.base_prefix + '_sm',
+                            initial={'form_count': 0},
                         )
 
                     # Merge user actions with rules actions
-                    context.item_actions = \
-                      context.actions.get(context.base_prefix, []) + \
-                      context.actions.get(cls_meta.registry_id, [])
+                    context.item_actions = context.actions.get(context.base_prefix, []) + context.actions.get(cls_meta.registry_id, [])
                     meta_modified = False
 
                     # Setup the expected number of forms if only user-supplied forms are counted;
@@ -780,13 +831,13 @@ def prepare_forms(context):
                     for index in xrange(form_count):
                         form_prefix = context.base_prefix + '_mu_' + str(index)
                         context.subforms.append(generate_form_for_class(
-                          context,
-                          form_prefix,
-                          context.data,
-                          index,
-                          validate = True,
-                          partial = context.partial_config,
-                          force_selector_widget = context.force_selector_widget
+                            context,
+                            form_prefix,
+                            context.data,
+                            index,
+                            validate=True,
+                            partial=context.partial_config,
+                            force_selector_widget=context.force_selector_widget,
                         ))
 
                     # Delete existing models
@@ -807,8 +858,8 @@ def prepare_forms(context):
 
                         # Update the submeta form with new count
                         submeta = RegistrySetMetaForm(
-                          prefix = context.base_prefix + '_sm',
-                          initial = { 'form_count' : len(context.subforms) }
+                            prefix=context.base_prefix + '_sm',
+                            initial={'form_count': len(context.subforms)},
                         )
         else:
             # This item class only supports a single object to be selected
@@ -822,31 +873,32 @@ def prepare_forms(context):
 
             form_prefix = context.base_prefix + '_mu_0'
             context.subforms.append(generate_form_for_class(
-              context,
-              form_prefix,
-              context.data,
-              0,
-              instance = mdl,
-              validate = context.save or context.only_rules,
-              partial = context.partial_config
+                context,
+                form_prefix,
+                context.data,
+                0,
+                instance=mdl,
+                validate=context.save or context.only_rules,
+                partial=context.partial_config,
             ))
 
             submeta = None
 
         forms.append({
-          'name'                    : cls_meta.registry_section,
-          'id'                      : cls_meta.registry_id,
-          'multiple'                : getattr(cls_meta, 'multiple', False),
-          'hide_multiple_controls'  : getattr(cls_meta, 'multiple_static', False),
-          'subforms'                : context.subforms,
-          'submeta'                 : submeta,
-          'prefix'                  : context.base_prefix
+            'name': cls_meta.registry_section,
+            'id': cls_meta.registry_id,
+            'multiple': getattr(cls_meta, 'multiple', False),
+            'hide_multiple_controls': getattr(cls_meta, 'multiple_static', False),
+            'subforms': context.subforms,
+            'submeta': submeta,
+            'prefix': context.base_prefix,
         })
 
     return forms
 
-def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None, save = False, only_rules = False, also_rules = False,
-                                    actions = None, current_config = None):
+
+def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, save=False, only_rules=False, also_rules=False,
+                                    actions=None, current_config=None):
     """
     Prepares a list of configuration forms for use on a regpoint root's
     configuration page.
@@ -861,8 +913,9 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
     :param actions: A list of actions that can modify forms
     :param current_config: An existing partial config dictionary
     """
+
     # Ensure that all registry forms and CGMs are registred
-    loader.load_modules("forms", "cgm")
+    loader.load_modules('forms', 'cgm')
 
     if save and only_rules:
         raise ValueError("You cannot use save and only_rules at the same time!")
@@ -876,24 +929,24 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
 
     # Prepare context
     context = RegistryFormContext(
-      regpoint = regpoint,
-      request = request,
-      root = root,
-      data = data,
-      save = save,
-      only_rules = only_rules,
-      also_rules = also_rules,
-      actions = actions,
-      current_config = current_config,
-      partial_config = {} if only_rules else None,
-      validation_errors = False
+        regpoint=regpoint,
+        request=request,
+        root=root,
+        data=data,
+        save=save,
+        only_rules=only_rules,
+        also_rules=also_rules,
+        actions=actions,
+        current_config=current_config,
+        partial_config={} if only_rules else None,
+        validation_errors=False,
     )
 
     # Prepare form processors
     form_processors = []
     for proc_module in settings.REGISTRY_FORM_PROCESSORS.get(regpoint.name, []):
-        i = proc_module.rfind(".")
-        module, attr = proc_module[:i], proc_module[i+1:]
+        i = proc_module.rfind('.')
+        module, attr = proc_module[:i], proc_module[i + 1:]
         try:
             module = importlib.import_module(module)
             form_processors.append(getattr(module, attr)())
@@ -938,6 +991,6 @@ def prepare_forms_for_regpoint_root(regpoint, request, root = None, data = None,
 
     # Also return (initial) evaluation state when requested
     if also_rules:
-        return forms, actions["STATE"]
+        return forms, actions['STATE']
 
     return forms if not save else (context.validation_errors, forms)

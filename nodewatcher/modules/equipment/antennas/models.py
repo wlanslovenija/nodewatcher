@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.registry import fields as registry_fields, registration
 
+
 class Antenna(models.Model):
     """
     Antenna descriptor.
@@ -16,15 +17,15 @@ class Antenna(models.Model):
         ('dual', _("Dual")),
     )
 
-    name = models.CharField(max_length = 100, verbose_name = _("Name"))
-    manufacturer = models.CharField(max_length = 100, verbose_name = _("Manufacturer"))
-    internal_for = models.CharField(max_length = 100, editable = False, null = True)
-    internal_id = models.CharField(max_length = 100, editable = False, null = True)
-    url = models.URLField(verify_exists = False, verbose_name = _("URL"), blank = True)
-    polarization = models.CharField(max_length = 20, choices = POLARIZATION_CHOICES)
-    angle_horizontal = models.IntegerField(default = 360, verbose_name = _("Horizontal angle"))
-    angle_vertical = models.IntegerField(default = 360, verbose_name = _("Vertical angle"))
-    gain = models.IntegerField(verbose_name = _("Gain (dBi)"))
+    name = models.CharField(max_length=100, verbose_name=_("Name"))
+    manufacturer = models.CharField(max_length=100, verbose_name=_("Manufacturer"))
+    internal_for = models.CharField(max_length=100, editable=False, null=True)
+    internal_id = models.CharField(max_length=100, editable=False, null=True)
+    url = models.URLField(verify_exists=False, verbose_name=_("URL"), blank=True)
+    polarization = models.CharField(max_length=20, choices=POLARIZATION_CHOICES)
+    angle_horizontal = models.IntegerField(default=360, verbose_name=_("Horizontal angle"))
+    angle_vertical = models.IntegerField(default=360, verbose_name=_("Vertical angle"))
+    gain = models.IntegerField(verbose_name=_("Gain (dBi)"))
 
     def __unicode__(self):
         """
@@ -36,18 +37,19 @@ class Antenna(models.Model):
         else:
             return "%s :: %s" % (self.manufacturer, self.name)
 
+
 class AntennaEquipmentConfig(registration.bases.NodeConfigRegistryItem):
     """
     Antenna that can be added to a wireless radio.
     """
 
     device = registry_fields.IntraRegistryForeignKey(
-        cgm_models.WifiRadioDeviceConfig, editable = False, null = False, related_name = 'antennas'
+        cgm_models.WifiRadioDeviceConfig, editable=False, null=False, related_name='antennas'
     )
     antenna = registry_fields.ModelSelectorKeyField(Antenna)
-    azimuth = models.FloatField(null = True, blank = True)
-    elevation_angle = models.FloatField(null = True, blank = True)
-    rotation = models.FloatField(null = True, blank = True)
+    azimuth = models.FloatField(null=True, blank=True)
+    elevation_angle = models.FloatField(null=True, blank=True)
+    rotation = models.FloatField(null=True, blank=True)
 
     class RegistryMeta:
         form_order = 50
