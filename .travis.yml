@@ -3,7 +3,11 @@ python: "2.7"
 services:
  - mongodb
  - postgresql
-install: "pip install -r requirements.txt --use-mirrors"
+install:
+ - pip install pep8 --use-mirrors
+ - pip install -r requirements.txt --use-mirrors
 before_script:
-  - psql -c 'create database test_nodewatcher;' -U postgres
-script: "./manage.py test"
+ - psql -c 'create database test_nodewatcher;' -U postgres
+ - pep8 nodewatcher
+script:
+ - ./manage.py test
