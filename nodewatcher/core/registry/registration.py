@@ -155,7 +155,7 @@ class RegistrationPoint(object):
 
         top_level = True
 
-        # TODO perform validation for multiple defined intra registry foreign keys
+        # TODO: Perform validation for multiple defined intra registry foreign keys
 
         # Augment the item with hierarchy information, discover foreign keys
         for field in child._meta.fields:
@@ -229,7 +229,7 @@ class RegistrationPoint(object):
             raise ValueError("Registry item '{0}' is not registered!".format(item_cls._meta.object_name))
 
         registry_id = item_cls.RegistryMeta.registry_id
-        # TODO properly handle removal with new item list
+        # TODO: Properly handle removal with new item list
 
         if item_cls.__base__ == self.item_base:
             # Top-level item, remove all registered subitems as well

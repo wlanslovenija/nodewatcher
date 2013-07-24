@@ -659,7 +659,7 @@ def prepare_forms(context):
 
     forms = []
     for items in context.regpoint.get_children(context.hierarchy_parent_cls):
-        # TODO is a deep copy really needed? shouldn't a shallow one suffice?
+        # TODO: Is a deep copy really needed? Shouldn't a shallow one suffice?
         context.items = copy.deepcopy(items)
         context.existing_items = set()
 
