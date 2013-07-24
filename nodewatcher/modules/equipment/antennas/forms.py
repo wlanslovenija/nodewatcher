@@ -26,6 +26,8 @@ class AntennaEquipmentConfigForm(forms.ModelForm):
     Antenna equipment configuration form.
     """
 
+    _antenna_fields = None
+
     class Meta:
         model = antenna_models.AntennaEquipmentConfig
 

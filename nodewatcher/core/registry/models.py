@@ -11,6 +11,12 @@ class RegistryItemBase(models.Model):
 
     content_type = models.ForeignKey(contenttypes_models.ContentType, editable=False)
 
+    root = None
+    _registry_regpoint = None
+
+    class RegistryMeta:
+        registry_id = None
+
     class Meta:
         abstract = True
         ordering = ['id']
@@ -21,7 +27,7 @@ class RegistryItemBase(models.Model):
         Returns the form used for this model.
         """
 
-        form = cls._forms.get(cls, None) if hasattr(cls, '_forms') else None
+        form = getattr(cls, '_forms', {}).get(cls, None)
 
         if form is None:
             class DefaultRegistryItemForm(forms.ModelForm):

@@ -326,7 +326,7 @@ class CountryField(fields.CharField):
         kwargs.setdefault('choices', countries_choices)
         kwargs.setdefault('default', get_initial_country)
 
-        super(fields.CharField, self).__init__(*args, **kwargs)
+        super(CountryField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
         return "CharField"
@@ -337,7 +337,7 @@ class CityField(fields.CharField):
         kwargs.setdefault('max_length', 150)
         kwargs.setdefault('default', get_initial_city)
 
-        super(fields.CharField, self).__init__(*args, **kwargs)
+        super(CityField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
         return "CharField"
@@ -349,7 +349,7 @@ class LanguageField(fields.CharField):
         kwargs.setdefault('choices', languages_choices)
         kwargs.setdefault('default', get_initial_language)
 
-        super(fields.CharField, self).__init__(*args, **kwargs)
+        super(LanguageField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
         return "CharField"
