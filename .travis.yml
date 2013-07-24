@@ -7,6 +7,8 @@ services:
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq binutils gdal-bin libproj-dev postgresql-9.1-postgis postgresql-server-dev-9.1 libgeoip1
+ - sudo rm -rf /dev/shm
+ - sudo ln -s /run/shm /dev/shm
 install:
  - pip install pep8 --use-mirrors
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
