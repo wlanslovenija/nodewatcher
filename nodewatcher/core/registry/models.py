@@ -48,8 +48,7 @@ class RegistryItemBase(models.Model):
         if cls.__base__ == cls._registry_regpoint.item_base:
             return cls._registry_regpoint.namespace + '_' + cls._meta.app_label + '_' + cls._meta.module_name
         else:
-            # TODO: Why is "cls.__base__" passed here to lookup_path? It does not take any arguments.
-            return cls.lookup_path(cls.__base__) + '__' + cls._meta.module_name
+            return cls.lookup_path() + '__' + cls._meta.module_name
 
     @classmethod
     def top_model(cls):
