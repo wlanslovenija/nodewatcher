@@ -374,7 +374,7 @@ class Migration(DataMigration):
                         pkg = orm['digitemp.DigitempPackageConfig'](root = node, content_type = digitemppkg_ctype)
                         pkg.save()
             else:
-                # TODO Migrate nodes without profiles (we need to ensure proper interfaces)
+                # TODO: Migrate nodes without profiles (we need to ensure proper interfaces)
                 print "     - Node has no profile configured."
 
     def backwards(self, orm):

@@ -41,7 +41,7 @@ class TPLinkWR842ND(cgm_routers.RouterBase):
         )
     ]
     antennas = [
-        # TODO :This information is probably not correct
+        # TODO: This information is probably not correct
         cgm_routers.InternalAntenna(
             identifier='a1',
             polarization='horizontal',

@@ -28,7 +28,7 @@ class UBNTNano(cgm_routers.RouterBase):
         cgm_routers.EthernetPort('lan0', "Lan0")
     ]
     antennas = [
-        # TODO this information is probably not correct
+        # TODO: This information is probably not correct
         cgm_routers.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
