@@ -29,7 +29,7 @@ DATABASES = {
         # Follow https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/ to install GeoDjango.
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'nodewatcher', # Use: createdb nodewatcher
-        'USER': 'nodewatcher', # Set to empty string to connect as current user.
+        'USER': os.environ.get('DJANGO_DATABASE_USER', 'nodewatcher'), # Set to empty string to connect as current user.
         'PASSWORD': '',
         'HOST': 'localhost', # Set to empty string for socket.
         'PORT': '', # Set to empty string for default.
