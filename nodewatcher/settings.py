@@ -418,6 +418,9 @@ REGISTRY_RULES_MODULES = {
     'node.config': 'nodewatcher.rules',
 }
 
+# Disable South migrations during unit tests as they will fail
+SOUTH_TESTS_MIGRATE = False
+
 # In general, use https when constructing full URLs to nodewatcher?
 # Django's is_secure is used in the code as well. See SECURE_PROXY_SSL_HEADER configuration option.
 USE_HTTPS = False
