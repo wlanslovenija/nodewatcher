@@ -210,9 +210,12 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+DEFAULT_EXCEPTION_REPORTER_FILTER = 'missing.debug.SafeExceptionReporterFilter'
+
 TEST_RUNNER = 'nodewatcher.test_runner.FilteredTestSuiteRunner'
 TEST_RUNNER_FILTER = (
     'nodewatcher.',
+    'missing.',
 )
 
 INSTALLED_APPS = (
