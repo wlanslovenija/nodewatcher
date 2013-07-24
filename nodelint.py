@@ -106,6 +106,7 @@ class NodewatcherChecker(checkers.BaseChecker):
                 node.locals['children'] = self._queryset
 
     def visit_callfunc(self, node):
+        # For registration.create_point calls add target registration point to the model
         if isinstance(node.func, astng.Getattr) and getattr(node.func, 'attrname', None) == 'create_point':
             try:
                 inferred = list(node.func.expr.infer())[0].frame()
