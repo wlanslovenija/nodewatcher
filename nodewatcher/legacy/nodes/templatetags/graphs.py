@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 from django import template
 from django.template import loader
 

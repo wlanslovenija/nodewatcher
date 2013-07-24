@@ -4,6 +4,7 @@ import md5crypt
 from django.contrib.auth import backends as auth_backends, models as auth_models
 
 try:
+    # pylint: disable=import-error
     import aprmd5
     APR_ENABLED = True
 except ImportError:

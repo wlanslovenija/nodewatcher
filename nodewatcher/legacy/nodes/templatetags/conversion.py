@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 from django import template
 
 register = template.Library()

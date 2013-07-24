@@ -49,6 +49,8 @@ class PlatformBase(object):
         """
         Class constructor.
         """
+
+        self.name = None
         self._modules = []
         self._packages = []
         self._routers = {}

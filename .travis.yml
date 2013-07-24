@@ -1,13 +1,20 @@
 language: python
 python: "2.7"
+env: PYTHONPATH=. DJANGO_DATABASE_USER=postgres
 services:
  - mongodb
  - postgresql
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq binutils gdal-bin libproj-dev postgresql-9.1-postgis postgresql-server-dev-9.1 libgeoip1
 install:
  - pip install pep8 --use-mirrors
+ - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
  - pip install -r requirements.txt --use-mirrors
 before_script:
- - psql -c 'create database test_nodewatcher;' -U postgres
+ - curl https://raw.github.com/django/django/1.5.1/docs/ref/contrib/gis/install/create_template_postgis-debian.sh | sh
+ - createdb -T template_postgis nodewatcher
  - pep8 nodewatcher
+ - pylint nodewatcher || true
 script:
- - ./manage.py test
+ - python -W error manage.py test

@@ -206,7 +206,7 @@ REQUIRED_ROUTER_ATTRIBUTES = {
 }
 
 
-class RouterMeta(type):
+class RouterMetaclass(type):
     """
     Type for router descriptors.
     """
@@ -215,6 +215,7 @@ class RouterMeta(type):
         """
         Creates a new RouterBase class.
         """
+
         new_class = type.__new__(cls, name, bases, attrs)
 
         if name != 'RouterBase':
@@ -261,12 +262,18 @@ class RouterBase(object):
     An abstract router hardware descriptor.
     """
 
-    __metaclass__ = RouterMeta
+    __metaclass__ = RouterMetaclass
 
     features = []
     port_map = {}
     drivers = {}
     profiles = {}
+    identifier = None
+    manufacturer = None
+    name = None
+    ports = None
+    radios = None
+    switches = None
 
     @classmethod
     def register(cls, platform):
