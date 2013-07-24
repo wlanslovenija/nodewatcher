@@ -181,7 +181,7 @@ class IEEE80211BG(WirelessProtocol):
 
 class IEEE80211N(IEEE80211BG):
     """
-    IEEE 802.11 N protocol
+    IEEE 802.11 N protocol.
     """
 
     identifier = "ieee-80211n"

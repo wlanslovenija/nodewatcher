@@ -319,7 +319,7 @@ class RegistrationPoint(object):
         Adds one or more mixins to the top-level registry item that is associated
         with this registration point.
 
-        :parma mixins: Mixin classes
+        :param mixins: Mixin classes
         """
 
         self.item_base.__bases__ += tuple(mixins)
