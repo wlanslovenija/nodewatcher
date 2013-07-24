@@ -1,9 +1,6 @@
 language: python
 python: "2.7"
-env:
- - global:
-    - PYTHONPATH=.
-    - DJANGO_DATABASE_USER=postgres
+env: PYTHONPATH=. DJANGO_DATABASE_USER=postgres
 services:
  - mongodb
  - postgresql
