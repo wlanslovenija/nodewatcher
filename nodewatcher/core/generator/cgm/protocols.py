@@ -145,6 +145,7 @@ class WirelessProtocol(object):
         capabilities = self.capabilities.intersection(capabilities)
         self.available_capabilities.update(capabilities)
 
+
 class IEEE80211BG(WirelessProtocol):
     """
     IEEE 8022.11 B/G protocols.
