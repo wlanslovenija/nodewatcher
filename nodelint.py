@@ -99,7 +99,7 @@ class DocVisitor(nodes.SparseNodeVisitor):
             return
 
         if paragraph[-1] not in '.!?':
-            self.checker.add_message('W9001', node=self.pynode, line=self.pynode.fromlineno)
+            self.checker.add_message('W9002', node=self.pynode, line=self.pynode.fromlineno)
 
 class DocStringChecker(checkers.BaseChecker):
     __implements__ = interfaces.IASTNGChecker
@@ -107,25 +107,22 @@ class DocStringChecker(checkers.BaseChecker):
     name = 'docstring'
     priority = -1
     msgs = {
-        'W9001': (
+        'W9002': (
             "Doc string does not end with '.' period",
             'docstring-missing-period',
             "Used when a doc string does not end with a period.",
         ),
-        'W9002': (
-            "Triple quotes",
-            'docstring-triple-quotes',
-            "Used when doc string does not use \"\"\".",
-        ),
+        # TODO: Implement
         'W9003': (
             "Invalid docstring start or end",
             'docstring-start-or-end',
             "Used when doc string does not start or end with \"\"\" on its own line.",
         ),
+        # TODO: Implement
         'W9004': (
             "Missing blank line after doc string",
             'docstring-missing blank line',
-            "Used when doc string is missing a blank line afterwards.",
+            "Used when a blank line is missing after a doc string.",
         ),
         'W9005': (
             "Doxygen syntax detected: %s",
@@ -297,3 +294,5 @@ def register(linter):
     AstCheckers.register(linter)
     linter.register_checker(DocStringChecker(linter))
     linter.register_checker(NodewatcherChecker(linter))
+
+    # TODO: Check that TODO comments have : after TODO
