@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: skip-file
 #
 # Development Django settings for nodewatcher project.
 
@@ -28,7 +29,7 @@ DATABASES = {
         # Follow https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/ to install GeoDjango.
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'nodewatcher', # Use: createdb nodewatcher
-        'USER': 'nodewatcher', # Set to empty string to connect as current user.
+        'USER': os.environ.get('DJANGO_DATABASE_USER', 'nodewatcher'), # Set to empty string to connect as current user.
         'PASSWORD': '',
         'HOST': 'localhost', # Set to empty string for socket.
         'PORT': '', # Set to empty string for default.
@@ -56,7 +57,7 @@ LANGUAGES = (
 )
 
 LOCALE_PATHS = (
-    #os.path.join(settings_dir, 'locale'),
+    os.path.abspath(os.path.join(settings_dir, 'locale')),
 )
 
 URL_VALIDATOR_USER_AGENT = 'nodewatcher'
@@ -118,11 +119,6 @@ SCSS_PATHS = [
     os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'compass')),
     os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'blueprint')),
 ]
-
-# URL prefix for admin static files -- CSS, JavaScript and images.
-# Make sure to use a trailing slash.
-# Examples: "http://foo.com/static/admin/", "/static/admin/".
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -214,6 +210,14 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+DEFAULT_EXCEPTION_REPORTER_FILTER = 'missing.debug.SafeExceptionReporterFilter'
+
+TEST_RUNNER = 'nodewatcher.test_runner.FilteredTestSuiteRunner'
+TEST_RUNNER_FILTER = (
+    'nodewatcher.',
+    'missing.',
+)
+
 INSTALLED_APPS = (
     # We override staticfiles runserver with default Django runserver in nodewatcher.core.frontend.
     'django.contrib.staticfiles',
@@ -269,12 +273,12 @@ INSTALLED_APPS = (
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
+# the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s',
@@ -284,33 +288,41 @@ LOGGING = {
         },
     },
     'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
     },
     'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        'null': {
+            'class': 'django.utils.log.NullHandler',
+        },
         'mail_admins': {
             'level': 'ERROR',
+            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
         }
     },
     'loggers': {
         'django': {
-            'handlers': ['null'],
-            'level': 'INFO',
-            'propagate': True,
+            'handlers': ['console'],
         },
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
-            'filters': ['require_debug_false'],
             'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'py.warnings': {
+            'handlers': ['console'],
         },
         # TODO: "monitor" or "nodewatcher.core.monitor"?
         'monitor': {

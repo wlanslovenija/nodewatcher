@@ -17,7 +17,7 @@ class Datastream(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        # TODO Should we enable addition of items that are not in the registry?
+        # TODO: Should we enable addition of items that are not in the registry?
         for item in node.monitoring:
             # If the monitoring registry item doesn't provide a connect_datastream attribute,
             # we skip it as we don't know which fields to include

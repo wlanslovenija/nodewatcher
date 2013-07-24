@@ -58,9 +58,11 @@ class WirelessProtocolMetaclass(type):
             # Merge channel widths from base classes
             new_class.widths = base.widths + new_class.widths
             # Merge capabilities from base classes
-            new_class.capabilities = \
-                tuple(getattr(base, 'capabilities', ())) + \
-                getattr(new_class, 'capabilities', ())
+            new_class.capabilities = list(
+                getattr(base, 'capabilities', None) or []
+            ) + list(
+                getattr(new_class, 'capabilities', None) or []
+            )
 
         new_class.capabilities = set(getattr(new_class, 'capabilities', []))
         new_class.available_capabilities = set()
@@ -78,10 +80,15 @@ class WirelessProtocol(object):
 
     __metaclass__ = WirelessProtocolMetaclass
 
+    channels = ()
+    widths = ()
+    capabilities = None
+    available_capabilities = None
+
     @classmethod
     def get_channel_choices(cls, width, regulatory_filter=None):
         """
-        Returns a list of channel chocies.
+        Returns a list of channel choices.
         """
 
         # No channels are available until channel width is known
@@ -178,7 +185,7 @@ class IEEE80211BG(WirelessProtocol):
 
 class IEEE80211N(IEEE80211BG):
     """
-    IEEE 802.11 N protocol
+    IEEE 802.11 N protocol.
     """
 
     identifier = "ieee-80211n"

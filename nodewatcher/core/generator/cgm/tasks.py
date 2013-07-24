@@ -19,7 +19,7 @@ def background_build(node, platform, cfg):
     a firmware image.
 
     :param node: Node instance
-    :parma platform: Platform name
+    :param platform: Platform name
     :param cfg: Generated configuration (platform-dependent)
     """
 

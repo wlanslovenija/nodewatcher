@@ -41,8 +41,7 @@ def evaluate_forms(request, regpoint_id, root_id):
 
         # Merge in client actions when available
         try:
-            # TODO maybe actions should be registered and each action should have something
-            #      like Action.name that would then call Action.prepare(...)
+            # TODO: Maybe actions should be registered and each action should have something like Action.name that would then call Action.prepare(...)
             for action, prefix in json.loads(request.POST['ACTIONS']).iteritems():
                 if action == 'append':
                     actions.setdefault(prefix, []).insert(0, registry_forms.AppendFormAction(None))
