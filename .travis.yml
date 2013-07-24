@@ -1,9 +1,6 @@
 language: python
 python: "2.7"
-env:
- - global:
-    - PYTHONPATH=.
-    - DJANGO_DATABASE_USER=
+env: PYTHONPATH="." DJANGO_DATABASE_USER=""
 services:
  - mongodb
  - postgresql
@@ -20,4 +17,4 @@ before_script:
  - pep8 nodewatcher
  - pylint nodewatcher || true
 script:
- - ./manage.py test
+ - python -W error manage.py test

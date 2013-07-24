@@ -210,6 +210,11 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+TEST_RUNNER = 'nodewatcher.test_runner.FilteredTestSuiteRunner'
+TEST_RUNNER_FILTER = (
+    'nodewatcher.',
+)
+
 INSTALLED_APPS = (
     # We override staticfiles runserver with default Django runserver in nodewatcher.core.frontend.
     'django.contrib.staticfiles',
