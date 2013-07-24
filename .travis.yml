@@ -14,7 +14,6 @@ install:
 before_script:
  - curl https://raw.github.com/django/django/1.5.1/docs/ref/contrib/gis/install/create_template_postgis-debian.sh | sh
  - createdb -T template_postgis nodewatcher
- - createdb -T template_postgis test_nodewatcher
  - pep8 nodewatcher
  - pylint nodewatcher || true
 script:
