@@ -58,7 +58,11 @@ class WirelessProtocolMetaclass(type):
             # Merge channel widths from base classes
             new_class.widths = base.widths + new_class.widths
             # Merge capabilities from base classes
-            new_class.capabilities = list(getattr(base, 'capabilities', None) or []) + list(getattr(new_class, 'capabilities', None) or [])
+            new_class.capabilities = list(
+                getattr(base, 'capabilities', None) or []
+            ) + list(
+                getattr(new_class, 'capabilities', None) or []
+            )
 
         new_class.capabilities = set(getattr(new_class, 'capabilities', []))
         new_class.available_capabilities = set()
