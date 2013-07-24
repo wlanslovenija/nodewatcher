@@ -49,7 +49,7 @@ disable=missing-docstring,line-too-long,no-init,too-few-public-methods,no-self-u
 output-format=colorized
 
 # Include message's id in output
-include-ids=no
+include-ids=yes
 
 # Include symbolic ids of messages in output
 symbols=yes

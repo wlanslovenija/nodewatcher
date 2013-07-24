@@ -229,8 +229,7 @@ class NodewatcherChecker(checkers.BaseChecker):
             inferred.locals[node.attrname] = self._registry_item_base
 
         # Capabilities are generates in the metaclass dynamically
-        class_name = '%s.%s' % (inferred.root().name, inferred.name)
-        if class_name == 'nodewatcher.core.generator.cgm.protocols.IEEE80211N':
+        if utils.nodeisinstance(inferred, ('nodewatcher.core.generator.cgm.protocols.WirelessProtocol',)):
             inferred.locals[node.attrname] = [astng.Instance(DynamicClass('CapabilityAttribute', None))] # TODO: Can we do something better?
 
         # We do the same for accessing Field attributes, which are just descriptors for dynamic values
@@ -263,7 +262,7 @@ class NodewatcherChecker(checkers.BaseChecker):
 
             # Pool model is self-referencing
             class_name = '%s.%s' % (node.root().name, node.name)
-            if class_name == 'nodewatcher.core.allocation.models.PoolBase':
+            if class_name == 'nodewatcher.core.allocation.models.PoolBase' or utils.nodeisinstance(node, ('nodewatcher.core.allocation.models.PoolBase',)):
                 node.locals['children'] = self._queryset
 
     def visit_callfunc(self, node):
