@@ -81,7 +81,7 @@ class InvalidEventsTestCase2(unittest.TestCase):
             'test': {
                 'sink': 'nodewatcher.core.events.tests.TestEventSink',
                 'filters': (
-                    'this.is.an.invalid.filter.Spec',
+                    'an.invalid.filter.Spec',
                 )
             }
         }
