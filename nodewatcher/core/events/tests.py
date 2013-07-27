@@ -71,8 +71,9 @@ class EventsTestCase(unittest.TestCase):
         with self.assertRaises(exceptions.EventSinkNotRegistered):
             pool.get_sink('NonExistantSink')
 
+
 class EventsSettingsTestCase(unittest.TestCase):
-    @override_settings(EVENT_SINKS = {
+    @override_settings(EVENT_SINKS={
         'TestEventSink': {
             'disable': True
         }
