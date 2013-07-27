@@ -50,7 +50,17 @@ class EventSink(object):
         Class constructor.
         """
 
+        self._enabled = True
         self._filters = []
+
+    def set_enabled(self, enabled):
+        """
+        Sets the enabled state of this sink.
+
+        :param enabled: True for enabling the sink, False otherwise
+        """
+
+        self._enabled = enabled
 
     def add_filter(self, filter):
         """
@@ -73,6 +83,9 @@ class EventSink(object):
 
         :param event: Event record
         """
+
+        if not self._enabled:
+            return
 
         for filter in self._filters:
             if not filter.filter(event):

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.utils import unittest
+from django.test.utils import override_settings
 
 from . import base, exceptions
 from .pool import pool
@@ -28,17 +29,14 @@ class TestInvalidSubclass(object):
 
 class EventsTestCase(unittest.TestCase):
     def setUp(self):
-        # Fake some sink configuration
-        settings.EVENT_SINKS = {
-            'test': {
-                'sink': 'nodewatcher.core.events.tests.TestEventSink',
-                'filters': (
-                    'nodewatcher.core.events.tests.TestEventFilter',
-                )
-            }
-        }
-        # Force re-discovery
-        pool._discovered = False
+        # Setup a test sink
+        pool.register(TestEventSink)
+        pool.get_sink('TestEventSink').add_filter(TestEventFilter())
+        # Fake discovery
+        pool._discovered = True
+
+    def tearDown(self):
+        pool.unregister(TestEventSink)
 
     def test_event_processing(self):
         base.EventRecord(a=1, b=2, message="Hello event world!").post()
@@ -46,7 +44,7 @@ class EventsTestCase(unittest.TestCase):
         base.EventRecord(a=5, b=6, c=True, message="Hello event world!").post()
         base.EventRecord(a=7, b=8, message="Hello event world!").post()
 
-        sink = pool.get_sink('test')
+        sink = pool.get_sink('TestEventSink')
         self.assertEqual(len(sink.events), 3)
         for x in sink.events:
             self.assertEqual(x.message, "Hello event world!")
@@ -57,72 +55,33 @@ class EventsTestCase(unittest.TestCase):
         self.assertEqual(sink.events[2].a, 7)
         self.assertEqual(sink.events[2].b, 8)
 
-
-class InvalidEventsTestCase1(unittest.TestCase):
-    def setUp(self):
-        # Fake some invalid sink configuration
-        settings.EVENT_SINKS = {
-            'test': {
-                'sink': 'nodewatcher.core.events.tests.TestEventSinkInvalid',
-            }
-        }
-        # Force re-discovery
-        pool._discovered = False
-
-    def test_exceptions(self):
-        with self.assertRaises(exceptions.EventSinkNotFound):
-            base.EventRecord(a=1, b=2, message="Hello event world!").post()
-
-
-class InvalidEventsTestCase2(unittest.TestCase):
-    def setUp(self):
-        # Fake some invalid sink configuration
-        settings.EVENT_SINKS = {
-            'test': {
-                'sink': 'nodewatcher.core.events.tests.TestEventSink',
-                'filters': (
-                    'an.invalid.filter.Spec',
-                )
-            }
-        }
-        # Force re-discovery
-        pool._discovered = False
-
-    def test_exceptions(self):
-        with self.assertRaises(exceptions.EventFilterNotFound):
-            base.EventRecord(a=1, b=2, message="Hello event world!").post()
-
-
-class InvalidEventsTestCase3(unittest.TestCase):
-    def setUp(self):
-        # Fake some invalid sink configuration
-        settings.EVENT_SINKS = {
-            'test': {
-                'sink': 'nodewatcher.core.events.tests.TestInvalidSubclass',
-            }
-        }
-        # Force re-discovery
-        pool._discovered = False
-
     def test_exceptions(self):
         with self.assertRaises(exceptions.InvalidEventSink):
-            base.EventRecord(a=1, b=2, message="Hello event world!").post()
+            pool.register(TestInvalidSubclass)
 
-
-class InvalidEventsTestCase4(unittest.TestCase):
-    def setUp(self):
-        # Fake some invalid sink configuration
-        settings.EVENT_SINKS = {
-            'test': {
-                'sink': 'nodewatcher.core.events.tests.TestEventSink',
-                'filters': (
-                    'nodewatcher.core.events.tests.TestInvalidSubclass',
-                )
-            }
-        }
-        # Force re-discovery
-        pool._discovered = False
-
-    def test_exceptions(self):
         with self.assertRaises(exceptions.InvalidEventFilter):
+            pool.get_sink('TestEventSink').add_filter(TestEventFilter)
+
+        with self.assertRaises(exceptions.InvalidEventFilter):
+            pool.get_sink('TestEventSink').add_filter(TestInvalidSubclass())
+
+        with self.assertRaises(exceptions.EventSinkAlreadyRegistered):
+            pool.register(TestEventSink)
+
+        with self.assertRaises(exceptions.EventSinkNotRegistered):
+            pool.get_sink('NonExistantSink')
+
+class EventsSettingsTestCase(unittest.TestCase):
+    @override_settings(EVENT_SINKS = {
+        'TestEventSink': {
+            'disable': True
+        }
+    })
+    def test_settings(self):
+        pool.register(TestEventSink)
+        try:
             base.EventRecord(a=1, b=2, message="Hello event world!").post()
+            sink = pool.get_sink('TestEventSink')
+            self.assertEqual(len(sink.events), 0)
+        finally:
+            pool.unregister(TestEventSink)

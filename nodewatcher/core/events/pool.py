@@ -13,19 +13,6 @@ class EventSinkPool(object):
         self._sinks = {}
         self._discovered = False
 
-    def _import_class(self, path, error_typ, error_msg):
-        """
-        A helper method for importing classes.
-        """
-
-        i = path.rfind(".")
-        module, attr = path[:i], path[i + 1:]
-        try:
-            module = importlib.import_module(module)
-            return getattr(module, attr)
-        except (ImportError, AttributeError):
-            raise error_typ(error_msg % path)
-
     def discover_sinks(self):
         """
         Discovers and loads all sinks.
@@ -37,22 +24,61 @@ class EventSinkPool(object):
             return
         self._discovered = True
 
-        for name, descriptor in settings.EVENT_SINKS.items():
-            sink = descriptor['sink']
-            filters = descriptor.get('filters', [])
+        for app in settings.INSTALLED_APPS:
+            try:
+                importlib.import_module('.events', app)
+            except ImportError, e:
+                message = str(e)
+                if message != 'No module named events':
+                    raise
 
-            # Attempt to import the sink class
-            sink = self._import_class(sink, exceptions.EventSinkNotFound, "Error importing event sink %s!")
+    def register(self, sink_or_iterable):
+        """
+        Registers new event sinks.
+
+        :param sink_or_iterable: A valid sink class or a list of such classes
+        """
+
+        from . import base
+
+        if not hasattr(sink_or_iterable, '__iter__'):
+            sink_or_iterable = [sink_or_iterable]
+
+        for sink in sink_or_iterable:
             if not issubclass(sink, base.EventSink):
-                raise exceptions.InvalidEventSink("Event sink '%s' is not a subclass of nodewatcher.core.events.base.EventSink!")
+                raise exceptions.InvalidEventSink("Event sink '%s' is not a subclass of nodewatcher.core.events.base.EventSink!" % sink.__name__)
 
-            # Attempt to import any filters and register them on the sink
+            sink_name = sink.__name__
+
+            if sink_name in self._sinks:
+                raise exceptions.EventSinkAlreadyRegistered("Event sink with name '%s' is already registered" % sink_name)
+
             sink = sink()
-            for filter in filters:
-                filter = self._import_class(filter, exceptions.EventFilterNotFound, "Error importing event filter %s!")
-                sink.add_filter(filter())
 
-            self._sinks[name] = sink
+            # Check if sink has been disabled by the settings
+            sink_cfg = getattr(settings, 'EVENT_SINKS', {}).get(sink_name, {})
+            if sink_cfg.get('disable', False) is True:
+                sink.set_enabled(False)
+
+            self._sinks[sink_name] = sink
+
+    def unregister(self, sink_or_iterable):
+        """
+        Unregisters event sinks.
+
+        :param sink_or_iterable: A valid sink class or a list of such classes
+        """
+
+        if not hasattr(sink_or_iterable, '__iter__'):
+            sink_or_iterable = [sink_or_iterable]
+
+        for sink in sink_or_iterable:
+            sink_name = sink.__name__
+
+            if sink_name not in self._sinks:
+                raise exceptions.EventSinkNotRegistered("No event sink with name '%s' is registered" % sink_name)
+
+            del self._sinks[sink_name]
 
     def get_all_sinks(self):
         """
@@ -76,6 +102,6 @@ class EventSinkPool(object):
         try:
             return self._sinks[sink_name]
         except KeyError:
-            raise exceptions.EventSinkNotFound("Sink with name '%s' cannot be found!" % sink_name)
+            raise exceptions.EventSinkNotRegistered("No event sink with name '%s' is registered" % sink_name)
 
 pool = EventSinkPool()

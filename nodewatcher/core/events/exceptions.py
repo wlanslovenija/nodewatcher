@@ -4,11 +4,15 @@ class EventException(Exception):
     pass
 
 
-class EventSinkNotFound(EventException):
+class InvalidEventSink(EventException, TypeError):
     pass
 
 
-class InvalidEventSink(EventException, TypeError):
+class EventSinkAlreadyRegistered(EventException):
+    pass
+
+
+class EventSinkNotRegistered(EventException):
     pass
 
 
