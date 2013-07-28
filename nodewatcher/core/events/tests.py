@@ -18,7 +18,7 @@ class TestEventSink(base.EventSink):
 class TestEventFilter(base.EventFilter):
     def __init__(self, pass_everything=False, **kwargs):
         super(TestEventFilter, self).__init__(**kwargs)
-        
+
         # An argument for testing if arguments work
         self.pass_everything = pass_everything
 
