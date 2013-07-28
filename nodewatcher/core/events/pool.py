@@ -53,14 +53,9 @@ class EventSinkPool(object):
             if sink_name in self._sinks:
                 raise exceptions.EventSinkAlreadyRegistered("Event sink with name '%s' is already registered" % sink_name)
 
-            sink = sink()
-
-            # Check if sink has been disabled by the settings
+            # Pass sink configuration to the sink
             sink_cfg = getattr(settings, 'EVENT_SINKS', {}).get(sink_name, {})
-            if sink_cfg.get('disable', False) is True:
-                sink.set_enabled(False)
-
-            self._sinks[sink_name] = sink
+            self._sinks[sink_name] = sink(**sink_cfg)
 
     def unregister(self, sink_or_iterable):
         """

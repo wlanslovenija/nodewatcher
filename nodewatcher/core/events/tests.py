@@ -7,8 +7,8 @@ from .pool import pool
 
 
 class TestEventSink(base.EventSink):
-    def __init__(self):
-        super(TestEventSink, self).__init__()
+    def __init__(self, **kwargs):
+        super(TestEventSink, self).__init__(**kwargs)
         self.events = []
 
     def deliver(self, event):

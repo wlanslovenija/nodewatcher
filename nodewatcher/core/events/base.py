@@ -45,12 +45,14 @@ class EventFilter(object):
 
 
 class EventSink(object):
-    def __init__(self):
+    def __init__(self, disable=False, **kwargs):
         """
         Class constructor.
+
+        :param disable: Should the sink be disabled by default
         """
 
-        self._enabled = True
+        self._enabled = not disable
         self._filters = []
 
     def set_enabled(self, enabled):
