@@ -31,7 +31,7 @@ class EventsTestCase(unittest.TestCase):
     def setUp(self):
         # Setup a test sink
         pool.register(TestEventSink)
-        pool.get_sink('TestEventSink').add_filter(TestEventFilter())
+        pool.get_sink('nodewatcher.core.events.tests.TestEventSink').add_filter(TestEventFilter())
         # Fake discovery
         pool._discovered = True
 
@@ -44,7 +44,7 @@ class EventsTestCase(unittest.TestCase):
         base.EventRecord(a=5, b=6, c=True, message="Hello event world!").post()
         base.EventRecord(a=7, b=8, message="Hello event world!").post()
 
-        sink = pool.get_sink('TestEventSink')
+        sink = pool.get_sink('nodewatcher.core.events.tests.TestEventSink')
         self.assertEqual(len(sink.events), 3)
         for x in sink.events:
             self.assertEqual(x.message, "Hello event world!")
@@ -60,10 +60,10 @@ class EventsTestCase(unittest.TestCase):
             pool.register(TestInvalidSubclass)
 
         with self.assertRaises(exceptions.InvalidEventFilter):
-            pool.get_sink('TestEventSink').add_filter(TestEventFilter)
+            pool.get_sink('nodewatcher.core.events.tests.TestEventSink').add_filter(TestEventFilter)
 
         with self.assertRaises(exceptions.InvalidEventFilter):
-            pool.get_sink('TestEventSink').add_filter(TestInvalidSubclass())
+            pool.get_sink('nodewatcher.core.events.tests.TestEventSink').add_filter(TestInvalidSubclass())
 
         with self.assertRaises(exceptions.EventSinkAlreadyRegistered):
             pool.register(TestEventSink)
@@ -74,7 +74,7 @@ class EventsTestCase(unittest.TestCase):
 
 class EventsSettingsTestCase(unittest.TestCase):
     @override_settings(EVENT_SINKS={
-        'TestEventSink': {
+        'nodewatcher.core.events.tests.TestEventSink': {
             'disable': True
         }
     })
@@ -82,7 +82,7 @@ class EventsSettingsTestCase(unittest.TestCase):
         pool.register(TestEventSink)
         try:
             base.EventRecord(a=1, b=2, message="Hello event world!").post()
-            sink = pool.get_sink('TestEventSink')
+            sink = pool.get_sink('nodewatcher.core.events.tests.TestEventSink')
             self.assertEqual(len(sink.events), 0)
         finally:
             pool.unregister(TestEventSink)

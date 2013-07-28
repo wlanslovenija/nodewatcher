@@ -48,7 +48,7 @@ class EventSinkPool(object):
             if not issubclass(sink, base.EventSink):
                 raise exceptions.InvalidEventSink("Event sink '%s' is not a subclass of nodewatcher.core.events.base.EventSink!" % sink.__name__)
 
-            sink_name = sink.__name__
+            sink_name = sink.get_name()
 
             if sink_name in self._sinks:
                 raise exceptions.EventSinkAlreadyRegistered("Event sink with name '%s' is already registered" % sink_name)
@@ -68,7 +68,7 @@ class EventSinkPool(object):
             sink_or_iterable = [sink_or_iterable]
 
         for sink in sink_or_iterable:
-            sink_name = sink.__name__
+            sink_name = sink.get_name()
 
             if sink_name not in self._sinks:
                 raise exceptions.EventSinkNotRegistered("No event sink with name '%s' is registered" % sink_name)

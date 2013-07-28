@@ -55,6 +55,13 @@ class EventSink(object):
         self._enabled = not disable
         self._filters = []
 
+    @classmethod
+    def get_name(cls):
+        """
+        Returns the sink name.
+        """
+        return "%s.%s" % (cls.__module__, cls.__name__)
+
     def set_enabled(self, enabled):
         """
         Sets the enabled state of this sink.
