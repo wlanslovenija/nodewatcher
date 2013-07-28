@@ -45,6 +45,12 @@ class EventFilter(object):
 
 
 class EventSink(object):
+    """
+    Base class for sink implementations.
+    """
+
+    name = None
+
     def __init__(self, disable=False, **kwargs):
         """
         Class constructor.
@@ -60,7 +66,11 @@ class EventSink(object):
         """
         Returns the sink name.
         """
-        return "%s.%s" % (cls.__module__, cls.__name__)
+
+        if cls.name:
+            return cls.name
+
+        return cls.__name__
 
     def set_enabled(self, enabled):
         """
