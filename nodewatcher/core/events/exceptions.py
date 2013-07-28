@@ -26,3 +26,7 @@ class EventFilterAlreadyAttached(EventException):
 
 class InvalidEventFilter(EventException, TypeError):
     pass
+
+
+class FilterArgumentReserved(EventException):
+    pass

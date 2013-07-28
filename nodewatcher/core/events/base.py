@@ -142,6 +142,9 @@ class EventSink(object):
                 "Event filter '%s' is already attached to sink '%s'!" % (filter_name, self.get_name())
             )
 
+        if 'disable' in kwargs:
+            raise exceptions.FilterArgumentReserved("Event filter argument 'disable' cannot be overriden!")
+
         filter_cfg = self._filter_cfg.get(filter_name, {})
         filter_cfg.update(kwargs)
         self._filters[filter_name] = filter(**filter_cfg)

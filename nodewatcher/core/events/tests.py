@@ -79,6 +79,10 @@ class EventsTestCase(unittest.TestCase):
         base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
         self.assertEqual(len(sink.events), 5)
 
+        # Check that we can't override the 'disable' argument
+        with self.assertRaises(exceptions.FilterArgumentReserved):
+            sink.add_filter(TestEventFilter, disable=True)
+
         # Check that filter arguments can be overriden
         sink.add_filter(TestEventFilter, pass_everything=True)
         base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
@@ -123,19 +127,39 @@ class EventsSettingsTestCase(django_test.TestCase):
             finally:
                 pool.unregister(TestEventSink)
 
-        # Test disabled filter via settings
+        # Test settings argument override
         with self.settings(EVENT_SINKS={
             'TestEventSink': {
                 'filters': {
                     'TestEventFilter': {
-                        'disabled': True
+                        'pass_everything': False
                     }
                 }
             }
         }):
             pool.register(TestEventSink)
+            pool.get_sink('TestEventSink').add_filter(TestEventFilter, pass_everything=True)
             try:
-                base.EventRecord(a=1, b=2, message="Hello event world!").post()
+                base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
+                sink = pool.get_sink('TestEventSink')
+                self.assertEqual(len(sink.events), 1)
+            finally:
+                pool.unregister(TestEventSink)
+
+        # Test disabled filter via settings
+        with self.settings(EVENT_SINKS={
+            'TestEventSink': {
+                'filters': {
+                    'TestEventFilter': {
+                        'disable': True
+                    }
+                }
+            }
+        }):
+            pool.register(TestEventSink)
+            pool.get_sink('TestEventSink').add_filter(TestEventFilter)
+            try:
+                base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
                 sink = pool.get_sink('TestEventSink')
                 self.assertEqual(len(sink.events), 1)
             finally:
