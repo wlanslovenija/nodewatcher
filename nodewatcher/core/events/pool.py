@@ -84,19 +84,24 @@ class EventSinkPool(object):
 
         return self._sinks.values()
 
-    def get_sink(self, sink_name):
+    def get_sink(self, sink_cls):
         """
         Returns the specified sink.
 
-        :param sink_name: Name of the sink
+        :param sink_cls: Sink class
         :return: Sink instance
         """
+
+        from . import base
+
+        if not issubclass(sink_cls, base.EventSink):
+            raise exceptions.InvalidEventSink("Event sink '%s' is not a subclass of nodewatcher.core.events.base.EventSink!" % sink.__name__)
 
         self.discover_sinks()
 
         try:
-            return self._sinks[sink_name]
+            return self._sinks[sink_cls.get_name()]
         except KeyError:
-            raise exceptions.EventSinkNotRegistered("No event sink with name '%s' is registered" % sink_name)
+            raise exceptions.EventSinkNotRegistered("No event sink with name '%s' is registered" % sink_cls.get_name())
 
 pool = EventSinkPool()
