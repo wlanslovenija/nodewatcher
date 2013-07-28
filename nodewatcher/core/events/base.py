@@ -33,6 +33,46 @@ class EventRecord(object):
 
 
 class EventFilter(object):
+    """
+    Base class for filter implementations.
+    """
+
+    name = None
+
+    def __init__(self, disable=False, **kwargs):
+        """
+        Class constructor.
+
+        :param disable: Should the filter be disabled by default
+        """
+
+        self._enabled = not disable
+
+    @classmethod
+    def get_name(cls):
+        """
+        Returns the filter name.
+        """
+
+        return cls.name or cls.__name__
+
+    @property
+    def enabled(self):
+        """
+        Returns true if this filter is enabled.
+        """
+
+        return self._enabled
+
+    def set_enabled(self, enabled):
+        """
+        Sets the enabled state of this filter.
+
+        :param enabled: True for enabling the filter, False otherwise
+        """
+
+        self._enabled = enabled
+
     def filter(self, event):
         """
         Should decide whether to deliver the event or not.
@@ -51,7 +91,7 @@ class EventSink(object):
 
     name = None
 
-    def __init__(self, disable=False, **kwargs):
+    def __init__(self, disable=False, filters=None, **kwargs):
         """
         Class constructor.
 
@@ -59,7 +99,8 @@ class EventSink(object):
         """
 
         self._enabled = not disable
-        self._filters = []
+        self._filters = {}
+        self._filter_cfg = filters or {}
 
     @classmethod
     def get_name(cls):
@@ -78,19 +119,46 @@ class EventSink(object):
 
         self._enabled = enabled
 
-    def add_filter(self, filter):
+    def add_filter(self, filter, **kwargs):
         """
-        Adds a filter to this event sink.
+        Adds a filter to this event sink. Any keyword arguments are passed to
+        filter constructor and override any configured settings.
 
         :param filter: Filter class to add
         """
 
-        if not isinstance(filter, EventFilter):
+        try:
+            if not issubclass(filter, EventFilter):
+                raise TypeError
+        except TypeError:
             raise exceptions.InvalidEventFilter(
                 "Event filter '%s' is not a subclass of nodewatcher.core.events.base.EventFilter!" % filter.__class__.__name__
             )
 
-        self._filters.append(filter)
+        filter_name = filter.get_name()
+
+        if filter_name in self._filters:
+            raise exceptions.EventFilterAlreadyAttached(
+                "Event filter '%s' is already attached to sink '%s'!" % (filter_name, self.get_name())
+            )
+
+        filter_cfg = self._filter_cfg.get(filter_name, {})
+        filter_cfg.update(kwargs)
+        self._filters[filter_name] = filter(**filter_cfg)
+
+    def remove_filter(self, filter_name):
+        """
+        Removes an existing filter.
+
+        :param filter_name: Name of the filter to remove
+        """
+
+        if filter_name not in self._filters:
+            raise exceptions.EventFilterNotFound(
+                "Event filter '%s' is not attached to sink '%s'!" % (filter_name, self.get_name())
+            )
+
+        del self._filters[filter_name]
 
     def post(self, event):
         """
@@ -103,8 +171,8 @@ class EventSink(object):
         if not self._enabled:
             return
 
-        for filter in self._filters:
-            if not filter.filter(event):
+        for filter in self._filters.values():
+            if filter.enabled and not filter.filter(event):
                 return
 
         self.deliver(event)

@@ -20,5 +20,9 @@ class EventFilterNotFound(EventException):
     pass
 
 
+class EventFilterAlreadyAttached(EventException):
+    pass
+
+
 class InvalidEventFilter(EventException, TypeError):
     pass
