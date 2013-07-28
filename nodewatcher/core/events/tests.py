@@ -16,7 +16,16 @@ class TestEventSink(base.EventSink):
 
 
 class TestEventFilter(base.EventFilter):
+    def __init__(self, pass_everything=False, **kwargs):
+        super(TestEventFilter, self).__init__(**kwargs)
+        
+        # An argument for testing if arguments work
+        self.pass_everything = pass_everything
+
     def filter(self, event):
+        if self.pass_everything:
+            return True
+
         if getattr(event, 'c', None) is True:
             return False
 
@@ -71,7 +80,7 @@ class EventsTestCase(unittest.TestCase):
         self.assertEqual(len(sink.events), 5)
 
         # Check that filter arguments can be overriden
-        sink.add_filter(TestEventFilter, disable=True)
+        sink.add_filter(TestEventFilter, pass_everything=True)
         base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
         self.assertEqual(len(sink.events), 6)
 
