@@ -67,10 +67,7 @@ class EventSink(object):
         Returns the sink name.
         """
 
-        if cls.name:
-            return cls.name
-
-        return cls.__name__
+        return cls.name or cls.__name__
 
     def set_enabled(self, enabled):
         """
