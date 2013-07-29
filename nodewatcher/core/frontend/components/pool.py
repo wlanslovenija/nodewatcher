@@ -2,7 +2,7 @@ from django import shortcuts
 from django.conf import settings, urls
 from django.utils import importlib, datastructures
 
-from . import base, exceptions
+from . import exceptions
 
 
 class FrontendComponentsPool(object):
@@ -24,6 +24,8 @@ class FrontendComponentsPool(object):
                     raise
 
     def register(self, component_or_iterable):
+        from . import base
+
         if not hasattr(component_or_iterable, '__iter__'):
             component_or_iterable = [component_or_iterable]
 

@@ -18,8 +18,6 @@ class EventSinkPool(object):
         Discovers and loads all sinks.
         """
 
-        from . import base
-
         if self._discovered:
             return
         self._discovered = True
@@ -46,12 +44,15 @@ class EventSinkPool(object):
 
         for sink in sink_or_iterable:
             if not issubclass(sink, base.EventSink):
-                raise exceptions.InvalidEventSink("Event sink '%s' is not a subclass of nodewatcher.core.events.base.EventSink!" % sink.__name__)
+                raise exceptions.InvalidEventSink("'%s' is not a subclass of nodewatcher.core.events.EventSink" % sink.__name__)
 
             sink_name = sink.get_name()
 
+            if '.' in sink_name or '/' in sink_name:
+                raise exceptions.InvalidEventSink("An evenk sink '%s' has invalid name" % component_name)
+
             if sink_name in self._sinks:
-                raise exceptions.EventSinkAlreadyRegistered("Event sink with name '%s' is already registered" % sink_name)
+                raise exceptions.EventSinkAlreadyRegistered("An event sink with name '%s' is already registered" % sink_name)
 
             # Pass sink configuration to the sink
             sink_cfg = getattr(settings, 'EVENT_SINKS', {}).get(sink_name, {})

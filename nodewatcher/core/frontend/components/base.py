@@ -1,4 +1,5 @@
 from . import exceptions
+from .pool import pool
 
 # Exports
 __all__ = [
@@ -12,22 +13,13 @@ class FrontendComponent(object):
     urls = None
 
     def __init__(self):
-        # To prevent import cycle
-        from .pool import pool
-
         for dependency in self.get_dependencies():
             if not pool.has_component(dependency):
                 raise exceptions.FrontendComponentDependencyNotRegistered("Frontend component '%s' depends on '%s', but the latter is not registered" % (self.get_name(), dependency))
 
     @classmethod
     def get_name(cls):
-        if cls.name:
-            return cls.name
-
-        name = cls.__name__
-        if name.endswith('Component'):
-            name = name[:-9]
-        return name.lower()
+        return cls.name or cls.__name__
 
     @classmethod
     def get_dependencies(cls):
