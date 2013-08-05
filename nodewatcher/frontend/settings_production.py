@@ -39,6 +39,7 @@ AUTHENTICATION_BACKENDS += (
 SITEMAPS_USE_HTTPS = True
 FEEDS_USE_HTTPS = True
 USE_HTTPS = True
+SESSION_COOKIE_SECURE = True
 
 # We want that Django knows that it is in fact running behind a HTTPS-only proxy
 MIDDLEWARE_CLASSES = (
