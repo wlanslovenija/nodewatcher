@@ -1198,7 +1198,10 @@ if __name__ == '__main__':
       ts_delta = time.time() - ts_start
       if ts_delta > settings.MONITOR_POLL_INTERVAL // 2:
         logging.warning("Processing took more than half of monitor poll interval ({0} sec)!".format(round(ts_delta, 2)))
-        ts_delta = settings.MONITOR_POLL_INTERVAL // 2
+        if ts_delta >= settings.MONITOR_POLL_INTERVAL:
+          ts_delta = settings.MONITOR_POLL_INTERVAL
+        else:
+          ts_delta = settings.MONITOR_POLL_INTERVAL // 2
       
       sleep(settings.MONITOR_POLL_INTERVAL - ts_delta)
   except:
