@@ -11,9 +11,9 @@ wlansi_template_dir = os.path.join(wlansi_dir, 'templates')
 SITE_ID = 2
 
 NETWORK_NAME = 'wlan slovenija'
-NETWORK_HOME = 'http://wlan-si.net'
+NETWORK_HOME = 'https://wlan-si.net'
 NETWORK_CONTACT = 'open@wlan-si.net'
-NETWORK_CONTACT_PAGE = 'http://wlan-si.net/contact/'
+NETWORK_CONTACT_PAGE = 'https://wlan-si.net/contact/'
 NETWORK_DESCRIPTION = 'open wireless network of Slovenia'
 NETWORK_FAVICON_URL = MEDIA_URL + 'wlansi/images/favicon.ico'
 NETWORK_LOGO_URL = MEDIA_URL + 'wlansi/images/logo.png'
@@ -31,8 +31,8 @@ TEMPLATE_DIRS = (
 IMAGES_BINDIST_URL = 'http://bindist.wlan-si.net/images/'
 
 DOCUMENTATION_LINKS.update({
-  'custom_node': 'http://dev.wlan-si.net/wiki/CustomNodes',
-  'known_issues': 'http://dev.wlan-si.net/wiki/Nodewatcher/KnownIssues',
-  'report_issue': 'http://dev.wlan-si.net/newticket',
-  'solar': 'http://dev.wlan-si.net/wiki/Solar',
+  'custom_node': 'https://dev.wlan-si.net/wiki/CustomNodes',
+  'known_issues': 'https://dev.wlan-si.net/wiki/Nodewatcher/KnownIssues',
+  'report_issue': 'https://dev.wlan-si.net/newticket',
+  'solar': 'https://dev.wlan-si.net/wiki/Solar',
 })
