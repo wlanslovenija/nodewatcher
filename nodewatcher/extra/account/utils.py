@@ -50,26 +50,6 @@ def get_profile_model():
     return model
 
 
-def user_activation_cleanup(user):
-    """
-    Some additinal clenaup after user activation.
-
-    Currently it clears possible registration activation token.
-    """
-
-    if hasattr(user, 'registrationprofile_set'):
-        from registration.models import RegistrationProfile
-        try:
-            profile = user.registrationprofile_set.get()
-        except RegistrationProfile.DoesNotExist:
-            # Registration profile does not exist anymore
-            return
-        # Just to be sure
-        RegistrationProfile.objects.activate_user(profile.activation_key)
-        # Not really sure why we would have to leave it as RegistrationProfile.ACTIVATED
-        user.registrationprofile_set.all().delete()
-
-
 def intersect(a, b):
     """
     Finds the intersection of two dictionaries.

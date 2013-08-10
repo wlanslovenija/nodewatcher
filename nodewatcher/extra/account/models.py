@@ -117,8 +117,6 @@ def activation_key_expired(instance):
     Otherwise original `registration.models.RegistrationProfile.activation_key_expired` rules apply.
     """
 
-    if instance.activation_key == instance.ACTIVATED:
-        return True
     if instance.user.last_login != instance.user.date_joined:
         return False
     return orig_activation_key_expired(instance)

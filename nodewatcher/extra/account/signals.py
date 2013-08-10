@@ -41,15 +41,3 @@ def user_logout_message(sender, request, user, **kwargs):
     messages.success(request, _("You have been successfully logged out."), fail_silently=True)
 
 user_logout.connect(user_logout_message, dispatch_uid=__name__ + '.user_logout_message')
-
-
-def cleanup_registration_profile(user, request, **kwargs):
-    """
-    Some additinal clenaup after user activation.
-
-    Currently it clears possible registration activation token.
-    """
-
-    utils.user_activation_cleanup(user)
-
-registration_signals.user_activated.connect(cleanup_registration_profile, dispatch_uid=__name__ + '.cleanup_registration_profile')
