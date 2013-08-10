@@ -53,6 +53,8 @@ def account(request):
         request.user.is_active = False
         request.user.save()
         
+        # Creates a new activation key
+        registration_models.RegistrationProfile.objects.filter(user=request.user).delete()
         registration_profile = registration_models.RegistrationProfile.objects.create_profile(request.user)
         registration_profile.send_activation_email(site, email_change=True)
         
