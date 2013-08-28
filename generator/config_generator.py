@@ -66,7 +66,6 @@ portLayouts = {
   'tp-wr703n' : None,
   'tp-mr3020' : None,
   'tp-mr3040' : None,
-  'tp-wr1043' : None,
   'ub-bullet' : None,
   'ub-nano'   : None,
   'ub-bullet-m5' : None,
@@ -1007,7 +1006,6 @@ config uhttpd main
         "tp-wr703n" : "TLWR703",
         "tp-mr3020" : "TLMR3020",
         "tp-mr3040" : "TLMR3040",
-        "tp-wr1043" : "TLWR1043",
         
         "ub-bullet" : "UBNT",
         "ub-nano" : "UBNT",
