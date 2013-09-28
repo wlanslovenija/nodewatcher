@@ -231,7 +231,6 @@ INSTALLED_APPS = (
     'nodewatcher.core.generator.cgm',
     'nodewatcher.core.generator',
     'nodewatcher.core.monitor',
-    'nodewatcher.core.monitor.sources.http',
     'nodewatcher.core.registry',
     'nodewatcher.modules.administration.types',
     'nodewatcher.modules.administration.projects',
@@ -240,6 +239,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.administration.roles',
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.platforms.openwrt',
+    'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.modules.routing.olsr',
@@ -382,7 +382,7 @@ MONITOR_INTERVAL = 300
 MONITOR_PROCESSORS = (
     'nodewatcher.modules.routing.olsr.processors.OLSRTopology',
     'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
-    'nodewatcher.core.monitor.sources.http.processors.HTTPTelemetry',
+    'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
     'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes'

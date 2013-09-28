@@ -1,5 +1,5 @@
-from ... import processors as monitor_processors
-from .... import models as core_models
+from nodewatcher.core import models as core_models
+from nodewatcher.core.monitor import processors as monitor_processors
 
 from . import parser as telemetry_parser
 
