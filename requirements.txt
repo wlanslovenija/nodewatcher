@@ -8,7 +8,7 @@ amqp==1.0.12
 anyjson==0.3.3
 billiard==2.7.3.30
 celery==3.0.20
-datastream==0.1.2
+datastream==0.1.3
 distribute==0.6.48
 django-celery==3.0.17
 django-classy-tags==0.4
