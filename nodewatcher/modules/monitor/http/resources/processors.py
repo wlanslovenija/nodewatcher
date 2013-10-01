@@ -33,7 +33,7 @@ class SystemStatus(monitor_processors.NodeProcessor):
             processes = int(context.http.general.loadavg.split()[3].split("/")[1])
         else:
             # Unsupported version (v0)
-            return
+            return context
 
         if version == 1:
             # Process memory resources (v1)

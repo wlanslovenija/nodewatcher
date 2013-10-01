@@ -204,7 +204,7 @@ def depends_on_context(*keys):
                 if key not in context:
                     return context
 
-            f(self, context, *args, **kwargs)
+            return f(self, context, *args, **kwargs)
 
         return wrapper
 
