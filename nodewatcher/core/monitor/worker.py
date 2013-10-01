@@ -124,7 +124,7 @@ class Worker(object):
                 logger.info("Running the following node processors:")
                 for p in processor_list:
                     logger.info("  - %s" % p.__name__)
-                self.workers.map(stage_worker, ((context, node, processor_list) for node in nodes))
+                self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes)).get(0xFFFF)
             else:
                 logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
 
@@ -159,5 +159,4 @@ class Worker(object):
         finally:
             # Ensure that the worker pool gets cleaned up after processing is completed
             logger.info("Stopping worker processes...")
-            self.workers.close()
-            self.workers.join()
+            self.workers.terminate()
