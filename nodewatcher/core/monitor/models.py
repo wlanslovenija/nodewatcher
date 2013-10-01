@@ -153,3 +153,47 @@ class NetworkResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
         registry_id = 'system.resources.network'
 
 registration.point('node.monitoring').register_item(NetworkResourcesMonitor)
+
+
+class InterfaceMonitor(registration.bases.NodeMonitoringRegistryItem):
+    """
+    A monitored interface.
+    """
+
+    name = models.CharField(max_length=50)
+    hw_address = registry_fields.MACAddressField()
+    tx_packets = models.BigIntegerField()
+    rx_packets = models.BigIntegerField()
+    tx_bytes = models.BigIntegerField()
+    rx_bytes = models.BigIntegerField()
+    mtu = models.IntegerField()
+
+    class RegistryMeta:
+        registry_id = 'core.interfaces'
+        multiple = True
+
+registration.point('node.monitoring').register_item(InterfaceMonitor)
+
+
+class WifiInterfaceMonitor(InterfaceMonitor):
+    """
+    A monitored wireless interface.
+    """
+
+    mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode')
+    essid = models.CharField(max_length=50)
+    bssid = registry_fields.MACAddressField(null=True)
+    protocol = models.CharField(max_length=50)
+    channel = models.PositiveIntegerField()
+    channel_width = models.PositiveIntegerField()
+    bitrate = models.PositiveIntegerField()
+    rts_threshold = models.IntegerField()
+    frag_threshold = models.IntegerField()
+    signal = models.IntegerField()
+    noise = models.IntegerField()
+    snr = models.FloatField()
+
+    class RegistryMeta(InterfaceMonitor.RegistryMeta):
+        pass
+
+registration.point('node.monitoring').register_item(WifiInterfaceMonitor)

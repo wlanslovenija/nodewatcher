@@ -242,6 +242,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
+    'nodewatcher.modules.monitor.http.interfaces',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
@@ -384,6 +385,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
+    'nodewatcher.modules.monitor.http.interfaces.processors.Interfaces',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
     'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes'
 )
