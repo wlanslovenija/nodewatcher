@@ -166,6 +166,10 @@ class InterfaceMonitor(registration.bases.NodeMonitoringRegistryItem):
     rx_packets = models.BigIntegerField()
     tx_bytes = models.BigIntegerField()
     rx_bytes = models.BigIntegerField()
+    tx_errors = models.BigIntegerField()
+    rx_errors = models.BigIntegerField()
+    tx_drops = models.BigIntegerField()
+    rx_drops = models.BigIntegerField()
     mtu = models.IntegerField()
 
     class RegistryMeta:

@@ -19,6 +19,10 @@ class Migration(SchemaMigration):
             ('rx_packets', self.gf('django.db.models.fields.BigIntegerField')()),
             ('tx_bytes', self.gf('django.db.models.fields.BigIntegerField')()),
             ('rx_bytes', self.gf('django.db.models.fields.BigIntegerField')()),
+            ('tx_errors', self.gf('django.db.models.fields.BigIntegerField')()),
+            ('rx_errors', self.gf('django.db.models.fields.BigIntegerField')()),
+            ('tx_drops', self.gf('django.db.models.fields.BigIntegerField')()),
+            ('rx_drops', self.gf('django.db.models.fields.BigIntegerField')()),
             ('mtu', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('monitor', ['InterfaceMonitor'])
@@ -84,8 +88,12 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'monitoring_monitor_interfacemonitor'", 'to': "orm['core.Node']"}),
             'rx_bytes': ('django.db.models.fields.BigIntegerField', [], {}),
+            'rx_drops': ('django.db.models.fields.BigIntegerField', [], {}),
+            'rx_errors': ('django.db.models.fields.BigIntegerField', [], {}),
             'rx_packets': ('django.db.models.fields.BigIntegerField', [], {}),
             'tx_bytes': ('django.db.models.fields.BigIntegerField', [], {}),
+            'tx_drops': ('django.db.models.fields.BigIntegerField', [], {}),
+            'tx_errors': ('django.db.models.fields.BigIntegerField', [], {}),
             'tx_packets': ('django.db.models.fields.BigIntegerField', [], {})
         },
         'monitor.networkresourcesmonitor': {

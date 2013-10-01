@@ -38,6 +38,10 @@ class Interfaces(monitor_processors.NodeProcessor):
             iface.rx_packets = int(data.rx_packets)
             iface.tx_bytes = int(data.tx_bytes)
             iface.rx_bytes = int(data.rx_bytes)
+            iface.tx_errors = int(data.tx_errs)
+            iface.rx_errors = int(data.rx_errs)
+            iface.tx_drops = int(data.tx_drops)
+            iface.rx_drops = int(data.rx_drops)
             iface.mtu = int(data.mtu)
 
             if name in context.http.wireless.radios:
