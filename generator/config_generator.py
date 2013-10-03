@@ -1023,7 +1023,7 @@ config uhttpd main
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []) + self.packages)
 
-      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe -wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger wireless-tools qos-scripts nodewatcher-watchdog %s"' % (profile_map[self.portLayout], pkgs)
+      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-core nodewatcher-clients ntpclient hostapd -ppp -ppp-mod-pppoe wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger wireless-tools qos-scripts nodewatcher-watchdog %s"' % (profile_map[self.portLayout], pkgs)
       os.chdir(path)
       os.system(buildString)
       return
