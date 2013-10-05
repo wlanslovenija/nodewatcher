@@ -4,7 +4,8 @@ from django_datastream import datastream
 class Field(object):
     """
     A datastream Field contains metadata on how to extract datapoints and create
-    metrics from them. These metrics are then pushed via the datastream API.
+    streams from them. Values are then appended to these streams via the datastream
+    API.
     """
 
     def __init__(self, attribute=None):
@@ -30,7 +31,7 @@ class Field(object):
 
     def prepare_tags(self):
         """
-        Returns a list of tags that will be included in the final metric.
+        Returns a list of tags that will be included in the final stream.
         """
 
         return [{'name': self.name}]
@@ -38,7 +39,7 @@ class Field(object):
     def prepare_query_tags(self):
         """
         Returns a list of tags that will be used to uniquely identify the final
-        metric in addition to document-specific tags. This is usually a subset
+        stream in addition to document-specific tags. This is usually a subset
         of tags returned by `prepare_tags`.
         """
 
@@ -46,7 +47,7 @@ class Field(object):
 
     def get_downsamplers(self):
         """
-        Returns a list of downsamplers that will be used for the underlying metric.
+        Returns a list of downsamplers that will be used for the underlying stream.
         """
 
         return [
@@ -61,7 +62,7 @@ class Field(object):
 
     def to_stream(self, obj, stream):
         """
-        Creates metrics and inserts datapoints to the stream via the datastream API.
+        Creates streams and inserts datapoints to the stream via the datastream API.
 
         :param obj: Source object
         :param stream: Stream API instance
@@ -69,17 +70,17 @@ class Field(object):
 
         attribute = self.name if self.attribute is None else self.attribute
         value = self.prepare_value(getattr(obj, attribute))
-        query_tags = obj.get_metric_query_tags() + self.prepare_query_tags()
-        tags = obj.get_metric_tags() + self.prepare_tags()
+        query_tags = obj.get_stream_query_tags() + self.prepare_query_tags()
+        tags = obj.get_stream_tags() + self.prepare_tags()
         downsamplers = self.get_downsamplers()
 
-        if hasattr(obj, 'get_metric_highest_granularity'):
-            highest_granularity = obj.get_metric_highest_granularity()
+        if hasattr(obj, 'get_stream_highest_granularity'):
+            highest_granularity = obj.get_stream_highest_granularity()
         else:
             highest_granularity = datastream.Granularity.Seconds
 
-        metric_id = stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity)
-        stream.append(metric_id, value)
+        stream_id = stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity)
+        stream.append(stream_id, value)
 
 
 class IntegerField(Field):

@@ -15,7 +15,7 @@ class MonitorRegistryItemMixin(object):
     special methods to each item.
     """
 
-    def get_metric_query_tags(self):
+    def get_stream_query_tags(self):
         """
         Returns a set of tags that uniquely identify this object.
 
@@ -27,9 +27,9 @@ class MonitorRegistryItemMixin(object):
             {'registry_id': self.RegistryMeta.registry_id}
         ]
 
-    def get_metric_tags(self):
+    def get_stream_tags(self):
         """
-        Returns the metric tags that should be included in every metric
+        Returns the stream tags that should be included in every stream
         derived from this object.
 
         :return: A list of tags to include
@@ -40,10 +40,10 @@ class MonitorRegistryItemMixin(object):
             {'registry_id': self.RegistryMeta.registry_id}
         ]
 
-    def get_metric_highest_granularity(self):
+    def get_stream_highest_granularity(self):
         """
         Returns the highest granularity that should be used by default for
-        all metrics derived from this object.
+        all streams derived from this object.
         """
 
         return datastream.Granularity.Minutes
