@@ -65,4 +65,12 @@ class SystemStatus(monitor_processors.NodeProcessor):
         resources.processes = processes
         resources.save()
 
+        # Schema update for network resources
+        if version >= 3:
+            resources = node.monitoring.system.resources.network(create=monitor_models.NetworkResourcesMonitor)
+            resources.routes = int(context.http.general.routes.ipv4) + int(context.http.general.routes.ipv6)
+            resources.tcp_connections = int(context.http.general.connections.tcp)
+            resources.udp_connections = int(context.http.general.connections.udp)
+            resources.save()
+
         return context
