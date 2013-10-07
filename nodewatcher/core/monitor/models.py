@@ -28,6 +28,21 @@ class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
 registration.point('node.monitoring').register_item(GeneralMonitor)
 
 
+class CgmGeneralMonitor(GeneralMonitor):
+    """
+    General monitored parameters about a node that has firmware generated
+    by the CGMs.
+    """
+
+    uuid = models.CharField(max_length=40, null=True)
+    firmware = models.CharField(max_length=100, null=True)
+
+    class RegistryMeta(GeneralMonitor.RegistryMeta):
+        pass
+
+registration.point('node.monitoring').register_item(CgmGeneralMonitor)
+
+
 class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Node's status.

@@ -384,6 +384,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.routing.olsr.processors.OLSRTopology',
     'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
+    'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.Interfaces',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
