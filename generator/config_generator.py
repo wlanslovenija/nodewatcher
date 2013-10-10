@@ -1001,6 +1001,7 @@ config uhttpd main
         "tp-wr842nd" : "TLWR842",
         "tp-wr743nd" : "TLWR743",
         "tp-wr841nd" : "TLWR841",
+        "tp-wr841ndv8" : "TLWR841",
         "tp-wr941nd" : "TLWR941",
         "tp-wr1041nd" : "TLWR1041",
         "tp-wr1043nd" : "TLWR1043",
