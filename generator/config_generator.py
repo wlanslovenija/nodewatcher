@@ -491,7 +491,7 @@ config interface mesh
         option netmask  255.255.0.0
 
 config interface clients
-        option ifname   eth0
+        option ifname   {iface_lan}
         option type     bridge
         option proto    static
         option ipaddr   {mesh_ip}
@@ -506,15 +506,16 @@ config alias
 """.format(
         mesh_ip = self.ip,
         clients_mask = self.subnets[0]['mask'],
-        vpn_ip = self.vpn['ip']
+        vpn_ip = self.vpn['ip'],
+        iface_lan = self.lanIface
       ))
       
       if self.portLayout not in portLayouts or portLayouts.get(self.portLayout) is not None:
-        f.write("config switch eth0\n")
+        f.write("config switch %s\n" % self.lanIface)
         f.write("        option enable_vlan      1\n")
         f.write("\n")
         f.write("config switch_vlan\n")
-        f.write("        option device   eth0\n")
+        f.write("        option device   %s\n" % self.lanIface)
         f.write("        option vlan     1\n")
         f.write('        option ports    "0 1 2 3 4"\n')
         f.write("\n")
@@ -538,14 +539,14 @@ config alias
       
       if wan_interface.get('ip', None):
         f.write("config interface wan\n")
-        f.write("        option ifname   eth1\n")
+        f.write("        option ifname   %s\n" % wan_interface['name'])
         f.write("        option proto    static\n")
         f.write("        option ipaddr   %s\n" % wan_interface['ip'])
         f.write("        option netmask  %s\n" % wan_interface['mask'])
         f.write("        option gateway  %s\n" % wan_interface['gateway'])
       else:
         f.write("config interface wan\n")
-        f.write("        option ifname   eth1\n")
+        f.write("        option ifname   %s\n" % wan_interface['name'])
         f.write("        option proto    dhcp\n")
       
       f.write("\n")
@@ -631,7 +632,7 @@ config policy
         option priority 999
 
 config policy
-        option device   'eth1'
+        option device   'wan'
         option table    'main'
         option priority 999
 
