@@ -64,7 +64,7 @@ class WirelessProtocolMetaclass(type):
                 getattr(new_class, 'capabilities', None) or []
             )
 
-        new_class.capabilities = set(getattr(new_class, 'capabilities', []))
+        new_class.capabilities = set(getattr(new_class, 'capabilities', []) or [])
         new_class.available_capabilities = set()
 
         for capability in new_class.capabilities:
