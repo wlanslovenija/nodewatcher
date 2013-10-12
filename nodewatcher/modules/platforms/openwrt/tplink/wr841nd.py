@@ -1,13 +1,13 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkWR841ND(cgm_routers.RouterBase):
+class TPLinkWR841NDv1(cgm_routers.RouterBase):
     """
-    TP-Link WR841ND device descriptor.
+    TP-Link WR841NDv1 device descriptor.
     """
 
-    identifier = 'tp-wr841nd'
-    name = "WR841ND"
+    identifier = 'tp-wr841ndv1'
+    name = "WR841ND (v1)"
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
@@ -61,6 +61,99 @@ class TPLinkWR841ND(cgm_routers.RouterBase):
             'lan0': 'eth0',
         }
     }
+    drivers = {
+        'openwrt': {
+            'wifi0': 'mac80211'
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841nd-v1.5-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class TPLinkWR841NDv3(TPLinkWR841NDv1):
+    """
+    TP-Link WR841NDv3 device descriptor.
+    """
+
+    identifier = 'tp-wr841ndv3'
+    name = "WR841ND (v3)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841nd-v3-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class TPLinkWR841NDv5(TPLinkWR841NDv1):
+    """
+    TP-Link WR841NDv5 device descriptor.
+    """
+
+    identifier = 'tp-wr841ndv5'
+    name = "WR841ND (v5)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841nd-v5-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class TPLinkWR841NDv7(TPLinkWR841NDv1):
+    """
+    TP-Link WR841NDv7 device descriptor.
+    """
+
+    identifier = 'tp-wr841ndv7'
+    name = "WR841ND (v7)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841nd-v7-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class TPLinkWR841NDv8(TPLinkWR841NDv1):
+    """
+    TP-Link WR841NDv8 device descriptor.
+    """
+
+    identifier = 'tp-wr841ndv8'
+    name = "WR841ND (v8)"
+    port_map = {
+        'openwrt': {
+            'wifi0': 'radio0',
+            'sw0': 'eth1',
+            'wan0': 'eth0',
+            'lan0': 'eth1',
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841n-v8-squashfs-factory.bin'
+            ]
+        }
+    }
 
 # Register the TP-Link WR841ND router
-cgm_base.register_router('openwrt', TPLinkWR841ND)
+cgm_base.register_router('openwrt', TPLinkWR841NDv1)
+cgm_base.register_router('openwrt', TPLinkWR841NDv3)
+cgm_base.register_router('openwrt', TPLinkWR841NDv5)
+cgm_base.register_router('openwrt', TPLinkWR841NDv7)
+cgm_base.register_router('openwrt', TPLinkWR841NDv8)
