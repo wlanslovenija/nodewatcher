@@ -1,13 +1,13 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkWR703N(cgm_routers.RouterBase):
+class TPLinkWR703Nv1(cgm_routers.RouterBase):
     """
-    TP-Link WR703N device descriptor.
+    TP-Link WR703Nv1 device descriptor.
     """
 
-    identifier = 'tp-wr703n'
-    name = "WR703N"
+    identifier = 'tp-wr703nv1'
+    name = "WR703N (v1)"
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
@@ -61,6 +61,19 @@ class TPLinkWR703N(cgm_routers.RouterBase):
             'lan0': 'eth0',
         }
     }
+    drivers = {
+        'openwrt': {
+            'wifi0': 'mac80211'
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR703',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr703n-v1-squashfs-factory.bin'
+            ]
+        }
+    }
 
 # Register the TP-Link WR703N router
-cgm_base.register_router('openwrt', TPLinkWR703N)
+cgm_base.register_router('openwrt', TPLinkWR703Nv1)

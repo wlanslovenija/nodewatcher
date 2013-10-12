@@ -1,13 +1,13 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkWR842ND(cgm_routers.RouterBase):
+class TPLinkWR842NDv1(cgm_routers.RouterBase):
     """
-    TP-Link WR842ND device descriptor.
+    TP-Link WR842NDv1 device descriptor.
     """
 
-    identifier = 'tp-wr842nd'
-    name = "WR842ND"
+    identifier = 'tp-wr842ndv1'
+    name = "WR842ND (v1)"
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
@@ -61,6 +61,19 @@ class TPLinkWR842ND(cgm_routers.RouterBase):
             'lan0': 'eth0',
         }
     }
+    drivers = {
+        'openwrt': {
+            'wifi0': 'mac80211'
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR842',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr842n-v1-squashfs-factory.bin'
+            ]
+        }
+    }
 
 # Register the TP-Link WR842ND router
-cgm_base.register_router('openwrt', TPLinkWR842ND)
+cgm_base.register_router('openwrt', TPLinkWR842NDv1)

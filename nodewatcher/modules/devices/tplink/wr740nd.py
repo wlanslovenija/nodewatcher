@@ -1,13 +1,13 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkWR740ND(cgm_routers.RouterBase):
+class TPLinkWR740NDv1(cgm_routers.RouterBase):
     """
-    TP-Link WR740ND device descriptor.
+    TP-Link WR740NDv1 device descriptor.
     """
 
-    identifier = 'tp-wr740nd'
-    name = "WR740ND"
+    identifier = 'tp-wr740ndv1'
+    name = "WR740ND (v1)"
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
@@ -61,6 +61,55 @@ class TPLinkWR740ND(cgm_routers.RouterBase):
             'lan0': 'eth0',
         }
     }
+    drivers = {
+        'openwrt': {
+            'wifi0': 'mac80211'
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR740',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr740n-v1-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class TPLinkWR740NDv3(TPLinkWR740NDv1):
+    """
+    TP-Link WR740NDv3 device descriptor.
+    """
+
+    identifier = 'tp-wr740ndv3'
+    name = "WR740ND (v3)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR740',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr740n-v3-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class TPLinkWR740NDv4(TPLinkWR740NDv1):
+    """
+    TP-Link WR740NDv4 device descriptor.
+    """
+
+    identifier = 'tp-wr740ndv4'
+    name = "WR740ND (v4)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR740',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr740n-v4-squashfs-factory.bin'
+            ]
+        }
+    }
 
 # Register the TP-Link WR740ND router
-cgm_base.register_router('openwrt', TPLinkWR740ND)
+cgm_base.register_router('openwrt', TPLinkWR740NDv1)
+cgm_base.register_router('openwrt', TPLinkWR740NDv3)
+cgm_base.register_router('openwrt', TPLinkWR740NDv4)

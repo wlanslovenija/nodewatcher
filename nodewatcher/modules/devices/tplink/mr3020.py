@@ -1,13 +1,13 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkMR3020(cgm_routers.RouterBase):
+class TPLinkMR3020v1(cgm_routers.RouterBase):
     """
-    TP-Link MR3020 device descriptor.
+    TP-Link MR3020v1 device descriptor.
     """
 
-    identifier = 'tp-mr3020'
-    name = "MR3020"
+    identifier = 'tp-mr3020v1'
+    name = "MR3020 (v1)"
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
@@ -61,6 +61,19 @@ class TPLinkMR3020(cgm_routers.RouterBase):
             'lan0': 'eth0',
         }
     }
+    drivers = {
+        'openwrt': {
+            'wifi0': 'mac80211'
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLMR3020',
+            'files': [
+                'openwrt-ar71xx-generic-tl-mr3020-v1-squashfs-factory.bin'
+            ]
+        }
+    }
 
 # Register the TP-Link MR3020 router
-cgm_base.register_router('openwrt', TPLinkMR3020)
+cgm_base.register_router('openwrt', TPLinkMR3020v1)
