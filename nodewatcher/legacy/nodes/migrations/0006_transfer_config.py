@@ -120,6 +120,7 @@ class Migration(DataMigration):
                     "tp-wr740nd" : "tp-wr740ndv1",
                     "tp-wr842nd" : "tp-wr842ndv1",
                     "tp-mr3020"  : "tp-mr3020v1",
+                    "tp-mr3040"  : "tp-mr3040v1",
                     "tp-wr841nd" : "tp-wr841ndv3",
                     "tp-wr841ndv8" : "tp-wr841ndv8",
                     "tp-wr703n"  : "tp-wr703nv1",
