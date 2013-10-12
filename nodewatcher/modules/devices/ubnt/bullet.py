@@ -62,9 +62,9 @@ class UBNTBullet(cgm_routers.RouterBase):
 
 
 class UBNTBulletM5(UBNTBullet):
-    '''
+    """
     UBNT Bullet M5 device descriptor.
-    '''
+    """
 
     identifier = 'ub-bullet-m5'
     name = "Bullet M5"
