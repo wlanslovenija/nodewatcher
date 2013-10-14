@@ -337,6 +337,13 @@ def configure_network(cfg, network, section):
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
     elif isinstance(network, cgm_models.DHCPNetworkConfig):
         section.proto = 'dhcp'
+    elif isinstance(network, cgm_models.PPPoENetworkConfig):
+        section.proto = 'pppoe'
+        section.username = network.username
+        section.password = network.password
+
+        # Package 'ppp-mod-pppoe' is required for using PPPoE
+        cfg.packages.update(['ppp-mod-pppoe'])
     else:
         section.proto = 'none'
 
