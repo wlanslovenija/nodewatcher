@@ -546,6 +546,8 @@ def network(node, cfg):
                 elif vif.mode == 'mesh':
                     wif.mode = 'adhoc'
                     wif.bssid = vif.bssid
+                elif vif.mode == 'sta':
+                    wif.mode = 'sta'
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
 
