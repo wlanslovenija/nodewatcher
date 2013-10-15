@@ -75,19 +75,6 @@ class PasswordAuthenticationConfig(AuthenticationConfig):
 registration.point('node.config').register_item(PasswordAuthenticationConfig)
 
 
-class PublicKeyAuthenticationConfig(AuthenticationConfig):
-    """
-    Public key authentication mechanism configuration.
-    """
-
-    public_key = models.TextField()
-
-    class RegistryMeta(AuthenticationConfig.RegistryMeta):
-        registry_name = _("Public Key")
-
-registration.point('node.config').register_item(PublicKeyAuthenticationConfig)
-
-
 # TODO: Should this go to OpenWrt module?
 class PackageConfig(registration.bases.NodeConfigRegistryItem):
     """

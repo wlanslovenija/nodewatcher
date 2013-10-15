@@ -247,6 +247,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
+    'nodewatcher.modules.authentication.public_key',
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.frontend.display',
     'nodewatcher.modules.frontend.editor',
