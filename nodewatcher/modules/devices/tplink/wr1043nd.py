@@ -26,18 +26,23 @@ class TPLinkWR1043NDv1(cgm_routers.RouterBase):
     switches = [
         cgm_routers.Switch(
             'sw0', "Switch0",
-            ports=5,
-            cpu_port=0,
+            ports=[0, 1, 2, 3, 4, 5],
+            cpu_port=5,
             vlans=16,
         )
     ]
     ports = [
-        cgm_routers.EthernetPort('wan0', "Wan0"),
+        cgm_routers.SwitchedEthernetPort(
+            'wan0', "Wan0",
+            switch='sw0',
+            vlan=2,
+            ports=[0, 5],
+        ),
         cgm_routers.SwitchedEthernetPort(
             'lan0', "Lan0",
             switch='sw0',
             vlan=1,
-            ports=[0, 1, 2, 3, 4],
+            ports=[1, 2, 3, 4, 5],
         )
     ]
     antennas = [
@@ -56,9 +61,9 @@ class TPLinkWR1043NDv1(cgm_routers.RouterBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
-            'wan0': 'eth1',
-            'lan0': 'eth0',
+            'sw0': 'rtl8366rb',
+            'wan0': 'eth0.2',
+            'lan0': 'eth0.1',
         }
     }
     drivers = {
