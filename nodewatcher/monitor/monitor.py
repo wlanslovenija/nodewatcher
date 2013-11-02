@@ -535,9 +535,9 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
       
       # Check node's wifi bitrate, level and noise
       if 'signal' in info['wifi']:
-        bitrate = safe_int_convert(info['wifi']['bitrate'])
-        signal = safe_dbm_convert(info['wifi']['signal'])
-        noise = safe_dbm_convert(info['wifi']['noise'])
+        bitrate = safe_int_convert(info['wifi']['bitrate']) or 0
+        signal = safe_dbm_convert(info['wifi']['signal']) or 0
+        noise = safe_dbm_convert(info['wifi']['noise']) or 0
         snr = float(signal) - float(noise)
         
         grapher.add_graph(GraphType.WifiBitrate, 'WiFi Bitrate', 'wifibitrate', bitrate)
