@@ -52,10 +52,10 @@ class Interfaces(monitor_processors.NodeProcessor):
                     iface.mode = "ap"
                 elif data.mode == "ibss":
                     iface.mode = "mesh"
-                elif data.mode == "sta":
+                elif data.mode == "managed":
                     iface.mode = "sta"
                 else:
-                    self.logger.warning("Ignoring unknown wifi mode '%s'!" % data.mode)
+                    self.logger.warning("Ignoring unknown wifi mode '%s' on node '%s'!" % (data.mode, node.pk))
 
                 iface.essid = data.essid
                 if iface.mode == "mesh":
