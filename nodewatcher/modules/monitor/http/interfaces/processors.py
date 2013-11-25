@@ -33,7 +33,7 @@ class Interfaces(monitor_processors.NodeProcessor):
 
             # TODO: We currently assume that interfaces will not change types between wifi/non-wifi
 
-            iface.hw_address = data.mac
+            iface.hw_address = str(data.mac)
             iface.tx_packets = int(data.tx_packets)
             iface.rx_packets = int(data.rx_packets)
             iface.tx_bytes = int(data.tx_bytes)
@@ -57,19 +57,19 @@ class Interfaces(monitor_processors.NodeProcessor):
                 else:
                     self.logger.warning("Ignoring unknown wifi mode '%s' on node '%s'!" % (data.mode, node.pk))
 
-                iface.essid = data.essid
-                if iface.mode == "mesh":
-                    iface.bssid = data.bssid
+                iface.essid = str(data.essid) if data.essid else None
+                if data.bssid and iface.mode in ("mesh", "sta"):
+                    iface.bssid = str(data.bssid)
                 else:
                     iface.bssid = None
 
-                iface.channel = int(data.channel)
-                iface.channel_width = int(data.channel_width)
-                iface.bitrate = int(data.bitrate)
-                iface.rts_threshold = int(data.rts_threshold)
-                iface.frag_threshold = int(data.frag_threshold)
-                iface.signal = int(data.signal)
-                iface.noise = int(data.noise)
+                iface.channel = int(data.channel) if data.channel else None
+                iface.channel_width = int(data.channel_width) if data.channel_width else None
+                iface.bitrate = float(data.bitrate) if data.bitrate else None
+                iface.rts_threshold = int(data.rts_threshold) if data.rts_threshold else None
+                iface.frag_threshold = int(data.frag_threshold) if data.frag_threshold else None
+                iface.signal = int(data.signal) if data.signal else None
+                iface.noise = int(data.noise) if data.noise else None
                 # TODO: Calculate signal-to-noise ratio
                 iface.snr = 0.0
 
