@@ -390,7 +390,8 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.Interfaces',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
-    'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes'
+    'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes',
+    'nodewatcher.modules.monitor.datastream.processors.Maintenance',
 )
 
 # Backend for the monitoring data archive.
