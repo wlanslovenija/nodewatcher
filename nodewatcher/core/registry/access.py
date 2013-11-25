@@ -84,7 +84,7 @@ class RegistryResolver(object):
         for obj in self._root._meta.get_all_related_objects():
             if issubclass(obj.model, self._regpoint.item_base):
                 for model in getattr(self._root, obj.field.rel.related_name).all():
-                    yield model
+                    yield model.cast()
 
     def __getattr__(self, key):
         """
