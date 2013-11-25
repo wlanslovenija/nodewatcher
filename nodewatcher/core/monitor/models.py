@@ -200,16 +200,16 @@ class WifiInterfaceMonitor(InterfaceMonitor):
     """
 
     mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode')
-    essid = models.CharField(max_length=50)
+    essid = models.CharField(max_length=50, null=True)
     bssid = registry_fields.MACAddressField(null=True)
     protocol = models.CharField(max_length=50)
-    channel = models.PositiveIntegerField()
-    channel_width = models.PositiveIntegerField()
-    bitrate = models.PositiveIntegerField()
-    rts_threshold = models.IntegerField()
-    frag_threshold = models.IntegerField()
-    signal = models.IntegerField()
-    noise = models.IntegerField()
+    channel = models.PositiveIntegerField(null=True)
+    channel_width = models.PositiveIntegerField(null=True)
+    bitrate = models.FloatField(null=True)
+    rts_threshold = models.IntegerField(null=True)
+    frag_threshold = models.IntegerField(null=True)
+    signal = models.IntegerField(null=True)
+    noise = models.IntegerField(null=True)
     snr = models.FloatField()
 
     class RegistryMeta(InterfaceMonitor.RegistryMeta):

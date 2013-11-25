@@ -89,18 +89,18 @@ class Migration(SchemaMigration):
         },
         'monitor.wifiinterfacemonitor': {
             'Meta': {'ordering': "['id']", 'object_name': 'WifiInterfaceMonitor', '_ormbases': ['monitor.InterfaceMonitor']},
-            'bitrate': ('django.db.models.fields.PositiveIntegerField', [], {}),
+            'bitrate': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
             'bssid': ('nodewatcher.core.registry.fields.MACAddressField', [], {'max_length': '17', 'null': 'True'}),
-            'channel': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'channel_width': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'essid': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'frag_threshold': ('django.db.models.fields.IntegerField', [], {}),
+            'channel': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
+            'channel_width': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
+            'essid': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
+            'frag_threshold': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'interfacemonitor_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['monitor.InterfaceMonitor']", 'unique': 'True', 'primary_key': 'True'}),
             'mode': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.interfaces#wifi_mode'"}),
-            'noise': ('django.db.models.fields.IntegerField', [], {}),
+            'noise': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'protocol': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'rts_threshold': ('django.db.models.fields.IntegerField', [], {}),
-            'signal': ('django.db.models.fields.IntegerField', [], {}),
+            'rts_threshold': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'signal': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'snr': ('django.db.models.fields.FloatField', [], {})
         }
     }
