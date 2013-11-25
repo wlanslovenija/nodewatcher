@@ -37,7 +37,7 @@ def stage_worker(args):
             raise
         except:
             transaction.rollback()
-            logger.error("Processor has failed with exception:")
+            logger.error("Processor for node '%s' has failed with exception:" % node.pk)
             logger.error(traceback.format_exc())
 
 
