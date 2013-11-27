@@ -119,7 +119,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
 pool.register(models.InterfaceMonitor, InterfaceMonitorStreams)
 
 
-class WifiInterfaceMonitorStreams(InterfaceStreams):
+class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
     channel = fields.IntegerField()
     channel_width = fields.IntegerField()
     bitrate = fields.FloatField()
