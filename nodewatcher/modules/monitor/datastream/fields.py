@@ -2,6 +2,7 @@ from django.core import exceptions
 
 from django_datastream import datastream
 
+from .pool import pool
 
 class Field(object):
     """
@@ -62,33 +63,29 @@ class Field(object):
             'count'
         ]
 
-    def ensure_stream(self, obj, attributes, stream):
+    def ensure_stream(self, obj, descriptor, stream):
         """
         Creates stream and returns its identifier.
 
         :param obj: Source object
-        :param attributes: Source object attributes
+        :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         :return: Stream identifier
         """
 
-        query_tags = attributes.get_stream_query_tags() + self.prepare_query_tags()
-        tags = attributes.get_stream_tags() + self.prepare_tags()
+        query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
+        tags = descriptor.get_stream_tags() + self.prepare_tags()
         downsamplers = self.get_downsamplers()
-
-        if hasattr(attributes, 'get_stream_highest_granularity'):
-            highest_granularity = attributes.get_stream_highest_granularity()
-        else:
-            highest_granularity = datastream.Granularity.Seconds
+        highest_granularity = descriptor.get_stream_highest_granularity()
 
         return stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity)
 
-    def to_stream(self, obj, attributes, stream):
+    def to_stream(self, obj, descriptor, stream):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
         :param obj: Source object
-        :param attributes: Source object attributes
+        :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         """
 
@@ -98,7 +95,7 @@ class Field(object):
             return
         
         value = self.prepare_value(getattr(obj, attribute))
-        stream.append(self.ensure_stream(obj, attributes, stream), value)
+        stream.append(self.ensure_stream(obj, descriptor, stream), value)
 
 
 class IntegerField(Field):
@@ -157,12 +154,12 @@ class DerivedField(Field):
         self.op = op
         self.op_arguments = arguments
 
-    def ensure_stream(self, obj, attributes, stream):
+    def ensure_stream(self, obj, descriptor, stream):
         """
         Creates stream and returns its identifier.
 
         :param obj: Source object
-        :param attributes: Source object attributes
+        :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         :return: Stream identifier
         """
@@ -176,26 +173,19 @@ class DerivedField(Field):
             if path:
                 mdl = root.monitoring.by_path(path)
 
-            if not hasattr(mdl, "connect_datastream"):
-                raise exceptions.ImproperlyConfigured("Datastream field '%s' not found!" % field_ref['field'])
-
-            field = mdl.connect_datastream.get_field(mdl.__class__, field)
+            mdl_descriptor = pool.get_descriptor(mdl)
+            field = mdl_descriptor.get_field(field)
             if field is None:
                 raise exceptions.ImproperlyConfigured("Datastream field '%s' not found!" % field_ref['field'])
 
-            mdl_attributes = mdl.connect_datastream.get_attributes(mdl)
             streams.append(
-                {'name': field_ref['name'], 'stream': field.ensure_stream(mdl, mdl_attributes, stream)}
+                {'name': field_ref['name'], 'stream': field.ensure_stream(mdl, mdl_descriptor, stream)}
             )
 
-        query_tags = attributes.get_stream_query_tags() + self.prepare_query_tags()
-        tags = attributes.get_stream_tags() + self.prepare_tags()
+        query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
+        tags = descriptor.get_stream_tags() + self.prepare_tags()
         downsamplers = self.get_downsamplers()
-
-        if hasattr(attributes, 'get_stream_highest_granularity'):
-            highest_granularity = attributes.get_stream_highest_granularity()
-        else:
-            highest_granularity = datastream.Granularity.Seconds
+        highest_granularity = descriptor.get_stream_highest_granularity()
 
         return stream.ensure_stream(
             query_tags,
@@ -207,16 +197,16 @@ class DerivedField(Field):
             derive_args=self.op_arguments,
         )
 
-    def to_stream(self, obj, attributes, stream):
+    def to_stream(self, obj, descriptor, stream):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
         :param obj: Source object
-        :param attributes: Source object attributes
+        :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         """
 
-        self.ensure_stream(obj, attributes, stream)
+        self.ensure_stream(obj, descriptor, stream)
 
 
 class ResetField(DerivedField):

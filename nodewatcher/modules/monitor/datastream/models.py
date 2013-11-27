@@ -1,27 +1,16 @@
 from django_datastream import datastream
 
-from nodewatcher.core.registry import registration
-
 # To create node.monitoring registration point
 import nodewatcher.core.monitor
 from nodewatcher.core.monitor import models
 
-from . import connect, fields
+from . import base, fields
+from .pool import pool
 
-
-class RegistryItemDatastreamAttributes(object):
+class RegistryItemStreams(base.StreamsBase):
     """
-    Base class for registry item datastream attributes.
+    Base class for registry item stream attributes.
     """
-
-    def __init__(self, obj):
-        """
-        Class constructor.
-
-        :param obj: Model object
-        """
-
-        self.obj = obj
 
     def get_stream_query_tags(self):
         """
@@ -31,8 +20,8 @@ class RegistryItemDatastreamAttributes(object):
         """
 
         return [
-            {'node': self.obj.root.uuid},
-            {'registry_id': self.obj.RegistryMeta.registry_id}
+            {'node': self._model.root.uuid},
+            {'registry_id': self._model.RegistryMeta.registry_id}
         ]
 
     def get_stream_tags(self):
@@ -44,8 +33,8 @@ class RegistryItemDatastreamAttributes(object):
         """
 
         return [
-            {'node': self.obj.root.uuid},
-            {'registry_id': self.obj.RegistryMeta.registry_id}
+            {'node': self._model.root.uuid},
+            {'registry_id': self._model.RegistryMeta.registry_id}
         ]
 
     def get_stream_highest_granularity(self):
@@ -56,32 +45,33 @@ class RegistryItemDatastreamAttributes(object):
 
         return datastream.Granularity.Minutes
 
-# Adds mappings between monitoring registry items attributes and datastream fields
-models.SystemStatusMonitor.connect_datastream = connect.ConnectDatastream(
-    RegistryItemDatastreamAttributes,
-    uptime=fields.IntegerField(),
-    reboots=fields.ResetField("#uptime"),
-)
 
-models.GeneralResourcesMonitor.connect_datastream = connect.ConnectDatastream(
-    RegistryItemDatastreamAttributes,
-    loadavg_1min=fields.FloatField(),
-    loadavg_5min=fields.FloatField(),
-    loadavg_15min=fields.FloatField(),
-    memory_free=fields.IntegerField(),
-    memory_buffers=fields.IntegerField(),
-    memory_cache=fields.IntegerField(),
-    processes=fields.IntegerField()
-)
+class SystemStatusMonitorStreams(RegistryItemStreams):
+    uptime = fields.IntegerField()
+    reboots = fields.ResetField("#uptime")
 
-models.NetworkResourcesMonitor.connect_datastream = connect.ConnectDatastream(
-    RegistryItemDatastreamAttributes,
-    routes=fields.IntegerField(),
-    tcp_connections=fields.IntegerField(),
-    udp_connections=fields.IntegerField()
-)
+pool.register(models.SystemStatusMonitor, SystemStatusMonitorStreams)
 
-class InterfaceDatastreamAttributes(RegistryItemDatastreamAttributes):
+
+class GeneralResourcesMonitorStreams(RegistryItemStreams):
+    loadavg_1min = fields.FloatField()
+    loadavg_5min = fields.FloatField()
+    loadavg_15min = fields.FloatField()
+    memory_free = fields.IntegerField()
+    memory_buffers = fields.IntegerField()
+    memory_cache = fields.IntegerField()
+    processes = fields.IntegerField()
+
+pool.register(models.GeneralResourcesMonitor, GeneralResourcesMonitorStreams)
+
+
+class NetworkResourcesMonitorStreams(RegistryItemStreams):
+    routes = fields.IntegerField()
+    tcp_connections = fields.IntegerField()
+    udp_connections = fields.IntegerField()
+
+
+class InterfaceStreams(RegistryItemStreams):
 
     def get_stream_query_tags(self):
         """
@@ -90,8 +80,8 @@ class InterfaceDatastreamAttributes(RegistryItemDatastreamAttributes):
         :return: A list of tags that uniquely identify this object
         """
 
-        return super(InterfaceDatastreamAttributes, self).get_stream_query_tags() + [
-            {'interface': self.obj.name}
+        return super(InterfaceStreams, self).get_stream_query_tags() + [
+            {'interface': self._model.name}
         ]
 
     def get_stream_tags(self):
@@ -102,39 +92,41 @@ class InterfaceDatastreamAttributes(RegistryItemDatastreamAttributes):
         :return: A list of tags to include
         """
 
-        return super(InterfaceDatastreamAttributes, self).get_stream_tags() + [
-            {'interface': self.obj.name}
+        return super(InterfaceStreams, self).get_stream_tags() + [
+            {'interface': self._model.name}
         ]
 
-models.InterfaceMonitor.connect_datastream = connect.ConnectDatastream(
-    InterfaceDatastreamAttributes,
-    tx_packets=fields.IntegerField(),
-    tx_packets_rate=fields.RateField("system.status#reboots", "#tx_packets"),
-    rx_packets=fields.IntegerField(),
-    rx_packets_rate=fields.RateField("system.status#reboots", "#rx_packets"),
-    tx_bytes=fields.IntegerField(),
-    tx_bytes_rate=fields.RateField("system.status#reboots", "#tx_bytes"),
-    rx_bytes=fields.IntegerField(),
-    rx_bytes_rate=fields.RateField("system.status#reboots", "#rx_bytes"),
-    tx_errors=fields.IntegerField(),
-    tx_errors_rate=fields.RateField("system.status#reboots", "#tx_errors"),
-    rx_errors=fields.IntegerField(),
-    rx_errors_rate=fields.RateField("system.status#reboots", "#rx_errors"),
-    tx_drops=fields.IntegerField(),
-    tx_drops_rate=fields.RateField("system.status#reboots", "#tx_drops"),
-    rx_drops=fields.IntegerField(),
-    rx_drops_rate=fields.RateField("system.status#reboots", "#rx_drops"),
-    mtu=fields.IntegerField()
-)
 
-models.WifiInterfaceMonitor.connect_datastream = connect.ConnectDatastream(
-    InterfaceDatastreamAttributes,
-    channel=fields.IntegerField(),
-    channel_width=fields.IntegerField(),
-    bitrate=fields.FloatField(),
-    rts_threshold=fields.IntegerField(),
-    frag_threshold=fields.IntegerField(),
-    signal=fields.IntegerField(),
-    noise=fields.IntegerField(),
-    snr=fields.FloatField()
-)
+class InterfaceMonitorStreams(InterfaceStreams):
+    tx_packets = fields.IntegerField()
+    tx_packets_rate = fields.RateField("system.status#reboots", "#tx_packets")
+    rx_packets = fields.IntegerField()
+    rx_packets_rate = fields.RateField("system.status#reboots", "#rx_packets")
+    tx_bytes = fields.IntegerField()
+    tx_bytes_rate = fields.RateField("system.status#reboots", "#tx_bytes")
+    rx_bytes = fields.IntegerField()
+    rx_bytes_rate = fields.RateField("system.status#reboots", "#rx_bytes")
+    tx_errors = fields.IntegerField()
+    tx_errors_rate = fields.RateField("system.status#reboots", "#tx_errors")
+    rx_errors = fields.IntegerField()
+    rx_errors_rate = fields.RateField("system.status#reboots", "#rx_errors")
+    tx_drops = fields.IntegerField()
+    tx_drops_rate = fields.RateField("system.status#reboots", "#tx_drops")
+    rx_drops = fields.IntegerField()
+    rx_drops_rate = fields.RateField("system.status#reboots", "#rx_drops")
+    mtu = fields.IntegerField()
+
+pool.register(models.InterfaceMonitor, InterfaceMonitorStreams)
+
+
+class WifiInterfaceMonitorStreams(InterfaceStreams):
+    channel = fields.IntegerField()
+    channel_width = fields.IntegerField()
+    bitrate = fields.FloatField()
+    rts_threshold = fields.IntegerField()
+    frag_threshold = fields.IntegerField()
+    signal = fields.IntegerField()
+    noise = fields.IntegerField()
+    snr = fields.FloatField()
+
+pool.register(models.WifiInterfaceMonitor, WifiInterfaceMonitorStreams)

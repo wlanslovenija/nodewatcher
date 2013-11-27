@@ -2,6 +2,9 @@ from django_datastream import datastream
 
 from nodewatcher.core.monitor import processors as monitor_processors
 
+from . import exceptions
+from .pool import pool
+
 
 class Datastream(monitor_processors.NodeProcessor):
     """
@@ -19,12 +22,13 @@ class Datastream(monitor_processors.NodeProcessor):
 
         # TODO: Should we enable addition of items that are not in the registry?
         for item in node.monitoring:
-            # If the monitoring registry item doesn't provide a connect_datastream attribute,
-            # we skip it as we don't know which fields to include
-            if getattr(item, "connect_datastream", None) is None:
+            # Only include models that have known stream descriptors registered in
+            # the descriptor pool
+            try:
+                descriptor = pool.get_descriptor(item)
+                descriptor.insert_to_stream(datastream)
+            except exceptions.StreamDescriptorNotRegistered:
                 continue
-
-            item.connect_datastream.insert_to_stream(item.__class__, item, datastream)
 
 
 class Maintenance(monitor_processors.NetworkProcessor):
