@@ -72,7 +72,6 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
 
 
 class InterfaceStreams(RegistryItemStreams):
-
     def get_stream_query_tags(self):
         """
         Returns a set of tags that uniquely identify this object.
