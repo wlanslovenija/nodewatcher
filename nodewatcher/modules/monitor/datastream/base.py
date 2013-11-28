@@ -76,7 +76,14 @@ class StreamsBase(object):
         """
 
         for field in self._fields.values():
-            field.to_stream(self._model, self, stream)
+            field.to_stream(self, stream)
+
+    def get_model(self):
+        """
+        Returns the underlying data model instance.
+        """
+
+        return self._model
 
     def get_field(self, name):
         """
@@ -87,6 +94,13 @@ class StreamsBase(object):
         """
 
         return self._fields.get(name, None)
+
+    def get_fields(self):
+        """
+        Returns a list of all field descriptors.
+        """
+
+        return self._fields.values()
 
     def get_stream_query_tags(self):
         """

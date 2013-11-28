@@ -1,5 +1,6 @@
 from django.core import exceptions
 
+from datastream import exceptions as ds_exceptions
 from django_datastream import datastream
 
 from .pool import pool
@@ -21,6 +22,7 @@ class Field(object):
 
         self.name = None
         self.attribute = attribute
+        self.custom_tags = {}
 
     def prepare_value(self, value):
         """
@@ -37,7 +39,7 @@ class Field(object):
         Returns a list of tags that will be included in the final stream.
         """
 
-        return [{'name': self.name}]
+        return [{'name': self.name}] + [{tag: value} for tag, value in self.custom_tags.items()]
 
     def prepare_query_tags(self):
         """
@@ -63,11 +65,10 @@ class Field(object):
             'count'
         ]
 
-    def ensure_stream(self, obj, descriptor, stream):
+    def ensure_stream(self, descriptor, stream):
         """
         Creates stream and returns its identifier.
 
-        :param obj: Source object
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         :return: Stream identifier
@@ -80,22 +81,30 @@ class Field(object):
 
         return stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity)
 
-    def to_stream(self, obj, descriptor, stream):
+    def to_stream(self, descriptor, stream):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
-        :param obj: Source object
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         """
 
         attribute = self.name if self.attribute is None else self.attribute
-        value = getattr(obj, attribute)
+        value = getattr(descriptor.get_model(), attribute)
         if value is None:
             return
         
-        value = self.prepare_value(getattr(obj, attribute))
-        stream.append(self.ensure_stream(obj, descriptor, stream), value)
+        value = self.prepare_value(value)
+        stream.append(self.ensure_stream(descriptor, stream), value)
+
+    def set_tags(self, **tags):
+        """
+        Sets custom tags on this field.
+
+        :param **tags: Keyword arguments describing the tags to set
+        """
+
+        self.custom_tags.update(tags)
 
 
 class IntegerField(Field):
@@ -154,22 +163,23 @@ class DerivedField(Field):
         self.op = op
         self.op_arguments = arguments
 
-    def ensure_stream(self, obj, descriptor, stream):
+        super(DerivedField, self).__init__()
+
+    def ensure_stream(self, descriptor, stream):
         """
         Creates stream and returns its identifier.
 
-        :param obj: Source object
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         :return: Stream identifier
         """
 
         # Acquire references to input streams
-        root = obj.root
+        root = descriptor.get_model().root
         streams = []
         for field_ref in self.streams:
             path, field = field_ref['field'].split('#')
-            mdl = obj
+            mdl = descriptor.get_model()
             if path:
                 mdl = root.monitoring.by_path(path)
 
@@ -179,7 +189,7 @@ class DerivedField(Field):
                 raise exceptions.ImproperlyConfigured("Datastream field '%s' not found!" % field_ref['field'])
 
             streams.append(
-                {'name': field_ref['name'], 'stream': field.ensure_stream(mdl, mdl_descriptor, stream)}
+                {'name': field_ref['name'], 'stream': field.ensure_stream(mdl_descriptor, stream)}
             )
 
         query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
@@ -197,16 +207,15 @@ class DerivedField(Field):
             derive_args=self.op_arguments,
         )
 
-    def to_stream(self, obj, descriptor, stream):
+    def to_stream(self, descriptor, stream):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
-        :param obj: Source object
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
         """
 
-        self.ensure_stream(obj, descriptor, stream)
+        self.ensure_stream(descriptor, stream)
 
 
 class ResetField(DerivedField):
@@ -243,3 +252,91 @@ class RateField(DerivedField):
             'counter_derivative',
             max_value=max_value
         )
+
+
+class DynamicSumField(Field):
+    """
+    A field that computes a sum of other source fields, the list of which
+    can be dynamically modified. The underlying derived stream is automatically
+    recreated whenever the set of source streams changes.
+    """
+
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self._fields = []
+
+        super(DynamicSumField, self).__init__()
+
+    def clear_source_fields(self):
+        """
+        Clears all the source fields.
+        """
+
+        self._fields = []
+
+    def add_source_field(self, field, descriptor):
+        """
+        Adds a source field.
+        """
+
+        self._fields.append((field, descriptor))
+
+    def ensure_stream(self, descriptor, stream):
+        """
+        Creates stream and returns its identifier.
+
+        :param descriptor: Destination stream descriptor
+        :param stream: Stream API instance
+        :return: Stream identifier
+        """
+
+        # Generate a list of input streams
+        streams = []
+        for src_field, src_descriptor in self._fields:
+            streams.append(
+                {'stream': src_field.ensure_stream(src_descriptor, stream)}
+            )
+
+        if not streams:
+            return
+
+        query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
+        tags = descriptor.get_stream_tags() + self.prepare_tags()
+        downsamplers = self.get_downsamplers()
+        highest_granularity = descriptor.get_stream_highest_granularity()
+
+        try:
+            return stream.ensure_stream(
+                query_tags,
+                tags,
+                downsamplers,
+                highest_granularity,
+                derive_from=streams,
+                derive_op='sum',
+                derive_args={},
+            )
+        except ds_exceptions.InconsistentStreamConfiguration:
+            # Drop the existing stream and re-create it
+            stream.remove_streams(query_tags)
+            return stream.ensure_stream(
+                query_tags,
+                tags,
+                downsamplers,
+                highest_granularity,
+                derive_from=streams,
+                derive_op='sum',
+                derive_args={},
+            )
+
+    def to_stream(self, descriptor, stream):
+        """
+        Creates streams and inserts datapoints to the stream via the datastream API.
+
+        :param descriptor: Destination stream descriptor
+        :param stream: Stream API instance
+        """
+
+        self.ensure_stream(descriptor, stream)

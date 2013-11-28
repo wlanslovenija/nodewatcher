@@ -1,3 +1,5 @@
+import itertools
+
 from django_datastream import datastream
 
 from nodewatcher.core.monitor import processors as monitor_processors
@@ -20,8 +22,7 @@ class Datastream(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        # TODO: Should we enable addition of items that are not in the registry?
-        for item in node.monitoring:
+        for item in itertools.chain(node.monitoring, context.datastream.values()):
             # Only include models that have known stream descriptors registered in
             # the descriptor pool
             try:

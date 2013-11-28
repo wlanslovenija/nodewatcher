@@ -389,6 +389,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.Interfaces',
+    'nodewatcher.modules.vpn.tunneldigger.processors.Tunneldigger',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
     'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes',
     'nodewatcher.modules.monitor.datastream.processors.Maintenance',
