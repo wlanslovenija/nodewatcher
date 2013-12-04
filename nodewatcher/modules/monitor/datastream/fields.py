@@ -12,17 +12,18 @@ class Field(object):
     API.
     """
 
-    def __init__(self, attribute=None):
+    def __init__(self, attribute=None, tags=None):
         """
         Class constructor.
 
         :param attribute: Optional name of the attribute that is source of data for
           this field
+        :param tags: Optional custom tags
         """
 
         self.name = None
         self.attribute = attribute
-        self.custom_tags = {}
+        self.custom_tags = tags or {}
 
     def prepare_value(self, value):
         """
@@ -150,20 +151,20 @@ class DerivedField(Field):
     A derived datastream field.
     """
 
-    def __init__(self, streams, op, **arguments):
+    def __init__(self, streams, op, arguments=None, **kwargs):
         """
         Class constructor.
 
         :param streams: A list of input stream descriptors
         :param op: Operator name
-        :param **arguments: Optional operator arguments
+        :param arguments: Optional operator arguments
         """
 
         self.streams = streams
         self.op = op
-        self.op_arguments = arguments
+        self.op_arguments = arguments or {}
 
-        super(DerivedField, self).__init__()
+        super(DerivedField, self).__init__(**kwargs)
 
     def ensure_stream(self, descriptor, stream):
         """
@@ -239,7 +240,7 @@ class RateField(DerivedField):
     A rate datastream field.
     """
 
-    def __init__(self, reset_field, data_field, max_value=None):
+    def __init__(self, reset_field, data_field, max_value=None, **kwargs):
         """
         Class constructor.
         """
@@ -250,7 +251,10 @@ class RateField(DerivedField):
                 {'name': None, 'field': data_field},
             ],
             'counter_derivative',
-            max_value=max_value
+            arguments={
+                'max_value': max_value,
+            },
+            **kwargs
         )
 
 
@@ -261,14 +265,14 @@ class DynamicSumField(Field):
     recreated whenever the set of source streams changes.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """
         Class constructor.
         """
 
         self._fields = []
 
-        super(DynamicSumField, self).__init__()
+        super(DynamicSumField, self).__init__(**kwargs)
 
     def clear_source_fields(self):
         """
