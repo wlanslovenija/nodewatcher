@@ -76,7 +76,7 @@ class Tunneldigger(monitor_processors.NodeProcessor):
                                 continue
 
                             # Hide source field from being displayed by default
-                            src_field.set_tags(hidden=True)
+                            src_field.set_tags(visualization={'hidden': True})
                             # Include this field into our general summed field
                             dst_field.add_source_field(src_field, iface_streams)
             except monitor_models.InterfaceMonitor.DoesNotExist:
