@@ -15,10 +15,10 @@ try:
         rx_bytes_rate = ds_fields.DynamicSumField()
 
         def get_stream_query_tags(self):
-            return [{'node': self._model.node.uuid}, {'module': 'tunneldigger'}]
+            return {'node': self._model.node.uuid, 'module': 'tunneldigger'}
 
         def get_stream_tags(self):
-            return [{'node': self._model.node.uuid}, {'module': 'tunneldigger'}]
+            return {'node': self._model.node.uuid, 'module': 'tunneldigger'}
 
         def get_stream_highest_granularity(self):
             return datastream.Granularity.Minutes

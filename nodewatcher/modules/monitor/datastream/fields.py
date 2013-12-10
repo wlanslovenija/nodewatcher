@@ -31,9 +31,7 @@ class TagReference(object):
         :return: Value of the referenced field
         """
 
-        for tag in descriptor.get_stream_tags():
-            if self.tag_name in tag:
-                return tag[self.tag_name]
+        return reduce(lambda x, y: x[y], self.tag_name.split('.'), descriptor.get_stream_tags())
 
 
 class Field(object):
@@ -68,19 +66,23 @@ class Field(object):
 
     def prepare_tags(self):
         """
-        Returns a list of tags that will be included in the final stream.
+        Returns a dictionary of tags that will be included in the final stream.
         """
 
-        return [{'name': self.name}] + [{tag: value} for tag, value in self.custom_tags.items()]
+        combined_tags = {
+            'name': self.name,
+        }
+        combined_tags.update(self.custom_tags)
+        return combined_tags
 
     def prepare_query_tags(self):
         """
-        Returns a list of tags that will be used to uniquely identify the final
+        Returns a dict of tags that will be used to uniquely identify the final
         stream in addition to document-specific tags. This is usually a subset
         of tags returned by `prepare_tags`.
         """
 
-        return [{'name': self.name}]
+        return {'name': self.name}
 
     def get_downsamplers(self):
         """
@@ -101,25 +103,36 @@ class Field(object):
         """
         Processes tags and resolves all tag references.
 
-        :param tags: A list of tags
+        :param tags: A dictionary of tags
         :param descriptor: Streams descriptor
-        :return: Processed list of tags
+        :return: Processed dictionary of tags
         """
 
-        output = []
-        for tag in tags:
-            if isinstance(tag, dict):
-                for key, value in tag.items():
-                    tag[key] = self._process_tag_references([value], descriptor)[0]
-                output.append(tag)
-            elif isinstance(tag, list):
-                output.append(self._process_tag_references(tag, descriptor))
-            elif isinstance(tag, TagReference):
-                output.append(tag.resolve(descriptor))
+        output = {}
+        for key, value in tags.iteritems():
+            if isinstance(value, dict):
+                output[key] = self._process_tag_references(value, descriptor)
+            elif isinstance(value, list):
+                output[key] = []
+                for item in value:
+                    output[key].append(self._process_tag_references(item, descriptor))
+            elif isinstance(value, TagReference):
+                output[key] = value.resolve(descriptor)
             else:
-                output.append(tag)
+                output[key] = value
 
         return output
+
+    def process_tags(self, descriptor):
+        """
+        Returns a tuple (query_tags, tags) to be used by ensure_stream.
+        """
+
+        query_tags = descriptor.get_stream_query_tags()
+        query_tags.update(self.prepare_query_tags())
+        tags = descriptor.get_stream_tags()
+        tags.update(self._process_tag_references(self.prepare_tags(), descriptor))
+        return query_tags, tags
 
     def ensure_stream(self, descriptor, stream):
         """
@@ -130,8 +143,7 @@ class Field(object):
         :return: Stream identifier
         """
 
-        query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
-        tags = descriptor.get_stream_tags() + self._process_tag_references(self.prepare_tags(), descriptor)
+        query_tags, tags = self.process_tags(descriptor)
         downsamplers = self.get_downsamplers()
         highest_granularity = descriptor.get_stream_highest_granularity()
 
@@ -188,7 +200,9 @@ class IntegerField(Field):
         return int(value)
 
     def prepare_tags(self):
-        return super(IntegerField, self).prepare_tags() + [{'type': 'integer'}]
+        tags = super(IntegerField, self).prepare_tags()
+        tags.update({'type': 'integer'})
+        return tags
 
 
 class FloatField(Field):
@@ -207,7 +221,9 @@ class FloatField(Field):
         return float(value)
 
     def prepare_tags(self):
-        return super(FloatField, self).prepare_tags() + [{'type': 'float'}]
+        tags = super(FloatField, self).prepare_tags()
+        tags.update({'type': 'float'})
+        return tags
 
 
 class DerivedField(Field):
@@ -257,8 +273,7 @@ class DerivedField(Field):
                 {'name': field_ref['name'], 'stream': field.ensure_stream(mdl_descriptor, stream)}
             )
 
-        query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
-        tags = descriptor.get_stream_tags() + self._process_tag_references(self.prepare_tags(), descriptor)
+        query_tags, tags = self.process_tags(descriptor)
         downsamplers = self.get_downsamplers()
         highest_granularity = descriptor.get_stream_highest_granularity()
 
@@ -372,8 +387,7 @@ class DynamicSumField(Field):
         if not streams:
             return
 
-        query_tags = descriptor.get_stream_query_tags() + self.prepare_query_tags()
-        tags = descriptor.get_stream_tags() + self._process_tag_references(self.prepare_tags(), descriptor)
+        query_tags, tags = self.process_tags(descriptor)
         downsamplers = self.get_downsamplers()
         highest_granularity = descriptor.get_stream_highest_granularity()
 

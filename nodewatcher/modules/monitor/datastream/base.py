@@ -106,7 +106,7 @@ class StreamsBase(object):
         """
         Returns a set of tags that uniquely identify this object.
 
-        :return: A list of tags that uniquely identify this object
+        :return: A dictionary of tags that uniquely identify this object
         """
 
         raise NotImplementedError
@@ -116,7 +116,7 @@ class StreamsBase(object):
         Returns the stream tags that should be included in every stream
         derived from this object.
 
-        :return: A list of tags to include
+        :return: A dictionary of tags to include
         """
 
         raise NotImplementedError
