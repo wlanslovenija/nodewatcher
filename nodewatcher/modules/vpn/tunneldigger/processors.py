@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_noop
+
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 from nodewatcher.core.generator.cgm import models as cgm_models
 
@@ -11,8 +13,22 @@ try:
 
 
     class TunneldiggerStreams(ds_base.StreamsBase):
-        tx_bytes_rate = ds_fields.DynamicSumField()
-        rx_bytes_rate = ds_fields.DynamicSumField()
+        tx_bytes_rate = ds_fields.DynamicSumField(tags={
+            'group': 'tunneldigger_bytes_rate',
+            'description': gettext_noop("Combined throughput of transmitted packets via VPN."),
+            'visualization': {
+                'type': 'line',
+                'with': {'group': 'tunneldigger_bytes_rate'},
+            }
+        })
+        rx_bytes_rate = ds_fields.DynamicSumField(tags={
+            'group': 'tunneldigger_bytes_rate',
+            'description': gettext_noop("Combined throughput of received packets via VPN."),
+            'visualization': {
+                'type': 'line',
+                'with': {'group': 'tunneldigger_bytes_rate'},
+            }
+        })
 
         def get_stream_query_tags(self):
             return {'node': self._model.node.uuid, 'module': 'tunneldigger'}

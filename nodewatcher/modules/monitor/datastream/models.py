@@ -302,13 +302,53 @@ pool.register(models.InterfaceMonitor, InterfaceMonitorStreams)
 
 
 class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
-    channel = fields.IntegerField()
-    channel_width = fields.IntegerField()
-    bitrate = fields.FloatField()
-    rts_threshold = fields.IntegerField()
-    frag_threshold = fields.IntegerField()
-    signal = fields.IntegerField()
-    noise = fields.IntegerField()
-    snr = fields.FloatField()
+    channel = fields.IntegerField(tags={
+        'description': gettext_noop("Channel the wireless radio is operating on."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    channel_width = fields.IntegerField(tags={
+        'description': gettext_noop("Width of the channel the wireless radio is operating on."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    bitrate = fields.FloatField(tags={
+        'description': gettext_noop("Wireless radio bitrate."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    rts_threshold = fields.IntegerField(tags={
+        'description': gettext_noop("RTS threshold."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    frag_threshold = fields.IntegerField(tags={
+        'description': gettext_noop("Fragmentation threshold."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    signal = fields.IntegerField(tags={
+        'description': gettext_noop("Amount of signal in dBm."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    noise = fields.IntegerField(tags={
+        'description': gettext_noop("Amount of noise in dBm."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
+    snr = fields.FloatField(tags={
+        'description': gettext_noop("Signal-to-noise ratio."),
+        'visualization': {
+            'type': 'line',
+        }
+    })
 
 pool.register(models.WifiInterfaceMonitor, WifiInterfaceMonitorStreams)
