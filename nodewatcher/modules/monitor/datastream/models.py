@@ -48,6 +48,44 @@ class RegistryItemStreams(base.StreamsBase):
         return datastream.Granularity.Minutes
 
 
+class ProxyRegistryItemStreams(RegistryItemStreams):
+    """
+    A convenience class that can be used in models that reference
+    registry items but are not registry items themselves.
+    """
+
+    class CombinedProxyModel(object):
+        def __init__(self, *models):
+            self.models = models
+
+        def __getattr__(self, key):
+            for mdl in self.models:
+                try:
+                    return getattr(mdl, key)
+                except AttributeError:
+                    continue
+
+            raise AttributeError(key)
+
+    def __init__(self, model):
+        """
+        Class constructor.
+        """
+
+        super(ProxyRegistryItemStreams, self).__init__(
+            ProxyRegistryItemStreams.CombinedProxyModel(model, self.get_base(model))
+        )
+
+    def get_base(self, model):
+        """
+        Returns the base model that this proxy should operate on.
+
+        :param model: Original model instance
+        :return: Base model instance
+        """
+
+        return model
+
 class SystemStatusMonitorStreams(RegistryItemStreams):
     uptime = fields.IntegerField(tags={
         'description': gettext_noop("Uptime of the node's system."),

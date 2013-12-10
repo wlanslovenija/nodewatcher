@@ -118,6 +118,20 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
                 elink.save()
                 visible_links.append(elink)
 
+            # Compute average values
+            if visible_links:
+                rtm.average_lq = float(sum([link.lq for link in visible_links])) / len(visible_links)
+                rtm.average_ilq = float(sum([link.ilq for link in visible_links])) / len(visible_links)
+                rtm.average_etx = float(sum([link.etx for link in visible_links])) / len(visible_links)
+            else:
+                rtm.average_lq = None
+                rtm.average_ilq = None
+                rtm.average_etx = None
+            rtm.save()
+
+            # Create streams for all links
+            context.datastream.olsr_links = visible_links
+
             # Remove all links that do not exist anymore
             rtm.links.exclude(pk__in=[x.pk for x in visible_links]).delete()
 

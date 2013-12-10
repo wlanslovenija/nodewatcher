@@ -22,14 +22,18 @@ class Datastream(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        for item in itertools.chain(node.monitoring, context.datastream.values()):
+        for items in itertools.chain(node.monitoring, context.datastream.values()):
+            if not isinstance(items, list):
+                items = [items]
+
             # Only include models that have known stream descriptors registered in
             # the descriptor pool
-            try:
-                descriptor = pool.get_descriptor(item)
-                descriptor.insert_to_stream(datastream)
-            except exceptions.StreamDescriptorNotRegistered:
-                continue
+            for item in items:
+                try:
+                    descriptor = pool.get_descriptor(item)
+                    descriptor.insert_to_stream(datastream)
+                except exceptions.StreamDescriptorNotRegistered:
+                    continue
 
 
 class Maintenance(monitor_processors.NetworkProcessor):
