@@ -33,7 +33,9 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average OLSR link quality."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'avg_link_quality'},
+            'minimum': 0.0,
+            'maximum': 1.0,
+            'with': {'group': 'avg_link_quality', 'node': ds_fields.TagReference('node')},
         }
     })
     average_ilq = ds_fields.FloatField(tags={
@@ -41,7 +43,9 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'avg_link_quality'},
+            'minimum': 0.0,
+            'maximum': 1.0,
+            'with': {'group': 'avg_link_quality', 'node': ds_fields.TagReference('node')},
         }
     })
     average_etx = ds_fields.FloatField(tags={
@@ -80,7 +84,13 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("OLSR link quality."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'link_quality', 'link': ds_fields.TagReference('link')},
+            'minimum': 0.0,
+            'maximum': 1.0,
+            'with': {
+                'group': 'link_quality',
+                'link': ds_fields.TagReference('link'),
+                'node': ds_fields.TagReference('node'),
+            },
         }
     })
     ilq = ds_fields.FloatField(tags={
@@ -88,7 +98,13 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'link_quality', 'link': ds_fields.TagReference('link')},
+            'minimum': 0.0,
+            'maximum': 1.0,
+            'with': {
+                'group': 'link_quality',
+                'link': ds_fields.TagReference('link'),
+                'node': ds_fields.TagReference('node'),
+            },
         }
     })
     etx = ds_fields.FloatField(tags={

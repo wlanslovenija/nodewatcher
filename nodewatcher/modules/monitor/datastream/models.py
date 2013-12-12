@@ -97,6 +97,7 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
     reboots = fields.ResetField("#uptime", tags={
         'visualization': {
             'type': 'event',
+            'with': {'node': fields.TagReference('node')},
         }
     })
 
@@ -109,7 +110,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("1 minute load average."),
         'visualization': {
             'type': 'stack',
-            'with': {'group': 'load_average'},
+            'with': {'group': 'load_average', 'node': fields.TagReference('node')},
         }
     })
     loadavg_5min = fields.FloatField(tags={
@@ -117,7 +118,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("5 minute load average."),
         'visualization': {
             'type': 'stack',
-            'with': {'group': 'load_average'},
+            'with': {'group': 'load_average', 'node': fields.TagReference('node')},
         }
     })
     loadavg_15min = fields.FloatField(tags={
@@ -125,7 +126,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("15 minute load average."),
         'visualization': {
             'type': 'stack',
-            'with': {'group': 'load_average'},
+            'with': {'group': 'load_average', 'node': fields.TagReference('node')},
         }
     })
     memory_free = fields.IntegerField(tags={
@@ -133,7 +134,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Amount of free memory."),
         'visualization': {
             'type': 'stack',
-            'with': {'group': 'memory'},
+            'with': {'group': 'memory', 'node': fields.TagReference('node')},
         }
     })
     memory_buffers = fields.IntegerField(tags={
@@ -141,7 +142,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Amount of memory used for kernel buffers."),
         'visualization': {
             'type': 'stack',
-            'with': {'group': 'memory'},
+            'with': {'group': 'memory', 'node': fields.TagReference('node')},
         }
     })
     memory_cache = fields.IntegerField(tags={
@@ -149,7 +150,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Amount of memory used for cache."),
         'visualization': {
             'type': 'stack',
-            'with': {'group': 'memory'},
+            'with': {'group': 'memory', 'node': fields.TagReference('node')},
         }
     })
     processes = fields.IntegerField(tags={
@@ -221,7 +222,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of transmitted packets."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'packets_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'packets_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     rx_packets = fields.IntegerField(tags={
@@ -236,7 +241,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of received packets."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'packets_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'packets_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     tx_bytes = fields.IntegerField(tags={
@@ -251,7 +260,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Throughput of transmitted packets."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'bytes_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'bytes_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     rx_bytes = fields.IntegerField(tags={
@@ -266,7 +279,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Throughput of received packets."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'bytes_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'bytes_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     tx_errors = fields.IntegerField(tags={
@@ -281,7 +298,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of transmission errors."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'errors_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'errors_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     rx_errors = fields.IntegerField(tags={
@@ -296,7 +317,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'errors_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'errors_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     tx_drops = fields.IntegerField(tags={
@@ -311,7 +336,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of transmission drops."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'drops_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'drops_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     rx_drops = fields.IntegerField(tags={
@@ -326,7 +355,11 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
-            'with': {'group': 'drops_rate', 'interface': fields.TagReference('interface')},
+            'with': {
+                'group': 'drops_rate',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         }
     })
     mtu = fields.IntegerField(tags={
