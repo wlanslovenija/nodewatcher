@@ -1,5 +1,6 @@
 import datetime
 import ijson
+import traceback
 
 from django.core.management import base
 
@@ -40,7 +41,15 @@ class Command(base.BaseCommand):
                     ],
                     datastream.Granularity.Minutes
                 )
-                datastream.append(stream_id, stream['value'], timestamp)
+
+                try:
+                    datastream.append(stream_id, stream['value'], timestamp)
+                except:
+                    # Skip datapoints on errors
+                    sys.stdout.write("WARNING: Skipping datapoint due to exception!\n")
+                    sys.stdout.write(traceback.format_exc())
+                    sys.stdout.write("\n")
+                    continue
 
     def import_data(self, item):
         return {
@@ -56,7 +65,22 @@ class Command(base.BaseCommand):
             10: self.import_traffic,
             # ETX
             11: self.import_etx,
+            # Uptime
+            1001: self.import_uptime,
         }.get(item['t'], lambda x: [])(item)
+
+    def import_uptime(self, item):
+        return [
+            # Stream for uptime field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'system.status',
+                    'name': 'uptime',
+                },
+                'value': float(item['d']['uptime']),
+            },
+        ]
 
     def import_load_average(self, item):
         return [
