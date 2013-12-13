@@ -177,14 +177,14 @@ class InterfaceMonitor(registration.bases.NodeMonitoringRegistryItem):
 
     name = models.CharField(max_length=50)
     hw_address = registry_fields.MACAddressField()
-    tx_packets = models.BigIntegerField()
-    rx_packets = models.BigIntegerField()
-    tx_bytes = models.BigIntegerField()
-    rx_bytes = models.BigIntegerField()
-    tx_errors = models.BigIntegerField()
-    rx_errors = models.BigIntegerField()
-    tx_drops = models.BigIntegerField()
-    rx_drops = models.BigIntegerField()
+    tx_packets = models.DecimalField(max_digits=100, decimal_places=0)
+    rx_packets = models.DecimalField(max_digits=100, decimal_places=0)
+    tx_bytes = models.DecimalField(max_digits=100, decimal_places=0)
+    rx_bytes = models.DecimalField(max_digits=100, decimal_places=0)
+    tx_errors = models.DecimalField(max_digits=100, decimal_places=0)
+    rx_errors = models.DecimalField(max_digits=100, decimal_places=0)
+    tx_drops = models.DecimalField(max_digits=100, decimal_places=0)
+    rx_drops = models.DecimalField(max_digits=100, decimal_places=0)
     mtu = models.IntegerField()
 
     class RegistryMeta:
