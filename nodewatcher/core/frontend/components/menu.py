@@ -29,7 +29,7 @@ class MenuEntry(object):
             self._name = label.message
             self._label = label
         else:
-            raise exceptions.MenuEntryHasInvalidLabel("Menu entry label must be a string or translated with nodewatcher.frontend.components.ugettext_lazy")
+            raise exceptions.InvalidMenuEntry("Menu entry label must be a string or translated with nodewatcher.frontend.components.ugettext_lazy")
 
         self._url = url
         self._permission_check = permission_check
@@ -60,7 +60,10 @@ class MenuEntry(object):
 class Menu(object):
     def __init__(self, name):
         if not name:
-            raise exceptions.MenuHasInvalidName("Menu has invalid name")
+            raise exceptions.InvalidMenu("A menu has invalid name")
+
+        if '.' in name or '/' in name:
+            raise exceptions.InvalidMenu("A menu '%s' has invalid name" % name)
 
         self._name = name
         self._entries = []
@@ -74,7 +77,7 @@ class Menu(object):
 
         for entry in entry_or_iterable:
             if not isinstance(entry, MenuEntry):
-                raise exceptions.MenuEntryHasInvalidBase("'%s' class is not a subclass of nodewatcher.core.frontend.components.MenuEntry" % entry.__name__)
+                raise exceptions.InvalidMenuEntry("'%s' class is not an instance of nodewatcher.core.frontend.components.MenuEntry" % entry.__name__)
 
             self._entries.append(entry)
 
@@ -124,9 +127,12 @@ class Menus(object):
 
         for menu in menu_or_iterable:
             if not isinstance(menu, Menu):
-                raise exceptions.FrontendComponentHasInvalidBase("'%s' class is not a subclass of nodewatcher.core.frontend.components.Menu" % menu.__name__)
+                raise exceptions.InvalidMenu("'%s' class is not an instance of nodewatcher.core.frontend.components.Menu" % menu.__name__)
 
             menu_name = menu.get_name()
+
+            if '.' in menu_name or '/' in menu_name:
+                raise exceptions.InvalidMenu("A menu '%s' has invalid name" % menu_name)
 
             if menu_name in self._menus:
                 raise exceptions.MenuAlreadyRegistered("A menu with name '%s' is already registered" % menu_name)
@@ -146,7 +152,7 @@ class Menus(object):
             del self._menus[menu_name]
 
     def get_all_menus(self):
-        return self._menus.itervalues()
+        return self._menus.values()
 
     def get_menu(self, menu_name):
         try:

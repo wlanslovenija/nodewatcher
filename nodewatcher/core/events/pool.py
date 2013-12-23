@@ -100,4 +100,7 @@ class EventSinkPool(object):
         except KeyError:
             raise exceptions.EventSinkNotRegistered("No event sink with name '%s' is registered" % sink_name)
 
+    def has_sink(self, sink_name):
+        return sink_name in self._sinks
+
 pool = EventSinkPool()

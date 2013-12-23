@@ -31,12 +31,12 @@ class FrontendComponentsPool(object):
 
         for component in component_or_iterable:
             if not issubclass(component, base.FrontendComponent):
-                raise exceptions.FrontendComponentHasInvalidBase("'%s' is not a subclass of nodewatcher.core.frontend.components.FrontendComponent" % component.__name__)
+                raise exceptions.InvalidFrontendComponent("'%s' is not a subclass of nodewatcher.core.frontend.components.FrontendComponent" % component.__name__)
 
             component_name = component.get_name()
 
             if '.' in component_name or '/' in component_name:
-                raise exceptions.FrontendComponentHasInvalidName("A frontend component '%s' has invalid name" % component_name)
+                raise exceptions.InvalidFrontendComponent("A frontend component '%s' has invalid name" % component_name)
 
             if component_name in self._components:
                 raise exceptions.FrontendComponentAlreadyRegistered("A frontend component with name '%s' is already registered" % component_name)

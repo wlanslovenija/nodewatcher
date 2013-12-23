@@ -2,6 +2,10 @@ class FrontendComponentException(Exception):
     pass
 
 
+class InvalidFrontendComponent(FrontendComponentException):
+    pass
+
+
 class FrontendComponentAlreadyRegistered(FrontendComponentException):
     pass
 
@@ -11,14 +15,6 @@ class FrontendComponentNotRegistered(FrontendComponentException):
 
 
 class FrontendComponentNoneRegistered(FrontendComponentException):
-    pass
-
-
-class FrontendComponentHasInvalidBase(FrontendComponentException):
-    pass
-
-
-class FrontendComponentHasInvalidName(FrontendComponentException):
     pass
 
 
@@ -34,11 +30,7 @@ class MenuEntryException(Exception):
     pass
 
 
-class MenuEntryHasInvalidLabel(MenuEntryException):
-    pass
-
-
-class MenuEntryHasInvalidBase(MenuEntryException):
+class InvalidMenuEntry(MenuEntryException):
     pass
 
 
@@ -46,7 +38,7 @@ class MenuException(Exception):
     pass
 
 
-class MenuHasInvalidName(MenuException):
+class InvalidMenu(MenuException):
     pass
 
 
@@ -55,8 +47,4 @@ class MenuAlreadyRegistered(MenuException):
 
 
 class MenuNotRegistered(MenuException):
-    pass
-
-
-class MenuHasInvalidBase(MenuException):
     pass
