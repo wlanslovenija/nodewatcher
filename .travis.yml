@@ -5,6 +5,7 @@ services:
  - mongodb
  - postgresql
 before_install:
+ - sudo add-apt-repository -r -y ppa:ubuntugis/ppa
  - sudo apt-get update -qq
  - sudo apt-get remove -qq --purge postgresql-9.1-postgis-2.1 postgresql-9.1-postgis-scripts
  - sudo apt-get install -qq binutils gdal-bin libproj-dev postgresql-9.1-postgis libgeoip1
