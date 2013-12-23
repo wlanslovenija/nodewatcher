@@ -5,8 +5,7 @@ services:
  - mongodb
  - postgresql
 before_install:
- - sudo apt-add-repository deb http://ppa.launchpad.net/ubuntugis/ppa/ubuntu precise main
- - sudo apt-add-repository deb-src http://ppa.launchpad.net/ubuntugis/ppa/ubuntu precise main
+ - sudo apt-add-repository ppa:ubuntugis/ppa
  - sudo apt-get update -qq
  - sudo apt-get install -qq binutils gdal-bin libproj-dev postgresql-9.1-postgis postgresql-server-dev-9.1 libgeoip1
  - sudo rm -rf /dev/shm
