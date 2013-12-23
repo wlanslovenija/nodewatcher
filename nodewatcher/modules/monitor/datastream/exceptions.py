@@ -12,4 +12,3 @@ class StreamDescriptorNotRegistered(StreamDescriptorException):
 
 class StreamDescriptorHasInvalidBase(StreamDescriptorException):
     pass
-
