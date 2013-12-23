@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 python manage.py syncdb --noinput
 python manage.py migrate djcelery 0002_v25_changes --fake
 python manage.py migrate frontend.nodes 0001 --fake
