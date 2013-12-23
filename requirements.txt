@@ -1,4 +1,4 @@
-Django==1.4.10
+-e git+https://github.com/wlanslovenija/django.git@f67d56e500abb0189c4d62795ba62384ddd39436#egg=Django-origin/wlanslovenija
 Jinja2==2.7
 MarkupSafe==0.18
 Pygments==1.6
