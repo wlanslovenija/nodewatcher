@@ -8,11 +8,11 @@ amqp==1.0.12
 anyjson==0.3.3
 billiard==2.7.3.30
 celery==3.0.20
-datastream==0.1.4
+datastream==0.2.6
 distribute==0.6.48
 django-celery==3.0.17
 django-classy-tags==0.4
-django-datastream==0.1.3
+django-datastream==0.1.5
 django-guardian==1.1.1
 -e git+https://github.com/mitar/django-missing.git@e4b7d5d0261786cee4554b30a5da2810fb21adab#egg=django_missing-dev
 django-phonenumber-field==0.2a3
