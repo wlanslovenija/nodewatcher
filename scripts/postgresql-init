@@ -23,7 +23,7 @@ if [ -d /usr/local/share/postgresql ]; then
     PSQL_USER_ARG=""
 fi
 if [ -d /usr/local/Cellar/postgresql9/9.0.11 ]; then
-    CONTRIB_IDR="/usr/local/Cellar/postgresql9/9.0.11/share/postgresql9/contrib"
+    CONTRIB_DIR="/usr/local/Cellar/postgresql9/9.0.11/share/postgresql9/contrib"
     PSQL_USER_ARG=""
 fi
 if [ -d /usr/local/Cellar/postgis15/1.5.8 ]; then
