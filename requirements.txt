@@ -18,7 +18,7 @@ django-phonenumber-field==0.2a3
 django-polymorphic==0.5.3
 django-registration==0.8
 django-sekizai==0.7
-django-tastypie==0.9.15
+django-tastypie==0.10.0
 dnspython==1.11.1
 docutils==0.11
 kombu==3.0.8
