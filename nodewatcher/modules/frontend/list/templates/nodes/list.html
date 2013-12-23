@@ -44,7 +44,7 @@
             <tfoot>
                 <tr>
                     <td class="table_menu" colspan="8">
-                        <a href="{% url editor:new %}">{% trans "Add new node" %}</a>
+                        <a href="{% url EditorComponent:new %}">{% trans "Add new node" %}</a>
                     </td>
                 </tr>
             </tfoot>
@@ -64,7 +64,7 @@
                             </a>
                         {% endif %}
                     </td>
-                    <td class="name"><a href="{% url editor:edit node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+                    <td class="name"><a href="{% url EditorComponent:edit node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
                     <td>{{ node.router_id }}</td>
                     {% if node.last_seen %}
                         <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>

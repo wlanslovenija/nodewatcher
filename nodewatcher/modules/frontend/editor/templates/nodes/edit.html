@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-    <form method="post" action="{% url editor:edit node.pk %}">
+    <form method="post" action="{% url EditorComponent:edit node.pk %}">
         {% csrf_token %}
         <div id="registry_forms">
             {% include "registry/forms.html" %}

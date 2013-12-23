@@ -18,5 +18,5 @@ components.pool.register(ListComponent)
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Node List"),
-    url=urlresolvers.reverse_lazy('list:list'),
+    url=urlresolvers.reverse_lazy('ListComponent:list'),
 ))

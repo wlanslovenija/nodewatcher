@@ -22,7 +22,7 @@ components.pool.register(EditorComponent)
 try:
     components.menus.get_menu('display_node_menu').add(components.MenuEntry(
         label=components.ugettext_lazy("Edit node"),
-        url=lambda context: urlresolvers.reverse('editor:edit', context['node'].pk),
+        url=lambda context: urlresolvers.reverse('EditorComponent:edit', context['node'].pk),
     ))
 except exceptions.MenuNotRegistered:
     pass
