@@ -1,8 +1,12 @@
+import re
+
 from django import shortcuts
 from django.conf import settings, urls
 from django.utils import importlib, datastructures
 
 from . import exceptions
+
+VALID_NAME = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 
 
 class FrontendComponentsPool(object):
@@ -35,7 +39,7 @@ class FrontendComponentsPool(object):
 
             component_name = component.get_name()
 
-            if '.' in component_name or '/' in component_name:
+            if not VALID_NAME.match(component_name):
                 raise exceptions.InvalidFrontendComponent("A frontend component '%s' has invalid name" % component_name)
 
             if component_name in self._components:

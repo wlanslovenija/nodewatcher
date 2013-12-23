@@ -1,7 +1,11 @@
+import re
+
 from django.conf import settings
 from django.utils import importlib
 
 from . import exceptions
+
+VALID_NAME = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 
 
 class EventSinkPool(object):
@@ -48,7 +52,7 @@ class EventSinkPool(object):
 
             sink_name = sink.get_name()
 
-            if '.' in sink_name or '/' in sink_name:
+            if not VALID_NAME.match(sink_name):
                 raise exceptions.InvalidEventSink("An evenk sink '%s' has invalid name" % sink_name)
 
             if sink_name in self._sinks:

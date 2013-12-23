@@ -1,4 +1,5 @@
 import copy
+import re
 
 from django.conf import settings
 from django.utils import translation
@@ -12,6 +13,8 @@ __all__ = [
     'ugettext_lazy',
     'menus'
 ]
+
+VALID_NAME = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 
 
 def ugettext_lazy(message):
@@ -62,7 +65,7 @@ class Menu(object):
         if not name:
             raise exceptions.InvalidMenu("A menu has invalid name")
 
-        if '.' in name or '/' in name:
+        if not VALID_NAME.match(name):
             raise exceptions.InvalidMenu("A menu '%s' has invalid name" % name)
 
         self._name = name
@@ -131,7 +134,7 @@ class Menus(object):
 
             menu_name = menu.get_name()
 
-            if '.' in menu_name or '/' in menu_name:
+            if not VALID_NAME.match(menu_name):
                 raise exceptions.InvalidMenu("A menu '%s' has invalid name" % menu_name)
 
             if menu_name in self._menus:
