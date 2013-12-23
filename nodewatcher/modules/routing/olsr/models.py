@@ -87,6 +87,7 @@ class OlsrTopologyLink(monitor_models.TopologyLink):
     ilq = models.FloatField(default=0.0)
     etx = models.FloatField(default=0.0)
 
+
 def peer_name(text):
     return ds_fields.TagReference(transform=lambda m: text % {'peer_name': m.peer.config.core.general().name})
 

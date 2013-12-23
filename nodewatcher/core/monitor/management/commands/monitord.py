@@ -9,13 +9,15 @@ class Command(BaseCommand):
     help = "Runs the nodewatcher monitoring daemon."
     requires_model_validation = True
     option_list = BaseCommand.option_list + (
-        make_option('--cycles',
+        make_option(
+            '--cycles',
             dest='cycles',
             default=None,
             type=int,
             help='Only perform a limited number of monitoring cycles',
         ),
-        make_option('--process-only-node',
+        make_option(
+            '--process-only-node',
             dest='process_only_node',
             default=None,
             help='Only process a specific node',
