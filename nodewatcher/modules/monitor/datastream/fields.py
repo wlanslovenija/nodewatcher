@@ -183,7 +183,7 @@ class Field(object):
         value = getattr(descriptor.get_model(), attribute)
         if value is None:
             return
-        
+
         value = self.prepare_value(value)
         stream.append(self.ensure_stream(descriptor, stream), value)
 

@@ -15,7 +15,7 @@ class StreamsMeta(type):
 
         # Create the actual class
         module = attrs.pop("__module__")
-        new_class = type.__new__(cls, classname, bases, { "__module__" : module })
+        new_class = type.__new__(cls, classname, bases, {"__module__": module})
         new_class._fields = collections.OrderedDict()
 
         from . import fields

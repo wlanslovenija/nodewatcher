@@ -9,6 +9,7 @@ from nodewatcher.core.monitor import models
 from . import base, fields
 from .pool import pool
 
+
 class RegistryItemStreams(base.StreamsBase):
     """
     Base class for registry item stream attributes.
@@ -85,6 +86,7 @@ class ProxyRegistryItemStreams(RegistryItemStreams):
         """
 
         return model
+
 
 class SystemStatusMonitorStreams(RegistryItemStreams):
     uptime = fields.IntegerField(tags={

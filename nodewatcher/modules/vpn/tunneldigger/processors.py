@@ -11,7 +11,6 @@ try:
     from nodewatcher.modules.monitor.datastream import base as ds_base, fields as ds_fields
     from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
-
     class TunneldiggerStreams(ds_base.StreamsBase):
         tx_bytes_rate = ds_fields.DynamicSumField(tags={
             'group': 'tunneldigger_bytes_rate',
@@ -44,7 +43,6 @@ try:
 
         def get_stream_highest_granularity(self):
             return datastream.Granularity.Minutes
-
 
     class TunneldiggerStreamsData(object):
         def __init__(self, node):
@@ -90,7 +88,7 @@ class Tunneldigger(monitor_processors.NodeProcessor):
                 iface = node.monitoring.core.interfaces(queryset=True).get(name=ifname).cast()
                 if DATASTREAM_SUPPORTED:
                     iface_streams = ds_pool.get_descriptor(iface)
-                    
+
                     if iface_streams is not None:
                         for dst_field in td_streams.get_fields():
                             src_field = getattr(iface_streams, dst_field.name, None)
