@@ -124,13 +124,18 @@ class Worker(object):
                 logger.info("Running the following node processors:")
                 for p in processor_list:
                     logger.info("  - %s" % p.__name__)
-                self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes)).get(0xFFFF)
+
+                if self._process_only_node is not None:
+                    logger.info("Limiting only to the following node: %s" % self._process_only_node)
+                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes if node.pk == self._process_only_node)).get(0xFFFF)
+                else:
+                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes)).get(0xFFFF)
             else:
                 logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
 
         logger.info("All done.")
 
-    def run(self):
+    def run(self, cycles=None, process_only_node=None):
         """
         Runs the monitoring process.
         """
@@ -144,11 +149,19 @@ class Worker(object):
         logger.info("Preparing the worker pool...")
         self.prepare_workers()
 
+        self._process_only_node = process_only_node
+
         logger.info("Entering monitoring cycle...")
         try:
+            cycle = 0
             while True:
                 start = time.time()
                 self.cycle()
+
+                cycle += 1
+                if cycles is not None and cycle >= cycles:
+                    logger.info("Reached %d cycles." % cycle)
+                    break
 
                 # Sleep for the right amount of time that cycles will be triggered
                 # on every MONITOR_INTERVAL seconds (but no less then 30 seconds apart)
