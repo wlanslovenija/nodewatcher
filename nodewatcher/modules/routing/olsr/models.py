@@ -30,9 +30,12 @@ registration.point('node.monitoring').register_item(OlsrRoutingTopologyMonitor)
 class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     average_lq = ds_fields.FloatField(tags={
         'group': 'avg_link_quality',
+        'title': gettext_noop("Average link quality"),
         'description': gettext_noop("Average OLSR link quality."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'maximum': 1.0,
             'with': {'group': 'avg_link_quality', 'node': ds_fields.TagReference('node')},
@@ -40,18 +43,25 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     })
     average_ilq = ds_fields.FloatField(tags={
         'group': 'avg_link_quality',
+        'title': gettext_noop("Average inverse link quality"),
         'description': gettext_noop("Average OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'maximum': 1.0,
             'with': {'group': 'avg_link_quality', 'node': ds_fields.TagReference('node')},
         }
     })
     average_etx = ds_fields.FloatField(tags={
+        'title': gettext_noop("Average ETX"),
         'description': gettext_noop("Average OLSR ETX metric."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 1.0,
         }
     })
 
@@ -81,9 +91,12 @@ class OlsrTopologyLink(monitor_models.TopologyLink):
 class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     lq = ds_fields.FloatField(tags={
         'group': 'link_quality',
+        'title': gettext_noop("Link quality"),
         'description': gettext_noop("OLSR link quality."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'maximum': 1.0,
             'with': {
@@ -95,9 +108,12 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     })
     ilq = ds_fields.FloatField(tags={
         'group': 'link_quality',
+        'title': gettext_noop("Inverse link quality"),
         'description': gettext_noop("OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'maximum': 1.0,
             'with': {
@@ -108,9 +124,13 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         }
     })
     etx = ds_fields.FloatField(tags={
+        'title': gettext_noop("ETX"),
         'description': gettext_noop("OLSR ETX metric for this link."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 1.0,
         }
     })
 

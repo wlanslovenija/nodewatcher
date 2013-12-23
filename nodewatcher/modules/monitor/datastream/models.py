@@ -88,13 +88,18 @@ class ProxyRegistryItemStreams(RegistryItemStreams):
 
 class SystemStatusMonitorStreams(RegistryItemStreams):
     uptime = fields.IntegerField(tags={
+        'title': gettext_noop("Uptime"),
         'description': gettext_noop("Uptime of the node's system."),
         'visualization': {
             'type': 'line',
             'hidden': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     reboots = fields.ResetField("#uptime", tags={
+        'title': gettext_noop("Reboots"),
+        'description': gettext_noop("Node reboot events."),
         'visualization': {
             'type': 'event',
             'with': {'node': fields.TagReference('node')},
@@ -107,6 +112,7 @@ pool.register(models.SystemStatusMonitor, SystemStatusMonitorStreams)
 class GeneralResourcesMonitorStreams(RegistryItemStreams):
     loadavg_1min = fields.FloatField(tags={
         'group': 'load_average',
+        'title': gettext_noop("Load average (1 min)"),
         'description': gettext_noop("1 minute load average."),
         'visualization': {
             'type': 'stack',
@@ -115,6 +121,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
     })
     loadavg_5min = fields.FloatField(tags={
         'group': 'load_average',
+        'title': gettext_noop("Load average (5 min)"),
         'description': gettext_noop("5 minute load average."),
         'visualization': {
             'type': 'stack',
@@ -123,6 +130,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
     })
     loadavg_15min = fields.FloatField(tags={
         'group': 'load_average',
+        'title': gettext_noop("Load average (15 min)"),
         'description': gettext_noop("15 minute load average."),
         'visualization': {
             'type': 'stack',
@@ -131,6 +139,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
     })
     memory_free = fields.IntegerField(tags={
         'group': 'memory',
+        'title': gettext_noop("Free memory"),
         'description': gettext_noop("Amount of free memory."),
         'visualization': {
             'type': 'stack',
@@ -139,6 +148,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
     })
     memory_buffers = fields.IntegerField(tags={
         'group': 'memory',
+        'title': gettext_noop("Buffers memory"),
         'description': gettext_noop("Amount of memory used for kernel buffers."),
         'visualization': {
             'type': 'stack',
@@ -147,6 +157,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
     })
     memory_cache = fields.IntegerField(tags={
         'group': 'memory',
+        'title': gettext_noop("Cache memory"),
         'description': gettext_noop("Amount of memory used for cache."),
         'visualization': {
             'type': 'stack',
@@ -154,9 +165,12 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         }
     })
     processes = fields.IntegerField(tags={
+        'title': gettext_noop("Processes"),
         'description': gettext_noop("Number of running processes."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
 
@@ -165,21 +179,30 @@ pool.register(models.GeneralResourcesMonitor, GeneralResourcesMonitorStreams)
 
 class NetworkResourcesMonitorStreams(RegistryItemStreams):
     routes = fields.IntegerField(tags={
+        'title': gettext_noop("Routes"),
         'description': gettext_noop("Number of routes installed in the kernel routing tables."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     tcp_connections = fields.IntegerField(tags={
+        'title': gettext_noop("TCP connections"),
         'description': gettext_noop("Number of tracked TCP connections."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     udp_connections = fields.IntegerField(tags={
+        'title': gettext_noop("UDP connections"),
         'description': gettext_noop("Number of tracked UDP connections."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
 
@@ -211,17 +234,23 @@ class InterfaceStreams(RegistryItemStreams):
 
 class InterfaceMonitorStreams(InterfaceStreams):
     tx_packets = fields.IntegerField(tags={
+        'title': gettext_noop("TX packets"),
         'description': gettext_noop("Number of transmitted packets."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     tx_packets_rate = fields.RateField("system.status#reboots", "#tx_packets", tags={
         'group': 'packets_rate',
+        'title': gettext_noop("TX packets rate"),
         'description': gettext_noop("Rate of transmitted packets."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'packets_rate',
                 'interface': fields.TagReference('interface'),
@@ -230,17 +259,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_packets = fields.IntegerField(tags={
+        'title': gettext_noop("RX packets"),
         'description': gettext_noop("Number of received packets."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     rx_packets_rate = fields.RateField("system.status#reboots", "#rx_packets", tags={
         'group': 'packets_rate',
+        'title': gettext_noop("RX packets rate"),
         'description': gettext_noop("Rate of received packets."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'packets_rate',
                 'interface': fields.TagReference('interface'),
@@ -249,17 +284,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     tx_bytes = fields.IntegerField(tags={
+        'title': gettext_noop("TX bytes"),
         'description': gettext_noop("Size of transmitted packets."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     tx_bytes_rate = fields.RateField("system.status#reboots", "#tx_bytes", tags={
         'group': 'bytes_rate',
+        'title': gettext_noop("TX bytes rate"),
         'description': gettext_noop("Throughput of transmitted packets."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'bytes_rate',
                 'interface': fields.TagReference('interface'),
@@ -268,17 +309,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_bytes = fields.IntegerField(tags={
+        'title': gettext_noop("RX bytes"),
         'description': gettext_noop("Size of received packets."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     rx_bytes_rate = fields.RateField("system.status#reboots", "#rx_bytes", tags={
         'group': 'bytes_rate',
+        'title': gettext_noop("RX bytes rate"),
         'description': gettext_noop("Throughput of received packets."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'bytes_rate',
                 'interface': fields.TagReference('interface'),
@@ -287,17 +334,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     tx_errors = fields.IntegerField(tags={
+        'title': gettext_noop("TX errors"),
         'description': gettext_noop("Number of transmission errors."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     tx_errors_rate = fields.RateField("system.status#reboots", "#tx_errors", tags={
         'group': 'errors_rate',
+        'title': gettext_noop("TX errors rate"),
         'description': gettext_noop("Rate of transmission errors."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'errors_rate',
                 'interface': fields.TagReference('interface'),
@@ -306,17 +359,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_errors = fields.IntegerField(tags={
+        'title': gettext_noop("RX errors"),
         'description': gettext_noop("Number of receive errors."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     rx_errors_rate = fields.RateField("system.status#reboots", "#rx_errors", tags={
         'group': 'errors_rate',
+        'title': gettext_noop("RX errors rate"),
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'errors_rate',
                 'interface': fields.TagReference('interface'),
@@ -325,17 +384,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     tx_drops = fields.IntegerField(tags={
+        'title': gettext_noop("TX drops"),
         'description': gettext_noop("Number of dropped packets when transmitting."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     tx_drops_rate = fields.RateField("system.status#reboots", "#tx_drops", tags={
         'group': 'drops_rate',
+        'title': gettext_noop("TX drops rate"),
         'description': gettext_noop("Rate of transmission drops."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'drops_rate',
                 'interface': fields.TagReference('interface'),
@@ -344,17 +409,23 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_drops = fields.IntegerField(tags={
+        'title': gettext_noop("RX drops"),
         'description': gettext_noop("Number of dropped packets when receiving."),
         'visualization': {
             'hidden': True,
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     rx_drops_rate = fields.RateField("system.status#reboots", "#rx_drops", tags={
         'group': 'drops_rate',
+        'title': gettext_noop("RX drops rate"),
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
                 'group': 'drops_rate',
                 'interface': fields.TagReference('interface'),
@@ -363,9 +434,12 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     mtu = fields.IntegerField(tags={
+        'title': gettext_noop("MTU"),
         'description': gettext_noop("Interface MTU (Maximum Transmission Unit)."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
 
@@ -374,51 +448,75 @@ pool.register(models.InterfaceMonitor, InterfaceMonitorStreams)
 
 class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
     channel = fields.IntegerField(tags={
+        'title': gettext_noop("Channel"),
         'description': gettext_noop("Channel the wireless radio is operating on."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     channel_width = fields.IntegerField(tags={
+        'title': gettext_noop("Channel width"),
         'description': gettext_noop("Width of the channel the wireless radio is operating on."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     bitrate = fields.FloatField(tags={
+        'title': gettext_noop("Bitrate"),
         'description': gettext_noop("Wireless radio bitrate."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     rts_threshold = fields.IntegerField(tags={
+        'title': gettext_noop("RTS threshold"),
         'description': gettext_noop("RTS threshold."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     frag_threshold = fields.IntegerField(tags={
+        'title': gettext_noop("Fragmentation threshold"),
         'description': gettext_noop("Fragmentation threshold."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     signal = fields.IntegerField(tags={
+        'title': gettext_noop("Signal"),
         'description': gettext_noop("Amount of signal in dBm."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     noise = fields.IntegerField(tags={
+        'title': gettext_noop("Noise"),
         'description': gettext_noop("Amount of noise in dBm."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
     snr = fields.FloatField(tags={
+        'title': gettext_noop("Signal-to-noise ratio"),
         'description': gettext_noop("Signal-to-noise ratio."),
         'visualization': {
             'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
         }
     })
 

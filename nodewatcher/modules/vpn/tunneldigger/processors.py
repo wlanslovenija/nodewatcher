@@ -15,17 +15,23 @@ try:
     class TunneldiggerStreams(ds_base.StreamsBase):
         tx_bytes_rate = ds_fields.DynamicSumField(tags={
             'group': 'tunneldigger_bytes_rate',
+            'title': gettext_noop("VPN TX bytes rate"),
             'description': gettext_noop("Combined throughput of transmitted packets via VPN."),
             'visualization': {
                 'type': 'line',
+                'time_downsamplers': ['mean'],
+                'value_downsamplers': ['min', 'mean', 'max'],
                 'with': {'group': 'tunneldigger_bytes_rate'},
             }
         })
         rx_bytes_rate = ds_fields.DynamicSumField(tags={
             'group': 'tunneldigger_bytes_rate',
+            'title': gettext_noop("VPN RX bytes rate"),
             'description': gettext_noop("Combined throughput of received packets via VPN."),
             'visualization': {
                 'type': 'line',
+                'time_downsamplers': ['mean'],
+                'value_downsamplers': ['min', 'mean', 'max'],
                 'with': {'group': 'tunneldigger_bytes_rate'},
             }
         })
