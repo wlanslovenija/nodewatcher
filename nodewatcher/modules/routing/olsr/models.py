@@ -87,11 +87,14 @@ class OlsrTopologyLink(monitor_models.TopologyLink):
     ilq = models.FloatField(default=0.0)
     etx = models.FloatField(default=0.0)
 
+def peer_name(text):
+    return ds_fields.TagReference(transform=lambda m: text % {'peer_name': m.peer.config.core.general().name})
+
 
 class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     lq = ds_fields.FloatField(tags={
         'group': 'link_quality',
-        'title': gettext_noop("Link quality"),
+        'title': peer_name(gettext_noop("Link quality to %(peer_name)s")),
         'description': gettext_noop("OLSR link quality."),
         'visualization': {
             'type': 'line',
@@ -108,7 +111,7 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     })
     ilq = ds_fields.FloatField(tags={
         'group': 'link_quality',
-        'title': gettext_noop("Inverse link quality"),
+        'title': peer_name(gettext_noop("Inverse link quality to %(peer_name)s")),
         'description': gettext_noop("OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
@@ -124,7 +127,7 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         }
     })
     etx = ds_fields.FloatField(tags={
-        'title': gettext_noop("ETX"),
+        'title': peer_name(gettext_noop("ETX to %(peer_name)s")),
         'description': gettext_noop("OLSR ETX metric for this link."),
         'visualization': {
             'type': 'line',

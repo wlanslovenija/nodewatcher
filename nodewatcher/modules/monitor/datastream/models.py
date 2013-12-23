@@ -234,7 +234,7 @@ class InterfaceStreams(RegistryItemStreams):
 
 class InterfaceMonitorStreams(InterfaceStreams):
     tx_packets = fields.IntegerField(tags={
-        'title': gettext_noop("TX packets"),
+        'title': fields.TagReference('interface', gettext_noop("TX packets (%(interface)s)")),
         'description': gettext_noop("Number of transmitted packets."),
         'visualization': {
             'hidden': True,
@@ -245,7 +245,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     tx_packets_rate = fields.RateField("system.status#reboots", "#tx_packets", tags={
         'group': 'packets_rate',
-        'title': gettext_noop("TX packets rate"),
+        'title': fields.TagReference('interface', gettext_noop("TX packets rate (%(interface)s)")),
         'description': gettext_noop("Rate of transmitted packets."),
         'visualization': {
             'type': 'line',
@@ -259,7 +259,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_packets = fields.IntegerField(tags={
-        'title': gettext_noop("RX packets"),
+        'title': fields.TagReference('interface', gettext_noop("RX packets (%(interface)s)")),
         'description': gettext_noop("Number of received packets."),
         'visualization': {
             'hidden': True,
@@ -270,7 +270,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     rx_packets_rate = fields.RateField("system.status#reboots", "#rx_packets", tags={
         'group': 'packets_rate',
-        'title': gettext_noop("RX packets rate"),
+        'title': fields.TagReference('interface', gettext_noop("RX packets rate (%(interface)s)")),
         'description': gettext_noop("Rate of received packets."),
         'visualization': {
             'type': 'line',
@@ -284,7 +284,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     tx_bytes = fields.IntegerField(tags={
-        'title': gettext_noop("TX bytes"),
+        'title': fields.TagReference('interface', gettext_noop("TX bytes (%(interface)s)")),
         'description': gettext_noop("Size of transmitted packets."),
         'visualization': {
             'hidden': True,
@@ -295,7 +295,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     tx_bytes_rate = fields.RateField("system.status#reboots", "#tx_bytes", tags={
         'group': 'bytes_rate',
-        'title': gettext_noop("TX bytes rate"),
+        'title': fields.TagReference('interface', gettext_noop("TX bytes rate (%(interface)s)")),
         'description': gettext_noop("Throughput of transmitted packets."),
         'visualization': {
             'type': 'line',
@@ -309,7 +309,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_bytes = fields.IntegerField(tags={
-        'title': gettext_noop("RX bytes"),
+        'title': fields.TagReference('interface', gettext_noop("RX bytes (%(interface)s)")),
         'description': gettext_noop("Size of received packets."),
         'visualization': {
             'hidden': True,
@@ -320,7 +320,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     rx_bytes_rate = fields.RateField("system.status#reboots", "#rx_bytes", tags={
         'group': 'bytes_rate',
-        'title': gettext_noop("RX bytes rate"),
+        'title': fields.TagReference('interface', gettext_noop("RX bytes rate (%(interface)s)")),
         'description': gettext_noop("Throughput of received packets."),
         'visualization': {
             'type': 'line',
@@ -334,7 +334,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     tx_errors = fields.IntegerField(tags={
-        'title': gettext_noop("TX errors"),
+        'title': fields.TagReference('interface', gettext_noop("TX errors (%(interface)s)")),
         'description': gettext_noop("Number of transmission errors."),
         'visualization': {
             'hidden': True,
@@ -345,7 +345,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     tx_errors_rate = fields.RateField("system.status#reboots", "#tx_errors", tags={
         'group': 'errors_rate',
-        'title': gettext_noop("TX errors rate"),
+        'title': fields.TagReference('interface', gettext_noop("TX errors rate (%(interface)s)")),
         'description': gettext_noop("Rate of transmission errors."),
         'visualization': {
             'type': 'line',
@@ -359,7 +359,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_errors = fields.IntegerField(tags={
-        'title': gettext_noop("RX errors"),
+        'title': fields.TagReference('interface', gettext_noop("RX errors (%(interface)s)")),
         'description': gettext_noop("Number of receive errors."),
         'visualization': {
             'hidden': True,
@@ -370,7 +370,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     rx_errors_rate = fields.RateField("system.status#reboots", "#rx_errors", tags={
         'group': 'errors_rate',
-        'title': gettext_noop("RX errors rate"),
+        'title': fields.TagReference('interface', gettext_noop("RX errors rate (%(interface)s)")),
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
@@ -384,7 +384,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     tx_drops = fields.IntegerField(tags={
-        'title': gettext_noop("TX drops"),
+        'title': fields.TagReference('interface', gettext_noop("TX drops (%(interface)s)")),
         'description': gettext_noop("Number of dropped packets when transmitting."),
         'visualization': {
             'hidden': True,
@@ -395,7 +395,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     tx_drops_rate = fields.RateField("system.status#reboots", "#tx_drops", tags={
         'group': 'drops_rate',
-        'title': gettext_noop("TX drops rate"),
+        'title': fields.TagReference('interface', gettext_noop("TX drops rate (%(interface)s)")),
         'description': gettext_noop("Rate of transmission drops."),
         'visualization': {
             'type': 'line',
@@ -409,7 +409,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     rx_drops = fields.IntegerField(tags={
-        'title': gettext_noop("RX drops"),
+        'title': fields.TagReference('interface', gettext_noop("RX drops (%(interface)s)")),
         'description': gettext_noop("Number of dropped packets when receiving."),
         'visualization': {
             'hidden': True,
@@ -420,7 +420,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
     })
     rx_drops_rate = fields.RateField("system.status#reboots", "#rx_drops", tags={
         'group': 'drops_rate',
-        'title': gettext_noop("RX drops rate"),
+        'title': fields.TagReference('interface', gettext_noop("RX drops rate (%(interface)s)")),
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
@@ -434,7 +434,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         }
     })
     mtu = fields.IntegerField(tags={
-        'title': gettext_noop("MTU"),
+        'title': fields.TagReference('interface', gettext_noop("MTU (%(interface)s)")),
         'description': gettext_noop("Interface MTU (Maximum Transmission Unit)."),
         'visualization': {
             'type': 'line',
@@ -448,7 +448,7 @@ pool.register(models.InterfaceMonitor, InterfaceMonitorStreams)
 
 class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
     channel = fields.IntegerField(tags={
-        'title': gettext_noop("Channel"),
+        'title': fields.TagReference('interface', gettext_noop("Channel (%(interface)s)")),
         'description': gettext_noop("Channel the wireless radio is operating on."),
         'visualization': {
             'type': 'line',
@@ -457,7 +457,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     channel_width = fields.IntegerField(tags={
-        'title': gettext_noop("Channel width"),
+        'title': fields.TagReference('interface', gettext_noop("Channel width (%(interface)s)")),
         'description': gettext_noop("Width of the channel the wireless radio is operating on."),
         'visualization': {
             'type': 'line',
@@ -466,7 +466,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     bitrate = fields.FloatField(tags={
-        'title': gettext_noop("Bitrate"),
+        'title': fields.TagReference('interface', gettext_noop("Bitrate (%(interface)s)")),
         'description': gettext_noop("Wireless radio bitrate."),
         'visualization': {
             'type': 'line',
@@ -475,7 +475,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     rts_threshold = fields.IntegerField(tags={
-        'title': gettext_noop("RTS threshold"),
+        'title': fields.TagReference('interface', gettext_noop("RTS threshold (%(interface)s)")),
         'description': gettext_noop("RTS threshold."),
         'visualization': {
             'type': 'line',
@@ -484,7 +484,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     frag_threshold = fields.IntegerField(tags={
-        'title': gettext_noop("Fragmentation threshold"),
+        'title': fields.TagReference('interface', gettext_noop("Fragmentation threshold (%(interface)s)")),
         'description': gettext_noop("Fragmentation threshold."),
         'visualization': {
             'type': 'line',
@@ -493,7 +493,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     signal = fields.IntegerField(tags={
-        'title': gettext_noop("Signal"),
+        'title': fields.TagReference('interface', gettext_noop("Signal (%(interface)s)")),
         'description': gettext_noop("Amount of signal in dBm."),
         'visualization': {
             'type': 'line',
@@ -502,7 +502,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     noise = fields.IntegerField(tags={
-        'title': gettext_noop("Noise"),
+        'title': fields.TagReference('interface', gettext_noop("Noise (%(interface)s)")),
         'description': gettext_noop("Amount of noise in dBm."),
         'visualization': {
             'type': 'line',
@@ -511,7 +511,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         }
     })
     snr = fields.FloatField(tags={
-        'title': gettext_noop("Signal-to-noise ratio"),
+        'title': fields.TagReference('interface', gettext_noop("Signal-to-noise ratio (%(interface)s)")),
         'description': gettext_noop("Signal-to-noise ratio."),
         'visualization': {
             'type': 'line',

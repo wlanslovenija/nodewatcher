@@ -14,14 +14,22 @@ class TagReference(object):
     descriptor in method get_stream_tags.
     """
 
-    def __init__(self, tag_name):
+    def __init__(self, tag_or_iterable=None, transform=None):
         """
         Class constructor.
 
-        :param tag_name: Name of the referenced tag
+        :param tag_or_iterable: Tag name or a list of referenced tags
+        :param transform: String or callable to transform the tag; callable
+                          gets the model instance as first argument
         """
 
-        self.tag_name = tag_name
+        if tag_or_iterable is None:
+            tag_or_iterable = []
+        elif not isinstance(tag_or_iterable, (list, tuple)):
+            tag_or_iterable = [tag_or_iterable]
+
+        self.tags = tag_or_iterable
+        self.transform = transform
 
     def resolve(self, descriptor):
         """
@@ -31,7 +39,20 @@ class TagReference(object):
         :return: Value of the referenced field
         """
 
-        return reduce(lambda x, y: x[y], self.tag_name.split('.'), descriptor.get_stream_tags())
+        # TODO: Dictionary comprehension in Python 2.7+
+        tag_values = dict([
+            (ref, reduce(lambda x, y: x[y], ref.split('.'), descriptor.get_stream_tags()))
+            for ref in self.tags
+        ])
+
+        if callable(self.transform):
+            return self.transform(descriptor.get_model(), **tag_values)
+        elif isinstance(self.transform, basestring):
+            return self.transform % tag_values
+        elif len(tag_values) == 1:
+            return tag_values.values()[0]
+        else:
+            raise ValueError("Multiple tags specified without transform callable!")
 
 
 class Field(object):
