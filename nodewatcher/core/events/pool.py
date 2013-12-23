@@ -49,7 +49,7 @@ class EventSinkPool(object):
             sink_name = sink.get_name()
 
             if '.' in sink_name or '/' in sink_name:
-                raise exceptions.InvalidEventSink("An evenk sink '%s' has invalid name" % component_name)
+                raise exceptions.InvalidEventSink("An evenk sink '%s' has invalid name" % sink_name)
 
             if sink_name in self._sinks:
                 raise exceptions.EventSinkAlreadyRegistered("An event sink with name '%s' is already registered" % sink_name)
