@@ -46,9 +46,14 @@ class Command(base.BaseCommand):
                     datastream.append(stream_id, stream['value'], timestamp)
                 except:
                     # Skip datapoints on errors
-                    sys.stdout.write("WARNING: Skipping datapoint due to exception!\n")
-                    sys.stdout.write(traceback.format_exc())
-                    sys.stdout.write("\n")
+                    self.stdout.write("=== WARNING: Skipping datapoint due to exception!\n")
+                    self.stdout.write("--- Exception:\n")
+                    self.stdout.write(traceback.format_exc())
+                    self.stdout.write("\n")
+                    self.stdout.write("--- Datapoint:\n")
+                    self.stdout.write("%s\n" % item['s'])
+                    self.stdout.write(repr(stream['value']))
+                    self.stdout.write("\n\n")
                     continue
 
     def import_data(self, item):
@@ -78,7 +83,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.status',
                     'name': 'uptime',
                 },
-                'value': float(item['d']['uptime']),
+                'value': float(item['d']['uptime']) if item['d'] is not None else None,
             },
         ]
 
@@ -91,7 +96,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'loadavg_1min',
                 },
-                'value': float(item['d']['la1min']),
+                'value': float(item['d']['la1min']) if item['d'] is not None else None,
             },
             # Stream for loadavg_5min field
             {
@@ -100,7 +105,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'loadavg_5min',
                 },
-                'value': float(item['d']['la5min']),
+                'value': float(item['d']['la5min']) if item['d'] is not None else None,
             },
             # Stream for loadavg_15min field
             {
@@ -109,7 +114,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'loadavg_15min',
                 },
-                'value': float(item['d']['la15min']),
+                'value': float(item['d']['la15min']) if item['d'] is not None else None,
             },
         ]
 
@@ -122,7 +127,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'memory_free',
                 },
-                'value': int(item['d']['memfree']),
+                'value': int(item['d']['memfree']) if item['d'] is not None else None,
             },
             # Stream for memory_buffers field
             {
@@ -131,7 +136,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'memory_buffers',
                 },
-                'value': int(item['d']['buffers']),
+                'value': int(item['d']['buffers']) if item['d'] is not None else None,
             },
             # Stream for memory_cache field
             {
@@ -140,7 +145,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'memory_cache',
                 },
-                'value': int(item['d']['cached']),
+                'value': int(item['d']['cached']) if item['d'] is not None else None,
             },
         ]
 
@@ -153,7 +158,7 @@ class Command(base.BaseCommand):
                     'registry_id': 'system.resources.general',
                     'name': 'processes',
                 },
-                'value': int(item['d']['nproc']),
+                'value': int(item['d']['nproc']) if item['d'] is not None else None,
             },
         ]
 
@@ -167,7 +172,7 @@ class Command(base.BaseCommand):
                     'name': 'tx_bytes',
                     'interface': item['m'],
                 },
-                'value': int(item['d']['upload']),
+                'value': int(item['d']['upload']) if item['d'] is not None else None,
             },
             # Stream for rx_bytes field
             {
@@ -177,7 +182,7 @@ class Command(base.BaseCommand):
                     'name': 'rx_bytes',
                     'interface': item['m'],
                 },
-                'value': int(item['d']['download']),
+                'value': int(item['d']['download']) if item['d'] is not None else None,
             },
         ]
 
@@ -191,7 +196,7 @@ class Command(base.BaseCommand):
                     'name': 'lq' if item['m'] else 'average_lq',
                     'link': item['m'] or None,
                 },
-                'value': float(item['d']['lq']),
+                'value': float(item['d']['lq']) if item['d'] is not None else None,
             },
             # Stream for ilq field
             {
@@ -201,7 +206,7 @@ class Command(base.BaseCommand):
                     'name': 'ilq' if item['m'] else 'average_ilq',
                     'link': item['m'] or None,
                 },
-                'value': float(item['d']['ilq']),
+                'value': float(item['d']['ilq']) if item['d'] is not None else None,
             },
         ]
 
@@ -215,6 +220,6 @@ class Command(base.BaseCommand):
                     'name': 'etx' if item['m'] else 'average_etx',
                     'link': item['m'] or None,
                 },
-                'value': float(item['d']['etx']),
+                'value': float(item['d']['etx']) if item['d'] is not None else None,
             },
         ]
