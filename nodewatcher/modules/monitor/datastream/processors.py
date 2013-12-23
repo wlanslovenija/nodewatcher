@@ -52,5 +52,6 @@ class Maintenance(monitor_processors.NetworkProcessor):
         """
 
         datastream.backprocess_streams()
+        datastream.downsample_streams()
 
         return context, nodes
