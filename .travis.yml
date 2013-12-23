@@ -6,7 +6,7 @@ services:
  - postgresql
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install binutils gdal-bin libproj-dev postgresql-9.1-postgis postgresql-server-dev-9.1 libgeoip1
+ - sudo apt-get install binutils gdal-bin libproj-dev postgresql-server-dev-9.1 libgeoip1
  - sudo rm -rf /dev/shm
  - sudo ln -s /run/shm /dev/shm
 install:
