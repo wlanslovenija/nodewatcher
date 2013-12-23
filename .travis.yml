@@ -5,11 +5,10 @@ services:
  - mongodb
  - postgresql
 before_install:
- - cat /etc/apt/sources.list.d/*
  - sudo add-apt-repository -r -y ppa:ubuntugis/ppa
  - sudo apt-get update
  - sudo apt-get remove --purge postgresql-9.1-postgis-2.1 postgresql-9.1-postgis-scripts
- - sudo apt-get install binutils gdal-bin libproj-dev postgresql-9.1-postgis libgeoip1
+ - sudo apt-get install binutils postgresql-9.1-postgis libgeoip1
 install:
  - pip install pep8 --use-mirrors
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
