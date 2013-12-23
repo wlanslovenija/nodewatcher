@@ -1,14 +1,9 @@
 language: python
 python: "2.7"
-env: PYTHONPATH=. DJANGO_DATABASE_USER=postgres
+env: PYTHONPATH=. DJANGO_DATABASE_USER=postgres POSTGIS=1.5
 services:
  - mongodb
  - postgresql
-before_install:
- - sudo apt-get update -qq
- - sudo apt-get install binutils gdal-bin libproj-dev postgresql-server-dev-9.1 libgeoip1
- - sudo rm -rf /dev/shm
- - sudo ln -s /run/shm /dev/shm
 install:
  - pip install pep8 --use-mirrors
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
