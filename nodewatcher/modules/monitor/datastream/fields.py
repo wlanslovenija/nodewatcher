@@ -108,18 +108,19 @@ class Field(object):
         :return: Processed dictionary of tags
         """
 
-        output = {}
-        for key, value in tags.iteritems():
-            if isinstance(value, dict):
+        output = None
+        if isinstance(tags, dict):
+            output = {}
+            for key, value in tags.iteritems():
                 output[key] = self._process_tag_references(value, descriptor)
-            elif isinstance(value, list):
-                output[key] = []
-                for item in value:
-                    output[key].append(self._process_tag_references(item, descriptor))
-            elif isinstance(value, TagReference):
-                output[key] = value.resolve(descriptor)
-            else:
-                output[key] = value
+        elif isinstance(tags, list):
+            output = []
+            for value in tags:
+                output.append(self._process_tag_references(value, descriptor))
+        elif isinstance(tags, TagReference):
+            output = tags.resolve(descriptor)
+        else:
+            output = tags
 
         return output
 
