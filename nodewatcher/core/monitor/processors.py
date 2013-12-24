@@ -190,6 +190,17 @@ class NodeProcessor(MonitoringProcessor):
 
         return context
 
+    def cleanup(self, context, node):
+        """
+        Called after all processors for a specific node have been called. Cleanup
+        methods are called in reverse order.
+
+        :param context: Current context
+        :param node: Node that is being processed
+        """
+
+        pass
+
 
 def depends_on_context(*keys):
     """

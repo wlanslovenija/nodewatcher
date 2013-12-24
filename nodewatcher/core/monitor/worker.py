@@ -28,17 +28,30 @@ def stage_worker(args):
     """
 
     context, node, processors = args
-    for p in processors:
-        try:
-            context = p().process(context, node)
-            transaction.commit()
-        except KeyboardInterrupt:
-            transaction.rollback()
-            raise
-        except:
-            transaction.rollback()
-            logger.error("Processor for node '%s' has failed with exception:" % node.pk)
-            logger.error(traceback.format_exc())
+    cleanup_queue = []
+    try:
+        for p in processors:
+            try:
+                processor = p()
+                context = processor.process(context, node)
+                transaction.commit()
+                cleanup_queue.append(processor)
+            except KeyboardInterrupt:
+                transaction.rollback()
+                raise
+            except:
+                transaction.rollback()
+                logger.error("Processor for node '%s' has failed with exception:" % node.pk)
+                logger.error(traceback.format_exc())
+                break
+    finally:
+        # Invoke all cleanup functions in reverse order
+        for processor in cleanup_queue[::-1]:
+            try:
+                processor.cleanup(context, node)
+            except:
+                logger.warning("Processor cleanup method for node '%s' has failed with exception:" % node.pk)
+                logger.warning(traceback.format_exc())
 
 
 class Worker(object):
