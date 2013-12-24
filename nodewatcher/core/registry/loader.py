@@ -9,7 +9,7 @@ def load_modules(*types):
     before registry operations can function normaly.
 
     :param types: Types of modules that should be loaded (type name
-        determines the filename that is loaded)
+                  determines the filename that is loaded)
     """
 
     for app in settings.INSTALLED_APPS:

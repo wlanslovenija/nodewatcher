@@ -16,14 +16,14 @@ def install_antenna_fixtures(sender, **kwargs):
     """
 
     global _core_migrated
-    if kwargs['app'] == "core":
+    if kwargs['app'] == 'core':
         _core_migrated = True
 
     if not _core_migrated:
         return
 
     # Ensure that all CGMs are registred
-    loader.load_modules("cgm")
+    loader.load_modules('cgm')
 
     for router in cgm_base.iterate_routers():
         for antenna in router.antennas:

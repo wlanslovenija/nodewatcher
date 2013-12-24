@@ -24,7 +24,7 @@ def background_build(node, platform, cfg):
     """
 
     # Ensure that all CGMs are loaded before doing processing
-    loader.load_modules("cgm")
+    loader.load_modules('cgm')
     platform = cgm_base.get_platform(platform)
 
     # Dispatch pre-build signal

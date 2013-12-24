@@ -233,7 +233,7 @@ def generate_config(node, only_validate=False):
     """
 
     # Ensure that all CGMs are registred
-    loader.load_modules("cgm")
+    loader.load_modules('cgm')
 
     # Determine the destination platform
     try:
