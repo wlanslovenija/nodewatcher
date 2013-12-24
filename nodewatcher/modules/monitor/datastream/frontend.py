@@ -2,6 +2,7 @@ from django.conf import urls
 
 from nodewatcher.core.frontend import components
 
+
 class DatastreamComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
