@@ -33,7 +33,7 @@ class Datastream(monitor_processors.NodeProcessor):
                 if item in processed_items:
                     continue
                 processed_items.add(item)
-                
+
                 try:
                     descriptor = pool.get_descriptor(item)
                     descriptor.insert_to_stream(datastream)
@@ -57,7 +57,9 @@ class Maintenance(monitor_processors.NetworkProcessor):
         :return: A (possibly) modified context and a (possibly) modified set of nodes
         """
 
+        self.logger.info("Backprocessing streams...")
         datastream.backprocess_streams()
+        self.logger.info("Downsampling streams...")
         datastream.downsample_streams()
 
         return context, nodes
