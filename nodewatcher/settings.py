@@ -266,6 +266,7 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
     'django.contrib.gis',
 
+    'tastypie',
     'django_datastream',
     'djcelery',
     'guardian',
@@ -339,15 +340,21 @@ LOGGING = {
     }
 }
 
+MONGO_DATABASE_NAME = 'nodewatcher'
+MONGO_DATABASE_OPTIONS = {
+    'tz_aware': USE_TZ,
+}
+
 CELERY_RESULT_BACKEND = 'mongodb'
 CELERY_MONGODB_BACKEND_SETTINGS = {
     'host': '127.0.0.1',
     'port': 27017,
-    'database': 'nodewatcher',
+    'database': MONGO_DATABASE_NAME,
     'taskmeta_collection': 'celery_taskmeta',
+    'options': MONGO_DATABASE_OPTIONS,
 }
 
-BROKER_URL = 'mongodb://127.0.0.1:27017/nodewatcher'
+BROKER_URL = 'mongodb://127.0.0.1:27017/%s' % MONGO_DATABASE_NAME
 
 CELERY_ENABLE_UTC = USE_TZ
 CELERY_TIMEZONE = TIME_ZONE
@@ -399,8 +406,15 @@ MONITOR_PROCESSORS = (
 DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
 # Each backend can have backend-specific settings that can be specified here.
 DATASTREAM_BACKEND_SETTINGS = {
-    'database_name': 'nodewatcher',
+    'database_name': MONGO_DATABASE_NAME,
+    'tz_aware': USE_TZ,
 }
+
+# We use RFC 2822 for better parsing in JavaScript and time-zone support.
+TASTYPIE_DATETIME_FORMATTING = 'rfc-2822'
+
+# JSONP support as well.
+TASTYPIE_DEFAULT_FORMATS = ('json', 'jsonp', 'xml')
 
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface.
