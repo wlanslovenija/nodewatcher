@@ -95,7 +95,7 @@ class Tunneldigger(monitor_processors.NodeProcessor):
 
 if DATASTREAM_SUPPORTED:
     class DatastreamTunneldigger(Tunneldigger):
-        
+
         def process(self, context, node):
             """
             Called for every processed node.

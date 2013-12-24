@@ -175,7 +175,7 @@ if DATASTREAM_SUPPORTED:
 
             super(DatastreamInterfaces, self).interface_enabled(context, iface)
             self.set_interface_hidden(iface, False)
-        
+
         def interface_disabled(self, context, iface):
             """
             Called when an interface is no longer available.
