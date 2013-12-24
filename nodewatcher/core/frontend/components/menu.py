@@ -123,6 +123,22 @@ class Menu(object):
 class Menus(object):
     def __init__(self):
         self._menus = {}
+        self._states = []
+
+    def __enter__(self):
+        self._states.append(copy.copy(self._menus))
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        state = self._states.pop()
+
+        if exc_type is not None:
+            # Reset to the state before the exception so that future
+            # calls do not raise MenuNotRegistered or
+            # MenuAlreadyRegistered exceptions
+            self._menus = state
+
+        # Re-raise any exception
+        return False
 
     def register(self, menu_or_iterable):
         if not hasattr(menu_or_iterable, '__iter__'):
