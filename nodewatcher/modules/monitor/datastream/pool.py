@@ -51,7 +51,7 @@ class StreamDescriptorPool(object):
             descriptor_class = self._descriptors[model.__class__]
             if (descriptor_class, model) not in self._cache:
                 self._cache[(descriptor_class, model)] = descriptor_class(model)
-            
+
             return self._cache[(descriptor_class, model)]
         except KeyError:
             raise exceptions.StreamDescriptorNotRegistered("Stream descriptor for model class '%s' is not registered" % model.__class__.__name__)

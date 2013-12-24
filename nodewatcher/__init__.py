@@ -32,6 +32,6 @@ def get_version(version=None):
 __version__ = get_version()
 __author__ = 'wlan slovenija'
 __contact__ = 'nodewatcher@wlan-si.net'
-__homepage__ = 'http://dev.wlan-si.net/wiki/Nodewatcher'
+__homepage__ = 'https://dev.wlan-si.net/wiki/Nodewatcher'
 __docformat__ = 'restructuredtext'
 __copyright__ = '2009-2013'

@@ -1,14 +1,20 @@
 from django.conf import settings, urls
 from django.conf.urls import static
 
+# Importing nodewatcher.core.frontend.urls auto-discovers frontend components
+from nodewatcher.core.frontend import api, urls as frontend_urls
+
 urlpatterns = urls.patterns(
     '',
 
     # Registry
-    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', app_name='registry')),
+    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace='registry', app_name='registry')),
+
+    # API
+    urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
 
     # Frontend
-    urls.url(r'^', urls.include('nodewatcher.core.frontend.urls')),
+    urls.url(r'^', urls.include(frontend_urls)),
 )
 
 # See CSRF_FAILURE_VIEW in settings.py as well
