@@ -1,4 +1,6 @@
-from ...registry import registration, loader
+from ....utils import loader
+
+from ...registry import registration
 
 from . import routers as cgm_routers, resources as cgm_resources
 
@@ -233,7 +235,7 @@ def generate_config(node, only_validate=False):
     """
 
     # Ensure that all CGMs are registred
-    loader.load_modules("cgm")
+    loader.load_modules('cgm')
 
     # Determine the destination platform
     try:

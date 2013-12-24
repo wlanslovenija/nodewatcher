@@ -7,7 +7,9 @@ from django.core import exceptions
 from django.db import transaction
 from django.utils import datastructures, importlib
 
-from .. import rules as registry_rules, registration, loader
+from ....utils import loader
+
+from .. import rules as registry_rules, registration
 
 
 class RegistryValidationError(Exception):

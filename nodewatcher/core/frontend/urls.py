@@ -1,9 +1,14 @@
 from . import components
 
-# Has to be before auto-discovery
-components.menus.register(components.Menu('main_menu'))
+# We are using context manager here because this is a special case
+# "menus.register" is not near the end of the module as usual and
+# "components.pool.discover_components" imports many modules so
+# chances of an exception are high, so we take extra care here
+with components.menus:
+    # Has to be before auto-discovery
+    components.menus.register(components.Menu('main_menu'))
 
-# Frontend components auto-discovery
-components.pool.discover_components()
+    # Frontend components auto-discovery
+    components.pool.discover_components()
 
-urlpatterns = components.pool.get_urls()
+    urlpatterns = components.pool.get_urls()

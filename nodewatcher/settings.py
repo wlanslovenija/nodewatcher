@@ -252,6 +252,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.display',
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
+    'nodewatcher.modules.frontend.api.nodes',
     'nodewatcher.extra.account',
 
     # Legacy apps for migrations.

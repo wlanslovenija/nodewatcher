@@ -35,7 +35,7 @@ class GeneralInfo(monitor_processors.NodeProcessor):
 
         if general is None:
             general = node.monitoring.core.general(create=monitor_models.CgmGeneralMonitor)
-        
+
         general.uuid = context.http.general.uuid
         general.firmware = context.http.general.version
         general.save()

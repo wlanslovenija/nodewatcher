@@ -1,7 +1,9 @@
+import copy
 import re
 
 from django.conf import settings
-from django.utils import importlib
+
+from ...utils import loader
 
 from . import exceptions
 
@@ -16,23 +18,34 @@ class EventSinkPool(object):
 
         self._sinks = {}
         self._discovered = False
+        self._states = []
+
+    def __enter__(self):
+        self._states.append((copy.copy(self._sinks), self._discovered))
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        state = self._states.pop()
+
+        if exc_type is not None:
+            # Reset to the state before the exception so that future
+            # calls do not raise EventSinkNotRegistered or
+            # EventSinkAlreadyRegistered exceptions
+            self._sinks, self._discovered = state
+
+        # Re-raise any exception
+        return False
 
     def discover_sinks(self):
         """
         Discovers and loads all sinks.
         """
 
-        if self._discovered:
-            return
-        self._discovered = True
+        with self:
+            if self._discovered:
+                return
+            self._discovered = True
 
-        for app in settings.INSTALLED_APPS:
-            try:
-                importlib.import_module('.events', app)
-            except ImportError, e:
-                message = str(e)
-                if message != 'No module named events':
-                    raise
+            loader.load_modules('events')
 
     def register(self, sink_or_iterable):
         """

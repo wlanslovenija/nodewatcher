@@ -6,7 +6,8 @@ from django.conf import settings
 from django.core import files as django_files
 from django.core.files import storage as django_storage
 
-from ...registry import loader
+from ....utils import loader
+
 from ...generator.cgm import base as cgm_base
 
 from . import signals
@@ -24,7 +25,7 @@ def background_build(node, platform, cfg):
     """
 
     # Ensure that all CGMs are loaded before doing processing
-    loader.load_modules("cgm")
+    loader.load_modules('cgm')
     platform = cgm_base.get_platform(platform)
 
     # Dispatch pre-build signal
