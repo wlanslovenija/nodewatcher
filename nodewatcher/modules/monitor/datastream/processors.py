@@ -33,7 +33,7 @@ class Datastream(monitor_processors.NodeProcessor):
                 if item in processed_items:
                     continue
                 processed_items.add(item)
-                
+
                 try:
                     descriptor = pool.get_descriptor(item)
                     descriptor.insert_to_stream(datastream)
