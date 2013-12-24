@@ -391,12 +391,13 @@ MONITOR_INTERVAL = 300
 # processors that are specified here will be called.
 MONITOR_PROCESSORS = (
     'nodewatcher.modules.routing.olsr.processors.OLSRTopology',
+    'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
     'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
-    'nodewatcher.modules.monitor.http.interfaces.processors.Interfaces',
-    'nodewatcher.modules.vpn.tunneldigger.processors.Tunneldigger',
+    'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
+    'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
     'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes',
     'nodewatcher.modules.monitor.datastream.processors.Maintenance',
