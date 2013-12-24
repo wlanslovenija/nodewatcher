@@ -2,8 +2,8 @@
 
 from south import signals as south_signals
 
-from nodewatcher.core.registry import loader
 from nodewatcher.core.generator.cgm import base as cgm_base
+from nodewatcher.utils import loader
 
 from .. import models as antennas_models
 

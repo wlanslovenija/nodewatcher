@@ -4,7 +4,7 @@ from django import shortcuts
 from django.conf import settings, urls
 from django.utils import datastructures
 
-from nodewatcher.core.registry import loader
+from ....utils import loader
 
 from . import exceptions
 

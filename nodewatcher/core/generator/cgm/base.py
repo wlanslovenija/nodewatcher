@@ -1,4 +1,6 @@
-from ...registry import registration, loader
+from ....utils import loader
+
+from ...registry import registration
 
 from . import routers as cgm_routers, resources as cgm_resources
 

@@ -2,9 +2,8 @@ import copy
 import re
 
 from django.conf import settings
-from django.utils import importlib
 
-from nodewatcher.core.registry import loader
+from ...utils import loader
 
 from . import exceptions
 
