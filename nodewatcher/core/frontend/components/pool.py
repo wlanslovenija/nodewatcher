@@ -2,7 +2,9 @@ import re
 
 from django import shortcuts
 from django.conf import settings, urls
-from django.utils import importlib, datastructures
+from django.utils import datastructures
+
+from nodewatcher.core.registry import loader
 
 from . import exceptions
 
@@ -38,13 +40,7 @@ class FrontendComponentsPool(object):
                 return
             self._discovered = True
 
-            for app in settings.INSTALLED_APPS:
-                try:
-                    importlib.import_module('.frontend', app)
-                except ImportError, e:
-                    message = str(e)
-                    if message != 'No module named frontend':
-                        raise
+            loader.load_modules('frontend')
 
     def register(self, component_or_iterable):
         from . import base

@@ -4,6 +4,8 @@ import re
 from django.conf import settings
 from django.utils import importlib
 
+from nodewatcher.core.registry import loader
+
 from . import exceptions
 
 VALID_NAME = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
@@ -44,13 +46,7 @@ class EventSinkPool(object):
                 return
             self._discovered = True
 
-            for app in settings.INSTALLED_APPS:
-                try:
-                    importlib.import_module('.events', app)
-                except ImportError, e:
-                    message = str(e)
-                    if message != 'No module named events':
-                        raise
+            loader.load_modules('events')
 
     def register(self, sink_or_iterable):
         """

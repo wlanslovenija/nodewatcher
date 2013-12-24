@@ -1,6 +1,5 @@
 from django.conf import settings
-from django.utils.importlib import import_module
-from django.utils.module_loading import module_has_submodule
+from django.utils import importlib, module_loading
 
 
 def load_modules(*types):
@@ -13,9 +12,9 @@ def load_modules(*types):
     """
 
     for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
+        mod = importlib.import_module(app)
 
         for type in types:
             # Attempt to import the submodule if it exists
-            if module_has_submodule(mod, type):
-                import_module(".%s" % type, app)
+            if module_loading.module_has_submodule(mod, type):
+                importlib.import_module(".%s" % type, app)
