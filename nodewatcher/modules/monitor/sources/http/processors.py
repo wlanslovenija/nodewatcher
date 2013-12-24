@@ -50,21 +50,21 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        try:
-            router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
-            parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
+        with context.in_namespace("http", HTTPTelemetryContext):
+            try:
+                router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
+                parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
 
-            # Fetch information from the router and merge it into local context
-            with context.in_namespace("http", HTTPTelemetryContext):
+                # Fetch information from the router and merge it into local context
                 try:
                     parser.parse_into(context)
                 except telemetry_parser.HttpTelemetryParseFailed:
                     # Parsing has failed, log this; all components that did not get parsed
                     # will be missing from context and so depending modules will not process them
                     self.logger.error("Failed to parse HTTP telemetry feed from %s!" % router_id)
-        except core_models.RouterIdConfig.DoesNotExist:
-            # No router-id for this node can be found for IPv4; this means
-            # that we have nothing to do here
-            pass
+            except core_models.RouterIdConfig.DoesNotExist:
+                # No router-id for this node can be found for IPv4; this means
+                # that we have nothing to do here
+                pass
 
         return context

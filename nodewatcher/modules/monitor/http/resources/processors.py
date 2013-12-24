@@ -21,6 +21,25 @@ class SystemStatus(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
+        # Reset monitor models
+        status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
+        status.uptime = None
+        status.local_time = None
+
+        gresources = node.monitoring.system.resources.general(create=monitor_models.GeneralResourcesMonitor)
+        gresources.loadavg_1min = None
+        gresources.loadavg_5min = None
+        gresources.loadavg_15min = None
+        gresources.memory_free = None
+        gresources.memory_buffers = None
+        gresources.memory_cache = None
+        gresources.processes = None
+
+        nresources = node.monitoring.system.resources.network(create=monitor_models.NetworkResourcesMonitor)
+        nresources.routes = None
+        nresources.tcp_connections = None
+        nresources.udp_connections = None
+
         version = context.http.get_module_version("core.general")
         if version >= 1:
             # Process node uptime and local time (v1+)
@@ -32,7 +51,10 @@ class SystemStatus(monitor_processors.NodeProcessor):
             loadavg = [float(x) for x in context.http.general.loadavg.split()[:3]]
             processes = int(context.http.general.loadavg.split()[3].split("/")[1])
         else:
-            # Unsupported version (v0)
+            # Unsupported version or data fetch failed (v0)
+            status.save()
+            gresources.save()
+            nresources.save()
             return context
 
         if version == 1:
@@ -49,28 +71,25 @@ class SystemStatus(monitor_processors.NodeProcessor):
             assert False
 
         # Schema update for system status
-        status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
         status.uptime = uptime
         status.local_time = datetime.datetime.fromtimestamp(local_time, pytz.utc)
         status.save()
 
         # Schema update for general resources
-        resources = node.monitoring.system.resources.general(create=monitor_models.GeneralResourcesMonitor)
-        resources.loadavg_1min = loadavg[0]
-        resources.loadavg_5min = loadavg[1]
-        resources.loadavg_15min = loadavg[2]
-        resources.memory_free = memory_free
-        resources.memory_buffers = memory_buffers
-        resources.memory_cache = memory_cache
-        resources.processes = processes
-        resources.save()
+        gresources.loadavg_1min = loadavg[0]
+        gresources.loadavg_5min = loadavg[1]
+        gresources.loadavg_15min = loadavg[2]
+        gresources.memory_free = memory_free
+        gresources.memory_buffers = memory_buffers
+        gresources.memory_cache = memory_cache
+        gresources.processes = processes
+        gresources.save()
 
         # Schema update for network resources
         if version >= 3:
-            resources = node.monitoring.system.resources.network(create=monitor_models.NetworkResourcesMonitor)
-            resources.routes = int(context.http.general.routes.ipv4) + int(context.http.general.routes.ipv6)
-            resources.tcp_connections = int(context.http.general.connections.tcp)
-            resources.udp_connections = int(context.http.general.connections.udp)
-            resources.save()
+            nresources.routes = int(context.http.general.routes.ipv4) + int(context.http.general.routes.ipv6)
+            nresources.tcp_connections = int(context.http.general.connections.tcp)
+            nresources.udp_connections = int(context.http.general.connections.udp)
+        nresources.save()    
 
         return context
