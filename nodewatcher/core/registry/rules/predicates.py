@@ -298,13 +298,13 @@ def value(location):
         return location
 
     def location_resolver(context):
-        path, attribute = location.split('#') if '#' in location else (location, None)
+        registry_id, attribute = location.split('#') if '#' in location else (location, None)
 
         # First check the partial configuration store
-        if path in context.partial_config and attribute is not None:
-            obj = context.partial_config[path]
+        if registry_id in context.partial_config and attribute is not None:
+            obj = context.partial_config[registry_id]
             if len(obj) > 1:
-                raise engine.EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
+                raise engine.EvaluationError("Registry identifier '%s' evaluates to a list but an attribute access is requested!" % registry_id)
 
             try:
                 return reduce(getattr, attribute.split('.'), obj[0])
@@ -313,13 +313,13 @@ def value(location):
 
         if context.root is None:
             return None
-        obj = context.regpoint.get_accessor(context.root).by_path(path)
+        obj = context.regpoint.get_accessor(context.root).by_registry_id(registry_id)
 
         if obj is None:
             return [] if attribute is None else None
         elif attribute is not None:
             if isinstance(obj, list):
-                raise engine.EvaluationError("Path '%s' evaluates to a list but an attribute access is requested!" % path)
+                raise engine.EvaluationError("Registry identifier '%s' evaluates to a list but an attribute access is requested!" % registry_id)
 
             try:
                 return reduce(getattr, attribute.split('.'), obj)

@@ -12,7 +12,7 @@
                     to the current page from some other page then to take her back to that page. But only if the target does not require
                     authenticated access which would be after logout denied.
                     {% endcomment %}
-                    {% url user_page user.username as user_account_url %}
+                    {% url AccountComponent:user_page user.username as user_account_url %}
                     <li class="first">{% blocktrans with user.username as username %}logged in as <a href="{{ user_account_url }}">{{ username }}</a>{% endblocktrans %}</li>
                     <li class="last"><a href="{% url AccountComponent:auth_logout %}{% if next_url and not next_url|authenticated_required %}?{{ REDIRECT_FIELD_NAME }}={{ next_url|urlencode }}{% endif %}">{% trans "Logout" %}</a></li>
                 {% else %}

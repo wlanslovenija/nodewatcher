@@ -293,6 +293,13 @@ class RegistrationPoint(object):
         assert isinstance(root, self.model)
         return getattr(root, self.namespace)
 
+    def all_registry_ids(self):
+        """
+        Returns all known registry identifiers.
+        """
+
+        return self.item_registry.keys()
+
     def get_registered_choices(self, choices_id):
         """
         Returns a list of previously registered choices.
@@ -411,6 +418,14 @@ def point(name):
     """
 
     return registry_state.points[name]
+
+
+def all_points():
+    """
+    Returns a list of all existing registration points.
+    """
+
+    return registry_state.points.values()
 
 
 def register_form_for_item(item, form_class):

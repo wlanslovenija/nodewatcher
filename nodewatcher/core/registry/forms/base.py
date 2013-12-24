@@ -697,7 +697,7 @@ def prepare_forms(context):
         # Fetch existing models for this item
         context.existing_models = datastructures.SortedDict()
         if context.root is not None:
-            existing_models_qs = context.regpoint.get_accessor(context.root).by_path(cls_meta.registry_id, queryset=True)
+            existing_models_qs = context.regpoint.get_accessor(context.root).by_registry_id(cls_meta.registry_id, queryset=True)
 
             if context.hierarchy_parent_cls is not None:
                 rel_field_name = item_cls._registry_object_parent_link.name

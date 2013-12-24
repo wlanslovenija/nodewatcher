@@ -281,10 +281,10 @@ class DerivedField(Field):
         root = descriptor.get_model().root
         streams = []
         for field_ref in self.streams:
-            path, field = field_ref['field'].split('#')
+            registry_id, field = field_ref['field'].split('#')
             mdl = descriptor.get_model()
-            if path:
-                mdl = root.monitoring.by_path(path)
+            if registry_id:
+                mdl = root.monitoring.by_registry_id(registry_id)
 
             mdl_descriptor = pool.get_descriptor(mdl)
             field = mdl_descriptor.get_field(field)

@@ -42,14 +42,14 @@ class SelectorFormField(form_fields.TypedChoiceField):
         if self._rp_choices is None:
             return
 
-        def resolve_path(loc):
-            path, attribute = loc.split('#')
+        def resolve_registry_id(loc):
+            registry_id, attribute = loc.split('#')
             try:
-                return reduce(getattr, attribute.split('.'), cfg[path][0])
+                return reduce(getattr, attribute.split('.'), cfg[registry_id][0])
             except (KeyError, IndexError, AttributeError):
                 return None
 
-        self.choices = fields.BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda path, value: resolve_path(path) == value)
+        self.choices = fields.BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
 
 
 class SelectorKeyField(models.CharField):
