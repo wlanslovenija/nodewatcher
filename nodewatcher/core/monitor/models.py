@@ -43,23 +43,6 @@ class CgmGeneralMonitor(GeneralMonitor):
 registration.point('node.monitoring').register_item(CgmGeneralMonitor)
 
 
-class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
-    """
-    Node's status.
-    """
-
-    status = registry_fields.SelectorKeyField('node.monitoring', 'core.status#status')
-    has_warnings = models.BooleanField(default=False)
-
-    class Meta:
-        app_label = 'core'
-
-    class RegistryMeta:
-        registry_id = 'core.status'
-
-registration.point('node.monitoring').register_item(StatusMonitor)
-
-
 class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Routing topology.
