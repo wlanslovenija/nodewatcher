@@ -237,6 +237,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.administration.location',
     'nodewatcher.modules.administration.description',
     'nodewatcher.modules.administration.roles',
+    'nodewatcher.modules.administration.states',
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.platforms.openwrt',
     'nodewatcher.modules.devices',
@@ -391,16 +392,17 @@ MONITOR_INTERVAL = 300
 # executed in parallel for all nodes that have been chosen so far by network processors. Only
 # processors that are specified here will be called.
 MONITOR_PROCESSORS = (
-    'nodewatcher.modules.routing.olsr.processors.OLSRTopology',
+    'nodewatcher.core.monitor.processors.GetAllNodes',
+    'nodewatcher.modules.routing.olsr.processors.Topology',
     'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
-    'nodewatcher.modules.routing.olsr.processors.OLSRNodePostprocess',
+    'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
+    'nodewatcher.modules.administration.states.processors.NodeState',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
-    'nodewatcher.modules.administration.policy.processors.PurgeInvalidNodes',
     'nodewatcher.modules.monitor.datastream.processors.Maintenance',
 )
 

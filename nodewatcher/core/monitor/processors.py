@@ -2,6 +2,8 @@ import contextlib
 import logging
 import traceback
 
+from nodewatcher.core import models as core_models
+
 
 class ProcessorContext(dict):
     """
@@ -200,6 +202,28 @@ class NodeProcessor(MonitoringProcessor):
         """
 
         pass
+
+
+class GetAllNodes(NetworkProcessor):
+    """
+    A processor that populates the nodes set with all nodes currently present in the
+    nodewatcher database.
+    """
+
+    def process(self, context, nodes):
+        """
+        Performs network-wide processing and selects the nodes that will be processed
+        in any following processors. Context is passed between network processors.
+
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
+        """
+
+        for node in core_models.Node.objects.all():
+            nodes.add(node)
+
+        return context, nodes
 
 
 def depends_on_context(*keys):

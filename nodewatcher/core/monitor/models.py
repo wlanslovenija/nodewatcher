@@ -57,12 +57,6 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     class RegistryMeta:
         registry_id = 'core.status'
 
-# TODO: This should not be hard-coded? Should be moved to modules?
-registration.point('node.monitoring').register_choice('core.status#status', 'up', _("Up"))
-registration.point('node.monitoring').register_choice('core.status#status', 'down', _("Down"))
-registration.point('node.monitoring').register_choice('core.status#status', 'invalid', _("Invalid"))
-registration.point('node.monitoring').register_choice('core.status#status', 'visible', _("Visible"))
-registration.point('node.monitoring').register_choice('core.status#status', 'pending', _("Pending"))
 registration.point('node.monitoring').register_item(StatusMonitor)
 
 

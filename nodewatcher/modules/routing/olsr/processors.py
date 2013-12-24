@@ -7,7 +7,7 @@ from nodewatcher.core.monitor import models as monitor_models, processors as mon
 from . import models as olsr_models, parser as olsr_parser
 
 
-class OLSRTopology(monitor_processors.NetworkProcessor):
+class Topology(monitor_processors.NetworkProcessor):
     """
     Processor that handles monitoring of olsrd routing daemon.
     """
@@ -66,14 +66,10 @@ class OLSRTopology(monitor_processors.NetworkProcessor):
                     rid_cfg.family = 'ipv4'
                     rid_cfg.save()
 
-                    status_mon = node.monitoring.core.status(create=monitor_models.StatusMonitor)
-                    status_mon.status = 'invalid'
-                    status_mon.save()
-
         return context, nodes
 
 
-class OLSRNodePostprocess(monitor_processors.NodeProcessor):
+class NodePostprocess(monitor_processors.NodeProcessor):
     def process(self, context, node):
         """
         Called for every processed node.
@@ -89,15 +85,18 @@ class OLSRNodePostprocess(monitor_processors.NodeProcessor):
             announces = context.routing.olsr.announces.get(router_id, [])
             aliases = context.routing.olsr.aliases.get(router_id, [])
 
+            if not topology:
+                context.node_available = False
+                return context
+            else:
+                context.node_available = True
+
             # Setup links in topology tables
             try:
                 rtm = node.monitoring.network.routing.topology(onlyclass=olsr_models.OlsrRoutingTopologyMonitor)[0]
             except IndexError:
                 rtm = node.monitoring.network.routing.topology(create=olsr_models.OlsrRoutingTopologyMonitor)
                 rtm.save()
-
-            if not topology:
-                self.logger.warning("Empty topology entry for router ID %s!" % router_id)
 
             visible_links = []
             for link in topology:

@@ -50,14 +50,23 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
+        node_available = context.node_available
+
         with context.in_namespace("http", HTTPTelemetryContext):
             try:
+                context.successfully_parsed = False
+
+                # If the node is not marked as available, we should skip telemetry parsing
+                if not node_available:
+                    return context
+
                 router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
                 parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
 
                 # Fetch information from the router and merge it into local context
                 try:
                     parser.parse_into(context)
+                    context.successfully_parsed = True
                 except telemetry_parser.HttpTelemetryParseFailed:
                     # Parsing has failed, log this; all components that did not get parsed
                     # will be missing from context and so depending modules will not process them
