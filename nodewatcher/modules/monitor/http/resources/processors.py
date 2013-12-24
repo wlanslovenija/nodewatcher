@@ -22,23 +22,26 @@ class SystemStatus(monitor_processors.NodeProcessor):
         """
 
         # Reset monitor models
-        status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
-        status.uptime = None
-        status.local_time = None
+        status = node.monitoring.system.status()
+        if status is not None:
+            status.uptime = None
+            status.local_time = None
 
-        gresources = node.monitoring.system.resources.general(create=monitor_models.GeneralResourcesMonitor)
-        gresources.loadavg_1min = None
-        gresources.loadavg_5min = None
-        gresources.loadavg_15min = None
-        gresources.memory_free = None
-        gresources.memory_buffers = None
-        gresources.memory_cache = None
-        gresources.processes = None
+        gresources = node.monitoring.system.resources.general()
+        if gresources is not None:
+            gresources.loadavg_1min = None
+            gresources.loadavg_5min = None
+            gresources.loadavg_15min = None
+            gresources.memory_free = None
+            gresources.memory_buffers = None
+            gresources.memory_cache = None
+            gresources.processes = None
 
-        nresources = node.monitoring.system.resources.network(create=monitor_models.NetworkResourcesMonitor)
-        nresources.routes = None
-        nresources.tcp_connections = None
-        nresources.udp_connections = None
+        nresources = node.monitoring.system.resources.network()
+        if nresources is not None:
+            nresources.routes = None
+            nresources.tcp_connections = None
+            nresources.udp_connections = None
 
         version = context.http.get_module_version("core.general")
         if version >= 1:
@@ -52,10 +55,19 @@ class SystemStatus(monitor_processors.NodeProcessor):
             processes = int(context.http.general.loadavg.split()[3].split("/")[1])
         else:
             # Unsupported version or data fetch failed (v0)
-            status.save()
-            gresources.save()
-            nresources.save()
+            if status:
+                status.save()
+            if gresources:
+                gresources.save()
+            if nresources:
+                nresources.save()
             return context
+
+        # Create models when they don't exist
+        if status is None:
+            status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
+        if gresources is None:
+            gresources = node.monitoring.system.resources.general(create=monitor_models.GeneralResourcesMonitor)
 
         if version == 1:
             # Process memory resources (v1)
@@ -67,8 +79,6 @@ class SystemStatus(monitor_processors.NodeProcessor):
             memory_free = int(context.http.general.memory.free)
             memory_buffers = int(context.http.general.memory.buffers)
             memory_cache = int(context.http.general.memory.cache)
-        else:
-            assert False
 
         # Schema update for system status
         status.uptime = uptime
@@ -87,9 +97,12 @@ class SystemStatus(monitor_processors.NodeProcessor):
 
         # Schema update for network resources
         if version >= 3:
+            if nresources is None:
+                nresources = node.monitoring.system.resources.network(create=monitor_models.NetworkResourcesMonitor)
+
             nresources.routes = int(context.http.general.routes.ipv4) + int(context.http.general.routes.ipv6)
             nresources.tcp_connections = int(context.http.general.connections.tcp)
             nresources.udp_connections = int(context.http.general.connections.udp)
-        nresources.save()    
+            nresources.save()
 
         return context

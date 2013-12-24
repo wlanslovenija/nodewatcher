@@ -21,9 +21,23 @@ class GeneralInfo(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        general = node.monitoring.core.general(create=monitor_models.CgmGeneralMonitor)
-        general.uuid = context.http.general.uuid or None
-        general.firmware = context.http.general.version or None
+        general = node.monitoring.core.general()
+        if general is not None:
+            general.uuid = None
+            general.firmware = None
+
+        version = context.http.get_module_version("core.general")
+        if version == 0:
+            # Unsupported version or data fetch failed (v0)
+            if general:
+                general.save()
+            return context
+
+        if general is None:
+            general = node.monitoring.core.general(create=monitor_models.CgmGeneralMonitor)
+        
+        general.uuid = context.http.general.uuid
+        general.firmware = context.http.general.version
         general.save()
 
         return context
