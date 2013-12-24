@@ -1,4 +1,6 @@
-from nodewatcher.core.monitor import processors as monitor_processors, models as monitor_models
+from nodewatcher.core.monitor import processors as monitor_processors
+
+from . import models
 
 
 class NodeState(monitor_processors.NodeProcessor):
@@ -16,14 +18,19 @@ class NodeState(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        sm = node.monitoring.core.status(create=monitor_models.StatusMonitor)
+        sm = node.monitoring.core.status(create=models.StatusMonitor)
         # TODO: Emit events on node state transitions
         if context.node_available is not True:
-            sm.status = 'down'
+            sm.network = 'down'
+            sm.monitored = None
         elif context.http.successfully_parsed is True:
-            sm.status = 'up'
+            sm.network = 'up'
+            sm.monitored = True
         else:
-            sm.status = 'visible'
+            sm.network = 'visible'
+            sm.monitored = False
+        # TODO: Change depending on any warning/error events
+        sm.health = 'unknown'
         sm.save()
 
         return context
