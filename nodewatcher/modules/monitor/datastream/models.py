@@ -117,7 +117,11 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Load average (1 min)"),
         'description': gettext_noop("1 minute load average."),
         'visualization': {
-            'type': 'stack',
+            # TODO: Change back to stack when supported
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {'group': 'load_average', 'node': fields.TagReference('node')},
         }
     })
@@ -126,7 +130,11 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Load average (5 min)"),
         'description': gettext_noop("5 minute load average."),
         'visualization': {
-            'type': 'stack',
+            # TODO: Change back to stack when supported
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {'group': 'load_average', 'node': fields.TagReference('node')},
         }
     })
@@ -135,7 +143,11 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Load average (15 min)"),
         'description': gettext_noop("15 minute load average."),
         'visualization': {
-            'type': 'stack',
+            # TODO: Change back to stack when supported
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {'group': 'load_average', 'node': fields.TagReference('node')},
         }
     })
@@ -144,7 +156,11 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Free memory"),
         'description': gettext_noop("Amount of free memory."),
         'visualization': {
-            'type': 'stack',
+            # TODO: Change back to stack when supported
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {'group': 'memory', 'node': fields.TagReference('node')},
         }
     })
@@ -153,7 +169,11 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Buffers memory"),
         'description': gettext_noop("Amount of memory used for kernel buffers."),
         'visualization': {
-            'type': 'stack',
+            # TODO: Change back to stack when supported
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {'group': 'memory', 'node': fields.TagReference('node')},
         }
     })
@@ -162,7 +182,11 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Cache memory"),
         'description': gettext_noop("Amount of memory used for cache."),
         'visualization': {
-            'type': 'stack',
+            # TODO: Change back to stack when supported
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {'group': 'memory', 'node': fields.TagReference('node')},
         }
     })
@@ -173,6 +197,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         }
     })
 
@@ -187,6 +212,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         }
     })
     tcp_connections = fields.IntegerField(tags={
@@ -196,6 +222,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         }
     })
     udp_connections = fields.IntegerField(tags={
@@ -205,6 +232,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         }
     })
 
