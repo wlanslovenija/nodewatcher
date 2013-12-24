@@ -9,6 +9,8 @@ class NodesList(generic.ListView):
         name='GeneralConfig.name',
         type='TypeConfig.type',
         router_id='RouterIdConfig.router_id',
-        status='StatusMonitor.status',
+        network_status='StatusMonitor.network',
+        monitored_status='StatusMonitor.monitored',
+        health_status='StatusMonitor.health',
     ).order_by('type', 'router_id')
     context_object_name = 'nodes'

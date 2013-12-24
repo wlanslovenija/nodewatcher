@@ -3,9 +3,9 @@ from nodewatcher.core.monitor import processors as monitor_processors
 from . import models
 
 
-class NodeState(monitor_processors.NodeProcessor):
+class NodeStatus(monitor_processors.NodeProcessor):
     """
-    A processor that determines the node's state based on the status of
+    A processor that determines the node's status based on the status of
     other processors (OLSR, HTTP telemetry, ...).
     """
 

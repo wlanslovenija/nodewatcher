@@ -237,7 +237,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.administration.location',
     'nodewatcher.modules.administration.description',
     'nodewatcher.modules.administration.roles',
-    'nodewatcher.modules.administration.states',
+    'nodewatcher.modules.administration.status',
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.platforms.openwrt',
     'nodewatcher.modules.devices',
@@ -401,7 +401,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
-    'nodewatcher.modules.administration.states.processors.NodeState',
+    'nodewatcher.modules.administration.states.processors.NodeStatus',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
     'nodewatcher.modules.monitor.datastream.processors.Maintenance',
 )
