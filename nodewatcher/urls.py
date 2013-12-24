@@ -5,7 +5,7 @@ urlpatterns = urls.patterns(
     '',
 
     # Registry
-    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', app_name='registry')),
+    urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace='registry', app_name='registry')),
 
     # Frontend
     urls.url(r'^', urls.include('nodewatcher.core.frontend.urls')),
