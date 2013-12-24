@@ -5,7 +5,7 @@ from django.utils import importlib, module_loading
 def load_modules(*types):
     """
     Loads the per-application specific modules that must always be loaded
-    before registry operations can function normaly.
+    before registry operations can function normally.
 
     :param types: Types of modules that should be loaded (type name
                   determines the filename that is loaded)
