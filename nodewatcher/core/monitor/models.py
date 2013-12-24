@@ -216,3 +216,37 @@ class WifiInterfaceMonitor(InterfaceMonitor):
         pass
 
 registration.point('node.monitoring').register_item(WifiInterfaceMonitor)
+
+
+class Measurement(models.Model):
+    """
+    Mixin for measurement monitor models.
+    """
+
+    source = models.ForeignKey(core_models.Node, null=True)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    class Meta:
+        abstract = True
+
+
+class RttMeasurementMonitor(registration.bases.NodeMonitoringRegistryItem, Measurement):
+    """
+    RTT measurements.
+    """
+
+    packet_size = models.PositiveIntegerField()
+    packet_loss = models.PositiveIntegerField()
+    all_packets = models.PositiveIntegerField()
+    successful_packets = models.PositiveIntegerField()
+    failed_packets = models.PositiveIntegerField()
+    rtt_minimum = models.FloatField()
+    rtt_average = models.FloatField()
+    rtt_maximum = models.FloatField()
+
+    class RegistryMeta:
+        registry_id = 'network.measurement.rtt'
+        multiple = True
+
+registration.point('node.monitoring').register_item(RttMeasurementMonitor)

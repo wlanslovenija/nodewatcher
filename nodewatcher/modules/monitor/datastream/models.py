@@ -236,6 +236,71 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
         }
     })
 
+pool.register(models.NetworkResourcesMonitor, NetworkResourcesMonitorStreams)
+
+
+class RttMeasurementMonitorStreams(RegistryItemStreams):
+    packet_loss = fields.IntegerField(tags={
+        'group': 'packet_loss',
+        'title': fields.TagReference('packet_size', gettext_noop("Packet loss (%(packet_size)s bytes)")),
+        'description': gettext_noop("Packet loss in percent."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'packet_loss', 'node': fields.TagReference('node')},
+        }
+    })
+    rtt_minimum = fields.FloatField(tags={
+        'group': 'rtt',
+        'title': fields.TagReference('packet_size', gettext_noop("RTT minimum (%(packet_size)s bytes)")),
+        'description': gettext_noop("Minimum measured RTT."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'rtt', 'node': fields.TagReference('node')},
+        }
+    })
+    rtt_average = fields.FloatField(tags={
+        'group': 'rtt',
+        'title': fields.TagReference('packet_size', gettext_noop("RTT average (%(packet_size)s bytes)")),
+        'description': gettext_noop("Average measured RTT."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'rtt', 'node': fields.TagReference('node')},
+        }
+    })
+    rtt_maximum = fields.FloatField(tags={
+        'group': 'rtt',
+        'title': fields.TagReference('packet_size', gettext_noop("RTT maximum (%(packet_size)s bytes)")),
+        'description': gettext_noop("Maximum measured RTT."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'rtt', 'node': fields.TagReference('node')},
+        }
+    })
+
+    def get_stream_query_tags(self):
+        tags = super(RttMeasurementMonitorStreams, self).get_stream_query_tags()
+        tags.update({'packet_size': self._model.packet_size})
+        return tags
+
+    def get_stream_tags(self):
+        tags = super(RttMeasurementMonitorStreams, self).get_stream_query_tags()
+        tags.update({'packet_size': self._model.packet_size})
+        return tags
+
+pool.register(models.RttMeasurementMonitor, RttMeasurementMonitorStreams)
+
 
 class InterfaceStreams(RegistryItemStreams):
     def get_stream_query_tags(self):
