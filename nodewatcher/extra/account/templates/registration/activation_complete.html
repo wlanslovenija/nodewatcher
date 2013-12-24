@@ -11,6 +11,6 @@
 {% endblock %}
 
 {% block content %}
-    {% url auth_login as auth_login_url %}
+    {% url AccountComponent:auth_login as auth_login_url %}
     <p>{% blocktrans %}Activation of your account has been successful. You can <a href="{{ auth_login_url }}">log in</a> now.{% endblocktrans %}</p>
 {% endblock %}
