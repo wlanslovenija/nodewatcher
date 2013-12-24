@@ -123,8 +123,8 @@ class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     Basic system status information like uptime and the local time.
     """
 
-    uptime = models.PositiveIntegerField()
-    local_time = models.DateTimeField()
+    uptime = models.PositiveIntegerField(null=True)
+    local_time = models.DateTimeField(null=True)
 
     class Meta:
         app_label = 'core'
@@ -140,13 +140,13 @@ class GeneralResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     General resources such as load average, system memory and the number of processes.
     """
 
-    loadavg_1min = models.FloatField()
-    loadavg_5min = models.FloatField()
-    loadavg_15min = models.FloatField()
-    memory_free = models.PositiveIntegerField()
-    memory_buffers = models.PositiveIntegerField()
-    memory_cache = models.PositiveIntegerField()
-    processes = models.PositiveIntegerField()
+    loadavg_1min = models.FloatField(null=True)
+    loadavg_5min = models.FloatField(null=True)
+    loadavg_15min = models.FloatField(null=True)
+    memory_free = models.PositiveIntegerField(null=True)
+    memory_buffers = models.PositiveIntegerField(null=True)
+    memory_cache = models.PositiveIntegerField(null=True)
+    processes = models.PositiveIntegerField(null=True)
 
     class RegistryMeta:
         registry_id = 'system.resources.general'
@@ -160,9 +160,9 @@ class NetworkResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     connections.
     """
 
-    routes = models.IntegerField()
-    tcp_connections = models.IntegerField()
-    udp_connections = models.IntegerField()
+    routes = models.IntegerField(null=True)
+    tcp_connections = models.IntegerField(null=True)
+    udp_connections = models.IntegerField(null=True)
 
     class RegistryMeta:
         registry_id = 'system.resources.network'
@@ -175,17 +175,17 @@ class InterfaceMonitor(registration.bases.NodeMonitoringRegistryItem):
     A monitored interface.
     """
 
-    name = models.CharField(max_length=50)
-    hw_address = registry_fields.MACAddressField()
-    tx_packets = models.DecimalField(max_digits=100, decimal_places=0)
-    rx_packets = models.DecimalField(max_digits=100, decimal_places=0)
-    tx_bytes = models.DecimalField(max_digits=100, decimal_places=0)
-    rx_bytes = models.DecimalField(max_digits=100, decimal_places=0)
-    tx_errors = models.DecimalField(max_digits=100, decimal_places=0)
-    rx_errors = models.DecimalField(max_digits=100, decimal_places=0)
-    tx_drops = models.DecimalField(max_digits=100, decimal_places=0)
-    rx_drops = models.DecimalField(max_digits=100, decimal_places=0)
-    mtu = models.IntegerField()
+    name = models.CharField(max_length=50, null=True)
+    hw_address = registry_fields.MACAddressField(null=True)
+    tx_packets = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    rx_packets = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    tx_bytes = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    rx_bytes = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    tx_errors = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    rx_errors = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    tx_drops = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    rx_drops = models.DecimalField(max_digits=100, decimal_places=0, null=True)
+    mtu = models.IntegerField(null=True)
 
     class RegistryMeta:
         registry_id = 'core.interfaces'
@@ -199,10 +199,10 @@ class WifiInterfaceMonitor(InterfaceMonitor):
     A monitored wireless interface.
     """
 
-    mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode')
+    mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode', null=True)
     essid = models.CharField(max_length=50, null=True)
     bssid = registry_fields.MACAddressField(null=True)
-    protocol = models.CharField(max_length=50)
+    protocol = models.CharField(max_length=50, null=True)
     channel = models.PositiveIntegerField(null=True)
     channel_width = models.PositiveIntegerField(null=True)
     bitrate = models.FloatField(null=True)
@@ -210,7 +210,7 @@ class WifiInterfaceMonitor(InterfaceMonitor):
     frag_threshold = models.IntegerField(null=True)
     signal = models.IntegerField(null=True)
     noise = models.IntegerField(null=True)
-    snr = models.FloatField()
+    snr = models.FloatField(null=True)
 
     class RegistryMeta(InterfaceMonitor.RegistryMeta):
         pass
@@ -224,8 +224,8 @@ class Measurement(models.Model):
     """
 
     source = models.ForeignKey(core_models.Node, null=True)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    start = models.DateTimeField(null=True)
+    end = models.DateTimeField(null=True)
 
     class Meta:
         abstract = True
@@ -236,14 +236,14 @@ class RttMeasurementMonitor(registration.bases.NodeMonitoringRegistryItem, Measu
     RTT measurements.
     """
 
-    packet_size = models.PositiveIntegerField()
-    packet_loss = models.PositiveIntegerField()
-    all_packets = models.PositiveIntegerField()
-    successful_packets = models.PositiveIntegerField()
-    failed_packets = models.PositiveIntegerField()
-    rtt_minimum = models.FloatField()
-    rtt_average = models.FloatField()
-    rtt_maximum = models.FloatField()
+    packet_size = models.PositiveIntegerField(null=True)
+    packet_loss = models.PositiveIntegerField(null=True)
+    all_packets = models.PositiveIntegerField(null=True)
+    successful_packets = models.PositiveIntegerField(null=True)
+    failed_packets = models.PositiveIntegerField(null=True)
+    rtt_minimum = models.FloatField(null=True)
+    rtt_average = models.FloatField(null=True)
+    rtt_maximum = models.FloatField(null=True)
 
     class RegistryMeta:
         registry_id = 'network.measurement.rtt'
