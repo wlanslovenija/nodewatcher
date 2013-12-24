@@ -1,3 +1,4 @@
+import copy
 import re
 
 from django import shortcuts
@@ -21,8 +22,14 @@ class FrontendComponentsPool(object):
 
         for app in settings.INSTALLED_APPS:
             try:
+                before_import_components = copy.copy(self._components)
                 importlib.import_module('.frontend', app)
             except ImportError, e:
+                # Reset to the state before the last import as this import will
+                # have to reoccur on the next request and this could raise
+                # FrontendComponentNotRegistered and FrontendComponentAlreadyRegistered exceptions
+                self._components = before_import_components
+
                 message = str(e)
                 if message != 'No module named frontend':
                     raise

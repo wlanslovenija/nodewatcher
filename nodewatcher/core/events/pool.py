@@ -1,3 +1,4 @@
+import copy
 import re
 
 from django.conf import settings
@@ -28,8 +29,14 @@ class EventSinkPool(object):
 
         for app in settings.INSTALLED_APPS:
             try:
+                before_import_sinks = copy.copy(self._sinks)
                 importlib.import_module('.events', app)
             except ImportError, e:
+                # Reset to the state before the last import as this import will
+                # have to reoccur on the next request and this could raise
+                # EventSinkNotRegistered and EventSinkAlreadyRegistered exceptions
+                self._sinks = before_import_sinks
+
                 message = str(e)
                 if message != 'No module named events':
                     raise
