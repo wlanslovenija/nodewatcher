@@ -1,15 +1,6 @@
-from django.conf import urls
+from django_datastream import urls
 
-from nodewatcher.core.frontend import components
+from nodewatcher.core.frontend import api
 
-
-class DatastreamComponent(components.FrontendComponent):
-    @classmethod
-    def get_urls(cls):
-        return super(DatastreamComponent, cls).get_urls() + urls.patterns(
-            '',
-
-            urls.url(r'^api/', urls.include('django_datastream.urls')),
-        )
-
-components.pool.register(DatastreamComponent)
+for resource in urls.v1_api._registry.values():
+    api.v1_api.register(resource)
