@@ -10,6 +10,7 @@ class StreamDescriptorPool(object):
         """
 
         self._descriptors = datastructures.SortedDict()
+        self._cache = {}
 
     def register(self, model, descriptor):
         """
@@ -47,7 +48,25 @@ class StreamDescriptorPool(object):
         """
 
         try:
-            return self._descriptors[model.__class__](model)
+            descriptor_class = self._descriptors[model.__class__]
+            if (descriptor_class, model) not in self._cache:
+                self._cache[(descriptor_class, model)] = descriptor_class(model)
+            
+            return self._cache[(descriptor_class, model)]
+        except KeyError:
+            raise exceptions.StreamDescriptorNotRegistered("Stream descriptor for model class '%s' is not registered" % model.__class__.__name__)
+
+    def clear_descriptor(self, model):
+        """
+        Clears a cached stream descriptor for a given model.
+
+        :param model: Underlying data model instance
+        """
+
+        try:
+            descriptor_class = self._descriptors[model.__class__]
+            if (descriptor_class, model) in self._cache:
+                del self._cache[(descriptor_class, model)]
         except KeyError:
             raise exceptions.StreamDescriptorNotRegistered("Stream descriptor for model class '%s' is not registered" % model.__class__.__name__)
 

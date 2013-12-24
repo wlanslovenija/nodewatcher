@@ -22,6 +22,7 @@ class Datastream(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
+        processed_items = set()
         for items in itertools.chain(node.monitoring, context.datastream.values()):
             if not isinstance(items, list):
                 items = [items]
@@ -29,9 +30,14 @@ class Datastream(monitor_processors.NodeProcessor):
             # Only include models that have known stream descriptors registered in
             # the descriptor pool
             for item in items:
+                if item in processed_items:
+                    continue
+                processed_items.add(item)
+                
                 try:
                     descriptor = pool.get_descriptor(item)
                     descriptor.insert_to_stream(datastream)
+                    pool.clear_descriptor(item)
                 except exceptions.StreamDescriptorNotRegistered:
                     continue
 

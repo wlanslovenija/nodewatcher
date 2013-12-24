@@ -16,25 +16,24 @@ class StreamsMeta(type):
         # Create the actual class
         module = attrs.pop("__module__")
         new_class = type.__new__(cls, classname, bases, {"__module__": module})
-        new_class._fields = collections.OrderedDict()
+        new_class._shared_fields = collections.OrderedDict()
 
         from . import fields
 
         # Inherit all fields from parent classes
         for base in bases:
-            if not hasattr(base, '_fields'):
+            if not hasattr(base, '_shared_fields'):
                 continue
 
-            for name, value in base._fields.items():
+            for name, value in base._shared_fields.items():
                 if not isinstance(value, fields.Field):
                     continue
 
-                if name in new_class._fields:
+                if name in new_class._shared_fields:
                     raise exceptions.ImproperlyConfigured("Duplicate field '%s' in stream descriptor '%s'!" % (name, classname))
 
                 value = copy.deepcopy(value)
-                new_class._fields[name] = value
-                setattr(new_class, name, value)
+                new_class._shared_fields[name] = value
 
         # Add all fields to our streams descriptor
         for name, value in attrs.items():
@@ -42,12 +41,11 @@ class StreamsMeta(type):
                 setattr(new_class, name, value)
                 continue
 
-            if name in new_class._fields:
+            if name in new_class._shared_fields:
                 raise exceptions.ImproperlyConfigured("Duplicate field '%s' in stream descriptor '%s'!" % (name, classname))
 
             value.name = name
-            new_class._fields[name] = value
-            setattr(new_class, name, value)
+            new_class._shared_fields[name] = value
 
         return new_class
 
@@ -68,6 +66,13 @@ class StreamsBase(object):
 
         self._model = model
 
+        # Make a local copy of all field descriptors for this model
+        self._local_fields = collections.OrderedDict()
+        for name, field in self._shared_fields.iteritems():
+            field = copy.deepcopy(field)
+            self._local_fields[name] = field
+            setattr(self, name, field)
+
     def insert_to_stream(self, stream):
         """
         Inserts all the fields specified in this descriptor to the datastream.
@@ -75,7 +80,7 @@ class StreamsBase(object):
         :param stream: Instance of the datastream to insert into
         """
 
-        for field in self._fields.values():
+        for field in self._local_fields.values():
             field.to_stream(self, stream)
 
     def get_model(self):
@@ -93,14 +98,14 @@ class StreamsBase(object):
         :return: Field descriptor or None
         """
 
-        return self._fields.get(name, None)
+        return self._local_fields.get(name, None)
 
     def get_fields(self):
         """
         Returns a list of all field descriptors.
         """
 
-        return self._fields.values()
+        return self._local_fields.values()
 
     def get_stream_query_tags(self):
         """
