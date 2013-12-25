@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "plain.html" %}
 
 {% load i18n nodestatus html_tags misc %}
 
@@ -19,7 +19,7 @@
     <ul></ul>
 {% endblock %}
 
-{% block content %}
+{% block plain-content %}
     {% if request.node %}
         {% notice webclient %}
             <b>You are visiting this page through the <i>{{ NETWORK.NAME }}</i> network.</b><br />

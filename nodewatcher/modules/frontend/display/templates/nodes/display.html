@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "plain.html" %}
 
 {% load i18n conversion gmap misc graphs html_tags %}
 
@@ -43,7 +43,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content %}
+{% block plain-content %}
     {% include "nodes/warnings.html" %}
 
     {% if current_owner and node.is_pending and node.profile %}
