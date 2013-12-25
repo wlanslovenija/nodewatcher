@@ -256,6 +256,28 @@ class FloatField(Field):
         return tags
 
 
+class MultiPointField(Field):
+    """
+    A datastream field that accepts already downsampled datapoints which
+    represent multiple actual datapoints.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Class constructor.
+        """
+
+        super(MultiPointField, self).__init__(**kwargs)
+
+    def prepare_value(self, value):
+        return dict(value)
+
+    def prepare_tags(self):
+        tags = super(MultiPointField, self).prepare_tags()
+        tags.update({'type': 'multipoint'})
+        return tags
+
+
 class DerivedField(Field):
     """
     A derived datastream field.
