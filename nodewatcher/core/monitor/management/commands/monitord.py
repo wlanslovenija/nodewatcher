@@ -10,6 +10,12 @@ class Command(BaseCommand):
     requires_model_validation = True
     option_list = BaseCommand.option_list + (
         make_option(
+            '--run',
+            dest='run',
+            default=None,
+            help='Only execute a specific run',
+        ),
+        make_option(
             '--cycles',
             dest='cycles',
             default=None,
@@ -26,4 +32,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         w = worker.Worker()
-        w.run(cycles=options['cycles'], process_only_node=options['process_only_node'])
+        w.run(cycles=options['cycles'], process_only_node=options['process_only_node'], run=options['run'])

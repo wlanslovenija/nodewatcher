@@ -383,28 +383,53 @@ CELERY_ROUTES = {
     },
 }
 
-# Monitor configuration.
-MONITOR_WORKERS = 20
-MONITOR_INTERVAL = 300
-
-# Monitoring processors configuration; this defines the order in which monitoring processors
+# Monitoring runs and processors configuration; this defines the order in which monitoring processors
 # will be called. Multiple consecutive node processors will be automatically grouped and
 # executed in parallel for all nodes that have been chosen so far by network processors. Only
 # processors that are specified here will be called.
-MONITOR_PROCESSORS = (
-    'nodewatcher.core.monitor.processors.GetAllNodes',
-    'nodewatcher.modules.routing.olsr.processors.Topology',
-    'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
-    'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
-    'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
-    'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
-    'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
-    'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
-    'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
-    'nodewatcher.modules.administration.status.processors.NodeStatus',
-    'nodewatcher.modules.monitor.datastream.processors.Datastream',
-    'nodewatcher.modules.monitor.datastream.processors.Maintenance',
-)
+#
+# Multiple runs are executed in parallel, each with its own worker pool and on a preconfigured interval
+MONITOR_RUNS = {
+    'latency': {
+        'workers': 10,
+        'interval': 600,
+        'processors': (
+            'nodewatcher.modules.routing.olsr.processors.Topology',
+            'nodewatcher.modules.monitor.measurements.rtt.processors.RttMeasurement',
+            'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
+            'nodewatcher.modules.monitor.measurements.rtt.processors.StoreNode',
+            'nodewatcher.modules.monitor.datastream.processors.Datastream',
+        ),
+    },
+
+    'telemetry': {
+        'workers': 20,
+        'interval': 300,
+        'processors': (
+            'nodewatcher.core.monitor.processors.GetAllNodes',
+            'nodewatcher.modules.routing.olsr.processors.Topology',
+            'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
+            'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
+            'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
+            'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
+            'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
+            'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
+            'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
+            'nodewatcher.modules.administration.status.processors.NodeStatus',
+            'nodewatcher.modules.monitor.datastream.processors.Datastream',
+            'nodewatcher.modules.monitor.datastream.processors.Maintenance',
+        ),
+    },
+
+    'topology': {
+        'workers': 5,
+        'interval': 60,
+        'processors': (
+            'nodewatcher.modules.routing.olsr.processors.Topology',
+            'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
+        ),
+    },
+}
 
 # Backend for the monitoring data archive.
 DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
@@ -431,6 +456,10 @@ REGISTRY_FORM_PROCESSORS = {
 
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
+
+# UUID of the node that is performing measurements (usually the node where the nodewatcher
+# monitor is running on).
+MEASUREMENT_SOURCE_NODE = ''
 
 # Storage for generated firmware images.
 GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'

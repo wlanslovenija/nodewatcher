@@ -54,39 +54,21 @@ def stage_worker(args):
                 logger.warning(traceback.format_exc())
 
 
-class Worker(object):
+def main_worker(run):
     """
-    Monitoring daemon.
+    Starts the given run.
     """
 
-    def prepare_processors(self):
-        """
-        Loads all processors as specified in configuration and groups them
-        accoording to their types.
-        """
+    global logger
+    logger = logger.getChild('run.%s' % run.name)
+    run.start()
 
-        self.processors = []
-        for proc_module in settings.MONITOR_PROCESSORS:
-            i = proc_module.rfind('.')
-            module, attr = proc_module[:i], proc_module[i + 1:]
-            try:
-                module = importlib.import_module(module)
-                processor = getattr(module, attr)
-            except (ImportError, AttributeError):
-                raise exceptions.ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)
 
-            if not self.processors:
-                self.processors.append([processor])
-            else:
-                prev_class = self.processors[-1][-1]
-                curr_class = processor
+class MonitorRun(object):
 
-                # Consecutive node processors are grouped together so they will all be run in parallel
-                # on the list of nodes that has been prepared by recent network processor invocations
-                if issubclass(prev_class, monitor_processors.NodeProcessor) and issubclass(curr_class, monitor_processors.NodeProcessor):
-                    self.processors[-1].append(processor)
-                else:
-                    self.processors.append([processor])
+    def __init__(self, name, config):
+        self.name = name
+        self.config = config
 
     def prepare_workers(self):
         """
@@ -100,12 +82,12 @@ class Worker(object):
 
         # Prepare worker processes
         try:
-            self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS, maxtasksperchild=1000)
+            self.workers = multiprocessing.Pool(self.config['workers'], maxtasksperchild=1000)
         except TypeError:
-            # Compatibility with Python 2.6 that doesn't have the maxtasksperchild arument
-            self.workers = multiprocessing.Pool(settings.MONITOR_WORKERS)
+            # Compatibility with Python 2.6 that doesn't have the maxtasksperchild argument
+            self.workers = multiprocessing.Pool(self.config['workers'])
 
-        logger.info("Ready with %d workers." % settings.MONITOR_WORKERS)
+        logger.info("Ready with %d workers for run %s." % (self.config['workers'], self.name))
 
     @transaction.commit_manually
     def cycle(self):
@@ -116,7 +98,7 @@ class Worker(object):
         nodes = set()
         context = monitor_processors.ProcessorContext()
 
-        for processor_list in self.processors:
+        for processor_list in self.config['processors']:
             lead_proc = processor_list[0]
             if issubclass(lead_proc, monitor_processors.NetworkProcessor):
                 # Network processors run serially and may modify the nodes list
@@ -138,9 +120,9 @@ class Worker(object):
                 for p in processor_list:
                     logger.info("  - %s" % p.__name__)
 
-                if self._process_only_node is not None:
-                    logger.info("Limiting only to the following node: %s" % self._process_only_node)
-                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes if node.pk == self._process_only_node)).get(0xFFFF)
+                if self.config['process_only_node'] is not None:
+                    logger.info("Limiting only to the following node: %s" % self.config['process_only_node'])
+                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
                 else:
                     self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes)).get(0xFFFF)
             else:
@@ -148,7 +130,88 @@ class Worker(object):
 
         logger.info("All done.")
 
-    def run(self, cycles=None, process_only_node=None):
+    def start(self):
+        logger.info("Preparing the worker pool for run %s..." % self.name)
+        self.prepare_workers()
+
+        logger.info("Run %s entering monitoring cycle..." % self.name)
+        try:
+            cycle = 0
+            while True:
+                start = time.time()
+                self.cycle()
+
+                cycle += 1
+                if self.config['cycles'] is not None and cycle >= self.config['cycles']:
+                    logger.info("Reached %d cycles." % cycle)
+                    break
+
+                # Sleep for the right amount of time that cycles will be triggered
+                # on every "interval" seconds (but no less then 30 seconds apart)
+                cycle_duration = time.time() - start
+                time.sleep(max(30, worker.runs[run]['interval'] - cycle_duration))
+        except KeyboardInterrupt:
+            logger.info("Aborted by user.")
+        finally:
+            # Ensure that the worker pool gets cleaned up after processing is completed
+            logger.info("Stopping worker processes...")
+            self.workers.terminate()
+
+
+class Worker(object):
+    """
+    Monitoring daemon.
+    """
+
+    def prepare_processors(self):
+        """
+        Loads all processors as specified in configuration and groups them
+        accoording to their types.
+        """
+
+        self.runs = {}
+        for run, config in settings.MONITOR_RUNS.iteritems():
+            processors = []
+            for proc_module in config['processors']:
+                i = proc_module.rfind('.')
+                module, attr = proc_module[:i], proc_module[i + 1:]
+                try:
+                    module = importlib.import_module(module)
+                    processor = getattr(module, attr)
+                except (ImportError, AttributeError):
+                    raise exceptions.ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)
+
+                if not processors:
+                    processors.append([processor])
+                else:
+                    prev_class = processors[-1][-1]
+                    curr_class = processor
+
+                    # Consecutive node processors are grouped together so they will all be run in parallel
+                    # on the list of nodes that has been prepared by recent network processor invocations
+                    if issubclass(prev_class, monitor_processors.NodeProcessor) and issubclass(curr_class, monitor_processors.NodeProcessor):
+                        processors[-1].append(processor)
+                    else:
+                        processors.append([processor])
+
+            self.runs[run] = {
+                'interval': config['interval'],
+                'workers': config['workers'],
+                'processors': processors,
+            }
+
+    def start_run(self, run, cycles=None, process_only_node=None):
+        # Create a run descriptor
+        self.runs[run]['cycles'] = cycles
+        self.runs[run]['process_only_node'] = process_only_node
+        rd = MonitorRun(run, self.runs[run])
+
+        # Fork a process for this run
+        p = multiprocessing.Process(target=main_worker, args=(rd,))
+        p.start()
+        return p
+
+    def run(self, cycles=None, process_only_node=None, run=None):
         """
         Runs the monitoring process.
         """
@@ -159,30 +222,12 @@ class Worker(object):
         logger.info("Loading processors...")
         self.prepare_processors()
 
-        logger.info("Preparing the worker pool...")
-        self.prepare_workers()
+        logger.info("Starting monitoring runs...")
+        runs = []
+        for r in self.runs.keys():
+            if run is not None and r != run:
+                continue
+            runs.append(self.start_run(r, cycles, process_only_node))
 
-        self._process_only_node = process_only_node
-
-        logger.info("Entering monitoring cycle...")
-        try:
-            cycle = 0
-            while True:
-                start = time.time()
-                self.cycle()
-
-                cycle += 1
-                if cycles is not None and cycle >= cycles:
-                    logger.info("Reached %d cycles." % cycle)
-                    break
-
-                # Sleep for the right amount of time that cycles will be triggered
-                # on every MONITOR_INTERVAL seconds (but no less then 30 seconds apart)
-                cycle_duration = time.time() - start
-                time.sleep(max(30, settings.MONITOR_INTERVAL - cycle_duration))
-        except KeyboardInterrupt:
-            logger.info("Aborted by user.")
-        finally:
-            # Ensure that the worker pool gets cleaned up after processing is completed
-            logger.info("Stopping worker processes...")
-            self.workers.terminate()
+        for p in runs:
+            p.join()

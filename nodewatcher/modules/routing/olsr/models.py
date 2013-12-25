@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils.translation import ugettext as _, gettext_noop
 
@@ -6,6 +8,8 @@ from nodewatcher.core.registry import registration
 from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
 from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
+# Randomly generated UUID for generating UUIDs for unknown nodes in the network from IPs
+OLSR_UUID_NAMESPACE = uuid.UUID('f3f785f9-9580-4945-a43a-3e16f93783a6')
 OLSR_PROTOCOL_NAME = 'olsr'
 
 # Register the routing protocol option so interfaces can use it
