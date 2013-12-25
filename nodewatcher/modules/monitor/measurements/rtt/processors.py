@@ -9,6 +9,7 @@ from nodewatcher.core import models as core_models
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 from nodewatcher.utils import which, ipaddr
 
+
 class RttMeasurement(monitor_processors.NetworkProcessor):
     """
     Performs RTT measurements to nodes using different packet sizes.
@@ -162,7 +163,7 @@ class StoreNode(monitor_processors.NodeProcessor):
                 rm.rtt_minimum = result['rtt_min']
                 rm.rtt_average = result['rtt_avg']
                 rm.rtt_maximum = result['rtt_max']
-                rm.packet_loss = 100*rm.failed_packets / rm.all_packets
+                rm.packet_loss = 100 * rm.failed_packets / rm.all_packets
                 rm.save()
         except core_models.RouterIdConfig.DoesNotExist:
             # No router-id for this node can be found for IPv4; this means
