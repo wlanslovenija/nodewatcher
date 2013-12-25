@@ -1,0 +1,13 @@
+{% load forloop_tags %}
+
+{% comment %}
+This template uses `menu` (menu object) in the context.
+{% endcomment %}
+
+{% spaceless %}
+    <ul class="menu-list">
+        {% for menu_entry in menu %}
+            <li class="menu-entry {{ menu_entry.classes }} {% css_classes "first" "last" "odd" "even" %}"><a href="{{ menu_entry.url }}" class="menu-entry-link"><span class="menu-entry-label">{{ menu_entry.label }}</span></a></li>
+        {% endfor %}
+    </ul>
+{% endspaceless %}

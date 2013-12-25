@@ -1,0 +1,5 @@
+{% load staticfiles %}
+
+{% for css in css_data %}
+    <link href="{% static css %}" media="all" rel="stylesheet" type="text/css" />
+{% endfor %}

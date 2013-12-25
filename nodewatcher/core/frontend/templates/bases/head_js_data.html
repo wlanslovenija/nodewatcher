@@ -1,0 +1,5 @@
+{% load staticfiles %}
+
+{% for js in js_data %}
+    <script src="{% static js %}" type="text/javascript"></script>
+{% endfor %}

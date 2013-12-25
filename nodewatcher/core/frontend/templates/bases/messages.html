@@ -1,0 +1,9 @@
+{% load forloop_tags %}
+
+{% spaceless %}
+    <ul class="messages-list">
+        {% for message in messages %}
+            <li class="message {{ message.tags }} {% css_classes "first" "last" "odd" "even" %}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endspaceless %}

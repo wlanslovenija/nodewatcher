@@ -197,7 +197,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/account/login/'
 LOGOUT_URL = '/account/logout/'
 
-AUTH_PROFILE_MODULE = 'account.UserProfileAndSettings'
+AUTH_PROFILE_MODULE = 'accounts.UserProfileAndSettings'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
@@ -206,7 +206,7 @@ REGISTRATION_OPEN = True
 ANONYMOUS_USER_ID = -1
 
 AUTHENTICATION_BACKENDS = (
-    'nodewatcher.extra.account.auth.ModelBackend',
+    'nodewatcher.extra.accounts.auth.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
 
@@ -254,7 +254,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
     'nodewatcher.modules.frontend.api',
-    'nodewatcher.extra.account',
+    'nodewatcher.extra.accounts',
 
     # Legacy apps for migrations.
     'nodewatcher.legacy.nodes',
@@ -501,11 +501,15 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.507
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node.
 
-NETWORK_NAME = 'your network name'
-NETWORK_HOME = 'http://example.net'
-NETWORK_CONTACT = 'open@example.net'
-NETWORK_CONTACT_PAGE = 'http://example.net/contact'
-NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
+NETWORK = {
+    'NAME': 'your network name',
+    'HOME': 'http://example.net',
+    'CONTACT': 'open@example.net',
+    'CONTACT_PAGE': 'http://example.net/contact',
+    'DESCRIPTION': 'open wireless network in your neighborhood',
+    'FAVICON_FILE': '',
+    'LOGO_FILE': '',
+}
 
 EVENTS_EMAIL = DEFAULT_FROM_EMAIL
 IMAGE_GENERATOR_EMAIL = DEFAULT_FROM_EMAIL

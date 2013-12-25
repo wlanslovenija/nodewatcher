@@ -1,0 +1,5 @@
+{% load i18n %}
+
+{% if permalink %}
+    <div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>
+{% endif %}

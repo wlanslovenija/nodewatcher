@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% load i18n nodestatus misc %}
+{% load i18n nodestatus html_tags misc %}
 
-{% block title %}{% trans "Node List" %}{% endblock %}
+{% block title %}{% trans "Node List" %}{{ block.super }}{% endblock %}
 
 {% block heading %}
     {% with _("Node List") as heading %}
