@@ -26,39 +26,27 @@
         {% block js %}{% endblock js %}
     </head>
 
-    <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_class %}{% endblock body_class %}">
+    <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_classes %}{% endblock body_classes %}">
         {% block header-wrapper %}
-            <header class="{% block header_class %}{% endblock header_class %}">
+            <header class="{% block header_classes %}{% endblock header_classes %}">
+                {% block header-before %}{% endblock header-before %}
                 {% block header %}
-                    {% block accounts_menu %}
-                        <div class="accounts-menu-wrapper">
-                            <ul class="accounts-menu">
-
-                            </ul>
-                        </div>
-                    {% endblock accounts_menu %}
                     {% block header_heading %}
                         {% include "header_heading.html" %}
                     {% endblock header_heading %}
                 {% endblock header %}
+                {% block header-after %}{% endblock header-after %}
             </header>
         {% endblock header-wrapper %}
-        {% block messages-wrapper %}
-            {% if messages %}
-                <section class="messages {% block messages_class %}{% endblock messages_class %}">
-                    {% block messages %}
-                        {% include "messages.html" %}
-                    {% endblock messages %}
-                </section>
-            {% endif %}
-        {% endblock messages-wrapper %}
+        {% block between-header-content %}{% endblock between-header-content %}
         {% block content-wrapper %}
-            <section class="content {% block content_class %}{% endblock content_class %}">
+            <section class="content {% block content_classes %}{% endblock content_classes %}">
                 {% block content %}{% endblock content %}
             </section>
         {% endblock content-wrapper %}
+        {% block between-content-footer %}{% endblock between-content-footer %}
         {% block footer-wrapper %}
-            <footer class="{% block footer_class %}{% endblock footer_class %}">
+            <footer class="{% block footer_classes %}{% endblock footer_classes %}">
                 {% block footer %}
                     {% include "footer.html" %}
                 {% endblock footer %}

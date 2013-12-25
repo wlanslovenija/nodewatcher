@@ -1,1 +1,34 @@
 {% extends "bases/base.html" %}
+
+{% block between-header-content %}
+    {% block messages-wrapper %}
+        {% if messages %}
+            <section class="messages {% block messages_classes %}{% endblock messages_classes %}">
+                {% block messages %}
+                    {% include "messages.html" %}
+                {% endblock messages %}
+            </section>
+        {% endif %}
+    {% endblock messages-wrapper %}
+    {{ block.super }}
+{% endblock between-header-content %}
+
+{% block between-content-footer %}
+    {{ block.super }}
+    {% block altlinks-wrapper %}
+        <section class="altlinks {% block altlinks_classes %}{% endblock altlinks_classes %}">
+            {% block altlinks %}{% endblock altlinks %}
+        </section>
+    {% endblock altlinks-wrapper %}
+{% endblock between-content-footer %}
+
+{% block content %}
+    {% block content_permalink %}
+        {% include "content_permalink.html" %}
+    {% endblock content_permalink %}
+    {% block heading %}
+        {% include "content_heading.html" %}
+    {% endblock %}
+    {{ block.super }}
+    {% block plain-content %}{% endblock %}
+{% endblock content %}
