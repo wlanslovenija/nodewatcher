@@ -1,7 +1,7 @@
 {% load i18n misc %}
 
 <header>
-    {% include "account.html" %}
+    {% include "account_menu.html" %}
     {% if NETWORK.LOGO_URL %}
         <a href="{% url main_page %}"><img src="{{ NETWORK.LOGO_URL }}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
     {% else %}
