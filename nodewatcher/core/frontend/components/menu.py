@@ -2,6 +2,7 @@ import copy
 import re
 
 from django.conf import settings
+from django.core import urlresolvers
 from django.utils import translation
 
 from . import exceptions
@@ -66,6 +67,16 @@ class MenuEntry(object):
     @property
     def classes(self):
         return self._classes
+
+    @property
+    def all_urls(self):
+        # If menu entry's URL is main page, we also return its alternative URL
+        # so that possibly nested URLs under it can be properly matched to it
+        # when determining if menu entry is active
+        if urlresolvers.reverse('main_page') == self.url:
+            return (self.url, urlresolvers.reverse('main_page_redirect'))
+        else:
+            return (self._url,)
 
     def has_permission(self, request):
         return not self._permission_check or self._permission_check(request, self)
