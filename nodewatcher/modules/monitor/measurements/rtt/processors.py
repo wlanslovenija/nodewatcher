@@ -15,7 +15,7 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
     Performs RTT measurements to nodes using different packet sizes.
     """
 
-    PACKET_SIZES = (100, 500, 1000, 1480)
+    PACKET_SIZES = (56, 100, 500, 1000, 1480)
     PACKET_COUNT = 10
 
     def process(self, context, nodes):
