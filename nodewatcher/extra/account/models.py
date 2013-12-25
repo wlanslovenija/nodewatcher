@@ -88,13 +88,7 @@ def send_activation_email(instance, site, email_change=False):
         'site': site,
         'base_url': base_url,
         'protocol': protocol,
-        'network': {
-            'name': settings.NETWORK_NAME,
-            'home': settings.NETWORK_HOME,
-            'contact': settings.NETWORK_CONTACT,
-            'contact_page': settings.NETWORK_CONTACT_PAGE,
-            'description': getattr(settings, 'NETWORK_DESCRIPTION', None),
-        },
+        'NETWORK': getattr(settings, 'NETWORK', {}),
         'email_change': email_change,
         'registration_activate_url': registration_activate_url,
     }

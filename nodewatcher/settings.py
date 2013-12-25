@@ -472,11 +472,15 @@ GOOGLE_MAPS_DEFAULT_LONG = 14.507
 GOOGLE_MAPS_DEFAULT_ZOOM = 13
 GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node.
 
-NETWORK_NAME = 'your network name'
-NETWORK_HOME = 'http://example.net'
-NETWORK_CONTACT = 'open@example.net'
-NETWORK_CONTACT_PAGE = 'http://example.net/contact'
-NETWORK_DESCRIPTION = 'open wireless network in your neighborhood'
+NETWORK = {
+    'NAME': 'your network name',
+    'HOME': 'http://example.net',
+    'CONTACT': 'open@example.net',
+    'CONTACT_PAGE': 'http://example.net/contact',
+    'DESCRIPTION': 'open wireless network in your neighborhood',
+    'FAVICON_FILENAME': '',
+    'LOGO_FILENAME': '',
+}
 
 EVENTS_EMAIL = DEFAULT_FROM_EMAIL
 IMAGE_GENERATOR_EMAIL = DEFAULT_FROM_EMAIL

@@ -9,15 +9,7 @@ def global_vars(request):
     """
 
     return {
-        'NETWORK': {
-            'NAME': settings.NETWORK_NAME,
-            'HOME': settings.NETWORK_HOME,
-            'CONTACT': getattr(settings, 'NETWORK_CONTACT', None),
-            'CONTACT_PAGE': getattr(settings, 'NETWORK_CONTACT_PAGE', None),
-            'DESCRIPTION': getattr(settings, 'NETWORK_DESCRIPTION', None),
-            'FAVICON_URL': getattr(settings, 'NETWORK_FAVICON_URL', None),
-            'LOGO_URL': getattr(settings, 'NETWORK_LOGO_URL', None),
-        },
+        'NETWORK': getattr(settings, 'NETWORK', {}),
         'REDIRECT_FIELD_NAME': auth.REDIRECT_FIELD_NAME,
 
         'site': sites_models.get_current_site(request),

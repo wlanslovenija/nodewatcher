@@ -5,14 +5,16 @@
 
 from .settings import *
 
-NETWORK_NAME = 'wlan slovenija'
-NETWORK_HOME = 'http://wlan-si.net'
-NETWORK_CONTACT = 'open@wlan-si.net'
-NETWORK_CONTACT_PAGE = 'http://wlan-si.net/contact/'
-NETWORK_DESCRIPTION = 'open wireless network of Slovenia'
+NETWORK.update({
+    'NAME': 'wlan slovenija',
+    'HOME': 'https://wlan-si.net',
+    'CONTACT': 'open@wlan-si.net',
+    'CONTACT_PAGE': 'http://wlan-si.net/contact/',
+    'DESCRIPTION': 'open wireless network of Slovenia',
+})
 
-EMAIL_SUBJECT_PREFIX = '[' + NETWORK_NAME + '] '
-DEFAULT_FROM_EMAIL = 'open@wlan-si.net'
+EMAIL_SUBJECT_PREFIX = '[' + NETWORK.NAME + '] '
+DEFAULT_FROM_EMAIL = NETWORK.CONTACT
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 EVENTS_EMAIL = 'events@wlan-si.net'
