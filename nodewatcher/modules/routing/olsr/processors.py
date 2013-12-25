@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.utils import timezone
 
@@ -56,15 +58,17 @@ class Topology(monitor_processors.NetworkProcessor):
                 self.logger.info("Creating unknown node instances...")
                 for router_id in visible_routers.difference(registered_routers):
                     # Create an invalid node for each unknown router id seen by olsrd
-                    node = core_models.Node()
-                    node.save()
+                    node, created = core_models.Node.objects.get_or_create(
+                        uuid=str(uuid.uuid5(olsr_models.OLSR_UUID_NAMESPACE, router_id.packed))
+                    )
                     nodes.add(node)
                     context.router_id_map[router_id] = node
 
-                    rid_cfg = node.config.core.routerid(create=core_models.RouterIdConfig)
-                    rid_cfg.router_id = router_id
-                    rid_cfg.family = 'ipv4'
-                    rid_cfg.save()
+                    if created:
+                        rid_cfg = node.config.core.routerid(create=core_models.RouterIdConfig)
+                        rid_cfg.router_id = router_id
+                        rid_cfg.family = 'ipv4'
+                        rid_cfg.save()
 
         return context, nodes
 
