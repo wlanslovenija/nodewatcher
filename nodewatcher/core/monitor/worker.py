@@ -211,7 +211,7 @@ class Worker(object):
         p.start()
         return p
 
-    def run(self, cycles=None, process_only_node=None):
+    def run(self, cycles=None, process_only_node=None, run=None):
         """
         Runs the monitoring process.
         """
@@ -224,8 +224,10 @@ class Worker(object):
 
         logger.info("Starting monitoring runs...")
         runs = []
-        for run in self.runs.keys():
-            runs.append(self.start_run(run, cycles, process_only_node))
+        for r in self.runs.keys():
+            if run is not None and r != run:
+                continue
+            runs.append(self.start_run(r, cycles, process_only_node))
 
         for p in runs:
             p.join()
