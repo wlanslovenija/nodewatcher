@@ -26,7 +26,7 @@ def user(request, username):
 @decorators.authenticated_required
 def account(request):
     """
-    View which displays `nodewatcher.extra.account.forms.AccountChangeForm` form for users to change their account.
+    View which displays `nodewatcher.extra.accounts.forms.AccountChangeForm` form for users to change their account.
 
     If the user changes her e-mail address her account is inactivated and she gets an activation e-mail.
     """
@@ -77,7 +77,7 @@ def logout_redirect(request, *args, **kwargs):
     """
     Logs out the user and redirects her to the log-in page or elsewhere, as specified.
 
-    A wrapper (which prefers redirects) around `django.contrib.auth.views.logout` view which sends a `nodewatcher.extra.account.signals.user_logout` signal on logout.
+    A wrapper (which prefers redirects) around `django.contrib.auth.views.logout` view which sends a `nodewatcher.extra.accounts.signals.user_logout` signal on logout.
     """
 
     kwargs.setdefault('redirect_field_name', auth.REDIRECT_FIELD_NAME)
@@ -95,7 +95,7 @@ def login(request, *args, **kwargs):
     """
     Displays the login form and handles the login action.
 
-    A wrapper around `django.contrib.auth.views.login` view which sends a `nodewatcher.extra.account.signals.user_login` signal on successful login.
+    A wrapper around `django.contrib.auth.views.login` view which sends a `nodewatcher.extra.accounts.signals.user_login` signal on successful login.
     """
 
     assert request.user.is_anonymous()

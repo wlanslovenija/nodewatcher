@@ -197,7 +197,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/account/login/'
 LOGOUT_URL = '/account/logout/'
 
-AUTH_PROFILE_MODULE = 'account.UserProfileAndSettings'
+AUTH_PROFILE_MODULE = 'accounts.UserProfileAndSettings'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
@@ -206,7 +206,7 @@ REGISTRATION_OPEN = True
 ANONYMOUS_USER_ID = -1
 
 AUTHENTICATION_BACKENDS = (
-    'nodewatcher.extra.account.auth.ModelBackend',
+    'nodewatcher.extra.accounts.auth.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
 
@@ -254,7 +254,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
     'nodewatcher.modules.frontend.api',
-    'nodewatcher.extra.account',
+    'nodewatcher.extra.accounts',
 
     # Legacy apps for migrations.
     'nodewatcher.legacy.nodes',

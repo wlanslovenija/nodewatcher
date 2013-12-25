@@ -1,7 +1,7 @@
-{% load staticfiles sekizai_tags %}<!DOCTYPE html>
-<html>
+{% load i18n staticfiles sekizai_tags %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
-        <title>{% with_data "title_data" as title_data %}{% for title in title_data %}{% if not forloop.first %}{% block title_delimiter %} – {% endblock title_delimiter %}{% endif %}{{ title }}{% endfor %}{% end_with_data %}{% block title %}{% endblock title %}</title>
+        <title>{% block title %}{% block title_suffix %}{% block title_delimiter %} – {% endblock title_delimiter %}{% block title_site_name %}{{ NETWORK.NAME|default:site.name }}{% endblock title_site_name %}{% endblock title_suffix %}{% endblock title %}</title>
         {% render_block "extrahead" %}
         {% block extrahead %}{% endblock extrahead %}
         {% with_data "css_data" as css_data %}
@@ -21,8 +21,38 @@
     </head>
 
     <body>
-        {% include "header.html" %}
-        {% include "content.html" %}
-        {% include "footer.html" %}
+        {% block header-wrapper %}
+            <header>
+                {% block header %}
+                    {% block accounts_menu %}
+                        <div class="accounts-menu-wrapper">
+                            <ul class="accounts-menu">
+
+                            </ul>
+                        </div>
+                    {% endblock accounts_menu %}
+
+
+                    {% if NETWORK.LOGO_URL %}
+                        <a href="{% url main_page %}"><img src="{{ NETWORK.LOGO_URL }}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
+                    {% else %}
+                        <h1><a href="{% url main_page %}">{{ NETWORK.NAME }}</a></h1>
+                        {% if NETWORK.DESCRIPTION %}<h2><a href="{% url main_page %}">{{ NETWORK.DESCRIPTION }}</a></h2>{% endif %}
+                    {% endif %}
+                {% endblock header %}
+            </header>
+        {% endblock header-wrapper %}
+        {% block content-wrapper %}
+            <section>
+                {% block content %}{% endblock content %}
+            </section>
+        {% endblock content-wrapper %}
+        {% block footer-wrapper %}
+            <footer>
+                {% block footer %}
+                    <p class="poweredby">{% blocktrans with nodewatcher='<a href="https://dev.wlan-si.net/wiki/Nodewatcher"><i>nodewatcher</i></a>' wlanslovenija='<a href="https://wlan-si.net/"><i>wlan slovenija</i></a>' %}Powered by {{ nodewatcher }}, a project of {{ wlanslovenija}} open wireless network.{% endblocktrans %}</p>
+                {% endblock footer %}
+            </footer>
+        {% endblock footer-wrapper %}
     </body>
 </html>

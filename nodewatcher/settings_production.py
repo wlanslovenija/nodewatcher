@@ -32,6 +32,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTPS', 'on')
 
 # We support some common password formats to ease transition.
 AUTHENTICATION_BACKENDS += (
-    'nodewatcher.extra.account.auth.AprBackend',
-    'nodewatcher.extra.account.auth.CryptBackend',
+    'nodewatcher.extra.accounts.auth.AprBackend',
+    'nodewatcher.extra.accounts.auth.CryptBackend',
 )
