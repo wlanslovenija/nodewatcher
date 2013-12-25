@@ -395,6 +395,10 @@ MONITOR_RUNS = {
         'interval': 600,
         'processors': (
             'nodewatcher.modules.routing.olsr.processors.Topology',
+            'nodewatcher.modules.monitor.measurements.rtt.processors.RttMeasurement',
+            'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
+            'nodewatcher.modules.monitor.measurements.rtt.processors.StoreNode',
+            'nodewatcher.modules.monitor.datastream.processors.Datastream',
         ),
     },
 
@@ -452,6 +456,10 @@ REGISTRY_FORM_PROCESSORS = {
 
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
+
+# UUID of the node that is performing measurements (usually the node where the nodewatcher
+# monitor is running on).
+MEASUREMENT_SOURCE_NODE = ''
 
 # Storage for generated firmware images.
 GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'
