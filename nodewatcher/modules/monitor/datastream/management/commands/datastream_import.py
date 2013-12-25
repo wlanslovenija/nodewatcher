@@ -230,11 +230,11 @@ class Command(base.BaseCommand):
         ]
 
     def import_rtt(self, item):
-        a = float(item['d']['rtt']) if item['d'] is not None else None
+        m = float(item['d']['rtt']) if item['d'] is not None else None
         l = float(item['d']['rtt_min']) if item['d'] is not None else None
         u = float(item['d']['rtt_max']) if item['d'] is not None else None
 
-        points = [l, a, u]
+        points = [l, m, u]
         s = sum(points)
         ss = sum([x ** 2 for x in points])
         d = math.sqrt((3 * ss - s ** 2) / (3.0 * (3 - 1)))
