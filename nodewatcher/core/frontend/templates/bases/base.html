@@ -2,13 +2,15 @@
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
         <title>{% block title %}{% block title_suffix %}{% block title_delimiter %} – {% endblock title_delimiter %}{% block title_site_name %}{{ NETWORK.NAME|default:site.name }}{% endblock title_site_name %}{% endblock title_suffix %}{% endblock title %}</title>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        {% if NETWORK.FAVICON_FILE %}
-            <link rel="icon" href="{% static NETWORK.FAVICON_FILE %}" />
-            <link rel="shortcut icon" href="{% static NETWORK.FAVICON_FILE %}" />
-        {% endif %}
+        {% block head_meta %}
+            {% include "head_meta.html" %}
+        {% endblock head_meta %}
+        {% block head_favicon %}
+            {% include "head_favicon.html" %}
+        {% endblock head_favicon %}
+        {% block head_permalink %}
+            {% include "head_permalink.html" %}
+        {% endblock head_permalink %}
         {% render_block "extrahead" %}
         {% block extrahead %}{% endblock extrahead %}
         {% with_data "css_data" as css_data %}
@@ -28,7 +30,7 @@
         {% block js %}{% endblock js %}
     </head>
 
-    <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% block body_class %}{% endblock body_class %}">
+    <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_class %}{% endblock body_class %}">
         {% block header-wrapper %}
             <header class="{% block header_class %}{% endblock header_class %}">
                 {% block header %}

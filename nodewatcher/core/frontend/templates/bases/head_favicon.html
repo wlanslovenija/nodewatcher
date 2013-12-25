@@ -1,0 +1,6 @@
+{% load staticfiles %}
+
+{% if NETWORK.FAVICON_FILE %}
+    <link rel="icon" href="{% static NETWORK.FAVICON_FILE %}" />
+    <link rel="shortcut icon" href="{% static NETWORK.FAVICON_FILE %}" />
+{% endif %}
