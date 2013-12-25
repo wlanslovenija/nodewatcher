@@ -1,6 +1,7 @@
 import subprocess
 import threading
 import collections
+import math
 
 from django.conf import settings
 from django.utils import timezone
@@ -116,13 +117,25 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
                     # TODO: Handle output for duplicate packets
                     continue
 
+                n = len(rtt)
+                s = sum(rtt)
+                ss = sum([x ** 2 for x in rtt])
+
+                if n == 0:
+                    std = None
+                elif n == 1:
+                    std = 0.0
+                else:
+                    std = math.sqrt((float(n) * ss - s ** 2) / (n * (n - 1)))
+
                 context.rtt.results.setdefault(str(node_ip), {})[size] = {
                     'sent': self.PACKET_COUNT,
-                    'successful': len(rtt),
-                    'failed': max(0, self.PACKET_COUNT - len(rtt)),
+                    'successful': n,
+                    'failed': max(0, self.PACKET_COUNT - n),
                     'rtt_min': min(rtt) if rtt else None,
                     'rtt_max': max(rtt) if rtt else None,
-                    'rtt_avg': (sum(rtt) / len(rtt)) if rtt else None,
+                    'rtt_avg': (float(s) / n) if rtt else None,
+                    'rtt_std': std,
                 }
 
         return context, nodes
@@ -163,6 +176,7 @@ class StoreNode(monitor_processors.NodeProcessor):
                 rm.rtt_minimum = result['rtt_min']
                 rm.rtt_average = result['rtt_avg']
                 rm.rtt_maximum = result['rtt_max']
+                rm.rtt_std = result['rtt_std']
                 rm.packet_loss = 100 * rm.failed_packets / rm.all_packets
                 rm.save()
         except core_models.RouterIdConfig.DoesNotExist:

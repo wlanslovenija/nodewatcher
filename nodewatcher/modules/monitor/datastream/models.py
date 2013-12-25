@@ -252,42 +252,28 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
             'with': {'group': 'packet_loss', 'node': fields.TagReference('node')},
         }
     })
-    rtt_minimum = fields.FloatField(tags={
-        'group': 'rtt',
-        'title': fields.TagReference('packet_size', gettext_noop("RTT minimum (%(packet_size)s bytes)")),
-        'description': gettext_noop("Minimum measured RTT."),
-        'visualization': {
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-            'minimum': 0.0,
-            'with': {'group': 'rtt', 'node': fields.TagReference('node')},
+    rtt = fields.MultiPointField(
+        tags={
+            'title': fields.TagReference('packet_size', gettext_noop("RTT (%(packet_size)s bytes)")),
+            'description': gettext_noop("Minimum measured RTT."),
+            'visualization': {
+                'type': 'line',
+                'time_downsamplers': ['mean'],
+                'value_downsamplers': ['min', 'mean', 'max'],
+                'minimum': 0.0,
+            }
+        },
+        value_downsamplers=['mean', 'sum', 'min', 'max', 'sum_squares', 'std_dev', 'count'],
+        attribute=lambda model: {
+            'c': model.successful_packets,
+            'm': model.rtt_average,
+            'l': model.rtt_minimum,
+            'u': model.rtt_maximum,
+            'd': model.rtt_std,
+            's': model.rtt_average * model.successful_packets if model.rtt_average else None,
+            'q': (model.rtt_average ** 2 * model.successful_packets + (model.rtt_std ** 2) * (model.successful_packets - 1)) if model.rtt_std else None,
         }
-    })
-    rtt_average = fields.FloatField(tags={
-        'group': 'rtt',
-        'title': fields.TagReference('packet_size', gettext_noop("RTT average (%(packet_size)s bytes)")),
-        'description': gettext_noop("Average measured RTT."),
-        'visualization': {
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-            'minimum': 0.0,
-            'with': {'group': 'rtt', 'node': fields.TagReference('node')},
-        }
-    })
-    rtt_maximum = fields.FloatField(tags={
-        'group': 'rtt',
-        'title': fields.TagReference('packet_size', gettext_noop("RTT maximum (%(packet_size)s bytes)")),
-        'description': gettext_noop("Maximum measured RTT."),
-        'visualization': {
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-            'minimum': 0.0,
-            'with': {'group': 'rtt', 'node': fields.TagReference('node')},
-        }
-    })
+    )
 
     def get_stream_query_tags(self):
         tags = super(RttMeasurementMonitorStreams, self).get_stream_query_tags()

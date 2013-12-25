@@ -221,6 +221,7 @@ class RttMeasurementMonitor(registration.bases.NodeMonitoringRegistryItem, Measu
     rtt_minimum = models.FloatField(null=True)
     rtt_average = models.FloatField(null=True)
     rtt_maximum = models.FloatField(null=True)
+    rtt_std = models.FloatField(null=True)
 
     class RegistryMeta:
         registry_id = 'network.measurement.rtt'

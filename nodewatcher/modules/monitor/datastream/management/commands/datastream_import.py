@@ -1,6 +1,7 @@
 import datetime
 import ijson
 import traceback
+import math
 
 from django.core.management import base
 
@@ -229,36 +230,33 @@ class Command(base.BaseCommand):
         ]
 
     def import_rtt(self, item):
+        a = float(item['d']['rtt']) if item['d'] is not None else None
+        l = float(item['d']['rtt_min']) if item['d'] is not None else None
+        u = float(item['d']['rtt_max']) if item['d'] is not None else None
+
+        points = [l, a, u]
+        s = sum(points)
+        ss = sum([x ** 2 for x in points])
+        d = math.sqrt((3 * ss - s ** 2) / (3.0 * (3 - 1)))
+
         return [
             # Stream for rtt_minimum field
             {
                 'tags': {
                     'node': item['n'],
                     'registry_id': 'network.measurement.rtt',
-                    'name': 'rtt_minimum',
+                    'name': 'rtt',
                     'packet_size': 56,
                 },
-                'value': float(item['d']['rtt_min']) if item['d'] is not None else None,
-            },
-            # Stream for rtt_average field
-            {
-                'tags': {
-                    'node': item['n'],
-                    'registry_id': 'network.measurement.rtt',
-                    'name': 'rtt_average',
-                    'packet_size': 56,
+                'value': {
+                    'm': m, # mean
+                    'l': l, # minimum
+                    'u': u, # maximum
+                    'c': 3, # count
+                    'd': d, # std. dev
+                    's': s, # sum
+                    'q': ss, # sum of squares
                 },
-                'value': float(item['d']['rtt']) if item['d'] is not None else None,
-            },
-            # Stream for rtt_maximum field
-            {
-                'tags': {
-                    'node': item['n'],
-                    'registry_id': 'network.measurement.rtt',
-                    'name': 'rtt_maximum',
-                    'packet_size': 56,
-                },
-                'value': float(item['d']['rtt_max']) if item['d'] is not None else None,
             },
         ]
 
