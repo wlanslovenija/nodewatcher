@@ -401,7 +401,7 @@ MONITOR_PROCESSORS = (
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
-    'nodewatcher.modules.administration.states.processors.NodeStatus',
+    'nodewatcher.modules.administration.status.processors.NodeStatus',
     'nodewatcher.modules.monitor.datastream.processors.Datastream',
     'nodewatcher.modules.monitor.datastream.processors.Maintenance',
 )
