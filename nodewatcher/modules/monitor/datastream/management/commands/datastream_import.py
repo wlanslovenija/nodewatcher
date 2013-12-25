@@ -64,8 +64,12 @@ class Command(base.BaseCommand):
             0: self.import_memory_usage,
             # LoadAverage
             1: self.import_load_average,
+            # RTT
+            2: self.import_rtt,
             # LQ
             3: self.import_link_quality,
+            # PacketLoss
+            4: self.import_packet_loss,
             # Traffic
             10: self.import_traffic,
             # ETX
@@ -221,5 +225,93 @@ class Command(base.BaseCommand):
                     'link': item['m'] or None,
                 },
                 'value': float(item['d']['etx']) if item['d'] is not None else None,
+            },
+        ]
+
+    def import_rtt(self, item):
+        return [
+            # Stream for rtt_minimum field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'rtt_minimum',
+                    'packet_size': 56,
+                },
+                'value': float(item['d']['rtt_min']) if item['d'] is not None else None,
+            },
+            # Stream for rtt_average field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'rtt_average',
+                    'packet_size': 56,
+                },
+                'value': float(item['d']['rtt']) if item['d'] is not None else None,
+            },
+            # Stream for rtt_maximum field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'rtt_maximum',
+                    'packet_size': 56,
+                },
+                'value': float(item['d']['rtt_max']) if item['d'] is not None else None,
+            },
+        ]
+
+    def import_packet_loss(self, item):
+        return [
+            # Stream for packet_loss field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'packet_loss',
+                    'packet_size': 56,
+                },
+                'value': float(item['d']['loss_def']) if item['d'] is not None else None,
+            },
+            # Stream for packet_loss field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'packet_loss',
+                    'packet_size': 100,
+                },
+                'value': float(item['d']['loss_100']) if item['d'] is not None else None,
+            },
+            # Stream for packet_loss field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'packet_loss',
+                    'packet_size': 500,
+                },
+                'value': float(item['d']['loss_500']) if item['d'] is not None else None,
+            },
+            # Stream for packet_loss field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'packet_loss',
+                    'packet_size': 1000,
+                },
+                'value': float(item['d']['loss_1000']) if item['d'] is not None else None,
+            },
+            # Stream for packet_loss field
+            {
+                'tags': {
+                    'node': item['n'],
+                    'registry_id': 'network.measurement.rtt',
+                    'name': 'packet_loss',
+                    'packet_size': 1480,
+                },
+                'value': float(item['d']['loss_1480']) if item['d'] is not None else None,
             },
         ]
