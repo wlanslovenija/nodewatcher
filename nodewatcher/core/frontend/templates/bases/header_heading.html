@@ -1,0 +1,10 @@
+{% load future staticfiles %}
+
+<div class="header-heading">
+    {% if NETWORK.LOGO_FILE %}
+        <a href="{% url "main_page" %}" class="logo"><img src="{% static NETWORK.LOGO_FILE %}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
+    {% else %}
+        <h1><a href="{% url "main_page" %}">{{ NETWORK.NAME }}</a></h1>
+        {% if NETWORK.DESCRIPTION %}<h2><a href="{% url "main_page" %}">{{ NETWORK.DESCRIPTION }}</a></h2>{% endif %}
+    {% endif %}
+</div>

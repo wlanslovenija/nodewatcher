@@ -1,4 +1,4 @@
-{% load i18n future staticfiles sekizai_tags %}<!DOCTYPE html>
+{% load staticfiles sekizai_tags %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
         <title>{% block title %}{% block title_suffix %}{% block title_delimiter %} – {% endblock title_delimiter %}{% block title_site_name %}{{ NETWORK.NAME|default:site.name }}{% endblock title_site_name %}{% endblock title_suffix %}{% endblock title %}</title>
@@ -33,14 +33,7 @@
                         </div>
                     {% endblock accounts_menu %}
                     {% block header_heading %}
-                        <div class="header-heading">
-                            {% if NETWORK.LOGO_FILE %}
-                                <a href="{% url "main_page" %}" class="logo"><img src="{% static NETWORK.LOGO_FILE %}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
-                            {% else %}
-                                <h1><a href="{% url "main_page" %}">{{ NETWORK.NAME }}</a></h1>
-                                {% if NETWORK.DESCRIPTION %}<h2><a href="{% url "main_page" %}">{{ NETWORK.DESCRIPTION }}</a></h2>{% endif %}
-                            {% endif %}
-                        </div>
+                        {% include "header_heading.html" %}
                     {% endblock header_heading %}
                 {% endblock header %}
             </header>
@@ -53,7 +46,7 @@
         {% block footer-wrapper %}
             <footer class="{% block footer_class %}{% endblock footer_class %}">
                 {% block footer %}
-                    <p class="poweredby">{% blocktrans with nodewatcher='<a href="https://dev.wlan-si.net/wiki/Nodewatcher"><i>nodewatcher</i></a>' wlanslovenija='<a href="https://wlan-si.net/"><i>wlan slovenija</i></a>' %}Powered by {{ nodewatcher }}, a project of {{ wlanslovenija}} open wireless network.{% endblocktrans %}</p>
+                    {% include "footer.html" %}
                 {% endblock footer %}
             </footer>
         {% endblock footer-wrapper %}
