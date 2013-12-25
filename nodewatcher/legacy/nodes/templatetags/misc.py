@@ -23,39 +23,6 @@ def startswith(value, arg):
     """
     return value.startswith(arg)
 
-@register.filter
-def anchorify(anchor):
-    """
-    Convert string to suitable for anchor id.
-    """
-    anchor = template.defaultfilters.striptags(anchor)
-    anchor = text.unescape_entities(anchor)
-    for a, b in HEADING_REPLACE:
-        anchor = anchor.replace(a, b)
-    anchor = template.defaultfilters.slugify(anchor)
-    anchor = DASH_START_END_RE.sub('', anchor)
-    if not anchor or not anchor[0].isalpha():
-        anchor = 'a' + anchor
-    return anchor
-
-@register.inclusion_tag('heading.html', takes_context=True)
-def heading(context, level, heading, classes=None):
-    """
-    Renders heading with anchor id.
-    """
-    anchor = base_anchor = anchorify(heading)
-    i = 0
-    while anchor in context.render_context:
-        anchor = base_anchor + "-" + unicode(i)
-        i += 1
-    context.render_context[anchor] = True
-    return {
-        'level'   : level,
-        'heading' : heading,
-        'id'      : anchor,
-        'classes' : classes,
-    }
-
 class SetContextNode(template.Node):
     """
     This class defines renderer which just updates current template context with the rendered output of the block inside tags.
