@@ -38,8 +38,17 @@
                 {% endblock header %}
             </header>
         {% endblock header-wrapper %}
+        {% block messages-wrapper %}
+            {% if messages %}
+                <section class="messages {% block messages_class %}{% endblock messages_class %}">
+                    {% block messages %}
+                        {% include "messages.html" %}
+                    {% endblock messages %}
+                </section>
+            {% endif %}
+        {% endblock messages-wrapper %}
         {% block content-wrapper %}
-            <section class="{% block content_class %}{% endblock content_class %}">
+            <section class="content {% block content_class %}{% endblock content_class %}">
                 {% block content %}{% endblock content %}
             </section>
         {% endblock content-wrapper %}
