@@ -62,7 +62,7 @@ class Field(object):
     API.
     """
 
-    def __init__(self, attribute=None, tags=None):
+    def __init__(self, attribute=None, tags=None, value_downsamplers=None):
         """
         Class constructor.
 
@@ -74,6 +74,19 @@ class Field(object):
         self.name = None
         self.attribute = attribute
         self.custom_tags = tags or {}
+
+        if value_downsamplers is None:
+            value_downsamplers = [
+                'mean',
+                'sum',
+                'min',
+                'max',
+                'sum_squares',
+                'std_dev',
+                'count',
+            ]
+
+        self.value_downsamplers = value_downsamplers
 
     def prepare_value(self, value):
         """
@@ -110,15 +123,7 @@ class Field(object):
         Returns a list of downsamplers that will be used for the underlying stream.
         """
 
-        return [
-            'mean',
-            'sum',
-            'min',
-            'max',
-            'sum_squares',
-            'std_dev',
-            'count'
-        ]
+        return self.value_downsamplers
 
     def _process_tag_references(self, tags, descriptor):
         """
@@ -180,7 +185,10 @@ class Field(object):
         """
 
         attribute = self.name if self.attribute is None else self.attribute
-        value = getattr(descriptor.get_model(), attribute)
+        if callable(attribute):
+            value = attribute(descriptor.get_model())
+        else:
+            value = getattr(descriptor.get_model(), attribute)
         if value is None:
             return
 
