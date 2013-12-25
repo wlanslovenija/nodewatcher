@@ -1,6 +1,13 @@
 {% extends "bases/base.html" %}
 
 {% block between-header-content %}
+    {% block main-menu-wrapper %}
+        <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
+            {% block main-menu %}
+                {% include "main_menu.html" %}
+            {% endblock main-menu %}
+        </section>
+    {% endblock main-menu-wrapper %}
     {% block messages-wrapper %}
         {% if messages %}
             <section class="messages {% block messages_classes %}{% endblock messages_classes %}">

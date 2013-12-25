@@ -24,7 +24,7 @@ def ugettext_lazy(message):
 
 
 class MenuEntry(object):
-    def __init__(self, label=None, url=None, permission_check=None, order=0):
+    def __init__(self, label=None, url=None, permission_check=None, order=0, classes=None):
         if isinstance(label, basestring):
             self._name = label
             self._label = label
@@ -37,22 +37,38 @@ class MenuEntry(object):
         self._url = url
         self._permission_check = permission_check
         self._order = order
+
+        if classes is None:
+            classes = ()
+        self._classes = ' '.join(classes)
+
         self._context = None
 
-    def get_label(self):
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def label(self):
         return self._label
 
-    def get_url(self):
+    @property
+    def url(self):
         if callable(self._url):
             return self._url(self._context)
         else:
             return self._url
 
+    @property
+    def order(self):
+        return self._order
+
+    @property
+    def classes(self):
+        return self._classes
+
     def has_permission(self, request):
         return not self._permission_check or self._permission_check(request, self)
-
-    def get_order(self):
-        return self._order
 
     def add_context(self, context):
         with_context = copy.copy(self)
@@ -111,10 +127,10 @@ class Menu(object):
         order_dict = dict([(setting_label(setting), setting_order(setting, order)) for (order, setting) in enumerate(order)])
 
         # Remove hidden entries
-        self._entries = [entry for entry in self._entries if not order_dict.get(entry._name, {}).get('hide', False)]
+        self._entries = [entry for entry in self._entries if not order_dict.get(entry.name, {}).get('hide', False)]
 
         def sort_key(entry):
-            return order_dict.get(entry._name, {}).get('order', -1), entry._order, entry._name
+            return order_dict.get(entry.name, {}).get('order', -1), entry.order, entry.name
 
         # Sort entries by settings, entry order, or name
         self._entries.sort(key=sort_key, reverse=True)
