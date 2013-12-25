@@ -478,8 +478,8 @@ NETWORK = {
     'CONTACT': 'open@example.net',
     'CONTACT_PAGE': 'http://example.net/contact',
     'DESCRIPTION': 'open wireless network in your neighborhood',
-    'FAVICON_FILENAME': '',
-    'LOGO_FILENAME': '',
+    'FAVICON_FILE': '',
+    'LOGO_FILE': '',
 }
 
 EVENTS_EMAIL = DEFAULT_FROM_EMAIL
