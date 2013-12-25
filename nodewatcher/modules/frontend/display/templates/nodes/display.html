@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n conversion  gmap misc graphs %}
+{% load i18n conversion gmap misc graphs html_tags %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
