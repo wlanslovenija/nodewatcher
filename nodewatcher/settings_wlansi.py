@@ -11,10 +11,12 @@ NETWORK.update({
     'CONTACT': 'open@wlan-si.net',
     'CONTACT_PAGE': 'http://wlan-si.net/contact/',
     'DESCRIPTION': 'open wireless network of Slovenia',
+    'FAVICON_FILE': 'wlansi/images/favicon.ico',
+    'LOGO_FILE': 'wlansi/images/logo.png',
 })
 
-EMAIL_SUBJECT_PREFIX = '[' + NETWORK.NAME + '] '
-DEFAULT_FROM_EMAIL = NETWORK.CONTACT
+EMAIL_SUBJECT_PREFIX = '[' + NETWORK['NAME'] + '] '
+DEFAULT_FROM_EMAIL = NETWORK['CONTACT']
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 EVENTS_EMAIL = 'events@wlan-si.net'

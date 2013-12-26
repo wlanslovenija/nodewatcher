@@ -1,6 +1,7 @@
 {% load future staticfiles html_tags %}
 
-<div class="header-heading">
+{% block included-header-before %}{% endblock included-header-before %}
+<div class="header-heading {% if NETWORK.LOGO_FILE %}logo{% endif %}">
     {% if NETWORK.LOGO_FILE %}
         <a href="{% url "main_page" %}" class="logo"><img src="{% static NETWORK.LOGO_FILE %}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
     {% endif %}
@@ -13,3 +14,4 @@
         {% set_base_heading_level 2 True %}
     {% endif %}
 </div>
+{% block included-header-after %}{% endblock included-header-after %}

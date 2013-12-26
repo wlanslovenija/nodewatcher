@@ -509,8 +509,8 @@ NETWORK = {
     'CONTACT': 'open@example.net',
     'CONTACT_PAGE': 'http://example.net/contact',
     'DESCRIPTION': 'open wireless network in your neighborhood',
-    'FAVICON_FILE': '',
-    'LOGO_FILE': '',
+    'FAVICON_FILE': None,
+    'LOGO_FILE': None,
 }
 
 EVENTS_EMAIL = DEFAULT_FROM_EMAIL

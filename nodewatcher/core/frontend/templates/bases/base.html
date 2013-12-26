@@ -2,9 +2,12 @@
 
 {% load sekizai_tags %}
 
-{% block between-header-content %}
+{% block header-wrapper %}
     {% add_data "css_data" "normalize/css/normalize.css" %}
+    {{ block.super }}
+{% endblock header-wrapper %}
 
+{% block between-header-content %}
     {% block main-menu-wrapper %}
         <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
             {% block main-menu %}
