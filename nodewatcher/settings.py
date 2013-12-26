@@ -516,3 +516,16 @@ EVENTS_EMAIL = DEFAULT_FROM_EMAIL
 IMAGE_GENERATOR_EMAIL = DEFAULT_FROM_EMAIL
 
 FRONTEND_MAIN_COMPONENT = 'ListComponent'
+
+MENUS = {
+    #'main_menu': [
+    #    {
+    #        'name': ...,
+    #        'weight': ...,
+    #        'visible': True,
+    #    },
+    #],
+    #'accounts_menu': [
+    #    ...
+    #],
+}

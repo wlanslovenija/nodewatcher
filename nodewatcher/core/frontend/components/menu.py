@@ -26,7 +26,7 @@ def ugettext_lazy(message):
 
 
 class MenuEntry(object):
-    def __init__(self, label=None, url=None, visible=None, order=0, classes=None, template='menu_entry.html', extra_context=None):
+    def __init__(self, label=None, url=None, visible=None, weight=0, classes=None, template='menu_entry.html', extra_context=None):
         if isinstance(label, basestring):
             self._name = label
             self._label = label
@@ -38,7 +38,7 @@ class MenuEntry(object):
 
         self._url = url
         self._visible = visible
-        self._order = order
+        self._weight = weight
 
         if classes is None:
             classes = ()
@@ -65,8 +65,8 @@ class MenuEntry(object):
             return self._url
 
     @property
-    def order(self):
-        return self._order
+    def weight(self):
+        return self._weight
 
     @property
     def classes(self):
@@ -125,35 +125,41 @@ class Menu(object):
     def get_entries(self):
         return self._entries
 
+    @staticmethod
+    def _setting_name(setting):
+        if isinstance(setting, basestring):
+            return setting
+        else:
+            # We require name to be present
+            return setting['name']
+
+    @staticmethod
+    def _setting_weight(setting, list_index):
+        if isinstance(setting, basestring):
+            return {
+                'name': setting,
+                # We use list index as a base for weight
+                'weight': list_index * 10,
+            }
+        elif 'weight' not in setting:
+            # If weight is not specified, we use list index as a base for weight
+            setting['weight'] = list_index * 10
+        return setting
+
+    @staticmethod
+    def _sort_key(settings_dict):
+        return lambda entry: (settings_dict.get(entry.name, {}).get('weight', 0), entry.weight)
+
     def _sort_entries(self):
-        order = getattr(settings, 'MENU_%s_ORDER' % self.get_name().upper(), [])
+        menu_settings = getattr(settings, 'MENUS', {}).get(self.get_name(), [])
 
-        def setting_label(setting):
-            if isinstance(setting, basestring):
-                return setting
-            else:
-                return setting['label']
-
-        def setting_order(setting, order):
-            if isinstance(setting, basestring):
-                return {
-                    'label': setting,
-                    'order': order,
-                }
-            else:
-                setting['order'] = order
-                return setting
-
-        order_dict = dict([(setting_label(setting), setting_order(setting, order)) for (order, setting) in enumerate(order)])
+        settings_dict = dict([(self._setting_name(setting), self._setting_weight(setting, list_index)) for (list_index, setting) in enumerate(menu_settings)])
 
         # Remove hidden entries
-        self._entries = [entry for entry in self._entries if not order_dict.get(entry.name, {}).get('hide', False)]
+        self._entries = [entry for entry in self._entries if settings_dict.get(entry.name, {}).get('visible', True)]
 
-        def sort_key(entry):
-            return order_dict.get(entry.name, {}).get('order', -1), entry.order, entry.name
-
-        # Sort entries by settings, entry order, or name
-        self._entries.sort(key=sort_key, reverse=True)
+        # Sort menu entries by settings, entry weight, or leave it in the add order (sort is stable)
+        self._entries.sort(key=self._sort_key(settings_dict))
 
 
 class Menus(object):
