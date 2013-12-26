@@ -20,6 +20,16 @@ class Migration(SchemaMigration):
         db.rename_table('core_generalmonitor', 'monitor_generalmonitor')
         db.rename_table('core_routingtopologymonitor', 'monitor_routingtopologymonitor')
 
+        # Adding field 'GeneralMonitor.uuid'
+        db.add_column('monitor_generalmonitor', 'uuid',
+                      self.gf('django.db.models.fields.CharField')(max_length=40, null=True),
+                      keep_default=False)
+
+        # Adding field 'GeneralMonitor.firmware'
+        db.add_column('monitor_generalmonitor', 'firmware',
+                      self.gf('django.db.models.fields.CharField')(max_length=100, null=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")
