@@ -1,52 +1,60 @@
-{% extends "base.html" %}
+{% load sekizai_tags %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+    <head>
+        <title>{% block title %}{% block title_suffix %}{% block title_delimiter %} – {% endblock title_delimiter %}{% block title_site_name %}{{ NETWORK.NAME|default:site.name }}{% endblock title_site_name %}{% endblock title_suffix %}{% endblock title %}</title>
+        {% block head_meta %}
+            {% include "head_meta.html" %}
+        {% endblock head_meta %}
+        {% block head_favicon %}
+            {% include "head_favicon.html" %}
+        {% endblock head_favicon %}
+        {% block head_permalink %}
+            {% include "head_permalink.html" %}
+        {% endblock head_permalink %}
+        {% render_block "extrahead" %}
+        {% block extrahead %}{% endblock extrahead %}
+        {% with_data "css_data" as css_data %}
+            {% include "head_css_data.html" %}
+        {% end_with_data %}
+        {% render_block "css" %}
+        {% block css %}{% endblock css %}
+        {% block extrastyle %}{% endblock %}
+        {% with_data "js_data" as js_data %}
+            {% include "head_js_data.html" %}
+        {% end_with_data %}
+        {% render_block "js" %}
+        {% block js %}{% endblock js %}
+    </head>
 
-{% block between-header-content %}
-    {% block main-menu-wrapper %}
-        <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
-            {% block main-menu %}
-                {% include "main_menu.html" %}
-            {% endblock main-menu %}
-        </section>
-    {% endblock main-menu-wrapper %}
-    {% block messages-wrapper %}
-        {% if messages %}
-            <section class="messages {% block messages_classes %}{% endblock messages_classes %}">
-                {% block messages %}
-                    {% include "messages.html" %}
-                {% endblock messages %}
+    <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_classes %}{% endblock body_classes %}">
+        {% block header-wrapper %}
+            <header class="{% block header_classes %}{% endblock header_classes %}">
+                {% block header-before %}{% endblock header-before %}
+                {% block header %}
+                    {% include "header.html" %}
+                {% endblock header %}
+                {% block header-after %}{% endblock header-after %}
+            </header>
+        {% endblock header-wrapper %}
+        {% block between-header-content %}{% endblock between-header-content %}
+        {% block content-wrapper %}
+            <section class="content {% block content_classes %}{% endblock content_classes %}">
+                {% block content-before %}{% endblock content-before %}
+                {% block content %}
+                    {# Should be empty so that users can just override it without having to call block.super #}
+                {% endblock content %}
+                {% block content-after %}{% endblock content-after %}
             </section>
-        {% endif %}
-    {% endblock messages-wrapper %}
-    {{ block.super }}
-{% endblock between-header-content %}
-
-{% block between-content-footer %}
-    {{ block.super }}
-    {% block altlinks-wrapper %}
-        <section class="altlinks {% block altlinks_classes %}{% endblock altlinks_classes %}">
-            {% block altlinks %}{% endblock altlinks %}
-        </section>
-    {% endblock altlinks-wrapper %}
-{% endblock between-content-footer %}
-
-{% block content %}
-    {% block content_permalink %}
-        {% include "content_permalink.html" %}
-    {% endblock content_permalink %}
-    {% block heading %}
-        {% include "content_heading.html" %}
-    {% endblock %}
-    {{ block.super }}
-    {% block plain-content %}{% endblock %}
-{% endblock content %}
-
-{% block header-before %}
-    {% block accounts-menu-wrapper %}
-        <section class="accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
-            {% block accounts-menu %}
-                {% include "accounts_menu.html" %}
-            {% endblock accounts-menu %}
-        </section>
-    {% endblock accounts-menu-wrapper %}
-    {{ block.super }}
-{% endblock header-before %}
+        {% endblock content-wrapper %}
+        {% block between-content-footer %}{% endblock between-content-footer %}
+        {% block footer-wrapper %}
+            <footer class="{% block footer_classes %}{% endblock footer_classes %}">
+                {% block footer-before %}{% endblock footer-before %}
+                {% block footer %}
+                    {% include "footer.html" %}
+                {% endblock footer %}
+                {% block footer-after %}{% endblock footer-after %}
+            </footer>
+        {% endblock footer-wrapper %}
+    </body>
+</html>
