@@ -1,4 +1,4 @@
-{% extends "bases/base.html" %}
+{% extends "base.html" %}
 
 {% block between-header-content %}
     {% block main-menu-wrapper %}
@@ -39,3 +39,14 @@
     {{ block.super }}
     {% block plain-content %}{% endblock %}
 {% endblock content %}
+
+{% block header-before %}
+    {% block accounts-menu-wrapper %}
+        <section class="accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
+            {% block accounts-menu %}
+                {% include "accounts_menu.html" %}
+            {% endblock accounts-menu %}
+        </section>
+    {% endblock accounts-menu-wrapper %}
+    {{ block.super }}
+{% endblock header-before %}

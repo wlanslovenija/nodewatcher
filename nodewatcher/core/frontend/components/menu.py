@@ -2,6 +2,8 @@ import copy
 import re
 
 from django.conf import settings
+from django.core import urlresolvers
+from django.template import loader
 from django.utils import translation
 
 from . import exceptions
@@ -24,7 +26,7 @@ def ugettext_lazy(message):
 
 
 class MenuEntry(object):
-    def __init__(self, label=None, url=None, permission_check=None, order=0, classes=None):
+    def __init__(self, label=None, url=None, visible=None, order=0, classes=None, template='menu_entry.html', extra_context=None):
         if isinstance(label, basestring):
             self._name = label
             self._label = label
@@ -35,12 +37,15 @@ class MenuEntry(object):
             raise exceptions.InvalidMenuEntry("Menu entry label must be a string or translated with nodewatcher.frontend.components.ugettext_lazy")
 
         self._url = url
-        self._permission_check = permission_check
+        self._visible = visible
         self._order = order
 
         if classes is None:
             classes = ()
         self._classes = ' '.join(classes)
+
+        self._template = template
+        self._extra_context = extra_context or {}
 
         self._context = None
 
@@ -67,13 +72,28 @@ class MenuEntry(object):
     def classes(self):
         return self._classes
 
-    def has_permission(self, request):
-        return not self._permission_check or self._permission_check(request, self)
+    @property
+    def all_urls(self):
+        # If menu entry's URL is main page, we also return its alternative URL
+        # so that possibly nested URLs under it can be properly matched to it
+        # when determining if menu entry is active
+        if urlresolvers.reverse('main_page') == self.url:
+            return (self.url, urlresolvers.reverse('main_page_redirect'))
+        else:
+            return (self._url,)
+
+    def is_visible(self, request):
+        return not self._visible or self._visible(self, request)
 
     def add_context(self, context):
         with_context = copy.copy(self)
         with_context._context = context
         return with_context
+
+    def render(self, context=None):
+        if context is None:
+            context = self._context
+        return loader.render_to_string(self._template, self._extra_context, context)
 
 
 class Menu(object):

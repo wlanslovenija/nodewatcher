@@ -7,6 +7,7 @@ from . import components
 with components.menus:
     # Has to be before auto-discovery
     components.menus.register(components.Menu('main_menu'))
+    components.menus.register(components.Menu('accounts_menu'))
 
     # Frontend components auto-discovery
     components.pool.discover_components()

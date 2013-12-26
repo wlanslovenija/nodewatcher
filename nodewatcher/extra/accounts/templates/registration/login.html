@@ -13,14 +13,14 @@
 {% block contenttype %}login{% endblock %}
 
 {% block content %}
-    {% url AccountComponents:registration_register as registration_register_url %}
+    {% url AccountsComponent:registration_register as registration_register_url %}
     <p>{% blocktrans %}To log in, please enter your valid username and password in the form bellow. Don't have them yet? In that case <a href="{{ registration_register_url }}">register</a> to get them.{% endblocktrans %}</p>
     <div id="loginform">
         {% with _("Log in") as form_submit %}
-            {% url AccountComponents:auth_login as form_action %}
+            {% url AccountsComponent:auth_login as form_action %}
             {% include "form.html" %}
         {% endwith %}
-        {% url AccountComponents:auth_password_reset as auth_password_reset_url %}
+        {% url AccountsComponent:auth_password_reset as auth_password_reset_url %}
         <p>{% blocktrans %}Have you <a href="{{ auth_password_reset_url }}">forgotten your password</a>?{% endblocktrans %}</p>
     </div>
 {% endblock %}

@@ -40,18 +40,18 @@ urlpatterns = urls.patterns(
     urls.url(r'^login/$', 'nodewatcher.extra.accounts.views.login', name='auth_login'),
     urls.url(r'^logout/$', 'nodewatcher.extra.accounts.views.logout_redirect', name='auth_logout'),
     urls.url(r'^password/change/$', decorators.authenticated_required(function=auth_views.password_change), {
-        'post_change_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountComponents:auth_password_change_done'),
+        'post_change_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_change_done'),
         'password_change_form': forms.PasswordChangeForm,
     }, name='auth_password_change'),
     urls.url(r'^password/change/complete/$', decorators.authenticated_required(function=auth_views.password_change_done), name='auth_password_change_done'),
     urls.url(r'^password/reset/$', decorators.anonymous_required(function=auth_views.password_reset), {
         'email_template_name': 'registration/password_reset_email.txt',
         'password_reset_form': forms.PasswordResetForm,
-        'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountComponents:auth_password_reset_done'),
+        'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_reset_done'),
     }, name='auth_password_reset'),
     urls.url(r'^password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', decorators.anonymous_required(function=auth_views.password_reset_confirm), {
         'set_password_form': forms.SetPasswordForm,
-        'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountComponents:auth_password_reset_complete'),
+        'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_reset_complete'),
     }, name='auth_password_reset_confirm'),
     urls.url(r'^password/reset/complete/$', decorators.anonymous_required(function=auth_views.password_reset_complete), name='auth_password_reset_complete'),
     urls.url(r'^password/reset/done/$', decorators.anonymous_required(function=auth_views.password_reset_done), name='auth_password_reset_done'),

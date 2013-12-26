@@ -129,7 +129,10 @@ class FrontendComponentsPool(object):
 
                 if component is main:
                     # Add redirect from specified regex to main page
-                    component_urls += [urls.url(component_main_url['regex'], lambda request: shortcuts.redirect('main_page', **component_main_url.get('kwargs', {})))]
+                    # It has to be specified outside current component namespace,
+                    # so we just add it directly to patterns, it is main url so
+                    # it should be before others in the component anyway
+                    patterns += [urls.url(component_main_url['regex'], lambda request: shortcuts.redirect('main_page', **component_main_url.get('kwargs', {})), name='main_page_redirect')]
 
             except exceptions.FrontendComponentWithoutMain:
                 pass
