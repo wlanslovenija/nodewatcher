@@ -2,7 +2,7 @@ from django.contrib.gis.db import models as gis_models
 from django import db
 from django.db.models.sql import constants
 
-from . import access as registry_access
+from . import access as registry_access, exceptions
 
 # Quote name
 qn = db.connection.ops.quote_name
@@ -83,7 +83,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             dst_model, dst_field = dst.split('.', 1)
             try:
                 dst_model = registry_access.get_model_class_by_name(dst_model)
-            except registry_access.UnknownRegistryClass:
+            except exceptions.UnknownRegistryClass:
                 continue
 
             if '.' in dst_field:

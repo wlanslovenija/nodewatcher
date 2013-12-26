@@ -1,10 +1,11 @@
 import collections
 
-from django.core import exceptions
+from django.core import exceptions as django_exceptions
 from django.db import models
 from django.utils import datastructures as django_datastructures
 
 from . import access as registry_access, lookup as registry_lookup, models as registry_models, state as registry_state
+from . import exceptions
 from ...utils import datastructures as nw_datastructures
 
 bases = registry_state.bases
@@ -79,7 +80,7 @@ class RegistrationPoint(object):
 
         # Sanity check for object names
         if '_' in item._meta.object_name:
-            raise exceptions.ImproperlyConfigured("Registry items must not have underscores in class names!")
+            raise django_exceptions.ImproperlyConfigured("Registry items must not have underscores in class names!")
 
         # Avoid registering the same class multiple times
         if item in self.item_classes:
@@ -98,7 +99,7 @@ class RegistrationPoint(object):
         if item.__base__ == self.item_base:
             registry_id = item.RegistryMeta.registry_id
             if registry_id in self.item_registry:
-                raise exceptions.ImproperlyConfigured(
+                raise django_exceptions.ImproperlyConfigured(
                     "Multiple top-level registry items claim identifier '{0}'! Claimed by '{1}' and '{2}'.".format(
                         registry_id, self.item_registry[registry_id], item
                     )
@@ -151,7 +152,7 @@ class RegistrationPoint(object):
 
         # Verify parent registration
         if parent not in self.item_classes:
-            raise exceptions.ImproperlyConfigured("Parent class '{0}' is not yet registered!".format(parent._meta.object_name))
+            raise django_exceptions.ImproperlyConfigured("Parent class '{0}' is not yet registered!".format(parent._meta.object_name))
 
         top_level = True
 
@@ -174,14 +175,14 @@ class RegistrationPoint(object):
                 # Setup the parent relation and verify that one doesn't already exist
                 existing_parent = child.__dict__.get('_registry_object_parent', None)
                 if existing_parent is not None and existing_parent.top_model() != parent.top_model():
-                    raise exceptions.ImproperlyConfigured("Registry item cannot have two object parents without a common ancestor!")
+                    raise django_exceptions.ImproperlyConfigured("Registry item cannot have two object parents without a common ancestor!")
                 child._registry_object_parent = parent
                 child._registry_object_parent_link = field
 
                 parent._registry_has_children = True
                 break
         else:
-            raise exceptions.ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
+            raise django_exceptions.ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
 
         # Register item with the registry
         self._register_item(child, top_level)
@@ -283,7 +284,7 @@ class RegistrationPoint(object):
         try:
             return self.item_registry[registry_id]
         except KeyError:
-            raise registry_access.UnknownRegistryIdentifier
+            raise exceptions.UnknownRegistryIdentifier
 
     def get_accessor(self, root):
         """

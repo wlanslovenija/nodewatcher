@@ -1,12 +1,6 @@
 from django.contrib.contenttypes import models as contenttypes_models
 
-
-class UnknownRegistryIdentifier(Exception):
-    pass
-
-
-class UnknownRegistryClass(Exception):
-    pass
+from . import exceptions
 
 
 class RegistryResolver(object):
@@ -73,7 +67,7 @@ class RegistryResolver(object):
                     else:
                         return None
         else:
-            raise UnknownRegistryIdentifier
+            raise exceptions.UnknownRegistryIdentifier
 
     def __iter__(self):
         """
@@ -131,7 +125,7 @@ def get_model_class_by_name(name):
         try:
             ctype = contenttypes_models.ContentType.objects.get(model=name).model_class()
         except contenttypes_models.ContentType.DoesNotExist:
-            raise UnknownRegistryClass
+            raise exceptions.UnknownRegistryClass
 
         CTYPE_CACHE[name] = ctype
 
