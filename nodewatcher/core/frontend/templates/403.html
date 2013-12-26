@@ -1,14 +1,13 @@
-{% extends "plain.html" %}
+{% extends "base.html" %}
 
 {% load i18n %}
 
 {% block title %}{% trans "403 Forbidden" %}{% endblock %}
+{% block heading %}{% trans "403 Forbidden" as heading %}{{ block.super }}{% endblock heading %}
 
 {% block extrahead %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
 {% block content %}
-    <h2>{% trans "403 Forbidden" %}</h2>
-
     <div class="error">
         <p>{% trans "You don't have permission to access the page you requested." %}</p>
         {% if no_referer %}
