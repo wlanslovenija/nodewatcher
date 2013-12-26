@@ -235,6 +235,25 @@ class IntegerField(Field):
         return tags
 
 
+class CounterField(IntegerField):
+    """
+    A counter field. This is basically an IntegerField but with certain
+    value downsamplers disabled.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs.setdefault('value_downsamplers', [])
+        tags = kwargs.setdefault('tags', {})
+        visualization = tags.setdefault('visualization', {})
+        visualization['hidden'] = True
+
+        super(CounterField, self).__init__(**kwargs)
+
+
 class FloatField(Field):
     """
     A float-typed datastream field.
