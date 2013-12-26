@@ -24,8 +24,7 @@ class Command(management_base.NoArgsCommand):
         for user in auth_models.User.objects.all():
             profile, created = model.objects.get_or_create(user=user)
             if verbosity == 2 and created:
-                # TODO: Change to self.stdout.write
-                print 'Created %s.' % profile
+                self.stdout.write('Created %s.\n' % profile)
         transaction.commit_unless_managed()
 
 
