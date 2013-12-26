@@ -398,6 +398,7 @@ MONITOR_RUNS = {
             'nodewatcher.modules.monitor.measurements.rtt.processors.RttMeasurement',
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             'nodewatcher.modules.monitor.measurements.rtt.processors.StoreNode',
+            'nodewatcher.modules.administration.status.processors.NodeStatus',
             'nodewatcher.modules.monitor.datastream.processors.Datastream',
         ),
     },

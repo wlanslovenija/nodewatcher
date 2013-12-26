@@ -1,6 +1,6 @@
 import datetime
 
-import pytz
+from django.utils import timezone
 
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 
@@ -36,6 +36,10 @@ class GeneralInfo(monitor_processors.NodeProcessor):
         if general is None:
             general = node.monitoring.core.general(create=monitor_models.GeneralMonitor)
 
+        if not general.first_seen:
+            general.first_seen = timezone.now()
+
+        general.last_seen = timezone.now()
         general.uuid = context.http.general.uuid
         general.firmware = context.http.general.version
         general.save()
