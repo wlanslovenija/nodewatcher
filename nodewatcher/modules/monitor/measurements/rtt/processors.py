@@ -193,4 +193,3 @@ class StoreNode(monitor_processors.NodeProcessor):
             pass
 
         return context
-
