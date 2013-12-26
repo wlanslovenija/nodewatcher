@@ -31,7 +31,7 @@ class Command(base.BaseCommand):
                 stream_id = datastream.ensure_stream(
                     stream['tags'],
                     stream['tags'],
-                    [
+                    stream.get('value_downsamplers', [
                         'mean',
                         'sum',
                         'min',
@@ -39,7 +39,7 @@ class Command(base.BaseCommand):
                         'sum_squares',
                         'std_dev',
                         'count'
-                    ],
+                    ]),
                     datastream.Granularity.Minutes
                 )
 
@@ -171,21 +171,25 @@ class Command(base.BaseCommand):
         return [
             # Stream for tx_bytes field
             {
+                'value_downsamplers': [],
                 'tags': {
                     'node': item['n'],
                     'registry_id': 'core.interfaces',
                     'name': 'tx_bytes',
                     'interface': item['m'],
+                    'visualization': {'hidden': True},
                 },
                 'value': int(item['d']['upload']) if item['d'] is not None else None,
             },
             # Stream for rx_bytes field
             {
+                'value_downsamplers': [],
                 'tags': {
                     'node': item['n'],
                     'registry_id': 'core.interfaces',
                     'name': 'rx_bytes',
                     'interface': item['m'],
+                    'visualization': {'hidden': True},
                 },
                 'value': int(item['d']['download']) if item['d'] is not None else None,
             },

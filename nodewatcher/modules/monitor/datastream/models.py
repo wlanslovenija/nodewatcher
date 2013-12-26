@@ -314,16 +314,7 @@ class InterfaceStreams(RegistryItemStreams):
 
 
 class InterfaceMonitorStreams(InterfaceStreams):
-    tx_packets = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("TX packets (%(interface)s)")),
-        'description': gettext_noop("Number of transmitted packets."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    tx_packets = fields.CounterField()
     tx_packets_rate = fields.RateField("system.status#reboots", "#tx_packets", tags={
         'group': 'packets_rate',
         'title': fields.TagReference('interface', gettext_noop("TX packets rate (%(interface)s)")),
@@ -339,16 +330,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    rx_packets = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("RX packets (%(interface)s)")),
-        'description': gettext_noop("Number of received packets."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    rx_packets = fields.CounterField()
     rx_packets_rate = fields.RateField("system.status#reboots", "#rx_packets", tags={
         'group': 'packets_rate',
         'title': fields.TagReference('interface', gettext_noop("RX packets rate (%(interface)s)")),
@@ -364,16 +346,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    tx_bytes = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("TX bytes (%(interface)s)")),
-        'description': gettext_noop("Size of transmitted packets."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    tx_bytes = fields.CounterField()
     tx_bytes_rate = fields.RateField("system.status#reboots", "#tx_bytes", tags={
         'group': 'bytes_rate',
         'title': fields.TagReference('interface', gettext_noop("TX bytes rate (%(interface)s)")),
@@ -389,16 +362,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    rx_bytes = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("RX bytes (%(interface)s)")),
-        'description': gettext_noop("Size of received packets."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    rx_bytes = fields.CounterField()
     rx_bytes_rate = fields.RateField("system.status#reboots", "#rx_bytes", tags={
         'group': 'bytes_rate',
         'title': fields.TagReference('interface', gettext_noop("RX bytes rate (%(interface)s)")),
@@ -414,16 +378,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    tx_errors = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("TX errors (%(interface)s)")),
-        'description': gettext_noop("Number of transmission errors."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    tx_errors = fields.CounterField()
     tx_errors_rate = fields.RateField("system.status#reboots", "#tx_errors", tags={
         'group': 'errors_rate',
         'title': fields.TagReference('interface', gettext_noop("TX errors rate (%(interface)s)")),
@@ -439,16 +394,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    rx_errors = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("RX errors (%(interface)s)")),
-        'description': gettext_noop("Number of receive errors."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    rx_errors = fields.CounterField()
     rx_errors_rate = fields.RateField("system.status#reboots", "#rx_errors", tags={
         'group': 'errors_rate',
         'title': fields.TagReference('interface', gettext_noop("RX errors rate (%(interface)s)")),
@@ -464,16 +410,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    tx_drops = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("TX drops (%(interface)s)")),
-        'description': gettext_noop("Number of dropped packets when transmitting."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    tx_drops = fields.CounterField()
     tx_drops_rate = fields.RateField("system.status#reboots", "#tx_drops", tags={
         'group': 'drops_rate',
         'title': fields.TagReference('interface', gettext_noop("TX drops rate (%(interface)s)")),
@@ -489,16 +426,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             },
         }
     })
-    rx_drops = fields.IntegerField(tags={
-        'title': fields.TagReference('interface', gettext_noop("RX drops (%(interface)s)")),
-        'description': gettext_noop("Number of dropped packets when receiving."),
-        'visualization': {
-            'hidden': True,
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
+    rx_drops = fields.CounterField()
     rx_drops_rate = fields.RateField("system.status#reboots", "#rx_drops", tags={
         'group': 'drops_rate',
         'title': fields.TagReference('interface', gettext_noop("RX drops rate (%(interface)s)")),
