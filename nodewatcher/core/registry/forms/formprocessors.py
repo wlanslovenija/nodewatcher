@@ -7,7 +7,7 @@ class RegistryFormProcessor(object):
     form input.
 
     Processors can be set up per registration point and are called in the
-    order specified. Raising a RegistryValidationError in post-processing
+    order weight specified. Raising a RegistryValidationError in post-processing
     will rollback any changes performed.
     """
     def preprocess(self, root):

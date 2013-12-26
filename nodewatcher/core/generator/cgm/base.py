@@ -103,11 +103,11 @@ class PlatformBase(object):
         from . import tasks
         tasks.background_build.delay(node, self.name, cfg)
 
-    def register_module(self, order, module, router=None):
+    def register_module(self, weight, module, router=None):
         """
         Registers a new platform module.
 
-        :param order: Call order
+        :param weight: Call order weight
         :param module: Module implementation function
         :param router: Optional router identifier
         """
@@ -115,7 +115,7 @@ class PlatformBase(object):
         if [x for x in self._modules if x[1] == module]:
             return
 
-        self._modules.append((order, module, router))
+        self._modules.append((weight, module, router))
 
     def register_package(self, name, config, package):
         """
@@ -184,13 +184,13 @@ def get_platform(platform):
         raise KeyError("Platform '{0}' does not exist!".format(platform))
 
 
-def register_platform_module(platform, order=999, router=None):
+def register_platform_module(platform, weight=999, router=None):
     """
     Registers a new platform module.
     """
 
     def wrapper(f):
-        get_platform(platform).register_module(order, f, router=router)
+        get_platform(platform).register_module(weight, f, router=router)
         return f
 
     return wrapper

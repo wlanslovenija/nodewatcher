@@ -316,7 +316,7 @@ class RouterBase(object):
 
             if function.cgm_module_platform is None or function.cgm_module_platform == platform.name:
                 platform.register_module(
-                    function.cgm_module_order,
+                    function.cgm_module_weight,
                     function,
                     cls.identifier,
                 )
@@ -383,14 +383,14 @@ class RouterBase(object):
                 return port
 
 
-def register_module(platform=None, order=50):
+def register_module(platform=None, weight=50):
     """
     Marks a method to be registered as a CGM upon router registration.
     """
 
     def wrapper(f):
         f.cgm_module = True
-        f.cgm_module_order = order
+        f.cgm_module_weight = weight
         f.cgm_module_platform = platform
         return staticmethod(f)
 
