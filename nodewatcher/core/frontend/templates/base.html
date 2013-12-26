@@ -2,20 +2,31 @@
 
 {% load sekizai_tags %}
 
-{% block header-wrapper %}
+{% block header_wrapper %}
     {% add_data "css_data" "normalize/css/normalize.css" %}
     {{ block.super }}
-{% endblock header-wrapper %}
+{% endblock header_wrapper %}
 
-{% block between-header-content %}
-    {% block main-menu-wrapper %}
-        <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
-            {% block main-menu %}
-                {% include "base/main_menu.html" %}
-            {% endblock main-menu %}
+{% block header %}
+    {% block accounts_menu_wrapper %}
+        <section class="accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
+            {% block accounts_menu %}
+                {% include "base/accounts_menu.html" %}
+            {% endblock accounts_menu %}
         </section>
-    {% endblock main-menu-wrapper %}
-    {% block messages-wrapper %}
+    {% endblock accounts_menu_wrapper %}
+    {{ block.super }}
+{% endblock header %}
+
+{% block content_wrapper %}
+    {% block main_menu_wrapper %}
+        <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
+            {% block main_menu %}
+                {% include "base/main_menu.html" %}
+            {% endblock main_menu %}
+        </section>
+    {% endblock main_menu_wrapper %}
+    {% block messages_wrapper %}
         {% if messages %}
             <section class="messages {% block messages_classes %}{% endblock messages_classes %}">
                 {% block messages %}
@@ -23,20 +34,16 @@
                 {% endblock messages %}
             </section>
         {% endif %}
-    {% endblock messages-wrapper %}
+    {% endblock messages_wrapper %}
     {{ block.super }}
-{% endblock between-header-content %}
-
-{% block between-content-footer %}
-    {{ block.super }}
-    {% block altlinks-wrapper %}
+    {% block altlinks_wrapper %}
         <section class="altlinks {% block altlinks_classes %}{% endblock altlinks_classes %}">
             {% block altlinks %}{% endblock altlinks %}
         </section>
-    {% endblock altlinks-wrapper %}
-{% endblock between-content-footer %}
+    {% endblock altlinks_wrapper %}
+{% endblock content_wrapper %}
 
-{% block content-before %}
+{% block content_before %}
     {% block content_permalink %}
         {% include "base/content_permalink.html" %}
     {% endblock content_permalink %}
@@ -44,15 +51,4 @@
         {% include "base/content_heading.html" %}
     {% endblock %}
     {{ block.super }}
-{% endblock content-before %}
-
-{% block header-before %}
-    {% block accounts-menu-wrapper %}
-        <section class="accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
-            {% block accounts-menu %}
-                {% include "base/accounts_menu.html" %}
-            {% endblock accounts-menu %}
-        </section>
-    {% endblock accounts-menu-wrapper %}
-    {{ block.super }}
-{% endblock header-before %}
+{% endblock content_before %}

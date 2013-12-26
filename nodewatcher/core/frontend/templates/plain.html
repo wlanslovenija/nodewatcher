@@ -27,34 +27,28 @@
     </head>
 
     <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_classes %}{% endblock body_classes %}">
-        {% block header-wrapper %}
+        {% block header_wrapper %}
             <header class="{% block header_classes %}{% endblock header_classes %}">
-                {% block header-before %}{% endblock header-before %}
                 {% block header %}
                     {% include "header.html" %}
                 {% endblock header %}
-                {% block header-after %}{% endblock header-after %}
             </header>
-        {% endblock header-wrapper %}
-        {% block between-header-content %}{% endblock between-header-content %}
-        {% block content-wrapper %}
+        {% endblock header_wrapper %}
+        {% block content_wrapper %}
             <section class="content {% block content_classes %}{% endblock content_classes %}">
-                {% block content-before %}{% endblock content-before %}
+                {% block content_before %}{% endblock content_before %}
                 {% block content %}
                     {# Should be empty so that users can just override it without having to call block.super #}
                 {% endblock content %}
-                {% block content-after %}{% endblock content-after %}
+                {% block content_after %}{% endblock content_after %}
             </section>
-        {% endblock content-wrapper %}
-        {% block between-content-footer %}{% endblock between-content-footer %}
-        {% block footer-wrapper %}
+        {% endblock content_wrapper %}
+        {% block footer_wrapper %}
             <footer class="{% block footer_classes %}{% endblock footer_classes %}">
-                {% block footer-before %}{% endblock footer-before %}
                 {% block footer %}
                     {% include "footer.html" %}
                 {% endblock footer %}
-                {% block footer-after %}{% endblock footer-after %}
             </footer>
-        {% endblock footer-wrapper %}
+        {% endblock footer_wrapper %}
     </body>
 </html>

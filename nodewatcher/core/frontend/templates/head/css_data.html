@@ -1,5 +1,9 @@
 {% load staticfiles %}
 
-{% for css in css_data %}
-    <link href="{% static css %}" media="all" rel="stylesheet" type="text/css" />
-{% endfor %}
+{% block head_css_data %}
+    {% for css in css_data %}
+        {% block head_css_data_entry %}
+            <link href="{% static css %}" media="all" rel="stylesheet" type="text/css" />
+        {% endblock head_css_data_entry %}
+    {% endfor %}
+{% endblock head_css_data %}

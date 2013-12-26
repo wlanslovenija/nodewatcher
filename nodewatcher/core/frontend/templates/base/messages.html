@@ -1,9 +1,15 @@
 {% load forloop_tags %}
 
-{% spaceless %}
-    <ul class="messages-list">
-        {% for message in messages %}
-            <li class="message {{ message.tags }} {% css_classes "first" "last" "odd" "even" %}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endspaceless %}
+{% block base_messages_wrapper %}
+    {% spaceless %}
+        <ul class="messages-list">
+            {% block base_messages %}
+                {% for message in messages %}
+                    {% block base_messages_entry %}
+                        <li class="message {{ message.tags }} {% css_classes "first" "last" "odd" "even" %} {% block base_messages_entry_classes %}{% endblock base_messages_entry_classes %}">{{ message }}</li>
+                    {% endblock base_messages_entry %}
+                {% endfor %}
+            {% endblock base_messages %}
+        </ul>
+    {% endspaceless %}
+{% endblock base_messages_wrapper %}

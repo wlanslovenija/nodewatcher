@@ -1,5 +1,7 @@
 {% load i18n %}
 
-{% if permalink %}
-    <div class="permalink">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>
-{% endif %}
+{% block base_content_permalink %}
+    {% if permalink %}
+        <div class="permalink {% block base_content_permalink_classes %}{% endblock base_content_permalink_classes %}">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>
+    {% endif %}
+{% endblock base_content_permalink %}

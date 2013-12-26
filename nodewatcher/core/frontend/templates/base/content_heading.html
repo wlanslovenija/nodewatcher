@@ -1,5 +1,7 @@
 {% load html_tags %}
 
-{% if heading %}
-    {% heading 1 heading %}
-{% endif %}
+{% block base_content_heading %}
+    {% if heading %}
+        {% heading 1 heading %}
+    {% endif %}
+{% endblock base_content_heading %}

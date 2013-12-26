@@ -4,12 +4,18 @@
 This template uses `menu` (menu object) in the context.
 {% endcomment %}
 
-{% spaceless %}
-    {% if menu %}
-        <ul class="menu-list">
-            {% for menu_entry in menu %}
-                {% render_menu_entry menu_entry %}
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endspaceless %}
+{% block base_menu_wrapper %}
+    {% spaceless %}
+        {% if menu %}
+            <ul class="menu-list">
+                {% block base_menu %}
+                    {% for menu_entry in menu %}
+                        {% block base_menu_entry %}
+                            {% render_menu_entry menu_entry %}
+                        {% endblock base_menu_entry %}
+                    {% endfor %}
+                {% endblock base_menu %}
+            </ul>
+        {% endif %}
+    {% endspaceless %}
+{% endblock base_menu_wrapper %}

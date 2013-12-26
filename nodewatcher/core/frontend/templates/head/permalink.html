@@ -1,3 +1,5 @@
-{% if permalink %}
-    <link rel="bookmark" href="{{ permalink }}" />
-{% endif %}
+{% block head_permalink %}
+    {% if permalink %}
+        <link rel="bookmark" href="{{ permalink }}" />
+    {% endif %}
+{% endblock head_permalink %}

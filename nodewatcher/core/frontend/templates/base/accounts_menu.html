@@ -2,6 +2,8 @@
 
 {% get_menu "accounts_menu" as accounts_menu %}
 
-{% with menu=accounts_menu %}
-    {% include "base/menu.html" %}
-{% endwith %}
+{% block base_accounts_menu %}
+    {% with menu=accounts_menu %}
+        {% include "base/menu.html" %}
+    {% endwith %}
+{% endblock base_accounts_menu %}

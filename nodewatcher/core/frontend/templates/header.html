@@ -1,17 +1,21 @@
 {% load future staticfiles html_tags %}
 
-{% block included-header-before %}{% endblock included-header-before %}
-<div class="header-heading {% if NETWORK.LOGO_FILE %}logo{% endif %}">
-    {% if NETWORK.LOGO_FILE %}
-        <a href="{% url "main_page" %}" class="logo"><img src="{% static NETWORK.LOGO_FILE %}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
-    {% endif %}
-    <h1><a href="{% url "main_page" %}">{{ NETWORK.NAME }}</a></h1>
-    {# We set top-level base heading level here #}
-    {% set_base_heading_level 1 True %}
-    {% if NETWORK.DESCRIPTION %}
-        <h2><a href="{% url "main_page" %}">{{ NETWORK.DESCRIPTION }}</a></h2>
-        {# We set top-level base heading level here #}
-        {% set_base_heading_level 2 True %}
-    {% endif %}
-</div>
-{% block included-header-after %}{% endblock included-header-after %}
+{% block included_header %}
+    <div class="header-heading {% if NETWORK.LOGO_FILE %}logo{% endif %}">
+        {% block included_header_logo %}
+            {% if NETWORK.LOGO_FILE %}
+                <a href="{% url "main_page" %}" class="logo"><img src="{% static NETWORK.LOGO_FILE %}" alt="{{ NETWORK.NAME }}" title="{{ NETWORK.DESCRIPTION|default:NETWORK.NAME }}" /></a>
+            {% endif %}
+        {% endblock included_header_logo %}
+        {% block included_header_heading %}
+            <h1><a href="{% url "main_page" %}">{{ NETWORK.NAME }}</a></h1>
+            {# We set top-level base heading level here #}
+            {% set_base_heading_level 1 True %}
+            {% if NETWORK.DESCRIPTION %}
+                <h2><a href="{% url "main_page" %}">{{ NETWORK.DESCRIPTION }}</a></h2>
+                {# We set top-level base heading level here #}
+                {% set_base_heading_level 2 True %}
+            {% endif %}
+        {% endblock included_header_heading %}
+    </div>
+{% endblock included_header %}
