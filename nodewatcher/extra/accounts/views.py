@@ -1,3 +1,5 @@
+import copy
+
 from django import shortcuts
 from django import template
 from django.conf import settings
@@ -6,7 +8,6 @@ from django.contrib.auth import views as auth_views
 from django.contrib.sites import models as sites_models
 from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
-from django.utils import copycompat as copy
 
 from registration import models as registration_models
 
