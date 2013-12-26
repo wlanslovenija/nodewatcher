@@ -1,6 +1,8 @@
 # Based on http://code.djangoproject.com/ticket/5446
 # Should be changed to use upstream code once it has been merged into it.
 
+# TODO: Migrate to use https://github.com/SmileyChris/django-countries
+
 from django.conf import settings
 from django.contrib.gis import geoip
 from django.db.models import fields

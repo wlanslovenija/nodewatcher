@@ -11,9 +11,8 @@ from registration import models as registration_models
 
 from phonenumber_field import modelfields as phonenumber_fields
 
-from . import geo_fields
-
 from nodewatcher.modules.administration.projects import models
+from nodewatcher.utils.fields import geographic
 
 ATTRIBUTION_CHOICES = (
     ('name', _("Use my full name")),
@@ -30,8 +29,8 @@ class UserProfileAndSettings(django_models.Model):
     user = django_models.OneToOneField(auth_models.User, editable=False)
 
     phone_number = phonenumber_fields.PhoneNumberField(_('phone number'), help_text=_('Please enter your phone number in international format (e.g. +411234567) for use in emergency. It will be visible only to network administrators.'), null=True)
-    country = geo_fields.CountryField(_('country'), blank=True, help_text=_('Where are you from? It will be public.'))
-    language = geo_fields.LanguageField(_('language'), help_text=_('Choose the language you wish this site to be in.'))
+    country = geographic.CountryField(_('country'), blank=True, help_text=_('Where are you from? It will be public.'))
+    language = geographic.LanguageField(_('language'), help_text=_('Choose the language you wish this site to be in.'))
     default_project = django_models.ForeignKey(models.Project, default=models.project_default, null=True, verbose_name=_('default project'))
     attribution = django_models.CharField(_('attribution'), max_length=8, choices=ATTRIBUTION_CHOICES, default=ATTRIBUTION_CHOICES[0][0], help_text=_('What to use when we want to give you public attribution for your participation and contribution?'))
 
