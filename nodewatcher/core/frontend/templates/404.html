@@ -1,4 +1,4 @@
-{% extends "plain.html" %}
+{% extends "base.html" %}
 
 {% load i18n %}
 
@@ -7,7 +7,7 @@
 
 {% block extrahead %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
-{% block plain-content %}
+{% block content %}
     <div class="error">
         <p>{% trans "The page you requested cannot be found." %}</p>
     </div>
