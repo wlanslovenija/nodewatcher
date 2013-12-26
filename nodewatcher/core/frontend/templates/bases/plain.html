@@ -31,9 +31,7 @@
             <header class="{% block header_classes %}{% endblock header_classes %}">
                 {% block header-before %}{% endblock header-before %}
                 {% block header %}
-                    {% block header_heading %}
-                        {% include "header_heading.html" %}
-                    {% endblock header_heading %}
+                    {% include "header.html" %}
                 {% endblock header %}
                 {% block header-after %}{% endblock header-after %}
             </header>
@@ -51,9 +49,11 @@
         {% block between-content-footer %}{% endblock between-content-footer %}
         {% block footer-wrapper %}
             <footer class="{% block footer_classes %}{% endblock footer_classes %}">
+                {% block footer-before %}{% endblock footer-before %}
                 {% block footer %}
                     {% include "footer.html" %}
                 {% endblock footer %}
+                {% block footer-after %}{% endblock footer-after %}
             </footer>
         {% endblock footer-wrapper %}
     </body>
