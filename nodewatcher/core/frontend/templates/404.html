@@ -2,13 +2,12 @@
 
 {% load i18n %}
 
-{% block title %}{% trans "404 Not Found" %}{% endblock %}
+{% block title %}{% trans "404 Not Found" %}{{ block.super }}{% endblock %}
+{% block heading %}{% trans "404 Not Found" as heading %}{{ block.super }}{% endblock heading %}
 
 {% block extrahead %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
-{% block content %}
-    <h2>{% trans "404 Not Found" %}</h2>
-
+{% block plain-content %}
     <div class="error">
         <p>{% trans "The page you requested cannot be found." %}</p>
     </div>
