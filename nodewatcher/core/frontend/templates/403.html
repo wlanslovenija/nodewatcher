@@ -1,13 +1,13 @@
 {% overextends "base.html" %}
 
-{% load i18n %}
+{% load i18n sekizai_tags %}
 
 {% block title %}{% trans "403 Forbidden" %}{% endblock %}
 {% block heading %}{% trans "403 Forbidden" as heading %}{{ block.super }}{% endblock heading %}
 
-{% block extrahead %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
-
 {% block content %}
+    {% addtoblock "extrahead" %}<meta name="robots" content="NONE,NOARCHIVE" />{% endaddtoblock %}
+
     <div class="error">
         <p>{% trans "You don't have permission to access the page you requested." %}</p>
         {% if no_referer %}
