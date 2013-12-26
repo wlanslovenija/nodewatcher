@@ -1,0 +1,3 @@
+{% load forloop_tags url_tags %}
+
+<li class="menu-entry {{ menu_entry.classes }} {% active_url menu_entry.all_urls "active" %} {% css_classes "first" "last" "odd" "even" %}"><a href="{{ menu_entry.url }}" class="menu-entry-link"><span class="menu-entry-label">{{ menu_entry.label }}</span></a></li>

@@ -3,6 +3,7 @@ import re
 
 from django.conf import settings
 from django.core import urlresolvers
+from django.template import loader
 from django.utils import translation
 
 from . import exceptions
@@ -25,7 +26,7 @@ def ugettext_lazy(message):
 
 
 class MenuEntry(object):
-    def __init__(self, label=None, url=None, permission_check=None, order=0, classes=None):
+    def __init__(self, label=None, url=None, permission_check=None, order=0, classes=None, template='menu_entry.html'):
         if isinstance(label, basestring):
             self._name = label
             self._label = label
@@ -42,6 +43,8 @@ class MenuEntry(object):
         if classes is None:
             classes = ()
         self._classes = ' '.join(classes)
+
+        self._template = template
 
         self._context = None
 
@@ -79,13 +82,17 @@ class MenuEntry(object):
             return (self._url,)
 
     def has_permission(self, request):
-        return not self._permission_check or self._permission_check(request, self)
+        return not self._permission_check or self._permission_check(self, request)
 
     def add_context(self, context):
         with_context = copy.copy(self)
         with_context._context = context
         return with_context
 
+    def render(self, context=None):
+        if context is None:
+            context = self._context
+        return loader.render_to_string(self._template, context_instance=context)
 
 class Menu(object):
     def __init__(self, name):

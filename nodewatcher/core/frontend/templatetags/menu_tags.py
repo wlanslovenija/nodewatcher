@@ -14,3 +14,15 @@ def get_menu(context, menu_name):
         if settings.TEMPLATE_DEBUG:
             raise
         return []
+
+
+@register.simple_tag(takes_context=True)
+def render_menu_entry(context, menu_entry):
+    try:
+        # We could call menu_entry.add_context(context).render() as well,
+        # but the following is performance-wise better
+        return menu_entry.render(context)
+    except:
+        if settings.TEMPLATE_DEBUG:
+            raise
+        return u''
