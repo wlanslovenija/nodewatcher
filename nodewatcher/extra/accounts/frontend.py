@@ -46,3 +46,29 @@ components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     url=logout_url,
     visible=lambda menu_entry, request: request.user.is_authenticated(),
 ))
+
+
+def login_url(context):
+    # If a user wants to log in we would like to take her back to the current page
+    # or if she has already been redirected to the current page from some other page
+    # then to take her back to that page. But only if the target does not require
+    # anonymous access which would be after logout denied.
+    # TODO: We might move to throwing an exception on permission denied and use 403 handler to explain that user should not be authenticated?
+    # TODO: Is there a way for account_tags.anonymous_required to work with official decorators as well?
+    url = urlresolvers.reverse('AccountsComponent:auth_login')
+    redirect_field_name = context.get('REDIRECT_FIELD_NAME', auth.REDIRECT_FIELD_NAME)
+    next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].REQUEST.get(redirect_field_name, None) or context['request'].get_full_path()
+    if next_url and not account_tags.anonymous_required(next_url):
+        url = "%s?%s=%s" % (url, redirect_field_name, http.urlquote(next_url))
+    return url
+
+components.menus.get_menu('accounts_menu').add(components.MenuEntry(
+    label=components.ugettext_lazy("Login"),
+    url=login_url,
+    visible=lambda menu_entry, request: request.user.is_anonymous(),
+))
+components.menus.get_menu('accounts_menu').add(components.MenuEntry(
+    label=components.ugettext_lazy("Register"),
+    url=urlresolvers.reverse_lazy('AccountsComponent:registration_register'),
+    visible=lambda menu_entry, request: request.user.is_anonymous(),
+))
