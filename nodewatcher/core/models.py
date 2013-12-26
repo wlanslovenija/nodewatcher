@@ -46,7 +46,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
         app_label = 'core'
 
     class RegistryMeta:
-        form_order = 1
+        form_weight = 1
         registry_id = 'core.general'
         registry_section = _("General Configuration")
         registry_name = _("Basic Configuration")
@@ -69,7 +69,7 @@ class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
         app_label = 'core'
 
     class RegistryMeta:
-        form_order = 100
+        form_weight = 100
         registry_id = 'core.routerid'
         multiple = True
         hidden = True

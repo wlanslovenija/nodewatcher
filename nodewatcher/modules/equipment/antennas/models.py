@@ -52,7 +52,7 @@ class AntennaEquipmentConfig(registration.bases.NodeConfigRegistryItem):
     rotation = models.FloatField(null=True, blank=True)
 
     class RegistryMeta:
-        form_order = 50
+        form_weight = 50
         registry_id = 'core.equipment.antenna'
         registry_section = _("Antennas")
         registry_name = _("Antenna")

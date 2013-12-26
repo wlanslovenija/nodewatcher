@@ -65,7 +65,7 @@ class RegistrationPoint(object):
         item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
         item_dict[item._meta.module_name] = item
         return django_datastructures.SortedDict(
-            sorted(container.items(), key=lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_order', 0))
+            sorted(container.items(), key=lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_weight', 0))
         )
 
     def _register_item(self, item, object_toplevel=True):

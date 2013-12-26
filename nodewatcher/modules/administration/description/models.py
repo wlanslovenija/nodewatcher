@@ -13,7 +13,7 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
     url = models.URLField(verify_exists=False, blank=True, default='', verbose_name=_("URL"))
 
     class RegistryMeta:
-        form_order = 4
+        form_weight = 4
         registry_id = 'core.description'
         registry_section = _("Description")
         registry_name = _("Basic Description")

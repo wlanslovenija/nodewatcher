@@ -11,7 +11,7 @@ class TypeConfig(registration.bases.NodeConfigRegistryItem):
     type = registry_fields.SelectorKeyField('node.config', 'core.type#type')
 
     class RegistryMeta:
-        form_order = 2
+        form_weight = 2
         registry_id = 'core.type'
         registry_section = _("Type Configuration")
         registry_name = _("Type Configuration")
