@@ -97,34 +97,6 @@ class Interfaces(monitor_processors.NodeProcessor):
         iface.rx_drops = int(data.rx_drops)
         iface.mtu = int(data.mtu)
 
-        if data.network:
-            existing_networks = {}
-            for net in iface.networks.all():
-                existing_networks[net.address] = net
-
-            for network in data.network.values():
-                address = ipaddr.IPNetwork(network.addr)
-                net = existing_networks.get(address, None)
-                if net is None:
-                    net, _ = iface.networks.get_or_create(
-                        root=node,
-                        interface=iface,
-                        address=address
-                    )
-                    existing_networks[address] = net
-
-                if network.family == 'inet':
-                    net.family = 'ipv4'
-                elif network.family == 'inet6':
-                    net.family = 'ipv6'
-                else:
-                    self.logger.warnin("Unknown network family '%s' on node '%s' interface '%s'!" % (network.family, node.pk, iface.name))
-                net.save()
-                del existing_networks[address]
-
-            for net in existing_networks.values():
-                net.delete()
-
         if iface.name in context.http.wireless.radios:
             data = context.http.wireless.radios[iface.name]
 
@@ -154,6 +126,37 @@ class Interfaces(monitor_processors.NodeProcessor):
             iface.noise = int(data.noise) if data.noise else None
             # TODO: Calculate signal-to-noise ratio
             iface.snr = None
+
+        if data.network:
+            # Ensure that the interface is saved
+            iface.save()
+
+            existing_networks = {}
+            for net in iface.networks.all():
+                existing_networks[net.address] = net
+
+            for network in data.network.values():
+                address = ipaddr.IPNetwork(network.addr)
+                net = existing_networks.get(address, None)
+                if net is None:
+                    net, _ = iface.networks.get_or_create(
+                        root=node,
+                        interface=iface,
+                        address=address
+                    )
+                    existing_networks[address] = net
+
+                if network.family == 'inet':
+                    net.family = 'ipv4'
+                elif network.family == 'inet6':
+                    net.family = 'ipv6'
+                else:
+                    self.logger.warnin("Unknown network family '%s' on node '%s' interface '%s'!" % (network.family, node.pk, iface.name))
+                net.save()
+                del existing_networks[address]
+
+            for net in existing_networks.values():
+                net.delete()
 
     def interface_enabled(self, context, iface):
         """
