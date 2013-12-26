@@ -1,1 +1,58 @@
-{% extends "bases/base.html" %}
+{% extends "plain.html" %}
+
+{% load sekizai_tags %}
+
+{% block header-wrapper %}
+    {% add_data "css_data" "normalize/css/normalize.css" %}
+    {{ block.super }}
+{% endblock header-wrapper %}
+
+{% block between-header-content %}
+    {% block main-menu-wrapper %}
+        <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
+            {% block main-menu %}
+                {% include "base/main_menu.html" %}
+            {% endblock main-menu %}
+        </section>
+    {% endblock main-menu-wrapper %}
+    {% block messages-wrapper %}
+        {% if messages %}
+            <section class="messages {% block messages_classes %}{% endblock messages_classes %}">
+                {% block messages %}
+                    {% include "base/messages.html" %}
+                {% endblock messages %}
+            </section>
+        {% endif %}
+    {% endblock messages-wrapper %}
+    {{ block.super }}
+{% endblock between-header-content %}
+
+{% block between-content-footer %}
+    {{ block.super }}
+    {% block altlinks-wrapper %}
+        <section class="altlinks {% block altlinks_classes %}{% endblock altlinks_classes %}">
+            {% block altlinks %}{% endblock altlinks %}
+        </section>
+    {% endblock altlinks-wrapper %}
+{% endblock between-content-footer %}
+
+{% block content-before %}
+    {% block content_permalink %}
+        {% include "base/content_permalink.html" %}
+    {% endblock content_permalink %}
+    {% block heading %}
+        {% include "base/content_heading.html" %}
+    {% endblock %}
+    {{ block.super }}
+{% endblock content-before %}
+
+{% block header-before %}
+    {% block accounts-menu-wrapper %}
+        <section class="accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
+            {% block accounts-menu %}
+                {% include "base/accounts_menu.html" %}
+            {% endblock accounts-menu %}
+        </section>
+    {% endblock accounts-menu-wrapper %}
+    {{ block.super }}
+{% endblock header-before %}

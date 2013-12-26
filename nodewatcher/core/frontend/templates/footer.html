@@ -1,1 +1,5 @@
-{% extends "bases/footer.html" %}
+{% load i18n %}
+
+{% block included-footer-before %}{% endblock included-footer-before %}
+<p class="poweredby">{% blocktrans with nodewatcher='<a href="https://dev.wlan-si.net/wiki/Nodewatcher"><i>nodewatcher</i></a>' wlanslovenija='<a href="https://wlan-si.net/"><i>wlan slovenija</i></a>' %}Powered by {{ nodewatcher }}, a project of {{ wlanslovenija}} open wireless network.{% endblocktrans %}</p>
+{% block included-footer-after %}{% endblock included-footer-after %}
