@@ -1,6 +1,9 @@
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from nodewatcher.core.registry import exceptions as registry_exceptions
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, routers as cgm_routers
+from nodewatcher.utils import posix_tz
 
 from . import builder as openwrt_builder
 
@@ -287,8 +290,16 @@ def general(node, cfg):
     system = cfg.system.add('system')
     system.hostname = node.config.core.general().name
     system.uuid = node.uuid
-    # TODO: Timezone should probably not be hardcoded
-    system.timezone = 'CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00'
+
+    try:
+        zone = node.config.core.location().timezone.zone
+        system.timezone = posix_tz.get_posix_tz(zone)
+        if not system.timezone:
+            raise cgm_base.ValidationError(_("Unsupported OpenWRT timezone '%s'!") % zone)
+    except registry_exceptions.UnknownRegistryIdentifier:
+        system.timezone = posix_tz.get_posix_tz(settings.TIME_ZONE)
+        if not system.timezone:
+            system.timezone = 'UTC'
 
     # Setup base packages to be installed
     # TODO: This should probably not be hardcoded (or at least moved to modules)
