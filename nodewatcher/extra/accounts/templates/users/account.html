@@ -3,12 +3,7 @@
 {% load i18n %}
 
 {% block title %}{% trans "Account" %}{% endblock %}
-
-{% block heading %}
-    {% with _("Account") as heading %}
-        {{ block.super }}
-    {% endwith %}
-{% endblock %}
+{% block heading %}{% trans "Account" as heading %}{{ block.super }}{% endblock %}
 
 {% block content %}
     {% url AccountsComponent:auth_password_change as auth_password_change_url %}
