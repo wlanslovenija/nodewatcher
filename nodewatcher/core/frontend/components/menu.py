@@ -80,7 +80,7 @@ class MenuEntry(object):
         if urlresolvers.reverse('main_page') == self.url:
             return (self.url, urlresolvers.reverse('main_page_redirect'))
         else:
-            return (self._url,)
+            return (self.url,)
 
     def is_visible(self, request):
         return not self._visible or self._visible(self, request)
