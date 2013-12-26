@@ -38,7 +38,7 @@ class RegistryResolver(object):
 
         return partial
 
-    def by_registry_id(self, registry_id, create=None, queryset=False, onlyclass=None):
+    def by_registry_id(self, registry_id, create=None, queryset=False, onlyclass=None, **kwargs):
         """
         Resolves the registry hierarchy.
         """
@@ -57,7 +57,7 @@ class RegistryResolver(object):
                     if not issubclass(create, top_level):
                         raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
 
-                    return create(root=self._root)
+                    return create(root=self._root, **kwargs)
                 else:
                     return map(lambda x: x.cast(), cfg.all())
             else:
@@ -69,7 +69,7 @@ class RegistryResolver(object):
                         if not issubclass(create, top_level):
                             raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
 
-                        return create(root=self._root)
+                        return create.objects.get_or_create(root=self._root, **kwargs)[0]
                     else:
                         return None
         else:
