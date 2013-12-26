@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-    {% url AccountComponents:user_account as user_account_url %}
+    {% url AccountsComponent:user_account as user_account_url %}
     <p>{% blocktrans %}Do you want to <a href="{{ user_account_url }}">change your account</a>?{% endblocktrans %}</p>
     <p>{% trans "Username" %} {{ username }}.</p>
 {% endblock %}
