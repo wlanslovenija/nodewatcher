@@ -130,6 +130,7 @@ class NodePostprocess(monitor_processors.NodeProcessor):
                 rtm.average_lq = None
                 rtm.average_ilq = None
                 rtm.average_etx = None
+            rtm.link_count = len(visible_links)
             rtm.save()
 
             # Create streams for all links

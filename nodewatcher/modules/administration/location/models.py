@@ -2,6 +2,8 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext as _
 
+import timezone_field
+
 from nodewatcher.core.registry import registration
 
 
@@ -13,6 +15,7 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     address = models.CharField(max_length=100)
     city = models.CharField(max_length=100) # TODO: City field?
     country = models.CharField(max_length=100) # TODO: Country field?
+    timezone = timezone_field.TimeZoneField(null=True)
     geolocation = gis_models.PointField(null=True)
     altitude = models.FloatField(default=0)
 

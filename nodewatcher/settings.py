@@ -275,6 +275,7 @@ INSTALLED_APPS = (
     'south',
     'sekizai',
     'missing',
+    'timezone_field',
     'overextends',
 )
 

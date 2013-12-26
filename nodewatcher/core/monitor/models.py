@@ -32,6 +32,8 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
     Routing topology.
     """
 
+    link_count = models.IntegerField(default=0)
+
     class RegistryMeta:
         registry_id = 'network.routing.topology'
         multiple = True
