@@ -9,6 +9,10 @@ class Migration(SchemaMigration):
     depends_on = (
         ("core", "0023_monitoring_p1"),
     )
+    needed_by = (
+        ("monitor", "0009_monitor_refactor"),
+    )
+
 
     def forwards(self, orm):
 

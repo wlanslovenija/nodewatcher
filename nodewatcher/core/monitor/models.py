@@ -18,9 +18,8 @@ class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
 
     first_seen = models.DateTimeField(null=True)
     last_seen = models.DateTimeField(null=True)
-
-    class Meta:
-        app_label = 'core'
+    uuid = models.CharField(max_length=40, null=True)
+    firmware = models.CharField(max_length=100, null=True)
 
     class RegistryMeta:
         registry_id = 'core.general'
@@ -28,28 +27,10 @@ class GeneralMonitor(registration.bases.NodeMonitoringRegistryItem):
 registration.point('node.monitoring').register_item(GeneralMonitor)
 
 
-class CgmGeneralMonitor(GeneralMonitor):
-    """
-    General monitored parameters about a node that has firmware generated
-    by the CGMs.
-    """
-
-    uuid = models.CharField(max_length=40, null=True)
-    firmware = models.CharField(max_length=100, null=True)
-
-    class RegistryMeta(GeneralMonitor.RegistryMeta):
-        pass
-
-registration.point('node.monitoring').register_item(CgmGeneralMonitor)
-
-
 class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
     Routing topology.
     """
-
-    class Meta:
-        app_label = 'core'
 
     class RegistryMeta:
         registry_id = 'network.routing.topology'
@@ -80,9 +61,6 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
     status = registry_fields.SelectorKeyField('node.monitoring', 'network.routing.announces#status')
     last_seen = models.DateTimeField()
 
-    class Meta:
-        app_label = 'core'
-
     class RegistryMeta:
         registry_id = 'network.routing.announces'
         multiple = True
@@ -102,9 +80,6 @@ class SystemStatusMonitor(registration.bases.NodeMonitoringRegistryItem):
 
     uptime = models.PositiveIntegerField(null=True)
     local_time = models.DateTimeField(null=True)
-
-    class Meta:
-        app_label = 'core'
 
     class RegistryMeta:
         registry_id = 'system.status'

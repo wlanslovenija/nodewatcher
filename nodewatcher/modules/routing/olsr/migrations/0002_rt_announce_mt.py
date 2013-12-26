@@ -10,6 +10,9 @@ class Migration(SchemaMigration):
     depends_on = (
         ("core", "0025_rt_announce_mt"),
     )
+    needed_by = (
+        ("monitor", "0009_monitor_refactor"),
+    )
 
     def forwards(self, orm):
         # Adding model 'OlsrRoutingAnnounceMonitor'

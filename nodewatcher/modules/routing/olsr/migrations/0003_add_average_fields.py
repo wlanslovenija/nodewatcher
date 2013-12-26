@@ -7,6 +7,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    needed_by = (
+        ("monitor", "0009_monitor_refactor"),
+    )
+
     def forwards(self, orm):
         # Adding field 'OlsrRoutingTopologyMonitor.average_lq'
         db.add_column('olsr_olsrroutingtopologymonitor', 'average_lq',
