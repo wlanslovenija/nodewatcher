@@ -15,6 +15,7 @@ django-classy-tags==0.4
 django-datastream==0.1.5
 django-guardian==1.1.1
 -e git+https://github.com/mitar/django-missing.git@3ddab2d4b2c04749b2f572967989d4feaf018a4a#egg=django_missing-master
+django-overextends==0.3.0
 django-phonenumber-field==0.2a3
 django-polymorphic==0.5.3
 django-registration==0.8
@@ -35,5 +36,6 @@ python-dateutil==2.2
 python-memcached==1.53
 pytz==2013.8
 six==1.4.1
+sphinx-me==0.2.1
 ujson==1.33
 wsgiref==0.1.2

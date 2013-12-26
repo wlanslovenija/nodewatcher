@@ -275,6 +275,7 @@ INSTALLED_APPS = (
     'south',
     'sekizai',
     'missing',
+    'overextends',
 )
 
 # A sample logging configuration. The only tangible logging
