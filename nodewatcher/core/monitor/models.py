@@ -170,6 +170,24 @@ class WifiInterfaceMonitor(InterfaceMonitor):
 registration.point('node.monitoring').register_item(WifiInterfaceMonitor)
 
 
+class NetworkAddressMonitor(registration.bases.NodeMonitoringRegistryItem):
+    """
+    Network address of a monitored interface.
+    """
+
+    interface = registry_fields.IntraRegistryForeignKey(InterfaceMonitor, related_name='networks')
+    family = registry_fields.SelectorKeyField('node.monitoring', 'core.interfaces.network#family', null=True)
+    address = registry_fields.IPAddressField(null=True)
+
+    class RegistryMeta:
+        registry_id = 'core.interfaces.network'
+        multiple = True
+
+registration.point('node.monitoring').register_choice('core.interfaces.network#family', 'ipv4', _("IPv4"))
+registration.point('node.monitoring').register_choice('core.interfaces.network#family', 'ipv6', _("IPv6"))
+registration.point('node.monitoring').register_item(NetworkAddressMonitor)
+
+
 class Measurement(models.Model):
     """
     Mixin for measurement monitor models.
