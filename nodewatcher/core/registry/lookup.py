@@ -60,7 +60,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 dst_model, dst_field = field.split('_', 1)
                 try:
                     dst_model = registry_access.get_model_class_by_name(dst_model)
-                except:
+                except exceptions.UnknownRegistryClass:
                     dst_model = None
 
             if dst_model is not None:
