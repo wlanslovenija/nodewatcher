@@ -1,0 +1,7 @@
+{% load menu_tags %}
+
+{% get_menu "accounts_menu" as accounts_menu %}
+
+{% with menu=accounts_menu %}
+    {% include "menu.html" %}
+{% endwith %}
