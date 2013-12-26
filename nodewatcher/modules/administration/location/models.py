@@ -17,7 +17,7 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     altitude = models.FloatField(default=0)
 
     class RegistryMeta:
-        form_order = 3
+        form_weight = 3
         registry_id = 'core.location'
         registry_section = _("Location")
         registry_name = _("Basic Location")

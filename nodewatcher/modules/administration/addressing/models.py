@@ -10,7 +10,7 @@ class BasicAddressingConfig(registration.bases.NodeConfigRegistryItem, ip_models
     """
 
     class RegistryMeta:
-        form_order = 51
+        form_weight = 51
         registry_id = 'core.basic-addressing'
         registry_section = _("Subnet Allocation")
         registry_name = _("Subnet")

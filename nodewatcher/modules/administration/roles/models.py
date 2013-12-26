@@ -10,7 +10,7 @@ class RoleConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     class RegistryMeta:
-        form_order = 20
+        form_weight = 20
         registry_id = 'core.roles'
         registry_section = _("Node Roles")
         registry_name = _("Generic Role")

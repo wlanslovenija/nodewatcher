@@ -52,7 +52,7 @@ class AuthenticationConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     class RegistryMeta:
-        form_order = 10
+        form_weight = 10
         registry_id = 'core.authentication'
         registry_section = _("Authentication")
         registry_name = _("Basic Authentication")
@@ -84,7 +84,7 @@ class PackageConfig(registration.bases.NodeConfigRegistryItem):
     enabled = models.BooleanField(default=True)
 
     class RegistryMeta:
-        form_order = 100
+        form_weight = 100
         registry_id = 'core.packages'
         registry_section = _("Extra Packages")
         registry_name = _("Package Configuration")
@@ -112,7 +112,7 @@ class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
     enabled = models.BooleanField(default=True)
 
     class RegistryMeta:
-        form_order = 50
+        form_weight = 50
         registry_id = 'core.interfaces'
         registry_section = _("Network Interface Configuration")
         registry_name = _("Generic Interface")
@@ -169,7 +169,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
     bssid = registry_fields.MACAddressField(verbose_name="BSSID")
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
-        form_order = 51
+        form_weight = 51
         registry_name = _("Wireless Interface")
         multiple = True
         hidden = False
@@ -205,7 +205,7 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     description = models.CharField(max_length=100, blank=True)
 
     class RegistryMeta:
-        form_order = 51
+        form_weight = 51
         registry_id = 'core.interfaces.network'
         registry_section = _("Network Configuration")
         registry_name = _("Generic Network Config")
@@ -315,7 +315,7 @@ class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
     enabled = models.BooleanField(default=True)
 
     class RegistryMeta:
-        form_order = 50
+        form_weight = 50
         registry_id = 'core.interfaces.limits'
         registry_section = _("Traffic Limits Configuration")
         registry_name = _("Generic Limits")

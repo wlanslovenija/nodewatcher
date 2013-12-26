@@ -52,7 +52,7 @@ class ProjectConfig(registration.bases.NodeConfigRegistryItem):
     project = registry_fields.ModelSelectorKeyField(Project)
 
     class RegistryMeta:
-        form_order = 2
+        form_weight = 2
         registry_id = 'core.project'
         registry_section = _("Project")
         registry_name = _("Basic Project")
