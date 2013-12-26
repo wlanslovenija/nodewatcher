@@ -26,7 +26,7 @@ def ugettext_lazy(message):
 
 
 class MenuEntry(object):
-    def __init__(self, label=None, url=None, permission_check=None, order=0, classes=None, template='menu_entry.html'):
+    def __init__(self, label=None, url=None, visible=None, order=0, classes=None, template='menu_entry.html', extra_context=None):
         if isinstance(label, basestring):
             self._name = label
             self._label = label
@@ -37,7 +37,7 @@ class MenuEntry(object):
             raise exceptions.InvalidMenuEntry("Menu entry label must be a string or translated with nodewatcher.frontend.components.ugettext_lazy")
 
         self._url = url
-        self._permission_check = permission_check
+        self._visible = visible
         self._order = order
 
         if classes is None:
@@ -45,6 +45,7 @@ class MenuEntry(object):
         self._classes = ' '.join(classes)
 
         self._template = template
+        self._extra_context = extra_context or {}
 
         self._context = None
 
@@ -81,8 +82,8 @@ class MenuEntry(object):
         else:
             return (self._url,)
 
-    def has_permission(self, request):
-        return not self._permission_check or self._permission_check(self, request)
+    def is_visible(self, request):
+        return not self._visible or self._visible(self, request)
 
     def add_context(self, context):
         with_context = copy.copy(self)
@@ -92,7 +93,8 @@ class MenuEntry(object):
     def render(self, context=None):
         if context is None:
             context = self._context
-        return loader.render_to_string(self._template, context_instance=context)
+        return loader.render_to_string(self._template, self._extra_context, context)
+
 
 class Menu(object):
     def __init__(self, name):
