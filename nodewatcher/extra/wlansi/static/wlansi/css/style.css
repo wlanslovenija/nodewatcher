@@ -1,0 +1,26 @@
+body {
+    background: url("../images/background.png") repeat-x scroll left top white;
+}
+
+footer hr {
+	display: none;
+}
+
+footer {
+	border-top: 1px solid;
+	padding: 20px 0;
+	color: #BBBBBB;
+	font-size: 10px;
+}
+
+footer .footer-license, footer .footer-links {
+	margin: 1.3em 0;
+}
+
+footer .footer-license {
+	margin-top: 0;
+}
+
+footer .footer-links {
+	margin-bottom: 0;
+}
