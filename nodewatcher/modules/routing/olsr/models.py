@@ -32,6 +32,16 @@ registration.point('node.monitoring').register_item(OlsrRoutingTopologyMonitor)
 
 
 class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
+    link_count = ds_fields.IntegerField(tags={
+        'title': gettext_noop("Link count (OLSR)"),
+        'description': gettext_noop("Number of links to other nodes in OLSR routing topology."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+        }
+    })
     average_lq = ds_fields.FloatField(tags={
         'group': 'avg_link_quality',
         'title': gettext_noop("Average link quality"),
@@ -71,12 +81,12 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
 
     def get_stream_query_tags(self):
         tags = super(OlsrRoutingTopologyMonitorStreams, self).get_stream_query_tags()
-        tags.update({'link': None})
+        tags.update({'link': None, 'protocol': 'olsr'})
         return tags
 
     def get_stream_tags(self):
         tags = super(OlsrRoutingTopologyMonitorStreams, self).get_stream_query_tags()
-        tags.update({'link': None})
+        tags.update({'link': None, 'protocol': 'olsr'})
         return tags
 
 ds_pool.register(OlsrRoutingTopologyMonitor, OlsrRoutingTopologyMonitorStreams)
@@ -147,12 +157,12 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
 
     def get_stream_query_tags(self):
         tags = super(OlsrTopologyLinkStreams, self).get_stream_query_tags()
-        tags.update({'link': self._model.peer.uuid})
+        tags.update({'link': self._model.peer.uuid, 'protocol': 'olsr'})
         return tags
 
     def get_stream_tags(self):
         tags = super(OlsrTopologyLinkStreams, self).get_stream_query_tags()
-        tags.update({'link': self._model.peer.uuid})
+        tags.update({'link': self._model.peer.uuid, 'protocol': 'olsr'})
         return tags
 
 ds_pool.register(OlsrTopologyLink, OlsrTopologyLinkStreams)
