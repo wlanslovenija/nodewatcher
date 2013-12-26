@@ -20,14 +20,22 @@ class EventRecord(object):
         """
         Class constructor. Any keyword arguments are saved into the event record.
         """
-        self.timestamp = timezone.now()
-        self.__dict__.update(kwargs)
+        self.record = {
+            'timestamp': timezone.now(),
+        }
+        self.record.update(kwargs)
+
+    def __getattr__(self, key):
+        try:
+            return self.record[key]
+        except KeyError:
+            raise AttributeError(key)
 
     def post(self):
         """
         Posts an event to subscribed sinks.
         """
-        # Post event to sinks
+
         for sink in pool.get_all_sinks():
             sink.post(self)
 
