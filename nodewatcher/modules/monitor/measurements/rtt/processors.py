@@ -158,8 +158,12 @@ class StoreNode(monitor_processors.NodeProcessor):
         try:
             router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
             results = context.rtt.results.get(router_id, None)
+            context.node_available = False
+            context.node_responds = False
             if not results:
                 return context
+            else:
+                context.node_available = True
 
             # Store results into monitoring schema
             for size, result in results.iteritems():
@@ -179,9 +183,14 @@ class StoreNode(monitor_processors.NodeProcessor):
                 rm.rtt_std = result['rtt_std']
                 rm.packet_loss = 100 * rm.failed_packets / rm.all_packets
                 rm.save()
+
+                # Mark the node as responding if at least one packet was delivered
+                if rm.successful_packets > 0:
+                    context.node_responds = True
         except core_models.RouterIdConfig.DoesNotExist:
             # No router-id for this node can be found for IPv4; this means
             # that we have nothing to do here
             pass
 
         return context
+
