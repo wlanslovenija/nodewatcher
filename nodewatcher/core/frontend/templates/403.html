@@ -1,15 +1,11 @@
 {% setcontext %}
-    {% load sekizai_tags %}
+    {% load i18n sekizai_tags %}
 
     {% addtoblock "extrahead" %}<meta name="robots" content="NONE,NOARCHIVE" />{% endaddtoblock %}
+    {% trans "403 Forbidden" as title %}
 {% endsetcontext %}
 
 {% overextends "base.html" %}
-
-{% load i18n %}
-
-{% block title %}{% trans "403 Forbidden" %}{{ block.super }}{% endblock %}
-{% block heading %}{% trans "403 Forbidden" as heading %}{{ block.super }}{% endblock heading %}
 
 {% block content %}
     <div class="error">

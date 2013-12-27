@@ -1,7 +1,7 @@
 {% load sekizai_tags %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
-        <title>{% block title %}{% block title_suffix %}{% block title_delimiter %} – {% endblock title_delimiter %}{% block title_site_name %}{{ NETWORK.NAME|default:site.name }}{% endblock title_site_name %}{% endblock title_suffix %}{% endblock title %}</title>
+        <title>{% block title %}{{ title }}{% block title_suffix %}{% block title_delimiter %} – {% endblock title_delimiter %}{% block title_site_name %}{{ NETWORK.NAME|default:site.name }}{% endblock title_site_name %}{% endblock title_suffix %}{% endblock title %}</title>
         {% block head_meta %}
             {% include "head/meta.html" %}
         {% endblock head_meta %}
