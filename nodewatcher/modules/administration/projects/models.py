@@ -1,16 +1,18 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import fields as registry_fields, registration
 
 
+# TODO: Clean this model, because some fields are not used anymore
 class Project(models.Model):
     """
     This class represents a project. Each project can contains some
     nodes and is also assigned a default IP allocation pool.
     """
     name = models.CharField(max_length=50)
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200) # TODO: Should be text field?
     channel = models.IntegerField()
     ssid = models.CharField(max_length=50)
     ssid_backbone = models.CharField(max_length=50)
@@ -39,7 +41,10 @@ def project_default(request=None):
     else:
         projects = Project.objects.all()
         if projects.exists():
-            return projects[0]
+            try:
+                return projects.get(name__iexact=(settings.NETWORK.get('DEFAULT_PROJECT', None) or ''))
+            except Project.DoesNotExist:
+                return projects[0]
         else:
             return None
 
