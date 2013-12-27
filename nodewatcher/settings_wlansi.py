@@ -22,9 +22,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EVENTS_EMAIL = 'events@wlan-si.net'
 IMAGE_GENERATOR_EMAIL = 'generator@wlan-si.net'
 
-# Add wlan slovenija specific things (templates, static files, etc.).
-# We add after 'nodewatcher.extra.normalize' so that we can override templates in
-# other apps, but we do not want to override 'nodewatcher.extra.normalize'.
-INSTALLED_APPS = list(INSTALLED_APPS)
-INSTALLED_APPS.insert(INSTALLED_APPS.index('nodewatcher.extra.normalize') + 1, 'nodewatcher.extra.wlansi')
-INSTALLED_APPS = tuple(INSTALLED_APPS)
+# We add to the beginning so that we can override templates in other apps.
+INSTALLED_APPS = (
+    'nodewatcher.extra.wlansi',
+) + INSTALLED_APPS

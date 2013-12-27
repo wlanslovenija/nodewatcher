@@ -222,7 +222,9 @@ INSTALLED_APPS = (
     # We override staticfiles runserver with default Django runserver in nodewatcher.core.frontend.
     'django.contrib.staticfiles',
 
-    # Normalize CSS first.
+    # Common frontend libraries before nodewatcher.core.frontend.
+    # Uses "prepend_data" to assure libraries are loaded first.
+    'nodewatcher.extra.jquery',
     'nodewatcher.extra.normalize',
 
     # Ours are at the beginning so that we can override default templates in 3rd party Django apps.
@@ -281,7 +283,7 @@ INSTALLED_APPS = (
     'djcelery',
     'guardian',
     'south',
-    'sekizai',
+    'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
     'missing',
     'timezone_field',
     'overextends',
