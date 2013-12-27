@@ -222,7 +222,10 @@ INSTALLED_APPS = (
     # We override staticfiles runserver with default Django runserver in nodewatcher.core.frontend.
     'django.contrib.staticfiles',
 
-    # Ours are at the beginning so that we can override default templates in other apps.
+    # Normalize CSS first.
+    'nodewatcher.extra.normalize',
+
+    # Ours are at the beginning so that we can override default templates in 3rd party Django apps.
     'nodewatcher.core',
     'nodewatcher.core.allocation',
     'nodewatcher.core.allocation.ip',
@@ -232,6 +235,8 @@ INSTALLED_APPS = (
     'nodewatcher.core.generator',
     'nodewatcher.core.monitor',
     'nodewatcher.core.registry',
+
+    # Modules.
     'nodewatcher.modules.administration.types',
     'nodewatcher.modules.administration.projects',
     'nodewatcher.modules.administration.location',
@@ -255,6 +260,8 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
     'nodewatcher.modules.frontend.api',
+
+    # Accounts support.
     'nodewatcher.extra.accounts',
 
     # Legacy apps for migrations.
