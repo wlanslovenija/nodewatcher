@@ -52,6 +52,9 @@ class TestInvalidSubclass(object):
 
 class EventsTestCase(unittest.TestCase):
     def setUp(self):
+        # Unregister any other sinks
+        self._previous_sinks = [sink.__class__ for sink in pool.get_all_sinks()]
+        pool.unregister(self._previous_sinks)
         # Setup a test sink
         pool.register(TestEventSink)
         pool.get_sink('TestEventSink').add_filter(TestEventFilter)
@@ -60,6 +63,9 @@ class EventsTestCase(unittest.TestCase):
 
     def tearDown(self):
         pool.unregister(TestEventSink)
+        # Register the previous sinks back
+        for sink in self._previous_sinks:
+            pool.register(sink)
 
     def test_event_processing(self):
         # Check basic event propagation
@@ -133,6 +139,18 @@ class EventsTestCase(unittest.TestCase):
 
 
 class EventsSettingsTestCase(django_test.TestCase):
+    def setUp(self):
+        # Unregister any other sinks
+        self._previous_sinks = [sink.__class__ for sink in pool.get_all_sinks()]
+        pool.unregister(self._previous_sinks)
+        # Fake discovery
+        pool._discovered = True
+
+    def tearDown(self):
+        # Register the previous sinks back
+        for sink in self._previous_sinks:
+            pool.register(sink)
+
     def test_settings(self):
         # Test disabled sink via settings
         with self.settings(EVENT_SINKS={
