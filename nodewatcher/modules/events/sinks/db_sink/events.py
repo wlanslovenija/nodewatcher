@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from nodewatcher.core.events import base, pool
+from nodewatcher.core.events import base, pool, events
 
 from . import models
 
@@ -14,6 +14,9 @@ class DatabaseSink(base.EventSink):
         """
         Persists the received event into the database.
         """
+
+        if not isinstance(event, events.NodeEventRecord):
+            return
 
         sid = transaction.savepoint()
         try:
