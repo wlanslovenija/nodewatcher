@@ -1,11 +1,9 @@
-{% overextends "plain.html" %}
-
-{% load sekizai_tags %}
-
-{% block header_wrapper %}
+{% setcontext %}
+    {% load sekizai_tags %}
     {% add_data "css_data" "normalize/css/normalize.css" %}
-    {{ block.super }}
-{% endblock header_wrapper %}
+{% endsetcontext %}
+
+{% overextends "plain.html" %}
 
 {% block header %}
     {% block accounts_menu_wrapper %}

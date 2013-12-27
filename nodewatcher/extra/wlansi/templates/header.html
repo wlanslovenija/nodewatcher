@@ -1,8 +1,0 @@
-{% overextends "header.html" %}
-
-{% load sekizai_tags %}
-
-{% block included_header %}
-    {% add_data "css_data" "wlansi/css/style.css" %}
-    {{ block.super }}
-{% endblock included_header %}
