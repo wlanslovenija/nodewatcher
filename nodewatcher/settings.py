@@ -250,6 +250,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.authentication.public_key',
     'nodewatcher.modules.vpn.tunneldigger',
+    'nodewatcher.modules.events.sinks.db_sink',
     'nodewatcher.modules.frontend.display',
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
@@ -277,6 +278,7 @@ INSTALLED_APPS = (
     'missing',
     'timezone_field',
     'overextends',
+    'json_field',
 )
 
 # A sample logging configuration. The only tangible logging

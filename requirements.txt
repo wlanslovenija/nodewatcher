@@ -40,3 +40,4 @@ sphinx-me==0.2.1
 ujson==1.33
 wsgiref==0.1.2
 django-timezone-field==1.0
+django-json-field==0.5.5

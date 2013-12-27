@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils import unittest
 from django import test as django_test
 
-from . import base, exceptions
+from . import base, exceptions, events
 from .pool import pool
 
 
@@ -32,12 +32,29 @@ class TestEventFilter(base.EventFilter):
         return True
 
 
+class TestNodeEvent(events.NodeEventRecord):
+    foo = events.CharAttribute()
+    bar = events.CharAttribute()
+
+    def __init__(self, foo, bar):
+        super(TestNodeEvent, self).__init__(
+            None,
+            events.NodeEventRecord.SEVERITY_INFO,
+            "Test event",
+            foo=foo,
+            bar=bar
+        )
+
+
 class TestInvalidSubclass(object):
     pass
 
 
 class EventsTestCase(unittest.TestCase):
     def setUp(self):
+        # Unregister any other sinks
+        self._previous_sinks = [sink.__class__ for sink in pool.get_all_sinks()]
+        pool.unregister(self._previous_sinks)
         # Setup a test sink
         pool.register(TestEventSink)
         pool.get_sink('TestEventSink').add_filter(TestEventFilter)
@@ -46,6 +63,9 @@ class EventsTestCase(unittest.TestCase):
 
     def tearDown(self):
         pool.unregister(TestEventSink)
+        # Register the previous sinks back
+        for sink in self._previous_sinks:
+            pool.register(sink)
 
     def test_event_processing(self):
         # Check basic event propagation
@@ -110,8 +130,27 @@ class EventsTestCase(unittest.TestCase):
         with self.assertRaises(exceptions.EventFilterNotFound):
             pool.get_sink('TestEventSink').remove_filter('TestUnattachedFilter')
 
+    def test_node_events(self):
+        self.assertEqual([a.name for a in TestNodeEvent.get_attributes()], ['foo', 'bar'])
+        self.assertEqual(TestNodeEvent.get_attribute('foo').name, 'foo')
+        self.assertEqual(TestNodeEvent.get_attribute('bar').name, 'bar')
+        with self.assertRaises(KeyError):
+            TestNodeEvent.get_attribute('does_not_exist')
+
 
 class EventsSettingsTestCase(django_test.TestCase):
+    def setUp(self):
+        # Unregister any other sinks
+        self._previous_sinks = [sink.__class__ for sink in pool.get_all_sinks()]
+        pool.unregister(self._previous_sinks)
+        # Fake discovery
+        pool._discovered = True
+
+    def tearDown(self):
+        # Register the previous sinks back
+        for sink in self._previous_sinks:
+            pool.register(sink)
+
     def test_settings(self):
         # Test disabled sink via settings
         with self.settings(EVENT_SINKS={

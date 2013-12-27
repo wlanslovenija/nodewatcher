@@ -11,7 +11,7 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     Node's status.
     """
 
-    network = registry_fields.SelectorKeyField('node.monitoring', 'core.status#network')
+    network = registry_fields.SelectorKeyField('node.monitoring', 'core.status#network', default='unknown')
     monitored = models.NullBooleanField(null=True)
     health = registry_fields.SelectorKeyField('node.monitoring', 'core.status#health')
 
