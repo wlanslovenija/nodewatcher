@@ -1,16 +1,17 @@
+{% setcontext %}
+    {% load i18n %}
+
+    {% trans "Account" as title %}
+{% endsetcontext %}
+
 {% overextends "base.html" %}
-
-{% load i18n %}
-
-{% block title %}{% trans "Account" %}{% endblock %}
-{% block heading %}{% trans "Account" as heading %}{{ block.super }}{% endblock %}
 
 {% block content %}
     {% url AccountsComponent:auth_password_change as auth_password_change_url %}
     <p>{% blocktrans %}Do you want to <a href="{{ auth_password_change_url }}">change your password</a>?{% endblocktrans %}</p>
+    <p>{% trans "Username" %} {{ user.username }}</p>
     {% with _("Update account") as form_submit %}
         {% url AccountsComponent:user_account as form_action %}
-        <p>{% trans "Username" %} {{ user.username }}</p>
         {% include "form.html" %}
     {% endwith %}
 {% endblock %}
