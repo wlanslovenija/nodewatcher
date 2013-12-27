@@ -1,3 +1,9 @@
+{% setcontext %}
+    {% load sekizai_tags %}
+
+    {% add_data "css_data" "frontend/css/style.css" %}
+{% endsetcontext %}
+
 {% overextends "plain.html" %}
 
 {% block header %}
