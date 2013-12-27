@@ -18,8 +18,10 @@ class EventRecord(object):
 
     def __init__(self, **kwargs):
         """
-        Class constructor. Any keyword arguments are saved into the event record.
+        Class constructor. Any keyword arguments are saved into the event record
+        and must be JSON-serializable.
         """
+
         self.record = {
             'timestamp': timezone.now(),
         }

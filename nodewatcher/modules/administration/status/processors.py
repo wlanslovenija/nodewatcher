@@ -1,6 +1,6 @@
 from nodewatcher.core.monitor import processors as monitor_processors
 
-from . import models
+from . import models, events
 
 
 class NodeStatus(monitor_processors.NodeProcessor):
@@ -19,7 +19,7 @@ class NodeStatus(monitor_processors.NodeProcessor):
         """
 
         sm = node.monitoring.core.status(create=models.StatusMonitor)
-        # TODO: Emit events on node state transitions
+        prev_network = sm.network
         if context.node_available is not True:
             sm.network = 'down'
             sm.monitored = None
@@ -41,5 +41,9 @@ class NodeStatus(monitor_processors.NodeProcessor):
         # TODO: Change depending on any warning/error events
         sm.health = 'unknown'
         sm.save()
+
+        # Emit event on node state transitions
+        if prev_network != sm.network:
+            events.NodeStatusChange(node, prev_network, sm.network).post()
 
         return context

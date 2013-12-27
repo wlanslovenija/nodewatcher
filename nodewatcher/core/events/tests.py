@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils import unittest
 from django import test as django_test
 
-from . import base, exceptions
+from . import base, exceptions, events
 from .pool import pool
 
 
@@ -30,6 +30,20 @@ class TestEventFilter(base.EventFilter):
             return False
 
         return True
+
+
+class TestNodeEvent(events.NodeEventRecord):
+    foo = events.CharAttribute()
+    bar = events.CharAttribute()
+
+    def __init__(self, foo, bar):
+        super(TestNodeEvent, self).__init__(
+            None,
+            events.NodeEventRecord.SEVERITY_INFO,
+            "Test event",
+            foo=foo,
+            bar=bar
+        )
 
 
 class TestInvalidSubclass(object):
@@ -109,6 +123,13 @@ class EventsTestCase(unittest.TestCase):
 
         with self.assertRaises(exceptions.EventFilterNotFound):
             pool.get_sink('TestEventSink').remove_filter('TestUnattachedFilter')
+
+    def test_node_events(self):
+        self.assertEqual([a.name for a in TestNodeEvent.get_attributes()], ['foo', 'bar'])
+        self.assertEqual(TestNodeEvent.get_attribute('foo').name, 'foo')
+        self.assertEqual(TestNodeEvent.get_attribute('bar').name, 'bar')
+        with self.assertRaises(KeyError):
+            TestNodeEvent.get_attribute('does_not_exist')
 
 
 class EventsSettingsTestCase(django_test.TestCase):
