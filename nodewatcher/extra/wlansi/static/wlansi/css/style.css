@@ -13,12 +13,17 @@ footer {
 	font-size: 10px;
 }
 
-footer .footer-license, footer .footer-links {
+footer .footer-license, footer .footer-cookies, footer .footer-links {
 	margin: 1.3em 0;
 }
 
 footer .footer-license {
 	margin-top: 0;
+    margin-bottom: 0.3em;
+}
+
+footer .footer-cookies {
+    margin-top: 0.3em;
 }
 
 footer .footer-links {

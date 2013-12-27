@@ -1,11 +1,16 @@
 {% overextends "footer.html" %}
 
+{% load i18n %}
+
 {% block included_footer %}
     <hr />
     <div class="footer-license">
-        All content on this website is available under <a href="https://wlan-si.net/content-license/">Creative Commons Attribution-ShareAlike license</a> unless specified otherwise.
+        {% blocktrans with contentlicense_url="https://wlan-si.net/content-license/" %}All content on this website is available under <a href="{{ contentlicense_url }}">Creative Commons Attribution-ShareAlike license</a> unless specified otherwise.{% endblocktrans %}
+    </div>
+    <div class="footer-cookies">
+        {% blocktrans with cookies_url="https://wlan-si.net/cookies/" %}This website uses <a href="{{ cookies_url }}">cookies to store your website preferences and login information</a>.{% endblocktrans %}
     </div>
     <div class="footer-links">
-        <a href="https://wlan-si.net/">wlan slovenija</a> | <a href="https://nodes.wlan-si.net/">node database</a> | <a href="https://dev.wlan-si.net/">development</a> | <a href="https://grow.wlan-si.net/">growing</a>
+        <a href="https://wlan-si.net/">wlan slovenija</a> | <a href="https://nodes.wlan-si.net/">{% trans "node database" %}</a> | <a href="https://dev.wlan-si.net/">{% trans "development" %}</a> | <a href="https://grow.wlan-si.net/">{% trans "growing" %}</a>
     </div>
 {% endblock included_footer %}
