@@ -65,6 +65,10 @@ class Topology(monitor_processors.NetworkProcessor):
                     context.router_id_map[router_id] = node
 
                     if created:
+                        general_cfg = node.config.core.general(create=core_models.GeneralConfig)
+                        general_cfg.name = None
+                        general_cfg.save()
+
                         rid_cfg = node.config.core.routerid(create=core_models.RouterIdConfig)
                         rid_cfg.router_id = router_id
                         rid_cfg.family = 'ipv4'

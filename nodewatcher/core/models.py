@@ -40,7 +40,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     node.
     """
 
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, null=True)
 
     class Meta:
         app_label = 'core'
