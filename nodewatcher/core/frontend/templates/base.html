@@ -47,9 +47,17 @@
         {% include "base/content_permalink.html" %}
     {% endblock content_permalink %}
     {% block heading %}
-        {% with heading=heading|default:title %}
+        {% if heading %}
             {% include "base/content_heading.html" %}
-        {% endwith %}
+        {% elif title %}
+            {% with heading=title %}
+                {% include "base/content_heading.html" %}
+            {% endwith %}
+        {% else %}
+            {% with heading="" %}
+                {% include "base/content_heading.html" %}
+            {% endwith %}
+        {% endif %}
     {% endblock %}
     {{ block.super }}
 {% endblock content_before %}
