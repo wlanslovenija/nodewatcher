@@ -1,3 +1,5 @@
+import copy
+
 from django.contrib.gis.db import models as gis_models
 from django import db
 from django.db.models.sql import constants
@@ -79,6 +81,54 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         clone = self._clone()
 
+        # Construct a temporary fake model for this query
+        if not hasattr(clone.model, '_registry_proxy'):
+            class Meta:
+                proxy = True
+                app_label = '_registry_proxy_models_'
+
+            # Use a dictionary to transfer data to closure by reference
+            this_class = {'parent': clone.model}
+            def pickle_reduce(self):
+                t = super(this_class['class'], self).__reduce__()
+                attrs = t[2]
+                for name in self._registry_attrs:
+                    if name in attrs:
+                        del attrs[name]
+                return (t[0], (this_class['parent'], t[1][1], t[1][2]), attrs)
+
+            clone.model = type(
+                '%sRegistryProxy' % clone.model.__name__,
+                (clone.model,),
+                {
+                    '__module__': 'nodewatcher.core.registry.lookup',
+                    '_registry_proxy': True,
+                    '_registry_attrs': [],
+                    'Meta': Meta,
+                    '__reduce__': pickle_reduce,
+                },
+            )
+            this_class['class'] = clone.model
+
+            # Prevent proxy models from cluttering up the cache
+            del db.models.loading.cache.app_models['_registry_proxy_models_']
+            # All our fields are virtual
+            clone.model._meta.add_field = clone.model._meta.add_virtual_field
+
+        def install_proxy_field(model, field, name):
+            field = copy.deepcopy(field)
+            field.name = None
+            select_name = name
+            field.contribute_to_class(clone.model, name)
+
+            if field.name != field.attname:
+                # Handle foreign key relations properly
+                select_name = '%s_att' % name
+                field.attname = select_name
+
+            model._registry_attrs.append(select_name)
+            return select_name
+
         for field, dst in kwargs.iteritems():
             dst_model, dst_field = dst.split('.', 1)
             try:
@@ -91,13 +141,22 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             else:
                 dst_related = None
 
-            dst_field = dst_model._meta.get_field_by_name(dst_field)[0]
+            dst_field, _, _, m2m = dst_model._meta.get_field_by_name(dst_field)
+            if m2m:
+                raise ValueError("Many-to-many fields not supported in registry_fields query!")
             if dst_related is None:
-                clone = clone.extra(select={field: '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))})
+                select_name = install_proxy_field(clone.model, dst_field, field)
+                clone = clone.extra(select={select_name: '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))})
             else:
                 dst_field_model = dst_field.rel.to
-                dst_related_field = dst_field_model._meta.get_field_by_name(dst_related)[0]
-                clone = clone.extra(select={field: '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))})
+                dst_related_field, _, _, m2m = dst_field_model._meta.get_field_by_name(dst_related)
+
+                if m2m:
+                    raise ValueError("Many-to-many fields not supported in registry_fields query!")
+
+                select_name = install_proxy_field(clone.model, dst_related_field, field)
+                clone = clone.extra(select={select_name: '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))})
+
             clone.query.get_initial_alias()
 
             # Join with top-level item

@@ -9,6 +9,7 @@ from django.db import connection, transaction
 from django.utils import importlib
 
 from . import processors as monitor_processors
+from .. import models as core_models
 
 # Welcome banner
 BANNER = """
@@ -27,7 +28,8 @@ def stage_worker(args):
     Runs a list of (node) processors on a given node.
     """
 
-    context, node, processors = args
+    context, node_pk, processors = args
+    node = core_models.Node.objects.get(pk=node_pk)
     cleanup_queue = []
     try:
         for p in processors:
@@ -87,7 +89,7 @@ class MonitorRun(object):
             # Compatibility with Python 2.6 that doesn't have the maxtasksperchild argument
             self.workers = multiprocessing.Pool(self.config['workers'])
 
-        logger.info("Ready with %d workers for run %s." % (self.config['workers'], self.name))
+        logger.info("Ready with %d workers for run '%s'." % (self.config['workers'], self.name))
 
     @transaction.commit_manually
     def cycle(self):
@@ -122,19 +124,19 @@ class MonitorRun(object):
 
                 if self.config['process_only_node'] is not None:
                     logger.info("Limiting only to the following node: %s" % self.config['process_only_node'])
-                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
+                    self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
                 else:
-                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes)).get(0xFFFF)
+                    self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes)).get(0xFFFF)
             else:
                 logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
 
         logger.info("All done.")
 
     def start(self):
-        logger.info("Preparing the worker pool for run %s..." % self.name)
+        logger.info("Preparing the worker pool for run '%s'..." % self.name)
         self.prepare_workers()
 
-        logger.info("Run %s entering monitoring cycle..." % self.name)
+        logger.info("Run '%s' entering monitoring cycle..." % self.name)
         try:
             cycle = 0
             while True:
