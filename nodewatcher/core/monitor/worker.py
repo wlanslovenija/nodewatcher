@@ -9,6 +9,7 @@ from django.db import connection, transaction
 from django.utils import importlib
 
 from . import processors as monitor_processors
+from .. import models as core_models
 
 # Welcome banner
 BANNER = """
@@ -27,7 +28,8 @@ def stage_worker(args):
     Runs a list of (node) processors on a given node.
     """
 
-    context, node, processors = args
+    context, node_pk, processors = args
+    node = core_models.Node.objects.get(pk=node_pk)
     cleanup_queue = []
     try:
         for p in processors:
@@ -122,9 +124,9 @@ class MonitorRun(object):
 
                 if self.config['process_only_node'] is not None:
                     logger.info("Limiting only to the following node: %s" % self.config['process_only_node'])
-                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
+                    self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
                 else:
-                    self.workers.map_async(stage_worker, ((context, node, processor_list) for node in nodes)).get(0xFFFF)
+                    self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes)).get(0xFFFF)
             else:
                 logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
 
