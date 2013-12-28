@@ -89,7 +89,7 @@ class MonitorRun(object):
             # Compatibility with Python 2.6 that doesn't have the maxtasksperchild argument
             self.workers = multiprocessing.Pool(self.config['workers'])
 
-        logger.info("Ready with %d workers for run %s." % (self.config['workers'], self.name))
+        logger.info("Ready with %d workers for run '%s'." % (self.config['workers'], self.name))
 
     @transaction.commit_manually
     def cycle(self):
@@ -133,10 +133,10 @@ class MonitorRun(object):
         logger.info("All done.")
 
     def start(self):
-        logger.info("Preparing the worker pool for run %s..." % self.name)
+        logger.info("Preparing the worker pool for run '%s'..." % self.name)
         self.prepare_workers()
 
-        logger.info("Run %s entering monitoring cycle..." % self.name)
+        logger.info("Run '%s' entering monitoring cycle..." % self.name)
         try:
             cycle = 0
             while True:
