@@ -59,7 +59,7 @@ class Topology(monitor_processors.NetworkProcessor):
                 for router_id in visible_routers.difference(registered_routers):
                     # Create an invalid node for each unknown router id seen by olsrd
                     node, created = core_models.Node.objects.get_or_create(
-                        uuid=str(uuid.uuid5(olsr_models.OLSR_UUID_NAMESPACE, router_id.packed))
+                        uuid=str(uuid.uuid5(olsr_models.OLSR_UUID_NAMESPACE, router_id))
                     )
                     nodes.add(node)
                     context.router_id_map[router_id] = node
