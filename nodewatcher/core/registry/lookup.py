@@ -87,15 +87,28 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 proxy = True
                 app_label = '_registry_proxy_models_'
 
+            # Use a dictionary to transfer data to closure by reference
+            this_class = {'parent': clone.model}
+            def pickle_reduce(self):
+                t = super(this_class['class'], self).__reduce__()
+                attrs = t[2]
+                for name in self._registry_attrs:
+                    if name in attrs:
+                        del attrs[name]
+                return (t[0], (this_class['parent'], t[1][1], t[1][2]), attrs)
+
             clone.model = type(
                 '%sRegistryProxy' % clone.model.__name__,
                 (clone.model,),
                 {
                     '__module__': 'nodewatcher.core.registry.lookup',
                     '_registry_proxy': True,
+                    '_registry_attrs': [],
                     'Meta': Meta,
+                    '__reduce__': pickle_reduce,
                 },
             )
+            this_class['class'] = clone.model
 
             # Prevent proxy models from cluttering up the cache
             del db.models.loading.cache.app_models['_registry_proxy_models_']
@@ -113,6 +126,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 select_name = '%s_att' % name
                 field.attname = select_name
 
+            model._registry_attrs.append(select_name)
             return select_name
 
         for field, dst in kwargs.iteritems():
