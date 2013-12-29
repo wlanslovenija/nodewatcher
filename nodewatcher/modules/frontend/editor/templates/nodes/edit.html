@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% load i18n gmap misc %}
+{% load futurei18n gmap misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block heading %}
     {% setcontext as heading %}
-        {% url display:node node.pk as node_url %}
+        {% url "DisplayComponent:node" node.pk as node_url %}
         {% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
     {% endsetcontext %}
     {{ block.super }}
 {% endblock %}
 
 {% block content %}
-    <form method="post" action="{% url EditorComponent:edit node.pk %}">
+    <form method="post" action="{% url "EditorComponent:edit" node.pk %}">
         {% csrf_token %}
         <div id="registry_forms">
             {% include "registry/forms.html" %}

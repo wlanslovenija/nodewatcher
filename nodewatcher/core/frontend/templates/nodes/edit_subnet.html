@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node {{ node_name}}{% endblocktrans %}{% endblock %}
 
 {% block heading %}
     {% setcontext as heading %}
-        {% url view_node node.get_current_id as node_url %}
+        {% url "view_node" node.get_current_id as node_url %}
         {% blocktrans with node.name|default:_("unknown") as node_name %}Edit Subnet {{ subnet }} for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
     {% endsetcontext %}
     {{ block.super }}
@@ -24,12 +24,12 @@
     {% include "nodes/general_info.html" %}
 
     {% heading 2 _("Subnet Information") %}
-    <form method="post" action="{% url edit_subnet node.pk subnet.id %}">
+    <form method="post" action="{% url "edit_subnet" node.pk subnet.id %}">
         {% csrf_token %}
         <table border="0" class="layout proptable">
             <tr>
                 <td class="proplabel">{% trans "Subnet" %}</td>
-                <td class="propbody">{{ subnet }} [<a href="{% url renumber_node node.get_current_id %}">{% trans "renumber" %}</a>]</td>
+                <td class="propbody">{{ subnet }} [<a href="{% url "renumber_node" node.get_current_id %}">{% trans "renumber" %}</a>]</td>
             </tr>
             <tr>
                 <td class="proplabel">{{ form.description.label }}</td>
@@ -43,7 +43,7 @@
 
         <div class="buttons">
             <input type="submit" value="{% trans "Save" %}" />&nbsp;
-            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url "view_node" node.get_current_id %}'" />
         </div>
     </form>
 {% endblock %}

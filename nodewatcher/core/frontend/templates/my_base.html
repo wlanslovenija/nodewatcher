@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block contenttype %}prefs{% endblock %}
 
 {% block ctxtnav %}
     {{ block.super }}
-    {% url my_nodes as my_nodes %}{% url new_node as new_node %}{% url my_whitelist as my_whitelist %}{% url my_events as my_events %}
+    {% url "my_nodes" as my_nodes %}{% url "new_node" as new_node %}{% url "my_whitelist" as my_whitelist %}{% url "my_events" as my_events %}
     <div id="mynav" class="nav">
         {% comment %}
         <ul>

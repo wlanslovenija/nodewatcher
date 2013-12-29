@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n gmap nodestatus misc %}
+{% load future i18n gmap nodestatus misc %}
 
 {% block title %}{% trans "Node Map" %}{% endblock %}
 
@@ -14,7 +14,7 @@
 
 {% block content %}
     <div class="gmap_wrapper">
-    {% url network_topology as network_topology %}
+    {% url "network_topology" as network_topology %}
     <p>{% blocktrans %}Only wireless links are shown. If you are interested in all links between nodes check the
     <a href="{{ network_topology }}">network topology</a> view.{% endblocktrans %}</p>
     <div id="gmap"></div>

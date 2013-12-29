@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block title %}Generate Image for Node {{ node.name }}{% endblock %}
 
 {% block heading %}
     {% setcontext as heading %}
-        {% url view_node node.get_current_id as node_url %}
+        {% url "view_node" node.get_current_id as node_url %}
         {% blocktrans with node.name|default:_("unknown") as node_name %}Generate Image for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
     {% endsetcontext %}
     {{ block.super }}
@@ -40,7 +40,7 @@
             {% endnotice %}
         {% else %}
             <div class="error">
-                {% url allocate_subnet node.get_current_id as newsubneturl %}
+                {% url "allocate_subnet" node.get_current_id as newsubneturl %}
                 {% blocktrans %}<b>ERROR:</b> This node has no allocated subnets or none are assigned to the WiFi interface. Image generation is not possible. Please assign it <a href="{{ newsubneturl }}">a subnet</a>.{% endblocktrans %}
             </div>
         {% endif %}
@@ -48,7 +48,7 @@
 
     {% include "nodes/general_info.html" %}
 
-    <form method="post" action="{% url generate_node node.pk %}">
+    <form method="post" action="{% url "generate_node" node.pk %}">
         {% csrf_token %}
         {% heading 2 _("Image Generator Information") %}
         <table border="0" class="proptable">
@@ -78,7 +78,7 @@
             {% if node.has_allocated_subnets and node.owner.email %}
                 <input type="submit" value="{% trans "Generate" %}" />&nbsp;
             {% endif %}
-            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url "view_node" node.get_current_id %}'" />
         </div>
     </form>
 {% endblock %}

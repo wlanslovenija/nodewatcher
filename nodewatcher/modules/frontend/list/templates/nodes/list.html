@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n nodestatus html_tags misc %}
+{% load future i18n nodestatus html_tags misc %}
 
 {% block title %}{% trans "Node List" %}{{ block.super }}{% endblock %}
 
@@ -24,7 +24,7 @@
         {% notice webclient %}
             <b>You are visiting this page through the <i>{{ NETWORK.NAME }}</i> network.</b><br />
             <br />
-            You are using the <a href="{% url view_node request.node.get_current_id %}">{{ request.node.name|default:_("unknown") }}</a> node to connect to the network.
+            You are using the <a href="{% url "view_node" request.node.get_current_id %}">{{ request.node.name|default:_("unknown") }}</a> node to connect to the network.
         {% endnotice %}
     {% endif %}
     <table border="0" width="100%" class="listing">
@@ -44,7 +44,7 @@
             <tfoot>
                 <tr>
                     <td class="table_menu" colspan="8">
-                        <a href="{% url EditorComponent:new %}">{% trans "Add new node" %}</a>
+                        <a href="{% url "EditorComponent:new" %}">{% trans "Add new node" %}</a>
                     </td>
                 </tr>
             </tfoot>
@@ -59,12 +59,12 @@
                 <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
                     <td align="center">
                         {% if node.warnings %}
-                            <a href="{% url view_node node.get_current_id %}">
+                            <a href="{% url "view_node" node.get_current_id %}">
                                 <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
                             </a>
                         {% endif %}
                     </td>
-                    <td class="name"><a href="{% url EditorComponent:edit node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
+                    <td class="name"><a href="{% url "EditorComponent:edit" node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
                     <td>{{ node.router_id }}</td>
                     {% if node.last_seen %}
                         <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>

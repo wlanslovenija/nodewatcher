@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load future i18n %}
 
 {% block title %}{% trans "Router Configuration Update Needed" %}{% endblock %}
 
@@ -15,7 +15,7 @@
         {% blocktrans %}Your node has been updated. However, at least one of settings you have changed requires that you <b>update the node's router configuration</b> to reflect that change. <b>Before you update the router configuration those changes will not be in effect.</b> You can simply generate a new image with new configuration for the router and flash it.{% endblocktrans %}
     </div>
     <div class="buttons" style="text-align: center">
-        <input type="button" value="{% trans "Generate image" %}" onclick="document.location='{% url generate_node node.get_current_id %}'" />&nbsp;
-        <input type="button" value="{% trans "Back to node" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+        <input type="button" value="{% trans "Generate image" %}" onclick="document.location='{% url "generate_node" node.get_current_id %}'" />&nbsp;
+        <input type="button" value="{% trans "Back to node" %}" onclick="document.location='{% url "view_node" node.get_current_id %}'" />
     </div>
 {% endblock %}

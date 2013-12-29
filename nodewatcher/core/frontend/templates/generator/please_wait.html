@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block title %}{% trans "Image Generation" %}{% endblock %}
 
@@ -25,6 +25,6 @@
         </div>
     {% endif %}
     <div class="buttons" style="text-align: center">
-        <input type="button" value="{% trans "Back to node" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+        <input type="button" value="{% trans "Back to node" %}" onclick="document.location='{% url "view_node" node.get_current_id %}'" />
     </div>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "my_base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block title %}{% trans "Events" %}{% endblock %}
 
@@ -11,13 +11,13 @@
 {% endblock %}
 
 {% block rss %}
-    <link rel="alternate" href="{% url events_feed user.username %}" title="{{ NETWORK.NAME }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
+    <link rel="alternate" href="{% url "events_feed" user.username %}" title="{{ NETWORK.NAME }} – Latest network events for {{ user.username }}" type="application/rss+xml" />
 {% endblock %}
 
 {% block altlinks %}
     <h3>{% trans "Download in other formats" %}:</h3>
     <ul>
-        <li class="first last"><a class="rss" href="{% url events_feed user.username %}">{% trans "RSS Feed" %}</a></li>
+        <li class="first last"><a class="rss" href="{% url "events_feed" user.username %}">{% trans "RSS Feed" %}</a></li>
     </ul>
 {% endblock %}
 
@@ -39,14 +39,14 @@
             <tfoot>
                 <tr>
                     <td class="table_menu" colspan="4">
-                        <a href="{% url my_events_subscribe %}">{% trans "Add event subscription" %}</a>
+                        <a href="{% url "my_events_subscribe" %}">{% trans "Add event subscription" %}</a>
                     </td>
                 </tr>
             </tfoot>
             <tbody>
                 {% for subscription in subscriptions %}
                     <tr class="{% cycle 'odd' 'even' %}">
-                        <td align="center"><a href="{% url my_events_unsubscribe subscription.id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Remove event subscription" %}" alt="{% trans "Remove" %}" /></a></td>
+                        <td align="center"><a href="{% url "my_events_unsubscribe" subscription.id %}"><img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Remove event subscription" %}" alt="{% trans "Remove" %}" /></a></td>
                         <td>
                             {{ subscription.type_to_string }}
                         </td>
@@ -93,7 +93,7 @@
                         {% if not event.node.name %}
                             {{ event.node.ip }}
                         {% else %}
-                            <a href="{% url view_node event.node.get_current_id %}">{{ event.node.name }}</a></td>
+                            <a href="{% url "view_node" event.node.get_current_id %}">{{ event.node.name }}</a></td>
                         {% endif %}
                     <td>{{ event.code_to_string }}</td>
                 </tr>

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
 {% block heading %}
     {% setcontext as heading %}
-        {% url view_node node.get_current_id as node_url %}
+        {% url "view_node" node.get_current_id as node_url %}
         {% blocktrans with node.name|default:_("unknown") as node_name %}Renumber Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
     {% endsetcontext %}
     {{ block.super }}
@@ -34,7 +34,7 @@
 
     {% heading 2 _("Renumber Specification") %}
 
-    <form method="post" action="{% url renumber_node node.pk %}">
+    <form method="post" action="{% url "renumber_node" node.pk %}">
         {% csrf_token %}
         <div style='display:none'>{{ form.confirm_all_warnings }}</div>
         <table border="0" class="proptable">
@@ -119,7 +119,7 @@
 
         <div class="buttons">
             <input type="submit" value="{% trans "Renumber" %}" />&nbsp;
-            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url view_node node.get_current_id %}'" />
+            <input type="button" value="{% trans "Cancel" %}" onclick="document.location='{% url "view_node" node.get_current_id %}'" />
         </div>
     </form>
 {% endblock %}
