@@ -34,8 +34,25 @@ class RegistryTestCase(django_test.TestCase):
             thing = models.Thing(foo='hello', bar=i)
             thing.save()
 
-            simple = thing.first.foo.simple(create=models.ChildRegistryItem)
+            simple = thing.first.foo.simple(create=models.DoubleChildRegistryItem)
             simple.interesting = 'bla'
+            simple.additional = 42
+            simple.another = 69
             simple.save()
 
-        # TODO
+        # Test basic queries
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#additional'):
+            self.assertEquals(thing.f1, 42)
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#another'):
+            self.assertEquals(thing.f1, 69)
+
+        # Test foreign key traversal
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name'):
+            self.assertEquals(thing.f1, None)
+
+        related = models.RelatedModel(name='test')
+        related.save()
+        models.DoubleChildRegistryItem.objects.update(related=related)
+
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name'):
+            self.assertEquals(thing.f1, 'test')
