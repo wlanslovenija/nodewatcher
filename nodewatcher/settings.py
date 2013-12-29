@@ -216,6 +216,7 @@ TEST_RUNNER = 'nodewatcher.test_runner.FilteredTestSuiteRunner'
 TEST_RUNNER_FILTER = (
     'nodewatcher.',
     'missing.',
+    'django_datastream.',
 )
 
 INSTALLED_APPS = (
