@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class MikrotikRB433AH(cgm_routers.RouterBase):
+class MikrotikRB433AH(cgm_devices.DeviceBase):
     """
     Mikrotik RB433AH device descriptor.
     """
@@ -13,13 +13,13 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
     architecture = 'ar71xx'
     radios = [
         # TODO: This information is not correct, there are no integrated radios
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = [
         # TODO: This information is possibly not correct
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=5,
             cpu_port=0,
@@ -28,8 +28,8 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
     ]
     ports = [
         # TODO: This information is possibly not correct
-        cgm_routers.EthernetPort('wan0', "Wan0"),
-        cgm_routers.EthernetPort('lan0', "Lan0"),
+        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.EthernetPort('lan0', "Lan0"),
     ]
     antennas = [
     ]
@@ -42,7 +42,7 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
         }
     }
 
-    @cgm_routers.register_module()
+    @cgm_devices.register_module()
     def network(node, cfg):
         """
         Network configuration CGM for Mikrotik RB433AH.
@@ -50,5 +50,5 @@ class MikrotikRB433AH(cgm_routers.RouterBase):
 
         pass
 
-# Register the Mikrotik RB433AH router
-cgm_base.register_router('openwrt', MikrotikRB433AH)
+# Register the Mikrotik RB433AH device
+cgm_base.register_device('openwrt', MikrotikRB433AH)

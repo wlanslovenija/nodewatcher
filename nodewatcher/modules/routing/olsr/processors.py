@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
+from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors, events as monitor_events
 
 from . import models as olsr_models, parser as olsr_parser
 
@@ -113,17 +113,18 @@ class NodePostprocess(monitor_processors.NodeProcessor):
                     self.logger.warning("Inconsistency in topology table for router ID %s!" % link['dst'])
                     continue
 
-                try:
-                    elink = rtm.links.get(peer=dst_node)
-                except monitor_models.TopologyLink.DoesNotExist:
-                    elink = olsr_models.OlsrTopologyLink(monitor=rtm, peer=dst_node)
-
+                elink, created = olsr_models.OlsrTopologyLink.objects.get_or_create(monitor=rtm, peer=dst_node)
                 elink.lq = link['lq']
                 elink.ilq = link['ilq']
                 elink.etx = link['etx']
                 elink.last_seen = timezone.now()
                 elink.save()
                 visible_links.append(elink)
+
+                if created:
+                    # TODO: This will still create one event for each end of the link
+                    # TODO: We should probably have a history of adjancencies (as in v2) to avoid repeating these events
+                    monitor_events.TopologyLinkEstablished(node, dst_node, olsr_models.OLSR_PROTOCOL_NAME).post()
 
             # Compute average values
             if visible_links:
@@ -150,11 +151,7 @@ class NodePostprocess(monitor_processors.NodeProcessor):
             )
             for announce in announces + aliases:
                 network = announce['net'] if 'net' in announce else announce['alias']
-                try:
-                    eannounce = existing_announces.get(network=network)
-                except monitor_models.RoutingAnnounceMonitor.DoesNotExist:
-                    eannounce = olsr_models.OlsrRoutingAnnounceMonitor(root=node, network=network)
-
+                eannounce, created = olsr_models.OlsrRoutingAnnounceMonitor.objects.get_or_create(root=node, network=network)
                 eannounce.status = "ok" if 'net' in announce else "alias"
                 eannounce.last_seen = timezone.now()
                 eannounce.save()

@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class UBNTBullet(cgm_routers.RouterBase):
+class UBNTBullet(cgm_devices.DeviceBase):
     """
     UBNT Bullet device descriptor.
     """
@@ -12,7 +12,7 @@ class UBNTBullet(cgm_routers.RouterBase):
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
             cgm_protocols.IEEE80211N(
                 cgm_protocols.IEEE80211N.SHORT_GI_40,
                 cgm_protocols.IEEE80211N.TX_STBC1,
@@ -20,16 +20,16 @@ class UBNTBullet(cgm_routers.RouterBase):
                 cgm_protocols.IEEE80211N.DSSS_CCK_40,
             )
         ], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = []
     ports = [
-        cgm_routers.EthernetPort('lan0', "Lan0")
+        cgm_devices.EthernetPort('lan0', "Lan0")
     ]
     antennas = [
         # TODO: This information is probably not correct
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -38,7 +38,7 @@ class UBNTBullet(cgm_routers.RouterBase):
         )
     ]
     features = [
-        cgm_routers.Features.MultipleSSID,
+        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {
@@ -69,6 +69,6 @@ class UBNTBulletM5(UBNTBullet):
     identifier = 'ub-bullet-m5'
     name = "Bullet M5"
 
-# Register the UBNT Bullet router
-cgm_base.register_router('openwrt', UBNTBullet)
-cgm_base.register_router('openwrt', UBNTBulletM5)
+# Register the UBNT Bullet device
+cgm_base.register_device('openwrt', UBNTBullet)
+cgm_base.register_device('openwrt', UBNTBulletM5)

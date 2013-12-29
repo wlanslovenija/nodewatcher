@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class TPLinkWR841NDv1(cgm_routers.RouterBase):
+class TPLinkWR841NDv1(cgm_devices.DeviceBase):
     """
     TP-Link WR841NDv1 device descriptor.
     """
@@ -12,7 +12,7 @@ class TPLinkWR841NDv1(cgm_routers.RouterBase):
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
             cgm_protocols.IEEE80211N(
                 cgm_protocols.IEEE80211N.SHORT_GI_20,
                 cgm_protocols.IEEE80211N.SHORT_GI_40,
@@ -20,11 +20,11 @@ class TPLinkWR841NDv1(cgm_routers.RouterBase):
                 cgm_protocols.IEEE80211N.DSSS_CCK_40,
             )
         ], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = [
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=5,
             cpu_port=0,
@@ -32,8 +32,8 @@ class TPLinkWR841NDv1(cgm_routers.RouterBase):
         )
     ]
     ports = [
-        cgm_routers.EthernetPort('wan0', "Wan0"),
-        cgm_routers.SwitchedEthernetPort(
+        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.SwitchedEthernetPort(
             'lan0', "Lan0",
             switch='sw0',
             vlan=1,
@@ -42,7 +42,7 @@ class TPLinkWR841NDv1(cgm_routers.RouterBase):
     ]
     antennas = [
         # TODO: This information is probably not correct
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -51,7 +51,7 @@ class TPLinkWR841NDv1(cgm_routers.RouterBase):
         )
     ]
     features = [
-        cgm_routers.Features.MultipleSSID,
+        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {
@@ -151,9 +151,9 @@ class TPLinkWR841NDv8(TPLinkWR841NDv1):
         }
     }
 
-# Register the TP-Link WR841ND router
-cgm_base.register_router('openwrt', TPLinkWR841NDv1)
-cgm_base.register_router('openwrt', TPLinkWR841NDv3)
-cgm_base.register_router('openwrt', TPLinkWR841NDv5)
-cgm_base.register_router('openwrt', TPLinkWR841NDv7)
-cgm_base.register_router('openwrt', TPLinkWR841NDv8)
+# Register the TP-Link WR841ND device
+cgm_base.register_device('openwrt', TPLinkWR841NDv1)
+cgm_base.register_device('openwrt', TPLinkWR841NDv3)
+cgm_base.register_device('openwrt', TPLinkWR841NDv5)
+cgm_base.register_device('openwrt', TPLinkWR841NDv7)
+cgm_base.register_device('openwrt', TPLinkWR841NDv8)

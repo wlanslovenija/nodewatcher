@@ -1,4 +1,4 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, devices as cgm_devices
 
 from . import fon2100
 
@@ -11,7 +11,7 @@ class FoneraPlus(fon2100.Fonera):
     identifier = 'fon-2200'
     name = "Fonera+"
     switches = [
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=5,
             cpu_port=0,
@@ -19,8 +19,8 @@ class FoneraPlus(fon2100.Fonera):
         )
     ]
     ports = [
-        cgm_routers.EthernetPort('wan0', "Wan0"),
-        cgm_routers.EthernetPort('lan0', "Lan0"),
+        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.EthernetPort('lan0', "Lan0"),
     ]
     port_map = {
         'openwrt': {
@@ -31,7 +31,7 @@ class FoneraPlus(fon2100.Fonera):
         }
     }
 
-    @cgm_routers.register_module()
+    @cgm_devices.register_module()
     def network(node, cfg):
         """
         Network configuration CGM for FON-2200.
@@ -39,5 +39,5 @@ class FoneraPlus(fon2100.Fonera):
 
         pass
 
-# Register the FON-2200 router
-cgm_base.register_router('openwrt', FoneraPlus)
+# Register the FON-2200 device
+cgm_base.register_device('openwrt', FoneraPlus)

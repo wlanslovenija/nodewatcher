@@ -6,9 +6,9 @@ from django.core import exceptions
 from ...registry import registration
 
 
-class RouterPort(object):
+class DevicePort(object):
     """
-    An abstract descriptor of a router port.
+    An abstract descriptor of a device port.
     """
 
     def __init__(self, identifier, description):
@@ -19,9 +19,9 @@ class RouterPort(object):
         self.description = description
 
 
-class EthernetPort(RouterPort):
+class EthernetPort(DevicePort):
     """
-    Describes a router's ethernet port.
+    Describes a device's ethernet port.
     """
 
     pass
@@ -29,7 +29,7 @@ class EthernetPort(RouterPort):
 
 class SwitchedEthernetPort(EthernetPort):
     """
-    Describes a router's ethernet port attached to a configurable
+    Describes a device's ethernet port attached to a configurable
     switch.
     """
 
@@ -43,12 +43,12 @@ class SwitchedEthernetPort(EthernetPort):
         self.vlan = vlan
         self.ports = ports
 
-    def validate(self, router):
+    def validate(self, device):
         """
         Ensure that the switch that the port refers to actually exists.
         """
 
-        switch = router.get_switch(self.switch)
+        switch = device.get_switch(self.switch)
         if switch is None:
             raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" % (
                 self.identifier, self.switch
@@ -84,9 +84,9 @@ class AntennaConnector(object):
         self.description = description
 
 
-class RouterRadio(object):
+class DeviceRadio(object):
     """
-    An abstract descriptor of a router radio.
+    An abstract descriptor of a device's radio.
     """
 
     def __init__(self, identifier, description, protocols, connectors):
@@ -126,17 +126,17 @@ class RouterRadio(object):
                 return protocol
 
 
-class IntegratedRadio(RouterRadio):
+class IntegratedRadio(DeviceRadio):
     """
-    Describes a router's integrated radio.
+    Describes a device's integrated radio.
     """
 
     pass
 
 
-class MiniPCIRadio(RouterRadio):
+class MiniPCIRadio(DeviceRadio):
     """
-    Describes a router's MiniPCI slot for a radio.
+    Describes a device's MiniPCI slot for a radio.
     """
 
     pass
@@ -144,7 +144,7 @@ class MiniPCIRadio(RouterRadio):
 
 class InternalAntenna(object):
     """
-    Describes an antenna that comes with the router by default.
+    Describes an antenna that comes with the device by default.
     """
 
     def __init__(self, identifier, polarization, angle_horizontal, angle_vertical, gain):
@@ -161,7 +161,7 @@ class InternalAntenna(object):
 
 class Switch(object):
     """
-    Describes an ethernet switch that a router has.
+    Describes an ethernet switch that a device has.
     """
 
     def __init__(self, identifier, description, ports, cpu_port, vlans):
@@ -187,13 +187,13 @@ class Switch(object):
 
 class Features(object):
     """
-    Represents features a router can have.
+    Represents features a device can have.
     """
 
     MultipleSSID = "multiple_ssid"
 
 # A list of attributes that are required to be defined
-REQUIRED_ROUTER_ATTRIBUTES = {
+REQUIRED_DEVICE_ATTRIBUTES = (
     'identifier',
     'name',
     'manufacturer',
@@ -203,66 +203,65 @@ REQUIRED_ROUTER_ATTRIBUTES = {
     'switches',
     'ports',
     'antennas',
-}
+)
 
 
-class RouterMetaclass(type):
+class DeviceMetaclass(type):
     """
-    Type for router descriptors.
+    Type for device descriptors.
     """
 
     def __new__(cls, name, bases, attrs):
         """
-        Creates a new RouterBase class.
+        Creates a new DeviceBase class.
         """
 
         new_class = type.__new__(cls, name, bases, attrs)
 
-        if name != 'RouterBase':
+        if name != 'DeviceBase':
             # Validate the presence of all attributes
-            required_attrs = copy.deepcopy(REQUIRED_ROUTER_ATTRIBUTES)
-            for attr in REQUIRED_ROUTER_ATTRIBUTES:
+            for attr in REQUIRED_DEVICE_ATTRIBUTES:
                 if getattr(new_class, attr, None) is None:
-                    raise exceptions.ImproperlyConfigured("Attribute '{0}' is required for router descriptor specification!".format(attr))
+                    raise exceptions.ImproperlyConfigured("Attribute '{0}' is required for device descriptor specification!".format(attr))
 
             # Validate that list of switches only contains Switch instances
             if len([x for x in new_class.switches if not isinstance(x, Switch)]):
-                raise exceptions.ImproperlyConfigured("List of router switches may only contain Switch instances!")
+                raise exceptions.ImproperlyConfigured("List of device switches may only contain Switch instances!")
 
             # Router ports and radios cannot both be empty
             if not len(new_class.radios) and not len(new_class.ports):
-                raise exceptions.ImproperlyConfigured("A router cannot be without radios and ports!")
+                raise exceptions.ImproperlyConfigured("A device cannot be without radios and ports!")
 
-            # Validate that list of ports only contains RouterPort instances and validate
+            # Validate that list of ports only contains DevicePort instances and validate
             # that switched ports refer to valid switches
             for port in new_class.ports:
-                if not isinstance(port, RouterPort):
-                    raise exceptions.ImproperlyConfigured("List of router ports may only contain RouterPort instances!")
+                if not isinstance(port, DevicePort):
+                    raise exceptions.ImproperlyConfigured("List of device ports may only contain DevicePort instances!")
 
                 if hasattr(port, 'validate'):
                     port.validate(new_class)
 
-            # Validate that list of radios only contains RouterRadio instances and assign
+            # Validate that list of radios only contains DeviceRadio instances and assign
             # radio indices
             for idx, radio in enumerate(new_class.radios):
-                if not isinstance(radio, RouterRadio):
-                    raise exceptions.ImproperlyConfigured("List of router radios may only contain RouterRadio instances!")
+                if not isinstance(radio, DeviceRadio):
+                    raise exceptions.ImproperlyConfigured("List of device radios may only contain DeviceRadio instances!")
 
                 radio.index = idx
 
             # Validate that list of antennas only contains InternalAntenna instances
             if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):
-                raise exceptions.ImproperlyConfigured("List of router antennas may only contain InternalAntenna instances!")
+                raise exceptions.ImproperlyConfigured("List of device antennas may only contain InternalAntenna instances!")
 
         return new_class
 
 
-class RouterBase(object):
+class DeviceBase(object):
     """
-    An abstract router hardware descriptor.
+    An abstract device hardware descriptor.
     """
 
-    __metaclass__ = RouterMetaclass
+    __metaclass__ = DeviceMetaclass
 
     features = []
     port_map = {}
@@ -278,7 +277,7 @@ class RouterBase(object):
     @classmethod
     def register(cls, platform):
         """
-        Performs router model registration.
+        Performs device model registration.
 
         :param platform: Platform instance
         """
@@ -287,11 +286,11 @@ class RouterBase(object):
         registration.point('node.config').register_choice(
             'core.general#router',
             cls.identifier,
-            '%s :: %s' % (cls.manufacturer, cls.name),
+            '%s - %s' % (cls.manufacturer, cls.name),
             limited_to=('core.general#platform', platform.name),
         )
 
-        # Register a new choice for available router ports
+        # Register a new choice for available device ports
         for port in cls.ports:
             registration.point('node.config').register_choice(
                 'core.interfaces#eth_port',
@@ -300,7 +299,7 @@ class RouterBase(object):
                 limited_to=('core.general#router', cls.identifier),
             )
 
-        # Register a new choice for available router radios
+        # Register a new choice for available device radios
         for radio in cls.radios:
             registration.point('node.config').register_choice(
                 'core.interfaces#wifi_radio',
@@ -341,7 +340,7 @@ class RouterBase(object):
 
     def __setattr__(self, key, value):
         """
-        Prevent modification of router model descriptors.
+        Prevent modification of device model descriptors.
         """
 
         raise AttributeError("Router model descriptors are immutable!")
@@ -385,7 +384,7 @@ class RouterBase(object):
 
 def register_module(platform=None, weight=50):
     """
-    Marks a method to be registered as a CGM upon router registration.
+    Marks a method to be registered as a CGM upon device registration.
     """
 
     def wrapper(f):

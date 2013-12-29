@@ -31,7 +31,7 @@ class CgmGeneralConfig(core_models.GeneralConfig):
         Returns the device descriptor for the configured router.
         """
 
-        return cgm_base.get_platform(self.platform).get_router(self.router)
+        return cgm_base.get_platform(self.platform).get_device(self.router)
 
 # Register all configured versions
 for platform, cfg in settings.GENERATOR_BUILDERS.items():

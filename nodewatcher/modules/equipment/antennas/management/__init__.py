@@ -25,17 +25,17 @@ def install_antenna_fixtures(sender, **kwargs):
     # Ensure that all CGMs are registred
     loader.load_modules('cgm')
 
-    for router in cgm_base.iterate_routers():
-        for antenna in router.antennas:
+    for device in cgm_base.iterate_devices():
+        for antenna in device.antennas:
             try:
-                mdl = antennas_models.Antenna.objects.get(internal_for=router.identifier, internal_id=antenna.identifier)
+                mdl = antennas_models.Antenna.objects.get(internal_for=device.identifier, internal_id=antenna.identifier)
             except antennas_models.Antenna.DoesNotExist:
-                mdl = antennas_models.Antenna(internal_for=router.identifier, internal_id=antenna.identifier)
+                mdl = antennas_models.Antenna(internal_for=device.identifier, internal_id=antenna.identifier)
 
             # Update antenna model
-            mdl.name = router.name
-            mdl.manufacturer = router.manufacturer
-            mdl.url = router.url
+            mdl.name = device.name
+            mdl.manufacturer = device.manufacturer
+            mdl.url = device.url
             mdl.polarization = antenna.polarization
             mdl.angle_horizontal = antenna.angle_horizontal
             mdl.angle_vertical = antenna.angle_vertical

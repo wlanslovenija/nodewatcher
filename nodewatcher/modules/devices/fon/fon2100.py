@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class Fonera(cgm_routers.RouterBase):
+class Fonera(cgm_devices.DeviceBase):
     """
     Fonera FON-2100 device descriptor.
     """
@@ -12,16 +12,16 @@ class Fonera(cgm_routers.RouterBase):
     url = 'http://www.fon.com'
     architecture = 'atheros'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = []
     ports = [
-        cgm_routers.EthernetPort('wan0', "Ethernet0")
+        cgm_devices.EthernetPort('wan0', "Ethernet0")
     ]
     antennas = [
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -36,7 +36,7 @@ class Fonera(cgm_routers.RouterBase):
         }
     }
 
-    @cgm_routers.register_module()
+    @cgm_devices.register_module()
     def network(node, cfg):
         """
         Network configuration CGM for FON-2100.
@@ -44,5 +44,5 @@ class Fonera(cgm_routers.RouterBase):
 
         pass
 
-# Register the FON-2100 router
-cgm_base.register_router('openwrt', Fonera)
+# Register the FON-2100 device
+cgm_base.register_device('openwrt', Fonera)

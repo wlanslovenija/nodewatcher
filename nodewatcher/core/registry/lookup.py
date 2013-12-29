@@ -10,6 +10,14 @@ from . import access as registry_access, exceptions
 qn = db.connection.ops.quote_name
 
 
+class RegistryProxyMixin(object):
+    # TODO: Needed until Django 1.7, see https://code.djangoproject.com/ticket/16458
+    def __eq__(self, other):
+        return (isinstance(other, db.models.Model) and
+                self._meta.concrete_model == other._meta.concrete_model and
+                self._get_pk_val() == other._get_pk_val())
+
+
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
     """
     An augmented query set that enables lookups of values from the registry.
@@ -89,6 +97,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             # Use a dictionary to transfer data to closure by reference
             this_class = {'parent': clone.model}
+
             def pickle_reduce(self):
                 t = super(this_class['class'], self).__reduce__()
                 attrs = t[2]
@@ -99,7 +108,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             clone.model = type(
                 '%sRegistryProxy' % clone.model.__name__,
-                (clone.model,),
+                (RegistryProxyMixin, clone.model),
                 {
                     '__module__': 'nodewatcher.core.registry.lookup',
                     '_registry_proxy': True,
@@ -119,6 +128,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             field = copy.deepcopy(field)
             field.name = None
             select_name = name
+            # Since the field is populated by a join, it can always be null when the model doesn't exist
+            field.null = True
             field.contribute_to_class(clone.model, name)
 
             if field.name != field.attname:

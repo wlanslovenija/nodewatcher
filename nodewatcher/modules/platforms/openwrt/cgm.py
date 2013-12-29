@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import exceptions as registry_exceptions
-from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, routers as cgm_routers
+from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, devices as cgm_devices
 from nodewatcher.utils import posix_tz
 
 from . import builder as openwrt_builder
@@ -269,14 +269,14 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         :return: A list of generated firmware files
         """
 
-        # Extract the router descriptor to get architecture and profile
-        router = node.config.core.general().get_device()
-        profile = router.profiles['openwrt']
+        # Extract the device descriptor to get architecture and profile
+        device = node.config.core.general().get_device()
+        profile = device.profiles['openwrt']
         version = node.config.core.general().version
 
         # Format UCI configuration and start the build process
         formatted_cfg = cfg.format(fmt=UCIFormat.FILES)
-        return openwrt_builder.build_image(formatted_cfg, router.architecture, version, profile, cfg.packages)
+        return openwrt_builder.build_image(formatted_cfg, device.architecture, version, profile, cfg.packages)
 
 cgm_base.register_platform('openwrt', _("OpenWRT"), PlatformOpenWRT())
 
@@ -296,7 +296,7 @@ def general(node, cfg):
         system.timezone = posix_tz.get_posix_tz(zone)
         if not system.timezone:
             raise cgm_base.ValidationError(_("Unsupported OpenWRT timezone '%s'!") % zone)
-    except registry_exceptions.UnknownRegistryIdentifier:
+    except (registry_exceptions.UnknownRegistryIdentifier, AttributeError):
         system.timezone = posix_tz.get_posix_tz(settings.TIME_ZONE)
         if not system.timezone:
             system.timezone = 'UTC'
@@ -404,17 +404,17 @@ def configure_interface(cfg, interface, section, iface_name):
         break
 
 
-def configure_switch(cfg, router, port):
+def configure_switch(cfg, device, port):
     """
     Configures a switch port.
 
     :param cfg: Platform configuration
-    :param router: Router descriptor
+    :param device: Device descriptor
     :param port: Port descriptor
     """
 
-    switch = router.get_switch(port.switch)
-    switch_iface = router.remap_port('openwrt', port.switch)
+    switch = device.get_switch(port.switch)
+    switch_iface = device.remap_port('openwrt', port.switch)
 
     # Enable switch if not yet enabled
     try:
@@ -449,8 +449,8 @@ def network(node, cfg):
     lo.ipaddr = '127.0.0.1'
     lo.netmask = '255.0.0.0'
 
-    # Obtain the router descriptor for this device
-    router = node.config.core.general().get_device()
+    # Obtain the device descriptor for this device
+    device = node.config.core.general().get_device()
 
     # Configure all interfaces
     for interface in node.config.core.interfaces():
@@ -465,10 +465,10 @@ def network(node, cfg):
                     _("Duplicate interface definition for port '%s'!") % interface.eth_port
                 )
 
-            iface.ifname = router.remap_port('openwrt', interface.eth_port)
+            iface.ifname = device.remap_port('openwrt', interface.eth_port)
             if iface.ifname is None:
                 raise cgm_base.ValidationError(
-                    _("No port remapping for port '%s' of router '%s' is available!") % (interface.eth_port, router.name)
+                    _("No port remapping for port '%s' of device '%s' is available!") % (interface.eth_port, device.name)
                 )
 
             if interface.uplink:
@@ -477,16 +477,16 @@ def network(node, cfg):
             configure_interface(cfg, interface, iface, interface.eth_port)
 
             # Check if we need to configure the switch
-            port = router.get_port(interface.eth_port)
-            if isinstance(port, cgm_routers.SwitchedEthernetPort):
-                configure_switch(cfg, router, port)
+            port = device.get_port(interface.eth_port)
+            if isinstance(port, cgm_devices.SwitchedEthernetPort):
+                configure_switch(cfg, device, port)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
             # Configure virtual interfaces on top of the same radio device
             interfaces = list(interface.interfaces.all())
-            if len(interfaces) > 1 and cgm_routers.Features.MultipleSSID not in router.features:
-                raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % router.name)
+            if len(interfaces) > 1 and cgm_devices.Features.MultipleSSID not in device.features:
+                raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % device.name)
 
-            wifi_radio = router.remap_port('openwrt', interface.wifi_radio)
+            wifi_radio = device.remap_port('openwrt', interface.wifi_radio)
             try:
                 radio = cfg.wireless.add(**{'wifi-device': wifi_radio})
             except ValueError:
@@ -495,13 +495,13 @@ def network(node, cfg):
                 )
 
             try:
-                radio.type = router.drivers['openwrt'][interface.wifi_radio]
+                radio.type = device.drivers['openwrt'][interface.wifi_radio]
             except KeyError:
                 raise cgm_base.ValidationError(
                     _("Radio driver for '%s' not defined on OpenWRT!") % interface.wifi_radio
                 )
 
-            dsc_radio = router.get_radio(interface.wifi_radio)
+            dsc_radio = device.get_radio(interface.wifi_radio)
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
             dsc_channel = dsc_protocol.get_channel(interface.channel)
             dsc_channel_width = dsc_protocol.get_channel_width(interface.channel_width)

@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class SiemensSX763v2(cgm_routers.RouterBase):
+class SiemensSX763v2(cgm_devices.DeviceBase):
     """
     Siemens SX763v2 device descriptor.
     """
@@ -12,14 +12,14 @@ class SiemensSX763v2(cgm_routers.RouterBase):
     url = 'http://www.siemens.com/'
     architecture = 'lantiq'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
             cgm_protocols.IEEE80211BG()
         ], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = [
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=[1, 2, 3, 4, 5],
             cpu_port=5,
@@ -27,13 +27,13 @@ class SiemensSX763v2(cgm_routers.RouterBase):
         )
     ]
     ports = [
-        cgm_routers.SwitchedEthernetPort(
+        cgm_devices.SwitchedEthernetPort(
             'wan0', "Wan0",
             switch='sw0',
             vlan=1,
             ports=[1, 5],
         ),
-        cgm_routers.SwitchedEthernetPort(
+        cgm_devices.SwitchedEthernetPort(
             'lan0', "Lan0",
             switch='sw0',
             vlan=2,
@@ -42,7 +42,7 @@ class SiemensSX763v2(cgm_routers.RouterBase):
     ]
     antennas = [
         # TODO: This information is probably not correct
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -51,7 +51,7 @@ class SiemensSX763v2(cgm_routers.RouterBase):
         )
     ]
     features = [
-        cgm_routers.Features.MultipleSSID,
+        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {
@@ -75,5 +75,5 @@ class SiemensSX763v2(cgm_routers.RouterBase):
         }
     }
 
-# Register the Siemens SX763 router
-cgm_base.register_router('openwrt', SiemensSX763v2)
+# Register the Siemens SX763 device
+cgm_base.register_device('openwrt', SiemensSX763v2)
