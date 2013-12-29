@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
+class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
     """
     TP-Link WR1043NDv1 device descriptor.
     """
@@ -12,7 +12,7 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
             cgm_protocols.IEEE80211N(
                 cgm_protocols.IEEE80211N.SHORT_GI_20,
                 cgm_protocols.IEEE80211N.SHORT_GI_40,
@@ -20,11 +20,11 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
                 cgm_protocols.IEEE80211N.DSSS_CCK_40,
             )
         ], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = [
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=[0, 1, 2, 3, 4, 5],
             cpu_port=5,
@@ -32,13 +32,13 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
         )
     ]
     ports = [
-        cgm_routers.SwitchedEthernetPort(
+        cgm_devices.SwitchedEthernetPort(
             'wan0', "Wan0",
             switch='sw0',
             vlan=2,
             ports=[0, 5],
         ),
-        cgm_routers.SwitchedEthernetPort(
+        cgm_devices.SwitchedEthernetPort(
             'lan0', "Lan0",
             switch='sw0',
             vlan=1,
@@ -47,7 +47,7 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
     ]
     antennas = [
         # TODO: This information is probably not correct
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -56,7 +56,7 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
         )
     ]
     features = [
-        cgm_routers.Features.MultipleSSID,
+        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {
@@ -80,5 +80,5 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
         }
     }
 
-# Register the TP-Link WR1043ND router
+# Register the TP-Link WR1043ND device
 cgm_base.register_device('openwrt', TPLinkWR1043NDv1)

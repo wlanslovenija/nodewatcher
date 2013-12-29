@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class LinksysWRT54GL(cgm_routers.DeviceBase):
+class LinksysWRT54GL(cgm_devices.DeviceBase):
     """
     Linksys WRT54GL device descriptor.
     """
@@ -12,13 +12,13 @@ class LinksysWRT54GL(cgm_routers.DeviceBase):
     url = 'http://www.linksysbycisco.com/'
     architecture = 'brcm47xx'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
-            cgm_routers.AntennaConnector('a1', "Antenna0"),
-            cgm_routers.AntennaConnector('a2', "Antenna1"),
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+            cgm_devices.AntennaConnector('a1', "Antenna0"),
+            cgm_devices.AntennaConnector('a2', "Antenna1"),
         ])
     ]
     switches = [
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=5,
             cpu_port=0,
@@ -26,12 +26,12 @@ class LinksysWRT54GL(cgm_routers.DeviceBase):
         )
     ]
     ports = [
-        cgm_routers.EthernetPort('wan0', "Wan0"),
-        cgm_routers.EthernetPort('lan0', "Lan0"),
+        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.EthernetPort('lan0', "Lan0"),
     ]
     antennas = [
         # TODO: this information is probably not correct
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -48,7 +48,7 @@ class LinksysWRT54GL(cgm_routers.DeviceBase):
         }
     }
 
-    @cgm_routers.register_module()
+    @cgm_devices.register_module()
     def network(node, cfg):
         """
         Network configuration CGM for Linksys WRT54GL.
@@ -56,5 +56,5 @@ class LinksysWRT54GL(cgm_routers.DeviceBase):
 
         pass
 
-# Register the Linksys WRT54GL router
+# Register the Linksys WRT54GL device
 cgm_base.register_device('openwrt', LinksysWRT54GL)

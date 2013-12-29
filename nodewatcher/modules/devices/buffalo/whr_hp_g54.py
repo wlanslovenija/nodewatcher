@@ -1,7 +1,7 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
+class BuffaloWHR_HP_G54(cgm_devices.DeviceBase):
     """
     Buffalo WHR-HP-G54 device descriptor.
     """
@@ -12,12 +12,12 @@ class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
     url = 'http://www.buffalo-technology.com/'
     architecture = 'brcm47xx'
     radios = [
-        cgm_routers.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
-            cgm_routers.AntennaConnector('a1', "Antenna0")
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+            cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]
     switches = [
-        cgm_routers.Switch(
+        cgm_devices.Switch(
             'sw0', "Switch0",
             ports=5,
             cpu_port=0,
@@ -25,12 +25,12 @@ class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
         )
     ]
     ports = [
-        cgm_routers.EthernetPort('wan0', "Wan0"),
-        cgm_routers.EthernetPort('lan0', "Lan0"),
+        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.EthernetPort('lan0', "Lan0"),
     ]
     antennas = [
         # TODO: This information is probably not correct
-        cgm_routers.InternalAntenna(
+        cgm_devices.InternalAntenna(
             identifier='a1',
             polarization='horizontal',
             angle_horizontal=360,
@@ -47,7 +47,7 @@ class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
         }
     }
 
-    @cgm_routers.register_module()
+    @cgm_devices.register_module()
     def network(node, cfg):
         """
         Network configuration CGM for Buffalo WHR-HP-G54.
@@ -55,5 +55,5 @@ class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
 
         pass
 
-# Register the Buffalo WHR-HP-G54 router
+# Register the Buffalo WHR-HP-G54 device
 cgm_base.register_device('openwrt', BuffaloWHR_HP_G54)

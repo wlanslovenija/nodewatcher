@@ -1,2 +1,2 @@
-# UBNT router modules
+# UBNT device modules
 from . import nano, bullet, rocket

@@ -2,7 +2,7 @@ from ....utils import loader
 
 from ...registry import registration
 
-from . import routers as cgm_routers, resources as cgm_resources
+from . import devices as cgm_devices, resources as cgm_resources
 
 # Registered platform modules
 PLATFORM_REGISTRY = {}
@@ -138,7 +138,7 @@ class PlatformBase(object):
         :param device: A subclass of DeviceBase
         """
 
-        if not issubclass(device, cgm_routers.DeviceBase):
+        if not issubclass(device, cgm_devices.DeviceBase):
             raise TypeError("Router descriptor must be a subclass of DeviceBase!")
 
         self._devices[device.identifier] = device

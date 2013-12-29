@@ -1,2 +1,2 @@
-# Siemens router modules
+# Siemens device modules
 from . import sx763
