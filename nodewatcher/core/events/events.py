@@ -1,6 +1,5 @@
-import collections
-
 from django.core import exceptions
+from django.utils import datastructures
 
 from . import base
 from ..registry import registration
@@ -91,7 +90,7 @@ class NodeEventRecordMeta(type):
         # Create the actual class
         module = attrs.pop("__module__")
         new_class = type.__new__(cls, classname, bases, {"__module__": module})
-        new_class._attributes = collections.OrderedDict()
+        new_class._attributes = datastructures.SortedDict()
 
         # Ensure that source_name and source_type are set
         if attrs.get('source_name', None) is None:
