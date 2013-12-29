@@ -15,7 +15,7 @@ django-classy-tags==0.4
 django-datastream==0.1.5
 django-guardian==1.1.1
 -e git+https://github.com/mitar/django-missing.git@ea3c5990716dbaa5aca21203047185e33ecd1897#egg=django_missing-master
-django-overextends==0.3.0
+-e git+https://github.com/wlanslovenija/django-overextends.git@ee963e2c338c1134e6ec49acabe9822b3636b536#egg=django_overextends-wlanslovenija
 django-phonenumber-field==0.2a3
 django-polymorphic==0.5.3
 django-registration==0.8
