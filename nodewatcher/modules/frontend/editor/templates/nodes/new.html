@@ -1,6 +1,6 @@
 {% extends "my_base.html" %}
 
-{% load i18n gmap misc %}
+{% load future i18n gmap misc %}
 
 {% block title %}{% trans "New Node Registration" %}{% endblock %}
 
@@ -21,7 +21,7 @@
         {% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
     {% endnotice %}
 
-    <form action="{% url editor:new %}" method="post">
+    <form action="{% url "editor:new" %}" method="post">
         {% csrf_token %}
         <div id="registry_forms">
             {% include "registry/forms.html" %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n conversion gmap misc graphs html_tags %}
+{% load future i18n conversion gmap misc graphs html_tags %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
@@ -11,32 +11,32 @@
     {{ block.super }}
 {% endblock %}
 
-{% block permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
+{% block permalink %}{% url "view_node" node.pk as permalink %}{{ block.super }}{% endblock %}
 
-{% block head_permalink %}{% url view_node node.pk as permalink %}{{ block.super }}{% endblock %}
+{% block head_permalink %}{% url "view_node" node.pk as permalink %}{{ block.super }}{% endblock %}
 
 {% block ctxtnav %}
     {{ block.super }}
     {% if current_owner %}
         <div id="mynav" class="nav">
             <ul>
-                <li><a href="{% url edit_node node.get_current_id %}">{% trans "Edit node" %}</a></li>
+                <li><a href="{% url "edit_node" node.get_current_id %}">{% trans "Edit node" %}</a></li>
                 {% if not node.is_dead %}
                     {% if node.profile %}
-                        <li><a href="{% url generate_node node.get_current_id %}">{% trans "Generate image" %}</a></li>
+                        <li><a href="{% url "generate_node" node.get_current_id %}">{% trans "Generate image" %}</a></li>
                     {% endif %}
-                    <li><a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a></li>
+                    <li><a href="{% url "allocate_subnet" node.get_current_id %}">{% trans "Add subnet" %}</a></li>
                 {% endif %}
             </ul>
             {% if not node.is_dead %}
                 <ul>
-                    <li><a href="{% url renumber_node node.get_current_id %}">{% trans "Renumber node" %}</a></li>
+                    <li><a href="{% url "renumber_node" node.get_current_id %}">{% trans "Renumber node" %}</a></li>
                 </ul>
                 <ul>
                     {% if node.is_resettable %}
-                        <li><a href="{% url reset_node node.get_current_id %}">{% trans "Reset node" %}</a></li>
+                        <li><a href="{% url "reset_node" node.get_current_id %}">{% trans "Reset node" %}</a></li>
                     {% endif %}
-                    <li><a href="{% url remove_node node.get_current_id %}">{% trans "Remove node" %}</a></li>
+                    <li><a href="{% url "remove_node" node.get_current_id %}">{% trans "Remove node" %}</a></li>
                 </ul>
             {% endif %}
         </div>
@@ -48,7 +48,7 @@
 
     {% if current_owner and node.is_pending and node.profile %}
         {% notice %}
-            {% url generate_node node.get_current_id as generate_image %}{% blocktrans %}If you want you can generate a custom firmware image for your node now (using the <i><a href="{{ generate_image }}">Generate image</a></i> below). The image will contain all necessary software and configuration and you just need to flash your node's router with it and the router will be ready for deployment.{% endblocktrans %}
+            {% url "generate_node" node.get_current_id as generate_image %}{% blocktrans %}If you want you can generate a custom firmware image for your node now (using the <i><a href="{{ generate_image }}">Generate image</a></i> below). The image will contain all necessary software and configuration and you just need to flash your node's router with it and the router will be ready for deployment.{% endblocktrans %}
         {% endnotice %}
     {% endif %}
 
@@ -61,7 +61,7 @@
             {% endblocktrans %}<br />
             {% if current_owner %}
                 <br/>
-                {% url generate_node node.get_current_id as generate_image %}{% blocktrans %}
+                {% url "generate_node" node.get_current_id as generate_image %}{% blocktrans %}
                     You must <b>update the node's router configuration</b> to reflect renumbering changes. You can simply <a href="{{ generate_image }}">generate a new image</a> with new configuration for the router and flash it.
                 {% endblocktrans %}
             {% endif %}
@@ -115,7 +115,7 @@
                         </tr>
                         <tr>
                             <td class="proplabel">{% trans "Events" %}</td>
-                            <td class="propbody"><a href="{% url view_node_events node.get_current_id %}">{% trans "show list" %}</a></td>
+                            <td class="propbody"><a href="{% url "view_node_events" node.get_current_id %}">{% trans "show list" %}</a></td>
                         </tr>
                     {% endif %}
                 </table>
@@ -198,7 +198,7 @@
                         {% if current_owner and node.installedpackage_set.all %}
                             <tr>
                                 <td class="proplabel">{% trans "Installed packages" %}</td>
-                                <td class="propbody"><a href="{% url view_node_packages node.get_current_id %}">{% trans "show list" %}</a></td>
+                                <td class="propbody"><a href="{% url "view_node_packages" node.get_current_id %}">{% trans "show list" %}</a></td>
                             </tr>
                         {% endif %}
                     </table>
@@ -265,7 +265,7 @@
             <tfoot>
                 <tr>
                     <td class="table_menu" colspan="{% if current_owner %}4{% else %}3{% endif %}">
-                        <a href="{% url allocate_subnet node.get_current_id %}">{% trans "Add subnet" %}</a>
+                        <a href="{% url "allocate_subnet" node.get_current_id %}">{% trans "Add subnet" %}</a>
                         {% if node.is_wireless_node and node.is_primary_ip_in_subnet and node.has_client_subnet and not node.has_allocated_subnets_to_lan %}
                         <p class="small_text">{% blocktrans %}By default clients can connect only to node's wireless interface using node's
                         primary subnet and LAN ethernet interface<br />is used to interconnect with possible other nodes. If you want for clients to be able to connect also to
@@ -281,10 +281,10 @@
                     {% if current_owner %}
                         <td>
                             {% if subnet.allocated and not subnet.is_primary %}
-                                <a href="{% url edit_subnet node.get_current_id subnet.pk %}">
+                                <a href="{% url "edit_subnet" node.get_current_id subnet.pk %}">
                                     <img src="{{ MEDIA_URL }}images/edit.png" title="{% trans "Edit subnet description" %}" alt="{% trans "Edit" %}" />
                                 </a>
-                                <a href="{% url remove_subnet node.get_current_id subnet.pk %}">
+                                <a href="{% url "remove_subnet" node.get_current_id subnet.pk %}">
                                     <img src="{{ MEDIA_URL }}images/delete.png" title="{% trans "Deallocate subnet" %}" alt="{% trans "Remove" %}" />
                                 </a>
                             {% endif %}
@@ -300,12 +300,12 @@
                                         <li>
                                             {% if conflict.is_announced %}
                                                 {% if conflict.is_properly_announced %}
-                                                    <b>{{ conflict }}</b> allocated to and announced by <a href="{% url view_node conflict.node.get_current_id %}">{{ conflict.node }}</a><br/>
+                                                    <b>{{ conflict }}</b> allocated to and announced by <a href="{% url "view_node" conflict.node.get_current_id %}">{{ conflict.node }}</a><br/>
                                                 {% else %}
-                                                    <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url view_node conflict.node.get_current_id %}">{{ conflict.node }}</a>
+                                                    <b>{{ conflict }}</b> annouced <i>without allocation</i> by <a href="{% url "view_node" conflict.node.get_current_id %}">{{ conflict.node }}</a>
                                                 {% endif %}
                                             {% else %}
-                                                {{ conflict }}</b> allocated to <a href="{% url view_node conflict.node.get_current_id %}">{{ conflict.node }}</a>
+                                                {{ conflict }}</b> allocated to <a href="{% url "view_node" conflict.node.get_current_id %}">{{ conflict.node }}</a>
                                             {% endif %}
                                         </li>
                                     {% endfor %}
@@ -365,7 +365,7 @@
             <tbody>
                 {% for peer in node.get_peers %}
                     <tr class="{% cycle 'odd' 'even' %}">
-                        <td><a href="{% url view_node peer.dst.get_current_id %}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
+                        <td><a href="{% url "view_node" peer.dst.get_current_id %}">{{ peer.dst.name|default:_("unknown") }}</a> ({{ peer.dst.ip }})</td>
                         <td align="center">{{ peer.lq }}</td>
                         <td align="center">{{ peer.ilq }}</td>
                         <td align="center">{{ peer.etx }}</td>

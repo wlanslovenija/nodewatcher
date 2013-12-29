@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n misc %}
+{% load future i18n misc %}
 
 {% block title %}{% trans "Network Topology" %}{% endblock %}
 
@@ -15,7 +15,7 @@
 {% block content %}
     <img id="topology" src="{{ MEDIA_URL }}graphs/network_topology.png" alt="{% trans "Network Topology View" %}" /><br/>
     <div class="legend">
-        {% url network_map as network_map %}
+        {% url "network_map" as network_map %}
         <p>{% blocktrans %}Network topology shows how are nodes in the network connected to each other. Each node can have multiple
         immediate neighbours (peers) to which it is connected with different link quality. All this is represented above with the
         structure and color of edges between nodes. Topology does not fully represent geographical relations between nodes. For this

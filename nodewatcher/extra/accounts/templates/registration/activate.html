@@ -1,13 +1,13 @@
 {% overextends "base.html" %}
 
 {% contextblock %}
-    {% load i18n %}
+    {% load future i18n %}
 
     {% trans "Activation" as title %}
 {% endcontextblock %}
 
 {% block content %}
-    {% url AccountsComponent:auth_login as auth_login_url %}
+    {% url "AccountsComponent:auth_login" as auth_login_url %}
     <p>
         {% blocktrans %}Activation of your account has <strong>not</strong> been successful. Please recheck activation instructions, especially that you have opened complete activation URL. Or maybe your account is <a href="{{ auth_login_url }}">already activated</a>?{% endblocktrans %}
     </p>

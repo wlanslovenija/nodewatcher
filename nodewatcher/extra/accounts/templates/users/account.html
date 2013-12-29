@@ -1,17 +1,17 @@
 {% overextends "base.html" %}
 
 {% contextblock %}
-    {% load i18n %}
+    {% load future i18n %}
 
     {% trans "Account" as title %}
 {% endcontextblock %}
 
 {% block content %}
-    {% url AccountsComponent:auth_password_change as auth_password_change_url %}
+    {% url "AccountsComponent:auth_password_change" as auth_password_change_url %}
     <p>{% blocktrans %}Do you want to <a href="{{ auth_password_change_url }}">change your password</a>?{% endblocktrans %}</p>
     <p>{% trans "Username" %} {{ user.username }}</p>
     {% with _("Update account") as form_submit %}
-        {% url AccountsComponent:user_account as form_action %}
+        {% url "AccountsComponent:user_account" as form_action %}
         {% include "form.html" %}
     {% endwith %}
 {% endblock %}

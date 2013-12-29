@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n conversion misc %}
+{% load future i18n conversion misc %}
 
 {% block title %}{% trans "Global Client List" %}{% endblock %}
 
@@ -29,7 +29,7 @@
                     <tr class="section_title">
                         <td colspan="5">
                             {% setcontext as heading %}
-                                {% url view_node client.node.get_current_id as node_url %}
+                                {% url "view_node" client.node.get_current_id as node_url %}
                                 {% blocktrans with client.node.name|default:_("unknown") as node_name %}Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
                             {% endsetcontext %}
                             {% heading 3 heading %}

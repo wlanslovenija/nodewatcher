@@ -1,6 +1,6 @@
 {% extends "my_base.html" %}
 
-{% load i18n nodestatus misc %}
+{% load future i18n nodestatus misc %}
 
 {% block title %}{% trans "My Nodes" %}{% endblock %}
 
@@ -33,7 +33,7 @@
         <tfoot>
             <tr>
                 <td class="table_menu" colspan="8">
-                    <a href="{% url new_node %}">{% trans "Add node" %}</a>
+                    <a href="{% url "new_node" %}">{% trans "Add node" %}</a>
                 </td>
             </tr>
         </tfoot>
@@ -47,12 +47,12 @@
                 <tr class="{% cycle 'odd' 'even' %}">
                     <td align="center">
                         {% if node.warnings %}
-                            <a href="{% url view_node node.get_current_id %}">
+                            <a href="{% url "view_node" node.get_current_id %}">
                                 <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
                             </a>
                         {% endif %}
                     </td>
-                    <td><a href="{% url view_node node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
+                    <td><a href="{% url "view_node" node.get_current_id %}">{{ node.name|default:_("unknown") }}</a></td>
                     <td>{{ node.ip }}</td>
                     {% if node.last_seen %}
                         <td>{{ node.last_seen|date:"DATETIME_FORMAT" }}</td>
@@ -72,7 +72,7 @@
             {% empty %}
                 <tr>
                     <td colspan="8" class="notice">
-                        {% url new_node as new_node %}{% blocktrans %}You currently have no nodes registered. You can use <i><a href="{{ new_node }}">New node</a></i> tab to register a new node. After the registration you can also generate a flashable firmware image, so you can set up your router directly.{% endblocktrans %}
+                        {% url "new_node" as new_node %}{% blocktrans %}You currently have no nodes registered. You can use <i><a href="{{ new_node }}">New node</a></i> tab to register a new node. After the registration you can also generate a flashable firmware image, so you can set up your router directly.{% endblocktrans %}
                     </td>
                 </tr>
             {% endfor %}
