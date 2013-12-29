@@ -128,6 +128,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             field = copy.deepcopy(field)
             field.name = None
             select_name = name
+            # Since the field is populated by a join, it can always be null when the model doesn't exist
+            field.null = True
             field.contribute_to_class(clone.model, name)
 
             if field.name != field.attname:
