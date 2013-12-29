@@ -39,7 +39,7 @@ fi
 # Drop can fail if there is no database already defined
 dropdb -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
 dropuser -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
-createuser -h ${PSQL_HOST} ${PSQL_USER_ARG} -S -D -R nodewatcher || true
+createuser -h ${PSQL_HOST} ${PSQL_USER_ARG} -S -d -R nodewatcher || true
 createdb -h ${PSQL_HOST} ${PSQL_USER_ARG} -E UNICODE -T template0 -O nodewatcher nodewatcher
 createlang -h ${PSQL_HOST} ${PSQL_USER_ARG} plpgsql nodewatcher || true
 psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis.sql
