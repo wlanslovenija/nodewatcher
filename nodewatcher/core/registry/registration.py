@@ -368,6 +368,21 @@ class RegistrationPoint(object):
         return "<RegistrationPoint '%s'>" % self.name
 
 
+def remove_point(name):
+    """
+    Removes an existing registration point.
+
+    :param name: Registration point name
+    """
+
+    p = point(name)
+    # Unregister all models
+    for models in p.get_all_registry_items().values():
+        p.unregister_item(models[0])
+    # Remove the registration point
+    del registry_state.points[name]
+
+
 def create_point(model, namespace, mixins=None):
     """
     Creates a new registration point (= registry root).
