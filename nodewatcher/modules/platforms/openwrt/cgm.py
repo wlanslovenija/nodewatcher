@@ -296,7 +296,7 @@ def general(node, cfg):
         system.timezone = posix_tz.get_posix_tz(zone)
         if not system.timezone:
             raise cgm_base.ValidationError(_("Unsupported OpenWRT timezone '%s'!") % zone)
-    except (registry_exceptions.UnknownRegistryIdentifier, AttributeError):
+    except (registry_exceptions.RegistryItemNotRegistered, AttributeError):
         system.timezone = posix_tz.get_posix_tz(settings.TIME_ZONE)
         if not system.timezone:
             system.timezone = 'UTC'

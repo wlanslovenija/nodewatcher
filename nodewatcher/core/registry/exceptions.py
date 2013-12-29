@@ -4,7 +4,15 @@ class RegistryException(Exception):
     pass
 
 
-class UnknownRegistryIdentifier(RegistryException):
+class RegistryItemAlreadyRegistered(RegistryException):
+    pass
+
+
+class RegistryItemNotRegistered(RegistryException):
+    pass
+
+
+class InvalidRegistryItemName(RegistryException):
     pass
 
 
