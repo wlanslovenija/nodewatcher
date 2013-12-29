@@ -1,27 +1,19 @@
-{% load i18n %}{% trans "Hi!" %}
+{% load future i18n %}{% blocktrans with username=user.username %}Hello {{ username }}!{% endblocktrans %}
+{% filter wordwrap:68 %}
+{% if email_change %}{% blocktrans with username=user.username %}You have changed your e-mail address and your {{ site_name }} account has been inactivated. This message was sent to you to confirm this e-mail address ({{ email }}) as yours and reactivate the account with username "{{ username }}". If you have already done so or the account does not belong to you, you can safely ignore this e-mail.{% endblocktrans %}{% else %}{% blocktrans with username=user.username %}Thank you for registering your {{ site_name }} account. This message was sent to you to confirm this e-mail address ({{ email }}) as yours and activate the account with username "{{ username }}". If you have already done so or the account does not belong to you, you can safely ignore this e-mail.{% endblocktrans %}{% endif %}
 
-{% if email_change %}{% blocktrans with site.name as site_name %}You have changed your e-mail address and your {{ site_name }} account
-has been inactivated. If you have not done so there has probably
-been some mistake and you can safely ignore this e-mail.{% endblocktrans %}
-{% else %}{% blocktrans with site.name as site_name %}Thank you for registering your {{ site_name }} account. If you have not
-done so and you do not want a {{ site_name }} account you can safely
-ignore this e-mail.{% endblocktrans %}
-{% endif %}
-{% blocktrans %}To be able to use your account you have to activate it. To do so
-please visit:{% endblocktrans %}
+{% blocktrans %}To be able to use your account you have to activate it. Please click the link below to confirm your e-mail address and activate your account:{% endblocktrans %}
 
-{{ registration_activate_url }}
-
-{% blocktrans %}Please be careful to open complete URL for activation. Your e-mail
-client might have broken it into several lines.{% endblocktrans %}
+{{ protocol }}://{{ domain }}{% url "AccountsComponent:registration_activate" activation_key=activation_key %}
 {% if not email_change %}
-{% blocktrans count expiration_days as expiration_days %}You have one day to activate your account.{% plural %}You have {{ expiration_days }} days to activate your account.{% endblocktrans %}
+{% blocktrans count days=expiration_days %}Activation link will be active for {{ expiration_days }} day.{% plural %}Activation link will be active for {{ expiration_days }} days.{% endblocktrans %}
 {% endif %}
-{% blocktrans with site.name as site_name and site.domain as domain %}If you have any problems activating your account or have any other
-questions just reply to this e-mail.
+{% blocktrans %}Please also be careful to open complete link. Your e-mail client might have broken it into several lines.{% endblocktrans %}
 
-Yours,
+{% blocktrans %}If you have any problems confirming your e-mail address or have any other questions just reply to this e-mail.{% endblocktrans %}
 
+{% blocktrans %}Yours,{% endblocktrans %}
+{% endfilter %}
 
-{{ site_name }}
-{{ protocol }}://{{ domain }}/{% endblocktrans %}
+{% if site_name %}{{ site_name }}
+{% endif %}{{ protocol }}://{{ domain }}{% url "main_page" %}

@@ -54,3 +54,19 @@ class ProfileBackend(backends_default.DefaultBackend):
         """
 
         return utils.initial_accepts_request(request, forms.AccountRegistrationForm)
+
+    def post_registration_redirect(self, request, user):
+        """
+        Return the name of the URL to redirect to after successful
+        user registration.
+        """
+
+        return ('AccountsComponent:registration_complete', (), {})
+
+    def post_activation_redirect(self, request, user):
+        """
+        Return the name of the URL to redirect to after successful
+        account activation.
+        """
+
+        return ('AccountsComponent:registration_activation_complete', (), {})

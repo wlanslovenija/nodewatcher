@@ -1,11 +1,11 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load i18n sekizai_tags %}
 
     {% addtoblock "extrahead" %}<meta name="robots" content="NONE,NOARCHIVE" />{% endaddtoblock %}
     {% trans "403 Forbidden" as title %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}
 
 {% block content %}
     <div class="error">

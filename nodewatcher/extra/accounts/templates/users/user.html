@@ -1,9 +1,15 @@
-{% setcontext as title %}{% load i18n %}{% blocktrans %}User {{ username }}{% endblocktrans %}{% endsetcontext %}
-
 {% overextends "base.html" %}
+
+{% contextblock %}
+    {% load i18n %}
+
+    {% setcontext as title %}{% blocktrans %}User {{ username }}{% endblocktrans %}{% endsetcontext %}
+{% endcontextblock %}
 
 {% block content %}
     {% url AccountsComponent:user_account as user_account_url %}
-    <p>{% blocktrans %}Do you want to <a href="{{ user_account_url }}">change your account</a>?{% endblocktrans %}</p>
+    {% if user.username == username %}
+        <p>{% blocktrans %}Do you want to <a href="{{ user_account_url }}">change your account</a>?{% endblocktrans %}</p>
+    {% endif %}
     <p>{% trans "Username" %} {{ username }}.</p>
 {% endblock %}
