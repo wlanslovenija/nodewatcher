@@ -1,10 +1,10 @@
-{% setcontext %}
+{% overextends "plain.html" %}
+
+{% contextblock %}
     {% load sekizai_tags %}
 
     {% add_data "css_data" "frontend/css/style.css" %}
-{% endsetcontext %}
-
-{% overextends "plain.html" %}
+{% endcontextblock %}
 
 {% block header %}
     {% block accounts_menu_wrapper %}

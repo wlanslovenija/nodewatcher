@@ -1,7 +1,7 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load sekizai_tags %}
 
     {% prepend_data "js_data" "jquery/js/jquery.js" %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}

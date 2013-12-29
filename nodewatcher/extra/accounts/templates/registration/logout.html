@@ -1,10 +1,10 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load i18n %}
 
     {% trans "Logout" as title %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}
 
 {% block content %}
     <p>{% blocktrans %}You have successfully logged out.{% endblocktrans %}</p>

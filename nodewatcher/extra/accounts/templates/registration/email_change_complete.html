@@ -1,10 +1,10 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load i18n %}
 
     {% trans "Account" as title %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}
 
 {% block content %}
     <p>

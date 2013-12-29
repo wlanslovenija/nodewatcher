@@ -1,11 +1,11 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load i18n sekizai_tags %}
 
     {% add_data "js_data" "accounts/js/code.js" %}
     {% trans "Login" as title %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}
 
 {% block content %}
     {% url AccountsComponent:registration_register as registration_register_url %}

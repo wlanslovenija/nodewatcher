@@ -1,7 +1,7 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load sekizai_tags %}
 
     {% prepend_data "css_data" "normalize/css/normalize.css" %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}

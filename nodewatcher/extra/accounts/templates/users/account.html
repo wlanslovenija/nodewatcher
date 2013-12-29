@@ -1,10 +1,10 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load i18n %}
 
     {% trans "Account" as title %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}
 
 {% block content %}
     {% url AccountsComponent:auth_password_change as auth_password_change_url %}

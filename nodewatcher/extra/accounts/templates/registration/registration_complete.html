@@ -1,10 +1,10 @@
-{% setcontext %}
+{% overextends "base.html" %}
+
+{% contextblock %}
     {% load i18n %}
 
     {% trans "Registration" as title %}
-{% endsetcontext %}
-
-{% overextends "base.html" %}
+{% endcontextblock %}
 
 {% block content %}
     <p>{% blocktrans %}Registration completed successfully. An e-mail with activation instructions for your new account has been sent to your e-mail address. Until you activate your new account you cannot log in into it.{% endblocktrans %}</p>

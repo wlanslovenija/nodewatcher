@@ -1,6 +1,10 @@
-{% setcontext as title %}{% load i18n %}{% blocktrans %}User {{ username }}{% endblocktrans %}{% endsetcontext %}
-
 {% overextends "base.html" %}
+
+{% contextblock %}
+    {% load i18n %}
+
+    {% setcontext as title %}{% blocktrans %}User {{ username }}{% endblocktrans %}{% endsetcontext %}
+{% endcontextblock %}
 
 {% block content %}
     {% url AccountsComponent:user_account as user_account_url %}
