@@ -57,7 +57,7 @@ def account(request):
                 registration_profile = registration_models.RegistrationProfile.objects.create_profile(request.user)
                 registration_profile.send_activation_email(site, email_change=True)
 
-                url = urlresolvers.reverse('email_change_complete')
+                url = urlresolvers.reverse('AccountsComponent:email_change_complete')
 
                 return logout_redirect(request, next_page=url)
         else:

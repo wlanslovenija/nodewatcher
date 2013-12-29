@@ -1,1 +1,1 @@
-{% load i18n %}{% blocktrans with site.name as site_name %}[{{ site_name }}] Activation instructions for your account{% endblocktrans %}
+{% load i18n %}{% blocktrans %}[{{ site_name }}] Activation instructions for your account{% endblocktrans %}

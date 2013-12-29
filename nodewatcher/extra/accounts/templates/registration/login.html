@@ -9,13 +9,13 @@
 
 {% block content %}
     {% url AccountsComponent:registration_register as registration_register_url %}
-    <p>{% blocktrans %}To log in, please enter your valid username and password in the form bellow. Don't have them yet? In that case <a href="{{ registration_register_url }}">register</a> to get them.{% endblocktrans %}</p>
+    <p>{% blocktrans %}To log in, please enter your username and password in the form bellow. Don't have them yet? In that case please <a href="{{ registration_register_url }}">register</a>.{% endblocktrans %}</p>
     <div class="login-form">
         {% with _("Log in") as form_submit %}
             {% url AccountsComponent:auth_login as form_action %}
             {% include "form.html" %}
         {% endwith %}
         {% url AccountsComponent:auth_password_reset as auth_password_reset_url %}
-        <p>{% blocktrans %}Have you <a href="{{ auth_password_reset_url }}">forgotten your password</a>?{% endblocktrans %}</p>
+        <p>{% blocktrans %}<a href="{{ auth_password_reset_url }}">Forgotten your username or password?</a>{% endblocktrans %}</p>
     </div>
 {% endblock %}

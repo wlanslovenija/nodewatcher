@@ -1,9 +1,8 @@
 from django.conf import settings
 from django import db
 from django.db import models as django_models
-from django.db.models import signals
+from django.db.models import signals as models_signals
 from django.contrib.auth import models as auth_models
-from django.core import urlresolvers
 from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
@@ -67,10 +66,10 @@ def create_profile_and_settings(sender, instance, created, **kwargs):
         except db.IntegrityError:
             pass
 
-signals.post_save.connect(create_profile_and_settings, sender=auth_models.User)
+models_signals.post_save.connect(create_profile_and_settings, sender=auth_models.User)
 
 
-# Monkey patach registration_models.RegistrationProfile
+# Monkey-patch registration_models.RegistrationProfile
 def send_activation_email(instance, site, email_change=False):
     """
     Based on `registration.models.RegistrationProfile.send_activation_email` to extend activation e-mail template context with
@@ -78,18 +77,17 @@ def send_activation_email(instance, site, email_change=False):
     """
 
     protocol = 'https' if getattr(settings, 'USE_HTTPS', False) else 'http'
-    base_url = "%s://%s" % (protocol, site.domain)
-    registration_activate_url = "%s%s" % (base_url, urlresolvers.reverse('registration_activate', args=(instance.activation_key,)))
 
     ctx_dict = {
+        'email': instance.user.email,
+        'domain': site.domain,
+        'site_name': site.name,
+        'user': instance.user,
+        'protocol': protocol,
         'activation_key': instance.activation_key,
         'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-        'site': site,
-        'base_url': base_url,
-        'protocol': protocol,
         'NETWORK': getattr(settings, 'NETWORK', {}),
         'email_change': email_change,
-        'registration_activate_url': registration_activate_url,
     }
     subject = loader.render_to_string('registration/activation_email_subject.txt', ctx_dict)
     subject = ''.join(subject.splitlines())
