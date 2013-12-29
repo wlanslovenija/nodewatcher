@@ -332,6 +332,9 @@ class RegistrationPoint(object):
 
         self.item_base.__bases__ += tuple(mixins)
 
+    def __repr__(self):
+        return "<RegistrationPoint '%s'>" % self.name
+
 
 def create_point(model, namespace, mixins=None):
     """
