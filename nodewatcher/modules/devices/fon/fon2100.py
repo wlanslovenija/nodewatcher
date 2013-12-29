@@ -45,4 +45,4 @@ class Fonera(cgm_routers.DeviceBase):
         pass
 
 # Register the FON-2100 router
-cgm_base.register_router('openwrt', Fonera)
+cgm_base.register_device('openwrt', Fonera)

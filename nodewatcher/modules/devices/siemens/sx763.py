@@ -76,4 +76,4 @@ class SiemensSX763v2(cgm_routers.DeviceBase):
     }
 
 # Register the Siemens SX763 router
-cgm_base.register_router('openwrt', SiemensSX763v2)
+cgm_base.register_device('openwrt', SiemensSX763v2)

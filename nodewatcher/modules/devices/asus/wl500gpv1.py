@@ -56,4 +56,4 @@ class AsusWL500GPremiumV1(cgm_routers.DeviceBase):
         pass
 
 # Register the Asus WL500G Premium v1 router
-cgm_base.register_router('openwrt', AsusWL500GPremiumV1)
+cgm_base.register_device('openwrt', AsusWL500GPremiumV1)

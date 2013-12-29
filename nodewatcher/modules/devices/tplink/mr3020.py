@@ -76,4 +76,4 @@ class TPLinkMR3020v1(cgm_routers.DeviceBase):
     }
 
 # Register the TP-Link MR3020 router
-cgm_base.register_router('openwrt', TPLinkMR3020v1)
+cgm_base.register_device('openwrt', TPLinkMR3020v1)

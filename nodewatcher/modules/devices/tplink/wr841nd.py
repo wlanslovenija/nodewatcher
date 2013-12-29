@@ -152,8 +152,8 @@ class TPLinkWR841NDv8(TPLinkWR841NDv1):
     }
 
 # Register the TP-Link WR841ND router
-cgm_base.register_router('openwrt', TPLinkWR841NDv1)
-cgm_base.register_router('openwrt', TPLinkWR841NDv3)
-cgm_base.register_router('openwrt', TPLinkWR841NDv5)
-cgm_base.register_router('openwrt', TPLinkWR841NDv7)
-cgm_base.register_router('openwrt', TPLinkWR841NDv8)
+cgm_base.register_device('openwrt', TPLinkWR841NDv1)
+cgm_base.register_device('openwrt', TPLinkWR841NDv3)
+cgm_base.register_device('openwrt', TPLinkWR841NDv5)
+cgm_base.register_device('openwrt', TPLinkWR841NDv7)
+cgm_base.register_device('openwrt', TPLinkWR841NDv8)

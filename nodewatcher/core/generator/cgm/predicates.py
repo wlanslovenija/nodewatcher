@@ -31,7 +31,7 @@ def router_descriptor(platform, router):
         def __getattr__(self, key):
             def resolve_attribute(context):
                 try:
-                    return getattr(cgm_base.get_platform(value(self.platform)(context)).get_router(value(self.router)(context)), key, None)
+                    return getattr(cgm_base.get_platform(value(self.platform)(context)).get_device(value(self.router)(context)), key, None)
                 except KeyError:
                     return None
 

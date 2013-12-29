@@ -110,6 +110,6 @@ class TPLinkWR740NDv4(TPLinkWR740NDv1):
     }
 
 # Register the TP-Link WR740ND router
-cgm_base.register_router('openwrt', TPLinkWR740NDv1)
-cgm_base.register_router('openwrt', TPLinkWR740NDv3)
-cgm_base.register_router('openwrt', TPLinkWR740NDv4)
+cgm_base.register_device('openwrt', TPLinkWR740NDv1)
+cgm_base.register_device('openwrt', TPLinkWR740NDv3)
+cgm_base.register_device('openwrt', TPLinkWR740NDv4)

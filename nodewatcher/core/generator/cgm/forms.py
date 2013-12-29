@@ -69,7 +69,7 @@ class WifiRadioDeviceConfigForm(forms.ModelForm):
         try:
             radio = cgm_base.get_platform(
                 cfg['core.general'][0].platform
-            ).get_router(
+            ).get_device(
                 cfg['core.general'][0].router
             ).get_radio(
                 item.wifi_radio

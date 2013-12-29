@@ -55,7 +55,7 @@ class PlatformBase(object):
         self.name = None
         self._modules = []
         self._packages = []
-        self._routers = {}
+        self._devices = {}
 
     def generate(self, node):
         """
@@ -65,8 +65,8 @@ class PlatformBase(object):
         cfg = self.config_class()
 
         # Execute the module chain in order
-        for _, module, router in sorted(self._modules):
-            if router is None or router == node.config.core.general().router:
+        for _, module, device in sorted(self._modules):
+            if device is None or device == node.config.core.general().router:
                 module(node, cfg)
 
         # Process user-configured packages
@@ -103,19 +103,19 @@ class PlatformBase(object):
         from . import tasks
         tasks.background_build.delay(node, self.name, cfg)
 
-    def register_module(self, weight, module, router=None):
+    def register_module(self, weight, module, device=None):
         """
         Registers a new platform module.
 
         :param weight: Call order weight
         :param module: Module implementation function
-        :param router: Optional router identifier
+        :param device: Optional device identifier
         """
 
         if [x for x in self._modules if x[1] == module]:
             return
 
-        self._modules.append((weight, module, router))
+        self._modules.append((weight, module, device))
 
     def register_package(self, name, config, package):
         """
@@ -131,27 +131,27 @@ class PlatformBase(object):
 
         self._packages.append((name, config, package))
 
-    def register_router(self, router):
+    def register_device(self, device):
         """
-        Registers a new router with this platform.
+        Registers a new device with this platform.
 
-        :param router: A subclass of DeviceBase
+        :param device: A subclass of DeviceBase
         """
 
-        if not issubclass(router, cgm_routers.DeviceBase):
+        if not issubclass(device, cgm_routers.DeviceBase):
             raise TypeError("Router descriptor must be a subclass of DeviceBase!")
 
-        self._routers[router.identifier] = router
-        router.register(self)
+        self._devices[device.identifier] = device
+        device.register(self)
 
-    def get_router(self, router):
+    def get_device(self, device):
         """
-        Returns a router descriptor.
+        Returns a device descriptor.
 
-        :param router: Unique router identifier
+        :param device: Unique device identifier
         """
 
-        return self._routers[router]
+        return self._devices[device]
 
 
 def register_platform(enum, text, platform):
@@ -184,13 +184,13 @@ def get_platform(platform):
         raise KeyError("Platform '{0}' does not exist!".format(platform))
 
 
-def register_platform_module(platform, weight=999, router=None):
+def register_platform_module(platform, weight=999, device=None):
     """
     Registers a new platform module.
     """
 
     def wrapper(f):
-        get_platform(platform).register_module(weight, f, router=router)
+        get_platform(platform).register_module(weight, f, device=device)
         return f
 
     return wrapper
@@ -208,22 +208,22 @@ def register_platform_package(platform, name, cfgclass):
     return wrapper
 
 
-def register_router(platform, router):
+def register_device(platform, device):
     """
-    Registers a new router.
+    Registers a new device.
     """
 
-    get_platform(platform).register_router(router)
+    get_platform(platform).register_device(device)
 
 
-def iterate_routers():
+def iterate_devices():
     """
-    Iterates over all registered routers.
+    Iterates over all registered devices.
     """
 
     for platform in PLATFORM_REGISTRY.values():
-        for router in platform._routers.values():
-            yield router
+        for device in platform._devices.values():
+            yield device
 
 
 def generate_config(node, only_validate=False):

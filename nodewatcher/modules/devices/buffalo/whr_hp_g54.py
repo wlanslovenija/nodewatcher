@@ -56,4 +56,4 @@ class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
         pass
 
 # Register the Buffalo WHR-HP-G54 router
-cgm_base.register_router('openwrt', BuffaloWHR_HP_G54)
+cgm_base.register_device('openwrt', BuffaloWHR_HP_G54)

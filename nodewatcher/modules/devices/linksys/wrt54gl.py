@@ -57,4 +57,4 @@ class LinksysWRT54GL(cgm_routers.DeviceBase):
         pass
 
 # Register the Linksys WRT54GL router
-cgm_base.register_router('openwrt', LinksysWRT54GL)
+cgm_base.register_device('openwrt', LinksysWRT54GL)

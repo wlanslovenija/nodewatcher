@@ -110,6 +110,6 @@ class TPLinkWR741NDv4(TPLinkWR741NDv1):
     }
 
 # Register the TP-Link WR741ND router
-cgm_base.register_router('openwrt', TPLinkWR741NDv1)
-cgm_base.register_router('openwrt', TPLinkWR741NDv2)
-cgm_base.register_router('openwrt', TPLinkWR741NDv4)
+cgm_base.register_device('openwrt', TPLinkWR741NDv1)
+cgm_base.register_device('openwrt', TPLinkWR741NDv2)
+cgm_base.register_device('openwrt', TPLinkWR741NDv4)

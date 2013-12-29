@@ -70,5 +70,5 @@ class UBNTBulletM5(UBNTBullet):
     name = "Bullet M5"
 
 # Register the UBNT Bullet router
-cgm_base.register_router('openwrt', UBNTBullet)
-cgm_base.register_router('openwrt', UBNTBulletM5)
+cgm_base.register_device('openwrt', UBNTBullet)
+cgm_base.register_device('openwrt', UBNTBulletM5)

@@ -76,4 +76,4 @@ class TPLinkWR842NDv1(cgm_routers.DeviceBase):
     }
 
 # Register the TP-Link WR842ND router
-cgm_base.register_router('openwrt', TPLinkWR842NDv1)
+cgm_base.register_device('openwrt', TPLinkWR842NDv1)

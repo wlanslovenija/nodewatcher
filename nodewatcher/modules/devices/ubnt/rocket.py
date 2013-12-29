@@ -61,4 +61,4 @@ class UBNTRocketM5(cgm_routers.DeviceBase):
     }
 
 # Register the UBNT Rocket router
-cgm_base.register_router('openwrt', UBNTRocketM5)
+cgm_base.register_device('openwrt', UBNTRocketM5)

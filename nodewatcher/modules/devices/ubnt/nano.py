@@ -70,5 +70,5 @@ class UBNTNanoM5(UBNTNano):
     name = "Nano M5"
 
 # Register the UBNT Nano router
-cgm_base.register_router('openwrt', UBNTNano)
-cgm_base.register_router('openwrt', UBNTNanoM5)
+cgm_base.register_device('openwrt', UBNTNano)
+cgm_base.register_device('openwrt', UBNTNanoM5)

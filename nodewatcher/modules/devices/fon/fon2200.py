@@ -40,4 +40,4 @@ class FoneraPlus(fon2100.Fonera):
         pass
 
 # Register the FON-2200 router
-cgm_base.register_router('openwrt', FoneraPlus)
+cgm_base.register_device('openwrt', FoneraPlus)

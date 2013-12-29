@@ -25,7 +25,7 @@ def install_antenna_fixtures(sender, **kwargs):
     # Ensure that all CGMs are registred
     loader.load_modules('cgm')
 
-    for router in cgm_base.iterate_routers():
+    for router in cgm_base.iterate_devices():
         for antenna in router.antennas:
             try:
                 mdl = antennas_models.Antenna.objects.get(internal_for=router.identifier, internal_id=antenna.identifier)

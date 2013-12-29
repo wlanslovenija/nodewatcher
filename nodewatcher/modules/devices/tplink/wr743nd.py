@@ -94,5 +94,5 @@ class TPLinkWR743NDv2(TPLinkWR743NDv1):
 
 
 # Register the TP-Link WR743ND router
-cgm_base.register_router('openwrt', TPLinkWR743NDv1)
-cgm_base.register_router('openwrt', TPLinkWR743NDv2)
+cgm_base.register_device('openwrt', TPLinkWR743NDv1)
+cgm_base.register_device('openwrt', TPLinkWR743NDv2)

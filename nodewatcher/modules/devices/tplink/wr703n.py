@@ -76,4 +76,4 @@ class TPLinkWR703Nv1(cgm_routers.DeviceBase):
     }
 
 # Register the TP-Link WR703N router
-cgm_base.register_router('openwrt', TPLinkWR703Nv1)
+cgm_base.register_device('openwrt', TPLinkWR703Nv1)

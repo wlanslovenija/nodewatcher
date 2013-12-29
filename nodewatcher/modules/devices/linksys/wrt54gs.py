@@ -12,4 +12,4 @@ class LinksysWRT54GS(wrt54gl.LinksysWRT54GL):
     name = "WRT54GS"
 
 # Register the Linksys WRT54GS router
-cgm_base.register_router('openwrt', LinksysWRT54GS)
+cgm_base.register_device('openwrt', LinksysWRT54GS)

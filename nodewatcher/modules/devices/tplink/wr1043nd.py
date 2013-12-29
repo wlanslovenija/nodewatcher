@@ -81,4 +81,4 @@ class TPLinkWR1043NDv1(cgm_routers.DeviceBase):
     }
 
 # Register the TP-Link WR1043ND router
-cgm_base.register_router('openwrt', TPLinkWR1043NDv1)
+cgm_base.register_device('openwrt', TPLinkWR1043NDv1)

@@ -51,4 +51,4 @@ class MikrotikRB433AH(cgm_routers.DeviceBase):
         pass
 
 # Register the Mikrotik RB433AH router
-cgm_base.register_router('openwrt', MikrotikRB433AH)
+cgm_base.register_device('openwrt', MikrotikRB433AH)
