@@ -1,6 +1,8 @@
+import unittest
+
 from django.conf import settings
 from django.test import simple, testcases
-from django.utils import unittest
+from django.utils import unittest as django_unittest
 
 
 class FilteredTestSuiteRunner(simple.DjangoTestSuiteRunner):
@@ -16,10 +18,10 @@ class FilteredTestSuiteRunner(simple.DjangoTestSuiteRunner):
             # We do NOT filter if filters are not set
             return suite
 
-        filtered = unittest.TestSuite()
+        filtered = django_unittest.TestSuite()
 
         for test in suite:
-            if isinstance(test, unittest.TestSuite):
+            if isinstance(test, (unittest.TestSuite, django_unittest.TestSuite)):
                 filtered.addTests(self._filter_suite(test))
             else:
                 for f in filters:
