@@ -93,7 +93,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         from . import registration
         clone = self._clone()
         try:
-            name = '{0}.{1}'.format(self.model._meta.module_name, name)
+            name = '{0}.{1}'.format(self.model._meta.concrete_model._meta.module_name, name)
             clone._regpoint = registration.point(name)
             return clone
         except KeyError:
