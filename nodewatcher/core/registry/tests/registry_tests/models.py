@@ -24,3 +24,14 @@ class ChildRegistryItem(SimpleRegistryItem):
     additional = models.IntegerField(null=True)
 
 registration.point('thing.first').register_item(ChildRegistryItem)
+
+
+class RelatedModel(models.Model):
+    name = models.CharField(max_length=30)
+
+
+class DoubleChildRegistryItem(ChildRegistryItem):
+    another = models.IntegerField(null=True)
+    related = models.ForeignKey(RelatedModel, null=True)
+
+registration.point('thing.first').register_item(DoubleChildRegistryItem)
