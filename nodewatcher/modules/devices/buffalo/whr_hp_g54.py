@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class BuffaloWHR_HP_G54(cgm_routers.RouterBase):
+class BuffaloWHR_HP_G54(cgm_routers.DeviceBase):
     """
     Buffalo WHR-HP-G54 device descriptor.
     """

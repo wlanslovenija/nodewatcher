@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class AsusWL500GPremiumV1(cgm_routers.RouterBase):
+class AsusWL500GPremiumV1(cgm_routers.DeviceBase):
     """
     Asus WL500G Premium v1 device descriptor.
     """

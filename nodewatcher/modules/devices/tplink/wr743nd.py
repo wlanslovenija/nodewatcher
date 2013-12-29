@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkWR743NDv1(cgm_routers.RouterBase):
+class TPLinkWR743NDv1(cgm_routers.DeviceBase):
     """
     TP-Link WR743NDv1 device descriptor.
     """

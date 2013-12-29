@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class SiemensSX763v2(cgm_routers.RouterBase):
+class SiemensSX763v2(cgm_routers.DeviceBase):
     """
     Siemens SX763v2 device descriptor.
     """

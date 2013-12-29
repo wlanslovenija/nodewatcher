@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class UBNTBullet(cgm_routers.RouterBase):
+class UBNTBullet(cgm_routers.DeviceBase):
     """
     UBNT Bullet device descriptor.
     """

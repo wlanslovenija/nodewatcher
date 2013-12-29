@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class MikrotikRB433AH(cgm_routers.RouterBase):
+class MikrotikRB433AH(cgm_routers.DeviceBase):
     """
     Mikrotik RB433AH device descriptor.
     """

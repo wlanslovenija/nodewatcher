@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class UBNTNano(cgm_routers.RouterBase):
+class UBNTNano(cgm_routers.DeviceBase):
     """
     UBNT Nano device descriptor.
     """

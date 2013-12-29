@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class LinksysWRT54GL(cgm_routers.RouterBase):
+class LinksysWRT54GL(cgm_routers.DeviceBase):
     """
     Linksys WRT54GL device descriptor.
     """

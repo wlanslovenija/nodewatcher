@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkMR3020v1(cgm_routers.RouterBase):
+class TPLinkMR3020v1(cgm_routers.DeviceBase):
     """
     TP-Link MR3020v1 device descriptor.
     """

@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class TPLinkWR842NDv1(cgm_routers.RouterBase):
+class TPLinkWR842NDv1(cgm_routers.DeviceBase):
     """
     TP-Link WR842NDv1 device descriptor.
     """

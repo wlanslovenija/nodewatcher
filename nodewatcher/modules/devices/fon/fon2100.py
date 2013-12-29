@@ -1,7 +1,7 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, routers as cgm_routers
 
 
-class Fonera(cgm_routers.RouterBase):
+class Fonera(cgm_routers.DeviceBase):
     """
     Fonera FON-2100 device descriptor.
     """

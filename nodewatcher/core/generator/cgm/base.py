@@ -135,11 +135,11 @@ class PlatformBase(object):
         """
         Registers a new router with this platform.
 
-        :param router: A subclass of RouterBase
+        :param router: A subclass of DeviceBase
         """
 
-        if not issubclass(router, cgm_routers.RouterBase):
-            raise TypeError("Router descriptor must be a subclass of RouterBase!")
+        if not issubclass(router, cgm_routers.DeviceBase):
+            raise TypeError("Router descriptor must be a subclass of DeviceBase!")
 
         self._routers[router.identifier] = router
         router.register(self)
