@@ -18,6 +18,9 @@ class FilteredTestSuiteRunner(simple.DjangoTestSuiteRunner):
             # We do NOT filter if filters are not set
             return suite
 
+        # Add unittest prefix to not filter special tests like unittest.loader.ModuleImportFailure
+        filters += ('unittest.',)
+
         filtered = django_unittest.TestSuite()
 
         for test in suite:
