@@ -193,7 +193,7 @@ class Features(object):
     MultipleSSID = "multiple_ssid"
 
 # A list of attributes that are required to be defined
-REQUIRED_ROUTER_ATTRIBUTES = {
+REQUIRED_ROUTER_ATTRIBUTES = (
     'identifier',
     'name',
     'manufacturer',
@@ -203,7 +203,7 @@ REQUIRED_ROUTER_ATTRIBUTES = {
     'switches',
     'ports',
     'antennas',
-}
+)
 
 
 class RouterMetaclass(type):
@@ -220,7 +220,6 @@ class RouterMetaclass(type):
 
         if name != 'RouterBase':
             # Validate the presence of all attributes
-            required_attrs = copy.deepcopy(REQUIRED_ROUTER_ATTRIBUTES)
             for attr in REQUIRED_ROUTER_ATTRIBUTES:
                 if getattr(new_class, attr, None) is None:
                     raise exceptions.ImproperlyConfigured("Attribute '{0}' is required for router descriptor specification!".format(attr))
