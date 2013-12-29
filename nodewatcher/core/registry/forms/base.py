@@ -671,9 +671,9 @@ def prepare_forms(context):
                 if all([issubclass(x, item_cls) for x in context.items.values()]):
                     break
             else:
-                item_cls = context.items.values()[0].top_model()
+                item_cls = context.items.values()[0].get_registry_toplevel()
         else:
-            item_cls = context.items.values()[0].top_model()
+            item_cls = context.items.values()[0].get_registry_toplevel()
         cls_meta = item_cls.RegistryMeta
 
         if context.hierarchy_prefix is not None:
@@ -701,7 +701,7 @@ def prepare_forms(context):
 
             if context.hierarchy_parent_cls is not None:
                 rel_field_name = item_cls._registry_object_parent_link.name
-                if item_cls != item_cls.top_model():
+                if item_cls != item_cls.get_registry_toplevel():
                     rel_field_name = "%s__%s" % (item_cls._meta.module_name, rel_field_name)
                     # We have to filter out completely unrelated items because if the parent object
                     # is set to None, the basic filter would also match those that aren't linked

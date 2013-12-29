@@ -63,7 +63,7 @@ def assign(_item, _cls=None, _parent=None, _index=0, _set=None, **kwargs):
 
         try:
             tlc = context.regpoint.get_top_level_class(_item)
-        except registry_exceptions.UnknownRegistryIdentifier:
+        except registry_exceptions.RegistryItemNotRegistered:
             raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve parent item
@@ -209,7 +209,7 @@ def remove(_item, _cls=None, _parent=None, **kwargs):
             tlc = context.regpoint.get_top_level_class(_item)
             if not getattr(tlc.RegistryMeta, 'multiple', False):
                 raise engine.EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(_item))
-        except registry_exceptions.UnknownRegistryIdentifier:
+        except registry_exceptions.RegistryItemNotRegistered:
             raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve parent item
@@ -249,7 +249,7 @@ def append(_item, _cls=None, _parent=None, **kwargs):
                 raise engine.EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(_item))
             if cls_name is None:
                 cls_name = tlc._meta.module_name
-        except registry_exceptions.UnknownRegistryIdentifier:
+        except registry_exceptions.RegistryItemNotRegistered:
             raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve class name into the actual class

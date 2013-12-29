@@ -27,7 +27,7 @@ class RegistryResolver(object):
         """
 
         partial = {}
-        for registry_id, _ in self._regpoint.item_registry.iteritems():
+        for registry_id in self._regpoint.get_all_registry_ids():
             partial[registry_id] = [x.cast() for x in self.by_registry_id(registry_id, queryset=True)]
 
         return partial
@@ -37,37 +37,34 @@ class RegistryResolver(object):
         Resolves the registry hierarchy.
         """
 
-        if registry_id in self._regpoint.item_registry:
-            # Determine which class the root is using for configuration
-            cfg, top_level = self._regpoint.get_top_level_queryset(self._root, registry_id)
-            if onlyclass is not None:
-                cfg = cfg.filter(content_type=contenttypes_models.ContentType.objects.get_for_model(onlyclass))
-            if queryset:
-                return cfg.all()
+        # Determine which class the root is using for configuration
+        cfg, top_level = self._regpoint.get_top_level_queryset(self._root, registry_id)
+        if onlyclass is not None:
+            cfg = cfg.filter(content_type=contenttypes_models.ContentType.objects.get_for_model(onlyclass))
+        if queryset:
+            return cfg.all()
 
-            if getattr(top_level.RegistryMeta, 'multiple', False):
-                # Model supports multiple configuration options of this type
+        if getattr(top_level.RegistryMeta, 'multiple', False):
+            # Model supports multiple configuration options of this type
+            if create is not None:
+                if not issubclass(create, top_level):
+                    raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
+
+                return create(root=self._root, **kwargs)
+            else:
+                return map(lambda x: x.cast(), cfg.all())
+        else:
+            # Only a single configuration option is supported
+            try:
+                return cfg.all()[0].cast()
+            except (IndexError, top_level.DoesNotExist):
                 if create is not None:
                     if not issubclass(create, top_level):
                         raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
 
-                    return create(root=self._root, **kwargs)
+                    return create.objects.get_or_create(root=self._root, **kwargs)[0]
                 else:
-                    return map(lambda x: x.cast(), cfg.all())
-            else:
-                # Only a single configuration option is supported
-                try:
-                    return cfg.all()[0].cast()
-                except (IndexError, top_level.DoesNotExist):
-                    if create is not None:
-                        if not issubclass(create, top_level):
-                            raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
-
-                        return create.objects.get_or_create(root=self._root, **kwargs)[0]
-                    else:
-                        return None
-        else:
-            raise exceptions.UnknownRegistryIdentifier
+                    return None
 
     def __iter__(self):
         """

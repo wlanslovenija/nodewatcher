@@ -51,15 +51,20 @@ class RegistryItemBase(models.Model):
             return cls.lookup_path() + '__' + cls._meta.module_name
 
     @classmethod
-    def top_model(cls):
+    def get_registry_id(cls):
         """
-        Returns the top-level model for this registry item.
+        Returns the item's registry identifier.
         """
 
-        if cls.__base__ == cls._registry_regpoint.item_base:
-            return cls
-        else:
-            return cls.__base__.top_model()
+        return cls.RegistryMeta.registry_id
+
+    @classmethod
+    def get_registry_toplevel(cls):
+        """
+        Returns the toplevel item for its registry id.
+        """
+
+        return cls._registry_regpoint.get_top_level_class(cls.get_registry_id())
 
     @classmethod
     def can_add(cls, user):
@@ -73,6 +78,22 @@ class RegistryItemBase(models.Model):
                 "module_name": cls._meta.module_name,
             }
         )
+
+    @classmethod
+    def has_registry_multiple(cls):
+        """
+        Returns true if the item's registry id can contain multiple items.
+        """
+
+        return getattr(cls.RegistryMeta, 'multiple', False)
+
+    @classmethod
+    def is_registry_toplevel(cls):
+        """
+        Returns true if the item is a toplevel item for its registry id.
+        """
+
+        return cls.__base__ == cls._registry_regpoint.item_base
 
     def cast(self):
         """

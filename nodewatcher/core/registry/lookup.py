@@ -1,21 +1,73 @@
 import copy
 
 from django.contrib.gis.db import models as gis_models
-from django import db
+from django import db as django_db
 from django.db.models.sql import constants
+from django.utils import functional
 
 from . import access as registry_access, exceptions
 
 # Quote name
-qn = db.connection.ops.quote_name
+qn = django_db.connection.ops.quote_name
 
 
 class RegistryProxyMixin(object):
     # TODO: Needed until Django 1.7, see https://code.djangoproject.com/ticket/16458
     def __eq__(self, other):
-        return (isinstance(other, db.models.Model) and
+        return (isinstance(other, django_db.models.Model) and
                 self._meta.concrete_model == other._meta.concrete_model and
                 self._get_pk_val() == other._get_pk_val())
+
+
+class RegistryProxySingleDescriptor(object):
+    def __init__(self, related_model):
+        self.related_model = related_model
+
+    def __get__(self, instance, instance_type):
+        if instance is None:
+            return self
+
+        return self.related_model.objects.get(root=instance)
+
+
+class RegistryProxyMultipleDescriptor(object):
+    def __init__(self, related_model, chain, related_field=None):
+        self.related_model = related_model
+        self.related_field = related_field
+        self.chain = chain
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            return self
+
+        if self.related_field is not None:
+            chain = "__".join(self.chain + ['root'])
+            qs = self.related_model.objects.filter(**{chain: instance})
+            qs = qs.values_list(self.related_field, flat=True)
+            return list(qs)
+
+        return self.related_manager_cls(instance)
+
+    @functional.cached_property
+    def related_manager_cls(self):
+        # Dynamically create a class that subclasses the related model's default
+        # manager.
+        superclass = self.related_model._default_manager.__class__
+        rel_model = self.related_model
+        chain = "__".join(self.chain + ['root'])
+
+        class RelatedManager(superclass):
+            def __init__(self, instance):
+                super(RelatedManager, self).__init__()
+                self.instance = instance
+                self.core_filters = {chain: instance}
+                self.model = rel_model
+
+            def get_query_set(self):
+                db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
+                return super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
+
+        return RelatedManager
 
 
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
@@ -65,6 +117,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             else:
                 field = condition
 
+            # First check if there is a flat lookup proxy
             dst_model, dst_field = self._regpoint.flat_lookup_proxies.get(field, (None, None))
             if dst_model is None and '_' in field:
                 dst_model, dst_field = field.split('_', 1)
@@ -120,7 +173,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             this_class['class'] = clone.model
 
             # Prevent proxy models from cluttering up the cache
-            del db.models.loading.cache.app_models['_registry_proxy_models_']
+            del django_db.models.loading.cache.app_models['_registry_proxy_models_']
             # All our fields are virtual
             clone.model._meta.add_field = clone.model._meta.add_virtual_field
 
@@ -140,47 +193,90 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             model._registry_attrs.append(select_name)
             return select_name
 
-        for field, dst in kwargs.iteritems():
-            dst_model, dst_field = dst.split('.', 1)
-            try:
-                dst_model = registry_access.get_model_class_by_name(dst_model)
-            except exceptions.UnknownRegistryClass:
-                continue
+        for field_name, dst in kwargs.iteritems():
+            if '#' in dst:
+                try:
+                    dst_registry_id, dst_field = dst.split('#')
+                except ValueError:
+                    raise ValueError("Expecting 'registry.id#field' specifier instead of '%s'!" % dst)
 
-            if '.' in dst_field:
-                dst_field, dst_related = dst_field.split('.')
+                # Dots in field specify relation traversal
+                if '.' in dst_field:
+                    # TODO: Support arbitrary chain of relations
+                    dst_field, dst_related = dst_field.split('.')
+                else:
+                    dst_related = None
+
+                # Discover which model provides the destination field
+                dst_model = None
+                for model in self._regpoint.get_classes(dst_registry_id):
+                    # Attempt to fetch the field from this model
+                    try:
+                        field, _, _, m2m = model._meta.get_field_by_name(dst_field)
+                        # If the field exists we have found our model
+                        dst_model = model
+                        dst_field = field
+                        break
+                    except django_db.models.FieldDoesNotExist:
+                        continue
+                else:
+                    raise ValueError("No registry item under '%s' provides field '%s'!" % (dst_registry_id, dst_field))
             else:
+                dst_registry_id = dst
+                dst_model = self._regpoint.get_top_level_class(dst_registry_id)
+                dst_field = None
                 dst_related = None
+                m2m = False
 
-            dst_field, _, _, m2m = dst_model._meta.get_field_by_name(dst_field)
             if m2m:
                 raise ValueError("Many-to-many fields not supported in registry_fields query!")
-            if dst_related is None:
-                select_name = install_proxy_field(clone.model, dst_field, field)
+
+            if dst_model.has_registry_multiple():
+                # The destination model can contain multiple items; in this case we need to
+                # provide the proxy model with a descriptor that returns a queryset to the models
+                if dst_related is not None:
+                    raise ValueError("Related fields on registry items with multiple models not supported!")
+
+                # Generate a chain that can be used to generate the filter query
+                toplevel = dst_model.get_registry_toplevel()
+                chain = ['%s_ptr' for x in dst_model._meta.get_base_chain(toplevel) or []]
+                setattr(clone.model, field_name, RegistryProxyMultipleDescriptor(dst_model, chain, dst_field.name if dst_field else None))
+                continue
+
+            if dst_field is None:
+                # If there can only be one item and no field is requested, create a descriptor
+                setattr(clone.model, field_name, RegistryProxySingleDescriptor(dst_model))
+                continue
+            elif dst_related is None:
+                # Select destination field and install proxy field descriptor
+                select_name = install_proxy_field(clone.model, dst_field, field_name)
                 clone = clone.extra(select={select_name: '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))})
             else:
+                # Traverse the relation and copy the destination field descriptor
                 dst_field_model = dst_field.rel.to
                 dst_related_field, _, _, m2m = dst_field_model._meta.get_field_by_name(dst_related)
+
+                # TODO: Support arbitrary chain of relations
 
                 if m2m:
                     raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
-                select_name = install_proxy_field(clone.model, dst_related_field, field)
+                select_name = install_proxy_field(clone.model, dst_related_field, field_name)
                 clone = clone.extra(select={select_name: '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))})
 
             clone.query.get_initial_alias()
 
             # Join with top-level item
-            top_model = dst_model.top_model()
+            toplevel = dst_model.get_registry_toplevel()
             clone.query.join(
-                (self.model._meta.db_table, top_model._meta.db_table, self.model._meta.pk.column, 'root_id'),
+                (self.model._meta.db_table, toplevel._meta.db_table, self.model._meta.pk.column, 'root_id'),
                 promote=True,
             )
 
-            if top_model != dst_model:
+            if toplevel != dst_model:
                 # Join with lower-level item
                 clone.query.join(
-                    (top_model._meta.db_table, dst_model._meta.db_table, top_model._meta.pk.column, dst_model._meta.pk.column),
+                    (toplevel._meta.db_table, dst_model._meta.db_table, toplevel._meta.pk.column, dst_model._meta.pk.column),
                     promote=True,
                 )
 
@@ -198,7 +294,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         Performs a lookup on inet fields.
         """
 
-        connection = db.connections[self._db or db.DEFAULT_DB_ALIAS]
+        connection = django_db.connections[self._db or django_db.DEFAULT_DB_ALIAS]
         where_opts = []
         for key, value in kwargs.iteritems():
             field, op = key.split(constants.LOOKUP_SEP)

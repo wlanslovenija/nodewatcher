@@ -80,7 +80,7 @@ class RegistrationPoint(object):
 
         # Sanity check for object names
         if '_' in item._meta.object_name:
-            raise django_exceptions.ImproperlyConfigured("Registry items must not have underscores in class names!")
+            raise exceptions.InvalidRegistryItemName("Registry items must not have underscores in class names!")
 
         # Avoid registering the same class multiple times
         if item in self.item_classes:
@@ -94,21 +94,26 @@ class RegistrationPoint(object):
         if object_toplevel:
             self.item_object_toplevel = self._register_item_to_container(item, self.item_object_toplevel)
 
-        # Only record the top-level item (class hierarchy) in the registry as there could be multiple
-        # specializations that define their own extensions
+        # Record the class with its registry identifier
+        registry_id = item.RegistryMeta.registry_id
         if item.__base__ == self.item_base:
-            registry_id = item.RegistryMeta.registry_id
             if registry_id in self.item_registry:
-                raise django_exceptions.ImproperlyConfigured(
-                    "Multiple top-level registry items claim identifier '{0}'! Claimed by '{1}' and '{2}'.".format(
-                        registry_id, self.item_registry[registry_id], item
+                raise exceptions.RegistryItemAlreadyRegistered(
+                    "Multiple top-level registry items claim identifier '%s'! Claimed by '%s' and '%s'." % (
+                        registry_id, self.item_registry[registry_id][0], item
                     )
                 )
-
-            self.item_registry[registry_id] = item
+        elif registry_id not in self.item_registry:
+            # Prevent registration of specializations when the top-level class has not yet been registered
+            raise exceptions.RegistryItemNotRegistered(
+                "Top-level registry class for '%s' not yet registered!" % registry_id
+            )
         elif getattr(item.RegistryMeta, 'hides_parent', False):
             parent = item.__base__
             parent._registry_hide_requests += 1
+
+        # The first item in the list is the top-level class for this registry id
+        self.item_registry.setdefault(registry_id, []).append(item)
 
         # Include registration point in item class
         item._registry_regpoint = self
@@ -174,7 +179,7 @@ class RegistrationPoint(object):
 
                 # Setup the parent relation and verify that one doesn't already exist
                 existing_parent = child.__dict__.get('_registry_object_parent', None)
-                if existing_parent is not None and existing_parent.top_model() != parent.top_model():
+                if existing_parent is not None and existing_parent.get_registry_id() != parent.get_registry_id():
                     raise django_exceptions.ImproperlyConfigured("Registry item cannot have two object parents without a common ancestor!")
                 child._registry_object_parent = parent
                 child._registry_object_parent_link = field
@@ -227,14 +232,18 @@ class RegistrationPoint(object):
             raise TypeError("Specified class is not a valid registry item!")
 
         if item_cls not in self.item_classes:
-            raise ValueError("Registry item '{0}' is not registered!".format(item_cls._meta.object_name))
+            raise exceptions.RegistryItemNotRegistered("Registry item '%s' is not registered!" % item_cls._meta.object_name)
 
         registry_id = item_cls.RegistryMeta.registry_id
         # TODO: Properly handle removal with new item list
 
         if item_cls.__base__ == self.item_base:
-            # Top-level item, remove all registered subitems as well
-            for item in self.item_object_toplevel[registry_id].values():
+            removal = set()
+            removal.update(self.item_registry[registry_id])
+            removal.update(self.item_object_toplevel[registry_id].values())
+
+            # Top-level item, remove all registered subclasses and subitems
+            for item in removal:
                 self._unregister_item(item)
 
             del self.item_object_toplevel[registry_id]
@@ -271,7 +280,11 @@ class RegistrationPoint(object):
         """
 
         assert isinstance(root, self.model)
-        top_level = self.item_registry[registry_id]
+        try:
+            top_level = self.item_registry[registry_id][0]
+        except KeyError:
+            raise exceptions.RegistryItemNotRegistered("Registry item with id '%s' is not registered!" % registry_id)
+
         return getattr(root, '{0}_{1}_{2}'.format(self.namespace, top_level._meta.app_label, top_level._meta.module_name)), top_level
 
     def get_top_level_class(self, registry_id):
@@ -282,9 +295,21 @@ class RegistrationPoint(object):
         """
 
         try:
-            return self.item_registry[registry_id]
+            return self.item_registry[registry_id][0]
         except KeyError:
-            raise exceptions.UnknownRegistryIdentifier
+            raise exceptions.RegistryItemNotRegistered("Registry item with id '%s' is not registered!" % registry_id)
+
+    def get_classes(self, registry_id):
+        """
+        Returns a list of classes registered under the specified identifier.
+
+        :param registry_id: A valid registry identifier
+        """
+
+        try:
+            return tuple(self.item_registry[registry_id])
+        except KeyError:
+            raise exceptions.RegistryItemNotRegistered("Registry item with id '%s' is not registered!" % registry_id)
 
     def get_accessor(self, root):
         """
@@ -294,12 +319,19 @@ class RegistrationPoint(object):
         assert isinstance(root, self.model)
         return getattr(root, self.namespace)
 
-    def all_registry_ids(self):
+    def get_all_registry_ids(self):
         """
         Returns all known registry identifiers.
         """
 
         return self.item_registry.keys()
+
+    def get_all_registry_items(self):
+        """
+        Returns all known registry items.
+        """
+
+        return self.item_registry.copy()
 
     def get_registered_choices(self, choices_id):
         """
@@ -331,6 +363,9 @@ class RegistrationPoint(object):
         """
 
         self.item_base.__bases__ += tuple(mixins)
+
+    def __repr__(self):
+        return "<RegistrationPoint '%s'>" % self.name
 
 
 def create_point(model, namespace, mixins=None):
