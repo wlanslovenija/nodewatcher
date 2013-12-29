@@ -16,7 +16,7 @@ before_install:
 install:
  - pip install pep8 --use-mirrors
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
- - pip uninstall unittest2
+ - pip uninstall --yes unittest2
  - pip install -r requirements.txt --use-mirrors
 before_script:
  - find / -name postgis.sql || true
