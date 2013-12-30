@@ -49,6 +49,11 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
             for node in nodes
         ]
 
+        # If there are no node IPs skip the measurement procedure
+        if not node_ips:
+            self.logger.warning("No nodes selected for measurement. Skipping RTT measurement.")
+            return context, nodes
+
         # Perform ping tests of different sizes
         processes = []
         threads = []
