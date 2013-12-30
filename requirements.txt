@@ -14,7 +14,7 @@ django-celery==3.1.1
 django-classy-tags==0.4
 django-datastream==0.1.5
 django-guardian==1.1.1
--e git+https://github.com/mitar/django-missing.git@4f3dd897c841fac57346b483ef1c0c4cc7785142#egg=django_missing-master
+-e git+https://github.com/mitar/django-missing.git@0faad5fff261f9f4d6696023991d2927f73a94a7#egg=django_missing-master
 -e git+https://github.com/wlanslovenija/django-overextends.git@ee963e2c338c1134e6ec49acabe9822b3636b536#egg=django_overextends-wlanslovenija
 django-phonenumber-field==0.2a3
 django-polymorphic==0.5.3
