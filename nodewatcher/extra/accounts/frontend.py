@@ -5,7 +5,7 @@ from django.utils import http
 
 from nodewatcher.core.frontend import components
 
-from .templatetags import account_tags
+from .templatetags import accounts_tags
 
 
 class AccountsComponent(components.FrontendComponent):
@@ -28,11 +28,11 @@ def logout_url(context):
     # authenticated access which would be after logout denied.
     # TODO: We should probably check not just if url requires authenticated access, but if user has permissions for access
     # TODO: We might move to throwing an exception on permission denied and show an login form inside 403 handler?
-    # TODO: Is there a way for account_tags.authenticated_required to work with official decorators as well?
+    # TODO: Is there a way for accounts_tags.authenticated_required to work with official decorators as well?
     url = urlresolvers.reverse('AccountsComponent:auth_logout')
     redirect_field_name = context.get('REDIRECT_FIELD_NAME', auth.REDIRECT_FIELD_NAME)
     next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].REQUEST.get(redirect_field_name, None) or context['request'].get_full_path()
-    if next_url and not account_tags.authenticated_required(next_url):
+    if next_url and not accounts_tags.authenticated_required(next_url):
         url = "%s?%s=%s" % (url, redirect_field_name, http.urlquote(next_url))
     return url
 
@@ -54,11 +54,11 @@ def login_url(context):
     # then to take her back to that page. But only if the target does not require
     # anonymous access which would be after logout denied.
     # TODO: We might move to throwing an exception on permission denied and use 403 handler to explain that user should not be authenticated?
-    # TODO: Is there a way for account_tags.anonymous_required to work with official decorators as well?
+    # TODO: Is there a way for accounts_tags.anonymous_required to work with official decorators as well?
     url = urlresolvers.reverse('AccountsComponent:auth_login')
     redirect_field_name = context.get('REDIRECT_FIELD_NAME', auth.REDIRECT_FIELD_NAME)
     next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].REQUEST.get(redirect_field_name, None) or context['request'].get_full_path()
-    if next_url and not account_tags.anonymous_required(next_url):
+    if next_url and not accounts_tags.anonymous_required(next_url):
         url = "%s?%s=%s" % (url, redirect_field_name, http.urlquote(next_url))
     return url
 
