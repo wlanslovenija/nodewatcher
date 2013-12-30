@@ -1,163 +1,58 @@
-{% extends "base.html" %}
+{% overextends "base.html" %}
 
-{% load future i18n nodestatus html_tags misc %}
+{% contextblock %}
+    {% load future i18n sekizai_tags html_tags url_tags %}
 
-{% block title %}{% trans "Node List" %}{{ block.super }}{% endblock %}
-
-{% block heading %}
-    {% with _("Node List") as heading %}
-        {{ block.super }}
-    {% endwith %}
-{% endblock %}
-
-{% block contenttype %}nodelist{% endblock %}
-
-{% block rss %}{% endblock %}
+    {% add_data "css_data" "datatables/css/jquery.dataTables.css" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
+    {% add_data "js_data" "datatables/js/code.js" %}
+    {% trans "Node List" as title %}
+{% endcontextblock %}
 
 {% block altlinks %}
-    <h3>{% trans "Download in other formats" %}:</h3>
-    <ul></ul>
-{% endblock %}
+    {% heading 2 _("Other Formats") %}
+
+    <ul class="node-list-altlinks">
+        <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=xml">{% trans "XML" %}</a></li>
+        <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=json">{% trans "JSON" %}</a></li>
+    </ul>
+{% endblock altlinks %}
 
 {% block content %}
-    {% if request.node %}
-        {% notice webclient %}
-            <b>You are visiting this page through the <i>{{ NETWORK.NAME }}</i> network.</b><br />
-            <br />
-            You are using the <a href="{% url "view_node" request.node.get_current_id %}">{{ request.node.name|default:_("unknown") }}</a> node to connect to the network.
-        {% endnotice %}
-    {% endif %}
-    <table border="0" width="100%" class="listing">
+    <table class="node-list" data-source="{% url "api:api_dispatch_list" "v1" "node" %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}">
         <thead>
             <tr>
-                <th style="width: 4%;"></th>
-                <th style="width: 22%;"><b>{% trans "Node name" %}</b></th>
-                <th style="width: 15%;"><b>IP</b></th>
-                <th style="width: 21%;"><b>{% trans "Last seen up" %}</b></th>
-                <th style="width: 8%;" class="center"><b>{% trans "Status" %}</b></th>
-                <th style="width: 8%;" class="center"><b>{% trans "Peers" %}</b></th>
-                <th style="width: 8%;" class="center"><b>{% trans "Clients" %}</b></th>
-                <th style="width: 10%;" class="center"><b>{% trans "Project" %}</b></th>
+                <th rowspan="2">{# Hidden node type #}</th>
+                <th rowspan="2" title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
+                <th rowspan="2" title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
+                <th colspan="3">{% trans "Status" %}</th>
+                <th rowspan="2" title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
+            </tr>
+            <tr>
+                <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
+                <th title="{% trans "Is the node monitored by <i>nodewatcher</i>." %}">{% trans "Monitored" %}</th>
+                <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
             </tr>
         </thead>
-        {% if user.is_authenticated %}
-            <tfoot>
-                <tr>
-                    <td class="table_menu" colspan="8">
-                        <a href="{% url "EditorComponent:new" %}">{% trans "Add new node" %}</a>
-                    </td>
-                </tr>
-            </tfoot>
-        {% endif %}
+        <tfoot>
+            <tr>
+                <th rowspan="2">{# Hidden node type #}</th>
+                <th rowspan="2" title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
+                <th rowspan="2" title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
+                <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
+                <th title="{% trans "Is the node monitored by <i>nodewatcher</i>." %}">{% trans "Monitored" %}</th>
+                <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
+                <th rowspan="2" title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
+            </tr>
+            <tr>
+                <th colspan="3">{% trans "Status" %}</th>
+            </tr>
+        </tfoot>
         <tbody>
-            {% for node in nodes %}
-                {% ifchanged node.node_type %}
-                <tr class="section_title">
-                    <td colspan="8">{% heading 3 node.node_type_as_string_plural %}</td>
-                </tr>
-                {% endifchanged %}
-                <tr class="{% cycle 'odd' 'even' %}{% ifequal node.pk web_client_node.pk %} webclient{% endifequal %}">
-                    <td align="center">
-                        {% if node.warnings %}
-                            <a href="{% url "view_node" node.get_current_id %}">
-                                <img src="{{ MEDIA_URL }}images/warnings_small.png" title="{% trans "Some problems were detected with this node! Click for details." %}" alt="{% trans "Warning" %}" />
-                            </a>
-                        {% endif %}
-                    </td>
-                    <td class="name"><a href="{% url "EditorComponent:edit" node.pk %}">{{ node.name|default:_("unknown") }}</a></td>
-                    <td>{{ node.router_id }}</td>
-                    {% if node.last_seen %}
-                        <td>{{ node.last_seen|date:"Y-m-d H:i:s" }}</td>
-                    {% else %}
-                        <td>{% trans "never" %}</td>
-                    {% endif %}
-                    <td class="center">{{ node.status_as_string|statusimage:"small" }}</td>
-                    {% if node.is_down %}
-                        {% if node.is_invalid %}
-                            <td class="center">{{ node.peers }}</td>
-                        {% else %}
-                            <td class="center">0</td>
-                        {% endif %}
-                        <td class="center">0</td>
-                    {% else %}
-                        <td class="center">{{ node.peers }}</td>
-                        <td class="center">{{ node.clients|default:"0" }}</td>
-                    {% endif %}
-                    <td class="center">{{ node.project|default:_("unknown") }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="8" class="notice">
-                        {% trans "There are currently no nodes registered/connected." %}
-                    </td>
-                </tr>
-            {% endfor %}
         </tbody>
     </table>
-    <div class="legend">
-        {% heading 3 _("Node status key:") %}
-        <dl>
-            <dt>{{ "up"|status:"small" }}</dt>
-            <dd>{% statusdesc "up" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "visible"|status:"small" }}</dt>
-            <dd>{% statusdesc "visible" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "down"|status:"small" }}</dt>
-            <dd>{% statusdesc "down" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "duped"|status:"small" }}</dt>
-            <dd>{% statusdesc "duped" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "invalid"|status:"small" }}</dt>
-            <dd>{% statusdesc "invalid" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "new"|status:"small" }}</dt>
-            <dd>{% statusdesc "new" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "pending"|status:"small" }}</dt>
-            <dd>{% statusdesc "pending" %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt>{{ "awaitingrenumber"|status:"small" }}</dt>
-            <dd>{% statusdesc "awaitingrenumber" %}</dd>
-            <dd class="defintion_end"></dd>
-        </dl>
-        {% heading 3 _("Columns:") %}
-        <dl>
-            <dt><b>Node name</b></dt>
-            <dd>{% blocktrans %}the name of the node{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt><b>IP</b></dt>
-            <dd>{% doclink ip_address _("IP address") as ip_address %}{% blocktrans %}primary {{ ip_address }} of the node{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt><b>Last seen up</b></dt>
-            <dd>{% blocktrans %}when was the node last seen connected to the network{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt><b>Status</b></dt>
-            <dd>{% blocktrans %}current status of the node{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt><b>Peers</b></dt>
-            <dd>{% blocktrans %}number of nodes in immediate neighbourhood to which the node is currently connected{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt><b>Clients</b></dt>
-            <dd>{% blocktrans %}number of currently connected clients to the node{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-            <dt><b>Project</b></dt>
-            <dd>{% blocktrans %}the project to which the node belongs{% endblocktrans %}</dd>
-            <dd class="defintion_end"></dd>
-        </dl>
-    </div>
-{% endblock %}
 
-{% block js %}
-    <script type="text/javascript">
-    /* <![CDATA[ */
-    var tablesConfig = [
-        {
-            "entryName": "nodes",
-            "sortColumn": [[2, "asc"]]
-        }
-    ];
-    /* ]]> */
-    </script>
+    <div class="node-list-legend">
+        {% include "nodes/legend.html" %}
+    </div>
 {% endblock %}

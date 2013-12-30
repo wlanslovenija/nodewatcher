@@ -18,10 +18,11 @@ class NodeResource(resources.NamespacedModelResource):
             monitored_status='core.status#monitored',
             health_status='core.status#health',
             peers='network.routing.topology#link_count',
-        ).order_by('type')
+        )
         resource_name = 'node'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
+        max_limit = 5000
         serializer = serializers.DatastreamSerializer()
 
     @classmethod

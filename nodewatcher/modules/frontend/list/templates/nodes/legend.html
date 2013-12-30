@@ -1,0 +1,73 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load future i18n html_tags node_status_tags %}
+
+{% heading 2 _("Node Network Status Key") %}
+
+{% block network_status_wrapper %}
+    <dl class="network-status {% block network_status_classes %}{% endblock network_status_classes %}">
+        {% block network_status %}
+            <dt class="up">{% network_status_icon "up" "small" %}</dt>
+            <dd class="up">{% network_status_description "up" %}</dd>
+            <dt class="down">{% network_status_icon "down" "small" %}</dt>
+            <dd class="down">{% network_status_description "down" %}</dd>
+            <dt class="visible">{% network_status_icon "visible" "small" %}</dt>
+            <dd class="visible">{% network_status_description "visible" %}</dd>
+            <dt class="unknown">{% network_status_icon "unknown" "small" %}</dt>
+            <dd class="unknown">{% network_status_description "unknown" %}</dd>
+        {% endblock network_status %}
+    </dl>
+{% endblock network_status_wrapper %}
+
+{% heading 2 _("Node Monitored Status Key") %}
+
+{% block monitored_status_wrapper %}
+    <dl class="monitored-status {% block monitored_status_classes %}{% endblock monitored_status_classes %}">
+        {% block monitored_status %}
+            <dt class="true">{% monitored_status_icon True "small" %}</dt>
+            <dd class="true">{% monitored_status_description True %}</dd>
+            <dt class="false">{% monitored_status_icon False "small" %}</dt>
+            <dd class="false">{% monitored_status_description False %}</dd>
+            <dt class="null">{% monitored_status_icon None "small" %}</dt>
+            <dd class="null">{% monitored_status_description None %}</dd>
+        {% endblock monitored_status %}
+    </dl>
+{% endblock monitored_status_wrapper %}
+
+{% heading 2 _("Node Health Status Key") %}
+
+{% block health_status_wrapper %}
+    <dl class="health-status {% block health_status_classes %}{% endblock health_status_classes %}">
+        {% block health_status %}
+            <dt class="healthy">{% health_status_icon "healthy" "small" %}</dt>
+            <dd class="healthy">{% health_status_description "healthy" %}</dd>
+            <dt class="warnings">{% health_status_icon "warnings" "small" %}</dt>
+            <dd class="warnings">{% health_status_description "warnings" %}</dd>
+            <dt class="errors">{% health_status_icon "errors" "small" %}</dt>
+            <dd class="errors">{% health_status_description "errors" %}</dd>
+            <dt class="unknown">{% health_status_icon "unknown" "small" %}</dt>
+            <dd class="unknown">{% health_status_description "unknown" %}</dd>
+        {% endblock health_status %}
+    </dl>
+{% endblock health_status_wrapper %}
+
+{% heading 2 _("Columns") %}
+
+{% block columns_wrapper %}
+    <dl class="columns {% block columns_classes %}{% endblock columns_classes %}">
+        {% block columns %}
+            <dt>{% trans "Name" %}</dt>
+            <dd>{% trans "The name of the node." %}</dd>
+            <dt>{% trans "Last seen" %}</dt>
+            <dd>{% trans "When was the node last seen connected to the network." %}</dd>
+            <dt>{% trans "Network Status" %}</dt>
+            <dd>{% trans "Current status of the node's connection to the network." %}</dd>
+            <dt>{% trans "Monitored Status" %}</dt>
+            <dd>{% trans "Is the node monitored by <i>nodewatcher</i>." %}</dd>
+            <dt>{% trans "Health Status" %}</dt>
+            <dd>{% trans "Are there any detected issues with the node." %}</dd>
+            <dt>{% trans "Project" %}</dt>
+            <dd>{% trans "The project to which the node belongs." %}</dd>
+        {% endblock columns %}
+    </dl>
+{% endblock columns_wrapper %}
