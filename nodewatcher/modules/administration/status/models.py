@@ -27,7 +27,7 @@ registration.point('node.monitoring').register_choice('core.status#network', 'vi
 registration.point('node.monitoring').register_choice('core.status#network', 'unknown', _("Unknown"))
 
 # Register valid health states
-registration.point('node.monitoring').register_choice('core.status#health', 'errors', _("Errors"))
-registration.point('node.monitoring').register_choice('core.status#health', 'warnings', _("Warnings"))
 registration.point('node.monitoring').register_choice('core.status#health', 'healthy', _("Healthy"))
+registration.point('node.monitoring').register_choice('core.status#health', 'warnings', _("Warnings"))
+registration.point('node.monitoring').register_choice('core.status#health', 'errors', _("Errors"))
 registration.point('node.monitoring').register_choice('core.status#health', 'unknown', _("Unknown"))
