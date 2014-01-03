@@ -99,46 +99,59 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         except KeyError:
             raise ValueError("Registration point '{0}' does not exist!".format(name))
 
-    def filter(self, **kwargs):
+    def registry_filter(self, **kwargs):
         """
         An augmented filter that enables filtering by virtual aliases for
         registry fields via joins.
         """
 
-        if not hasattr(self, '_regpoint'):
-            return super(RegistryQuerySet, self).filter(**kwargs)
+        if getattr(self, '_regpoint', None) is None:
+            raise ValueError("Calling 'registry_filter' first requires a selected registration point!")
 
         clone = self._clone()
 
         # Resolve fields from kwargs that are virtual aliases for registry fields
-        for condition, value in kwargs.items():
-            if '__' in condition:
-                field = condition[:condition.find('__')]
+        filter_selectors = {}
+        for selector, value in kwargs.items():
+            if '__' in selector:
+                field, selector = selector.split('__', 1)
             else:
-                field = condition
+                field = selector
+                selector = None
 
             # First check if there is a flat lookup proxy
-            dst_model, dst_field = self._regpoint.flat_lookup_proxies.get(field, (None, None))
-            if dst_model is None and '_' in field:
-                dst_model, dst_field = field.split('_', 1)
-                try:
-                    dst_model = registry_access.get_model_class_by_name(dst_model)
-                except exceptions.UnknownRegistryClass:
-                    dst_model = None
+            dst_model, dst_field = self._regpoint.get_lookup_proxy(field)
+            if dst_model is None:
+                if selector is None:
+                    raise ValueError("'%s' is not a known proxy field!" % field)
+                else:
+                    # Not a lookup proxy, check if this is a valid registry identifier
+                    registry_id = field.replace('_', '.')
+                    if '__' in selector:
+                        dst_field, selector = selector.split('__', 1)
+                    else:
+                        dst_field = selector
+                        selector = None
 
-            if dst_model is not None:
-                dst_field = dst_model.lookup_path() + '__' + dst_field
-                del kwargs[condition]
-                condition = condition.replace(field, dst_field)
-                kwargs[condition] = value
+                    dst_model, dst_field, m2m = self._regpoint.get_model_with_field(registry_id, dst_field)
+                    dst_field = dst_field.name
+
+            new_selector = dst_model.get_registry_lookup_chain() + '__' + dst_field
+            if selector is not None:
+                new_selector += '__' + selector
+
+            filter_selectors[new_selector] = value
 
         # Pass transformed query into the standard filter routine
-        return super(RegistryQuerySet, clone).filter(**kwargs)
+        return super(RegistryQuerySet, clone).filter(**filter_selectors)
 
     def registry_fields(self, **kwargs):
         """
         Select fields from the registry.
         """
+
+        if getattr(self, '_regpoint', None) is None:
+            raise ValueError("Calling 'registry_filter' first requires a selected registration point!")
 
         clone = self._clone()
 
@@ -208,19 +221,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     dst_related = None
 
                 # Discover which model provides the destination field
-                dst_model = None
-                for model in self._regpoint.get_classes(dst_registry_id):
-                    # Attempt to fetch the field from this model
-                    try:
-                        field, _, _, m2m = model._meta.get_field_by_name(dst_field)
-                        # If the field exists we have found our model
-                        dst_model = model
-                        dst_field = field
-                        break
-                    except django_db.models.FieldDoesNotExist:
-                        continue
-                else:
-                    raise ValueError("No registry item under '%s' provides field '%s'!" % (dst_registry_id, dst_field))
+                dst_model, dst_field, m2m = self._regpoint.get_model_with_field(dst_registry_id, dst_field)
             else:
                 dst_registry_id = dst
                 dst_model = self._regpoint.get_top_level_class(dst_registry_id)

@@ -39,16 +39,18 @@ class RegistryItemBase(models.Model):
         return form
 
     @classmethod
-    def lookup_path(cls):
+    def get_registry_lookup_chain(cls):
         """
-        Returns a query filter "path" that can be used for performing root lookups with
+        Returns a query filter "chain" that can be used for performing root lookups with
         fields that are part of some registry object.
         """
 
         if cls.__base__ == cls._registry_regpoint.item_base:
             return cls._registry_regpoint.namespace + '_' + cls._meta.app_label + '_' + cls._meta.module_name
         else:
-            return cls.lookup_path() + '__' + cls._meta.module_name
+            for base in cls.__bases__:
+                if hasattr(base, 'get_registry_lookup_chain'):
+                    return base.get_registry_lookup_chain() + '__' + cls._meta.module_name
 
     @classmethod
     def get_registry_id(cls):

@@ -34,4 +34,7 @@ class DoubleChildRegistryItem(ChildRegistryItem):
     another = models.IntegerField(null=True)
     related = models.ForeignKey(RelatedModel, null=True)
 
+    class RegistryMeta(ChildRegistryItem.RegistryMeta):
+        lookup_proxies = ['another']
+
 registration.point('thing.first').register_item(DoubleChildRegistryItem)
