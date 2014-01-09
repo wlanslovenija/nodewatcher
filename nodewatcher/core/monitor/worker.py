@@ -151,7 +151,7 @@ class MonitorRun(object):
                 # Sleep for the right amount of time that cycles will be triggered
                 # on every "interval" seconds (but no less then 30 seconds apart)
                 cycle_duration = time.time() - start
-                time.sleep(max(30, worker.runs[run]['interval'] - cycle_duration))
+                time.sleep(max(30, self.config['interval'] - cycle_duration))
         except KeyboardInterrupt:
             logger.info("Aborted by user.")
         finally:
