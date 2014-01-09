@@ -143,6 +143,10 @@ class MonitorRun(object):
                 start = time.time()
                 self.cycle()
 
+                # Log the amount of time a cycle took
+                cycle_duration = time.time() - start
+                logger.info("Run took %d%% of configured period time." % int(100 * cycle_duration / self.config['interval']))
+
                 cycle += 1
                 if self.config['cycles'] is not None and cycle >= self.config['cycles']:
                     logger.info("Reached %d cycles." % cycle)
@@ -150,7 +154,6 @@ class MonitorRun(object):
 
                 # Sleep for the right amount of time that cycles will be triggered
                 # on every "interval" seconds (but no less then 30 seconds apart)
-                cycle_duration = time.time() - start
                 time.sleep(max(30, self.config['interval'] - cycle_duration))
         except KeyboardInterrupt:
             logger.info("Aborted by user.")
