@@ -4,7 +4,6 @@ South==0.7.5
 amqplib==1.0.2
 anyjson==0.3.1
 celery==2.5.3
-distribute==0.6.27
 django-celery==2.5.5
 django-phonenumber-field==0.2a3
 django-picklefield==0.2.1
