@@ -388,6 +388,13 @@ class RegistrationPoint(object):
 
         return iter(self.item_classes)
 
+    def registered_choices(self):
+        """
+        A generator that iterates through registered choices.
+        """
+
+        return self.choices_registry.iteritems()
+
     def add_mixins(self, *mixins):
         """
         Adds one or more mixins to the top-level registry item that is associated
