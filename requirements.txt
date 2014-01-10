@@ -9,7 +9,7 @@ django-celery==2.5.5
 django-phonenumber-field==0.2a3
 django-picklefield==0.2.1
 django-registration==0.8
-dnspython==1.10.0
+dnspython==1.11.1
 flup==1.0.2
 kombu==2.1.7
 lxml==2.3.4
