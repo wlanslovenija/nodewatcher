@@ -13,9 +13,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   installation
-   theming
-   telemetry
+   translation
    registry
 
 Source Code, Issue Tracker and Mailing List
