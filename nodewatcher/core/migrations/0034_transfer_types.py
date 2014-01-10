@@ -23,7 +23,7 @@ class Migration(DataMigration):
 
         # Transfer all the types to the new class
         for cfg in orm['core.GeneralConfig'].objects.all():
-            typcfg = orm['types.TypeConfig'](root=cfg.root, content_type=type_ctype)
+            typcfg = orm['types.TypeConfig'](root=cfg.root, polymorphic_ctype=type_ctype)
             typcfg.type = cfg.type
             typcfg.save()
 
@@ -164,7 +164,7 @@ class Migration(DataMigration):
         },
         'types.typeconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'TypeConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_types_typeconfig'", 'to': "orm['nodes.Node']"}),
             'type': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.type#type'"})

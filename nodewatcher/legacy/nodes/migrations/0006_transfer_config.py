@@ -19,6 +19,9 @@ class Migration(DataMigration):
     needed_by = (
         ("core", "0025_rt_announce_mt"),
         ("cgm", "0018_fkey_details"),
+        ("solar", "0003_polymorphic"),
+        ("digitemp", "0003_polymorphic"),
+        ("projects", "0004_polymorphic"),
     )
 
     def get_content_type(self, orm, app_label, model):
@@ -81,7 +84,7 @@ class Migration(DataMigration):
             projectcfg.save()
 
             # core.location
-            loccfg = orm['location.LocationConfig'](root=node, content_type=loc_ctype)
+            loccfg = orm['location.LocationConfig'](root=node, polymorphic_ctype=loc_ctype)
             loccfg.address = node.location
             loccfg.city = "?"
             loccfg.country = "?"
@@ -95,7 +98,7 @@ class Migration(DataMigration):
             loccfg.save()
 
             # core.description
-            dsccfg = orm['description.DescriptionConfig'](root=node, content_type=desc_ctype)
+            dsccfg = orm['description.DescriptionConfig'](root=node, polymorphic_ctype=desc_ctype)
             dsccfg.notes = node.notes
             dsccfg.url = node.url or ""
             dsccfg.save()
@@ -148,19 +151,19 @@ class Migration(DataMigration):
             general.save()
 
             # core.roles
-            system_node_role = orm['roles.SystemRoleConfig'](root=node, content_type=sys_role_ctype)
+            system_node_role = orm['roles.SystemRoleConfig'](root=node, polymorphic_ctype=sys_role_ctype)
             system_node_role.system = node.system_node
             system_node_role.save()
 
-            border_router_role = orm['roles.BorderRouterRoleConfig'](root=node, content_type=brouter_role_ctype)
+            border_router_role = orm['roles.BorderRouterRoleConfig'](root=node, polymorphic_ctype=brouter_role_ctype)
             border_router_role.border_router = node.border_router
             border_router_role.save()
 
-            vpn_server_role = orm['roles.VpnServerRoleConfig'](root=node, content_type=vpn_role_ctype)
+            vpn_server_role = orm['roles.VpnServerRoleConfig'](root=node, polymorphic_ctype=vpn_role_ctype)
             vpn_server_role.vpn_server = node.vpn_server
             vpn_server_role.save()
 
-            redundant_node_role = orm['roles.RedundantNodeRoleConfig'](root=node, content_type=redundant_role_ctype)
+            redundant_node_role = orm['roles.RedundantNodeRoleConfig'](root=node, polymorphic_ctype=redundant_role_ctype)
             redundant_node_role.redundancy_required = node.redundancy_req
             redundant_node_role.save()
 
@@ -622,7 +625,7 @@ class Migration(DataMigration):
             'address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'altitude': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -635,7 +638,7 @@ class Migration(DataMigration):
         },
         'roles.roleconfig': {
             'Meta': {'object_name': 'RoleConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_roleconfig'", 'to': "orm['nodes.Node']"})
         },
@@ -1006,7 +1009,7 @@ class Migration(DataMigration):
         },
         'description.descriptionconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'DescriptionConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_descriptionconfig'", 'to': "orm['nodes.Node']"}),
