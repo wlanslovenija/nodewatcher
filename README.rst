@@ -9,9 +9,9 @@ deployment, monitoring and maintanance platform with emphasis on community.
 
 .. warning::
 
-    This is ``development`` branch with future (3.0) version of *nodewatcher*
+    This is the ``development`` branch with future (3.0) version of *nodewatcher*
     which is still being developed and does not have all the functionality found in
-    the 2.0 version. For stable 2.0 version, switch to ``master`` branch.
+    the 2.0 version. For stable 2.0 version, switch to the ``master`` branch.
 
 Documentation is found at:
 
