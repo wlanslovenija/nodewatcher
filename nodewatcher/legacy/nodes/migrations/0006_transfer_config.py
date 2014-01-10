@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
 class Migration(DataMigration):
 
     depends_on = (
@@ -25,62 +26,62 @@ class Migration(DataMigration):
         A helper method to get or create content types.
         """
         try:
-            return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
+            return orm['contenttypes.ContentType'].objects.get(app_label=app_label, model=model)
         except orm['contenttypes.ContentType'].DoesNotExist:
-            ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
+            ctype = orm['contenttypes.ContentType'](name=model, app_label=app_label, model=model)
             ctype.save()
             return ctype
 
     def forwards(self, orm):
         # Transfer all node configuration from old schema to new one (ignoring Unknown nodes)
-        general_ctype         = self.get_content_type(orm, 'cgm', 'cgmgeneralconfig')
-        project_ctype         = self.get_content_type(orm, app_label = 'projects', model = 'projectconfig')
-        loc_ctype             = self.get_content_type(orm, app_label = 'location', model = 'locationconfig')
-        desc_ctype            = self.get_content_type(orm, app_label = 'description', model = 'descriptionconfig')
-        pwdauth_ctype         = self.get_content_type(orm, app_label = 'cgm', model = 'passwordauthenticationconfig')
-        sys_role_ctype        = self.get_content_type(orm, app_label = 'roles', model = 'systemroleconfig')
-        brouter_role_ctype    = self.get_content_type(orm, app_label = 'roles', model = 'borderrouterroleconfig')
-        vpn_role_ctype        = self.get_content_type(orm, app_label = 'roles', model = 'vpnserverroleconfig')
-        redundant_role_ctype  = self.get_content_type(orm, app_label = 'roles', model = 'redundantnoderoleconfig')
-        rid_ctype             = self.get_content_type(orm, app_label = 'core', model = 'routeridconfig')
-        ethiface_ctype        = self.get_content_type(orm, app_label = 'cgm', model = 'ethernetinterfaceconfig')
-        dhcpnetconf_ctype     = self.get_content_type(orm, app_label = 'cgm', model = 'dhcpnetworkconfig')
-        staticnetconf_ctype   = self.get_content_type(orm, app_label = 'cgm', model = 'staticnetworkconfig')
-        allocnetconf_ctype    = self.get_content_type(orm, app_label = 'cgm', model = 'allocatednetworkconfig')
-        vpniface_ctype        = self.get_content_type(orm, app_label = 'cgm', model = 'vpninterfaceconfig')
-        vpnserver_ctype       = self.get_content_type(orm, app_label = 'cgm', model = 'vpnserverconfig')
-        tpifacelimit_ctype    = self.get_content_type(orm, app_label = 'cgm', model = 'throughputinterfacelimitconfig')
-        wifiiface_ctype       = self.get_content_type(orm, app_label = 'cgm', model = 'wifiinterfaceconfig')
-        wifinetconf_ctype     = self.get_content_type(orm, app_label = 'cgm', model = 'wifinetworkconfig')
-        solarpkg_ctype        = self.get_content_type(orm, app_label = 'solar', model = 'solarpackageconfig')
-        digitemppkg_ctype     = self.get_content_type(orm, app_label = 'digitemp', model = 'digitemppackageconfig')
+        general_ctype = self.get_content_type(orm, 'cgm', 'cgmgeneralconfig')
+        project_ctype = self.get_content_type(orm, app_label='projects', model='projectconfig')
+        loc_ctype = self.get_content_type(orm, app_label='location', model='locationconfig')
+        desc_ctype = self.get_content_type(orm, app_label='description', model='descriptionconfig')
+        pwdauth_ctype = self.get_content_type(orm, app_label='cgm', model='passwordauthenticationconfig')
+        sys_role_ctype = self.get_content_type(orm, app_label='roles', model='systemroleconfig')
+        brouter_role_ctype = self.get_content_type(orm, app_label='roles', model='borderrouterroleconfig')
+        vpn_role_ctype = self.get_content_type(orm, app_label='roles', model='vpnserverroleconfig')
+        redundant_role_ctype = self.get_content_type(orm, app_label='roles', model='redundantnoderoleconfig')
+        rid_ctype = self.get_content_type(orm, app_label='core', model='routeridconfig')
+        ethiface_ctype = self.get_content_type(orm, app_label='cgm', model='ethernetinterfaceconfig')
+        dhcpnetconf_ctype = self.get_content_type(orm, app_label='cgm', model='dhcpnetworkconfig')
+        staticnetconf_ctype = self.get_content_type(orm, app_label='cgm', model='staticnetworkconfig')
+        allocnetconf_ctype = self.get_content_type(orm, app_label='cgm', model='allocatednetworkconfig')
+        vpniface_ctype = self.get_content_type(orm, app_label='cgm', model='vpninterfaceconfig')
+        vpnserver_ctype = self.get_content_type(orm, app_label='cgm', model='vpnserverconfig')
+        tpifacelimit_ctype = self.get_content_type(orm, app_label='cgm', model='throughputinterfacelimitconfig')
+        wifiiface_ctype = self.get_content_type(orm, app_label='cgm', model='wifiinterfaceconfig')
+        wifinetconf_ctype = self.get_content_type(orm, app_label='cgm', model='wifinetworkconfig')
+        solarpkg_ctype = self.get_content_type(orm, app_label='solar', model='solarpackageconfig')
+        digitemppkg_ctype = self.get_content_type(orm, app_label='digitemp', model='digitemppackageconfig')
 
         # Remove all invalid nodes
-        orm.Node.objects.filter(status = 4).delete()
+        orm.Node.objects.filter(status=4).delete()
 
-        for node in orm.Node.objects.exclude(status = 4):
+        for node in orm.Node.objects.exclude(status=4):
             print "   > Migrating node:", node.name
 
             # core.general[CgmGeneralConfig]
-            general = orm['cgm.CgmGeneralConfig'](root = node, content_type = general_ctype)
+            general = orm['cgm.CgmGeneralConfig'](root=node, content_type=general_ctype)
             general.name = node.name
 
             type_map = {
-              1 : "server",
-              2 : "wireless",
-              3 : "test",
-              5 : "mobile",
-              6 : "dead"
+                1: "server",
+                2: "wireless",
+                3: "test",
+                5: "mobile",
+                6: "dead",
             }
             general.type = type_map[node.node_type]
 
             # core.project
-            projectcfg = orm['projects.ProjectConfig'](root = node, content_type = project_ctype)
+            projectcfg = orm['projects.ProjectConfig'](root=node, content_type=project_ctype)
             projectcfg.project = node.project
             projectcfg.save()
 
             # core.location
-            loccfg = orm['location.LocationConfig'](root = node, content_type = loc_ctype)
+            loccfg = orm['location.LocationConfig'](root=node, content_type=loc_ctype)
             loccfg.address = node.location
             loccfg.city = "?"
             loccfg.country = "?"
@@ -94,50 +95,50 @@ class Migration(DataMigration):
             loccfg.save()
 
             # core.description
-            dsccfg = orm['description.DescriptionConfig'](root = node, content_type = desc_ctype)
+            dsccfg = orm['description.DescriptionConfig'](root=node, content_type=desc_ctype)
             dsccfg.notes = node.notes
             dsccfg.url = node.url or ""
             dsccfg.save()
 
             try:
-                profile = orm['generator.Profile'].objects.get(node = node)
+                profile = orm['generator.Profile'].objects.get(node=node)
             except orm['generator.Profile'].DoesNotExist:
                 profile = None
 
             general.version = "stable"
             if profile is not None:
                 router_map = {
-                    "wrt54g" : "wrt54gl",
-                    "wrt54gl" : "wrt54gl",
-                    "wrt54gs" : "wrt54gs",
-                    "whr-hp-g54" : "whr-hp-g54",
-                    "fonera" : "fon-2100",
-                    "foneraplus" : "fon-2200",
-                    "wl-500gp" : "wl500gpv1",
-                    "wl-500gp-v1" : "wl500gpv1",
-                    "wl-500gd" : "wl500gpv1",
-                    "rb433ah" : "rb433ah",
-                    "tp-wr741nd" : "tp-wr741ndv4",
-                    "tp-wr740nd" : "tp-wr740ndv1",
-                    "tp-wr743nd" : "tp-wr743ndv1",
-                    "tp-wr842nd" : "tp-wr842ndv1",
-                    "tp-mr3020"  : "tp-mr3020v1",
-                    "tp-mr3040"  : "tp-mr3040v1",
-                    "tp-wr841nd" : "tp-wr841ndv3",
-                    "tp-wr841ndv8" : "tp-wr841ndv8",
-                    "tp-wr703n"  : "tp-wr703nv1",
-                    "ub-bullet" : "ub-bullet",
-                    "ub-nano" : "ub-nano",
-                    "ub-bullet-m5" : "ub-bullet-m5",
-                    "ub-rocket-m5" : "ub-rocket-m5",
-                    "tp-wr941nd" : "tp-wr941ndv4",
-                    "tp-wr1041nd" : "tp-wr1041ndv2",
-                    "tp-wr1043nd" : "tp-wr1043ndv1",
+                    "wrt54g": "wrt54gl",
+                    "wrt54gl": "wrt54gl",
+                    "wrt54gs": "wrt54gs",
+                    "whr-hp-g54": "whr-hp-g54",
+                    "fonera": "fon-2100",
+                    "foneraplus": "fon-2200",
+                    "wl-500gp": "wl500gpv1",
+                    "wl-500gp-v1": "wl500gpv1",
+                    "wl-500gd": "wl500gpv1",
+                    "rb433ah": "rb433ah",
+                    "tp-wr741nd": "tp-wr741ndv4",
+                    "tp-wr740nd": "tp-wr740ndv1",
+                    "tp-wr743nd": "tp-wr743ndv1",
+                    "tp-wr842nd": "tp-wr842ndv1",
+                    "tp-mr3020": "tp-mr3020v1",
+                    "tp-mr3040": "tp-mr3040v1",
+                    "tp-wr841nd": "tp-wr841ndv3",
+                    "tp-wr841ndv8": "tp-wr841ndv8",
+                    "tp-wr703n": "tp-wr703nv1",
+                    "ub-bullet": "ub-bullet",
+                    "ub-nano": "ub-nano",
+                    "ub-bullet-m5": "ub-bullet-m5",
+                    "ub-rocket-m5": "ub-rocket-m5",
+                    "tp-wr941nd": "tp-wr941ndv4",
+                    "tp-wr1041nd": "tp-wr1041ndv2",
+                    "tp-wr1043nd": "tp-wr1043ndv1",
                 }
                 general.router = router_map[profile.template.short_name]
                 general.platform = "openwrt"
 
-                pwdcfg = orm['cgm.PasswordAuthenticationConfig'](root = node, content_type = pwdauth_ctype)
+                pwdcfg = orm['cgm.PasswordAuthenticationConfig'](root=node, content_type=pwdauth_ctype)
                 pwdcfg.password = profile.root_pass
                 pwdcfg.save()
             else:
@@ -147,25 +148,25 @@ class Migration(DataMigration):
             general.save()
 
             # core.roles
-            system_node_role = orm['roles.SystemRoleConfig'](root = node, content_type = sys_role_ctype)
+            system_node_role = orm['roles.SystemRoleConfig'](root=node, content_type=sys_role_ctype)
             system_node_role.system = node.system_node
             system_node_role.save()
 
-            border_router_role = orm['roles.BorderRouterRoleConfig'](root = node, content_type = brouter_role_ctype)
+            border_router_role = orm['roles.BorderRouterRoleConfig'](root=node, content_type=brouter_role_ctype)
             border_router_role.border_router = node.border_router
             border_router_role.save()
 
-            vpn_server_role = orm['roles.VpnServerRoleConfig'](root = node, content_type = vpn_role_ctype)
+            vpn_server_role = orm['roles.VpnServerRoleConfig'](root=node, content_type=vpn_role_ctype)
             vpn_server_role.vpn_server = node.vpn_server
             vpn_server_role.save()
 
-            redundant_node_role = orm['roles.RedundantNodeRoleConfig'](root = node, content_type = redundant_role_ctype)
+            redundant_node_role = orm['roles.RedundantNodeRoleConfig'](root=node, content_type=redundant_role_ctype)
             redundant_node_role.redundancy_required = node.redundancy_req
             redundant_node_role.save()
 
             # core.routerid
             print "     - Router-ID:", node.ip
-            routerid = orm['core.RouterIdConfig'](root = node, content_type = rid_ctype)
+            routerid = orm['core.RouterIdConfig'](root=node, content_type=rid_ctype)
             routerid.family = "ipv4"
             routerid.router_id = node.ip
             routerid.save()
@@ -174,41 +175,41 @@ class Migration(DataMigration):
             if profile is not None:
                 # WiFi
                 proto_map = {
-                    "wrt54g" : "ieee-80211bg",
-                    "wrt54gl" : "ieee-80211bg",
-                    "wrt54gs" : "ieee-80211bg",
-                    "whr-hp-g54" : "ieee-80211bg",
-                    "fonera" : "ieee-80211bg",
-                    "foneraplus" : "ieee-80211bg",
-                    "wl-500gp" : "ieee-80211bg",
-                    "wl-500gp-v1" : "ieee-80211bg",
-                    "wl-500gd" : "ieee-80211bg",
-                    "rb433ah" : "ieee-80211bg",
-                    "tp-wr741nd" : "ieee-80211n",
-                    "tp-wr740nd" : "ieee-80211n",
-                    "tp-wr743nd" : "ieee-80211n",
-                    "tp-wr842nd" : "ieee-80211n",
-                    "tp-mr3020"  : "ieee-80211n",
-                    "tp-mr3040"  : "ieee-80211n",
-                    "tp-wr841nd" : "ieee-80211n",
-                    "tp-wr841ndv8" : "ieee-80211n",
-                    "tp-wr703n"  : "ieee-80211n",
-                    "tp-wr941nd" : "ieee-80211n",
-                    "tp-wr1041nd" : "ieee-80211n",
-                    "tp-wr1043nd" : "ieee-80211n",
-                    "ub-bullet" : "ieee-80211n",
-                    "ub-nano" : "ieee-80211n",
-                    "ub-bullet-m5" : "ieee-80211n",
-                    "ub-rocket-m5" : "ieee-80211n",
+                    "wrt54g": "ieee-80211bg",
+                    "wrt54gl": "ieee-80211bg",
+                    "wrt54gs": "ieee-80211bg",
+                    "whr-hp-g54": "ieee-80211bg",
+                    "fonera": "ieee-80211bg",
+                    "foneraplus": "ieee-80211bg",
+                    "wl-500gp": "ieee-80211bg",
+                    "wl-500gp-v1": "ieee-80211bg",
+                    "wl-500gd": "ieee-80211bg",
+                    "rb433ah": "ieee-80211bg",
+                    "tp-wr741nd": "ieee-80211n",
+                    "tp-wr740nd": "ieee-80211n",
+                    "tp-wr743nd": "ieee-80211n",
+                    "tp-wr842nd": "ieee-80211n",
+                    "tp-mr3020": "ieee-80211n",
+                    "tp-mr3040": "ieee-80211n",
+                    "tp-wr841nd": "ieee-80211n",
+                    "tp-wr841ndv8": "ieee-80211n",
+                    "tp-wr703n": "ieee-80211n",
+                    "tp-wr941nd": "ieee-80211n",
+                    "tp-wr1041nd": "ieee-80211n",
+                    "tp-wr1043nd": "ieee-80211n",
+                    "ub-bullet": "ieee-80211n",
+                    "ub-nano": "ieee-80211n",
+                    "ub-bullet-m5": "ieee-80211n",
+                    "ub-rocket-m5": "ieee-80211n",
                 }
 
-                wifi_iface = orm['cgm.WifiInterfaceConfig'](root = node, content_type = wifiiface_ctype)
+                wifi_iface = orm['cgm.WifiInterfaceConfig'](root=node, content_type=wifiiface_ctype)
                 wifi_iface.wifi_radio = "wifi0"
                 wifi_iface.protocol = proto_map[profile.template.short_name]
                 wifi_iface.channel = "ch%d" % profile.channel
                 wifi_iface.antenna_connector = "a1"
                 try:
-                    antenna = orm['core.Antenna'].objects.filter(internal_for = general.router)[0]
+                    antenna = orm['core.Antenna'].objects.filter(internal_for=general.router)[0]
                 except IndexError:
                     antenna = None
 
@@ -217,18 +218,18 @@ class Migration(DataMigration):
                     antenna.name = "Migrated Antenna for '{0}'".format(node.name)
                     antenna.manufacturer = "Unknown"
                     polarization_map = {
-                      0 : "horizontal",
-                      1 : "horizontal",
-                      2 : "vertical",
-                      3 : "circular",
-                      4 : "dual",
+                        0: "horizontal",
+                        1: "horizontal",
+                        2: "vertical",
+                        3: "circular",
+                        4: "dual",
                     }
                     antenna.polarization = polarization_map[node.ant_polarization]
                     angle_map = {
-                      0 : (360, 75),
-                      1 : (360, 75),
-                      2 : (180, 75),
-                      3 : (45, 45),
+                        0: (360, 75),
+                        1: (360, 75),
+                        2: (180, 75),
+                        3: (45, 45),
                     }
                     antenna.angle_horizontal, antenna.angle_vertical = angle_map[node.ant_type]
                     antenna.gain = 8
@@ -238,7 +239,7 @@ class Migration(DataMigration):
                 wifi_iface.save()
 
                 # Wireless network config
-                wifi_netconf = orm['cgm.WifiNetworkConfig'](root = node, content_type = wifinetconf_ctype)
+                wifi_netconf = orm['cgm.WifiNetworkConfig'](root=node, content_type=wifinetconf_ctype)
                 wifi_netconf.interface = wifi_iface
                 wifi_netconf.enabled = True
                 wifi_netconf.description = "Mesh"
@@ -246,8 +247,8 @@ class Migration(DataMigration):
                 wifi_netconf.essid = node.project.ssid
                 wifi_netconf.bssid = "02:CA:FF:EE:BA:BE"
 
-                wifi_subnet = node.subnet_set.get(gen_iface_type = 2, allocated = True)
-                pool = orm['core.IpPool'].objects.filter(network = wifi_subnet.subnet, prefix_length = wifi_subnet.cidr)
+                wifi_subnet = node.subnet_set.get(gen_iface_type=2, allocated=True)
+                pool = orm['core.IpPool'].objects.filter(network=wifi_subnet.subnet, prefix_length=wifi_subnet.cidr)
                 if not pool:
                     print "     - WARNING: Primary IP pool not found, skipping network configuration!"
                     continue
@@ -263,14 +264,14 @@ class Migration(DataMigration):
                 wifi_netconf.save()
 
                 # WAN (wan0)
-                wan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
+                wan_iface = orm['cgm.EthernetInterfaceConfig'](root=node, content_type=ethiface_ctype)
                 wan_iface.enabled = True
                 wan_iface.eth_port = "wan0"
                 wan_iface.save()
                 if profile.wan_dhcp:
                     # DHCP config
                     print "     - Detected DHCP WAN configuration."
-                    dhcp_netconf = orm['cgm.DHCPNetworkConfig'](root = node, content_type = dhcpnetconf_ctype)
+                    dhcp_netconf = orm['cgm.DHCPNetworkConfig'](root=node, content_type=dhcpnetconf_ctype)
                     dhcp_netconf.interface = wan_iface
                     dhcp_netconf.enabled = True
                     dhcp_netconf.description = "Internet uplink"
@@ -278,7 +279,7 @@ class Migration(DataMigration):
                 else:
                     # Static config
                     print "     - Detected static WAN configuration."
-                    static_netconf = orm['cgm.StaticNetworkConfig'](root = node, content_type = staticnetconf_ctype)
+                    static_netconf = orm['cgm.StaticNetworkConfig'](root=node, content_type=staticnetconf_ctype)
                     static_netconf.interface = wan_iface
                     static_netconf.enabled = True
                     static_netconf.description = "Internet uplink"
@@ -289,8 +290,8 @@ class Migration(DataMigration):
 
                 # LAN subnets (lan0)
                 lan_subnets = []
-                for subnet in node.subnet_set.filter(gen_iface_type = 0, allocated = True):
-                    pool = orm['core.IpPool'].objects.filter(network = subnet.subnet, prefix_length = subnet.cidr)
+                for subnet in node.subnet_set.filter(gen_iface_type=0, allocated=True):
+                    pool = orm['core.IpPool'].objects.filter(network=subnet.subnet, prefix_length=subnet.cidr)
                     if not pool:
                         continue
 
@@ -299,22 +300,22 @@ class Migration(DataMigration):
                         pool = pool.parent
 
                     lan_subnets.append({
-                      'cidr' : subnet.cidr,
-                      'pool' : pool,
-                      'allocation' : alloc
+                        'cidr': subnet.cidr,
+                        'pool': pool,
+                        'allocation': alloc,
                     })
 
                 if lan_subnets:
                     # Create LAN configuration
                     print "     - Detected LAN subnets."
-                    lan_iface = orm['cgm.EthernetInterfaceConfig'](root = node, content_type = ethiface_ctype)
+                    lan_iface = orm['cgm.EthernetInterfaceConfig'](root=node, content_type=ethiface_ctype)
                     lan_iface.enabled = True
                     lan_iface.eth_port = "lan0"
                     lan_iface.save()
 
                     # Create allocated network config for each subnet
                     for subnet in lan_subnets:
-                        alloc_netconf = orm['cgm.AllocatedNetworkConfig'](root = node, content_type = allocnetconf_ctype)
+                        alloc_netconf = orm['cgm.AllocatedNetworkConfig'](root=node, content_type=allocnetconf_ctype)
                         alloc_netconf.interface = lan_iface
                         alloc_netconf.enabled = True
                         alloc_netconf.description = "LAN"
@@ -328,25 +329,25 @@ class Migration(DataMigration):
                 # VPN
                 if profile.use_vpn:
                     print "     - Detected VPN tunnel."
-                    vpn_iface = orm['cgm.VpnInterfaceConfig'](root = node, content_type = vpniface_ctype)
+                    vpn_iface = orm['cgm.VpnInterfaceConfig'](root=node, content_type=vpniface_ctype)
                     vpn_iface.enabled = True
                     vpn_iface.mac = node.vpn_mac_conf
                     vpn_iface.save()
 
                     # Interface limits
-                    vpn_limit = orm['cgm.ThroughputInterfaceLimitConfig'](root = node, content_type = tpifacelimit_ctype)
+                    vpn_limit = orm['cgm.ThroughputInterfaceLimitConfig'](root=node, content_type=tpifacelimit_ctype)
                     vpn_limit.interface = vpn_iface
                     limit_map = {
-                      128 : "128",
-                      256 : "256",
-                      512 : "512",
-                      1024 : "1024",
-                      2048 : "2048",
-                      4096 : "4096",
+                        128: "128",
+                        256: "256",
+                        512: "512",
+                        1024: "1024",
+                        2048: "2048",
+                        4096: "4096",
                     }
                     vpn_limit.limit_out = limit_map.get(profile.vpn_egress_limit, "")
                     try:
-                        vpn_limit.limit_in = limit_map.get(node.gw_policy.get(addr = node.vpn_mac_conf, family = 1).tc_class.bandwidth, "")
+                        vpn_limit.limit_in = limit_map.get(node.gw_policy.get(addr=node.vpn_mac_conf, family=1).tc_class.bandwidth, "")
                     except orm['policy.Policy'].DoesNotExist:
                         vpn_limit.limit_in = ""
                     vpn_limit.save()
@@ -357,15 +358,15 @@ class Migration(DataMigration):
 
                     # VPN servers
                     vpn_servers = [
-                      ("46.54.226.43", 8942),
-                      ("46.54.226.43", 53),
-                      ("46.54.226.43", 123),
-                      ("91.175.203.240", 8942),
-                      ("91.175.203.240", 53),
-                      ("91.175.203.240", 123),
+                        ("46.54.226.43", 8942),
+                        ("46.54.226.43", 53),
+                        ("46.54.226.43", 123),
+                        ("91.175.203.240", 8942),
+                        ("91.175.203.240", 53),
+                        ("91.175.203.240", 123),
                     ]
                     for host, port in vpn_servers:
-                        vpn_server = orm['cgm.VpnServerConfig'](root = node, content_type = vpnserver_ctype)
+                        vpn_server = orm['cgm.VpnServerConfig'](root=node, content_type=vpnserver_ctype)
                         vpn_server.protocol = "tunneldigger"
                         vpn_server.hostname = host
                         vpn_server.port = port
@@ -375,11 +376,11 @@ class Migration(DataMigration):
                 for package in profile.optional_packages.all():
                     if package.fancy_name == 'solar':
                         print "     - Found optional package: solar"
-                        pkg = orm['solar.SolarPackageConfig'](root = node, content_type = solarpkg_ctype)
+                        pkg = orm['solar.SolarPackageConfig'](root=node, content_type=solarpkg_ctype)
                         pkg.save()
                     elif package.fancy_name == 'digitemp':
                         print "     - Found optional package: digitemp"
-                        pkg = orm['digitemp.DigitempPackageConfig'](root = node, content_type = digitemppkg_ctype)
+                        pkg = orm['digitemp.DigitempPackageConfig'](root=node, content_type=digitemppkg_ctype)
                         pkg.save()
             else:
                 # TODO: Migrate nodes without profiles (we need to ensure proper interfaces)
