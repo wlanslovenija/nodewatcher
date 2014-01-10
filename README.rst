@@ -17,6 +17,8 @@ Documentation is found at:
 
 http://nodewatcher.readthedocs.org/en/development/
 
-For questions and development discussions use `nodewatcher mailing list`_.
+More info on `wlan slovenija wiki`_. Use `nodewatcher mailing list`_ for
+questions and development discussions.
 
+.. _wlan slovenija wiki: https://dev.wlan-si.net/wiki/Nodewatcher
 .. _nodewatcher mailing list: https://wlan-si.net/lists/info/nodewatcher
