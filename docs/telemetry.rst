@@ -3,7 +3,7 @@ Telemetry
 
 The telemetry provider component enables any node to report its operational
 attributes via a simple HTTP-based hierarchical key-value format. Provider
-is split into multiple OpenWrt packages as follows:
+is modular, easily extendable, and is split into multiple OpenWRT packages as follows:
 
 * ``nodewatcher-core`` provides the basic framework for developing telemetry
   modules, it is required by all other packages.
@@ -26,6 +26,23 @@ Installing these packages should be just a matter of adding our repository to
 where PLATFORM is one of the supported platforms (currently ``atheros``, ``brcm24``
 and ``ar71xx``). Then installing packages should be just a matter of an ``opkg install``.
 
+Source Code
+-----------
+
+The source code for OpenWRT packages providing telemetry are available on GitHub_. Feel free to make
+pull requests with additional providers you might need, and especially to request improvements to
+the framework provided in core package for easier and modular development of such providers.
+
+.. _GitHub: https://github.com/wlanslovenija/firmware-packages-opkg/tree/master/util
+
+Telemetry Provider for Servers
+------------------------------
+
+Servers often do not run OpenWRT, so a Python-based CGI script is available_ which provides
+similar telemetry in a compatible format.
+
+.. _available: https://github.com/wlanslovenija/serwatcher
+
 Structure
 ---------
 
@@ -33,7 +50,7 @@ Remote invocation scripts are installed into ``/www/cgi-bin`` and should be
 accessible via HTTP URL in the form of ``http://x.y.z.w/cgi-bin/nodewatcher``
 (where ``x.y.z.w`` is the node's primary IP address).
 
-Individual telemetry modules are installed into ``/etc/nodewatcher.d``, there
+Individual telemetry modules are installed into ``/etc/nodewatcher.d/``, there
 is also an example module available in our repository (note that this module
 is not installed).
 
@@ -43,7 +60,7 @@ Format
 The format used by our provider is a simple text format. Lines starting with a
 semicolon (``;``) are comments and should be ignored by parsers. Any non-comment
 line is composed of two parts separated by the first left-wise colon (``:``). Left
-part is denoted as key and the right part as value.
+part is denoted as *key* and the right part as *value*.
 
 All keys form a hierarchy. Namespace atoms are ASCII strings that match the regular
 expressions based on their position in the hierarchy:
@@ -69,7 +86,7 @@ In the future this hierarchical namespace will be centrally allocated to individ
 Example
 -------
 
-The following is an example of nodewatcher output from one of the nodes::
+The following is an example of *nodewatcher* output from one of the nodes::
 
     ;
     ; nodewatcher monitoring system
