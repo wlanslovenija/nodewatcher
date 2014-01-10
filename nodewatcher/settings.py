@@ -55,10 +55,11 @@ LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = (
     ('en', _('English')),
+    ('sl', _('Slovenian')),
 )
 
 LOCALE_PATHS = (
-    os.path.abspath(os.path.join(settings_dir, 'locale')),
+    #os.path.abspath(os.path.join(settings_dir, 'locale')),
 )
 
 URL_VALIDATOR_USER_AGENT = 'nodewatcher'
