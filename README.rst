@@ -18,3 +18,7 @@ deployment, monitoring and maintanance platform with emphasis on community.
 Documentation is found at:
 
 http://nodewatcher.readthedocs.org/
+
+For questions and development discussions use `nodewatcher mailing list`_.
+
+.. _nodewatcher mailing list: https://wlan-si.net/lists/info/nodewatcher
