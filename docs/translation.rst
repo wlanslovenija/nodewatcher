@@ -13,7 +13,7 @@ To make your strings translatable edit them as follows:
 Creation of Translation Files
 -----------------------------
 
-.. warning:: It is important to run following commands from repository root directory!
+.. warning:: It is important to run following commands from ``nodewatcher`` subdirectory of the repository!
 
 Add your wanted language(s) in ``settings.py`` under ``LANGUAGES`` and make
 sure your Django applications you want translated have a directory called
