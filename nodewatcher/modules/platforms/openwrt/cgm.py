@@ -468,7 +468,7 @@ def network(node, cfg):
             iface.ifname = device.remap_port('openwrt', interface.eth_port)
             if iface.ifname is None:
                 raise cgm_base.ValidationError(
-                    _("No port remapping for port '%s' of device '%s' is available!") % (interface.eth_port, device.name)
+                    _("No port remapping for port '%(port)s' of device '%s(device_name)' is available!") % {'port': interface.eth_port, 'device_name': device.name}
                 )
 
             if interface.uplink:
