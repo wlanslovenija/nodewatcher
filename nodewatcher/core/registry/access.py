@@ -40,7 +40,7 @@ class RegistryResolver(object):
         # Determine which class the root is using for configuration
         cfg, top_level = self._regpoint.get_top_level_queryset(self._root, registry_id)
         if onlyclass is not None:
-            cfg = cfg.filter(content_type=contenttypes_models.ContentType.objects.get_for_model(onlyclass))
+            cfg = cfg.instance_of(onlyclass)
         if queryset:
             return cfg.all()
 
@@ -52,11 +52,11 @@ class RegistryResolver(object):
 
                 return create(root=self._root, **kwargs)
             else:
-                return map(lambda x: x.cast(), cfg.all())
+                return cfg.all()
         else:
             # Only a single configuration option is supported
             try:
-                return cfg.all()[0].cast()
+                return cfg.all()[0]
             except (IndexError, top_level.DoesNotExist):
                 if create is not None:
                     if not issubclass(create, top_level):

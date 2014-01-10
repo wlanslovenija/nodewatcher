@@ -47,9 +47,9 @@ class Topology(monitor_processors.NetworkProcessor):
                 context.router_id_map = {}
                 for node in core_models.Node.objects.regpoint('config').registry_fields(
                     router_id='core.routerid#router_id'
-                ).filter(
-                    routeridconfig_family='ipv4',
-                    routeridconfig_router_id__in=visible_routers,
+                ).registry_filter(
+                    core_routerid__family='ipv4',
+                    core_routerid__router_id__in=visible_routers,
                 ):
                     context.router_id_map[node.router_id[0]] = node
                     registered_routers.add(node.router_id[0])

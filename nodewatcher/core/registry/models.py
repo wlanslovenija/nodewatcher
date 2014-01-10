@@ -1,15 +1,12 @@
 from django import forms
-from django.contrib.contenttypes import models as contenttypes_models
-from django.core import exceptions
-from django.db import models
+
+import polymorphic
 
 
-class RegistryItemBase(models.Model):
+class RegistryItemBase(polymorphic.PolymorphicModel):
     """
     An abstract registry configuration item.
     """
-
-    content_type = models.ForeignKey(contenttypes_models.ContentType, editable=False)
 
     root = None
     _registry_regpoint = None
@@ -39,16 +36,18 @@ class RegistryItemBase(models.Model):
         return form
 
     @classmethod
-    def lookup_path(cls):
+    def get_registry_lookup_chain(cls):
         """
-        Returns a query filter "path" that can be used for performing root lookups with
+        Returns a query filter "chain" that can be used for performing root lookups with
         fields that are part of some registry object.
         """
 
         if cls.__base__ == cls._registry_regpoint.item_base:
             return cls._registry_regpoint.namespace + '_' + cls._meta.app_label + '_' + cls._meta.module_name
         else:
-            return cls.lookup_path() + '__' + cls._meta.module_name
+            for base in cls.__bases__:
+                if hasattr(base, 'get_registry_lookup_chain'):
+                    return base.get_registry_lookup_chain() + '__' + cls._meta.module_name
 
     @classmethod
     def get_registry_id(cls):
@@ -100,21 +99,14 @@ class RegistryItemBase(models.Model):
         Casts this registry item into the proper downwards type.
         """
 
-        mdl = self.content_type.model_class()
-        if mdl == self.__class__:
-            return self
-        elif mdl is None:
-            raise exceptions.ImproperlyConfigured("This configuration object ({0}) is of a class that is not available anymore! If you have recently removed any registry modules, convert your database or reinstall them.".format(self.RegistryMeta.registry_id))
-
-        return mdl.objects.get(pk=self.pk)
+        # TODO: The cast method should not be needed anymore and should be removed
+        return self.get_real_instance()
 
     def save(self, *args, **kwargs):
         """
         Sets up and saves the configuration item.
         """
 
-        # Set class identifier
-        self.content_type = contenttypes_models.ContentType.objects.get_for_model(self.__class__)
         super(RegistryItemBase, self).save(*args, **kwargs)
 
         # If only one configuration instance should be allowed, we

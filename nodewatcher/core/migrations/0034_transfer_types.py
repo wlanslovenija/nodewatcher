@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
 class Migration(DataMigration):
 
     def get_content_type(self, orm, app_label, model):
@@ -11,18 +12,18 @@ class Migration(DataMigration):
         A helper method to get or create content types.
         """
         try:
-            return orm['contenttypes.ContentType'].objects.get(app_label = app_label, model = model)
+            return orm['contenttypes.ContentType'].objects.get(app_label=app_label, model=model)
         except orm['contenttypes.ContentType'].DoesNotExist:
-            ctype = orm['contenttypes.ContentType'](name = model, app_label = app_label, model = model)
+            ctype = orm['contenttypes.ContentType'](name=model, app_label=app_label, model=model)
             ctype.save()
             return ctype
 
     def forwards(self, orm):
-        type_ctype = self.get_content_type(orm, app_label = 'types', model = 'typeconfig')
+        type_ctype = self.get_content_type(orm, app_label='types', model='typeconfig')
 
         # Transfer all the types to the new class
         for cfg in orm['core.GeneralConfig'].objects.all():
-            typcfg = orm['types.TypeConfig'](root = cfg.root, content_type = type_ctype)
+            typcfg = orm['types.TypeConfig'](root=cfg.root, polymorphic_ctype=type_ctype)
             typcfg.type = cfg.type
             typcfg.save()
 
@@ -163,7 +164,7 @@ class Migration(DataMigration):
         },
         'types.typeconfig': {
             'Meta': {'ordering': "['id']", 'object_name': 'TypeConfig'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_types_typeconfig'", 'to': "orm['nodes.Node']"}),
             'type': ('nodewatcher.core.registry.fields.SelectorKeyField', [], {'max_length': '50', 'regpoint': "'node.config'", 'enum_id': "'core.type#type'"})

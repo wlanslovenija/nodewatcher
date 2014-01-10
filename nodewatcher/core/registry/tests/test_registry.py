@@ -6,7 +6,7 @@ from django.test import utils
 
 from .registry_tests import models
 
-from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import registration, exceptions
 
 CUSTOM_SETTINGS = {
     'INSTALLED_APPS': settings.INSTALLED_APPS + ('nodewatcher.core.registry.tests.registry_tests',),
@@ -46,6 +46,11 @@ class RegistryTestCase(django_test.TestCase):
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#another'):
             self.assertEquals(thing.f1, 69)
 
+        with self.assertRaises(ValueError):
+            models.Thing.objects.regpoint('first').registry_fields(f1='this.is.an.invalid.specifier###')
+        with self.assertRaises(exceptions.RegistryItemNotRegistered):
+            models.Thing.objects.regpoint('first').registry_fields(f1='foo.invalid#additional')
+
         # Test foreign key traversal
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name'):
             self.assertEquals(thing.f1, None)
@@ -56,3 +61,14 @@ class RegistryTestCase(django_test.TestCase):
 
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name'):
             self.assertEquals(thing.f1, 'test')
+
+        # Test filter queries
+        thing = models.Thing.objects.all()[0]
+        mdl = thing.first.foo.simple()
+        mdl.another = 42
+        mdl.save()
+
+        items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__another=69)
+        self.assertEquals(len(items), 99)
+        items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__another=42)
+        self.assertEquals(len(items), 1)

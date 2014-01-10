@@ -340,6 +340,40 @@ class RegistrationPoint(object):
 
         return self.choices_registry.setdefault(choices_id, LazyChoiceList())
 
+    def get_lookup_proxy(self, field_name):
+        """
+        Returns a lookup proxy for a specific field (if one exists). If no proxy
+        is registered under the specified name, a tuple of two None values is
+        returned.
+
+        :param field_name: Lookup proxy field name
+        :return: A tuple (dst_model, dst_field) to the proxied model/field
+        """
+
+        return self.flat_lookup_proxies.get(field_name, (None, None))
+
+    def get_model_with_field(self, registry_id, field):
+        """
+        Searches the class hierarchy under a specified registry identifier for a
+        registry item that provides the specified field.
+
+        :param registry_id: Registry identifier
+        :param field: Field name
+        :return: A tuple (model, field, m2m)
+        """
+
+        # Discover which model provides the destination field
+        for model in self.get_classes(registry_id):
+            # Attempt to fetch the field from this model
+            try:
+                dst_field, _, _, m2m = model._meta.get_field_by_name(field)
+                # If the field exists we have found our model
+                return (model, dst_field, m2m)
+            except models.FieldDoesNotExist:
+                continue
+        else:
+            raise ValueError("No registry item under '%s' provides field '%s'!" % (registry_id, field))
+
     def register_choice(self, choices_id, enum, text, limited_to=None):
         """
         Registers a new choice/enumeration.
@@ -353,6 +387,13 @@ class RegistrationPoint(object):
         """
 
         return iter(self.item_classes)
+
+    def registered_choices(self):
+        """
+        A generator that iterates through registered choices.
+        """
+
+        return self.choices_registry.iteritems()
 
     def add_mixins(self, *mixins):
         """
