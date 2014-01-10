@@ -16,6 +16,7 @@ Contents
    installation
    theming
    telemetry
+   schema
 
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------
