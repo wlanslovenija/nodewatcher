@@ -65,7 +65,7 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
         multiple = True
 
 # TODO: Does this depend on routing protocol?
-registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('ok', _("Ok")))
+registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('ok', _("OK")))
 registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('alias', _("Alias")))
 registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('unallocated', _("Unallocated")))
 registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('conflicting', _("Conflicting")))
