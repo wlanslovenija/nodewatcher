@@ -13,10 +13,10 @@ OLSR_UUID_NAMESPACE = uuid.UUID('f3f785f9-9580-4945-a43a-3e16f93783a6')
 OLSR_PROTOCOL_NAME = 'olsr'
 
 # Register the routing protocol option so interfaces can use it
-registration.point('node.config').register_choice('core.interfaces#routing_protocol', OLSR_PROTOCOL_NAME, _("OLSR"))
+registration.point('node.config').register_choice('core.interfaces#routing_protocol', registration.Choice(OLSR_PROTOCOL_NAME, _("OLSR")))
 
 # Register the subnet announce option so interfaces can use it
-registration.point('node.config').register_choice('core.interfaces.network#routing_announce', OLSR_PROTOCOL_NAME, _("OLSR HNA"))
+registration.point('node.config').register_choice('core.interfaces.network#routing_announce', registration.Choice(OLSR_PROTOCOL_NAME, _("OLSR HNA")))
 
 
 class OlsrRoutingTopologyMonitor(monitor_models.RoutingTopologyMonitor):

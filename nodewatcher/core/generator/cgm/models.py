@@ -38,9 +38,11 @@ for platform, cfg in settings.GENERATOR_BUILDERS.items():
     for version, (builder, name) in cfg['versions'].items():
         registration.point('node.config').register_choice(
             'core.general#version',
-            version,
-            name,
-            limited_to=('core.general#platform', platform),
+            registration.Choice(
+                version,
+                name,
+                limited_to=('core.general#platform', platform),
+            )
         )
 
 registration.point('node.config').register_item(CgmGeneralConfig)
@@ -174,9 +176,9 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         multiple = True
         hidden = False
 
-registration.point('node.config').register_choice('core.interfaces#wifi_mode', 'mesh', _("Mesh"))
-registration.point('node.config').register_choice('core.interfaces#wifi_mode', 'ap', _("AP"))
-registration.point('node.config').register_choice('core.interfaces#wifi_mode', 'sta', _("STA"))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('sta', _("STA")))
 registration.point('node.config').register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
 
 
@@ -243,8 +245,8 @@ class StaticNetworkConfig(NetworkConfig):
         if self.gateway.ip == self.address.ip:
             raise exceptions.ValidationError(_("Host address and gateway address must be different!"))
 
-registration.point('node.config').register_choice('core.interfaces.network#ip_family', 'ipv4', _("IPv4"))
-registration.point('node.config').register_choice('core.interfaces.network#ip_family', 'ipv6', _("IPv6"))
+registration.point('node.config').register_choice('core.interfaces.network#ip_family', registration.Choice('ipv4', _("IPv4")))
+registration.point('node.config').register_choice('core.interfaces.network#ip_family', registration.Choice('ipv6', _("IPv6")))
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 registration.point('node.config').register_subitem(WifiInterfaceConfig, StaticNetworkConfig)
 
@@ -344,10 +346,10 @@ class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
         hidden = False
 
 # TODO: This probably shouldn't be hardcoded, it should be moved to modules.administration?
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '128', _("128 Kbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '256', _("256 Kbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '512', _("512 Kbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '1024', _("1 Mbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '2048', _("2 Mbit/s"))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', '4096', _("4 Mbit/s"))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('128', _("128 Kbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('256', _("256 Kbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('512', _("512 Kbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('1024', _("1 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('2048', _("2 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('4096', _("4 Mbit/s")))
 registration.point('node.config').register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)

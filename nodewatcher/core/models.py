@@ -74,6 +74,6 @@ class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
         multiple = True
         hidden = True
 
-registration.point('node.config').register_choice('core.routerid#family', 'ipv4', _("IPv4"))
-registration.point('node.config').register_choice('core.routerid#family', 'ipv6', _("IPv6"))
+registration.point('node.config').register_choice('core.routerid#family', registration.Choice('ipv4', _("IPv4")))
+registration.point('node.config').register_choice('core.routerid#family', registration.Choice('ipv6', _("IPv6")))
 registration.point('node.config').register_item(RouterIdConfig)

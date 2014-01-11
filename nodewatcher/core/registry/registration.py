@@ -11,29 +11,60 @@ from ...utils import datastructures as nw_datastructures
 bases = registry_state.bases
 
 
+class Choice(object):
+    def __init__(self, name, verbose_name, help_text=None, limited_to=None):
+        self.name = name
+        self.verbose_name = verbose_name
+        self.help_text = help_text
+        self.limited_to = limited_to
+
+    def get_field_tuple(self):
+        return (self.name, self.verbose_name)
+
+    def __repr__(self):
+        return "<Choice '%s'>" % self.name
+
+
 class LazyChoiceList(collections.Sequence):
     def __init__(self):
         super(LazyChoiceList, self).__init__()
         self._list = nw_datastructures.OrderedSet()
         self._dependent_choices = nw_datastructures.OrderedSet()
+        self._returns_field_tuples = False
+
+    def field_tuples(self):
+        # Make a copy that shares the same list and dependencies but that changes
+        # the way items are returned from this lazy list
+        lazy_choices = LazyChoiceList()
+        lazy_choices._list = self._list
+        lazy_choices._dependent_choices = self._dependent_choices
+        lazy_choices._returns_field_tuples = True
+        return lazy_choices
 
     def __len__(self):
         return len(self._list)
 
     def __iter__(self):
-        return self._list.__iter__()
+        if self._returns_field_tuples:
+            return (choice.get_field_tuple() for choice in self._list.__iter__())
+        else:
+            return self._list.__iter__()
 
     def __getitem__(self, index):
-        return list(self._list)[index]
+        return list(self.__iter__())[index]
 
     def __nonzero__(self):
         return True
 
     def subset_choices(self, condition):
-        return [choice for limited_to, choice in self._dependent_choices if limited_to is None or condition(*limited_to)]
+        return [
+            (choice if not self._returns_field_tuples else choice.get_field_tuple())
+            for limited_to, choice in self._dependent_choices
+            if limited_to is None or condition(*limited_to)
+        ]
 
-    def add_choice(self, choice, limited_to):
-        self._dependent_choices.add((limited_to, choice))
+    def add_choice(self, choice):
+        self._dependent_choices.add((choice.limited_to, choice))
         self._list.add(choice)
 
 
@@ -335,7 +366,7 @@ class RegistrationPoint(object):
 
     def get_registered_choices(self, choices_id):
         """
-        Returns a list of previously registered choices.
+        Returns a list of previously registered choice instaces.
         """
 
         return self.choices_registry.setdefault(choices_id, LazyChoiceList())
@@ -374,12 +405,15 @@ class RegistrationPoint(object):
         else:
             raise ValueError("No registry item under '%s' provides field '%s'!" % (registry_id, field))
 
-    def register_choice(self, choices_id, enum, text, limited_to=None):
+    def register_choice(self, choices_id, choice):
         """
         Registers a new choice/enumeration.
         """
 
-        self.get_registered_choices(choices_id).add_choice((enum, text), limited_to)
+        if not isinstance(choice, Choice):
+            raise TypeError("'choice' must be an instance of Choice!")
+
+        self.get_registered_choices(choices_id).add_choice(choice)
 
     def config_items(self):
         """

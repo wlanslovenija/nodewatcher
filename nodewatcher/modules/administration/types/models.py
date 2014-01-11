@@ -18,10 +18,10 @@ class TypeConfig(registration.bases.NodeConfigRegistryItem):
         lookup_proxies = ['type']
 
 # Register possible node types
-registration.point('node.config').register_choice('core.type#type', 'wireless', _("Wireless"))
-registration.point('node.config').register_choice('core.type#type', 'server', _("Server"))
-registration.point('node.config').register_choice('core.type#type', 'mobile', _("Mobile"))
-registration.point('node.config').register_choice('core.type#type', 'test', _("Test"))
-registration.point('node.config').register_choice('core.type#type', 'dead', _("Dead"))
-registration.point('node.config').register_choice('core.type#type', 'unknown', _("Unknown"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('wireless', _("Wireless")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('server', _("Server")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('mobile', _("Mobile")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('test', _("Test")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('dead', _("Dead")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('unknown', _("Unknown")))
 registration.point('node.config').register_item(TypeConfig)

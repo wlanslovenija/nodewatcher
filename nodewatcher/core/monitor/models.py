@@ -65,10 +65,10 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
         multiple = True
 
 # TODO: Does this depend on routing protocol?
-registration.point('node.monitoring').register_choice('network.routing.announces#status', 'ok', _("Ok"))
-registration.point('node.monitoring').register_choice('network.routing.announces#status', 'alias', _("Alias"))
-registration.point('node.monitoring').register_choice('network.routing.announces#status', 'unallocated', _("Unallocated"))
-registration.point('node.monitoring').register_choice('network.routing.announces#status', 'conflicting', _("Conflicting"))
+registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('ok', _("Ok")))
+registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('alias', _("Alias")))
+registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('unallocated', _("Unallocated")))
+registration.point('node.monitoring').register_choice('network.routing.announces#status', registration.Choice('conflicting', _("Conflicting")))
 registration.point('node.monitoring').register_item(RoutingAnnounceMonitor)
 
 
@@ -182,8 +182,8 @@ class NetworkAddressMonitor(registration.bases.NodeMonitoringRegistryItem):
         registry_id = 'core.interfaces.network'
         multiple = True
 
-registration.point('node.monitoring').register_choice('core.interfaces.network#family', 'ipv4', _("IPv4"))
-registration.point('node.monitoring').register_choice('core.interfaces.network#family', 'ipv6', _("IPv6"))
+registration.point('node.monitoring').register_choice('core.interfaces.network#family', registration.Choice('ipv4', _("IPv4")))
+registration.point('node.monitoring').register_choice('core.interfaces.network#family', registration.Choice('ipv6', _("IPv6")))
 registration.point('node.monitoring').register_item(NetworkAddressMonitor)
 
 

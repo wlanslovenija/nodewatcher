@@ -65,7 +65,7 @@ class ChoiceAttribute(CharAttribute):
 
         self.regpoint = regpoint
         self.enum_id = enum_id
-        self.choices = registration.point(regpoint).get_registered_choices(enum_id)
+        self.choices = registration.point(regpoint).get_registered_choices(enum_id).field_tuples()
         super(ChoiceAttribute, self).__init__(**kwargs)
 
     def get_form_field(self):

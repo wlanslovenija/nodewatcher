@@ -170,7 +170,7 @@ def register_platform(enum, text, platform):
     platform.name = enum
 
     # Register the choice in configuration registry
-    registration.point("node.config").register_choice("core.general#platform", enum, text)
+    registration.point("node.config").register_choice("core.general#platform", registration.Choice(enum, text))
 
 
 def get_platform(platform):

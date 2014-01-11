@@ -21,13 +21,13 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
 registration.point('node.monitoring').register_item(StatusMonitor)
 
 # Register valid network states
-registration.point('node.monitoring').register_choice('core.status#network', 'up', _("Up"))
-registration.point('node.monitoring').register_choice('core.status#network', 'down', _("Down"))
-registration.point('node.monitoring').register_choice('core.status#network', 'visible', _("Visible"))
-registration.point('node.monitoring').register_choice('core.status#network', 'unknown', _("Unknown"))
+registration.point('node.monitoring').register_choice('core.status#network', registration.Choice('up', _("Up")))
+registration.point('node.monitoring').register_choice('core.status#network', registration.Choice('down', _("Down")))
+registration.point('node.monitoring').register_choice('core.status#network', registration.Choice('visible', _("Visible")))
+registration.point('node.monitoring').register_choice('core.status#network', registration.Choice('unknown', _("Unknown")))
 
 # Register valid health states
-registration.point('node.monitoring').register_choice('core.status#health', 'healthy', _("Healthy"))
-registration.point('node.monitoring').register_choice('core.status#health', 'warnings', _("Warnings"))
-registration.point('node.monitoring').register_choice('core.status#health', 'errors', _("Errors"))
-registration.point('node.monitoring').register_choice('core.status#health', 'unknown', _("Unknown"))
+registration.point('node.monitoring').register_choice('core.status#health', registration.Choice('healthy', _("Healthy")))
+registration.point('node.monitoring').register_choice('core.status#health', registration.Choice('warnings', _("Warnings")))
+registration.point('node.monitoring').register_choice('core.status#health', registration.Choice('errors', _("Errors")))
+registration.point('node.monitoring').register_choice('core.status#health', registration.Choice('unknown', _("Unknown")))

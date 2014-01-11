@@ -285,27 +285,33 @@ class DeviceBase(object):
         # Register a new choice in the configuration registry
         registration.point('node.config').register_choice(
             'core.general#router',
-            cls.identifier,
-            '%s - %s' % (cls.manufacturer, cls.name),
-            limited_to=('core.general#platform', platform.name),
+            registration.Choice(
+                cls.identifier,
+                '%s - %s' % (cls.manufacturer, cls.name),
+                limited_to=('core.general#platform', platform.name),
+            )
         )
 
         # Register a new choice for available device ports
         for port in cls.ports:
             registration.point('node.config').register_choice(
                 'core.interfaces#eth_port',
-                port.identifier,
-                port.description,
-                limited_to=('core.general#router', cls.identifier),
+                registration.Choice(
+                    port.identifier,
+                    port.description,
+                    limited_to=('core.general#router', cls.identifier),
+                )
             )
 
         # Register a new choice for available device radios
         for radio in cls.radios:
             registration.point('node.config').register_choice(
                 'core.interfaces#wifi_radio',
-                radio.identifier,
-                radio.description,
-                limited_to=('core.general#router', cls.identifier),
+                registration.Choice(
+                    radio.identifier,
+                    radio.description,
+                    limited_to=('core.general#router', cls.identifier),
+                )
             )
 
         # Register CGM methods

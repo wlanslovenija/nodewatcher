@@ -6,7 +6,7 @@ from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_bas
 from . import models
 
 # Register tunneldigger VPN protocol
-registration.point('node.config').register_choice('core.interfaces#vpn_protocol', 'tunneldigger', _("Tunneldigger"))
+registration.point('node.config').register_choice('core.interfaces#vpn_protocol', registration.Choice('tunneldigger', _("Tunneldigger")))
 
 
 @cgm_base.register_platform_module('openwrt', 100)
