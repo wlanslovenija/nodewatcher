@@ -366,7 +366,7 @@ class RegistrationPoint(object):
 
     def get_registered_choices(self, choices_id):
         """
-        Returns a list of previously registered choice instaces.
+        Returns a list of previously registered choice instances.
         """
 
         return self.choices_registry.setdefault(choices_id, LazyChoiceList())
