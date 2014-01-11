@@ -25,7 +25,7 @@ def alter_user_form_fields(form):
         form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
     # We set it every time to be sure
     form.fields['username'].min_length = 4
-    form.fields['username'].help_text = _('Letters, digits and @/./+/-/_ only. Will be public.')
+    form.fields['username'].help_text = _("Letters, digits and @/./+/-/_ only. Will be public.")
 
     # E-mail domain validation (we check it in a model field)
     emailfield = filter(lambda x: x.name == 'email', form.Meta.model._meta.fields)[0]
@@ -36,8 +36,8 @@ def alter_user_form_fields(form):
         emailfield.validators.append(validators.validate_email_with_hostname)
 
     # We add in a form field as it is too late to add in model field
-    form.fields['email'].help_text = _('Carefully enter your e-mail address as it will be used for account activation. It will be visible to other registered users.')
-    form.fields['first_name'].help_text = _('By default used for attribution. You can hide it to be visible only to network administrators in privacy section bellow.')
+    form.fields['email'].help_text = _("Carefully enter your e-mail address as it will be used for account activation. It will be visible to other registered users.")
+    form.fields['first_name'].help_text = _("By default used for attribution. You can hide it to be visible only to network administrators in privacy section bellow.")
     form.fields['last_name'].help_text = form.fields['first_name'].help_text
 
     # We want those fields to be required (UserCreationForm.Meta.fields is made from user_add_fieldsets)
@@ -62,8 +62,8 @@ def check_password_length(form):
         form.fields[fieldname1].validators.append(core_validators.MinLengthValidator(6))
     # We set it every time to be sure
     form.fields[fieldname1].min_length = 6
-    form.fields[fieldname1].help_text = _('Minimal password length is 6.')
-    form.fields[fieldname2].help_text = _('Enter the same password as above, for verification.')
+    form.fields[fieldname1].help_text = _("Minimal password length is 6.")
+    form.fields[fieldname2].help_text = _("Enter the same password as above, for verification.")
 
 
 class UserCreationForm(auth_forms.UserCreationForm):
@@ -109,7 +109,7 @@ class UserCreationForm(auth_forms.UserCreationForm):
 
 class AdminUserChangeForm(auth_forms.UserChangeForm):
     """
-    This class defines change form for `django.contrib.auth.models.User` objects for admin inteface.
+    This class defines change form for `django.contrib.auth.models.User` objects for admin interface.
 
     It marks first name, last name and e-mail address fields as required. It validates hostname part of the e-mail
     address and sets minimal length on the username field.
@@ -141,7 +141,7 @@ class UserChangeForm(AdminUserChangeForm):
         del self.fields['username']
         del self.fields['password']
 
-        self.fields['email'].help_text = _('If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.')
+        self.fields['email'].help_text = _("If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.")
 
     class Meta(AdminUserChangeForm.Meta):
         fields = admin_util.flatten_fieldsets(user_change_fieldsets)

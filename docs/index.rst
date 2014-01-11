@@ -1,11 +1,11 @@
-nodewatcher's documentation
-===========================
+nodewatcher documentation
+=========================
 
-*nodewatcher* is one of the projects of `wlan slovenija`_ open wireless network.
-Its main goal is the development of an open source network planning,
-deployment, monitoring and maintanance platform.
+*nodewatcher* is one of the projects of `wlan slovenija`_ open wireless
+network. Its main goal is the development of an open source network planning,
+deployment, monitoring and maintanance platform with emphasis on community.
 
-.. _wlan slovenija: http://wlan-si.net
+.. _wlan slovenija: https://wlan-si.net
 
 Contents
 --------
@@ -13,20 +13,24 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   installation
-   theming
-   telemetry
+   translation
    registry
 
-Source Code and Issue Tracker
------------------------------
+Source Code, Issue Tracker and Mailing List
+-------------------------------------------
 
 For development *wlan slovenija* open wireless network `development Trac`_ is
-used, so source code and issue tracker is found there.
+used, so you can see `existing open tickets`_ or `open a new one`_ there. Source
+code is available on GitHub_. If you have any questions or if you want to
+discuss the project, use `nodewatcher mailing list`_.
 
-.. _development Trac: http://dev.wlan-si.net
+.. _development Trac: https://dev.wlan-si.net/wiki/Nodewatcher
+.. _existing open tickets: https://dev.wlan-si.net/report/14
+.. _open a new one: https://dev.wlan-si.net/newticket
+.. _GitHub: https://github.com/wlanslovenija/nodewatcher
+.. _nodewatcher mailing list: https://wlan-si.net/lists/info/nodewatcher
 
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`
