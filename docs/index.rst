@@ -15,6 +15,8 @@ Contents
 
    translation
    registry
+   node_config
+   node_monitoring
 
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------

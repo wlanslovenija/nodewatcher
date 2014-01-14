@@ -24,8 +24,8 @@ Registration Points in nodewatcher
 
 Core nodewatcher platform currently provides the following two registration points:
 
-* ``node.config`` attached to the ``Node`` model. This registration point holds all per-node configuration models that the modules provide. TODO: link to schema
-* ``node.monitoring`` attached to the ``Node`` model. This registration point holds all per-node monitoring models that the modules provide. TODO: link to schema
+* ``node.config`` attached to the ``Node`` model. This registration point holds all per-node configuration models that the modules provide (see :ref:`registry-node-config-schema`).
+* ``node.monitoring`` attached to the ``Node`` model. This registration point holds all per-node monitoring models that the modules provide (see :ref:`registry-node-monitoring-schema`).
 
 Queryset Extensions
 -------------------
