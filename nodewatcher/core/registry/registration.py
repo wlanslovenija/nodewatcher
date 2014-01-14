@@ -342,6 +342,21 @@ class RegistrationPoint(object):
         except KeyError:
             raise exceptions.RegistryItemNotRegistered("Registry item with id '%s' is not registered!" % registry_id)
 
+    def get_class(self, registry_id, class_name):
+        """
+        Returns a class instance registered under specified registry identifier.
+
+        :param registry_id: A valid registry identifier
+        :param class_name: Case-insensitive class name
+        :return: A valid class
+        """
+
+        for cls in self.get_classes(registry_id):
+            if cls.__name__.lower() == class_name.lower():
+                return cls
+
+        raise exceptions.UnknownRegistryClass(class_name)
+
     def get_accessor(self, root):
         """
         Returns the registry accessor for the specified root.

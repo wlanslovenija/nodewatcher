@@ -72,3 +72,10 @@ class RegistryTestCase(django_test.TestCase):
         self.assertEquals(len(items), 99)
         items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__another=42)
         self.assertEquals(len(items), 1)
+
+        # Test class query
+        self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'SimpleRegistryItem'), models.SimpleRegistryItem)
+        self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'ChildRegistryItem'), models.ChildRegistryItem)
+        self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'DoubleChildRegistryItem'), models.DoubleChildRegistryItem)
+        with self.assertRaises(exceptions.UnknownRegistryClass):
+            self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'doesnotexist'))

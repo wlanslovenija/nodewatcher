@@ -253,8 +253,9 @@ def append(_item, _cls=None, _parent=None, **kwargs):
             raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 
         # Resolve class name into the actual class
-        cls = registry_access.get_model_class_by_name(cls_name)
-        if not issubclass(cls, tlc):
+        try:
+            cls = context.regpoint.get_class(_item, cls_name)
+        except registry_exceptions.UnknownRegistryClass:
             raise engine.EvaluationError("Class '{0}' is not registered for '{1}'!".format(cls_name, _item))
 
         # Resolve parent item

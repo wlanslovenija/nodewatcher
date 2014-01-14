@@ -103,27 +103,3 @@ class RegistryAccessor(object):
 
     def __get__(self, instance, owner):
         return RegistryResolver(self.regpoint, instance)
-
-# Cache for class resolutions
-CTYPE_CACHE = {}
-
-
-def get_model_class_by_name(name):
-    """
-    Returns the model class identified by its name.
-
-    :param name: Model class name
-    """
-
-    name = name.lower()
-    try:
-        ctype = CTYPE_CACHE[name]
-    except KeyError:
-        try:
-            ctype = contenttypes_models.ContentType.objects.get(model=name).model_class()
-        except contenttypes_models.ContentType.DoesNotExist:
-            raise exceptions.UnknownRegistryClass
-
-        CTYPE_CACHE[name] = ctype
-
-    return ctype
