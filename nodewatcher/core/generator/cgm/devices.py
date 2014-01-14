@@ -287,7 +287,7 @@ class DeviceBase(object):
             'core.general#router',
             registration.Choice(
                 cls.identifier,
-                '%s - %s' % (cls.manufacturer, cls.name),
+                _("%(manufacturer)s - %(name)s") % {'manufacturer': cls.manufacturer, 'name': cls.name},
                 limited_to=('core.general#platform', platform.name),
             )
         )
