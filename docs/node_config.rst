@@ -10,13 +10,13 @@ The following table represents the node configuration registry schema that is bu
 +=========================+============+=======+==================+==================================+
 | core.general            | no         |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | GeneralConfig                                             |
-|                                      | | *provided by:* ``core``                                   |
+|                                      || GeneralConfig                                              |
+|                                      || *provided by:* ``core``                                    |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | name             | string                           |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | CgmGeneralConfig(GeneralConfig)                           |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || CgmGeneralConfig(GeneralConfig)                            |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | router           | | registered choice              |
 |                                      |       |                  | | (see :ref:`device-descriptors`)|
@@ -28,22 +28,22 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.type               | no         |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | TypeConfig                                                |
-|                                      | | *provided by:* ``modules.administration.types``           |
+|                                      || TypeConfig                                                 |
+|                                      || *provided by:* ``modules.administration.types``            |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | type             | registered choice                |
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.project            | no         |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | ProjectConfig                                             |
-|                                      | | *provided by:* ``modules.administration.projects``        |
+|                                      || ProjectConfig                                              |
+|                                      || *provided by:* ``modules.administration.projects``         |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | project          | foreign key                      |
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.description        | no         |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | DescriptionConfig                                         |
-|                                      | | *provided by:* ``modules.administration.description``     |
+|                                      || DescriptionConfig                                          |
+|                                      || *provided by:* ``modules.administration.description``      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | notes            | text                             |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -51,8 +51,8 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.location           | no         |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | LocationConfig                                            |
-|                                      | | *provided by:* ``modules.administration.location``        |
+|                                      || LocationConfig                                             |
+|                                      || *provided by:* ``modules.administration.location``         |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | address          | string                           |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -68,8 +68,8 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.routerid           | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | RouterIdConfig                                            |
-|                                      | | *provided by:* ``core``                                   |
+|                                      || RouterIdConfig                                             |
+|                                      || *provided by:* ``core``                                    |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | family           | registered choice                |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -77,61 +77,61 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.authentication     | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | *AuthenticationConfig (hidden parent)*                    |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || *AuthenticationConfig (hidden parent)*                     |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------------------------------------------------------------+
-|                                      | | PasswordAuthenticationConfig(AuthenticationConfig)        |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || PasswordAuthenticationConfig(AuthenticationConfig)         |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | password         | string                           |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | PublicKeyAuthenticationConfig(AuthenticationConfig)       |
-|                                      | | *provided by:* ``modules.authentication.public_key``      |
+|                                      || PublicKeyAuthenticationConfig(AuthenticationConfig)        |
+|                                      || *provided by:* ``modules.authentication.public_key``       |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | public_key       | string                           |
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.roles              | yes/static |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | *RoleConfig (hidden parent)*                              |
-|                                      | | *provided by:* ``modules.administration.roles``           |
+|                                      || *RoleConfig (hidden parent)*                               |
+|                                      || *provided by:* ``modules.administration.roles``            |
 +--------------------------------------+-------------------------------------------------------------+
-|                                      | | SystemRoleConfig(RoleConfig)                              |
-|                                      | | *provided by:* ``modules.administration.roles``           |
+|                                      || SystemRoleConfig(RoleConfig)                               |
+|                                      || *provided by:* ``modules.administration.roles``            |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | system           | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | BorderRouterRoleConfig(RoleConfig)                        |
-|                                      | | *provided by:* ``modules.administration.roles``           |
+|                                      || BorderRouterRoleConfig(RoleConfig)                         |
+|                                      || *provided by:* ``modules.administration.roles``            |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | border_router    | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | VpnServerRoleConfig(RoleConfig)                           |
-|                                      | | *provided by:* ``modules.administration.roles``           |
+|                                      || VpnServerRoleConfig(RoleConfig)                            |
+|                                      || *provided by:* ``modules.administration.roles``            |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | vpn_server       | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | RedundancyRequiredRoleConfig(RoleConfig)                  |
-|                                      | | *provided by:* ``modules.administration.roles``           |
+|                                      || RedundancyRequiredRoleConfig(RoleConfig)                   |
+|                                      || *provided by:* ``modules.administration.roles``            |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | redundancy       | boolean                          |
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.interfaces         | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | InterfaceConfig                                           |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || InterfaceConfig                                            |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | enabled          | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | EthernetInterfaceConfig(InterfaceConfig)                  |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || EthernetInterfaceConfig(InterfaceConfig)                   |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | eth_port         | | registered choice              |
 |                                      |       |                  | | *(depends on router model)*    |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | uplink           | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | WifiRadioDeviceConfig(InterfaceConfig)                    |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || WifiRadioDeviceConfig(InterfaceConfig)                     |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | wifi_radio       | | registered choice              |
 |                                      |       |                  | | *(depends on router model)*    |
@@ -154,8 +154,8 @@ The following table represents the node configuration registry schema that is bu
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | frag_threshold   | integer                          |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | WifiInterfaceConfig(InterfaceConfig, RoutableInterface)   |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || WifiInterfaceConfig(InterfaceConfig, RoutableInterface)    |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | device           | foreign key                      |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -165,8 +165,8 @@ The following table represents the node configuration registry schema that is bu
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | bssid            | mac string                       |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | VpnInterfaceConfig(InterfaceConfig, RoutableInterface)    |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || VpnInterfaceConfig(InterfaceConfig, RoutableInterface)     |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | protocol         | registered choice                |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -174,8 +174,10 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.basic_addressing   | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | BasicAddressingConfig(IpAddressAllocator)                 |
-|                                      | | *provided by:* ``modules.administration.addressing``      |
+|                                      || BasicAddressingConfig(IpAddressAllocator)                  |
+|                                      || *provided by:* ``modules.administration.addressing``       |
+|                                      ||                                                            |
+|                                      ||                                                            |
 |                                      | **Note:** *Only available if* ``core.generator.cgm``        |
 |                                      | *module is not enabled. Otherwise this registry item is     |
 |                                      | replaced by core.interfaces.network per-interface           |
@@ -183,8 +185,8 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------------------------------------------------------------+
 | core.interfaces.network | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | NetworkConfig                                             |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || NetworkConfig                                              |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | enabled          | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -192,30 +194,30 @@ The following table represents the node configuration registry schema that is bu
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | description      | string                           |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | StaticNetworkConfig(NetworkConfig)                        |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || StaticNetworkConfig(NetworkConfig)                         |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | address          | ip address                       |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | gateway          | ip address                       |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | AllocatedNetworkConfig(NetworkConfig, IpAddressAllocator) |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || AllocatedNetworkConfig(NetworkConfig, IpAddressAllocator)  |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | routing_announce | registered choice                |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | DHCPNetworkConfig(NetworkConfig)                          |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || DHCPNetworkConfig(NetworkConfig)                           |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------------------------------------------------------------+
-|                                      | | PPPoENetworkConfig(NetworkConfig)                         |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || PPPoENetworkConfig(NetworkConfig)                          |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | username         | string                           |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | password         | string                           |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | VPNNetworkConfig(NetworkConfig)                           |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || VPNNetworkConfig(NetworkConfig)                            |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | address          | ip address                       |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -223,15 +225,15 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.interfaces.limits  | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | InterfaceLimitConfig                                      |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || InterfaceLimitConfig                                       |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | enabled          | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | interface        | foreign key                      |
 +--------------------------------------+-------+------------------+----------------------------------+
-|                                      | | ThroughputInterfaceLimitConfig(InterfaceLimitConfig)      |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || ThroughputInterfaceLimitConfig(InterfaceLimitConfig)       |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | limit_in         | registered choice                |
 +--------------------------------------+-------+------------------+----------------------------------+
@@ -255,8 +257,8 @@ The following table represents the node configuration registry schema that is bu
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.packages           | yes        |                                                             |
 +-------------------------+------------+-------------------------------------------------------------+
-|                                      | | PackageConfig                                             |
-|                                      | | *provided by:* ``core.generator.cgm``                     |
+|                                      || PackageConfig                                              |
+|                                      || *provided by:* ``core.generator.cgm``                      |
 +--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | enabled          | boolean                          |
 +--------------------------------------+-------+------------------+----------------------------------+
