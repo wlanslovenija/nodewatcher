@@ -17,6 +17,7 @@ Contents
    registry
    node_config
    node_monitoring
+   cgm
 
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------
