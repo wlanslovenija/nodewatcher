@@ -364,9 +364,9 @@ class Migration(DataMigration):
                         ("46.54.226.43", 8942),
                         ("46.54.226.43", 53),
                         ("46.54.226.43", 123),
-                        ("91.175.203.240", 8942),
-                        ("91.175.203.240", 53),
-                        ("91.175.203.240", 123),
+                        ("92.53.140.74", 8942),
+                        ("92.53.140.74", 53),
+                        ("92.53.140.74", 123),
                     ]
                     for host, port in vpn_servers:
                         vpn_server = orm['cgm.VpnServerConfig'](root=node, content_type=vpnserver_ctype)
