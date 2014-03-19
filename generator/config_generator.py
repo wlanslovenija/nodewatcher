@@ -628,8 +628,8 @@ config policy
         # Add configuration for trunk netifd
         network_config.write("""
 config rule
-        option dest '{0}'
-        option lookup 'main'
+        option dest '{0}/32'
+        option goto '32766'
         option priority 999
 """.format(server))
       
@@ -656,12 +656,12 @@ config policy
       network_config.write("""
 config rule
         option dest '{subnet}/{cidr}'
-        option lookup 'main'
+        option goto '32766'
         option priority 999
 
 config rule
         option in 'wan'
-        option lookup 'main'
+        option goto '32766'
         option priority 999
 
 config rule
@@ -748,8 +748,10 @@ config olsrd
 
       # Hack config for UBNT
       extra = ""
-      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5'):
+      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5', 'tp-wr1043nd'):
         extra = '"wlan0"'
+      else:
+        extra = '"wlan0-1"'
       
       f = open(os.path.join(directory, 'olsrd.conf'), 'w')
       f.write("""
@@ -775,7 +777,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0-1" "wlan1" "br-clients" {diggers} {extra}
+Interface "wlan1" "br-clients" {diggers} {extra}
 {{
   IPv4Multicast 255.255.255.255
   HelloInterval 5.0
