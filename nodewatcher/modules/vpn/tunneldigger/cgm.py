@@ -84,7 +84,7 @@ def tunneldigger(node, cfg):
 
             # Support policy routing configuration in trunk
             policy = cfg.network.add('rule')
-            policy.dest = broker.ip
+            policy.dest = "%s/32" % broker.ip
             policy.lookup = 'main'
             policy.priority = 500
 
