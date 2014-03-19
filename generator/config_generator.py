@@ -550,7 +550,7 @@ config alias
         f.write("        option proto    dhcp\n")
       
       f.write("\n")
-      f.close()
+      network_config = f
       
       # Firewall configuration
       f = open(os.path.join(configPath, "firewall"), 'w')
@@ -624,6 +624,14 @@ config policy
         option table    'main'
         option priority 999
 """.format(server))
+
+        # Add configuration for trunk netifd
+        network_config.write("""
+config rule
+        option dest '{0}'
+        option lookup 'main'
+        option priority 999
+""".format(server))
       
       f.write("""
 config policy
@@ -643,8 +651,29 @@ config policy
         subnet = self.subnets[0]['subnet'],
         cidr = self.subnets[0]['cidr']
       ))
+
+      # Add configuration for trunk netifd
+      network_config.write("""
+config rule
+        option dest '{subnet}/{cidr}'
+        option lookup 'main'
+        option priority 999
+
+config rule
+        option in 'wan'
+        option lookup 'main'
+        option priority 999
+
+config rule
+        option lookup '20'
+        option priority 1000
+""".format(
+        subnet = self.subnets[0]['subnet'],
+        cidr = self.subnets[0]['cidr']
+      ))
       
       f.close()
+      network_config.close()
       
       # Wireless configuration
       # WiFi hack script
