@@ -80,5 +80,31 @@ class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
         }
     }
 
+
+class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
+    """
+    TP-Link WR1043NDv2 device descriptor.
+    """
+
+    identifier = 'tp-wr1043ndv2'
+    name = "WR1043ND (v2)"
+    port_map = {
+        'openwrt': {
+            'wifi0': 'radio0',
+            'sw0': 'switch0',
+            'wan0': 'eth0',
+            'lan0': 'eth1',
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR1043',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr1043nd-v2-squashfs-factory.bin'
+            ]
+        }
+    }
+
 # Register the TP-Link WR1043ND device
 cgm_base.register_device('openwrt', TPLinkWR1043NDv1)
+cgm_base.register_device('openwrt', TPLinkWR1043NDv2)
