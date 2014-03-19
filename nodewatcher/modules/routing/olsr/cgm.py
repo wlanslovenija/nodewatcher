@@ -85,5 +85,10 @@ def olsr(node, cfg):
     rt.table = ROUTING_TABLE_NAME
     rt.priority = ROUTING_TABLE_PRIORITY
 
+    # Support policy routing configuration in trunk
+    rt = cfg.network.add('rule')
+    rt.lookup = ROUTING_TABLE_ID
+    rt.priority = ROUTING_TABLE_PRIORITY
+
     # Ensure that "olsrd" and "policy-routing" packages are installed
     cfg.packages.update(['olsrd', 'policy-routing'])

@@ -82,11 +82,23 @@ def tunneldigger(node, cfg):
             policy.table = 'main'
             policy.priority = 500
 
+            # Support policy routing configuration in trunk
+            policy = cfg.network.add('rule')
+            policy.dest = broker.ip
+            policy.lookup = 'main'
+            policy.priority = 500
+
     if tunneldigger_enabled:
         # Ensure that WAN traffic is routed via the main table
         policy = cfg.routing.add('policy')
         policy.device = uplink_interface
         policy.table = 'main'
+        policy.priority = 500
+
+        # Support policy routing configuration in trunk
+        policy = cfg.network.add('rule')
+        setattr(policy, 'in', uplink_interface)
+        policy.lookup = 'main'
         policy.priority = 500
 
         # Register the 'tunneldigger' and 'policy-routing' packages
