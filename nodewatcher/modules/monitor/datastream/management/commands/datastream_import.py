@@ -244,7 +244,10 @@ class Command(base.BaseCommand):
         points = [l, m, u]
         s = sum(points)
         ss = sum([x ** 2 for x in points])
-        d = math.sqrt((3 * ss - s ** 2) / (3.0 * (3 - 1)))
+        try:
+            d = math.sqrt((3 * ss - s ** 2) / (3.0 * (3 - 1)))
+        except ValueError:
+            d = 0
 
         return [
             # Stream for rtt_minimum field
