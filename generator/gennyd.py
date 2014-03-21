@@ -64,6 +64,7 @@ IMAGEBUILDERS = (
   "imagebuilder.ar71xx",
   "imagebuilder.nextgen.ar71xx",
   "imagebuilder.nextgen.ar71xx-ubnt",
+  "imagebuilder.nextgen.ar71xx-trunk",
   "imagebuilder.nextgen.atheros",
 )
 
