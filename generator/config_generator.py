@@ -2,7 +2,7 @@
 #
 # nodewatcher configuration generator
 #
-# Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
+# Copyright (C) 2008 Jernej Kos <jernej@kos.mx>
 #
 
 import os

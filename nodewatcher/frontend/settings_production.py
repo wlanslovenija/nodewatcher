@@ -11,7 +11,7 @@ DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Jernej Kos', 'kostko@unimatrix-one.org'),
+    ('Jernej Kos', 'jernej@kos.mx'),
     ('Mitar', 'mitar.nodewatcher@tnode.com'),
 )
 

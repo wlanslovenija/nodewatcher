@@ -2,7 +2,7 @@
 #
 # nodewatcher Image Generator Daemon
 #
-# Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
+# Copyright (C) 2009 by Jernej Kos <jernej@kos.mx>
 #
 
 # TODO: Move to manage.py command

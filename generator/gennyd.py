@@ -2,7 +2,7 @@
 #
 # nodewatcher firmware generator daemon
 #
-# Copyright (C) 2009 by Jernej Kos <kostko@unimatrix-one.org>
+# Copyright (C) 2009 by Jernej Kos <jernej@kos.mx>
 #
 
 # First parse options (this must be done here since they contain import paths

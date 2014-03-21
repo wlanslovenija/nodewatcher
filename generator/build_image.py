@@ -2,7 +2,7 @@
 #
 # nodewatcher OpenWRT image builder
 #
-# Copyright (C) 2008 Jernej Kos <kostko@unimatrix-one.org>
+# Copyright (C) 2008 Jernej Kos <jernej@kos.mx>
 #
 from config_generator import OpenWrtConfig, portLayouts
 from optparse import OptionParser
