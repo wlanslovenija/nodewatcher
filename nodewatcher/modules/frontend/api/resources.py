@@ -43,10 +43,14 @@ class NodeResource(resources.NamespacedModelResource):
         meta_fields = cls._meta.object_class._meta.local_fields
         try:
             cls._meta.object_class._meta.local_fields = cls._meta.object_class._meta.virtual_fields
+            if hasattr(cls._meta.object_class._meta, 'fields'):
+                del cls._meta.object_class._meta.fields
             cls._meta.object_class._meta._fill_fields_cache()
             final_fields.update(parent_get_fields())
         finally:
             cls._meta.object_class._meta.local_fields = meta_fields
+            if hasattr(cls._meta.object_class._meta, 'fields'):
+                del cls._meta.object_class._meta.fields
             cls._meta.object_class._meta._fill_fields_cache()
 
         return final_fields

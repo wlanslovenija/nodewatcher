@@ -5,8 +5,6 @@ from django import db as django_db
 from django.db.models.sql import constants
 from django.utils import functional
 
-from . import access as registry_access, exceptions
-
 # Quote name
 qn = django_db.connection.ops.quote_name
 
@@ -267,25 +265,33 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             clone.query.get_initial_alias()
 
+            # Dummy join relation descriptor
+            class RegistryJoinRelation(object):
+                def get_extra_restriction(*args, **kwargs):
+                    return None
+
             # Join with top-level item
             toplevel = dst_model.get_registry_toplevel()
             clone.query.join(
-                (self.model._meta.db_table, toplevel._meta.db_table, self.model._meta.pk.column, 'root_id'),
-                promote=True,
+                (self.model._meta.db_table, toplevel._meta.db_table, ((self.model._meta.pk.column, 'root_id'),)),
+                join_field=RegistryJoinRelation(),
+                outer_if_first=True,
             )
 
             if toplevel != dst_model:
                 # Join with lower-level item
                 clone.query.join(
-                    (toplevel._meta.db_table, dst_model._meta.db_table, toplevel._meta.pk.column, dst_model._meta.pk.column),
-                    promote=True,
+                    (toplevel._meta.db_table, dst_model._meta.db_table, ((toplevel._meta.pk.column, dst_model._meta.pk.column),)),
+                    join_field=RegistryJoinRelation(),
+                    outer_if_first=True,
                 )
 
             if dst_related is not None:
                 dst_field_model = dst_field.rel.to
                 clone.query.join(
-                    (dst_model._meta.db_table, dst_field_model._meta.db_table, dst_field.column, dst_field_model._meta.pk.column),
-                    promote=True,
+                    (dst_model._meta.db_table, dst_field_model._meta.db_table, ((dst_field.column, dst_field_model._meta.pk.column),)),
+                    join_field=RegistryJoinRelation(),
+                    outer_if_first=True,
                 )
 
         return clone

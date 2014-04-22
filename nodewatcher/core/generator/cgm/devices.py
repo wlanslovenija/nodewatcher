@@ -1,7 +1,7 @@
-import copy
 import inspect
 
 from django.core import exceptions
+from django.utils.translation import ugettext as _
 
 from ...registry import registration
 
@@ -315,7 +315,7 @@ class DeviceBase(object):
             )
 
         # Register CGM methods
-        for _, function in inspect.getmembers(cls, inspect.isfunction):
+        for name, function in inspect.getmembers(cls, inspect.isfunction):
             if not getattr(function, 'cgm_module', False):
                 continue
 

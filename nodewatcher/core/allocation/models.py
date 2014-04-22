@@ -1,5 +1,5 @@
 from django.contrib.contenttypes import generic, models as contenttypes_models
-from django.db import models
+from django.db import models, transaction
 
 
 class AddressAllocator(models.Model):
@@ -92,8 +92,9 @@ class PoolBase(models.Model):
     def modifies_pool(cls, f):
         def decorator(self, *args, **kwargs):
             # Lock our own instance
-            locked_instance = self.__class__.objects.select_for_update().get(pk=self.pk)
-            return f(locked_instance, *args, **kwargs)
+            with transaction.atomic():
+                locked_instance = self.__class__.objects.select_for_update().get(pk=self.pk)
+                return f(locked_instance, *args, **kwargs)
 
         return decorator
 

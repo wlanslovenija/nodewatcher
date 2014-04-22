@@ -5,6 +5,7 @@ PSQL_HOST="localhost"
 
 CONTRIB_DIR=""
 POSTGIS_DIR=""
+POSTGIS_VER="1"
 if [ -d /usr/share/postgresql/8.4 ]; then
     CONTRIB_DIR="/usr/share/postgresql/8.4/contrib"
     POSTGIS_DIR="/usr/share/postgresql/8.4/contrib/postgis-1.5"
@@ -12,6 +13,11 @@ fi
 if [ -d /usr/share/postgresql/9.1 ]; then
     CONTRIB_DIR="/usr/share/postgresql/9.1/contrib"
     POSTGIS_DIR="/usr/share/postgresql/9.1/contrib/postgis-1.5"
+fi
+if [ -d /usr/share/postgresql/9.3 ]; then
+    CONTRIB_DIR="/usr/share/postgresql/9.3/contrib"
+    POSTGIS_DIR="/usr/share/postgresql/9.3/contrib/postgis-2.1"
+    POSTGIS_VER="2"
 fi
 if [ -d /usr/share/postgresql-8.3 ]; then
     CONTRIB_DIR="/usr/share/postgresql-8.3/contrib"
@@ -42,8 +48,14 @@ dropuser -h ${PSQL_HOST} ${PSQL_USER_ARG} nodewatcher || true
 createuser -h ${PSQL_HOST} ${PSQL_USER_ARG} -S -d -R nodewatcher || true
 createdb -h ${PSQL_HOST} ${PSQL_USER_ARG} -E UNICODE -T template0 -O nodewatcher nodewatcher
 createlang -h ${PSQL_HOST} ${PSQL_USER_ARG} plpgsql nodewatcher || true
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis.sql
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/spatial_ref_sys.sql
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE geometry_columns OWNER TO nodewatcher;"
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER VIEW geography_columns OWNER TO nodewatcher;"
-psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE spatial_ref_sys OWNER TO nodewatcher;"
+if [ "${POSTGIS_VER}" == "1" ]; then
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/postgis.sql
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -f ${POSTGIS_DIR}/spatial_ref_sys.sql
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE geometry_columns OWNER TO nodewatcher;"
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER VIEW geography_columns OWNER TO nodewatcher;"
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "ALTER TABLE spatial_ref_sys OWNER TO nodewatcher;"
+elif [ "${POSTGIS_VER}" == "2" ]; then
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "CREATE EXTENSION postgis;"
+    psql -h ${PSQL_HOST} ${PSQL_USER_ARG} -d nodewatcher -c "CREATE EXTENSION postgis_topology;"
+fi
+

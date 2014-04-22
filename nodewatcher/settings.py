@@ -546,3 +546,6 @@ MENUS = {
     #    ...
     #],
 }
+
+# Allowed hosts (required for production use)
+ALLOWED_HOSTS = []

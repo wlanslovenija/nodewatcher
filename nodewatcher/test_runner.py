@@ -1,7 +1,7 @@
 import unittest
 
 from django.conf import settings
-from django.test import simple, testcases
+from django.test import simple, testcases, runner
 from django.utils import unittest as django_unittest
 
 
@@ -36,4 +36,4 @@ class FilteredTestSuiteRunner(simple.DjangoTestSuiteRunner):
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
         suite = super(FilteredTestSuiteRunner, self).build_suite(test_labels, extra_tests=None, **kwargs)
         suite = self._filter_suite(suite)
-        return simple.reorder_suite(suite, (testcases.TestCase,))
+        return runner.reorder_suite(suite, (testcases.TestCase,))

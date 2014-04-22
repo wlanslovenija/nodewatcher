@@ -2,7 +2,7 @@ from django.conf import urls
 from django.contrib.auth import views as auth_views
 from django.core import urlresolvers
 from django.utils import functional as functional_utils
-from django.views.generic import simple as generic_simple
+from django.views import generic
 
 from registration import views as registration_views
 
@@ -19,8 +19,8 @@ from . import decorators, forms
 urlpatterns = urls.patterns(
     '',
 
-    urls.url(r'^activate/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
-        'template': 'registration/activation_complete.html',
+    urls.url(r'^activate/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
+        'template_name': 'registration/activation_complete.html',
     }, name='registration_activation_complete'),
     urls.url(r'^activate/(?P<activation_key>\w+)/$', decorators.anonymous_required(function=registration_views.activate), {
         'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
@@ -28,14 +28,14 @@ urlpatterns = urls.patterns(
     urls.url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
         'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
     }, name='registration_register'),
-    urls.url(r'^register/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
-        'template': 'registration/registration_complete.html',
+    urls.url(r'^register/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
+        'template_name': 'registration/registration_complete.html',
     }, name='registration_complete'),
-    urls.url(r'^register/closed/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
-        'template': 'registration/registration_closed.html',
+    urls.url(r'^register/closed/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
+        'template_name': 'registration/registration_closed.html',
     }, name='registration_disallowed'),
-    urls.url(r'^email/change/complete/$', decorators.anonymous_required(function=generic_simple.direct_to_template), {
-        'template': 'registration/email_change_complete.html',
+    urls.url(r'^email/change/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
+        'template_name': 'registration/email_change_complete.html',
     }, name='email_change_complete'),
     urls.url(r'^login/$', 'nodewatcher.extra.accounts.views.login', name='auth_login'),
     urls.url(r'^logout/$', 'nodewatcher.extra.accounts.views.logout_redirect', name='auth_logout'),
