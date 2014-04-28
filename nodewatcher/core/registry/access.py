@@ -1,6 +1,3 @@
-from django.contrib.contenttypes import models as contenttypes_models
-
-from . import exceptions
 
 
 class RegistryResolver(object):
