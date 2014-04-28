@@ -12,7 +12,7 @@ class LocationWidget(forms.widgets.TextInput):
 
     class Media:
         js = (
-            'nodewatcher/js/gmap.js',
+            'frontend/js/gmap.js',
             '//maps.google.com/maps?file=api&amp;v=2&amp;key=' + settings.GOOGLE_MAPS_API_KEY,
         )
 

@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
-{% load future i18n gmap misc %}
+{% contextblock %}
+    {% load future i18n sekizai_tags %}
+
+    {% add_data "js_data" "frontend/js/jquery-ui-1.8.12.custom.min.js" %}
+    {% add_data "js_data" "frontend/js/jquery.cookie.js" %}
+    {% add_data "js_data" "frontend/js/csrf.js" %}
+    {% add_data "js_data" "frontend/js/registry.js" %}
+{% endcontextblock %}
 
 {% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
 
@@ -23,10 +30,4 @@
             <button role="button" onclick="document.location='/'" class="ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-button-text">{% trans "Cancel" %}</span></button>
         </div>
     </form>
-{% endblock %}
-
-{% block js %}
-    <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/n11ndata.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/n11n.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}nodewatcher/js/unidecode.js"></script>
 {% endblock %}
