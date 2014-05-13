@@ -571,6 +571,9 @@ def network(node, cfg):
                 elif vif.mode == 'mesh':
                     wif.mode = 'adhoc'
                     wif.bssid = vif.bssid
+                    # Override default mcast_rate to avoid broadcast traffic from
+                    # stealing too much air time
+                    wif.mcast_rate = 6000
                 elif vif.mode == 'sta':
                     wif.mode = 'sta'
                 else:
