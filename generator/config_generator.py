@@ -761,19 +761,6 @@ Hna4
   {hna_subnet}  {hna_mask}
 }}
 
-AllowNoInt yes
-UseHysteresis no
-LinkQualityFishEye 0
-Willingness 3
-LinkQualityLevel 2
-LinkQualityAging 0.1
-LinkQualityAlgorithm "etx_ff"
-FIBMetric "flat"
-Pollrate 0.025
-TcRedundancy 2
-MprCoverage 3
-NatThreshold 0.75
-SmartGateway no
 MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
@@ -781,14 +768,6 @@ RtTable 20
 Interface "wlan1" "br-clients" {diggers} {extra}
 {{
   IPv4Multicast 255.255.255.255
-  HelloInterval 5.0
-  HelloValidityTime 40.0
-  TcInterval 7.0
-  TcValidityTime 161.0
-  MidInterval 18.0
-  MidValidityTime 324.0
-  HnaInterval 18.0
-  HnaValidityTime 324.0
 }}
 """.format(
         router_id = self.ip,
