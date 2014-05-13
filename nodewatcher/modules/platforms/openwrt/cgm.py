@@ -169,8 +169,22 @@ class UCIRoot(object):
 
         return section
 
+    def named_sections(self):
+        """
+        Returns an iterator over the named sections.
+        """
+
+        return self._named_sections.iteritems()
+
+    def ordered_sections(self):
+        """
+        Returns an iterator over the ordered sections.
+        """
+
+        return self._ordered_sections.iteritems()
+
     def __iter__(self):
-        return iter(self._named_sections.iteritems())
+        return self.named_sections()
 
     def __contains__(self, section):
         return section in self._named_sections or section in self._ordered_sections
