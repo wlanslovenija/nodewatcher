@@ -728,6 +728,7 @@ start() {{
       uci set wireless.@wifi-iface[1].ssid={mesh_ssid}
       uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
       uci set wireless.@wifi-iface[1].encryption=none
+      uci set wireless.@wifi-iface[1].mcast_rate=6000
       
       uci commit
       /etc/init.d/inituci disable
