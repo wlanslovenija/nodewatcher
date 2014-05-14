@@ -120,7 +120,7 @@ class NodeConfig(object):
   primarySubnet = None
   usedOlsrIps = 1
   hasClientSubnet = False
-  
+
   def __init__(self):
     """
     Class constructor.
@@ -129,13 +129,13 @@ class NodeConfig(object):
     self.interfaces = []
     self.services = []
     self.packages = []
-  
+
   def setUUID(self, uuid):
     """
     Sets this node's unique identifier.
     """
     self.uuid = uuid
-  
+
   def setHostname(self, hostname):
     """
     Sets this node's hostname.
@@ -161,52 +161,52 @@ class NodeConfig(object):
     self.wifiIface = iface
     self.wifiDriver = driver
     self.wifiChannel = channel
-    
+
     if driver in wifiVirtuals:
       self.wifiVirtualIface = wifiVirtuals[driver]
     else:
       self.wifiVirtualIface = iface
-  
+
   def setWifiAnt(self, rx, tx):
     """
     Sets the wireless receive/transmit antenna.
     """
     self.wifiRxAnt = rx
     self.wifiTxAnt = tx
-    
+
     if self.wifiRxAnt == self.wifiTxAnt == 3:
       self.wifiAntDiv = 1
-    
+
     if self.portLayout in wifiAntennas:
       ant, force = wifiAntennas[self.portLayout]
-      
+
       if force or rx == tx == 4:
         self.wifiRxAnt = self.wifiTxAnt = ant
-  
+
   def setLanIface(self, iface):
     """
     Sets the LAN interface name.
     """
     self.lanIface = iface
-  
+
   def setOpenwrtVersion(self, version):
     """
     Sets the OpenWRT version.
     """
     self.openwrtVersion = version
-  
+
   def setArch(self, arch):
     """
     Sets the CPU architecture.
     """
     self.arch = arch
-  
+
   def setPortLayout(self, layout):
     """
     Sets the port layout.
     """
     self.portLayout = layout
-  
+
   def setNodeType(self, nodeType):
     """
     Sets the node type.
@@ -218,34 +218,34 @@ class NodeConfig(object):
     Sets the SSID.
     """
     self.ssid = ssid
-  
+
   def addService(self, priority, name):
     """
     Adds a service to be executed on bootup.
-    
+
     @param priority: Service priority code
     @param name: Service name
     """
     self.services.append({ 'priority' : priority,
                            'name'     : name })
-  
+
   def switchWanToLan(self):
     """
     Changes interface configurations so WAN interfaces takes the role
     of the LAN interface. This will only happen when no VLAN tagging
     is possible (there is no port layout configured for that specified
     configuration).
-    
+
     Also VPN must not be configured, otherwise this method will do
     nothing at all.
     """
     if portLayouts[self.portLayout] or self.vpn or not self.hasInterface('wan'):
       return
-    
+
     wan = self.getInterface('wan')
     self.lanIface = wan['name']
     self.removeInterface('wan')
-  
+
   def enableLanWifiBridge(self):
     """
     Enables LAN<->WiFi bridge.
@@ -254,24 +254,24 @@ class NodeConfig(object):
     for subnet in self.subnets:
       if subnet['interface'] == self.lanIface:
         return
-    
+
     self.lanWifiBridge = True
-  
+
   def removeInterface(self, id):
     """
     Removes an interface.
-    
+
     @param id: Interface configuration identifier
     """
     for interface in self.interfaces[:]:
       if interface['id'] == id:
         self.interfaces.remove(interface)
         return
-  
+
   def addInterface(self, id, name, ip = None, cidr = None, gateway = None, init = False, olsr = False, type = None):
     """
     Adds a non-standard interface to this node.
-    
+
     @param id: Interface configuration identifier
     @param name: Interface name
     @param ip: IP address or None for DHCP
@@ -282,17 +282,17 @@ class NodeConfig(object):
     @param type: Optional interface type
     """
     netmask = None
-    
+
     if ip:
       if not cidr:
         raise Exception('Static IP configuration requires CIDR parameter!')
-      
+
       network = ipcalc.Network("%s/%s" % (ip, cidr))
       netmask = str(network.netmask())
-      
+
       if gateway and gateway not in ipcalc.Network("%s/%s" % (str(network.network()), cidr)):
         raise Exception('Gateway must be in the same network as the given interface!')
-    
+
     self.interfaces.insert(0, { 'name'     : name,
                                 'ip'       : ip,
                                 'cidr'     : cidr,
@@ -302,7 +302,7 @@ class NodeConfig(object):
                                 'init'     : init,
                                 'olsr'     : olsr,
                                 'type'     : type })
-  
+
   def hasInterface(self, id):
     """
     Returns true if the given interface exists.
@@ -310,9 +310,9 @@ class NodeConfig(object):
     for interface in self.interfaces:
       if interface['id'] == id:
         return True
-    
+
     return False
-  
+
   def getInterface(self, id):
     """
     Returns the interface with the given id.
@@ -320,9 +320,9 @@ class NodeConfig(object):
     for interface in self.interfaces:
       if interface['id'] == id:
         return interface
-    
+
     return None
-  
+
   def getInterfaceByName(self, name):
     """
     Returns the interface with the given name.
@@ -330,13 +330,13 @@ class NodeConfig(object):
     for interface in self.interfaces:
       if interface['name'] == name:
         return interface
-    
+
     return None
-  
+
   def addSubnet(self, interface, subnet, cidr, dhcp = False, olsr = True):
     """
     Adds a subnet to this node.
-    
+
     @param interface: Interface name
     @param subnet: Subnet
     @param cidr: CIDR
@@ -345,7 +345,7 @@ class NodeConfig(object):
     """
     if dhcp and cidr <= 28 and interface == self.wifiIface:
       self.hasClientSubnet = True
-    
+
     network = ipcalc.Network("%s/%s" % (subnet, cidr))
     subnet = { 'interface'   : interface,
                'subnet'      : subnet,
@@ -354,9 +354,9 @@ class NodeConfig(object):
                'firstIp'     : str(network.host_first()),
                'dhcp'        : dhcp,
                'olsr'        : olsr }
-    
+
     self.subnets.append(subnet)
-    
+
     if ipcalc.IP(self.ip) in network:
       self.primarySubnet = subnet
 
@@ -367,18 +367,18 @@ class NodeConfig(object):
     """
     network = ipcalc.Network("%s/%s" % (self.primarySubnet['subnet'], self.primarySubnet['cidr']))
     ip = str(ipcalc.IP(long(network.network()) + self.usedOlsrIps + 1))
-    
+
     # Sanity check so we don't overstep our bounds
     if ipcalc.IP(ip) not in network:
       raise PrimarySubnetTooSmall
-    
+
     self.usedOlsrIps += 1
     return ip
 
   def setVpn(self, username, password, mac = None, limit_down = None, limit_up = None):
     """
     Sets VPN parameters.
-    
+
     @param username: Assigned username
     @param password: Assigned password
     @param mac: Assigned MAC address
@@ -386,12 +386,12 @@ class NodeConfig(object):
     """
     if not self.hasInterface('wan'):
       raise Exception('VPN requires WAN access configuration!')
-    
+
     if self.primarySubnet['cidr'] > 30:
       # Prevent VPN from being enabled when primary subnet is too small
       # for allocation of additional IP addresses (less than /30)
       return
-    
+
     self.addInterface('vpn', 'tap0', olsr = True)
     self.vpn = { 'username' : username,
                  'password' : password,
@@ -399,7 +399,7 @@ class NodeConfig(object):
                  'limit_down' : limit_down,
                  'limit_up'   : limit_up,
                  'ip'       : self.allocateIpForOlsr() }
-  
+
   def setCaptivePortal(self, value):
     """
     Toggles the use of a captive portal for internet connections.
@@ -418,19 +418,19 @@ class NodeConfig(object):
     for package in args:
       if package not in self.packages:
         self.packages.append(package)
-  
+
   def generate(self, directory):
     """
     Generates the required configuration files.
-    
+
     @param directory: Path to etc directory
     """
     raise Exception("Missing 'generate' method implementation!")
-  
+
   def build(self, destination):
     """
     Builds the image.
-    
+
     @param destination: Path to image build root
     """
     raise Exception("Missing 'setupPackages' method implementation!")
@@ -441,17 +441,17 @@ class OpenWrtConfig(NodeConfig):
     Class constructor.
     """
     NodeConfig.__init__(self)
-    
+
     # Add some basic services
     self.addService('S46', 'misc')
     self.addService('K46', 'misc')
-  
+
   def generate(self, directory):
     """
     Generates the required configuration files for OpenWRT.
     """
     self.base = directory
-    
+
     # XXX hardcoded new tplink for openwrt trunk; this is a quick hack for
     #     supporting tp-link wr741nd devices that we need
     if self.openwrtVersion == 'nextgen':
@@ -462,20 +462,20 @@ class OpenWrtConfig(NodeConfig):
       keyPath = os.path.join(directory, "dropbear")
       os.mkdir(keyPath)
       self.__copyTemplate("keys/authorized_keys", os.path.join(keyPath, "authorized_keys"))
-      
+
       # Write UUID to /etc/uuid
       f = open(os.path.join(directory, 'uuid'), 'w')
       f.write(self.uuid)
       f.close()
-      
+
       # Create the 'config' directory
       configPath = os.path.join(directory, 'config')
       os.mkdir(configPath)
-      
+
       # General configuration
       f = open(os.path.join(configPath, "system"), 'w')
       self.__generateSystemConfig(f)
-      
+
       # Network configuration
       f = open(os.path.join(configPath, "network"), 'w')
       f.write("""
@@ -509,7 +509,7 @@ config alias
         vpn_ip = self.vpn['ip'],
         iface_lan = self.lanIface
       ))
-      
+
       if self.portLayout not in portLayouts or portLayouts.get(self.portLayout) is not None:
         f.write("config switch %s\n" % self.lanIface)
         f.write("        option enable_vlan      1\n")
@@ -519,7 +519,7 @@ config alias
         f.write("        option vlan     1\n")
         f.write('        option ports    "0 1 2 3 4"\n')
         f.write("\n")
-      
+
       # Configure tunneldigger interfaces
       ips = [self.vpn['ip']] + [self.allocateIpForOlsr() for _ in xrange(len(self.tdServer) - 1)]
       for idx, ip in zip(xrange(len(self.tdServer)), ips):
@@ -529,14 +529,14 @@ config alias
         f.write("        option ipaddr   %s\n" % ip)
         f.write("        option netmask  255.255.0.0\n")
         f.write("\n")
-      
+
       # Configure WAN interface
       wan_interface = {}
       for iface in self.interfaces:
         if iface['id'] == "wan":
           wan_interface = iface
           break
-      
+
       if wan_interface.get('ip', None):
         f.write("config interface wan\n")
         f.write("        option ifname   %s\n" % wan_interface['name'])
@@ -548,10 +548,10 @@ config alias
         f.write("config interface wan\n")
         f.write("        option ifname   %s\n" % wan_interface['name'])
         f.write("        option proto    dhcp\n")
-      
+
       f.write("\n")
       network_config = f
-      
+
       # Firewall configuration
       f = open(os.path.join(configPath, "firewall"), 'w')
       f.write("""
@@ -609,7 +609,7 @@ config rule
 """.format(diggers = " ".join(['digger%d' % x for x in xrange(len(self.tdServer))])))
 
       f.close()
-      
+
       # Policy routing configuration
       f = open(os.path.join(configPath, "routing"), 'w')
       f.write("""
@@ -632,7 +632,7 @@ config rule
         option goto '32766'
         option priority 999
 """.format(server))
-      
+
       f.write("""
 config policy
         option dest_ip  '{subnet}/{cidr}'
@@ -671,10 +671,10 @@ config rule
         subnet = self.subnets[0]['subnet'],
         cidr = self.subnets[0]['cidr']
       ))
-      
+
       f.close()
       network_config.close()
-      
+
       # Wireless configuration
       # WiFi hack script
       inituci_path = os.path.join(directory, "init.d", "inituci")
@@ -691,14 +691,14 @@ start() {
       uci set wireless.radio0.country=US
       uci set wireless.radio0.txpower=22
       uci set wireless.radio0.distance=20000
-      
+
       uci set wireless.@wifi-iface[0].device=radio0
       uci set wireless.@wifi-iface[0].network=mesh
       uci set wireless.@wifi-iface[0].mode=adhoc
       uci set wireless.@wifi-iface[0].ssid=backbone.wlan-si.net
       uci set wireless.@wifi-iface[0].bssid=02:CA:FF:EE:BA:BE
       uci set wireless.@wifi-iface[0].encryption=none
-      
+
       uci commit
       /etc/init.d/inituci disable
       /etc/init.d/dnsmasq disable
@@ -714,13 +714,13 @@ start() {{
       uci set wireless.radio0.channel={channel}
       uci set wireless.radio0.country=SI
       uci set wireless.radio0.txpower=20
-      
+
       uci set wireless.@wifi-iface[0].device=radio0
       uci set wireless.@wifi-iface[0].network=clients
       uci set wireless.@wifi-iface[0].mode=ap
       uci set wireless.@wifi-iface[0].ssid={ssid}
       uci set wireless.@wifi-iface[0].encryption=none
-      
+
       uci add wireless wifi-iface
       uci set wireless.@wifi-iface[1].device=radio0
       uci set wireless.@wifi-iface[1].network=mesh
@@ -729,7 +729,7 @@ start() {{
       uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
       uci set wireless.@wifi-iface[1].encryption=none
       uci set wireless.@wifi-iface[1].mcast_rate=6000
-      
+
       uci commit
       /etc/init.d/inituci disable
       /sbin/wifi up
@@ -738,7 +738,7 @@ start() {{
 
       f.close()
       os.chmod(inituci_path, 0755)
- 
+
       # OLSRd configuration
       f = open(os.path.join(configPath, "olsrd"), 'w')
       f.write("""
@@ -753,7 +753,7 @@ config olsrd
         extra = '"wlan0"'
       else:
         extra = '"wlan0-1"'
-      
+
       f = open(os.path.join(directory, 'olsrd.conf'), 'w')
       f.write("""
 Hna4
@@ -777,12 +777,12 @@ Interface "wlan1" "br-clients" {diggers} {extra}
         extra = extra
       ))
       f.close()
-      
+
       # DHCP configuration
       network = ipcalc.Network("%s/%s" % (self.subnets[0]['subnet'], self.subnets[0]['cidr']))
       start_ip = str(ipcalc.IP(long(network.network()) + 4)).split(".")[-1]
       end_ip = str(network.host_last()).split(".")[-1]
-      
+
       f = open(os.path.join(configPath, "dhcp"), 'w')
       f.write("""
 config dnsmasq
@@ -808,12 +808,12 @@ config dhcp clients
         end_ip = end_ip
       ))
       f.close()
-      
+
       # Tunneldigger VPN configuration
       if self.vpn:
         f = open(os.path.join(configPath, "tunneldigger"), 'w')
         iface = 0
-        
+
         for server, ports in self.tdServer:
           ports = "\n".join(["        list address          '%s:%d'" % (server, x) for x in ports])
           f.write("""
@@ -826,7 +826,7 @@ config broker
             f.write("        option limit_bw_down    '%s'" % self.vpn['limit_down'])
           f.write('\n')
           iface += 1
-        
+
         f.close()
 
       # QoS configuration
@@ -838,7 +838,7 @@ config broker
           f.write("        option enabled     1\n")
           f.write("        option upload      %d\n" % self.vpn['limit_up'])
           f.write("\n")
-      
+
       f.write("""
 config classify
         option target       "Priority"
@@ -914,7 +914,7 @@ config class "Bulk"
         option packetdelay 200
 """)
       f.close()
-      
+
       # uhttpd configuration
       f = open(os.path.join(configPath, "uhttpd"), 'w')
       f.write("""
@@ -932,18 +932,18 @@ config uhttpd main
       ))
       f.close()
       return
-   
+
     os.mkdir(os.path.join(directory, 'init.d'))
-    
+
     # Generate iproute2 rt_tables (hardcoded for now)
     os.mkdir(os.path.join(directory, 'iproute2'))
     f = open(os.path.join(directory, 'iproute2', 'rt_tables'), 'w')
     f.write('8\twan\n')
     f.close()
-    
+
     # Configure HTTP server
     self.__copyServiceTemplate('general/httpd.init', 'httpd')
-    
+
     # Prevent the date from going to far into the past on reboot
     miscScriptPath = os.path.join(directory, 'init.d', 'misc')
     f = open(miscScriptPath, 'w')
@@ -952,7 +952,7 @@ config uhttpd main
 
     # Setup passwords
     self.__generatePasswords()
-    
+
     # Write UUID to /etc/uuid
     f = open(os.path.join(directory, 'uuid'), 'w')
     f.write(self.uuid)
@@ -961,44 +961,44 @@ config uhttpd main
     # Create the 'config' directory
     configPath = os.path.join(directory, 'config')
     os.mkdir(configPath)
-    
+
     f = open(os.path.join(configPath, "system"), 'w')
     self.__generateSystemConfig(f)
-    
+
     f = open(os.path.join(configPath, "network"), 'w')
     self.__generateNetworkConfig(f)
-    
+
     f = open(os.path.join(configPath, "wireless"), 'w')
     self.__generateWirelessConfig(f)
-    
+
     f = open(os.path.join(configPath, "ntpclient"), 'w')
     self.__generateNtpClientConfig(f)
-    
+
     # 'dhcp' configuration must be empty, so the init script will use
     # dnsmasq.conf in /etc
     f = open(os.path.join(configPath, "dhcp"), 'w')
     f.close()
-    
+
     # Create the 'olsrd.conf'
     f = open(os.path.join(directory, 'olsrd.conf'), 'w')
     self.__generateOlsrdConfig(f)
-    
+
     # Create the VPN configuration
     if self.vpn:
       self.__generateVpnConfig(os.path.join(directory, 'openvpn'))
-    
+
     # Create the dnsmasq configuration
     f = open(os.path.join(directory, 'dnsmasq.conf'), 'w')
     self.__generateDnsmasqConfig(f)
-    
+
     # Create the captive portal configuration
     if self.captivePortal and self.hasClientSubnet:
       self.__generateCaptivePortalConfig(os.path.join(directory, 'nodogsplash'))
-    
+
     # Setup service symlinks
     if self.openwrtVersion == "old":
       self.__generateServices(os.path.join(directory, 'rc.d'))
-  
+
   def build(self, path):
     """
     Build the image using ImageBuilder.
@@ -1019,12 +1019,12 @@ config uhttpd main
         "tp-wr703n" : "TLWR703",
         "tp-mr3020" : "TLMR3020",
         "tp-mr3040" : "TLMR3040",
-        
+
         "ub-bullet" : "UBNT",
         "ub-nano" : "UBNT",
         "ub-bullet-m5" : "UBNT",
         "ub-rocket-m5" : "UBNT",
-        
+
         "fonera"     : "",
       }
 
@@ -1044,10 +1044,10 @@ config uhttpd main
       os.chdir(path)
       os.system(buildString)
       return
-    
+
     if self.wifiDriver in driverPackages:
       self.addPackage(*driverPackages[self.wifiDriver])
-    
+
     if self.portLayout in platformPackages:
       self.addPackage(*platformPackages[self.portLayout])
 
@@ -1059,7 +1059,7 @@ config uhttpd main
     self.addPackage('tc', 'kmod-sched')
     #self.addPackage('kmod-ipv6')
     self.addPackage('dnsmasq')
-    
+
     if self.hasClientSubnet:
       self.addPackage('nullhttpd', 'nodewatcher-clients')
     else:
@@ -1074,17 +1074,17 @@ config uhttpd main
     print buildString
     os.chdir(path)
     os.system(buildString)
-  
+
   def __overwriteService(self, name):
     path = os.path.join(self.base, 'init.d', name)
     open(path, 'w').close()
     os.chmod(path, 0755)
-  
+
   def __copyTemplate(self, name, destination):
     f = open(destination, 'w')
     f.write(open(os.path.join("templates", name), "r").read())
     f.close()
-  
+
   def __copyServiceTemplate(self, template, name):
     path = os.path.join(self.base, 'init.d', name)
     self.__copyTemplate(template, path)
@@ -1093,7 +1093,7 @@ config uhttpd main
   def __generatePasswords(self):
     from random import choice
     import string
-    
+
     if not self.password:
       raise Exception("No password has been defined!")
 
@@ -1102,16 +1102,16 @@ config uhttpd main
     f.write('root:%s:0:0:root:/tmp:/bin/ash\n' % crypt.md5crypt(self.password, salt))
     f.write('nobody:*:65534:65534:nobody:/var:/bin/false\n')
     f.close()
-  
+
   def __generateVpnConfig(self, directory):
     os.mkdir(directory)
-    
+
     # Configuration
     f = open(os.path.join(directory, 'wlanlj.conf'), 'w')
     f.write('client\n')
     f.write('proto udp\n')
     f.write('dev tap0\n')
-    
+
     vpnServers = list(self.vpnServer)
     shuffle(vpnServers)
     for vpn in vpnServers:
@@ -1136,7 +1136,7 @@ config uhttpd main
     f.write('ca /etc/openvpn/wlanlj-ca.crt\n')
     f.write('tls-auth /etc/openvpn/wlanlj-ta.key 1\n')
     f.close()
-    
+
     # Password file
     f = open(os.path.join(directory, 'wlanlj-password'), 'w')
     f.write(self.vpn['username'] + "\n")
@@ -1158,7 +1158,7 @@ config uhttpd main
       f.write('  # set on wlan slovenija gateways will cease to work!\n')
       f.write('  openvpn --mktun --dev tap0\n')
       f.write('  ifconfig tap0 hw ether %s\n' % self.vpn['mac'])
-      
+
       if self.vpn['limit_up']:
         f.write('\n')
         f.write('  # Setup egress limiting on VPN interface\n')
@@ -1169,41 +1169,41 @@ config uhttpd main
       f.close()
       os.chmod(up_path, 0755)
       self.addService('S60', 'openvpn-mac')
-    
+
     # Copy the key and CA templates
     self.__copyTemplate("openvpn/ta.key", os.path.join(directory, 'wlanlj-ta.key'))
     self.__copyTemplate("openvpn/ca.crt", os.path.join(directory, 'wlanlj-ca.crt'))
-    
+
     # Add package dependencies
     self.addPackage('kmod-tun', 'zlib', 'libopenssl', 'liblzo', 'openvpn')
-  
+
   def __generateCaptivePortalConfig(self, directory):
     os.mkdir(directory)
     os.mkdir(os.path.join(directory, 'htdocs'))
-    
+
     # Basic configuration (static)
     f = open(os.path.join(directory, 'nodogsplash.conf'), 'w')
     f.write('GatewayInterface %s\n' % (self.wifiIface if not self.lanWifiBridge else self.lanWifiBridgeIface))
     f.write('GatewayName wlan-lj.net\n')
-    
+
     subnetSize = 30
     for subnet in self.subnets:
       if subnet['dhcp'] and subnet['interface'] == (self.wifiIface if not self.lanWifiBridge else self.lanWifiBridgeIface):
         f.write('GatewayIPRange %(subnet)s/%(cidr)s\n' % subnet)
         subnetSize = ipcalc.Network("%(subnet)s/%(cidr)s" % subnet).size() - 2
         break
-    
+
     f.write('ClientIdleTimeout 30\n')
     f.write('ClientForceTimeout 360\n')
     f.write('MaxClients %d\n' % subnetSize)
     f.write('\n')
     f.write('FirewallRuleSet preauthenticated-users {\n')
-    
+
     for dns in self.dns:
       f.write('  FirewallRule allow tcp port 53 to %s\n' % dns)
       f.write('  FirewallRule allow udp port 53 to %s\n' % dns)
       f.write('  FirewallRule allow icmp to %s\n' % dns)
-    
+
     f.write('}\n')
     f.write('\n')
     f.write('EmptyRuleSetPolicy authenticated-users passthrough\n')
@@ -1211,12 +1211,12 @@ config uhttpd main
     f.write('EmptyRuleSetPolicy trusted-users passthrough\n')
     f.write('EmptyRuleSetPolicy trusted-users-to-router passthrough\n')
     f.close()
-    
+
     # Add the nodogsplash service and package dependencies
     self.addService('S50', 'nodogsplash')
     self.addPackage('kmod-ipt-ipopt', 'iptables-mod-ipopt')
     self.addPackage('libpthread', 'nodogsplash')
-  
+
   def __generateDnsmasqConfig(self, f):
     f.write('domain-needed\n')
     f.write('bogus-priv\n')
@@ -1226,11 +1226,11 @@ config uhttpd main
 
     for dns in self.dns:
       f.write('server=%s\n' % dns)
-    
+
     f.write('dhcp-authoritative\n')
     f.write('dhcp-leasefile=/tmp/dhcp.leases\n')
     f.write('\n')
-    
+
     for subnet in self.subnets:
       if subnet['dhcp'] and subnet['cidr'] <= 28:
         network = ipcalc.Network("%s/%s" % (subnet['subnet'], subnet['cidr']))
@@ -1238,25 +1238,25 @@ config uhttpd main
         if ipcalc.IP(self.ip) in network:
           # First few IPs of primary subnet might be used for individual interfaces
           offset += self.usedOlsrIps - 1
-        
+
         subnet['ntp'] = self.ntp[0]
         subnet['rangeStart'] = str(ipcalc.IP(long(network.network()) + offset + 1))
         subnet['rangeEnd'] = str(network.host_last())
-        
+
         f.write('# %(subnet)s/%(cidr)s\n' % subnet)
         f.write('dhcp-range=%(interface)s,%(rangeStart)s,%(rangeEnd)s,%(mask)s,30m\n' % subnet)
         f.write('dhcp-option=%(interface)s,3,%(firstIp)s\n' % subnet)
         f.write('dhcp-option=%(interface)s,6,%(firstIp)s\n' % subnet)
         f.write('dhcp-option=%(interface)s,42,%(ntp)s\n' % subnet)
-    
+
     f.close()
-  
+
   def __generateMiscScript(self, f):
     f.write('#!/bin/sh /etc/rc.common\n')
     f.write('START=46\n')
     f.write('STOP=46\n')
     f.write('start() {\n')
-    
+
     # Prevent the time from reseting to far into the past
     t = datetime.today()
     f.write('\tif [ ! -f /etc/datetime.save ]; then\n')
@@ -1265,12 +1265,12 @@ config uhttpd main
     f.write('\tDT=`cat /etc/datetime.save`\n')
     f.write('\tdate $DT\n')
     f.write('\n')
-    
+
     # Allow txtinfo access when selected
     if 'olsrd-mod-txtinfo' in self.packages:
       f.write('\tiptables -A INPUT -p tcp --dport 2006 -j ACCEPT\n')
       f.write('\n')
-    
+
     # Set boot_wait to on if it is not set
     f.write('\tif [ -x /usr/sbin/nvram ]; then\n')
     f.write('\t\tBOOT_WAIT=`nvram get boot_wait`\n')
@@ -1278,7 +1278,7 @@ config uhttpd main
     f.write('\t\t  nvram set boot_wait=on\n')
     f.write('\t\t  nvram commit\n')
     f.write('\t\t}\n')
-    
+
     # Set boardflags on WHR-HP-G54
     if self.portLayout == 'whr-hp-g54':
       f.write('\tBOARDFLAGS=`nvram get boardflags`\n')
@@ -1286,40 +1286,40 @@ config uhttpd main
       f.write('\t\t  nvram set boardflags=0x3758\n')
       f.write('\t\t  nvram commit\n')
       f.write('\t\t}\n')
-    
+
     f.write('\tfi\n')
-    
+
     f.write('}\n')
-    
+
     f.write('stop() {\n')
     f.write('\tDT=`date +%m%d%H%M%Y`\n')
     f.write('\techo $DT > /etc/datetime.save\n')
     f.write('}\n')
-    
+
     f.close()
-    
+
     if self.openwrtVersion == "old":
       # Copy timezone template
       self.__copyTemplate("general/timezone", os.path.join(self.base, 'TZ'))
-  
+
   def __generateServices(self, directory):
     os.mkdir(directory)
-    
+
     for service in self.services:
       os.symlink("/etc/init.d/%(name)s" % service, os.path.join(directory, "%(priority)s%(name)s" % service))
-  
+
   def __generateOlsrdConfig(self, f):
     # Subnet configuration
     if self.subnets:
       f.write('Hna4\n')
       f.write('{\n')
-      
+
       for subnet in self.subnets:
         if subnet['olsr']:
           f.write('  %(subnet)s  %(mask)s\n' % subnet)
-      
+
       f.write('}\n\n')
-    
+
     # General configuration (static)
     f.write('AllowNoInt yes\n')
     f.write('UseHysteresis no\n')
@@ -1337,7 +1337,7 @@ config uhttpd main
     f.write('MainIp {0}\n'.format(self.ip))
     f.write('SrcIpRoutes yes\n')
     f.write('\n')
-    
+
     # Setup txtinfo plugin when selected
     if 'olsrd-mod-txtinfo' in self.packages:
       f.write('LoadPlugin "olsrd_txtinfo.so.0.1"\n')
@@ -1345,7 +1345,7 @@ config uhttpd main
       f.write('  PlParam "accept" "0.0.0.0"\n')
       f.write('}\n')
       f.write('\n')
-    
+
     # Setup actions plugin to trigger a nodewatcher script when the default
     # route is added or removed from the routing table
     if self.hasClientSubnet:
@@ -1356,10 +1356,10 @@ config uhttpd main
         f.write('  PlParam "trigger" "%s>/etc/actions.d/olsr_dns_action"\n' % dns)
       f.write('}\n')
       f.write('\n')
-      
+
       # Add the olsrd-mod-actions package
       self.addPackage('olsrd-mod-actions')
-    
+
     # General interface configuration (static)
     def interfaceConfiguration(name):
       f.write('Interface "{0}"\n'.format(name))
@@ -1373,17 +1373,17 @@ config uhttpd main
       f.write('  MidValidityTime 324.0\n')
       f.write('  HnaInterval 18.0\n')
       f.write('  HnaValidityTime 324.0\n')
-      
+
       f.write('}\n')
       f.write('\n')
-    
+
     # Additional interface configuration
     for interface in self.interfaces:
       if interface['olsr']:
         interfaceConfiguration(interface['name'])
-    
+
     f.close()
-  
+
   def __generateSystemConfig(self, f):
     # System configuration
     f.write('config system\n')
@@ -1392,18 +1392,18 @@ config uhttpd main
     f.write('\toption timezone "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"\n')
     f.write('\n')
     f.close()
-  
+
   def __generateNetworkConfig(self, f):
     # VLAN configuration
     layout = portLayouts[self.portLayout]
-    
+
     if isinstance(layout, tuple):
       f.write('#### VLAN configuration\n')
       f.write('config switch %s\n' % ("eth0" if not self.portLayout in switchIds else switchIds[self.portLayout]))
       f.write('\toption vlan0 "%s"\n' % layout[0])
       f.write('\toption vlan1 "%s"\n' % layout[1])
       f.write('\n')
-    
+
     # Loopback configuration (static)
     f.write('#### Loopback configuration\n')
     f.write('config interface loopback\n')
@@ -1412,7 +1412,7 @@ config uhttpd main
     f.write('\toption ipaddr 127.0.0.1\n')
     f.write('\toption netmask 255.0.0.0\n')
     f.write('\n')
-    
+
     # LAN configuration
     if self.lanIface:
       # When LAN<->WiFi bridge is enabled, this interface is called 'mesh' as firewall
@@ -1430,7 +1430,7 @@ config uhttpd main
       except PrimarySubnetTooSmall:
         # Not enough IPs for LAN interface, disable it
         self.lanIface = ''
-    
+
     # Add wireless interface configuration (when no LAN<->WiFi bridge is enabled)
     if not self.lanWifiBridge:
       self.addInterface('mesh', self.wifiIface, self.ip, 16, olsr = (self.nodeType == "adhoc"), init = True)
@@ -1439,10 +1439,10 @@ config uhttpd main
       for subnet in self.subnets:
         if subnet['interface'] == self.wifiIface:
           subnet['interface'] = self.lanWifiBridgeIface
-      
+
       # Create a virtual bridge interface (for OLSR configuration)
       self.addInterface("mesh", self.lanWifiBridgeIface, self.ip, 16, olsr = True, init = False)
-    
+
     # Other interfaces configuration
     for interface in self.interfaces:
       if interface['init']:
@@ -1450,19 +1450,19 @@ config uhttpd main
         f.write('\toption ifname "%(name)s"\n' % interface)
         if interface['type']:
           f.write('\toption type %(type)s\n' % interface)
-        
+
         if interface['ip']:
           f.write('\toption proto static\n')
           f.write('\toption ipaddr %(ip)s\n' % interface)
           f.write('\toption netmask %(mask)s\n' % interface)
-          
+
           if interface['gateway']:
             f.write('\toption gateway %(gateway)s\n' % interface)
         else:
           f.write('\toption proto dhcp\n')
-        
+
         f.write('\n')
-        
+
         # Set a fallback IP on WAN interface
         if interface['id'] == 'wan':
           if self.openwrtVersion == "old":
@@ -1471,33 +1471,33 @@ config uhttpd main
           else:
             f.write('config alias wanfallback\n')
             f.write('\toption interface wan\n')
-          
+
           f.write('\toption proto static\n')
           f.write('\toption ipaddr 169.254.189.120\n')
           f.write('\toption netmask 255.255.0.0\n')
           f.write('\n')
-    
+
     # VPN route override
     if self.vpn:
       idx = 0
       wanIface = self.getInterface('wan')
-      
+
       for vpn in self.vpnServer:
         f.write('config route vpn%d\n' % idx)
         f.write('\toption interface wan\n')
         f.write('\toption target %s\n' % vpn[0])
-        
+
         # If WAN obtains IP via DHCP, set gateway to 'auto'
         if wanIface['gateway'] == None:
           f.write('\toption gateway auto\n')
         else:
           f.write('\toption gateway %s\n' % wanIface['gateway'])
-        
+
         f.write('\toption metric 0\n')
         f.write('\toption table wan\n')
         f.write('\n')
         idx += 1
-    
+
     # WAN stuff
     if self.hasInterface('wan'):
       f.write('config route wannetwork\n')
@@ -1506,7 +1506,7 @@ config uhttpd main
       f.write('\toption metric 0\n')
       f.write('\toption table wan\n')
       f.write('\n')
-      
+
       f.write('config route wandefault\n')
       f.write('\toption interface wan\n')
       f.write('\toption target default\n')
@@ -1514,35 +1514,35 @@ config uhttpd main
       f.write('\toption metric 0\n')
       f.write('\toption table wan\n')
       f.write('\n')
-    
+
     # Subnets
     if self.subnets:
       f.write('#### Subnet configuration\n')
       virtualIfaceIds = {}
-      
+
       for subnetId, subnet in enumerate(self.subnets):
         # Ignore small subnets
         if subnet['cidr'] >= 29:
           continue
-        
+
         # Generate subnet configuration
         ifaceId = virtualIfaceIds.setdefault(subnet['interface'], 0)
         virtualIfaceIds[subnet['interface']] += 1
-        
+
         if self.openwrtVersion == "old":
           f.write('config interface subnet%d\n' % subnetId)
           f.write('\toption ifname "%s:%d"\n' % (subnet['interface'], ifaceId))
         else:
           f.write('config alias subnet%d\n' % subnetId)
           f.write('\toption interface %(id)s\n' % self.getInterfaceByName(subnet['interface']))
-        
+
         f.write('\toption proto static\n')
         f.write('\toption ipaddr %(firstIp)s\n' % subnet)
         f.write('\toption netmask %(mask)s\n' % subnet)
         f.write('\n')
-    
+
     f.close()
-  
+
   def __generateWirelessConfig(self, f):
     # Wifi device configuration
     f.write('config wifi-device %s\n' % self.wifiVirtualIface)
@@ -1552,25 +1552,25 @@ config uhttpd main
     f.write('\toption rxantenna %s\n' % self.wifiRxAnt)
     f.write('\toption txantenna %s\n' % self.wifiTxAnt)
     f.write('\n')
-    
+
     # Wifi interface configuration
     f.write('config wifi-iface\n')
     f.write('\toption device %s\n' % self.wifiVirtualIface)
     f.write('\toption network mesh\n')
     f.write('\toption mode %s\n' % self.nodeType)
     f.write('\toption ssid %s\n' % self.ssid)
-    
+
     if self.nodeType == "adhoc":
       f.write('\toption bssid %s\n' % self.bssid)
-    
+
     f.write('\toption hidden 0\n')
     f.write('\toption bgscan 0\n')
     f.write('\toption encryption none\n')
     f.write('\toption mcast_rate 5500\n')
     f.write('\n')
-    
+
     f.close()
-  
+
   def __generateNtpClientConfig(self, f):
     # Ntpclient configuration
     for ntp in self.ntp:
@@ -1579,21 +1579,21 @@ config uhttpd main
         f.write('\toption count "1"\n')
       else:
         f.write('config ntpserver\n')
-      
+
       f.write('\toption hostname "%s"\n' % ntp)
       f.write('\toption port "123"\n')
       f.write('\n')
-    
+
     if self.openwrtVersion == "new":
       f.write('config ntpdrift\n')
       f.write('\toption freq 0\n')
       f.write('\n')
-      
+
       f.write('config ntpclient\n')
       f.write('\toption interval 3600\n')
       f.write('\n')
-    
+
     f.close()
-    
+
     # Add ntpclient service
     self.addService('S80', 'ntpclient')
