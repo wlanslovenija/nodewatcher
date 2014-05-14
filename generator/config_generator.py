@@ -70,6 +70,15 @@ portLayouts = {
   'ub-nano'   : None,
   'ub-bullet-m5' : None,
   'ub-rocket-m5' : None,
+
+  # Siemens SX763v2
+  'sm-sx763v2': {
+    'switch': 'eth0',
+    'vlans': {
+      1: '4 3 2 5t',
+      2: '1 5t',
+    },
+  },
 }
 
 # Optional packages that should be removed when configuring a router-only node
@@ -510,7 +519,21 @@ config alias
         iface_lan = self.lanIface
       ))
 
-      if self.portLayout not in portLayouts or portLayouts.get(self.portLayout) is not None:
+      if isinstance(portLayouts.get(self.portLayout, None), dict):
+        switch = portLayouts[self.portLayout]
+
+        f.write("config switch %s\n" % switch['switch'])
+        f.write("        option enable_vlan '1'\n")
+        f.write("        option name '%s'\n" % switch['switch'])
+        f.write("\n")
+
+        for vlan, ports in switch['vlans'].iteritems():
+          f.write("config switch_vlan\n")
+          f.write("        option device   %s\n" % switch['switch'])
+          f.write("        option vlan     '%d'\n" % vlan)
+          f.write("        option ports    '%s'\n" % ports)
+          f.write("\n")
+      elif self.portLayout not in portLayouts or portLayouts.get(self.portLayout) is not None:
         f.write("config switch %s\n" % self.lanIface)
         f.write("        option enable_vlan      1\n")
         f.write("\n")
@@ -1026,6 +1049,8 @@ config uhttpd main
         "ub-rocket-m5" : "UBNT",
 
         "fonera"     : "",
+
+        "sm-sx763v2" : "GIGASX76X",
       }
 
       for package in clientOnlyPackages:
