@@ -3,7 +3,6 @@ import json
 from django import http, shortcuts, template
 from django.contrib.auth import decorators as auth_decorators
 from django.db import transaction
-from django.utils import safestring
 
 from . import forms as registry_forms, registration
 
@@ -60,17 +59,15 @@ def evaluate_forms(request, regpoint_id, root_id):
             actions=actions,
             current_config=partial_config,
         )
+
+        if temp_root:
+            forms.root = None
     finally:
         transaction.savepoint_rollback(sid)
 
     # Render forms and return them
     return shortcuts.render_to_response(
         'registry/forms.html',
-        {
-            'registry_forms': forms,
-            'eval_state': safestring.mark_safe(json.dumps(actions["STATE"])),
-            'registry_root': root if not temp_root else None,
-            'registry_regpoint': regpoint_id,
-        },
+        {'registry_forms': forms},
         context_instance=template.RequestContext(request),
     )

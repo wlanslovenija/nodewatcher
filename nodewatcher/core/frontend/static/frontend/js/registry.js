@@ -13,8 +13,16 @@
     // Registry methods object
     $.registry = {};
 
-    // Initialize registry fields
-    $(document).ready(function () {
+    /**
+     * Initializes the registry API.
+     *
+     * @param rpid Registry point identifier
+     * @param rid Root object identifier
+     */
+    $.registry.initialize = function(rpid, rid) {
+        regpoint_id = rpid;
+        root_id = rid;
+
         // Bind event handlers
         $('.registry_form_item_chooser').change(function() {
             $.registry.evaluate_rules({});
@@ -28,17 +36,6 @@
         $('.registry_form_remover').click(function() {
             $.registry.evaluate_rules({ 'remove_last' : $(this).attr('name') });
         });
-    });
-
-    /**
-     * Initializes the registry API.
-     *
-     * @param rpid Registry point identifier
-     * @param rid Root object identifier
-     */
-    $.registry.initialize = function(rpid, rid) {
-        regpoint_id = rpid;
-        root_id = rid;
     };
 
     /**

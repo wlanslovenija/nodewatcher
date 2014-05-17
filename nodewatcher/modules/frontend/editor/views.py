@@ -2,7 +2,6 @@ from django import http
 from django.core import exceptions, urlresolvers
 from django.db import transaction
 from django.views import generic
-from django.utils import safestring, simplejson as json
 
 from guardian import mixins, shortcuts
 
@@ -32,11 +31,7 @@ class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(NewNode, self).get_context_data(**kwargs)
-
         context['registry_forms'] = self.dynamic_forms
-        context['registry_regpoint'] = 'node.config'
-        context['eval_state'] = json.dumps(self.eval_state)
-
         return context
 
     def get(self, request, *args, **kwargs):
@@ -66,7 +61,6 @@ class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
                 data=request.POST,
                 only_rules=True,
             )
-            self.eval_state = actions['STATE']
 
             has_errors, self.dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
                 'node.config',
@@ -85,6 +79,7 @@ class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
                 return self.form_valid()
             else:
                 transaction.savepoint_rollback(sid)
+                self.dynamic_forms.root = None
                 return self.form_invalid()
         except:
             transaction.savepoint_rollback(sid)
@@ -108,12 +103,7 @@ class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.Detail
 
     def get_context_data(self, **kwargs):
         context = super(EditNode, self).get_context_data(**kwargs)
-
         context['registry_forms'] = self.dynamic_forms
-        context['registry_root'] = self.object
-        context['registry_regpoint'] = 'node.config'
-        context['eval_state'] = json.dumps(self.eval_state)
-
         return context
 
     def get(self, request, *args, **kwargs):
@@ -138,7 +128,6 @@ class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.Detail
             data=request.POST,
             only_rules=True,
         )
-        self.eval_state = actions['STATE']
 
         has_errors, self.dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
             'node.config',

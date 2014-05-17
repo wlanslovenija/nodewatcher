@@ -1,7 +1,7 @@
 {{ registry_forms.media.js }}
 {{ registry_forms }}
 
-<input type="hidden" name="STATE" id="reg_eval_state" value='{{ eval_state }}' />
+<input type="hidden" name="registry_form_id" value="{{ registry_forms.form_id }}" />
 <script type="text/javascript">
-    $.registry.initialize('{{ registry_regpoint }}', '{{ registry_root.pk }}');
+    $.registry.initialize('{{ registry_forms.regpoint }}', '{{ registry_forms.root }}');
 </script>

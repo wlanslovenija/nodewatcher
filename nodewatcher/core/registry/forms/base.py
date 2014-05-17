@@ -1,5 +1,7 @@
 import copy
+import hashlib
 import json
+import os
 
 from django import forms, template
 from django.conf import settings
@@ -117,15 +119,19 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
 
     template = 'registry/render_items.html'
 
-    def __init__(self, forms):
+    def __init__(self, context, forms):
         """
         Class constructor.
 
+        :param context: Registry form render context
         :param forms: A list of form descriptors
         """
 
         super(RootRegistryRenderItem, self).__init__(None, None, forms)
         self.errors = []
+        self.regpoint = context.regpoint.name
+        self.root = context.root.pk if context.root else None
+        self.form_id = context.form_id
 
     def add_error(self, message):
         """
@@ -463,6 +469,51 @@ class RegistryFormContext(object):
         Class constructor.
         """
         self.__dict__.update(kwargs)
+        self._form_id = None
+
+        if self.form_id not in self.request.session:
+            self.state = {}
+
+    @property
+    def form_id(self):
+        """
+        Returns the unique form identifier. If one is not yet configured,
+        a new one is generated.
+        """
+
+        if not self._form_id:
+            if not self.data or 'registry_form_id' not in self.data:
+                self._form_id = hashlib.sha1('registry-form-%s' % os.urandom(32)).hexdigest()
+            else:
+                self._form_id = self.data['registry_form_id']
+
+        return self._form_id
+
+    def _get_state(self):
+        """
+        Rule evaluation state getter.
+        """
+
+        self.request.session.modified = True
+        return self.request.session[self.form_id]
+
+    def _set_state(self, value):
+        """
+        Rule evaluation state setter.
+        """
+
+        self.request.session[self.form_id] = value
+        self.request.session.modified = True
+
+    state = property(_get_state, _set_state)
+
+    def clear_state(self):
+        """
+        Clears rule evaluation state.
+        """
+
+        del self.request.session[self.form_id]
+        self.request.session.modified = True
 
 
 def prepare_forms(context):
@@ -772,16 +823,18 @@ def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, sav
 
     try:
         sid = transaction.savepoint()
-        forms = RootRegistryRenderItem(prepare_forms(context))
+        forms = RootRegistryRenderItem(context, prepare_forms(context))
 
         if only_rules:
             # If only rule validation is requested, we should evaluate rules and then rollback
             # the savepoint in any case; all validation errors are ignored
-            actions = registry_rules.evaluate(regpoint, root, json.loads(data['STATE']), context.partial_config)
+            actions = registry_rules.evaluate(regpoint, root, context.state, context.partial_config)
             transaction.savepoint_rollback(sid)
+            context.state = actions['STATE']
             return actions, context.partial_config
         elif also_rules:
             actions = registry_rules.evaluate(regpoint, root)
+            context.state = actions['STATE']
 
         # Execute any validation hooks when saving and there are no validation errors
         if save and root is not None and not context.validation_errors:
@@ -794,6 +847,7 @@ def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, sav
 
         if not context.validation_errors:
             transaction.savepoint_commit(sid)
+            context.clear_state()
         else:
             transaction.savepoint_rollback(sid)
     except RegistryValidationError:
