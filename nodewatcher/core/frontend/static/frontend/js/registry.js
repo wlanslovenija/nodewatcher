@@ -1,9 +1,45 @@
-var registry = {
-    // Regpoint identifier that needs to be set
-    regpoint_id: '',
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as anonymous module.
+        define(['jquery'], factory);
+    } else {
+        // Browser globals.
+        factory(jQuery);
+    }
+}(function ($) {
+    var regpoint_id;
+    var root_id;
 
-    // Regpoint root identifier that needs to be set
-    root_id: '',
+    // Registry methods object
+    $.registry = {};
+
+    // Initialize registry fields
+    $(document).ready(function () {
+        // Bind event handlers
+        $('.registry_form_item_chooser').change(function() {
+            $.registry.evaluate_rules({});
+        });
+        $('.registry_form_selector').change(function() {
+            $.registry.evaluate_rules({});
+        });
+        $('.registry_form_adder').click(function() {
+            $.registry.evaluate_rules({ 'append' : $(this).attr('name') });
+        });
+        $('.registry_form_remover').click(function() {
+            $.registry.evaluate_rules({ 'remove_last' : $(this).attr('name') });
+        });
+    });
+
+    /**
+     * Initializes the registry API.
+     *
+     * @param rpid Registry point identifier
+     * @param rid Root object identifier
+     */
+    $.registry.initialize = function(rpid, rid) {
+        regpoint_id = rpid;
+        root_id = rid;
+    };
 
     /**
      * Performs server-side rule evaluation based on current values of all
@@ -11,52 +47,16 @@ var registry = {
      * changes as a set of Javascript instructions that manipulate the registry
      * object.
      */
-    reevaluate_rules: function(actions)
-    {
+    $.registry.evaluate_rules = function(actions) {
         // Prepare form in serialized form (pun intended)
         var forms = $('#registry_forms *').serialize();
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
 
         $.postCsrf(
-            "/registry/evaluate_forms/" + registry.regpoint_id + "/" + registry.root_id,
+            "/registry/evaluate_forms/" + regpoint_id + "/" + root_id,
             forms
         ).done(function(data) {
             $('#registry_forms').html(data);
         });
-    },
-
-    /**
-     * Initializes the client-side registry functions.
-     */
-    register_action_fields: function()
-    {
-        // Bind event handlers
-        $('.regact_item_chooser').change(function() {
-            registry.reevaluate_rules({});
-        });
-        $('.regact_selector').change(function() {
-            registry.reevaluate_rules({});
-        });
-        $('.regact_adder').click(function() {
-            registry.reevaluate_rules({ 'append' : $(this).attr('name') })
-        });
-        $('.regact_remover').click(function() {
-            registry.reevaluate_rules({ 'remove_last' : $(this).attr('name') })
-        });
-    },
-
-    /**
-     * Updates the evaluation state that needs to be stored between invocations
-     * for proper change handling.
-     */
-    state: function(new_state)
-    {
-        $('#reg_eval_state').val(new_state);
-    }
-};
-
-// Initialize registry functions
-$(document).ready(function () {
-    registry.register_action_fields();
-});
-
+    };
+}));

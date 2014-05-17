@@ -26,7 +26,7 @@ class SelectorFormField(form_fields.TypedChoiceField):
         Class constructor.
         """
 
-        kwargs['widget'] = widgets.Select(attrs={'class': 'regact_selector'})
+        kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
         super(SelectorFormField, self).__init__(*args, **kwargs)
 
         # Override choices so we get a lazy list instead of being evaluated right here
@@ -119,7 +119,7 @@ class ModelSelectorKeyField(models.ForeignKey):
         Returns an augmented form field.
         """
 
-        defaults = {'widget': widgets.Select(attrs={'class': 'regact_selector'})}
+        defaults = {'widget': widgets.Select(attrs={'class': 'registry_form_selector'})}
         defaults.update(kwargs)
         return super(ModelSelectorKeyField, self).formfield(**defaults)
 
