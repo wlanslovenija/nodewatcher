@@ -1,5 +1,5 @@
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.core.monitor import processors as monitor_processors, events as monitor_events
 
 from . import parser as telemetry_parser
 
@@ -71,6 +71,10 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                     # Parsing has failed, log this; all components that did not get parsed
                     # will be missing from context and so depending modules will not process them
                     self.logger.error("Failed to parse HTTP telemetry feed from %s!" % router_id)
+
+                    # Create an event in case the router has an associated firmware configuration
+                    if hasattr(node.config.core.general(), 'router'):
+                        monitor_events.TelemetryProcessingFailed(node).post()
             except core_models.RouterIdConfig.DoesNotExist:
                 # No router-id for this node can be found for IPv4; this means
                 # that we have nothing to do here

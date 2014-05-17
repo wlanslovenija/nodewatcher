@@ -28,3 +28,22 @@ class TopologyLinkEstablished(events.NodeEventRecord):
             _("Link between two nodes has been established"),
             routing_protocol=routing_protocol,
         )
+
+
+class TelemetryProcessingFailed(events.NodeEventRecord):
+    """
+    Telemetry failure event.
+    """
+
+    def __init__(self, node):
+        """
+        Class constructor.
+
+        :param node: Node on which the telemetry processing failed
+        """
+
+        super(TelemetryProcessingFailed, self).__init__(
+            [node],
+            events.NodeEventRecord.SEVERITY_ERROR,
+            _("Telemetry processing has failed"),
+        )
