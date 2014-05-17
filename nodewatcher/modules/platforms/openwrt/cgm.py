@@ -493,7 +493,7 @@ def network(node, cfg):
                     iface_dhcp = cfg.dhcp.add(dhcp=interface.eth_port)
                     iface_dhcp.interface = interface.eth_port
                 except ValueError:
-                    pass
+                    iface_dhcp = cfg.dhcp[interface.eth_port]
 
                 iface_dhcp.ignore = True
 
