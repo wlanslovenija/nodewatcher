@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors, events as monitor_events
+from nodewatcher.core.monitor import processors as monitor_processors, events as monitor_events
 
 from . import models as olsr_models, parser as olsr_parser
 
