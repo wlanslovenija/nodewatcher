@@ -488,6 +488,15 @@ def network(node, cfg):
             if interface.uplink:
                 iface._uplink = True
 
+                # Ensure that DHCP server does not announce anything via this interface
+                try:
+                    iface_dhcp = cfg.dhcp.add(dhcp=interface.eth_port)
+                    iface_dhcp.interface = interface.eth_port
+                except ValueError:
+                    pass
+
+                iface_dhcp.ignore = True
+
             if interface.mac_address:
                 iface.macaddr = interface.mac_address
 
