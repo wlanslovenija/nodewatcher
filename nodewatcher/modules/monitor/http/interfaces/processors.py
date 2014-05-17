@@ -151,7 +151,7 @@ class Interfaces(monitor_processors.NodeProcessor):
                 elif network.family == 'inet6':
                     net.family = 'ipv6'
                 else:
-                    self.logger.warnin("Unknown network family '%s' on node '%s' interface '%s'!" % (network.family, node.pk, iface.name))
+                    self.logger.warning("Unknown network family '%s' on node '%s' interface '%s'!" % (network.family, node.pk, iface.name))
                 net.save()
                 del existing_networks[address]
 
