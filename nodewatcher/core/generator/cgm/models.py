@@ -131,6 +131,7 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     eth_port = registry_fields.SelectorKeyField('node.config', 'core.interfaces#eth_port')
     uplink = models.BooleanField(default=False)
+    mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Ethernet Interface")

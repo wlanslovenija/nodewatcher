@@ -488,6 +488,9 @@ def network(node, cfg):
             if interface.uplink:
                 iface._uplink = True
 
+            if interface.mac_address:
+                iface.macaddr = interface.mac_address
+
             configure_interface(cfg, interface, iface, interface.eth_port)
 
             # Check if we need to configure the switch
