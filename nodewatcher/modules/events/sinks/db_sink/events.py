@@ -18,8 +18,7 @@ class DatabaseSink(base.EventSink):
         if not isinstance(event, events.NodeEventRecord):
             return
 
-        sid = transaction.savepoint()
-        try:
+        with transaction.atomic():
             mdl = models.SerializedNodeEvent()
             mdl.timestamp = event.timestamp
             mdl.severity = event.severity
@@ -42,9 +41,5 @@ class DatabaseSink(base.EventSink):
             mdl.save()
             # Add related nodes
             mdl.related_nodes.add(*event.related_nodes)
-            transaction.savepoint_commit(sid)
-        except:
-            transaction.savepoint_rollback(sid)
-            raise
 
 pool.register(DatabaseSink)
