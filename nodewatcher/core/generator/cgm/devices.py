@@ -327,15 +327,34 @@ class DeviceBase(object):
                 )
 
     @classmethod
-    def remap_port(cls, platform, port):
+    def remap_port(cls, platform, interface_or_port):
         """
         Remaps a port according to the port mapping.
 
         :param platform: Platform identifier
-        :param port: Port identifier
+        :param interface_or_port: Interface model or port identifier
         """
 
-        return cls.port_map.get(platform, {}).get(port, None)
+        from . import models as cgm_models
+
+        if isinstance(interface_or_port, cgm_models.EthernetInterfaceConfig):
+            interface_or_port = interface_or_port.eth_port
+        elif isinstance(interface_or_port, cgm_models.WifiRadioDeviceConfig):
+            interface_or_port = interface_or_port.wifi_radio
+
+        return cls.port_map.get(platform, {}).get(interface_or_port, None)
+
+    @classmethod
+    def get_vif_mapping(cls, platform, radio, vif):
+        """
+        Returns a name for the wireless virtual interface.
+
+        :param platform: Platform identifier
+        :param radio: Radio identifier
+        :param vif: Wireless virtual interface model
+        """
+
+        return 'vif%s' % vif.get_unique_id()
 
     def __init__(self):
         """

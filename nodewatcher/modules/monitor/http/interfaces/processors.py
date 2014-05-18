@@ -1,5 +1,6 @@
+from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
-from nodewatcher.utils import ipaddr
+from nodewatcher.utils import ipaddr, loader
 
 DATASTREAM_SUPPORTED = False
 try:
@@ -7,6 +8,8 @@ try:
     DATASTREAM_SUPPORTED = True
 except ImportError:
     pass
+
+from . import events
 
 
 class Interfaces(monitor_processors.NodeProcessor):
@@ -55,6 +58,7 @@ class Interfaces(monitor_processors.NodeProcessor):
         if version_ifaces < 2 or version_wifi < 2:
             return context
 
+        interfaces = {}
         for name, data in context.http.iface.iteritems():
             try:
                 iface = existing_interfaces[name]
@@ -68,14 +72,70 @@ class Interfaces(monitor_processors.NodeProcessor):
 
             self.process_interface(context, node, iface, data)
             iface.save()
-            self.interface_enabled(context, iface)
+            self.interface_enabled(context, node, iface)
 
             del existing_interfaces[name]
+            interfaces[name] = iface
 
         # Store reset values for any interfaces that were not found; also hide these interfaces
         for iface in existing_interfaces.values():
             iface.save()
-            self.interface_disabled(context, iface)
+            self.interface_disabled(context, node, iface)
+
+        # Check if any configured interfaces are missing from the report or if there are some
+        # things misconfigured
+        try:
+            loader.load_modules('cgm')
+
+            platform = node.config.core.general().platform
+            if not platform:
+                raise AttributeError
+            device = node.config.core.general().get_device()
+
+            for interface in node.config.core.interfaces():
+                if not interface.enabled:
+                    continue
+
+                iface_names = []
+                if isinstance(interface, cgm_models.WifiRadioDeviceConfig):
+                    for vif in interface.interfaces.all():
+                        iface_names.append((vif, device.get_vif_mapping(platform, interface.wifi_radio, vif)))
+                elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
+                    iface_names.append((interface, device.remap_port(platform, interface)))
+
+                for iface_cfg, iface_name in iface_names:
+                    if not iface_name:
+                        continue
+
+                    if iface_name not in interfaces:
+                        # Generate an event that the interface is missing
+                        events.MissingConfiguredInterface(node, iface_cfg, iface_name).post()
+                    else:
+                        iface_mon = interfaces[iface_name]
+
+                        # Perform interface validation
+                        if isinstance(iface_cfg, cgm_models.WifiInterfaceConfig):
+                            # Check if interface type matches
+                            if isinstance(iface_mon, monitor_models.WifiInterfaceMonitor):
+                                # Check if mode matches
+                                if iface_cfg.mode != iface_mon.mode:
+                                    events.WifiInterfaceModeMismatch(node, iface_name, iface_cfg.mode, iface_mon.mode).post()
+
+                                # Check if ESSID/BSSID matches
+                                if iface_cfg.essid != iface_mon.essid:
+                                    events.WifiInterfaceESSIDMismatch(node, iface_name, iface_cfg.essid, iface_mon.essid).post()
+
+                                if iface_cfg.bssid != iface_mon.bssid:
+                                    events.WifiInterfaceBSSIDMismatch(node, iface_name, iface_cfg.bssid, iface_mon.bssid).post()
+                            else:
+                                # Generate interface type mismatch event
+                                events.InterfaceTypeMismatch(node, iface_cfg, iface_mon, iface_name).post()
+                        else:
+                            # TODO: Validation for other kinds of interfaces
+                            pass
+        except AttributeError:
+            # Do no checking for routers without firmware configuration
+            pass
 
         return context
 
@@ -158,14 +218,14 @@ class Interfaces(monitor_processors.NodeProcessor):
             for net in existing_networks.values():
                 net.delete()
 
-    def interface_enabled(self, context, iface):
+    def interface_enabled(self, context, node, iface):
         """
         Called when an interface has valid data (is available).
         """
 
         pass
 
-    def interface_disabled(self, context, iface):
+    def interface_disabled(self, context, node, iface):
         """
         Called when an interface is no longer available.
         """
@@ -200,18 +260,18 @@ if DATASTREAM_SUPPORTED:
             descriptor.rx_drops_rate.set_tags(visualization={'hidden': hidden})
             descriptor.mtu.set_tags(visualization={'hidden': hidden})
 
-        def interface_enabled(self, context, iface):
+        def interface_enabled(self, context, node, iface):
             """
             Called when an interface has valid data (is available).
             """
 
-            super(DatastreamInterfaces, self).interface_enabled(context, iface)
+            super(DatastreamInterfaces, self).interface_enabled(context, node, iface)
             self.set_interface_hidden(iface, False)
 
-        def interface_disabled(self, context, iface):
+        def interface_disabled(self, context, node, iface):
             """
             Called when an interface is no longer available.
             """
 
-            super(DatastreamInterfaces, self).interface_disabled(context, iface)
+            super(DatastreamInterfaces, self).interface_disabled(context, node, iface)
             self.set_interface_hidden(iface, True)

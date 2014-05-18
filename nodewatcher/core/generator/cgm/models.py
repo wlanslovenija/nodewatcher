@@ -1,3 +1,5 @@
+import hashlib
+
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
@@ -176,6 +178,13 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         registry_name = _("Wireless Interface")
         multiple = True
         hidden = False
+
+    def get_unique_id(self):
+        """
+        Returns a unique identifier for this virtual wifi interface.
+        """
+
+        return hashlib.sha1(":".join([str(self.device.pk), self.mode, self.essid, self.bssid])).hexdigest()[:5]
 
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))

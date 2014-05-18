@@ -572,7 +572,7 @@ def network(node, cfg):
             if interface.ack_distance:
                 radio.distance = interface.ack_distance
 
-            for index, vif in enumerate(interfaces):
+            for vif in interfaces:
                 wif = cfg.wireless.add('wifi-iface')
                 wif.device = wifi_radio
                 wif.encryption = 'none'
@@ -592,9 +592,10 @@ def network(node, cfg):
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
 
                 # Configure network interface for each vif, first being the primary network
-                vif_name = '%sv%d' % (wifi_radio, index)
+                vif_name = device.get_vif_mapping('openwrt', interface.wifi_radio, vif)
                 iface = cfg.network.add(interface=vif_name)
                 wif.network = vif_name
+                wif.ifname = vif_name
 
                 configure_interface(cfg, vif, iface, vif_name)
 
