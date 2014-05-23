@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+export PGPASSWORD=${DB_1_ENV_PGSQL_SUPERUSER_PASSWORD}
+
+psql -h ${DB_1_PORT_5432_TCP_ADDR} -U nodewatcher -d nodewatcher -f "$1" -P pager
