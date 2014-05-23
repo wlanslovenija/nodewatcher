@@ -1,0 +1,7 @@
+postgresql-client-9.3
+postgresql-server-dev-9.3
+libxml2-dev
+libxslt-dev
+libpcre3-dev
+libgeoip1
+libgeos-c1

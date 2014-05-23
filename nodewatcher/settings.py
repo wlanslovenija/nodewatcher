@@ -25,15 +25,19 @@ ADMINS = ()
 
 MANAGERS = ADMINS
 
+# Specify the version of PostGIS installed in the nodewatcher database; this is
+# required to avoid Django from raising errors about an invalid version
+POSTGIS_VERSION = (2, 1)
+
 DATABASES = {
     'default': {
         # Follow https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/ to install GeoDjango.
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'nodewatcher', # Use: createdb nodewatcher
-        'USER': os.environ.get('DJANGO_DATABASE_USER', 'nodewatcher'), # Set to empty string to connect as current user.
-        'PASSWORD': '',
-        'HOST': 'localhost', # Set to empty string for socket.
-        'PORT': '', # Set to empty string for default.
+        'USER': os.environ.get('DB_1_ENV_PGSQL_SUPERUSER_USERNAME', 'nodewatcher'), # Set to empty string to connect as current user.
+        'PASSWORD': os.environ.get('DB_1_ENV_PGSQL_SUPERUSER_PASSWORD', ''),
+        'HOST': os.environ.get('DB_1_PORT_5432_TCP_ADDR', 'localhost'), # Set to empty string for socket.
+        'PORT': os.environ.get('DB_1_PORT_5432_TCP_PORT', ''), # Set to empty string for default.
     },
 }
 
@@ -365,14 +369,18 @@ MONGO_DATABASE_OPTIONS = {
 
 CELERY_RESULT_BACKEND = 'mongodb'
 CELERY_MONGODB_BACKEND_SETTINGS = {
-    'host': '127.0.0.1',
-    'port': 27017,
+    'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
+    'port': int(os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017')),
     'database': MONGO_DATABASE_NAME,
     'taskmeta_collection': 'celery_taskmeta',
     'options': MONGO_DATABASE_OPTIONS,
 }
 
-BROKER_URL = 'mongodb://127.0.0.1:27017/%s' % MONGO_DATABASE_NAME
+BROKER_URL = 'mongodb://%(host)s:%(port)s/%(db)s' % {
+    'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
+    'port': os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017'),
+    'db': MONGO_DATABASE_NAME,
+}
 
 CELERY_ENABLE_UTC = USE_TZ
 CELERY_TIMEZONE = TIME_ZONE
@@ -453,6 +461,8 @@ DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
 # Each backend can have backend-specific settings that can be specified here.
 DATASTREAM_BACKEND_SETTINGS = {
     'database_name': MONGO_DATABASE_NAME,
+    'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
+    'port': int(os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017')),
     'tz_aware': USE_TZ,
 }
 

@@ -1,0 +1,22 @@
+db:
+    image: kostko/postgis
+    environment:
+        PGSQL_SUPERUSER_USERNAME: nodewatcher
+        PGSQL_SUPERUSER_PASSWORD: nodewatcher
+    volumes:
+        # Use a volume to enable database persistency across restarts
+        - /tmp/nodewatcher-db:/var/lib/postgresql/9.3/main
+tokumx:
+    image: kostko/tokumx
+    # A privileged container is required to disable hugepages for TokuMX
+    privileged: true
+web:
+    build: .
+    command: python manage.py runserver
+    volumes:
+        - .:/code
+    ports:
+        - "8000:8000"
+    links:
+        - db
+        - tokumx

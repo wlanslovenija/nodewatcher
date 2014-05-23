@@ -1,7 +1,9 @@
 #!/bin/bash -e
 
 PSQL_USER_ARG="-U postgres"
-PSQL_HOST="localhost"
+if [ -z "$PSQL_HOST" ]; then
+    PSQL_HOST="localhost"
+fi
 
 CONTRIB_DIR=""
 POSTGIS_DIR=""
