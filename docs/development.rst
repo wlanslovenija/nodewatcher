@@ -44,3 +44,10 @@ After the dump has been imported, migrations have to be run::
     $ fig run web scripts/migrate-v2-to-v3
 
 Now the database is ready for use with nodewatcher 3.
+
+Running management commands
+---------------------------
+
+Don't forget to run any management command via the container as otherwise the settings will be wrong. You can do it by prefixing commands with `fig run web` like this::
+
+    $ fig run web python manage.py <command...>
