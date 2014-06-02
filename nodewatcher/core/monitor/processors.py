@@ -11,13 +11,13 @@ class ProcessorContext(dict):
     of namespaces and attribute access.
     """
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         """
         Class instance creator. This is overriden so we ensure that the namespace
         attribute is present - which is required in case of unpickling instances.
         """
 
-        instance = dict.__new__(cls)
+        instance = dict.__new__(cls, *args, **kwargs)
         instance._namespace = []
         return instance
 
@@ -73,7 +73,7 @@ class ProcessorContext(dict):
         Attribute access.
         """
 
-        if name.startswith('_'):
+        if name.startswith('_') and not name in self:
             return super(ProcessorContext, self).__getattribute__(name)
         return self[name]
 
