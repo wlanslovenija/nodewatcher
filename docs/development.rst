@@ -31,7 +31,7 @@ This will recreate the `nodewatcher` database and thus erase ALL data from the d
 Importing a database dump from version 2
 ----------------------------------------
 
-If you have an SQL dump from nodewatcher version 2 available and would like to migrate to version 3, the procedure is as follows. Lets assume that the dump is stored in a filed called `dump.sql` (note that the dump file must be located inside the toplevel directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher directory). First the dump must be preprocessed before it can be imported::
+If you have an SQL dump from nodewatcher version 2 available and would like to migrate to version 3, the procedure is as follows. Lets assume that the dump is stored in a file called `dump.sql` (note that the dump file must be located inside the toplevel directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher directory). First the dump must be preprocessed before it can be imported::
 
     $ ./scripts/convert-wlansi-v2-dump dump.sql
 
