@@ -55,15 +55,18 @@ class Interfaces(monitor_processors.NodeProcessor):
 
         version_ifaces = context.http.get_module_version("core.interfaces")
         version_wifi = context.http.get_module_version("core.wireless")
-        if version_ifaces < 2 or version_wifi < 2:
+        if version_ifaces < 3 or version_wifi < 3 or context.http.get_version() < 3:
             return context
 
         interfaces = {}
-        for name, data in context.http.iface.iteritems():
+        for name, data in context.http.core.interfaces.iteritems():
+            if name.startswith('_') or name in ('lo',):
+                continue
+
             try:
                 iface = existing_interfaces[name]
             except KeyError:
-                if name in context.http.wireless.radios:
+                if name in context.http.core.wireless:
                     iface = node.monitoring.core.interfaces(create=monitor_models.WifiInterfaceMonitor)
                 else:
                     iface = node.monitoring.core.interfaces(create=monitor_models.InterfaceMonitor)
@@ -147,47 +150,44 @@ class Interfaces(monitor_processors.NodeProcessor):
         # TODO: We currently assume that interfaces will not change types between wifi/non-wifi
 
         iface.hw_address = str(data.mac)
-        iface.tx_packets = int(data.tx_packets)
-        iface.rx_packets = int(data.rx_packets)
-        iface.tx_bytes = int(data.tx_bytes)
-        iface.rx_bytes = int(data.rx_bytes)
-        iface.tx_errors = int(data.tx_errs)
-        iface.rx_errors = int(data.rx_errs)
-        iface.tx_drops = int(data.tx_drops)
-        iface.rx_drops = int(data.rx_drops)
-        iface.mtu = int(data.mtu)
+        iface.tx_packets = int(data.statistics.tx_packets)
+        iface.rx_packets = int(data.statistics.rx_packets)
+        iface.tx_bytes = int(data.statistics.tx_bytes)
+        iface.rx_bytes = int(data.statistics.rx_bytes)
+        iface.tx_errors = int(data.statistics.tx_errors)
+        iface.rx_errors = int(data.statistics.rx_errors)
+        iface.tx_drops = int(data.statistics.tx_dropped)
+        iface.rx_drops = int(data.statistics.rx_dropped)
+        iface.mtu = int(data.mtu) if data.mtu else None
 
-        if iface.name in context.http.wireless.radios:
-            data = context.http.wireless.radios[iface.name]
+        if iface.name in context.http.core.wireless:
+            wdata = context.http.core.wireless[iface.name]
 
             # Wireless interface has some additional fields
-            if data.mode == "ap":
+            if wdata.mode == "Master":
                 iface.mode = "ap"
-            elif data.mode == "ibss":
+            elif wdata.mode == "Ad-Hoc":
                 iface.mode = "mesh"
-            elif data.mode == "managed":
+            elif wdata.mode == "Client":
                 iface.mode = "sta"
             else:
                 iface.mode = None
-                self.logger.warning("Ignoring unknown wifi mode '%s' on node '%s' interface '%s'!" % (data.mode, node.pk, iface.name))
+                self.logger.warning("Ignoring unknown wifi mode '%s' on node '%s' interface '%s'!" % (wdata.mode, node.pk, iface.name))
 
-            iface.essid = str(data.essid) if data.essid else None
-            if data.bssid and iface.mode in ("mesh", "sta"):
-                iface.bssid = str(data.bssid)
-            else:
-                iface.bssid = None
-
-            iface.channel = int(data.channel) if data.channel else None
-            iface.channel_width = int(data.channel_width) if data.channel_width else None
-            iface.bitrate = float(data.bitrate) if data.bitrate else None
-            iface.rts_threshold = int(data.rts_threshold) if data.rts_threshold else None
-            iface.frag_threshold = int(data.frag_threshold) if data.frag_threshold else None
-            iface.signal = int(data.signal) if data.signal else None
-            iface.noise = int(data.noise) if data.noise else None
+            iface.essid = str(wdata.essid) if wdata.essid else None
+            iface.bssid = str(wdata.bssid) if wdata.bssid else None
+            iface.channel = int(wdata.channel) if wdata.channel else None
+            iface.channel_width = int(wdata.channel_width) if wdata.channel_width else None
+            iface.bitrate = float(wdata.bitrate) if wdata.bitrate else None
+            iface.rts_threshold = int(wdata.rts_threshold) if wdata.rts_threshold else None
+            iface.frag_threshold = int(wdata.frag_threshold) if wdata.frag_threshold else None
+            iface.signal = int(wdata.signal) if wdata.signal else None
+            iface.noise = int(wdata.noise) if wdata.noise else None
             # TODO: Calculate signal-to-noise ratio
             iface.snr = None
+            iface.protocol = "".join(sorted(wdata.protocols)) if wdata.protocols else None
 
-        if data.network:
+        if data.addresses:
             # Ensure that the interface is saved
             iface.save()
 
@@ -195,8 +195,8 @@ class Interfaces(monitor_processors.NodeProcessor):
             for net in iface.networks.all():
                 existing_networks[net.address] = net
 
-            for network in data.network.values():
-                address = ipaddr.IPNetwork(network.addr)
+            for network in data.addresses:
+                address = ipaddr.IPNetwork("%(address)s/%(mask)d" % network)
                 net = existing_networks.get(address, None)
                 if net is None:
                     net, _ = iface.networks.get_or_create(
@@ -206,9 +206,9 @@ class Interfaces(monitor_processors.NodeProcessor):
                     )
                     existing_networks[address] = net
 
-                if network.family == 'inet':
+                if network['family'] == 'ipv4':
                     net.family = 'ipv4'
-                elif network.family == 'inet6':
+                elif network['family'] == 'ipv6':
                     net.family = 'ipv6'
                 else:
                     self.logger.warning("Unknown network family '%s' on node '%s' interface '%s'!" % (network.family, node.pk, iface.name))

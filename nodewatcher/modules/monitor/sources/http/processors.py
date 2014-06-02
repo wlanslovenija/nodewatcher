@@ -11,6 +11,17 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
     module presence/versions.
     """
 
+    def get_version(self):
+        """
+        Returns the telemetry format version.
+        """
+
+        # Always return 0 when parsing has failed and no info is available
+        if not self.get('successfully_parsed', False):
+            return 0
+
+        return self._meta.version
+
     def get_module_version(self, module):
         """
         Returns the active version of a telemetry module present on the remote
@@ -21,14 +32,24 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
           not installed/present
         """
 
-        module = module.replace('.', '-')
-        metadata = self.META.modules.get(module)
-        if metadata:
+        # Always return 0 when parsing has failed and no info is available
+        if not self.get('successfully_parsed', False):
+            return 0
+
+        if self._meta.version == 2:
+            module = module.replace('.', '-')
+            metadata = self.META.modules.get(module)
+            if metadata:
+                try:
+                    return int(metadata.serial)
+                except ValueError:
+                    # This could only happen when the parsed output is corrupted as serial
+                    # should always be an integer
+                    return 0
+        elif self._meta.version == 3:
             try:
-                return int(metadata.serial)
-            except ValueError:
-                # This could only happen when the parsed output is corrupted as serial
-                # should always be an integer
+                return reduce(lambda x, y: x[y], module.split('.'), self)._meta.version
+            except (KeyError, AttributeError):
                 return 0
 
         return 0
@@ -66,6 +87,9 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                 # Fetch information from the router and merge it into local context
                 try:
                     parser.parse_into(context)
+                    if context._meta.version == 2:
+                        # TODO: Add a warning that the node is using a legacy feed
+                        pass
                     context.successfully_parsed = True
                 except telemetry_parser.HttpTelemetryParseFailed:
                     # Parsing has failed, log this; all components that did not get parsed

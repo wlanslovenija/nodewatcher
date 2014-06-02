@@ -317,7 +317,14 @@ def general(node, cfg):
 
     # Setup base packages to be installed
     # TODO: This should probably not be hardcoded (or at least moved to modules)
-    cfg.packages.update(['nodewatcher-core', 'nodewatcher-watchdog'])
+    cfg.packages.update([
+        'nodewatcher-agent',
+        'nodewatcher-agent-mod-general',
+        'nodewatcher-agent-mod-resources',
+        'nodewatcher-agent-mod-interfaces',
+        'nodewatcher-agent-mod-wireless',
+        'nodewatcher-watchdog'
+    ])
 
 
 def configure_network(cfg, network, section):
