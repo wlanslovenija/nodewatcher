@@ -1,6 +1,5 @@
 import copy
 import hashlib
-import json
 import os
 
 from django import forms, template
