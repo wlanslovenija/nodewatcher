@@ -220,3 +220,28 @@ class RttMeasurementMonitor(registration.bases.NodeMonitoringRegistryItem, Measu
         multiple = True
 
 registration.point('node.monitoring').register_item(RttMeasurementMonitor)
+
+
+class ClientMonitor(registration.bases.NodeMonitoringRegistryItem):
+    """
+    Client connected to the network via some node.
+    """
+
+    client_id = models.CharField(max_length=32)
+
+    class RegistryMeta:
+        registry_id = 'network.clients'
+        multiple = True
+
+registration.point('node.monitoring').register_item(ClientMonitor)
+
+
+class ClientAddress(models.Model):
+    """
+    A client address.
+    """
+
+    client = models.ForeignKey(ClientMonitor, related_name='addresses')
+    family = registry_fields.SelectorKeyField('node.monitoring', 'core.interfaces.network#family', null=True)
+    address = registry_fields.IPAddressField()
+    expiry_time = models.DateTimeField(null=True)

@@ -439,6 +439,7 @@ MONITOR_RUNS = {
             'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
             'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
             'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
+            'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
             'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
             'nodewatcher.modules.administration.status.processors.NodeStatus',
             'nodewatcher.modules.monitor.datastream.processors.Datastream',
