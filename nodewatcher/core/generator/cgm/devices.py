@@ -182,7 +182,7 @@ class Switch(object):
             cpu_ports = set(cpu_port)
 
         for cpu_port in cpu_ports:
-            if cpu_ports not in ports:
+            if cpu_port not in ports:
                 raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" % (
                     self.identifier, cpu_port
                 ))
