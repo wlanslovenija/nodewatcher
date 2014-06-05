@@ -59,7 +59,7 @@ class SwitchedEthernetPort(EthernetPort):
                 self.identifier, self.vlan
             ))
 
-        if switch.cpu_port not in self.ports:
+        if not switch.cpu_ports.intersection(self.ports):
             raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" % (
                 self.identifier
             ))
@@ -176,12 +176,18 @@ class Switch(object):
             ports = range(ports)
 
         self.ports = ports
-        if cpu_port not in ports:
-            raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" % (
-                self.identifier, cpu_port
-            ))
+        if not isinstance(cpu_port, (list, tuple)):
+            cpu_ports = set([cpu_port])
+        else:
+            cpu_ports = set(cpu_port)
 
-        self.cpu_port = cpu_port
+        for cpu_port in cpu_ports:
+            if cpu_ports not in ports:
+                raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" % (
+                    self.identifier, cpu_port
+                ))
+
+        self.cpu_ports = cpu_ports
         self.vlans = vlans
 
 
