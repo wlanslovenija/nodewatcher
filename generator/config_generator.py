@@ -711,7 +711,7 @@ START=15
 start() {
       uci delete wireless.radio0.disabled
       uci set wireless.radio0.channel=100
-      uci set wireless.radio0.country=US
+      uci set wireless.radio0.country=SI
       uci set wireless.radio0.txpower=22
       uci set wireless.radio0.distance=20000
 
@@ -721,6 +721,7 @@ start() {
       uci set wireless.@wifi-iface[0].ssid=backbone.wlan-si.net
       uci set wireless.@wifi-iface[0].bssid=02:CA:FF:EE:BA:BE
       uci set wireless.@wifi-iface[0].encryption=none
+      uci set wireless.@wifi-iface[0].ifname=wlan0
 
       uci commit
       /etc/init.d/inituci disable
@@ -743,6 +744,7 @@ start() {{
       uci set wireless.@wifi-iface[0].mode=ap
       uci set wireless.@wifi-iface[0].ssid={ssid}
       uci set wireless.@wifi-iface[0].encryption=none
+      uci set wireless.@wifi-iface[0].ifname=wlan0-1
 
       uci add wireless wifi-iface
       uci set wireless.@wifi-iface[1].device=radio0
@@ -752,6 +754,7 @@ start() {{
       uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
       uci set wireless.@wifi-iface[1].encryption=none
       uci set wireless.@wifi-iface[1].mcast_rate=6000
+      uci set wireless.@wifi-iface[1].ifname=wlan0
 
       uci commit
       /etc/init.d/inituci disable
@@ -774,12 +777,6 @@ config olsrd
       f.close()
 
       # Hack config for UBNT
-      extra = ""
-      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5', 'tp-wr1043nd'):
-        extra = '"wlan0"'
-      else:
-        extra = '"wlan0-1"'
-
       f = open(os.path.join(directory, 'olsrd.conf'), 'w')
       f.write("""
 Hna4
@@ -791,7 +788,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan1" "br-clients" {diggers} {extra}
+Interface "wlan0" "br-clients" {diggers}
 {{
   IPv4Multicast 255.255.255.255
 }}
@@ -800,7 +797,6 @@ Interface "wlan1" "br-clients" {diggers} {extra}
         hna_subnet = self.subnets[0]['subnet'],
         hna_mask = self.subnets[0]['mask'],
         diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.tdServer))]),
-        extra = extra
       ))
       f.close()
 
