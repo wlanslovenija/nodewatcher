@@ -763,11 +763,14 @@ start() {{
       os.chmod(inituci_path, 0755)
 
       # OLSRd configuration
-      f = open(os.path.join(configPath, "olsrd"), 'w')
+      f = open(os.path.join(configPath, "olsrd4"), 'w')
       f.write("""
 config olsrd
         option config_file      '/etc/olsrd.conf'
 """)
+      f.close()
+
+      f = open(os.path.join(configPath, "olsrd6"), 'w')
       f.close()
 
       # Hack config for UBNT
