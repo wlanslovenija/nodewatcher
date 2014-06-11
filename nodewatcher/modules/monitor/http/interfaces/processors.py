@@ -66,7 +66,7 @@ class Interfaces(monitor_processors.NodeProcessor):
             try:
                 iface = existing_interfaces[name]
             except KeyError:
-                if name in context.http.core.wireless:
+                if name in context.http.core.wireless.interfaces:
                     iface = node.monitoring.core.interfaces(create=monitor_models.WifiInterfaceMonitor)
                 else:
                     iface = node.monitoring.core.interfaces(create=monitor_models.InterfaceMonitor)
@@ -160,8 +160,8 @@ class Interfaces(monitor_processors.NodeProcessor):
         iface.rx_drops = int(data.statistics.rx_dropped)
         iface.mtu = int(data.mtu) if data.mtu else None
 
-        if iface.name in context.http.core.wireless:
-            wdata = context.http.core.wireless[iface.name]
+        if iface.name in context.http.core.wireless.interfaces:
+            wdata = context.http.core.wireless.interfaces[iface.name]
 
             # Wireless interface has some additional fields
             if wdata.mode == "Master":
