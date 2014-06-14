@@ -24,21 +24,9 @@ class TPLinkWR703Nv1(cgm_devices.DeviceBase):
         ])
     ]
     switches = [
-        cgm_devices.Switch(
-            'sw0', "Switch0",
-            ports=5,
-            cpu_port=0,
-            vlans=16,
-        )
     ]
     ports = [
         cgm_devices.EthernetPort('wan0', "Wan0"),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=1,
-            ports=[0, 1, 2, 3, 4],
-        )
     ]
     antennas = [
         # TODO: This information is probably not correct
@@ -56,9 +44,7 @@ class TPLinkWR703Nv1(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
-            'wan0': 'eth1',
-            'lan0': 'eth0',
+            'wan0': 'eth0',
         }
     }
     drivers = {

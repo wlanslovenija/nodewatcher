@@ -56,7 +56,7 @@ class TPLinkWR841NDv1(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
+            'sw0': 'switch0',
             'wan0': 'eth1',
             'lan0': 'eth0',
         }
@@ -137,7 +137,7 @@ class TPLinkWR841NDv8(TPLinkWR841NDv1):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth1',
+            'sw0': 'switch0',
             'wan0': 'eth0',
             'lan0': 'eth1',
         }
@@ -151,9 +151,27 @@ class TPLinkWR841NDv8(TPLinkWR841NDv1):
         }
     }
 
+
+class TPLinkWR841NDv9(TPLinkWR841NDv1):
+    """
+    TP-Link WR841NDv9 device descriptor.
+    """
+
+    identifier = 'tp-wr841ndv9'
+    name = "WR841ND (v9)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841n-v9-squashfs-factory.bin'
+            ]
+        }
+    }
+
 # Register the TP-Link WR841ND device
 cgm_base.register_device('openwrt', TPLinkWR841NDv1)
 cgm_base.register_device('openwrt', TPLinkWR841NDv3)
 cgm_base.register_device('openwrt', TPLinkWR841NDv5)
 cgm_base.register_device('openwrt', TPLinkWR841NDv7)
 cgm_base.register_device('openwrt', TPLinkWR841NDv8)
+cgm_base.register_device('openwrt', TPLinkWR841NDv9)
