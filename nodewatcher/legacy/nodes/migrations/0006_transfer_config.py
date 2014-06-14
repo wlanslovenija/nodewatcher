@@ -88,6 +88,7 @@ class Migration(DataMigration):
             loccfg.address = node.location
             loccfg.city = "?"
             loccfg.country = "?"
+            loccfg.timezone = "Europe/Ljubljana"
             loccfg.altitude = 0
 
             if node.geo_lat is not None:
@@ -629,6 +630,7 @@ class Migration(DataMigration):
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'timezone': ('timezone_field.TimeZoneField', [], {'null': 'True'}),
             'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})
