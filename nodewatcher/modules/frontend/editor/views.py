@@ -92,7 +92,7 @@ class NewNode(mixins.LoginRequiredMixin, RegistryFormMixin, generic.DetailView):
         return self.render_to_response(self.get_context_data())
 
     def get_success_url(self):
-        return urlresolvers.reverse('display:node', kwargs={'pk': self.object.pk})
+        return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.object.pk})
 
 
 class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailView):
@@ -145,4 +145,4 @@ class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.Detail
             return self.form_invalid()
 
     def get_success_url(self):
-        return urlresolvers.reverse('display:node', kwargs={'pk': self.object.pk})
+        return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.object.pk})

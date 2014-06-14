@@ -104,9 +104,11 @@ class RemoveLastFormAction(RegistryFormAction):
         Removes the last subform.
         """
 
-        if len(self.context.subforms) > 0:
-            self.context.subforms.pop()
-            return True
+        if not self.context.subforms:
+            return False
+
+        self.context.subforms.pop()
+        return True
 
 
 class AppendFormAction(RegistryFormAction):

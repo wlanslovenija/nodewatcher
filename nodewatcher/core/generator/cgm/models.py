@@ -1,4 +1,6 @@
 import hashlib
+import random
+import string
 
 from django.conf import settings
 from django.core import exceptions
@@ -126,6 +128,34 @@ class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_item(InterfaceConfig)
 
 
+class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
+    """
+    Bridge interface configuration.
+    """
+
+    name = models.CharField(max_length=30)
+    stp = models.BooleanField(verbose_name=_("STP"), default=False)
+    mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
+
+    class RegistryMeta(InterfaceConfig.RegistryMeta):
+        registry_name = _("Bridge")
+
+    def __init__(self, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        super(BridgeInterfaceConfig, self).__init__(*args, **kwargs)
+        # Automatically generate a random bridge name when one does not exist
+        if not self.name:
+            self.name = "Bridge%(id)s" % {'id': random.choice(string.uppercase)}
+
+    def __unicode__(self):
+        return self.name
+
+registration.point('node.config').register_item(BridgeInterfaceConfig)
+
+
 class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
     """
     An ethernet interface.
@@ -226,6 +256,20 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_subitem(InterfaceConfig, NetworkConfig)
 
 
+class BridgedNetworkConfig(NetworkConfig):
+    """
+    Network configuration that puts the interface into a bridge.
+    """
+
+    bridge = registry_fields.ReferenceChoiceField(BridgeInterfaceConfig)
+
+    class RegistryMeta(NetworkConfig.RegistryMeta):
+        registry_name = _("Bridged")
+
+registration.point('node.config').register_subitem(EthernetInterfaceConfig, BridgedNetworkConfig)
+registration.point('node.config').register_subitem(WifiInterfaceConfig, BridgedNetworkConfig)
+
+
 class StaticNetworkConfig(NetworkConfig):
     """
     Static IP configuration.
@@ -259,6 +303,7 @@ registration.point('node.config').register_choice('core.interfaces.network#ip_fa
 registration.point('node.config').register_choice('core.interfaces.network#ip_family', registration.Choice('ipv6', _("IPv6")))
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 registration.point('node.config').register_subitem(WifiInterfaceConfig, StaticNetworkConfig)
+registration.point('node.config').register_subitem(BridgeInterfaceConfig, StaticNetworkConfig)
 
 
 class DHCPNetworkConfig(NetworkConfig):
@@ -288,6 +333,7 @@ class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator):
 
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
 registration.point('node.config').register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
+registration.point('node.config').register_subitem(BridgeInterfaceConfig, AllocatedNetworkConfig)
 
 
 class PPPoENetworkConfig(NetworkConfig):

@@ -24,8 +24,16 @@ class RegistryResolver(object):
         """
 
         partial = {}
-        for registry_id in self._regpoint.get_all_registry_ids():
-            partial[registry_id] = [x.cast() for x in self.by_registry_id(registry_id, queryset=True)]
+        for cls in self._regpoint.get_children():
+            cls = cls.values()[0]
+            items = []
+
+            for item in self.by_registry_id(cls.get_registry_id(), queryset=True):
+                if hasattr(item, '_registry_object_parent_link'):
+                    continue
+                items.append(item)
+
+            partial[cls.get_registry_id()] = items
 
         return partial
 
