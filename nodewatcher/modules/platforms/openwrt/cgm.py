@@ -679,3 +679,22 @@ def qos_base(node, cfg):
 
     # Ensure that we have qos-scripts installed
     cfg.packages.update(['qos-scripts'])
+
+
+@cgm_base.register_platform_module('openwrt', 10)
+def dns_servers(node, cfg):
+    """
+    Configures DNS servers.
+    """
+
+    # DNS configuration is part of the DHCP config
+    dnsmasq = cfg.dhcp.add('dnsmasq')
+    dnsmasq.domainneeded = False
+    dnsmasq.boguspriv = False
+    dnsmasq.localise_queries = True
+    dnsmasq.rebind_protection = False
+    dnsmasq.nonegcache = True
+    dnsmasq.noresolv = True
+    dnsmasq.authoritative = True
+    dnsmasq.lease_file = '/tmp/dhcp.leases'
+    dnsmasq.server = [str(x.address.ip) for x in node.config.core.servers.dns()]
