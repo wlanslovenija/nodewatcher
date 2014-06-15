@@ -331,6 +331,18 @@ class Migration(DataMigration):
                         alloc_netconf.usage = "clients"
                         alloc_netconf.allocation = subnet['allocation']
                         alloc_netconf.save()
+                else:
+                    # Obtain device descriptor so we can check if the router has a LAN port
+                    from nodewatcher.core.generator.cgm import base as cgm_base
+                    device = cgm_base.get_platform('openwrt').get_device(general.router)
+
+                    # Create LAN routing-only configuration
+                    if device.get_port('lan0'):
+                        print "     - Designating LAN as routing-only linking segment."
+                        lan_iface = orm['cgm.EthernetInterfaceConfig'](root=node, content_type=ethiface_ctype)
+                        lan_iface.enabled = True
+                        lan_iface.eth_port = "lan0"
+                        lan_iface.save()
 
                 # VPN
                 if profile.use_vpn:
