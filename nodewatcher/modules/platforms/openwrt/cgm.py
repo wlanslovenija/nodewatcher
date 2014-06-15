@@ -369,6 +369,7 @@ def configure_network(cfg, network, section):
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
     elif isinstance(network, cgm_models.DHCPNetworkConfig):
         section.proto = 'dhcp'
+        section.hostname = cfg.system.system[0].hostname
     elif isinstance(network, cgm_models.PPPoENetworkConfig):
         section.proto = 'pppoe'
         section.username = network.username
@@ -458,7 +459,7 @@ def configure_switch(cfg, device, port):
     vlan.ports = ' '.join([str(x) for x in port.ports])
 
 
-@cgm_base.register_platform_module('openwrt', 10)
+@cgm_base.register_platform_module('openwrt', 15)
 def network(node, cfg):
     """
     Basic network configuration.
@@ -607,7 +608,7 @@ def network(node, cfg):
                 configure_interface(cfg, vif, iface, vif_name)
 
 
-@cgm_base.register_platform_module('openwrt', 10)
+@cgm_base.register_platform_module('openwrt', 15)
 def qos_base(node, cfg):
     """
     Configures basic QoS rules (independent of interfaces).
@@ -681,7 +682,7 @@ def qos_base(node, cfg):
     cfg.packages.update(['qos-scripts'])
 
 
-@cgm_base.register_platform_module('openwrt', 10)
+@cgm_base.register_platform_module('openwrt', 15)
 def dns_servers(node, cfg):
     """
     Configures DNS servers.
