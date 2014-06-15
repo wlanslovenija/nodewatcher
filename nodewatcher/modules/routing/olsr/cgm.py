@@ -54,19 +54,10 @@ def olsr(node, cfg):
         iface.interface = routable_ifaces
         iface.IPv4Multicast = '255.255.255.255'
 
-    # Create the olsrd routing table
-    rt = cfg.routing.add(table=ROUTING_TABLE_NAME)
-    rt.id = ROUTING_TABLE_ID
-
     # Ensure that all traffic gets routed via the olsrd table by default
-    rt = cfg.routing.add('policy')
-    rt.table = ROUTING_TABLE_NAME
-    rt.priority = ROUTING_TABLE_PRIORITY
-
-    # Support policy routing configuration in trunk
     rt = cfg.network.add('rule')
     rt.lookup = ROUTING_TABLE_ID
     rt.priority = ROUTING_TABLE_PRIORITY
 
-    # Ensure that "olsrd" and "policy-routing" packages are installed
-    cfg.packages.update(['olsrd', 'policy-routing'])
+    # Ensure that "olsrd" package is installed
+    cfg.packages.update(['olsrd'])
