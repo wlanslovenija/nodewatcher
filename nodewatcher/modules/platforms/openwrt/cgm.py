@@ -391,7 +391,7 @@ def configure_interface(cfg, interface, section, iface_name):
     :param iface_name: Name of the UCI interface
     """
 
-    section._routable = interface.routing_protocol
+    section._routable = getattr(interface, 'routing_protocol', None)
 
     networks = [x.cast() for x in interface.networks.all()]
     if networks:
@@ -459,6 +459,23 @@ def configure_switch(cfg, device, port):
     vlan.ports = ' '.join([str(x) for x in port.ports])
 
 
+def set_dhcp_ignore(cfg, iface_name):
+    """
+    Ensure that DHCP server does not announce anything via an interface.
+
+    :param cfg: UCI configuration instance
+    :param iface_name: Interface name
+    """
+
+    try:
+        iface_dhcp = cfg.dhcp.add(dhcp=iface_name)
+        iface_dhcp.interface = iface_name
+    except ValueError:
+        iface_dhcp = cfg.dhcp[iface_name]
+
+    iface_dhcp.ignore = True
+
+
 @cgm_base.register_platform_module('openwrt', 15)
 def network(node, cfg):
     """
@@ -473,13 +490,67 @@ def network(node, cfg):
 
     # Obtain the device descriptor for this device
     device = node.config.core.general().get_device()
+    # Mobile interface counter
+    mobile_interface_id = 0
 
     # Configure all interfaces
     for interface in node.config.core.interfaces():
         if not interface.enabled:
             continue
 
-        if isinstance(interface, cgm_models.EthernetInterfaceConfig):
+        if isinstance(interface, cgm_models.MobileInterfaceConfig):
+            mobile_ifname = 'mobile%d' % mobile_interface_id
+            mobile_interface_id += 1
+
+            iface = cfg.network.add(interface=mobile_ifname)
+            iface._uplink = True
+            set_dhcp_ignore(cfg, mobile_ifname)
+
+            # Mapping of device identifiers to ports
+            port_map = {
+                'mobile0': '/dev/ttyUSB0',
+                'mobile1': '/dev/ttyUSB1',
+            }
+
+            iface.device = port_map.get(interface.device, None)
+            if not iface.device:
+                raise cgm_base.ValidationError(
+                    _("Unsupported mobile interface port '%(port)s'!") % {'port': interface.device}
+                )
+
+            if interface.service == 'umts':
+                iface.service = 'umts'
+            elif interface.service == 'gprs':
+                iface.service = 'gprs'
+            elif interface.service == 'cdma':
+                iface.service = 'cdma'
+            else:
+                raise cgm_base.ValidationError(
+                    _("Unsupported mobile service type '%(service)s'!") % {'service': interface.service}
+                )
+
+            iface.apn = interface.apn
+            iface.pincode = interface.pin
+            if interface.username:
+                iface.username = interface.username
+                iface.password = interface.password
+
+            configure_interface(cfg, interface, iface, mobile_ifname)
+            iface.proto = '3g'
+
+            # Some packages are required for using a mobile interface
+            cfg.packages.update([
+                'comgt',
+                'usb-modeswitch',
+                'kmod-usb-serial',
+                'kmod-usb-serial-option',
+                'kmod-usb-serial-wwan',
+                'kmod-usb-ohci',
+                'kmod-usb-uhci',
+                'kmod-usb-acm',
+                'kmod-usb2',
+            ])
+        elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
             try:
                 iface = cfg.network.add(interface=interface.eth_port)
             except ValueError:
@@ -495,15 +566,7 @@ def network(node, cfg):
 
             if interface.uplink:
                 iface._uplink = True
-
-                # Ensure that DHCP server does not announce anything via this interface
-                try:
-                    iface_dhcp = cfg.dhcp.add(dhcp=interface.eth_port)
-                    iface_dhcp.interface = interface.eth_port
-                except ValueError:
-                    iface_dhcp = cfg.dhcp[interface.eth_port]
-
-                iface_dhcp.ignore = True
+                set_dhcp_ignore(cfg, interface.eth_port)
 
             if interface.mac_address:
                 iface.macaddr = interface.mac_address

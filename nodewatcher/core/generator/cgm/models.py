@@ -237,6 +237,29 @@ class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
 registration.point('node.config').register_item(VpnInterfaceConfig)
 
 
+class MobileInterfaceConfig(InterfaceConfig):
+    """
+    A mobile (3G/UMTS/GPRS) interface.
+    """
+
+    service = registry_fields.SelectorKeyField('node.config', 'core.interfaces#mobile_service', default='umts')
+    device = registry_fields.SelectorKeyField('node.config', 'core.interfaces#mobile_device', default='mobile0')
+    apn = models.CharField(max_length=100, verbose_name=_("APN"))
+    pin = models.CharField(max_length=4, verbose_name=_("PIN"))
+    username = models.CharField(max_length=50, blank=True)
+    password = models.CharField(max_length=50, blank=True)
+
+    class RegistryMeta(InterfaceConfig.RegistryMeta):
+        registry_name = _("Mobile Interface")
+
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('mobile0', _("Mobile0")))
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('mobile1', _("Mobile1")))
+registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('umts', _("UMTS")))
+registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('gprs', _("GPRS")))
+registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('cdma', _("CDMA")))
+registration.point('node.config').register_item(MobileInterfaceConfig)
+
+
 class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     """
     Network configuration of an interface.
