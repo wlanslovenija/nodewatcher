@@ -490,8 +490,6 @@ def network(node, cfg):
 
     # Obtain the device descriptor for this device
     device = node.config.core.general().get_device()
-    # Mobile interface counter
-    mobile_interface_id = 0
 
     # Configure all interfaces
     for interface in node.config.core.interfaces():
@@ -499,12 +497,9 @@ def network(node, cfg):
             continue
 
         if isinstance(interface, cgm_models.MobileInterfaceConfig):
-            mobile_ifname = 'mobile%d' % mobile_interface_id
-            mobile_interface_id += 1
-
-            iface = cfg.network.add(interface=mobile_ifname)
+            iface = cfg.network.add(interface=interface.device)
             iface._uplink = True
-            set_dhcp_ignore(cfg, mobile_ifname)
+            set_dhcp_ignore(cfg, interface.device)
 
             # Mapping of device identifiers to ports
             port_map = {
@@ -535,7 +530,7 @@ def network(node, cfg):
                 iface.username = interface.username
                 iface.password = interface.password
 
-            configure_interface(cfg, interface, iface, mobile_ifname)
+            configure_interface(cfg, interface, iface, interface.device)
             iface.proto = '3g'
 
             # Some packages are required for using a mobile interface
