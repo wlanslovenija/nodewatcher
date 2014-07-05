@@ -634,21 +634,7 @@ config rule
       f.close()
 
       # Policy routing configuration
-      f = open(os.path.join(configPath, "routing"), 'w')
-      f.write("""
-config table mesh
-        option id       20
-""")
-
       for server, ports in self.tdServer:
-        f.write("""
-config policy
-        option dest_ip  '{0}'
-        option table    'main'
-        option priority 999
-""".format(server))
-
-        # Add configuration for trunk netifd
         network_config.write("""
 config rule
         option dest '{0}/32'
@@ -656,26 +642,6 @@ config rule
         option priority 999
 """.format(server))
 
-      f.write("""
-config policy
-        option dest_ip  '{subnet}/{cidr}'
-        option table    'main'
-        option priority 999
-
-config policy
-        option device   'wan'
-        option table    'main'
-        option priority 999
-
-config policy
-        option table    'mesh'
-        option priority 1000
-""".format(
-        subnet = self.subnets[0]['subnet'],
-        cidr = self.subnets[0]['cidr']
-      ))
-
-      # Add configuration for trunk netifd
       network_config.write("""
 config rule
         option dest '{subnet}/{cidr}'
@@ -695,7 +661,6 @@ config rule
         cidr = self.subnets[0]['cidr']
       ))
 
-      f.close()
       network_config.close()
 
       # Wireless configuration
@@ -1064,7 +1029,7 @@ config uhttpd main
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []) + self.packages)
 
-      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="policy-routing olsrd uhttpd tc nodewatcher-agent nodewatcher-agent-mod-general nodewatcher-agent-mod-resources nodewatcher-agent-mod-interfaces nodewatcher-agent-mod-wireless nodewatcher-agent-mod-keys_ssh nodewatcher-agent-mod-clients nodewatcher-core nodewatcher-clients ntpclient -ppp -ppp-mod-pppoe wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger wireless-tools qos-scripts nodewatcher-watchdog %s"' % (profile_map[self.portLayout], pkgs)
+      buildString = 'make image FILES="../files" PROFILE="%s" PACKAGES="olsrd uhttpd tc nodewatcher-agent nodewatcher-agent-mod-general nodewatcher-agent-mod-resources nodewatcher-agent-mod-interfaces nodewatcher-agent-mod-wireless nodewatcher-agent-mod-keys_ssh nodewatcher-agent-mod-clients nodewatcher-core nodewatcher-clients ntpclient -ppp -ppp-mod-pppoe wpad-mini kmod-l2tp kmod-l2tp-ip kmod-l2tp-eth tunneldigger wireless-tools qos-scripts nodewatcher-watchdog %s"' % (profile_map[self.portLayout], pkgs)
       os.chdir(path)
       os.system(buildString)
       return
