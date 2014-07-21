@@ -7,10 +7,8 @@ services:
  - mongodb
  - postgresql
 before_install:
- - sudo add-apt-repository -r -y ppa:ubuntugis/ppa
  - sudo apt-get update
- - sudo apt-get remove --purge postgresql-9.1-postgis-2.1 postgresql-9.1-postgis-scripts
- - sudo apt-get install postgresql-9.1-postgis libgeoip1
+ - sudo apt-get install libgeoip1
  - sudo rm -rf /dev/shm
  - sudo ln -s /run/shm /dev/shm
 install:
@@ -18,8 +16,8 @@ install:
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
  - pip install -r requirements.txt --use-mirrors
 before_script:
- - curl https://raw.githubusercontent.com/django/django/1.5.1/docs/ref/contrib/gis/install/create_template_postgis-debian.sh | sh
- - createdb -T template_postgis nodewatcher
+ - createdb nodewatcher
+ - psql -U postgres -c "create extension postgis" nodewatcher
  - pep8 nodewatcher
  - pylint nodewatcher || true
 script:
