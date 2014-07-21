@@ -5,7 +5,7 @@
 {% block title %}{% trans "Image Generation" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Image Generation Request Queued") as heading %}
+    {% with heading=_("Image Generation Request Queued") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

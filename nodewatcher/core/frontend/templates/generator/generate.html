@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-    {% with "process your request" as form_errors_context %}
+    {% with form_errors_context="process your request" %}
         {% include "form_errors.html" %}
     {% endwith %}
 

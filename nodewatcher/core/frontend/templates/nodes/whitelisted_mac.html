@@ -5,16 +5,14 @@
 {% block title %}{% trans "MAC Whitelist" %}{% endblock %}
 
 {% block heading %}
-    {% with _("MAC Whitelist") as heading %}
+    {% with heading=_("MAC Whitelist") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}
 
 {% block my_content %}
-    {% with "whitelist a MAC address" as form_errors_context %}
-        {% with "no-top-margin" as classes %}
-            {% include "form_errors.html" %}
-        {% endwith %}
+    {% with form_errors_context="whitelist a MAC address" classes="no-top-margin" %}
+        {% include "form_errors.html" %}
     {% endwith %}
 
     <table border="0" class="listing">

@@ -19,24 +19,16 @@ from . import decorators, forms
 urlpatterns = urls.patterns(
     '',
 
-    urls.url(r'^activate/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
-        'template_name': 'registration/activation_complete.html',
-    }, name='registration_activation_complete'),
+    urls.url(r'^activate/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/activation_complete.html')), name='registration_activation_complete'),
     urls.url(r'^activate/(?P<activation_key>\w+)/$', decorators.anonymous_required(function=registration_views.activate), {
         'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
     }, name='registration_activate'),
     urls.url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
         'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
     }, name='registration_register'),
-    urls.url(r'^register/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
-        'template_name': 'registration/registration_complete.html',
-    }, name='registration_complete'),
-    urls.url(r'^register/closed/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
-        'template_name': 'registration/registration_closed.html',
-    }, name='registration_disallowed'),
-    urls.url(r'^email/change/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view), {
-        'template_name': 'registration/email_change_complete.html',
-    }, name='email_change_complete'),
+    urls.url(r'^register/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/registration_complete.html')), name='registration_complete'),
+    urls.url(r'^register/closed/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/registration_closed.html')), name='registration_disallowed'),
+    urls.url(r'^email/change/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/email_change_complete.html')), name='email_change_complete'),
     urls.url(r'^login/$', 'nodewatcher.extra.accounts.views.login', name='auth_login'),
     urls.url(r'^logout/$', 'nodewatcher.extra.accounts.views.logout_redirect', name='auth_logout'),
     urls.url(r'^password/change/$', decorators.authenticated_required(function=auth_views.password_change), {
@@ -49,7 +41,7 @@ urlpatterns = urls.patterns(
         'password_reset_form': forms.PasswordResetForm,
         'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_reset_done'),
     }, name='auth_password_reset'),
-    urls.url(r'^password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', decorators.anonymous_required(function=auth_views.password_reset_confirm), {
+    urls.url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', decorators.anonymous_required(function=auth_views.password_reset_confirm), {
         'set_password_form': forms.SetPasswordForm,
         'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_reset_complete'),
     }, name='auth_password_reset_confirm'),

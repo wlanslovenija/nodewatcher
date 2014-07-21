@@ -5,7 +5,7 @@
 {% block title %}{% trans "Network Topology" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Network Topology") as heading %}
+    {% with heading=_("Network Topology") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

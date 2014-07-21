@@ -5,7 +5,7 @@
 {% block title %}{% trans "Events" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Events") as heading %}
+    {% with heading=_("Events") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

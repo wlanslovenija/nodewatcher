@@ -5,14 +5,14 @@
 {% block title %}{% trans "My Nodes" %}{% endblock %}
 
 {% block heading %}
-    {% with _("My Nodes") as heading %}
+    {% with heading=_("My Nodes") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}
 
 {% block my_content %}
     {% if not user.email %}
-        {% with "no-top-margin" as classes %}
+        {% with classes="no-top-margin" %}
             {% include "nodes/missing_email_error.html" %}
         {% endwith %}
     {% endif %}

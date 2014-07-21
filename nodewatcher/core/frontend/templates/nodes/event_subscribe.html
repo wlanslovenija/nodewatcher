@@ -5,20 +5,18 @@
 {% block title %}{% trans "Subscribe to Event" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Subscribe to Event") as heading %}
+    {% with heading=_("Subscribe to Event") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}
 
 {% block my_content %}
-    {% with "subscribe to event" as form_errors_context %}
-        {% with "no-top-margin" as classes %}
-            {% include "form_errors.html" %}
-        {% endwith %}
+    {% with form_errors_context="subscribe to event" classes="no-top-margin" %}
+        {% include "form_errors.html" %}
     {% endwith %}
 
     {% if not user.email %}
-        {% with "no-top-margin" as classes %}
+        {% with classes="no-top-margin" %}
             {% include "nodes/missing_email_error.html" %}
         {% endwith %}
     {% endif %}

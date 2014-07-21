@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-    {% with "renumber the node" as form_errors_context %}
+    {% with form_errors_context="renumber the node" %}
         {% include "form_errors.html" %}
     {% endwith %}
     {% if form.warnings %}

@@ -5,7 +5,7 @@
 {% block title %}{% trans "Global Client List" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Global Client List") as heading %}
+    {% with heading=_("Global Client List") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

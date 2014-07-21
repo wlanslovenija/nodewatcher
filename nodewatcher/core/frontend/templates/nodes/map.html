@@ -5,7 +5,7 @@
 {% block title %}{% trans "Node Map" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Node Map") as heading %}
+    {% with heading=_("Node Map") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

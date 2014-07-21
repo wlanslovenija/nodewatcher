@@ -55,7 +55,7 @@ class UserProfileAndSettings(django_models.Model):
 
     @django_models.permalink
     def get_absolute_url(self):
-        return ('user_account',)
+        return ('AccountsComponent:user_account',)
 
 
 def create_profile_and_settings(sender, instance, created, **kwargs):
