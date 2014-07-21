@@ -178,6 +178,9 @@ def get_platform(platform):
     Returns the given platform implementation.
     """
 
+    # Ensure that all CGMs are registred
+    loader.load_modules('cgm')
+
     try:
         return PLATFORM_REGISTRY[platform]
     except KeyError:
@@ -233,9 +236,6 @@ def generate_config(node, only_validate=False):
     :param node: Node instance
     :param only_validate: True if only validation should be performed
     """
-
-    # Ensure that all CGMs are registred
-    loader.load_modules('cgm')
 
     # Determine the destination platform
     try:

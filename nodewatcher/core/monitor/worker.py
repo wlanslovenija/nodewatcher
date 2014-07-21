@@ -22,7 +22,6 @@ BANNER = """
 logger = logging.getLogger('monitor.worker')
 
 
-@transaction.commit_manually
 def stage_worker(args):
     """
     Runs a list of (node) processors on a given node.
@@ -34,15 +33,13 @@ def stage_worker(args):
     try:
         for p in processors:
             try:
-                processor = p()
-                context = processor.process(context, node)
-                transaction.commit()
+                with transaction.atomic():
+                    processor = p()
+                    context = processor.process(context, node)
                 cleanup_queue.append(processor)
             except KeyboardInterrupt:
-                transaction.rollback()
                 raise
             except:
-                transaction.rollback()
                 logger.error("Processor for node '%s' has failed with exception:" % node.pk)
                 logger.error(traceback.format_exc())
                 break
@@ -91,7 +88,6 @@ class MonitorRun(object):
 
         logger.info("Ready with %d workers for run '%s'." % (self.config['workers'], self.name))
 
-    @transaction.commit_manually
     def cycle(self):
         """
         Performs a single monitoring cycle.
@@ -107,13 +103,11 @@ class MonitorRun(object):
                 logger.info("Running network processor %s..." % lead_proc.__name__)
 
                 try:
-                    context, nodes = lead_proc().process(context, nodes)
-                    transaction.commit()
+                    with transaction.atomic():
+                        context, nodes = lead_proc().process(context, nodes)
                 except KeyboardInterrupt:
-                    transaction.rollback()
                     raise
                 except:
-                    transaction.rollback()
                     logger.error("Processor has failed with exception:")
                     logger.error(traceback.format_exc())
             elif issubclass(lead_proc, monitor_processors.NodeProcessor):

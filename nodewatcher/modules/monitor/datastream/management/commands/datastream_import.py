@@ -23,9 +23,23 @@ class Command(base.BaseCommand):
             raise base.CommandError("Unable to open file '%s'!" % input_filename)
 
         self.stdout.write("Starting import process...\n")
+        item_index = 0
         for item in ijson.items(input_file, 'items.item'):
             timestamp = datetime.datetime.utcfromtimestamp(item['s'])
-            streams = self.import_data(item)
+            item_index += 1
+            try:
+                streams = self.import_data(item)
+            except:
+                self.stdout.write("=== ERROR: Exception ocurred while processing input stream!\n")
+                self.stdout.write("--- Exception:\n")
+                self.stdout.write(traceback.format_exc())
+                self.stdout.write("\n")
+                self.stdout.write("--- Item index:\n")
+                self.stdout.write("%s\n" % item_index)
+                self.stdout.write("--- Item data:\n")
+                self.stdout.write(repr(item))
+                self.stdout.write("\n\n")
+                raise base.CommandError("Exception ocurred, terminating import.")
 
             for stream in streams:
                 stream_id = datastream.ensure_stream(
@@ -244,7 +258,10 @@ class Command(base.BaseCommand):
         points = [l, m, u]
         s = sum(points)
         ss = sum([x ** 2 for x in points])
-        d = math.sqrt((3 * ss - s ** 2) / (3.0 * (3 - 1)))
+        try:
+            d = math.sqrt((3 * ss - s ** 2) / (3.0 * (3 - 1)))
+        except ValueError:
+            d = 0
 
         return [
             # Stream for rtt_minimum field

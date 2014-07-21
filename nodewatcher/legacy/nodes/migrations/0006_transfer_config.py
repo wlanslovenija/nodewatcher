@@ -88,6 +88,7 @@ class Migration(DataMigration):
             loccfg.address = node.location
             loccfg.city = "?"
             loccfg.country = "?"
+            loccfg.timezone = "Europe/Ljubljana"
             loccfg.altitude = 0
 
             if node.geo_lat is not None:
@@ -137,6 +138,7 @@ class Migration(DataMigration):
                     "tp-wr941nd": "tp-wr941ndv4",
                     "tp-wr1041nd": "tp-wr1041ndv2",
                     "tp-wr1043nd": "tp-wr1043ndv1",
+                    "sm-sx763v2": "sm-sx763v2",
                 }
                 general.router = router_map[profile.template.short_name]
                 general.platform = "openwrt"
@@ -204,6 +206,7 @@ class Migration(DataMigration):
                     "ub-nano": "ieee-80211n",
                     "ub-bullet-m5": "ieee-80211n",
                     "ub-rocket-m5": "ieee-80211n",
+                    "sm-sx763v2": "ieee-80211bg",
                 }
 
                 wifi_iface = orm['cgm.WifiInterfaceConfig'](root=node, content_type=wifiiface_ctype)
@@ -328,6 +331,18 @@ class Migration(DataMigration):
                         alloc_netconf.usage = "clients"
                         alloc_netconf.allocation = subnet['allocation']
                         alloc_netconf.save()
+                else:
+                    # Obtain device descriptor so we can check if the router has a LAN port
+                    from nodewatcher.core.generator.cgm import base as cgm_base
+                    device = cgm_base.get_platform('openwrt').get_device(general.router)
+
+                    # Create LAN routing-only configuration
+                    if device.get_port('lan0'):
+                        print "     - Designating LAN as routing-only linking segment."
+                        lan_iface = orm['cgm.EthernetInterfaceConfig'](root=node, content_type=ethiface_ctype)
+                        lan_iface.enabled = True
+                        lan_iface.eth_port = "lan0"
+                        lan_iface.save()
 
                 # VPN
                 if profile.use_vpn:
@@ -364,9 +379,9 @@ class Migration(DataMigration):
                         ("46.54.226.43", 8942),
                         ("46.54.226.43", 53),
                         ("46.54.226.43", 123),
-                        ("91.175.203.240", 8942),
-                        ("91.175.203.240", 53),
-                        ("91.175.203.240", 123),
+                        ("92.53.140.74", 8942),
+                        ("92.53.140.74", 53),
+                        ("92.53.140.74", 123),
                     ]
                     for host, port in vpn_servers:
                         vpn_server = orm['cgm.VpnServerConfig'](root=node, content_type=vpnserver_ctype)
@@ -627,6 +642,7 @@ class Migration(DataMigration):
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'timezone': ('timezone_field.TimeZoneField', [], {'null': 'True'}),
             'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'config_core_locationconfig'", 'to': "orm['nodes.Node']"})

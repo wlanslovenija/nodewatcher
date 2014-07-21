@@ -41,6 +41,21 @@ class LazyChoiceList(collections.Sequence):
         lazy_choices._returns_field_tuples = True
         return lazy_choices
 
+    def resolve(self, choice_name):
+        """
+        Resolves a choice name and returns a `Choice` descriptor. If the
+        choice does not exist, `KeyError` is raised.
+
+        :param choice_name: Choice name
+        :return: An instance of `Choice`
+        """
+
+        for choice in self._list:
+            if choice.name == choice_name:
+                return choice
+
+        raise KeyError(choice_name)
+
     def __len__(self):
         return len(self._list)
 

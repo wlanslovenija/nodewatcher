@@ -6,7 +6,7 @@ from django.utils import unittest
 from . import models
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def _concurrent_allocation_worker(pool):
     try:
         alloc = pool.allocate_subnet(prefix_len=27)

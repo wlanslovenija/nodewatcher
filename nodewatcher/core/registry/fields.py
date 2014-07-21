@@ -4,6 +4,7 @@ import re
 from django.core import exceptions
 from django.db import models
 from django.db.models import fields
+from django.db.models.fields import related as related_fields
 from django.forms import fields as form_fields, widgets
 from django.utils import text
 from django.utils.translation import ugettext_lazy as _
@@ -12,7 +13,7 @@ import south.modelsinspector
 
 from ...utils import ipaddr
 
-from . import registration
+from . import registration, models as registry_models
 
 
 class SelectorFormField(form_fields.TypedChoiceField):
@@ -26,7 +27,7 @@ class SelectorFormField(form_fields.TypedChoiceField):
         Class constructor.
         """
 
-        kwargs['widget'] = widgets.Select(attrs={'class': 'regact_selector'})
+        kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
         super(SelectorFormField, self).__init__(*args, **kwargs)
 
         # Override choices so we get a lazy list instead of being evaluated right here
@@ -119,7 +120,7 @@ class ModelSelectorKeyField(models.ForeignKey):
         Returns an augmented form field.
         """
 
-        defaults = {'widget': widgets.Select(attrs={'class': 'regact_selector'})}
+        defaults = {'widget': widgets.Select(attrs={'class': 'registry_form_selector'})}
         defaults.update(kwargs)
         return super(ModelSelectorKeyField, self).formfield(**defaults)
 
@@ -373,6 +374,160 @@ class IPAddressFormField(form_fields.CharField):
 
         return IPAddressField.ip_to_python(value, IPAddressField.default_error_messages)
 
+
+class ReferenceChoiceField(models.ForeignKey):
+    """
+    Foreign key that can be used to reference registry items from other
+    subforms for the same node.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs['null'] = True
+        kwargs['blank'] = True
+        super(ReferenceChoiceField, self).__init__(*args, **kwargs)
+
+    def _validate_relation(self, field, model, cls):
+        """
+        Performs relation validation after the destination model is fully resolved.
+        """
+
+        if not issubclass(cls, registry_models.RegistryItemBase):
+            raise exceptions.ImproperlyConfigured(
+                'ReferenceChoiceField can only be used in registry item models!'
+            )
+
+        if not issubclass(self.rel.to, registry_models.RegistryItemBase):
+            raise exceptions.ImproperlyConfigured(
+                'ReferenceChoiceField requires a relation with a registry item!'
+            )
+
+        if cls.get_registry_regpoint() != self.rel.to.get_registry_regpoint():
+            raise exceptions.ImproperlyConfigured(
+                'ReferenceChoiceField can only reference items registered under the same registration point!'
+            )
+
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        """
+        Ensure that field validation is run after the destination model is
+        fully resolved.
+        """
+
+        # FIXME: Enable validation when we know how to skip it on South migrations
+        #related_fields.add_lazy_relation(cls, self, self.rel.to, self._validate_relation)
+        super(ReferenceChoiceField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+
+    def value_from_object(self, obj):
+        try:
+            return getattr(obj, self.name)
+        except models.ObjectDoesNotExist:
+            return None
+
+    def formfield(self, **kwargs):
+        """
+        Returns an augmented form field.
+        """
+
+        defaults = {
+            'required': not self.blank,
+            'label': text.capfirst(self.verbose_name),
+            'help_text': self.help_text,
+            'choices_model': self.rel.to,
+        }
+
+        return ReferenceChoiceFormField(**defaults)
+
+
+class ReferenceChoiceFormField(form_fields.TypedChoiceField):
+    """
+    Form field for :class:`ReferenceChoiceField` database field.
+    """
+
+    def __init__(self, choices_model, *args, **kwargs):
+        """
+        Class constructor.
+
+        :param choices_model: Choices model class
+        """
+
+        self.choices_rid = choices_model.get_registry_id()
+        self.filter_model = choices_model
+        self.partially_validated_tree = None
+        super(ReferenceChoiceFormField, self).__init__(*args, **kwargs)
+
+    def get_dependencies(self, value):
+        """
+        Returns a list of dependencies on other registry forms. This method will
+        only be called when form validation succeeds and the form is scheduled
+        to be saved.
+
+        :param value: Cleaned value
+        :return: A list of dependency tuples (cfg_location, cfg_parent, cfg_index)
+        """
+
+        if value is None:
+            return []
+
+        return [(self.choices_rid, None, value)]
+
+    def modify_to_context(self, item, cfg, request):
+        """
+        Limits the valid choices to items from the partially validated configuration.
+        """
+
+        self.choices = [
+            (index, model)
+            for index, model in enumerate(cfg.get(self.choices_rid, []))
+            if isinstance(model, self.filter_model)
+        ]
+
+        # Store the partially validated tree on which the choices are based
+        self.partially_validated_tree = cfg
+
+    def prepare_value(self, value):
+        if isinstance(value, self.filter_model):
+            for index, model in self.choices:
+                if value.pk == model.pk:
+                    return index
+
+        return super(ReferenceChoiceFormField, self).prepare_value(value)
+
+    def to_python(self, value):
+        if value is None or not self.partially_validated_tree:
+            return None
+
+        try:
+            model = self.partially_validated_tree[self.choices_rid][int(value)]
+            if not model.pk:
+                return None
+
+            return model
+        except (KeyError, IndexError, TypeError):
+            return None
+
+    def valid_value(self, value):
+        if value is None:
+            return True
+
+        for index, model in self.choices:
+            if isinstance(model, models.Model):
+                try:
+                    if value == self.partially_validated_tree[self.choices_rid][index]:
+                        return True
+                except (KeyError, IndexError):
+                    pass
+            else:
+                try:
+                    if int(value) == index:
+                        return True
+                except ValueError:
+                    pass
+
+        return False
+
 # Add South introspection for our fields
 south.modelsinspector.add_introspection_rules([
     (
@@ -386,6 +541,7 @@ south.modelsinspector.add_introspection_rules([
 ], [r'^nodewatcher\.core\.registry\.fields\.SelectorKeyField$'])
 south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.ModelSelectorKeyField$'])
 south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.IntraRegistryForeignKey$'])
+south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.ReferenceChoiceField$'])
 south.modelsinspector.add_introspection_rules([
     (
         [MACAddressField],

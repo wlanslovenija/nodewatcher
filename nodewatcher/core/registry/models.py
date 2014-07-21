@@ -19,6 +19,14 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
         ordering = ['id']
 
     @classmethod
+    def get_registry_regpoint(self):
+        """
+        Returns the registration point this registry item belongs to.
+        """
+
+        return self._registry_regpoint
+
+    @classmethod
     def get_form(cls):
         """
         Returns the form used for this model.

@@ -1,5 +1,5 @@
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import processors as monitor_processors
+from nodewatcher.core.monitor import processors as monitor_processors, events as monitor_events
 
 from . import parser as telemetry_parser
 
@@ -11,6 +11,17 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
     module presence/versions.
     """
 
+    def get_version(self):
+        """
+        Returns the telemetry format version.
+        """
+
+        # Always return 0 when parsing has failed and no info is available
+        if not self.get('successfully_parsed', False):
+            return 0
+
+        return self._meta.version
+
     def get_module_version(self, module):
         """
         Returns the active version of a telemetry module present on the remote
@@ -21,14 +32,24 @@ class HTTPTelemetryContext(monitor_processors.ProcessorContext):
           not installed/present
         """
 
-        module = module.replace('.', '-')
-        metadata = self.META.modules.get(module)
-        if metadata:
+        # Always return 0 when parsing has failed and no info is available
+        if not self.get('successfully_parsed', False):
+            return 0
+
+        if self._meta.version == 2:
+            module = module.replace('.', '-')
+            metadata = self.META.modules.get(module)
+            if metadata:
+                try:
+                    return int(metadata.serial)
+                except ValueError:
+                    # This could only happen when the parsed output is corrupted as serial
+                    # should always be an integer
+                    return 0
+        elif self._meta.version == 3:
             try:
-                return int(metadata.serial)
-            except ValueError:
-                # This could only happen when the parsed output is corrupted as serial
-                # should always be an integer
+                return reduce(lambda x, y: x[y], module.split('.'), self)._meta.version
+            except (KeyError, AttributeError):
                 return 0
 
         return 0
@@ -66,11 +87,18 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                 # Fetch information from the router and merge it into local context
                 try:
                     parser.parse_into(context)
+                    if context._meta.version == 2:
+                        # TODO: Add a warning that the node is using a legacy feed
+                        pass
                     context.successfully_parsed = True
                 except telemetry_parser.HttpTelemetryParseFailed:
                     # Parsing has failed, log this; all components that did not get parsed
                     # will be missing from context and so depending modules will not process them
                     self.logger.error("Failed to parse HTTP telemetry feed from %s!" % router_id)
+
+                    # Create an event in case the router has an associated firmware configuration
+                    if hasattr(node.config.core.general(), 'router'):
+                        monitor_events.TelemetryProcessingFailed(node).post()
             except core_models.RouterIdConfig.DoesNotExist:
                 # No router-id for this node can be found for IPv4; this means
                 # that we have nothing to do here

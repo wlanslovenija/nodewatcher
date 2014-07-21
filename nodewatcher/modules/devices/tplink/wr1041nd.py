@@ -26,18 +26,23 @@ class TPLinkWR1041NDv2(cgm_devices.DeviceBase):
     switches = [
         cgm_devices.Switch(
             'sw0', "Switch0",
-            ports=5,
+            ports=6,
             cpu_port=0,
             vlans=16,
         )
     ]
     ports = [
-        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.SwitchedEthernetPort(
+            'wan0', "Wan0",
+            switch='sw0',
+            vlan=2,
+            ports=[0, 1],
+        ),
         cgm_devices.SwitchedEthernetPort(
             'lan0', "Lan0",
             switch='sw0',
             vlan=1,
-            ports=[0, 1, 2, 3, 4],
+            ports=[0, 2, 3, 4, 5],
         )
     ]
     antennas = [
@@ -56,9 +61,9 @@ class TPLinkWR1041NDv2(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
-            'wan0': 'eth1',
-            'lan0': 'eth0',
+            'sw0': 'switch0',
+            'wan0': 'eth0.2',
+            'lan0': 'eth0.1',
         }
     }
     drivers = {

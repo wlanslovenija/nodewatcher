@@ -169,8 +169,22 @@ class UCIRoot(object):
 
         return section
 
+    def named_sections(self):
+        """
+        Returns an iterator over the named sections.
+        """
+
+        return self._named_sections.iteritems()
+
+    def ordered_sections(self):
+        """
+        Returns an iterator over the ordered sections.
+        """
+
+        return self._ordered_sections.iteritems()
+
     def __iter__(self):
-        return iter(self._named_sections.iteritems())
+        return self.named_sections()
 
     def __contains__(self, section):
         return section in self._named_sections or section in self._ordered_sections
@@ -303,7 +317,14 @@ def general(node, cfg):
 
     # Setup base packages to be installed
     # TODO: This should probably not be hardcoded (or at least moved to modules)
-    cfg.packages.update(['nodewatcher-core', 'nodewatcher-watchdog'])
+    cfg.packages.update([
+        'nodewatcher-agent',
+        'nodewatcher-agent-mod-general',
+        'nodewatcher-agent-mod-resources',
+        'nodewatcher-agent-mod-interfaces',
+        'nodewatcher-agent-mod-wireless',
+        'nodewatcher-watchdog'
+    ])
 
 
 def configure_network(cfg, network, section):
@@ -348,6 +369,7 @@ def configure_network(cfg, network, section):
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
     elif isinstance(network, cgm_models.DHCPNetworkConfig):
         section.proto = 'dhcp'
+        section.hostname = cfg.system.system[0].hostname
     elif isinstance(network, cgm_models.PPPoENetworkConfig):
         section.proto = 'pppoe'
         section.username = network.username
@@ -369,7 +391,7 @@ def configure_interface(cfg, interface, section, iface_name):
     :param iface_name: Name of the UCI interface
     """
 
-    section._routable = interface.routing_protocol
+    section._routable = getattr(interface, 'routing_protocol', None)
 
     networks = [x.cast() for x in interface.networks.all()]
     if networks:
@@ -437,7 +459,24 @@ def configure_switch(cfg, device, port):
     vlan.ports = ' '.join([str(x) for x in port.ports])
 
 
-@cgm_base.register_platform_module('openwrt', 10)
+def set_dhcp_ignore(cfg, iface_name):
+    """
+    Ensure that DHCP server does not announce anything via an interface.
+
+    :param cfg: UCI configuration instance
+    :param iface_name: Interface name
+    """
+
+    try:
+        iface_dhcp = cfg.dhcp.add(dhcp=iface_name)
+        iface_dhcp.interface = iface_name
+    except ValueError:
+        iface_dhcp = cfg.dhcp[iface_name]
+
+    iface_dhcp.ignore = True
+
+
+@cgm_base.register_platform_module('openwrt', 15)
 def network(node, cfg):
     """
     Basic network configuration.
@@ -457,7 +496,56 @@ def network(node, cfg):
         if not interface.enabled:
             continue
 
-        if isinstance(interface, cgm_models.EthernetInterfaceConfig):
+        if isinstance(interface, cgm_models.MobileInterfaceConfig):
+            iface = cfg.network.add(interface=interface.device)
+            iface._uplink = True
+            set_dhcp_ignore(cfg, interface.device)
+
+            # Mapping of device identifiers to ports
+            port_map = {
+                'mobile0': '/dev/ttyUSB0',
+                'mobile1': '/dev/ttyUSB1',
+            }
+
+            iface.device = port_map.get(interface.device, None)
+            if not iface.device:
+                raise cgm_base.ValidationError(
+                    _("Unsupported mobile interface port '%(port)s'!") % {'port': interface.device}
+                )
+
+            if interface.service == 'umts':
+                iface.service = 'umts'
+            elif interface.service == 'gprs':
+                iface.service = 'gprs'
+            elif interface.service == 'cdma':
+                iface.service = 'cdma'
+            else:
+                raise cgm_base.ValidationError(
+                    _("Unsupported mobile service type '%(service)s'!") % {'service': interface.service}
+                )
+
+            iface.apn = interface.apn
+            iface.pincode = interface.pin
+            if interface.username:
+                iface.username = interface.username
+                iface.password = interface.password
+
+            configure_interface(cfg, interface, iface, interface.device)
+            iface.proto = '3g'
+
+            # Some packages are required for using a mobile interface
+            cfg.packages.update([
+                'comgt',
+                'usb-modeswitch',
+                'kmod-usb-serial',
+                'kmod-usb-serial-option',
+                'kmod-usb-serial-wwan',
+                'kmod-usb-ohci',
+                'kmod-usb-uhci',
+                'kmod-usb-acm',
+                'kmod-usb2',
+            ])
+        elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
             try:
                 iface = cfg.network.add(interface=interface.eth_port)
             except ValueError:
@@ -473,6 +561,10 @@ def network(node, cfg):
 
             if interface.uplink:
                 iface._uplink = True
+                set_dhcp_ignore(cfg, interface.eth_port)
+
+            if interface.mac_address:
+                iface.macaddr = interface.mac_address
 
             configure_interface(cfg, interface, iface, interface.eth_port)
 
@@ -546,7 +638,7 @@ def network(node, cfg):
             if interface.ack_distance:
                 radio.distance = interface.ack_distance
 
-            for index, vif in enumerate(interfaces):
+            for vif in interfaces:
                 wif = cfg.wireless.add('wifi-iface')
                 wif.device = wifi_radio
                 wif.encryption = 'none'
@@ -557,20 +649,24 @@ def network(node, cfg):
                 elif vif.mode == 'mesh':
                     wif.mode = 'adhoc'
                     wif.bssid = vif.bssid
+                    # Override default mcast_rate to avoid broadcast traffic from
+                    # stealing too much air time
+                    wif.mcast_rate = 6000
                 elif vif.mode == 'sta':
                     wif.mode = 'sta'
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
 
                 # Configure network interface for each vif, first being the primary network
-                vif_name = '%sv%d' % (wifi_radio, index)
+                vif_name = device.get_vif_mapping('openwrt', interface.wifi_radio, vif)
                 iface = cfg.network.add(interface=vif_name)
                 wif.network = vif_name
+                wif.ifname = vif_name
 
                 configure_interface(cfg, vif, iface, vif_name)
 
 
-@cgm_base.register_platform_module('openwrt', 10)
+@cgm_base.register_platform_module('openwrt', 15)
 def qos_base(node, cfg):
     """
     Configures basic QoS rules (independent of interfaces).
@@ -642,3 +738,22 @@ def qos_base(node, cfg):
 
     # Ensure that we have qos-scripts installed
     cfg.packages.update(['qos-scripts'])
+
+
+@cgm_base.register_platform_module('openwrt', 15)
+def dns_servers(node, cfg):
+    """
+    Configures DNS servers.
+    """
+
+    # DNS configuration is part of the DHCP config
+    dnsmasq = cfg.dhcp.add('dnsmasq')
+    dnsmasq.domainneeded = False
+    dnsmasq.boguspriv = False
+    dnsmasq.localise_queries = True
+    dnsmasq.rebind_protection = False
+    dnsmasq.nonegcache = True
+    dnsmasq.noresolv = True
+    dnsmasq.authoritative = True
+    dnsmasq.lease_file = '/tmp/dhcp.leases'
+    dnsmasq.server = [str(x.address.ip) for x in node.config.core.servers.dns()]

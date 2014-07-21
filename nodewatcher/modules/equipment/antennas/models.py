@@ -21,7 +21,7 @@ class Antenna(models.Model):
     manufacturer = models.CharField(max_length=100, verbose_name=_("Manufacturer"))
     internal_for = models.CharField(max_length=100, editable=False, null=True)
     internal_id = models.CharField(max_length=100, editable=False, null=True)
-    url = models.URLField(verify_exists=False, verbose_name=_("URL"), blank=True)
+    url = models.URLField(verbose_name=_("URL"), blank=True)
     polarization = models.CharField(max_length=20, choices=POLARIZATION_CHOICES)
     angle_horizontal = models.IntegerField(default=360, verbose_name=_("Horizontal angle"))
     angle_vertical = models.IntegerField(default=360, verbose_name=_("Vertical angle"))

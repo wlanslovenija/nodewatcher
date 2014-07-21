@@ -56,7 +56,7 @@ class TPLinkWR741NDv1(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
+            'sw0': 'switch0',
             'wan0': 'eth1',
             'lan0': 'eth0',
         }

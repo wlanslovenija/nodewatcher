@@ -56,7 +56,7 @@ class TPLinkWR842NDv1(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
+            'sw0': 'switch0',
             'wan0': 'eth1',
             'lan0': 'eth0',
         }
@@ -75,5 +75,31 @@ class TPLinkWR842NDv1(cgm_devices.DeviceBase):
         }
     }
 
+
+class TPLinkWR842NDv2(TPLinkWR842NDv1):
+    """
+    TP-Link WR842NDv2 device descriptor.
+    """
+
+    identifier = 'tp-wr842ndv2'
+    name = "WR842ND (v2)"
+    port_map = {
+        'openwrt': {
+            'wifi0': 'radio0',
+            'sw0': 'switch0',
+            'wan0': 'eth0',
+            'lan0': 'eth1',
+        }
+    }
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR842',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr842n-v2-squashfs-factory.bin'
+            ]
+        }
+    }
+
 # Register the TP-Link WR842ND device
 cgm_base.register_device('openwrt', TPLinkWR842NDv1)
+cgm_base.register_device('openwrt', TPLinkWR842NDv2)

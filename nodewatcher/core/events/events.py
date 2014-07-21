@@ -1,3 +1,5 @@
+import copy
+
 from django.core import exceptions
 from django.utils import datastructures
 

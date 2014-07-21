@@ -1,3 +1,7 @@
+import hashlib
+import random
+import string
+
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
@@ -124,6 +128,34 @@ class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_item(InterfaceConfig)
 
 
+class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
+    """
+    Bridge interface configuration.
+    """
+
+    name = models.CharField(max_length=30)
+    stp = models.BooleanField(verbose_name=_("STP"), default=False)
+    mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
+
+    class RegistryMeta(InterfaceConfig.RegistryMeta):
+        registry_name = _("Bridge")
+
+    def __init__(self, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        super(BridgeInterfaceConfig, self).__init__(*args, **kwargs)
+        # Automatically generate a random bridge name when one does not exist
+        if not self.name:
+            self.name = "Bridge%(id)s" % {'id': random.choice(string.uppercase)}
+
+    def __unicode__(self):
+        return self.name
+
+registration.point('node.config').register_item(BridgeInterfaceConfig)
+
+
 class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
     """
     An ethernet interface.
@@ -131,6 +163,7 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     eth_port = registry_fields.SelectorKeyField('node.config', 'core.interfaces#eth_port')
     uplink = models.BooleanField(default=False)
+    mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Ethernet Interface")
@@ -176,6 +209,13 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         multiple = True
         hidden = False
 
+    def get_unique_id(self):
+        """
+        Returns a unique identifier for this virtual wifi interface.
+        """
+
+        return hashlib.sha1(":".join([str(self.device.pk), self.mode, self.essid, self.bssid])).hexdigest()[:5]
+
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('sta', _("STA")))
@@ -197,6 +237,29 @@ class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
 registration.point('node.config').register_item(VpnInterfaceConfig)
 
 
+class MobileInterfaceConfig(InterfaceConfig):
+    """
+    A mobile (3G/UMTS/GPRS) interface.
+    """
+
+    service = registry_fields.SelectorKeyField('node.config', 'core.interfaces#mobile_service', default='umts')
+    device = registry_fields.SelectorKeyField('node.config', 'core.interfaces#mobile_device', default='mobile0')
+    apn = models.CharField(max_length=100, verbose_name=_("APN"))
+    pin = models.CharField(max_length=4, verbose_name=_("PIN"))
+    username = models.CharField(max_length=50, blank=True)
+    password = models.CharField(max_length=50, blank=True)
+
+    class RegistryMeta(InterfaceConfig.RegistryMeta):
+        registry_name = _("Mobile Interface")
+
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('mobile0', _("Mobile0")))
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('mobile1', _("Mobile1")))
+registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('umts', _("UMTS")))
+registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('gprs', _("GPRS")))
+registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('cdma', _("CDMA")))
+registration.point('node.config').register_item(MobileInterfaceConfig)
+
+
 class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     """
     Network configuration of an interface.
@@ -214,6 +277,20 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
         multiple = True
 
 registration.point('node.config').register_subitem(InterfaceConfig, NetworkConfig)
+
+
+class BridgedNetworkConfig(NetworkConfig):
+    """
+    Network configuration that puts the interface into a bridge.
+    """
+
+    bridge = registry_fields.ReferenceChoiceField(BridgeInterfaceConfig)
+
+    class RegistryMeta(NetworkConfig.RegistryMeta):
+        registry_name = _("Bridged")
+
+registration.point('node.config').register_subitem(EthernetInterfaceConfig, BridgedNetworkConfig)
+registration.point('node.config').register_subitem(WifiInterfaceConfig, BridgedNetworkConfig)
 
 
 class StaticNetworkConfig(NetworkConfig):
@@ -249,6 +326,7 @@ registration.point('node.config').register_choice('core.interfaces.network#ip_fa
 registration.point('node.config').register_choice('core.interfaces.network#ip_family', registration.Choice('ipv6', _("IPv6")))
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, StaticNetworkConfig)
 registration.point('node.config').register_subitem(WifiInterfaceConfig, StaticNetworkConfig)
+registration.point('node.config').register_subitem(BridgeInterfaceConfig, StaticNetworkConfig)
 
 
 class DHCPNetworkConfig(NetworkConfig):
@@ -278,6 +356,7 @@ class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator):
 
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, AllocatedNetworkConfig)
 registration.point('node.config').register_subitem(WifiInterfaceConfig, AllocatedNetworkConfig)
+registration.point('node.config').register_subitem(BridgeInterfaceConfig, AllocatedNetworkConfig)
 
 
 class PPPoENetworkConfig(NetworkConfig):
@@ -353,3 +432,20 @@ registration.point('node.config').register_choice('core.interfaces.limits#speeds
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('2048', _("2 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('4096', _("4 Mbit/s")))
 registration.point('node.config').register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)
+
+
+class DnsServerConfig(registration.bases.NodeConfigRegistryItem):
+    """
+    DNS server address configuration.
+    """
+
+    address = registry_fields.IPAddressField(host_required=True)
+
+    class RegistryMeta:
+        form_weight = 60
+        registry_id = 'core.servers.dns'
+        registry_section = _("DNS Servers")
+        registry_name = _("DNS Server")
+        multiple = True
+
+registration.point('node.config').register_item(DnsServerConfig)

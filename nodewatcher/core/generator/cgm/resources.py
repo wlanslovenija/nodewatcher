@@ -76,7 +76,13 @@ class IpResource(Resource):
         self.family = family
         self.subnet = subnet
         self.config = config
-        self.allocation = self.subnet.iterhosts()
+
+        # Special handling for single-address subnets where we can only allocate
+        # that one address (in this case network/broadcast is ignored)
+        if self.subnet.numhosts == 1:
+            self.allocation = iter([self.subnet.network])
+        else:
+            self.allocation = self.subnet.iterhosts()
 
     def allocate(self, family=None):
         """

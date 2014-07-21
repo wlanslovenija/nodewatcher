@@ -1,7 +1,7 @@
-import copy
 import inspect
 
 from django.core import exceptions
+from django.utils.translation import ugettext as _
 
 from ...registry import registration
 
@@ -59,7 +59,7 @@ class SwitchedEthernetPort(EthernetPort):
                 self.identifier, self.vlan
             ))
 
-        if switch.cpu_port not in self.ports:
+        if not switch.cpu_ports.intersection(self.ports):
             raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" % (
                 self.identifier
             ))
@@ -176,12 +176,18 @@ class Switch(object):
             ports = range(ports)
 
         self.ports = ports
-        if cpu_port not in ports:
-            raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" % (
-                self.identifier, cpu_port
-            ))
+        if not isinstance(cpu_port, (list, tuple)):
+            cpu_ports = set([cpu_port])
+        else:
+            cpu_ports = set(cpu_port)
 
-        self.cpu_port = cpu_port
+        for cpu_port in cpu_ports:
+            if cpu_port not in ports:
+                raise exceptions.ImproperlyConfigured("Switch descriptor '%s' refers to an invalid CPU port '%s'!" % (
+                    self.identifier, cpu_port
+                ))
+
+        self.cpu_ports = cpu_ports
         self.vlans = vlans
 
 
@@ -315,7 +321,7 @@ class DeviceBase(object):
             )
 
         # Register CGM methods
-        for _, function in inspect.getmembers(cls, inspect.isfunction):
+        for name, function in inspect.getmembers(cls, inspect.isfunction):
             if not getattr(function, 'cgm_module', False):
                 continue
 
@@ -327,15 +333,34 @@ class DeviceBase(object):
                 )
 
     @classmethod
-    def remap_port(cls, platform, port):
+    def remap_port(cls, platform, interface_or_port):
         """
         Remaps a port according to the port mapping.
 
         :param platform: Platform identifier
-        :param port: Port identifier
+        :param interface_or_port: Interface model or port identifier
         """
 
-        return cls.port_map.get(platform, {}).get(port, None)
+        from . import models as cgm_models
+
+        if isinstance(interface_or_port, cgm_models.EthernetInterfaceConfig):
+            interface_or_port = interface_or_port.eth_port
+        elif isinstance(interface_or_port, cgm_models.WifiRadioDeviceConfig):
+            interface_or_port = interface_or_port.wifi_radio
+
+        return cls.port_map.get(platform, {}).get(interface_or_port, None)
+
+    @classmethod
+    def get_vif_mapping(cls, platform, radio, vif):
+        """
+        Returns a name for the wireless virtual interface.
+
+        :param platform: Platform identifier
+        :param radio: Radio identifier
+        :param vif: Wireless virtual interface model
+        """
+
+        return 'vif%s' % vif.get_unique_id()
 
     def __init__(self):
         """

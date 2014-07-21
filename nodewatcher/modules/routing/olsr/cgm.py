@@ -19,20 +19,6 @@ def olsr(node, cfg):
         return
 
     olsrd = cfg.olsrd.add('olsrd')
-    olsrd.IpVersion = 4
-    olsrd.AllowNoInt = 'yes'
-    olsrd.UseHysteresis = 'no'
-    olsrd.LinkQualityFishEye = '0'
-    olsrd.Willingness = 3
-    olsrd.LinkQualityLevel = 2
-    olsrd.LinkQualityAging = '0.1'
-    olsrd.LinkQualityAlgorithm = 'etx_ff'
-    olsrd.FIBMetric = 'flat'
-    olsrd.Pollrate = '0.025'
-    olsrd.TcRedundancy = 2
-    olsrd.MprCoverage = 3
-    olsrd.NatThreshold = '0.75'
-    olsrd.SmartGateway = 'no'
     olsrd.MainIp = router_id
     olsrd.SrcIpRoutes = 'yes'
     olsrd.RtTable = ROUTING_TABLE_ID
@@ -67,23 +53,11 @@ def olsr(node, cfg):
         iface = cfg.olsrd.add('Interface')
         iface.interface = routable_ifaces
         iface.IPv4Multicast = '255.255.255.255'
-        iface.HelloInterval = '5.0'
-        iface.HelloValidityTime = '40.0'
-        iface.TcInterval = '7.0'
-        iface.TcValidityTime = '161.0'
-        iface.MidInterval = '18.0'
-        iface.MidValidityTime = '324.0'
-        iface.HnaInterval = '18.0'
-        iface.HnaValidityTime = '324.0'
-
-    # Create the olsrd routing table
-    rt = cfg.routing.add(table=ROUTING_TABLE_NAME)
-    rt.id = ROUTING_TABLE_ID
 
     # Ensure that all traffic gets routed via the olsrd table by default
-    rt = cfg.routing.add('policy')
-    rt.table = ROUTING_TABLE_NAME
+    rt = cfg.network.add('rule')
+    rt.lookup = ROUTING_TABLE_ID
     rt.priority = ROUTING_TABLE_PRIORITY
 
-    # Ensure that "olsrd" and "policy-routing" packages are installed
-    cfg.packages.update(['olsrd', 'policy-routing'])
+    # Ensure that "olsrd" package is installed
+    cfg.packages.update(['olsrd'])

@@ -77,17 +77,17 @@ def tunneldigger(node, cfg):
         # Create routing policy entries to ensure tunneldigger connections are not
         # routed via the mesh
         for broker in unique_brokers:
-            policy = cfg.routing.add('policy')
-            policy.dest_ip = broker.ip
-            policy.table = 'main'
+            policy = cfg.network.add('rule')
+            policy.dest = "%s/32" % broker.ip
+            policy.lookup = 'main'
             policy.priority = 500
 
     if tunneldigger_enabled:
         # Ensure that WAN traffic is routed via the main table
-        policy = cfg.routing.add('policy')
-        policy.device = uplink_interface
-        policy.table = 'main'
+        policy = cfg.network.add('rule')
+        setattr(policy, 'in', uplink_interface)
+        policy.lookup = 'main'
         policy.priority = 500
 
-        # Register the 'tunneldigger' and 'policy-routing' packages
-        cfg.packages.update(['tunneldigger', 'policy-routing'])
+        # Ensure that "tunneldigger" package is installed
+        cfg.packages.update(['tunneldigger'])

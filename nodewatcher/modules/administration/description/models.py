@@ -10,7 +10,7 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     notes = models.TextField(blank=True, default='')
-    url = models.URLField(verify_exists=False, blank=True, default='', verbose_name=_("URL"))
+    url = models.URLField(blank=True, default='', verbose_name=_("URL"))
 
     class RegistryMeta:
         form_weight = 4

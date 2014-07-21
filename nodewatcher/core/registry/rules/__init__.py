@@ -7,16 +7,18 @@ __all__ = [
 ]
 
 
-def evaluate(regpoint, root, state, partial_config=None):
+def evaluate(regpoint, root, state=None, partial_config=None):
     """
     Evaluates the rules.
 
     :param regpoint: Registration point instance
     :param root: Regpoint root instance to evaluate the rules for
-    :param state: Current evaluation state
+    :param state: Optional current evaluation state
     :param partial_config: Optional partial updated configuration
     """
 
+    if state is None:
+        state = {}
     if partial_config is None:
         partial_config = {}
 
