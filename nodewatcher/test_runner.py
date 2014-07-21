@@ -1,11 +1,11 @@
 import unittest
 
 from django.conf import settings
-from django.test import simple, testcases, runner
+from django.test import testcases, runner
 from django.utils import unittest as django_unittest
 
 
-class FilteredTestSuiteRunner(simple.DjangoTestSuiteRunner):
+class FilteredTestSuiteRunner(runner.DiscoverRunner):
     """
     It is the same as in DjangoTestSuiteRunner, but it also supports filtering only
     wanted tests through ``TEST_RUNNER_FILTER`` Django setting.
