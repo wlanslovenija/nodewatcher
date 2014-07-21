@@ -41,7 +41,7 @@ urlpatterns = urls.patterns(
         'password_reset_form': forms.PasswordResetForm,
         'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_reset_done'),
     }, name='auth_password_reset'),
-    urls.url(r'^password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', decorators.anonymous_required(function=auth_views.password_reset_confirm), {
+    urls.url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', decorators.anonymous_required(function=auth_views.password_reset_confirm), {
         'set_password_form': forms.SetPasswordForm,
         'post_reset_redirect': functional_utils.lazy(urlresolvers.reverse, str)('AccountsComponent:auth_password_reset_complete'),
     }, name='auth_password_reset_confirm'),
