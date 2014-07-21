@@ -19,5 +19,5 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y gi
 
 # Install code dependencies
 RUN cat /code/packages.txt | DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
-# Install Python package dependencies
-RUN pip install -r /code/requirements.txt
+# Install Python package dependencies (do not use pip install -r here!)
+RUN { cat /code/requirements.txt | xargs -n 1 pip install; } || true
