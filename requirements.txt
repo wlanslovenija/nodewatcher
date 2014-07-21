@@ -17,7 +17,7 @@ django-guardian==1.2
 git+https://github.com/mitar/django-missing.git@9cf0fd6cfe39bb2cd0b90b3dd37be1b465308ae8#egg=django_missing-master
 git+https://github.com/wlanslovenija/django-overextends.git@ee963e2c338c1134e6ec49acabe9822b3636b536#egg=django_overextends-wlanslovenija
 django-phonenumber-field==0.5
-django-polymorphic==0.5.5
+git+https://github.com/wlanslovenija/django_polymorphic.git@514f6079696838f241bec0c0397d8ce193c19ac0#egg=django_polymorphic-wlanslovenija
 django-registration==0.8
 django-sekizai==0.7
 django-tastypie==0.10.0
