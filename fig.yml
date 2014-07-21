@@ -31,3 +31,4 @@ web:
     links:
         - db
         - tokumx
+        - generator
