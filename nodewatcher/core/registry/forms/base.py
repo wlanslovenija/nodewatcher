@@ -169,7 +169,7 @@ class RegistryMetaForm(django_forms.Form):
         # Choose a default item in case one is not set
         if selected_item is None:
             selected_item = context.items.values()[0]
-        selected_item = selected_item._meta.module_name
+        selected_item = selected_item._meta.model_name
 
         if not static and (len(context.items) > 1 or force_selector_widget):
             item_widget = django_forms.Select(attrs={'class': 'registry_form_item_chooser'})
@@ -517,7 +517,7 @@ class RegistryFormContext(object):
         if item is None:
             form_prefix = prefix
         else:
-            form_prefix = '%s_%s' % (prefix, item._meta.module_name)
+            form_prefix = '%s_%s' % (prefix, item._meta.model_name)
 
         if field is None:
             return form_prefix
@@ -596,9 +596,9 @@ def prepare_forms(context):
         context.subforms = []
         context.force_selector_widget = False
 
-        if getattr(cls_meta, 'hidden', False) and item_cls._meta.module_name in context.items:
+        if getattr(cls_meta, 'hidden', False) and item_cls._meta.model_name in context.items:
             # The top-level item should be hidden
-            del context.items[item_cls._meta.module_name]
+            del context.items[item_cls._meta.model_name]
             context.force_selector_widget = True
 
             # When there is only the top-level item and it should be hidden, we don't
@@ -614,12 +614,12 @@ def prepare_forms(context):
             if context.hierarchy_parent_cls is not None:
                 rel_field_name = item_cls._registry_object_parent_link.name
                 if item_cls != item_cls.get_registry_toplevel():
-                    rel_field_name = "%s__%s" % (item_cls._meta.module_name, rel_field_name)
+                    rel_field_name = "%s__%s" % (item_cls._meta.model_name, rel_field_name)
                     # We have to filter out completely unrelated items because if the parent object
                     # is set to None, the basic filter would also match those that aren't linked
                     # to the correct model at all.
                     existing_models_qs = existing_models_qs.exclude(
-                        **{item_cls._meta.module_name: None}
+                        **{item_cls._meta.model_name: None}
                     )
 
                 existing_models_qs = existing_models_qs.filter(
@@ -637,7 +637,7 @@ def prepare_forms(context):
                         continue
 
                 # Skip items that should not be here
-                if mdl._meta.module_name not in context.items:
+                if mdl._meta.model_name not in context.items:
                     continue
 
                 context.existing_models[mdl.pk] = mdl
