@@ -1,3 +1,5 @@
+from .celery import app as celery_app
+
 NAME = 'nodewatcher'
 VERSION = (3, 0, 0, 'beta', 0)
 
