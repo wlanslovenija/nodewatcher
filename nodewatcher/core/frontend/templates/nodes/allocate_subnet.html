@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-    {% with "allocate a subnet" as form_errors_context %}
+    {% with form_errors_context="allocate a subnet" %}
         {% include "form_errors.html" %}
     {% endwith %}
 

@@ -5,7 +5,7 @@
 {% block title %}{% trans "Router Configuration Update Needed" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Router Configuration Update Needed") as heading %}
+    {% with heading=_("Router Configuration Update Needed") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

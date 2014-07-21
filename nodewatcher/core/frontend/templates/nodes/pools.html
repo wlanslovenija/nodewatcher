@@ -5,7 +5,7 @@
 {% block title %}{% trans "IP Allocation Pools" %}{% endblock %}
 
 {% block heading %}
-    {% with _("IP Allocation Pools") as heading %}
+    {% with heading=_("IP Allocation Pools") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

@@ -5,7 +5,7 @@
 {% block title %}{% trans "Network Statistics" %}{% endblock %}
 
 {% block heading %}
-    {% with _("Network Statistics") as heading %}
+    {% with heading=_("Network Statistics") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}

@@ -5,16 +5,14 @@
 {% block title %}{% trans "New Node Registration" %}{% endblock %}
 
 {% block heading %}
-    {% with _("New Node Registration") as heading %}
+    {% with heading=_("New Node Registration") %}
         {{ block.super }}
     {% endwith %}
 {% endblock %}
 
 {% block my_content %}
-    {% with "register a new node" as form_errors_context %}
-        {% with "no-top-margin" as classes %}
-            {% include "form_errors.html" %}
-        {% endwith %}
+    {% with form_errors_context="register a new node" classes="no-top-margin" %}
+        {% include "form_errors.html" %}
     {% endwith %}
 
     {% notice "" "no-top-margin" %}
