@@ -8,11 +8,11 @@ amqp==1.4.5
 anyjson==0.3.3
 billiard==3.3.0.17
 celery==3.1.11
-datastream==0.2.6
+git+https://github.com/wlanslovenija/datastream.git@2cd5c5d7c4178d32fbbfeb816fe31b3f27f32012#egg=datastream-master
 defusedxml==0.4.1
 django-celery==3.1.10
 django-classy-tags==0.5.1
-django-datastream==0.1.5
+git+https://github.com/wlanslovenija/django-datastream.git@75bc27c9f56be45f073d94d2d563c7372add9e06#egg=django_datastream-master
 django-guardian==1.2
 git+https://github.com/mitar/django-missing.git@9cf0fd6cfe39bb2cd0b90b3dd37be1b465308ae8#egg=django_missing-master
 git+https://github.com/wlanslovenija/django-overextends.git@ee963e2c338c1134e6ec49acabe9822b3636b536#egg=django_overextends-wlanslovenija
