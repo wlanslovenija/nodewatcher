@@ -186,6 +186,6 @@ class AssignToFormAction(RegistryFormAction):
 
         form_prefix = self.context.base_prefix + '_mu_' + str(self.index)
         for field, value in self.attributes.iteritems():
-            self.context.data[form_prefix + '_' + self.item._meta.module_name + '-' + field] = value
+            self.context.data[form_prefix + '_' + self.item._meta.model_name + '-' + field] = value
 
         return True

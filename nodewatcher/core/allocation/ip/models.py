@@ -6,6 +6,9 @@ from .. import models as allocation_models
 from ...registry import fields as registry_fields, forms as registry_forms, permissions
 from ....utils import ipaddr
 
+# Needed for node.config registration point
+from ... import models as core_models
+
 
 class IpPoolStatus(object):
     """

@@ -61,9 +61,9 @@ class RegistryProxyMultipleDescriptor(object):
                 self.core_filters = {chain: instance}
                 self.model = rel_model
 
-            def get_query_set(self):
+            def get_queryset(self):
                 db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
-                return super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
+                return super(RelatedManager, self).get_queryset().using(db).filter(**self.core_filters)
 
         return RelatedManager
 
@@ -91,7 +91,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         from . import registration
         clone = self._clone()
         try:
-            name = '{0}.{1}'.format(self.model._meta.concrete_model._meta.module_name, name)
+            name = '{0}.{1}'.format(self.model._meta.concrete_model._meta.model_name, name)
             clone._regpoint = registration.point(name)
             return clone
         except KeyError:
@@ -336,14 +336,14 @@ class RegistryLookupManager(gis_models.GeoManager):
         self._regpoint = regpoint
         super(RegistryLookupManager, self).__init__()
 
-    def get_query_set(self):
+    def get_queryset(self):
         qs = RegistryQuerySet(self.model, using=self._db)
         if self._regpoint is not None:
             qs._regpoint = self._regpoint
         return qs
 
     def regpoint(self, name):
-        return self.get_query_set().regpoint(name)
+        return self.get_queryset().regpoint(name)
 
     def registry_fields(self, **kwargs):
-        return self.get_query_set().registry_fields(**kwargs)
+        return self.get_queryset().registry_fields(**kwargs)

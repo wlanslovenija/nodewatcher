@@ -110,7 +110,7 @@ class RegistrationPoint(object):
 
     def _register_item_to_container(self, item, container):
         item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
-        item_dict[item._meta.module_name] = item
+        item_dict[item._meta.model_name] = item
         return django_datastructures.SortedDict(
             sorted(container.items(), key=lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_weight', 0))
         )
@@ -133,7 +133,7 @@ class RegistrationPoint(object):
             return False
         else:
             self.item_classes.add(item)
-            self.item_classes_name['%s.%s' % (item._meta.app_label, item._meta.module_name)] = item
+            self.item_classes_name['%s.%s' % (item._meta.app_label, item._meta.model_name)] = item
 
         # Record the item in object hierarchy so we know which items don't depend on any other items in the
         # object (runtime editable) hierarchy
@@ -296,7 +296,7 @@ class RegistrationPoint(object):
             del self.item_registry[registry_id]
         else:
             # Item that subclasses a top-level item
-            del self.item_object_toplevel[registry_id][item_cls._meta.module_name]
+            del self.item_object_toplevel[registry_id][item_cls._meta.model_name]
             assert len(self.item_object_toplevel[registry_id]) > 0
             self._unregister_item(item_cls)
 
@@ -331,7 +331,7 @@ class RegistrationPoint(object):
         except KeyError:
             raise exceptions.RegistryItemNotRegistered("Registry item with id '%s' is not registered!" % registry_id)
 
-        return getattr(root, '{0}_{1}_{2}'.format(self.namespace, top_level._meta.app_label, top_level._meta.module_name)), top_level
+        return getattr(root, '{0}_{1}_{2}'.format(self.namespace, top_level._meta.app_label, top_level._meta.model_name)), top_level
 
     def get_top_level_class(self, registry_id):
         """

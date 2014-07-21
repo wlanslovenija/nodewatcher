@@ -73,7 +73,7 @@ class ProcessorContext(dict):
         Attribute access.
         """
 
-        if name.startswith('_') and not name in self:
+        if name.startswith('_') and name not in self:
             return super(ProcessorContext, self).__getattribute__(name)
         return self[name]
 

@@ -248,7 +248,7 @@ def append(_item, _cls=None, _parent=None, **kwargs):
             if not getattr(tlc.RegistryMeta, 'multiple', False):
                 raise engine.EvaluationError("Attempted to use append predicate on singular registry item '{0}'!".format(_item))
             if cls_name is None:
-                cls_name = tlc._meta.module_name
+                cls_name = tlc._meta.model_name
         except registry_exceptions.RegistryItemNotRegistered:
             raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
 

@@ -51,11 +51,11 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
         """
 
         if cls.__base__ == cls._registry_regpoint.item_base:
-            return cls._registry_regpoint.namespace + '_' + cls._meta.app_label + '_' + cls._meta.module_name
+            return cls._registry_regpoint.namespace + '_' + cls._meta.app_label + '_' + cls._meta.model_name
         else:
             for base in cls.__bases__:
                 if hasattr(base, 'get_registry_lookup_chain'):
-                    return base.get_registry_lookup_chain() + '__' + cls._meta.module_name
+                    return base.get_registry_lookup_chain() + '__' + cls._meta.model_name
 
     @classmethod
     def get_registry_id(cls):
@@ -80,9 +80,9 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
         """
 
         return user.has_perm(
-            "%(app_label)s.add_%(module_name)s" % {
+            "%(app_label)s.add_%(model_name)s" % {
                 "app_label": cls._meta.app_label,
-                "module_name": cls._meta.module_name,
+                "model_name": cls._meta.model_name,
             }
         )
 
