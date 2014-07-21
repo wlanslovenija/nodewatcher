@@ -30,7 +30,7 @@
             </tr>
             <tr>
                 <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
-                <th title="{% trans "Is the node monitored by <i>nodewatcher</i>." %}">{% trans "Monitored" %}</th>
+                <th title="{% filter striptags %}{% trans "Is the node monitored by <i>nodewatcher</i>." %}{% endfilter %}">{% trans "Monitored" %}</th>
                 <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
             </tr>
         </thead>
@@ -40,7 +40,7 @@
                 <th rowspan="2" title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
                 <th rowspan="2" title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
                 <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
-                <th title="{% trans "Is the node monitored by <i>nodewatcher</i>." %}">{% trans "Monitored" %}</th>
+                <th title="{% filter striptags %}{% trans "Is the node monitored by <i>nodewatcher</i>." %}{% endfilter %}">{% trans "Monitored" %}</th>
                 <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
                 <th rowspan="2" title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
             </tr>

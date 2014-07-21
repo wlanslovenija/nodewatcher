@@ -25,6 +25,13 @@
         return function (data, type, full) {
             if (type !== 'display') return data;
 
+            switch (data) {
+                case true: data = 'True'; break;
+                case false: data = 'False'; break;
+                case null: data = 'None'; break;
+                default: break;
+            }
+
             return $('.node-list-legend .' + legendName + '-status dt.' + data).html();
         };
     }
