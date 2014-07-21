@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+import os
+
+# Get current working directory
+root = os.getcwd()
+# Discover all symlinks below the current directory
+for dirpath, dirnames, filenames in os.walk('.'):
+    for filename in filenames:
+        try:
+            orig_path = os.path.join(dirpath, filename)
+            target = os.readlink(orig_path)
+            if not target.startswith(root):
+                continue
+
+            link_root_elements = len(os.path.abspath(dirpath)[len(root) + 1:].split('/'))
+            link_rel_path = os.path.join(*(([".."] * link_root_elements) + [target[len(root) + 1:]]))
+            print "Relinking", orig_path, "to", link_rel_path
+            os.unlink(orig_path)
+            os.symlink(link_rel_path, orig_path)
+        except OSError:
+            continue
