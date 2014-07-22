@@ -90,29 +90,22 @@ class MenuEntry(object):
         with_context._context = context
         return with_context
 
+    def get_extra_context(self, context):
+        if callable(self._extra_context):
+            return self._extra_context(context)
+        else:
+            return self._extra_context or {}
+
     def render(self, context=None):
         if context is None:
             context = self._context
-        return loader.render_to_string(self._template, self._extra_context, context)
+        extra_context = self.get_extra_context(context)
+        return loader.render_to_string(self._template, extra_context, context)
 
 
-class Menu(object):
-    def __init__(self, name):
-        if not name:
-            raise exceptions.InvalidMenu("A menu has invalid name")
-
-        if not VALID_NAME.match(name):
-            raise exceptions.InvalidMenu("A menu '%s' has invalid name" % name)
-
-        self._name = name
+class DeferredMenu(object):
+    def __init__(self):
         self._entries = []
-
-    def get_name(self):
-        return self._name
-
-    @property
-    def name(self):
-        return self.get_name()
 
     def add(self, entry_or_iterable):
         if not hasattr(entry_or_iterable, '__iter__'):
@@ -123,6 +116,29 @@ class Menu(object):
                 raise exceptions.InvalidMenuEntry("'%s' class is not an instance of nodewatcher.core.frontend.components.MenuEntry" % entry.__name__)
 
             self._entries.append(entry)
+
+
+class Menu(DeferredMenu):
+    def __init__(self, name):
+        if not name:
+            raise exceptions.InvalidMenu("A menu has invalid name")
+
+        if not VALID_NAME.match(name):
+            raise exceptions.InvalidMenu("A menu '%s' has invalid name" % name)
+
+        self._name = name
+
+        super(Menu, self).__init__()
+
+    def get_name(self):
+        return self._name
+
+    @property
+    def name(self):
+        return self.get_name()
+
+    def add(self, entry_or_iterable):
+        super(Menu, self).add(entry_or_iterable)
 
         self._sort_entries()
 
@@ -173,10 +189,11 @@ class Menu(object):
 class Menus(object):
     def __init__(self):
         self._menus = {}
+        self._deferred = {}
         self._states = []
 
     def __enter__(self):
-        self._states.append(copy.copy(self._menus))
+        self._states.append((copy.copy(self._menus), copy.copy(self._deferred)))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         state = self._states.pop()
@@ -185,7 +202,7 @@ class Menus(object):
             # Reset to the state before the exception so that future
             # calls do not raise MenuNotRegistered or
             # MenuAlreadyRegistered exceptions
-            self._menus = state
+            self._menus, self._deferred = state
 
         # Re-raise any exception
         return False
@@ -204,6 +221,10 @@ class Menus(object):
             if menu.name in self._menus:
                 raise exceptions.MenuAlreadyRegistered("A menu with name '%s' is already registered" % menu.name)
 
+            if menu.name in self._deferred:
+                menu.add(self._deferred[menu.name]._entries)
+                del self._deferred[menu.name]
+
             self._menus[menu.name] = menu
 
     def unregister(self, menu_or_iterable):
@@ -219,11 +240,20 @@ class Menus(object):
     def get_all_menus(self):
         return self._menus.values()
 
-    def get_menu(self, menu_name):
+    def get_menu(self, menu_name, dont_defer=False):
         try:
             return self._menus[menu_name]
         except KeyError:
-            raise exceptions.MenuNotRegistered("No menu with name '%s' is registered" % menu_name)
+            if dont_defer:
+                raise exceptions.MenuNotRegistered("No menu with name '%s' is registered" % menu_name)
+
+        try:
+            return self._deferred[menu_name]
+        except KeyError:
+            pass
+
+        self._deferred[menu_name] = DeferredMenu()
+        return self._deferred[menu_name]
 
     def has_menu(self, menu_name):
         return menu_name in self._menus

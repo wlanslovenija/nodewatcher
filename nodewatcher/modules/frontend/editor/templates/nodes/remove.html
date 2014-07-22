@@ -20,12 +20,12 @@
     {% endblock node_remove_warning_wrapper %}
 
     {% block node_snippet_wrapper %}
-        {% include "nodes/snippet.html" %}
+        {% include "nodes/node_remove_snippet.html" %}
     {% endblock node_snippet_wrapper %}
 
     {% block node_remove_form_wrapper %}
         {% with form_submit=_("Remove") %}
-            {% include "form.html" %}
+            {% include "node_remove_form.html" %}
         {% endwith %}
     {% endblock node_remove_form_wrapper %}
 {% endblock %}

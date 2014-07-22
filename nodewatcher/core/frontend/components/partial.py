@@ -33,7 +33,7 @@ class PartialEntry(object):
             classes = ()
         self._classes = ' '.join(classes)
 
-        self._extra_context = extra_context or {}
+        self._extra_context = extra_context
 
         self._context = None
 
@@ -57,29 +57,22 @@ class PartialEntry(object):
         with_context._context = context
         return with_context
 
+    def get_extra_context(self, context):
+        if callable(self._extra_context):
+            return self._extra_context(context)
+        else:
+            return self._extra_context or {}
+
     def render(self, context=None):
         if context is None:
             context = self._context
-        return loader.render_to_string(self._template, self._extra_context, context)
+        extra_context = self.get_extra_context(context)
+        return loader.render_to_string(self._template, extra_context, context)
 
 
-class Partial(object):
-    def __init__(self, name):
-        if not name:
-            raise exceptions.InvalidPartial("A partial has invalid name")
-
-        if not VALID_NAME.match(name):
-            raise exceptions.InvalidPartial("A partial '%s' has invalid name" % name)
-
-        self._name = name
+class DeferredPartial(object):
+    def __init__(self):
         self._entries = []
-
-    def get_name(self):
-        return self._name
-
-    @property
-    def name(self):
-        return self.get_name()
 
     def add(self, entry_or_iterable):
         if not hasattr(entry_or_iterable, '__iter__'):
@@ -90,6 +83,29 @@ class Partial(object):
                 raise exceptions.InvalidPartialEntry("'%s' class is not an instance of nodewatcher.core.frontend.components.PartialEntry" % entry.__name__)
 
             self._entries.append(entry)
+
+
+class Partial(DeferredPartial):
+    def __init__(self, name):
+        if not name:
+            raise exceptions.InvalidPartial("A partial has invalid name")
+
+        if not VALID_NAME.match(name):
+            raise exceptions.InvalidPartial("A partial '%s' has invalid name" % name)
+
+        self._name = name
+
+        super(Partial, self).__init__()
+
+    def get_name(self):
+        return self._name
+
+    @property
+    def name(self):
+        return self.get_name()
+
+    def add(self, entry_or_iterable):
+        super(Partial, self).add(entry_or_iterable)
 
         self._sort_entries()
 
@@ -140,10 +156,11 @@ class Partial(object):
 class Partials(object):
     def __init__(self):
         self._partials = {}
+        self._deferred = {}
         self._states = []
 
     def __enter__(self):
-        self._states.append(copy.copy(self._partials))
+        self._states.append((copy.copy(self._partials), copy.copy(self._deferred)))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         state = self._states.pop()
@@ -152,7 +169,7 @@ class Partials(object):
             # Reset to the state before the exception so that future
             # calls do not raise PartialNotRegistered or
             # PartialAlreadyRegistered exceptions
-            self._partials = state
+            self._partials, self._deferred = state
 
         # Re-raise any exception
         return False
@@ -171,6 +188,10 @@ class Partials(object):
             if partial.name in self._partials:
                 raise exceptions.PartialAlreadyRegistered("A partial with name '%s' is already registered" % partial.name)
 
+            if partial.name in self._deferred:
+                partial.add(self._deferred[partial.name]._entries)
+                del self._deferred[partial.name]
+
             self._partials[partial.name] = partial
 
     def unregister(self, partial_or_iterable):
@@ -186,11 +207,20 @@ class Partials(object):
     def get_all_partials(self):
         return self._partials.values()
 
-    def get_partial(self, partial_name):
+    def get_partial(self, partial_name, dont_defer=False):
         try:
             return self._partials[partial_name]
         except KeyError:
-            raise exceptions.PartialNotRegistered("No partial with name '%s' is registered" % partial_name)
+            if dont_defer:
+                raise exceptions.PartialNotRegistered("No partial with name '%s' is registered" % partial_name)
+
+        try:
+            return self._deferred[partial_name]
+        except KeyError:
+            pass
+
+        self._deferred[partial_name] = DeferredPartial()
+        return self._deferred[partial_name]
 
     def has_partial(self, partial_name):
         return partial_name in self._partials

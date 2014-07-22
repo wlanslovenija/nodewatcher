@@ -558,5 +558,14 @@ MENUS = {
     #],
 }
 
+PARTIALS = {
+    'node_snippet_partial': [
+        {
+            'name': 'name',
+            'weight': -1,
+        }
+    ],
+}
+
 # Allowed hosts (required for production use)
 ALLOWED_HOSTS = []

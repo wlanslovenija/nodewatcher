@@ -1,0 +1,4 @@
+{% load i18n %}
+
+<dt class="node-project">{% trans "Project" %}</dt>
+<dd class="node-project">{{ node_project.name|default:_("unknown") }}</dd>

@@ -85,9 +85,26 @@ class Migration(DataMigration):
 
             # core.location
             loccfg = orm['location.LocationConfig'](root=node, polymorphic_ctype=loc_ctype)
-            loccfg.address = node.location
-            loccfg.city = "?"
-            loccfg.country = "?"
+            loccfg.address = node.location.strip()
+            if node.project.name in ['Števerjan']:
+                loccfg.city = 'Števerjan'
+                loccfg.country = 'IT'
+            elif node.project.name in ['Maribor', 'Murska Sobota', 'Kranj', 'Sežana', 'Slovenska Bistrica', 'Haloze', 'Vipava']:
+                loccfg.city = node.project.name
+                loccfg.country = 'SI'
+            elif node.project.name in ['London']:
+                loccfg.city = node.project.name
+                loccfg.country = 'GB'
+            elif node.project.name in ['Croatia']:
+                loccfg.city = ''
+                loccfg.country = 'HR'
+            elif node.project.name in ['Dolenjska']:
+                loccfg.city = ''
+                loccfg.country = 'SI'
+            else:
+                loccfg.city = 'Ljubljana'
+                loccfg.country = 'SI'
+
             loccfg.timezone = "Europe/Ljubljana"
             loccfg.altitude = 0
 
@@ -641,7 +658,7 @@ class Migration(DataMigration):
             'altitude': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'city': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'country': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'country': ('nodewatcher.utils.fields.geographic.CountryField', [], {}),
             'timezone': ('timezone_field.TimeZoneField', [], {'null': 'True'}),
             'geolocation': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

@@ -1,0 +1,7 @@
+{% overextends "base/partial.html" %}
+
+{% block included_partial %}
+    <dl class="snippet-list">
+        {{ block.super }}
+    </dl>
+{% endblock included_partial %}
