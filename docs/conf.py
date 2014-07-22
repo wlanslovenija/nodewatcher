@@ -24,9 +24,6 @@ sys.path.insert(0, os.path.abspath('..'))
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "_ext")))
 
-# Set environmental variable so we can ignore some things
-os.environ['NODEWATCHER_DOCUMENTATION_BUILD'] = '1'
-
 import nodewatcher as package_init
 
 # -- General configuration -----------------------------------------------------
