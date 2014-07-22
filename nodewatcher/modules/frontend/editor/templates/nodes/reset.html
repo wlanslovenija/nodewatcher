@@ -1,0 +1,31 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n %}
+
+    {% setcontext as title %}{% blocktrans %}Reset Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
+    {% setcontext as heading %}{% spaceless %}
+        {% url "DisplayComponent:node" node.pk as node_url %}
+        {% blocktrans %}Reset Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endspaceless %}{% endsetcontext %}
+{% endcontextblock %}
+
+{% block content %}
+    {% block node_reset_warning_wrapper %}
+        <div class="warning {% block node_reset_warning_classes %}{% endblock node_reset_warning_classes %}">
+            {% block node_reset_warning %}
+                {% include "nodes/node_reset_warning.html" %}
+            {% endblock node_reset_warning %}
+        </div>
+    {% endblock node_reset_warning_wrapper %}
+
+    {% include "nodes/snippet.html" %}
+
+    <form method="post" action="{{ request.get_full_path }}">
+        {% csrf_token %}
+        <div class="buttons">
+            <button type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>
+            <button type="submit" name="reset" value="reset">{% trans "Reset" %}</button>
+        </div>
+    </form>
+{% endblock %}

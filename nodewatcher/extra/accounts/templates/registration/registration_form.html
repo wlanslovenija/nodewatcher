@@ -9,7 +9,6 @@
 {% block content %}
     <div class="registration-form">
         {% with form_submit=_("Register") %}
-            {% url "AccountsComponent:registration_register" as form_action %}
             {% include "form.html" %}
         {% endwith %}
     </div>

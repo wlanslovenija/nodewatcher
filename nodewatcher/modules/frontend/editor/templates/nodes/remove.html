@@ -1,0 +1,33 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n %}
+
+    {% setcontext as title %}{% blocktrans %}Remove Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
+    {% setcontext as heading %}{% spaceless %}
+        {% url "DisplayComponent:node" node.pk as node_url %}
+        {% blocktrans %}Remove Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endspaceless %}{% endsetcontext %}
+{% endcontextblock %}
+
+{% block content %}
+    {% block node_remove_warning_wrapper %}
+        <div class="warning {% block node_remove_warning_classes %}{% endblock node_remove_warning_classes %}">
+            {% block node_remove_warning %}
+                {% include "nodes/node_remove_warning.html" %}
+            {% endblock node_remove_warning %}
+        </div>
+    {% endblock node_remove_warning_wrapper %}
+
+    {% block node_snippet_wrapper %}
+        {% include "nodes/snippet.html" %}
+    {% endblock node_snippet_wrapper %}
+
+    <form method="post" action="{{ request.get_full_path }}">
+        {% csrf_token %}
+        <div class="buttons">
+            <button type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>
+            <button type="submit" name="remove" value="remove">{% trans "Remove" %}</button>
+        </div>
+    </form>
+{% endblock %}

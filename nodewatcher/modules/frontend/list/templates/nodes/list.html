@@ -12,7 +12,7 @@
 {% block altlinks %}
     {% heading 2 _("Other Formats") %}
 
-    <ul class="node-list-altlinks">
+    <ul class="altlinks-list node-list-altlinks">
         <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=xml">{% trans "XML" %}</a></li>
         <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=json">{% trans "JSON" %}</a></li>
     </ul>

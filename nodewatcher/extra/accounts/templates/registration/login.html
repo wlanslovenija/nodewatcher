@@ -12,7 +12,6 @@
     <p>{% blocktrans %}To log in, please enter your username and password in the form bellow. Don't have them yet? In that case please <a href="{{ registration_register_url }}">register</a>.{% endblocktrans %}</p>
     <div class="login-form">
         {% with form_submit=_("Log in") %}
-            {% url "AccountsComponent:auth_login" as form_action %}
             {% include "form.html" %}
         {% endwith %}
         {% url "AccountsComponent:auth_password_reset" as auth_password_reset_url %}

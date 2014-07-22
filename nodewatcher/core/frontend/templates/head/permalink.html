@@ -1,7 +1,7 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% block head_permalink %}
+{% block included_permalink %}
     {% if permalink %}
         <link rel="bookmark" href="{{ permalink }}" />
     {% endif %}
-{% endblock head_permalink %}
+{% endblock included_permalink %}

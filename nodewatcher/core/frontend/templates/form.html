@@ -9,9 +9,9 @@
     {% endcomment %}
     {% if form %}
         {% if form.is_multipart %}
-            <form action="{{ form_action }}" method="post" enctype="multipart/form-data">
+            <form action="{{ form_action|default:request.get_full_path }}" method="post" enctype="multipart/form-data">
         {% else %}
-            <form action="{{ form_action }}" method="post">
+            <form action="{{ form_action|default:request.get_full_path }}" method="post">
         {% endif %}
         {% if form.errors %}
             <p class="errornote">{% blocktrans count form.errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}</p>
