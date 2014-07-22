@@ -37,15 +37,19 @@ class RegistryResolver(object):
 
         return partial
 
-    def by_registry_id(self, registry_id, queryset=False, onlyclass=None, create=None, **kwargs):
+    def by_registry_id(self, registry_id, queryset=False, onlyclass=None, create=None, default=None, **kwargs):
         """
         Resolves the registry hierarchy.
         """
 
         # Determine which class the root is using for configuration
         cfg, top_level = self._regpoint.get_top_level_queryset(self._root, registry_id)
+
         if create is not None and not issubclass(create, top_level):
             raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
+        if default is not None and not issubclass(default, top_level):
+            raise TypeError("Not a valid registry item class for '{0}'!".format(registry_id))
+
         if onlyclass is not None:
             cfg = cfg.instance_of(onlyclass)
         if queryset:
@@ -55,6 +59,8 @@ class RegistryResolver(object):
             # Model supports multiple configuration options of this type
             if create is not None:
                 return create(root=self._root, **kwargs)
+            elif default is not None:
+                return default(root=self._root, **kwargs)
             else:
                 return cfg.all()
         else:
@@ -64,6 +70,8 @@ class RegistryResolver(object):
             except (IndexError, top_level.DoesNotExist):
                 if create is not None:
                     return create.objects.get_or_create(root=self._root, **kwargs)[0]
+                elif default is not None:
+                    return default(root=self._root, **kwargs)
                 else:
                     return None
 
