@@ -15,13 +15,16 @@ class Migration(DataMigration):
         for node in orm['nodes.Node'].objects.filter(owner__isnull = False):
             for perm in ('change_node', 'delete_node', 'reset_node'):
                 content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node')
-                permission = orm['auth.Permission'].objects.get(content_type = content_type, codename = perm)
+                if perm == 'reset_node':
+                    permission, created = orm['auth.Permission'].objects.get_or_create(content_type = content_type, codename = 'reset_node', name = "Can reset node")
+                else:
+                    permission = orm['auth.Permission'].objects.get(content_type = content_type, codename = perm)
 
                 orm['guardian.UserObjectPermission'].objects.get_or_create(
-                  content_type = content_type,
-                  permission = permission,
-                  object_pk = node.pk,
-                  user = node.owner
+                    content_type = content_type,
+                    permission = permission,
+                    object_pk = node.pk,
+                    user = node.owner
                 )
 
     def backwards(self, orm):
