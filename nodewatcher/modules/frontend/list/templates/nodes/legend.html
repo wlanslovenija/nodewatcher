@@ -2,7 +2,9 @@
 
 {% load future i18n html_tags node_status_tags registry %}
 
-{% heading 2 _("Node Network Status Key") %}
+{% block network_status_heading %}
+    {% heading 2 _("Node Network Status Key") %}
+{% endblock network_status_heading %}
 
 {% block network_status_wrapper %}
     <dl class="network-status {% block network_status_classes %}{% endblock network_status_classes %}">
@@ -16,7 +18,9 @@
     </dl>
 {% endblock network_status_wrapper %}
 
-{% heading 2 _("Node Monitored Status Key") %}
+{% block monitored_status_heading %}
+    {% heading 2 _("Node Monitored Status Key") %}
+{% endblock monitored_status_heading %}
 
 {% block monitored_status_wrapper %}
     <dl class="monitored-status {% block monitored_status_classes %}{% endblock monitored_status_classes %}">
@@ -30,7 +34,9 @@
     </dl>
 {% endblock monitored_status_wrapper %}
 
-{% heading 2 _("Node Health Status Key") %}
+{% block health_status_heading %}
+    {% heading 2 _("Node Health Status Key") %}
+{% endblock health_status_heading %}
 
 {% block health_status_wrapper %}
     <dl class="health-status {% block health_status_classes %}{% endblock health_status_classes %}">
@@ -44,7 +50,9 @@
     </dl>
 {% endblock health_status_wrapper %}
 
-{% heading 2 _("Columns") %}
+{% block columns_heading %}
+    {% heading 2 _("Columns") %}
+{% endblock columns_heading %}
 
 {% block columns_wrapper %}
     <dl class="columns {% block columns_classes %}{% endblock columns_classes %}">
