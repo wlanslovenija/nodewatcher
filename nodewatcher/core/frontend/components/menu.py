@@ -247,6 +247,11 @@ class Menus(object):
             if dont_defer:
                 raise exceptions.MenuNotRegistered("No menu with name '%s' is registered" % menu_name)
 
+        try:
+            return self._deferred[menu_name]
+        except KeyError:
+            pass
+
         self._deferred[menu_name] = DeferredMenu()
         return self._deferred[menu_name]
 

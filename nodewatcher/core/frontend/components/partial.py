@@ -214,6 +214,11 @@ class Partials(object):
             if dont_defer:
                 raise exceptions.PartialNotRegistered("No partial with name '%s' is registered" % partial_name)
 
+        try:
+            return self._deferred[partial_name]
+        except KeyError:
+            pass
+
         self._deferred[partial_name] = DeferredPartial()
         return self._deferred[partial_name]
 
