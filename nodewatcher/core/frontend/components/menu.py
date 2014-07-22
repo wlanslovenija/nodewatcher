@@ -90,13 +90,16 @@ class MenuEntry(object):
         with_context._context = context
         return with_context
 
+    def get_extra_context(self, context):
+        if callable(self._extra_context):
+            return self._extra_context(context)
+        else:
+            return self._extra_context or {}
+
     def render(self, context=None):
         if context is None:
             context = self._context
-        if callable(self._extra_context):
-            extra_context = self._extra_context(context)
-        else:
-            extra_context = self._extra_context or {}
+        extra_context = self.get_extra_context(context)
         return loader.render_to_string(self._template, extra_context, context)
 
 
