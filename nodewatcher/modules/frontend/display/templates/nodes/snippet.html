@@ -1,5 +1,11 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% block node_snippet %}
+{% load partial_tags %}
 
-{% endblock node_snippet %}
+{% get_partial "node_snippet_partial" as node_snippet_partial %}
+
+{% block included_node_snippet %}
+    {% with partial=node_snippet_partial %}
+        {% include "base/partial.html" %}
+    {% endwith %}
+{% endblock included_node_snippet %}

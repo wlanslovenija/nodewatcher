@@ -7,16 +7,16 @@ register = template.Library()
 
 
 # To allow setting a name
-class MenuEntries(list):
+class PartialEntries(list):
     pass
 
 
 @register.assignment_tag(takes_context=True)
-def get_menu(context, menu_name):
+def get_partial(context, partial_name):
     try:
-        menu = MenuEntries([entry.add_context(context) for entry in components.menus.get_menu(menu_name).entries if entry.is_visible(context['request'], context)])
-        menu.name = menu_name
-        return menu
+        partial = PartialEntries([entry.add_context(context) for entry in components.partials.get_partial(partial_name).entries if entry.is_visible(context['request'], context)])
+        partial.name = partial_name
+        return partial
     except:
         if settings.TEMPLATE_DEBUG:
             raise
@@ -24,11 +24,11 @@ def get_menu(context, menu_name):
 
 
 @register.simple_tag(takes_context=True)
-def render_menu_entry(context, menu_entry):
+def render_partial_entry(context, partial_entry):
     try:
-        # We could call menu_entry.add_context(context).render() as well,
+        # We could call partial_entry.add_context(context).render() as well,
         # but the following is performance-wise better
-        return menu_entry.render(context)
+        return partial_entry.render(context)
     except:
         if settings.TEMPLATE_DEBUG:
             raise

@@ -17,3 +17,5 @@ class DisplayComponent(components.FrontendComponent):
 components.pool.register(DisplayComponent)
 
 components.menus.register(components.Menu('display_node_menu'))
+
+components.partials.register(components.Partial('node_snippet_partial'))

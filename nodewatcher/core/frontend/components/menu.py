@@ -110,6 +110,10 @@ class Menu(object):
     def get_name(self):
         return self._name
 
+    @property
+    def name(self):
+        return self.get_name()
+
     def add(self, entry_or_iterable):
         if not hasattr(entry_or_iterable, '__iter__'):
             entry_or_iterable = [entry_or_iterable]
@@ -124,6 +128,10 @@ class Menu(object):
 
     def get_entries(self):
         return self._entries
+
+    @property
+    def entries(self):
+        return self.get_entries()
 
     @staticmethod
     def _setting_name(setting):
@@ -151,7 +159,7 @@ class Menu(object):
         return lambda entry: (settings_dict.get(entry.name, {}).get('weight', 0), entry.weight)
 
     def _sort_entries(self):
-        menu_settings = getattr(settings, 'MENUS', {}).get(self.get_name(), [])
+        menu_settings = getattr(settings, 'MENUS', {}).get(self.name, [])
 
         settings_dict = dict([(self._setting_name(setting), self._setting_weight(setting, list_index)) for (list_index, setting) in enumerate(menu_settings)])
 
@@ -190,27 +198,23 @@ class Menus(object):
             if not isinstance(menu, Menu):
                 raise exceptions.InvalidMenu("'%s' class is not an instance of nodewatcher.core.frontend.components.Menu" % menu.__name__)
 
-            menu_name = menu.get_name()
+            if not VALID_NAME.match(menu.name):
+                raise exceptions.InvalidMenu("A menu '%s' has invalid name" % menu.name)
 
-            if not VALID_NAME.match(menu_name):
-                raise exceptions.InvalidMenu("A menu '%s' has invalid name" % menu_name)
+            if menu.name in self._menus:
+                raise exceptions.MenuAlreadyRegistered("A menu with name '%s' is already registered" % menu.name)
 
-            if menu_name in self._menus:
-                raise exceptions.MenuAlreadyRegistered("A menu with name '%s' is already registered" % menu_name)
-
-            self._menus[menu_name] = menu
+            self._menus[menu.name] = menu
 
     def unregister(self, menu_or_iterable):
         if not hasattr(menu_or_iterable, '__iter__'):
             menu_or_iterable = [menu_or_iterable]
 
         for menu in menu_or_iterable:
-            menu_name = menu.get_name()
+            if menu.name not in self._menus:
+                raise exceptions.MenuNotRegistered("No menu with name '%s' is registered" % menu.name)
 
-            if menu_name not in self._menus:
-                raise exceptions.MenuNotRegistered("No menu with name '%s' is registered" % menu_name)
-
-            del self._menus[menu_name]
+            del self._menus[menu.name]
 
     def get_all_menus(self):
         return self._menus.values()
