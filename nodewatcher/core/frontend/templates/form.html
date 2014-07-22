@@ -1,26 +1,40 @@
-{% spaceless %}
-    {% load i18n %}
-    {% comment %}
-    Template which uses `form` (form object), `form_submit` (submit button label) and `form_action` (form action URL) from
-    the context.
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-    We use `next` from the context or use `request_get_next`, which is set to `next` from request arguments, to set
-    where the form should redirect after submission.
-    {% endcomment %}
-    {% if form %}
-        {% if form.is_multipart %}
-            <form action="{{ form_action }}" method="post" enctype="multipart/form-data">
-        {% else %}
-            <form action="{{ form_action }}" method="post">
+{% load i18n %}
+
+{% comment %}
+Template which uses from the context:
+  form: Django form object
+  form_submit: submit button label
+  form_action: form action URL
+  next: where the form should redirect after submission
+
+We use `next` from the context or use `request_get_next` which is set to `next` from request arguments
+in global_vars context processor.
+{% endcomment %}
+
+{% spaceless %}
+    {% if form.is_multipart %}
+        <form action="{{ form_action|default:request.get_full_path }}" method="post" enctype="multipart/form-data">
+    {% else %}
+        <form action="{{ form_action|default:request.get_full_path }}" method="post">
+    {% endif %}
+
+        {% csrf_token %}
+
+        {% if next|default:request_get_next %}
+            <div style="display: none;">
+                <input type="hidden" name="{{ REDIRECT_FIELD_NAME }}" value="{{ next|default:request_get_next }}" />
+            </div>
         {% endif %}
-        {% if form.errors %}
-            <p class="errornote">{% blocktrans count form.errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}</p>
-            {{ form.non_field_errors }}
-        {% endif %}
-            {% csrf_token %}
-            {% if next|default:request_get_next %}<div style='display:none'><input type="hidden" name="{{ REDIRECT_FIELD_NAME }}" value="{{ next|default:request_get_next }}" /></div>{% endif %}
+
+        {% if form %}
+            {% if form.errors %}
+                <p class="errornote">{% blocktrans count form.errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}</p>
+                {{ form.non_field_errors }}
+            {% endif %}
             {% for field in form.hidden_fields %}
-                <div style='display:none'>{{ field }}</div>
+                <div style="display: none;">{{ field }}</div>
             {% endfor %}
             {% for field in form.visible_fields %}
                 {% ifchanged field.fieldset.name %}
@@ -42,10 +56,12 @@
                     </fieldset>
                 {% endif %}
             {% endfor %}
-            <div class="buttons">
-                <input type="reset" value="Reset" />
-                <input type="submit" value="{{ form_submit }}" />
-            </div>
-        </form>
-    {% endif %}
+        {% endif %}
+
+        <div class="buttons">
+            <button type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>
+            <button type="submit">{{ form_submit }}</button>
+        </div>
+
+    </form>
 {% endspaceless %}

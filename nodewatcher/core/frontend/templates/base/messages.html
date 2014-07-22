@@ -2,16 +2,16 @@
 
 {% load forloop_tags %}
 
-{% block base_messages_wrapper %}
+{% block included_messages_wrapper %}
     {% spaceless %}
         <ul class="messages-list">
-            {% block base_messages %}
+            {% block included_messages %}
                 {% for message in messages %}
-                    {% block base_messages_entry %}
-                        <li class="message {{ message.tags }} {% css_classes "first" "last" "odd" "even" %} {% block base_messages_entry_classes %}{% endblock base_messages_entry_classes %}">{{ message }}</li>
-                    {% endblock base_messages_entry %}
+                    {% block included_messages_entry %}
+                        <li class="message {{ message.tags }} {% css_classes "first" "last" "odd" "even" %} {% block included_messages_entry_classes %}{% endblock included_messages_entry_classes %}">{{ message }}</li>
+                    {% endblock included_messages_entry %}
                 {% endfor %}
-            {% endblock base_messages %}
+            {% endblock included_messages %}
         </ul>
     {% endspaceless %}
-{% endblock base_messages_wrapper %}
+{% endblock included_messages_wrapper %}

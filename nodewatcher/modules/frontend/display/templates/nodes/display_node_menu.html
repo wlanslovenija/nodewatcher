@@ -1,0 +1,11 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load menu_tags %}
+
+{% get_menu "display_node_menu" as display_node_menu %}
+
+{% block included_display_node_menu %}
+    {% with menu=display_node_menu %}
+        {% include "base/menu.html" %}
+    {% endwith %}
+{% endblock included_display_node_menu %}

@@ -6,18 +6,18 @@
 This template uses `menu` (menu object) in the context.
 {% endcomment %}
 
-{% block base_menu_wrapper %}
+{% block included_menu_wrapper %}
     {% spaceless %}
         {% if menu %}
             <ul class="menu-list">
-                {% block base_menu %}
+                {% block included_menu %}
                     {% for menu_entry in menu %}
-                        {% block base_menu_entry %}
+                        {% block included_menu_entry %}
                             {% render_menu_entry menu_entry %}
-                        {% endblock base_menu_entry %}
+                        {% endblock included_menu_entry %}
                     {% endfor %}
-                {% endblock base_menu %}
+                {% endblock included_menu %}
             </ul>
         {% endif %}
     {% endspaceless %}
-{% endblock base_menu_wrapper %}
+{% endblock included_menu_wrapper %}

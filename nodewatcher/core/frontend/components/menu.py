@@ -60,7 +60,7 @@ class MenuEntry(object):
     @property
     def url(self):
         if callable(self._url):
-            return self._url(self._context)
+            return self._url(self, self._context)
         else:
             return self._url
 
@@ -82,8 +82,8 @@ class MenuEntry(object):
         else:
             return (self.url,)
 
-    def is_visible(self, request):
-        return not self._visible or self._visible(self, request)
+    def is_visible(self, request, context):
+        return not self._visible or self._visible(self, request, context)
 
     def add_context(self, context):
         with_context = copy.copy(self)

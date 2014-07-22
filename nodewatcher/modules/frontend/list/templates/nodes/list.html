@@ -12,7 +12,7 @@
 {% block altlinks %}
     {% heading 2 _("Other Formats") %}
 
-    <ul class="node-list-altlinks">
+    <ul class="altlinks-list node-list-altlinks">
         <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=xml">{% trans "XML" %}</a></li>
         <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=json">{% trans "JSON" %}</a></li>
     </ul>
@@ -52,7 +52,11 @@
         </tbody>
     </table>
 
-    <div class="node-list-legend">
-        {% include "nodes/legend.html" %}
-    </div>
+    {% block node_list_legend_wrapper %}
+        <div class="node-list-legend {% block node_list_legend_classes %}{% endblock node_list_legend_classes %}">
+            {% block node_list_legend %}
+                {% include "nodes/legend.html" %}
+            {% endblock node_list_legend %}
+        </div>
+    {% endblock node_list_legend_wrapper %}
 {% endblock %}

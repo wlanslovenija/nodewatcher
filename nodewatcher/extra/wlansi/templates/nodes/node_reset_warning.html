@@ -1,0 +1,9 @@
+{% overextends "nodes/node_reset_warning.html" %}
+
+{% load future i18n %}
+
+{% block included_node_reset_warning %}
+    {{ block.super }}
+    {% url "EditorComponent:edit" node.pk as edit_node %}
+    <p>{% blocktrans %}By issuing a reset command you will reset (erase) all node statistics and graphs! Use this option <b>only when</b> you have been just <b>performing testing</b> and therefore current statistics are no longer relevant. <b>Do not use it on a node which have been running for some time</b> (for example to improve its statistics) as it is important to have history records of network's growth and development. Consider marking it as a dead node (<a href="{{ edit_node }}">change its type</a>) and registering a new node.{% endblocktrans %}</p>
+{% endblock included_node_reset_warning %}

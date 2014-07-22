@@ -4,8 +4,8 @@
 
 {% get_menu "main_menu" as main_menu %}
 
-{% block base_main_menu %}
+{% block included_main_menu %}
     {% with menu=main_menu %}
         {% include "base/menu.html" %}
     {% endwith %}
-{% endblock base_main_menu %}
+{% endblock included_main_menu %}

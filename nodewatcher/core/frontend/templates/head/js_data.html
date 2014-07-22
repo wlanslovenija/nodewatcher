@@ -2,10 +2,10 @@
 
 {% load staticfiles %}
 
-{% block head_js_data %}
+{% block included_js_data %}
     {% for js in js_data %}
-        {% block head_js_data_entry %}
+        {% block included_js_data_entry %}
             <script src="{% static js %}" type="text/javascript"></script>
-        {% endblock head_js_data_entry %}
+        {% endblock included_js_data_entry %}
     {% endfor %}
-{% endblock head_js_data %}
+{% endblock included_js_data %}

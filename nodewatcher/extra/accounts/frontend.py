@@ -21,7 +21,7 @@ class AccountsComponent(components.FrontendComponent):
 components.pool.register(AccountsComponent)
 
 
-def logout_url(context):
+def logout_url(menu_entry, context):
     # If a user wants to log out we would like to take her back to the current page
     # or if she has already been redirected to the current page from some other page
     # then to take her back to that page. But only if the target does not require
@@ -38,17 +38,17 @@ def logout_url(context):
 
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     label='logged_in',
-    visible=lambda menu_entry, request: request.user.is_authenticated(),
+    visible=lambda menu_entry, request, context: request.user.is_authenticated(),
     template='menu_entry_logged_in.html',
 ))
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Logout"),
     url=logout_url,
-    visible=lambda menu_entry, request: request.user.is_authenticated(),
+    visible=lambda menu_entry, request, context: request.user.is_authenticated(),
 ))
 
 
-def login_url(context):
+def login_url(menu_entry, context):
     # If a user wants to log in we would like to take her back to the current page
     # or if she has already been redirected to the current page from some other page
     # then to take her back to that page. But only if the target does not require
@@ -65,10 +65,10 @@ def login_url(context):
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Login"),
     url=login_url,
-    visible=lambda menu_entry, request: request.user.is_anonymous(),
+    visible=lambda menu_entry, request, context: request.user.is_anonymous(),
 ))
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Register"),
     url=urlresolvers.reverse_lazy('AccountsComponent:registration_register'),
-    visible=lambda menu_entry, request: request.user.is_anonymous(),
+    visible=lambda menu_entry, request, context: request.user.is_anonymous(),
 ))

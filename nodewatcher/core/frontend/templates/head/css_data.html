@@ -2,10 +2,10 @@
 
 {% load staticfiles %}
 
-{% block head_css_data %}
+{% block included_css_data %}
     {% for css in css_data %}
-        {% block head_css_data_entry %}
+        {% block included_css_data_entry %}
             <link href="{% static css %}" media="all" rel="stylesheet" type="text/css" />
-        {% endblock head_css_data_entry %}
+        {% endblock included_css_data_entry %}
     {% endfor %}
-{% endblock head_css_data %}
+{% endblock included_css_data %}

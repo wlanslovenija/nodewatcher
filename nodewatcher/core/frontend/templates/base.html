@@ -8,7 +8,7 @@
 
 {% block header %}
     {% block accounts_menu_wrapper %}
-        <section class="accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
+        <section class="menu accounts-menu {% block accounts_menu_classes %}{% endblock accounts_menu_classes %}">
             {% block accounts_menu %}
                 {% include "base/accounts_menu.html" %}
             {% endblock accounts_menu %}
@@ -19,7 +19,7 @@
 
 {% block content_wrapper %}
     {% block main_menu_wrapper %}
-        <section class="main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
+        <section class="menu main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
             {% block main_menu %}
                 {% include "base/main_menu.html" %}
             {% endblock main_menu %}

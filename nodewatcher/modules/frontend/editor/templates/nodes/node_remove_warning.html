@@ -1,0 +1,8 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load i18n %}
+
+{% block included_node_remove_warning %}
+    <p>{% trans "WARNING: This action is irreversible." %}</p>
+    <p>Permanently remove the node?</p>
+{% endblock included_node_remove_warning %}

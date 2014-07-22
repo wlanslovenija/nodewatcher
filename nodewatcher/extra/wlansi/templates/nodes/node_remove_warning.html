@@ -1,0 +1,9 @@
+{% overextends "nodes/node_remove_warning.html" %}
+
+{% load future i18n %}
+
+{% block included_node_remove_warning %}
+    {{ block.super }}
+    {% url "EditorComponent:edit" node.pk as edit_node %}
+    <p>{% blocktrans %}Consider instead marking it as a dead node (<a href="{{ edit_node }}">change its type</a>) if the node has some history as it is important to have history records of network's growth and development. Be careful, by removing this node you will be returning all its allocated IP space back into the IP pool where it will be available for immediate allocation by other nodes.{% endblocktrans %}</p>
+{% endblock included_node_remove_warning %}

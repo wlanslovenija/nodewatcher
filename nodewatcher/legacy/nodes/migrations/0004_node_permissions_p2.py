@@ -13,7 +13,7 @@ class Migration(DataMigration):
     def forwards(self, orm):
         # Assign change and remove permissions to node maintainers
         for node in orm['nodes.Node'].objects.filter(owner__isnull = False):
-            for perm in ("change_node", "delete_node"):
+            for perm in ('change_node', 'delete_node', 'reset_node'):
                 content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node')
                 permission = orm['auth.Permission'].objects.get(content_type = content_type, codename = perm)
 
