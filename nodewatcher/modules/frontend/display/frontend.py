@@ -19,3 +19,8 @@ components.pool.register(DisplayComponent)
 components.menus.register(components.Menu('display_node_menu'))
 
 components.partials.register(components.Partial('node_snippet_partial'))
+
+components.partials.get_partial('node_snippet_partial').add(components.PartialEntry(
+    name='name',
+    template='nodes/snippet/name.html',
+))

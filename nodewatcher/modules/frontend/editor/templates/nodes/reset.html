@@ -20,12 +20,12 @@
     {% endblock node_reset_warning_wrapper %}
 
     {% block node_snippet_wrapper %}
-        {% include "nodes/snippet.html" %}
+        {% include "nodes/node_reset_snippet.html" %}
     {% endblock node_snippet_wrapper %}
 
     {% block node_reset_form_wrapper %}
         {% with form_submit=_("Reset") %}
-            {% include "form.html" %}
+            {% include "node_reset_form.html" %}
         {% endwith %}
     {% endblock node_reset_form_wrapper %}
 {% endblock %}
