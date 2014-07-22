@@ -86,19 +86,19 @@ class Migration(DataMigration):
             # core.location
             loccfg = orm['location.LocationConfig'](root=node, polymorphic_ctype=loc_ctype)
             loccfg.address = node.location.strip()
-            if node.project.name in ['Števerjan']:
-                loccfg.city = 'Števerjan'
+            if node.project.name in [u'Števerjan']:
+                loccfg.city = u'Števerjan'
                 loccfg.country = 'IT'
-            elif node.project.name in ['Maribor', 'Murska Sobota', 'Kranj', 'Sežana', 'Slovenska Bistrica', 'Haloze', 'Vipava']:
+            elif node.project.name in [u'Maribor', u'Murska Sobota', u'Kranj', u'Sežana', u'Slovenska Bistrica', u'Haloze', u'Vipava']:
                 loccfg.city = node.project.name
                 loccfg.country = 'SI'
-            elif node.project.name in ['London']:
+            elif node.project.name in [u'London']:
                 loccfg.city = node.project.name
                 loccfg.country = 'GB'
-            elif node.project.name in ['Croatia']:
+            elif node.project.name in [u'Croatia']:
                 loccfg.city = ''
                 loccfg.country = 'HR'
-            elif node.project.name in ['Dolenjska']:
+            elif node.project.name in [u'Dolenjska']:
                 loccfg.city = ''
                 loccfg.country = 'SI'
             else:
