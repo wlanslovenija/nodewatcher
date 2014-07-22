@@ -2,9 +2,9 @@ from nodewatcher.core.frontend import components
 
 
 components.partials.get_partial('node_snippet_partial').add(components.PartialEntry(
-    name='location',
-    template='nodes/snippet/location.html',
+    name='project',
+    template='nodes/snippet/project.html',
     extra_context=lambda context: {
-        'node_location': context['node'].config.core.location(),
+        'node_project': context['node'].config.core.project().project,
     }
 ))
