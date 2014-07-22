@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import fields
 from django.db.models.fields import related as related_fields
 from django.forms import fields as form_fields, widgets
-from django.utils import text
+from django.utils import text, functional
 from django.utils.translation import ugettext_lazy as _
 
 import south.modelsinspector
@@ -70,6 +70,23 @@ class SelectorKeyField(models.CharField):
         kwargs['max_length'] = 50
         self._rp_choices = kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id).field_tuples()
         super(SelectorKeyField, self).__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        """
+        Augments the containing class.
+        """
+
+        super(SelectorKeyField, self).contribute_to_class(cls, name, virtual_only)
+
+        def get_FIELD_choice(self, field):
+            value = getattr(self, field.attname)
+            return registration.point(field.regpoint).get_registered_choices(field.enum_id).resolve(value)
+
+        setattr(
+            cls,
+            'get_%s_choice' % self.name,
+            functional.curry(get_FIELD_choice, field=self)
+        )
 
     def formfield(self, **kwargs):
         """
