@@ -23,7 +23,9 @@
         {% include "nodes/snippet.html" %}
     {% endblock node_snippet_wrapper %}
 
-    {% with form_submit=_("Reset") %}
-        {% include "form.html" %}
-    {% endwith %}
+    {% block node_reset_form_wrapper %}
+        {% with form_submit=_("Reset") %}
+            {% include "form.html" %}
+        {% endwith %}
+    {% endblock node_reset_form_wrapper %}
 {% endblock %}

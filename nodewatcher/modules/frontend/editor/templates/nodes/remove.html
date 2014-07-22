@@ -23,7 +23,9 @@
         {% include "nodes/snippet.html" %}
     {% endblock node_snippet_wrapper %}
 
-    {% with form_submit=_("Remove") %}
-        {% include "form.html" %}
-    {% endwith %}
+    {% block node_remove_form_wrapper %}
+        {% with form_submit=_("Remove") %}
+            {% include "form.html" %}
+        {% endwith %}
+    {% endblock node_remove_form_wrapper %}
 {% endblock %}
