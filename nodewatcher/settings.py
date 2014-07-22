@@ -559,12 +559,16 @@ MENUS = {
 }
 
 PARTIALS = {
-    'node_snippet_partial': [
-        {
-            'name': 'name',
-            'weight': -1,
-        }
-    ],
+    #'node_snippet_partial': [
+    #    {
+    #        'name': ...,
+    #        'weight': ...,
+    #        'visible': True,
+    #    }
+    #],
+    #'node_display_partial': [
+    #    ...
+    #],
 }
 
 # Allowed hosts (required for production use)

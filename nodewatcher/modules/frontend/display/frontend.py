@@ -25,6 +25,7 @@ components.partials.register(components.Partial('node_snippet_partial'))
 components.partials.get_partial('node_snippet_partial').add(components.PartialEntry(
     name='name',
     template='nodes/snippet/name.html',
+    weight=-1,
     extra_context=lambda context: {} if 'node_name' in context else {
         'node_name': getattr(context['node'].config.core.general(), 'name', None) or _("unknown")
     },
