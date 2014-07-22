@@ -38,3 +38,31 @@ class DoubleChildRegistryItem(ChildRegistryItem):
         lookup_proxies = ['another']
 
 registration.point('thing.first').register_item(DoubleChildRegistryItem)
+
+
+class MultipleRegistryItem(registration.bases.ThingSecondRegistryItem):
+    foo = models.IntegerField(null=True)
+
+    class RegistryMeta:
+        registry_id = 'foo.multiple'
+        multiple = True
+
+registration.point('thing.second').register_item(MultipleRegistryItem)
+
+
+class FirstSubRegistryItem(MultipleRegistryItem):
+    bar = models.IntegerField(null=True)
+
+registration.point('thing.second').register_item(FirstSubRegistryItem)
+
+
+class SecondSubRegistryItem(MultipleRegistryItem):
+    moo = models.IntegerField(null=True)
+
+registration.point('thing.second').register_item(SecondSubRegistryItem)
+
+
+class ThirdSubRegistryItem(MultipleRegistryItem):
+    moo = models.IntegerField(null=True)
+
+registration.point('thing.second').register_item(ThirdSubRegistryItem)

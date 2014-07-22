@@ -13,12 +13,12 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   development
    translation
    registry
    node_config
    node_monitoring
    cgm
-   development
 
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------

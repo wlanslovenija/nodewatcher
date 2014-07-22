@@ -147,6 +147,9 @@ class Interfaces(monitor_processors.NodeProcessor):
         Performs per-interface processing.
         """
 
+        if not data.up:
+            return
+
         # TODO: We currently assume that interfaces will not change types between wifi/non-wifi
 
         iface.hw_address = str(data.mac)
