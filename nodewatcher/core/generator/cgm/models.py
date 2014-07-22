@@ -284,7 +284,7 @@ class BridgedNetworkConfig(NetworkConfig):
     Network configuration that puts the interface into a bridge.
     """
 
-    bridge = registry_fields.ReferenceChoiceField(BridgeInterfaceConfig)
+    bridge = registry_fields.ReferenceChoiceField(BridgeInterfaceConfig, related_name='bridge_ports')
 
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("Bridged")

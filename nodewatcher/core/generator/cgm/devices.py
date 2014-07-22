@@ -362,6 +362,17 @@ class DeviceBase(object):
 
         return 'vif%s' % vif.get_unique_id()
 
+    @classmethod
+    def get_bridge_mapping(cls, platform, bridge):
+        """
+        Returns a bridge name.
+
+        :param platform: Platform identifier
+        :param bridge: Bridge interface model
+        """
+
+        return bridge.name.lower().replace(' ', '')
+
     def __init__(self):
         """
         Prevent instantiation of this class.
