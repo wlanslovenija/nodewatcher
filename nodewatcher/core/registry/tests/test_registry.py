@@ -9,12 +9,13 @@ from .registry_tests import models
 from nodewatcher.core.registry import registration, exceptions
 
 CUSTOM_SETTINGS = {
+    'DEBUG': True,
     'INSTALLED_APPS': settings.INSTALLED_APPS + ('nodewatcher.core.registry.tests.registry_tests',),
 }
 
 
 @utils.override_settings(**CUSTOM_SETTINGS)
-class RegistryTestCase(django_test.TestCase):
+class RegistryTestCase(django_test.TransactionTestCase):
     @classmethod
     def tearDownClass(cls):
         registration.remove_point('thing.first')
@@ -39,6 +40,21 @@ class RegistryTestCase(django_test.TestCase):
             simple.additional = 42
             simple.another = 69
             simple.save()
+
+            item = thing.second.foo.multiple(create=models.FirstSubRegistryItem)
+            item.foo = 3
+            item.bar = 88
+            item.save()
+
+            item = thing.second.foo.multiple(create=models.SecondSubRegistryItem)
+            item.foo = 3
+            item.moo = 77
+            item.save()
+
+            item = thing.second.foo.multiple(create=models.ThirdSubRegistryItem)
+            item.foo = 3
+            item.moo = 77
+            item.save()
 
         # Test basic queries
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#additional'):
@@ -79,3 +95,6 @@ class RegistryTestCase(django_test.TestCase):
         self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'DoubleChildRegistryItem'), models.DoubleChildRegistryItem)
         with self.assertRaises(exceptions.UnknownRegistryClass):
             self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'doesnotexist'))
+
+        # Test polymorphic cascade deletions
+        thing.delete()
