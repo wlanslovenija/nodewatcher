@@ -48,3 +48,27 @@ class MenuAlreadyRegistered(MenuException):
 
 class MenuNotRegistered(MenuException):
     pass
+
+
+class PartialEntryException(Exception):
+    pass
+
+
+class InvalidPartialEntry(PartialEntryException):
+    pass
+
+
+class PartialException(Exception):
+    pass
+
+
+class InvalidPartial(PartialException):
+    pass
+
+
+class PartialAlreadyRegistered(PartialException):
+    pass
+
+
+class PartialNotRegistered(PartialException):
+    pass

@@ -159,7 +159,9 @@ class ResetNodeMixin(object):
     def reset(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
+        signals.pre_reset_node.send(sender=self, request=request, node=self.object)
         signals.reset_node.send(sender=self, request=request, node=self.object)
+        signals.post_reset_node.send(sender=self, request=request, node=self.object)
         return http.HttpResponseRedirect(success_url)
 
     def post(self, request, *args, **kwargs):
@@ -188,8 +190,9 @@ class RemoveNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, views.Canc
     context_object_name = 'node'
 
     def delete(self, request, *args, **kwargs):
+        signals.pre_remove_node.send(sender=self, request=request, node=self.object)
         response = super(RemoveNode, self).delete(request, *args, **kwargs)
-        signals.remove_node.send(sender=self, request=request, node=self.object)
+        signals.post_remove_node.send(sender=self, request=request, node=self.object)
         return response
 
     def get_success_url(self):
