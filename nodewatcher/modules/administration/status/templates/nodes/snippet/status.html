@@ -1,0 +1,8 @@
+{% load i18n node_status_tags %}
+
+<dt class="node-status">{% trans "Status" %}</dt>
+<dd class="node-status">
+    {% network_status_icon node_status.get_network_choice "small" %}
+    {% monitored_status_icon node_status.get_monitored_choice "small" %}
+    {% health_status_icon node_status.get_health_choice "small" %}
+</dd>
