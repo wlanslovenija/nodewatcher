@@ -1,4 +1,3 @@
-import collections
 import copy
 
 from django.core import exceptions
