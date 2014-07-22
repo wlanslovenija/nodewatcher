@@ -5,6 +5,6 @@ components.partials.get_partial('node_snippet_partial').add(components.PartialEn
     name='project',
     template='nodes/snippet/project.html',
     extra_context=lambda context: {
-        'node_project': context['node'].config.core.project().project,
+        'node_project': getattr(context['node'].config.core.project(), 'project', None),
     }
 ))
