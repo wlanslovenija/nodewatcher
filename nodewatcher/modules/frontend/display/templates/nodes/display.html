@@ -26,3 +26,9 @@
         </section>
     {% endblock display_node_menu_wrapper %}
 {% endblock content_before %}
+
+{% block content %}
+    {% block display_partial_wrapper %}
+        {% include "nodes/display_partial.html" %}
+    {% endblock display_partial_wrapper %}
+{% endblock content %}
