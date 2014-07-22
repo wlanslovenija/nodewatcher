@@ -1,9 +1,11 @@
+from django.db.models import signals as django_signals
 from django.utils.translation import gettext_noop
 
 from django_datastream import datastream
 
 # To create node.monitoring registration point
 import nodewatcher.core.monitor
+from nodewatcher.core import models as core_models
 from nodewatcher.core.monitor import models
 
 from . import base, fields
@@ -530,3 +532,29 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
     })
 
 pool.register(models.WifiInterfaceMonitor, WifiInterfaceMonitorStreams)
+
+
+def datastream_node_removed(sender, instance=None, **kwargs):
+    """
+    Remove all streams when a node gets removed.
+    """
+
+    datastream.delete_streams({'node': instance.pk})
+
+django_signals.post_delete.connect(datastream_node_removed, sender=core_models.Node)
+
+# In case we have the frontend module installed, we also subscribe to its
+# reset signal that gets called when a user requests a node's data to be reset
+try:
+    from nodewatcher.modules.frontend.editor import signals as editor_signals
+
+    def datastream_node_reset(sender, request=None, node=None, **kwargs):
+        """
+        Remove all streams when a user requests the node to be reset.
+        """
+
+        datastream.delete_streams({'node': node.pk})
+
+    editor_signals.reset_node.connect(datastream_node_reset)
+except ImportError:
+    pass
