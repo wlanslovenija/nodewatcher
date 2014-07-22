@@ -304,12 +304,6 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
             instance._skip_delete = True
         else:
             instance = selected_item(root=context.root)
-            if context.hierarchy_parent_cls is not None:
-                setattr(
-                    instance,
-                    selected_item._registry_object_parent_link.name,
-                    context.hierarchy_parent_obj,
-                )
 
     # Populate data with default values from the registry item instance
     if selected_item != previous_item and instance is not None:
@@ -367,35 +361,35 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
         if partial is None:
             # Perform a full validation and save the form
             if form.is_valid():
-                # Avoid an integrity error when the parent model has failed validation and had not
-                # been saved; when this happens the parent does not have an id and saving a child will fail
-                if context.hierarchy_parent_obj is not None and not context.hierarchy_parent_obj.pk:
-                    context.validation_errors = True
-                else:
-                    # Setup dependencies among forms
-                    dependencies = set()
-                    for name, field in form.fields.iteritems():
-                        if hasattr(field, 'get_dependencies'):
-                            dependencies.update(field.get_dependencies(form.cleaned_data.get(name, None)))
+                form_id = (instance.get_registry_id(), id(context.hierarchy_parent_obj), index)
+                assert form_id not in context.pending_save_forms
 
-                    # If we have a parent, we depend on it
-                    if context.hierarchy_parent_obj is not None:
-                        dependencies.add((
-                            context.hierarchy_parent_obj.get_registry_id(),
-                            context.hierarchy_grandparent_obj,
-                            context.hierarchy_parent_index,
-                        ))
+                # Setup dependencies among forms
+                dependencies = set()
+                for name, field in form.fields.iteritems():
+                    if hasattr(field, 'get_dependencies'):
+                        dependencies.update(field.get_dependencies(form.cleaned_data.get(name, None)))
 
-                    form_id = (instance.get_registry_id(), context.hierarchy_parent_obj, index)
-                    assert form_id not in context.pending_save_forms
+                # If we have a parent, we depend on it
+                if context.hierarchy_parent_obj is not None:
+                    parent_id = (
+                        context.hierarchy_parent_obj.get_registry_id(),
+                        id(context.hierarchy_grandparent_obj),
+                        context.hierarchy_parent_index,
+                    )
+                    dependencies.add(parent_id)
+                    context.pending_save_foreign_keys.setdefault(parent_id, []).append(
+                        (form_id, selected_item._registry_object_parent_link.name)
+                    )
 
-                    # Add form to list of forms pending save together with dependencies
-                    context.pending_save_forms[form_id] = {
-                        'registry_id': instance.get_registry_id(),
-                        'index': index,
-                        'form': form,
-                        'dependencies': dependencies,
-                    }
+                # Add form to list of forms pending save together with dependencies
+                context.pending_save_forms[form_id] = {
+                    'registry_id': instance.get_registry_id(),
+                    'index': index,
+                    'form': form,
+                    'form_id': form_id,
+                    'dependencies': dependencies,
+                }
             else:
                 context.validation_errors = True
 
@@ -453,6 +447,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
             hierarchy_grandparent_obj=context.hierarchy_parent_obj,
             validation_errors=False,
             pending_save_forms=context.pending_save_forms,
+            pending_save_foreign_keys=context.pending_save_foreign_keys,
         )
 
         forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context))
@@ -498,6 +493,7 @@ class RegistryFormContext(object):
     existing_items = None
     existing_models = None
     pending_save_forms = None
+    pending_save_foreign_keys = None
 
     def __init__(self, **kwargs):
         """
@@ -858,6 +854,7 @@ def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, sav
         existing_partial_config=regpoint.get_accessor(root).to_partial() if root is not None else {},
         validation_errors=False,
         pending_save_forms={},
+        pending_save_foreign_keys={},
     )
 
     # Prepare form processors
@@ -909,6 +906,13 @@ def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, sav
                         instance = form.save()
                         if info['registry_id'] in context.current_config:
                             context.current_config[info['registry_id']][info['index']] = instance
+
+                        for form_id, field in context.pending_save_foreign_keys.get(info['form_id'], []):
+                            setattr(
+                                context.pending_save_forms[form_id]['form'].instance,
+                                field,
+                                instance
+                            )
                     else:
                         context.validation_errors = True
 

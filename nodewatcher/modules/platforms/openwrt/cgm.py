@@ -476,6 +476,32 @@ def set_dhcp_ignore(cfg, iface_name):
     iface_dhcp.ignore = True
 
 
+def check_interface_bridged(interface):
+    """
+    Checks if the interface is part of a bridge and returns the bridge
+    descriptor if so.
+
+    :param interface: Interface instance
+    :return: Bridge interface or None if interface is not part of a bridge
+    """
+
+    bridge = None
+    for network in interface.networks.all():
+        if isinstance(network, cgm_models.BridgedNetworkConfig):
+            if bridge is not None:
+                raise cgm_base.ValidationError(
+                    _("Interface cannot be part of multiple bridges!")
+                )
+
+            bridge = network.bridge
+        elif bridge is not None:
+            raise cgm_base.ValidationError(
+                _("Interface cannot be part of a bridge and also have network configuration!")
+            )
+
+    return bridge
+
+
 @cgm_base.register_platform_module('openwrt', 15)
 def network(node, cfg):
     """
@@ -496,7 +522,46 @@ def network(node, cfg):
         if not interface.enabled:
             continue
 
-        if isinstance(interface, cgm_models.MobileInterfaceConfig):
+        if isinstance(interface, cgm_models.BridgeInterfaceConfig):
+            iface_name = device.get_bridge_mapping('openwrt', interface)
+            iface = cfg.network.add(interface=iface_name)
+
+            # Configure bridge interfaces
+            iface.ifname = []
+            for port in interface.bridge_ports.all():
+                port = port.interface
+                if isinstance(port, cgm_models.EthernetInterfaceConfig):
+                    iface.ifname.append(device.remap_port('openwrt', port.eth_port))
+
+                    if port.uplink:
+                        iface._uplink = True
+                        set_dhcp_ignore(cfg, iface_name)
+
+                    if port.routing_protocol:
+                        raise cgm_base.ValidationError(
+                            _("Ethernet interface '%(name)s' cannot be part of a bridge and also marked as routable!") % {
+                                'name': port.eth_port,
+                            }
+                        )
+                elif isinstance(port, cgm_models.WifiInterfaceConfig):
+                    # Wireless interfaces are reverse-configured to be part of a bridge
+                    if port.routing_protocol:
+                        raise cgm_base.ValidationError(
+                            _("Wireless interface under radio '%(radio)s' cannot be part of a bridge and also marked as routable!") % {
+                                'radio': port.device.wifi_radio,
+                            }
+                        )
+                else:
+                    raise cgm_base.ValidationError(
+                        _("Unsupported interface type '%(type)s' used as bridge port!" % {'type': port.interface.__class__.__name__})
+                    )
+
+            iface.stp = interface.stp
+            if interface.mac_address:
+                iface.macaddr = interface.mac_address
+
+            configure_interface(cfg, interface, iface, iface_name)
+        elif isinstance(interface, cgm_models.MobileInterfaceConfig):
             iface = cfg.network.add(interface=interface.device)
             iface._uplink = True
             set_dhcp_ignore(cfg, interface.device)
@@ -546,6 +611,9 @@ def network(node, cfg):
                 'kmod-usb2',
             ])
         elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
+            if check_interface_bridged(interface) is not None:
+                continue
+
             try:
                 iface = cfg.network.add(interface=interface.eth_port)
             except ValueError:
@@ -659,11 +727,16 @@ def network(node, cfg):
 
                 # Configure network interface for each vif, first being the primary network
                 vif_name = device.get_vif_mapping('openwrt', interface.wifi_radio, vif)
-                iface = cfg.network.add(interface=vif_name)
-                wif.network = vif_name
                 wif.ifname = vif_name
 
-                configure_interface(cfg, vif, iface, vif_name)
+                bridge = check_interface_bridged(vif)
+                if bridge is not None:
+                    # Wireless interfaces are reverse-configured to be part of a bridge
+                    wif.network = bridge.name
+                else:
+                    iface = cfg.network.add(interface=vif_name)
+                    wif.network = vif_name
+                    configure_interface(cfg, vif, iface, vif_name)
 
 
 @cgm_base.register_platform_module('openwrt', 15)

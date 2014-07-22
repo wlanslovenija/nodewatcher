@@ -465,13 +465,13 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
         to be saved.
 
         :param value: Cleaned value
-        :return: A list of dependency tuples (cfg_location, cfg_parent, cfg_index)
+        :return: A list of dependency tuples (cfg_location, id(cfg_parent), cfg_index)
         """
 
         if value is None:
             return []
 
-        return [(self.choices_rid, None, value)]
+        return [(self.choices_rid, id(None), value)]
 
     def modify_to_context(self, item, cfg, request):
         """

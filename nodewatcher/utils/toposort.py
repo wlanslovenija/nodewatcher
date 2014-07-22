@@ -18,7 +18,7 @@ def topological_sort(data, dependency_key='dependencies'):
     dep_graph.update({item: set() for item in extra_items_in_deps})
 
     while True:
-        ordered = set(item for item, dep in dep_graph.iteritems() if not dep)
+        ordered = {item for item, dep in dep_graph.iteritems() if not dep}
         if not ordered:
             break
 
