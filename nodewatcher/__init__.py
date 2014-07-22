@@ -1,4 +1,7 @@
-from .celery import app as celery_app
+import os
+
+if os.environ.get('NODEWATCHER_DOCUMENTATION_BUILD') != '1':
+    from .celery import app as celery_app
 
 NAME = 'nodewatcher'
 VERSION = (3, 0, 0, 'beta', 0)
