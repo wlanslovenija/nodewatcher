@@ -19,13 +19,11 @@
         </div>
     {% endblock node_reset_warning_wrapper %}
 
-    {% include "nodes/snippet.html" %}
+    {% block node_snippet_wrapper %}
+        {% include "nodes/snippet.html" %}
+    {% endblock node_snippet_wrapper %}
 
-    <form method="post" action="{{ request.get_full_path }}">
-        {% csrf_token %}
-        <div class="buttons">
-            <button type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>
-            <button type="submit" name="reset" value="reset">{% trans "Reset" %}</button>
-        </div>
-    </form>
+    {% with form_submit=_("Reset") %}
+        {% include "form.html" %}
+    {% endwith %}
 {% endblock %}
