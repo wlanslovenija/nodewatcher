@@ -53,6 +53,39 @@ class SelectorFormField(form_fields.TypedChoiceField):
         self.choices = fields.BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
 
 
+class NullBooleanChoiceField(models.NullBooleanField):
+    """
+    A null boolean field that is linked to a registered choice. For use in
+    this field, registered choices should cover True/False/None values.
+    """
+
+    def __init__(self, regpoint, enum_id, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        self.regpoint = regpoint
+        self.enum_id = enum_id
+        super(NullBooleanChoiceField, self).__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        """
+        Augments the containing class.
+        """
+
+        super(NullBooleanChoiceField, self).contribute_to_class(cls, name, virtual_only)
+
+        def get_FIELD_choice(self, field):
+            value = getattr(self, field.attname)
+            return registration.point(field.regpoint).get_registered_choices(field.enum_id).resolve(value)
+
+        setattr(
+            cls,
+            'get_%s_choice' % self.name,
+            functional.curry(get_FIELD_choice, field=self)
+        )
+
+
 class SelectorKeyField(models.CharField):
     """
     A character field that supports choices derived from a pre-registered choice set.
@@ -556,6 +589,16 @@ south.modelsinspector.add_introspection_rules([
         },
     ),
 ], [r'^nodewatcher\.core\.registry\.fields\.SelectorKeyField$'])
+south.modelsinspector.add_introspection_rules([
+    (
+        [NullBooleanChoiceField],
+        [],
+        {
+            'regpoint': ['regpoint', {}],
+            'enum_id': ['enum_id', {}],
+        },
+    ),
+], [r'^nodewatcher\.core\.registry\.fields\.NullBooleanChoiceField$'])
 south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.ModelSelectorKeyField$'])
 south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.IntraRegistryForeignKey$'])
 south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.ReferenceChoiceField$'])

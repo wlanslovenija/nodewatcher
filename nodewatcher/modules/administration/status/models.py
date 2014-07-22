@@ -12,7 +12,7 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
 
     network = registry_fields.SelectorKeyField('node.monitoring', 'core.status#network', default='unknown')
-    monitored = models.NullBooleanField()
+    monitored = registry_fields.NullBooleanChoiceField('node.monitoring', 'core.status#monitored')
     health = registry_fields.SelectorKeyField('node.monitoring', 'core.status#health', default='unknown')
 
     class RegistryMeta:
