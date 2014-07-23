@@ -244,7 +244,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 # If there can only be one item and no field is requested, create a descriptor
                 from . import fields
 
-                field = fields.RegistryEmbeddedRelationField(dst_model)
+                field = fields.RegistryRelationField(dst_model)
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
                 continue
             elif dst_related is None:

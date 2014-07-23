@@ -609,13 +609,13 @@ class RegistryProxySingleDescriptor(object):
             return self.related_model()
 
 
-class RegistryEmbeddedRelationField(models.Field):
+class RegistryRelationField(models.Field):
     def __init__(self, to, *args, **kwargs):
         kwargs['rel'] = related_fields.ForeignObjectRel(self, to)
-        super(RegistryEmbeddedRelationField, self).__init__(*args, **kwargs)
+        super(RegistryRelationField, self).__init__(*args, **kwargs)
 
     def contribute_to_class(self, cls, name, virtual_only=False):
-        super(RegistryEmbeddedRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+        super(RegistryRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
         setattr(cls, name, RegistryProxySingleDescriptor(self.rel.to))
 
 
