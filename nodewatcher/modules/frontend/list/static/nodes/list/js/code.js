@@ -70,10 +70,10 @@
                     {'mData': 'type', 'bVisible': false},
                     {'mData': 'name', 'mRender': nodeName(table)},
                     {'mData': 'last_seen'},
-                    {'mData': 'network_status', 'mRender': iconFromLegend('network')},
+                    {'mData': 'status.network', 'mRender': iconFromLegend('network')},
                     // Not really reasonable to be searchable
-                    {'mData': 'monitored_status', 'mRender': iconFromLegend('monitored'), 'bSearchable': false},
-                    {'mData': 'health_status', 'mRender': iconFromLegend('health')},
+                    {'mData': 'status.monitored', 'mRender': iconFromLegend('monitored'), 'bSearchable': false},
+                    {'mData': 'status.health', 'mRender': iconFromLegend('health')},
                     {'mData': 'project'}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
