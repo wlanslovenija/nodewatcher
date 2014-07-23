@@ -27,7 +27,7 @@ class RegistryItemStreams(base.StreamsBase):
 
         return {
             'node': self._model.root.uuid,
-            'registry_id': self._model.RegistryMeta.registry_id,
+            'registry_id': self._model.get_registry_id(),
         }
 
     def get_stream_tags(self):
@@ -40,7 +40,7 @@ class RegistryItemStreams(base.StreamsBase):
 
         return {
             'node': self._model.root.uuid,
-            'registry_id': self._model.RegistryMeta.registry_id,
+            'registry_id': self._model.get_registry_id(),
         }
 
     def get_stream_highest_granularity(self):
@@ -50,6 +50,19 @@ class RegistryItemStreams(base.StreamsBase):
         """
 
         return datastream.Granularity.Minutes
+
+    def resolve_model_reference(self, model_reference):
+        """
+        Some fields support referencing other fields. In order to resolve
+        model references, this method must be overriden. It should return
+        the resolved model class.
+
+        :param model_reference: String representing the model reference
+        :return: Resolved model class
+        """
+
+        regpoint = self._model.get_registry_regpoint()
+        return getattr(self._model.root, regpoint.namespace).by_registry_id(model_reference)
 
 
 class ProxyRegistryItemStreams(RegistryItemStreams):

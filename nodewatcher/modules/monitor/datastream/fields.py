@@ -62,13 +62,15 @@ class Field(object):
     API.
     """
 
-    def __init__(self, attribute=None, tags=None, value_downsamplers=None):
+    def __init__(self, attribute=None, tags=None, value_downsamplers=None, value_type='numeric'):
         """
         Class constructor.
 
         :param attribute: Optional name of the attribute that is source of data for
           this field
         :param tags: Optional custom tags
+        :param value_downsamplers: Optional value downsamplers to use
+        :param value_type: Optional datastream value type (defaults to numeric)
         """
 
         self.name = None
@@ -76,17 +78,23 @@ class Field(object):
         self.custom_tags = tags or {}
 
         if value_downsamplers is None:
-            value_downsamplers = [
-                'mean',
-                'sum',
-                'min',
-                'max',
-                'sum_squares',
-                'std_dev',
-                'count',
-            ]
+            if value_type == 'numeric':
+                value_downsamplers = [
+                    'mean',
+                    'sum',
+                    'min',
+                    'max',
+                    'sum_squares',
+                    'std_dev',
+                    'count',
+                ]
+            elif value_type == 'graph':
+                value_downsamplers = [
+                    'count',
+                ]
 
         self.value_downsamplers = value_downsamplers
+        self.value_type = value_type
 
     def prepare_value(self, value):
         """
@@ -174,7 +182,7 @@ class Field(object):
         downsamplers = self.get_downsamplers()
         highest_granularity = descriptor.get_stream_highest_granularity()
 
-        return stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity)
+        return stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity, value_type=self.value_type)
 
     def to_stream(self, descriptor, stream):
         """
@@ -224,6 +232,7 @@ class IntegerField(Field):
         Class constructor.
         """
 
+        kwargs['value_type'] = 'numeric'
         super(IntegerField, self).__init__(**kwargs)
 
     def prepare_value(self, value):
@@ -264,6 +273,7 @@ class FloatField(Field):
         Class constructor.
         """
 
+        kwargs['value_type'] = 'numeric'
         super(FloatField, self).__init__(**kwargs)
 
     def prepare_value(self, value):
@@ -286,6 +296,7 @@ class MultiPointField(Field):
         Class constructor.
         """
 
+        kwargs['value_type'] = 'numeric'
         super(MultiPointField, self).__init__(**kwargs)
 
     def prepare_value(self, value):
@@ -327,13 +338,12 @@ class DerivedField(Field):
         """
 
         # Acquire references to input streams
-        root = descriptor.get_model().root
         streams = []
         for field_ref in self.streams:
-            registry_id, field = field_ref['field'].split('#')
+            model_reference, field = field_ref['field'].split('#')
             mdl = descriptor.get_model()
-            if registry_id:
-                mdl = root.monitoring.by_registry_id(registry_id)
+            if model_reference:
+                mdl = descriptor.resolve_model_reference(model_reference)
 
             mdl_descriptor = pool.get_descriptor(mdl)
             field = mdl_descriptor.get_field(field)
@@ -356,6 +366,7 @@ class DerivedField(Field):
             derive_from=streams,
             derive_op=self.op,
             derive_args=self.op_arguments,
+            value_type=self.value_type,
         )
 
     def to_stream(self, descriptor, stream):
@@ -379,6 +390,7 @@ class ResetField(DerivedField):
         Class constructor.
         """
 
+        kwargs['value_type'] = 'numeric'
         super(ResetField, self).__init__(
             [{'name': 'reset', 'field': field}],
             'counter_reset',
@@ -396,6 +408,7 @@ class RateField(DerivedField):
         Class constructor.
         """
 
+        kwargs['value_type'] = 'numeric'
         super(RateField, self).__init__(
             [
                 {'name': 'reset', 'field': reset_field},
@@ -422,6 +435,7 @@ class DynamicSumField(Field):
         """
 
         self._fields = []
+        kwargs['value_type'] = 'numeric'
 
         super(DynamicSumField, self).__init__(**kwargs)
 
@@ -471,6 +485,7 @@ class DynamicSumField(Field):
                 derive_from=streams,
                 derive_op='sum',
                 derive_args={},
+                value_type=self.value_type,
             )
         except ds_exceptions.InconsistentStreamConfiguration:
             # Drop the existing stream and re-create it
@@ -483,6 +498,7 @@ class DynamicSumField(Field):
                 derive_from=streams,
                 derive_op='sum',
                 derive_args={},
+                value_type=self.value_type,
             )
 
     def to_stream(self, descriptor, stream):
@@ -494,3 +510,20 @@ class DynamicSumField(Field):
         """
 
         self.ensure_stream(descriptor, stream)
+
+
+class GraphField(Field):
+    """
+    A field that can store graph datapoints.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs['value_type'] = 'graph'
+        super(GraphField, self).__init__(**kwargs)
+
+    def prepare_value(self, value):
+        return dict(value)

@@ -133,3 +133,15 @@ class StreamsBase(object):
         """
 
         raise NotImplementedError
+
+    def resolve_model_reference(self, model_reference):
+        """
+        Some fields support referencing other fields. In order to resolve
+        model references, this method must be overriden. It should return
+        the resolved model class.
+
+        :param model_reference: String representing the model reference
+        :return: Resolved model class
+        """
+
+        raise NotImplementedError
