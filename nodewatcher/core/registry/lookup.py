@@ -17,17 +17,6 @@ class RegistryProxyMixin(object):
                 self._get_pk_val() == other._get_pk_val())
 
 
-class RegistryProxySingleDescriptor(object):
-    def __init__(self, related_model):
-        self.related_model = related_model
-
-    def __get__(self, instance, instance_type):
-        if instance is None:
-            return self
-
-        return self.related_model.objects.get(root=instance)
-
-
 class RegistryProxyMultipleDescriptor(object):
     def __init__(self, related_model, chain, related_field=None):
         self.related_model = related_model
@@ -185,8 +174,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             # Prevent proxy models from cluttering up the cache
             del django_db.models.loading.cache.app_models['_registry_proxy_models_']
-            # All our fields are virtual
-            clone.model._meta.add_field = clone.model._meta.add_virtual_field
 
         def install_proxy_field(model, field, name):
             field = copy.deepcopy(field)
@@ -194,7 +181,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             select_name = name
             # Since the field is populated by a join, it can always be null when the model doesn't exist
             field.null = True
-            field.contribute_to_class(clone.model, name)
+            field.contribute_to_class(clone.model, name, virtual_only=True)
 
             if field.name != field.attname:
                 # Handle foreign key relations properly
@@ -244,7 +231,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             if dst_field is None:
                 # If there can only be one item and no field is requested, create a descriptor
-                setattr(clone.model, field_name, RegistryProxySingleDescriptor(dst_model))
+                from . import fields
+
+                field = fields.RegistryEmbeddedRelationField(dst_model)
+                field.contribute_to_class(clone.model, field_name, virtual_only=True)
                 continue
             elif dst_related is None:
                 # Select destination field and install proxy field descriptor

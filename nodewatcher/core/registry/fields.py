@@ -594,6 +594,28 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
 
         return False
 
+
+class RegistryProxySingleDescriptor(object):
+    def __init__(self, related_model):
+        self.related_model = related_model
+
+    def __get__(self, instance, instance_type):
+        if instance is None:
+            return self
+
+        return self.related_model.objects.get(root=instance)
+
+
+class RegistryEmbeddedRelationField(models.Field):
+    def __init__(self, to, *args, **kwargs):
+        kwargs['rel'] = related_fields.ForeignObjectRel(self, to)
+        super(RegistryEmbeddedRelationField, self).__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        super(RegistryEmbeddedRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+        setattr(cls, name, RegistryProxySingleDescriptor(self.rel.to))
+
+
 # Add South introspection for our fields
 south.modelsinspector.add_introspection_rules([
     (
