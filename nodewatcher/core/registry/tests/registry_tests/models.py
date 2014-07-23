@@ -31,7 +31,7 @@ class RelatedModel(models.Model):
 
 
 class DoubleChildRegistryItem(ChildRegistryItem):
-    another = models.IntegerField(null=True)
+    another = models.IntegerField(null=True, default=17)
     related = models.ForeignKey(RelatedModel, null=True)
 
     class RegistryMeta(ChildRegistryItem.RegistryMeta):

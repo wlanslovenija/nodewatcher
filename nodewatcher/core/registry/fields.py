@@ -77,7 +77,15 @@ class NullBooleanChoiceField(models.NullBooleanField):
 
         def get_FIELD_choice(self, field):
             value = getattr(self, field.attname)
-            return registration.point(field.regpoint).get_registered_choices(field.enum_id).resolve(value)
+            choices = registration.point(field.regpoint).get_registered_choices(field.enum_id)
+
+            try:
+                return choices.resolve(value)
+            except KeyError:
+                try:
+                    return choices.resolve(field.default)
+                except KeyError:
+                    return None
 
         setattr(
             cls,
@@ -113,7 +121,15 @@ class SelectorKeyField(models.CharField):
 
         def get_FIELD_choice(self, field):
             value = getattr(self, field.attname)
-            return registration.point(field.regpoint).get_registered_choices(field.enum_id).resolve(value)
+            choices = registration.point(field.regpoint).get_registered_choices(field.enum_id)
+
+            try:
+                return choices.resolve(value)
+            except KeyError:
+                try:
+                    return choices.resolve(field.default)
+                except KeyError:
+                    return None
 
         setattr(
             cls,
