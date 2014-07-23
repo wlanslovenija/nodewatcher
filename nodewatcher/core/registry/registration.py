@@ -300,6 +300,16 @@ class RegistrationPoint(object):
             assert len(self.item_object_toplevel[registry_id]) > 0
             self._unregister_item(item_cls)
 
+    def is_item(self, model):
+        """
+        Returns true if a specified model class is a registry item under this
+        registration point.
+
+        :param model: Model class
+        """
+
+        return issubclass(model, self.item_base)
+
     def get_children(self, parent=None):
         """
         Returns the child registry item classes that are available under the given
