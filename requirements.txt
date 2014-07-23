@@ -1,4 +1,4 @@
-git+https://github.com/wlanslovenija/django.git@f2a2c594b6a5bf660c300067640cf2416ddd4f13#egg=Django-wlanslovenija
+git+https://github.com/wlanslovenija/django.git@ab42fa765fe3c52bac4f0bdf8c2de48ad5044a3a#egg=Django-wlanslovenija
 GDAL==1.10.1
 Jinja2==2.7.2
 MarkupSafe==0.23
