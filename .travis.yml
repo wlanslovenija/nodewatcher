@@ -8,6 +8,7 @@ services:
 before_install:
  - sudo apt-get update
  - sudo apt-get install libgeoip1
+ - sudo cat /code/packages.txt | DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
  - sudo rm -rf /dev/shm
  - sudo ln -s /run/shm /dev/shm
 install:

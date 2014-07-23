@@ -5,4 +5,5 @@ libxslt-dev
 libpcre3-dev
 libgeoip1
 libgeos-c1
+libgdal-dev
 fping
