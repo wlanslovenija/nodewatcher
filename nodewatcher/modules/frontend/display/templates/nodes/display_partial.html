@@ -1,0 +1,11 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load partial_tags %}
+
+{% get_partial "node_display_partial" as node_display_partial %}
+
+{% block included_node_display_partial %}
+    {% with partial=node_display_partial %}
+        {% include "base/partial.html" %}
+    {% endwith %}
+{% endblock included_node_display_partial %}

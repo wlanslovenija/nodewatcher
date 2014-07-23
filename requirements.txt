@@ -12,7 +12,7 @@ git+https://github.com/wlanslovenija/datastream.git@2cd5c5d7c4178d32fbbfeb816fe3
 defusedxml==0.4.1
 django-celery==3.1.10
 django-classy-tags==0.5.1
-git+https://github.com/wlanslovenija/django-datastream.git@75bc27c9f56be45f073d94d2d563c7372add9e06#egg=django_datastream-master
+git+https://github.com/wlanslovenija/django-datastream.git@d799799f39ddd21d69b0206ab202ed9cabb1ffc6#egg=django_datastream-master
 django-guardian==1.2
 git+https://github.com/mitar/django-missing.git@9cf0fd6cfe39bb2cd0b90b3dd37be1b465308ae8#egg=django_missing-master
 git+https://github.com/wlanslovenija/django-overextends.git@ee963e2c338c1134e6ec49acabe9822b3636b536#egg=django_overextends-wlanslovenija
@@ -20,7 +20,7 @@ django-phonenumber-field==0.5
 git+https://github.com/wlanslovenija/django_polymorphic.git@514f6079696838f241bec0c0397d8ce193c19ac0#egg=django_polymorphic-wlanslovenija
 git+https://github.com/wlanslovenija/django-registration.git@670779dce3b81fabc7cc2394db1ddd45ffcc4dc7#egg=django_registration-wlanslovenija
 django-sekizai==0.7
-django-tastypie==0.10.0
+django-tastypie==0.11.1
 dnspython==1.11.1
 docutils==0.11
 lxml==3.3.5

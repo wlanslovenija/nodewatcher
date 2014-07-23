@@ -205,6 +205,14 @@ LOGOUT_URL = '/account/logout/'
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfileAndSettings'
 
+def user_url(user):
+    from django.core import urlresolvers
+    return urlresolvers.reverse('AccountsComponent:user_page', kwargs={'username': user.username})
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': user_url,
+}
+
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
 
@@ -559,12 +567,16 @@ MENUS = {
 }
 
 PARTIALS = {
-    'node_snippet_partial': [
-        {
-            'name': 'name',
-            'weight': -1,
-        }
-    ],
+    #'node_snippet_partial': [
+    #    {
+    #        'name': ...,
+    #        'weight': ...,
+    #        'visible': True,
+    #    }
+    #],
+    #'node_display_partial': [
+    #    ...
+    #],
 }
 
 # Allowed hosts (required for production use)

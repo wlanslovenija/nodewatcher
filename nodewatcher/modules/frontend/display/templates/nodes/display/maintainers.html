@@ -1,0 +1,15 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load html_tags %}
+
+{% block included_maintainers %}
+    {% if maintainers.exists %}
+        {% heading 2 _("Maintainers") %}
+
+        <ul class="maintainers">
+            {% for maintainer in maintainers %}
+                <li class="maintainer"><a href="{{ maintainer.get_absolute_url }}">{{ maintainer.username }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock included_maintainers %}
