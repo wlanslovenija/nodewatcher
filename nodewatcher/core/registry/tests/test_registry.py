@@ -93,6 +93,10 @@ class RegistryTestCase(django_test.TransactionTestCase):
             self.assertEquals(thing.f1.interesting, 'bla')
             self.assertEquals(thing.f1.additional, 42)
 
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1=models.AnotherRegistryItem):
+            self.assertEquals(thing.f1.interesting, 'nope')
+            self.assertEquals(thing.f1.pk, None)
+
         with self.assertRaises(TypeError):
             models.Thing.objects.regpoint('first').registry_fields(f1=models.FirstSubRegistryItem)
 

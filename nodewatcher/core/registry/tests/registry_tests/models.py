@@ -11,6 +11,15 @@ registration.create_point(Thing, 'first')
 registration.create_point(Thing, 'second')
 
 
+class AnotherRegistryItem(registration.bases.ThingFirstRegistryItem):
+    interesting = models.CharField(max_length=30, default='nope', null=True)
+
+    class RegistryMeta:
+        registry_id = 'foo.another'
+
+registration.point('thing.first').register_item(AnotherRegistryItem)
+
+
 class SimpleRegistryItem(registration.bases.ThingFirstRegistryItem):
     interesting = models.CharField(max_length=30, default='nope', null=True)
 

@@ -9,7 +9,7 @@ amqp==1.4.5
 anyjson==0.3.3
 billiard==3.3.0.17
 celery==3.1.11
-git+https://github.com/wlanslovenija/datastream.git@2cd5c5d7c4178d32fbbfeb816fe31b3f27f32012#egg=datastream-master
+git+https://github.com/wlanslovenija/datastream.git@d886b2b30d2293cfe00445d7a666f6849a29fc9b#egg=datastream-master
 defusedxml==0.4.1
 django-celery==3.1.10
 django-classy-tags==0.5.1

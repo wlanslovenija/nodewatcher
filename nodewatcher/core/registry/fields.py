@@ -603,7 +603,10 @@ class RegistryProxySingleDescriptor(object):
         if instance is None:
             return self
 
-        return self.related_model.objects.get(root=instance)
+        try:
+            return self.related_model.objects.get(root=instance)
+        except self.related_model.DoesNotExist:
+            return self.related_model()
 
 
 class RegistryEmbeddedRelationField(models.Field):
