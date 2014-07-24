@@ -1,18 +1,20 @@
 import sys
 
+from django.utils import six
+
 from tastypie import fields as tastypie_fields, resources
 from tastypie.contrib.gis import resources as gis_resources
 
 from django_datastream import serializers
 
-from nodewatcher.core import models
-from nodewatcher.core.registry import fields as registry_fields
-
-# TODO: Temporary, create a way to register fields into an API
-from ...administration.status import models as status_models
-from ...administration.location import models as location_models
+from ...registry import fields as registry_fields
 
 from . import fields
+
+# Exports
+__all__ = [
+    'BaseResource',
+]
 
 
 # Adapted from PEP 257
@@ -42,7 +44,15 @@ def trim(docstring):
     return '\n'.join(trimmed).split('\n\n')[0]
 
 
-class BaseResource(resources.NamespacedModelResource, gis_resources.ModelResource):
+class BaseMetaclass(resources.ModelDeclarativeMetaclass):
+    def __new__(cls, name, bases, attrs):
+        # Make serializers.DatastreamSerializer default serializer
+        if attrs.get('Meta') and not getattr(attrs['Meta'], 'serializer', None):
+            attrs['Meta'].serializer = serializers.DatastreamSerializer()
+        return super(BaseMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelResource, gis_resources.ModelResource)):
     # In class methods which are called from a metaclass we cannot use super() because BaseResource is not
     # yet defined then. We cannot call gis_resources.ModelResource.<method>() either, because then our current
     # cls is not given, but gis_resources.ModelResource is used instead. So we create a custom function where skip
@@ -158,25 +168,3 @@ class BaseResource(resources.NamespacedModelResource, gis_resources.ModelResourc
                     })
 
         return data
-
-
-class NodeResource(BaseResource):
-    class Meta:
-        # TODO: Temporary, create a way to register fields into an API
-        queryset = models.Node.objects.regpoint('config').registry_fields(
-            name='core.general#name',
-            type='core.type#type',
-            router_id='core.routerid#router_id',
-            project='core.project#project.name',
-            location=location_models.LocationConfig,
-        ).regpoint('monitoring').registry_fields(
-            last_seen='core.general#last_seen',
-            status=status_models.StatusMonitor,
-            peers='network.routing.topology#link_count',
-            # TODO: Add current clients?
-        )
-        resource_name = 'node'
-        list_allowed_methods = ('get',)
-        detail_allowed_methods = ('get',)
-        max_limit = 5000
-        serializer = serializers.DatastreamSerializer()
