@@ -7,6 +7,8 @@ from tastypie.contrib.gis import resources as gis_resources
 
 from django_datastream import serializers
 
+import json_field
+
 from ...registry import fields as registry_fields
 
 from . import fields
@@ -76,7 +78,10 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             return gis_resources.ModelResource.api_field_from_django_field.im_func(cls, field, default)
 
         if not isinstance(field, registry_fields.RegistryRelationField):
-            field_class = parent_api_field_from_django_field()
+            if isinstance(field, json_field.JSONField):
+                field_class = tastypie_fields.DictField
+            else:
+                field_class = parent_api_field_from_django_field()
 
             def create_field(**kwargs):
                 f = field_class(**kwargs)

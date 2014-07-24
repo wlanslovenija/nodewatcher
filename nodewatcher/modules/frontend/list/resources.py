@@ -1,6 +1,4 @@
-from django_datastream import serializers
-
-from nodewatcher.core import models
+from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import api
 
 # TODO: Temporary, create a way to register fields into an API
@@ -11,7 +9,7 @@ from ...administration.location import models as location_models
 class NodeResource(api.BaseResource):
     class Meta:
         # TODO: Temporary, create a way to register fields into an API
-        queryset = models.Node.objects.regpoint('config').registry_fields(
+        queryset = core_models.Node.objects.regpoint('config').registry_fields(
             name='core.general#name',
             type='core.type#type',
             router_id='core.routerid#router_id',
