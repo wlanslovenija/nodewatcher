@@ -1,0 +1,13 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n %}
+
+    {% trans "Network Statistics" as title %}
+{% endcontextblock %}
+
+{% block content %}
+    {% block network_statistics_wrapper %}
+        {% include "network/statistics_partial.html" %}
+    {% endblock network_statistics_wrapper %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load partial_tags %}
+
+{% get_partial "network_statistics_partial" as network_statistics_partial %}
+
+{% block included_network_statistics_partial %}
+    {% with partial=network_statistics_partial %}
+        {% include "base/partial.html" %}
+    {% endwith %}
+{% endblock included_network_statistics_partial %}
