@@ -19,8 +19,9 @@ class NodeResource(api.BaseResource):
             last_seen='core.general#last_seen',
             status=status_models.StatusMonitor,
             peers='network.routing.topology#link_count',
-            # TODO: Add current clients?
-        )
+            # TODO: Add current clients count?
+        # TODO: We should order in the order core.type#type are registered
+        ).order_by('type')
         resource_name = 'node'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
