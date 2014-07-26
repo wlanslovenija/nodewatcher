@@ -1,0 +1,40 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n sekizai_tags html_tags url_tags %}
+
+    {% add_data "css_data" "datatables/css/jquery.dataTables.css" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
+    {% add_data "js_data" "events/list/js/code.js" %}
+    {% trans "Events" as title %}
+{% endcontextblock %}
+
+{% block altlinks %}
+    {% heading 2 _("Other Formats") %}
+
+    <ul class="altlinks-list events-list-altlinks">
+        <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "event" %}?format=xml">{% trans "XML" %}</a></li>
+        <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "event" %}?format=json">{% trans "JSON" %}</a></li>
+    </ul>
+{% endblock altlinks %}
+
+{% block content %}
+    <table class="events-list" data-source="{% url "api:api_dispatch_list" "v1" "event" %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}">
+        <thead>
+            <tr>
+                <th>{% trans "Timestamp" %}</th>
+                <th>{% trans "Related nodes" %}</th>
+                <th>{% trans "Title" %}</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>{% trans "Timestamp" %}</th>
+                <th>{% trans "Related nodes" %}</th>
+                <th>{% trans "Title" %}</th>
+            </tr>
+        </tfoot>
+        <tbody>
+        </tbody>
+    </table>
+{% endblock %}

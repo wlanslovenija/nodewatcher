@@ -43,7 +43,8 @@
             return $('<a/>').attr(
                 'href', $(table).data('node-url-template'
             // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-            ).replace('{pk}', full.uuid)).text(data).wrap('<span/>').parent().html();
+            // TODO: Make string translatable
+            ).replace('{pk}', full.uuid)).text(data || "unknown").wrap('<span/>').parent().html();
         };
     }
 
@@ -57,12 +58,10 @@
                 'bSort': true,
                 'bInfo': true,
                 'bAutoWidth': true,
+                // TODO: Use our own state saving by changing URL anchor
                 'bStateSave': false,
+                // TODO: Start using bServerSide and move limit there?
                 'sAjaxSource': $(table).data('source') + '?limit=5000',
-                // TODO: Currently does not work, see http://datatables.net/forums/discussion/18900/data-parameter-to-ajax-calls-should-be-an-object-and-not-an-array
-                /*'fnServerParams': function (aoData) {
-		            aoData.push({'limit': '5000'});
-		        },*/
                 'sAjaxDataProp': 'objects',
                 // TODO: Enable Ajax caching, see http://datatables.net/forums/discussion/18899/make-cache-false-in-ajax-request-optional
                 'sDom': 'ifrtif',
@@ -83,8 +82,9 @@
                 'fnDrawCallback': groupDrawCallback(table),
                 'oLanguage': {
                     // TODO: Make strings translatable
-                    'sZeroRecords': "No matching nodes found",
+                    'sZeroRecords': "No matching nodes found.",
                     'sEmptyTable ': "There are currently no nodes registered/connected.",
+                    // We do not provide pagination here, so we use only __TOTAL__ here
                     'sInfo': "_TOTAL_ nodes shown",
                     'sInfoEmpty': "0 nodes shown",
                     'sInfoFiltered': "(from _MAX_ all nodes)",

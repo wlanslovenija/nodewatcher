@@ -21,7 +21,7 @@ django-phonenumber-field==0.5
 git+https://github.com/wlanslovenija/django_polymorphic.git@514f6079696838f241bec0c0397d8ce193c19ac0#egg=django_polymorphic-wlanslovenija
 git+https://github.com/wlanslovenija/django-registration.git@670779dce3b81fabc7cc2394db1ddd45ffcc4dc7#egg=django_registration-wlanslovenija
 django-sekizai==0.7
-django-tastypie==0.11.1
+git+https://github.com/wlanslovenija/django-tastypie.git@493359475f5ef21ba071bb004699293e2675beed#egg=django_tastypie-wlanslovenija
 dnspython==1.11.1
 docutils==0.11
 lxml==3.3.5

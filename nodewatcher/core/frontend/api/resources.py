@@ -1,5 +1,6 @@
 import sys
 
+from django.db.models import query
 from django.utils import six
 
 from tastypie import fields as tastypie_fields, resources
@@ -11,7 +12,7 @@ import json_field
 
 from ...registry import fields as registry_fields
 
-from . import fields
+from . import fields, paginator
 
 # Exports
 __all__ = [
@@ -48,9 +49,11 @@ def trim(docstring):
 
 class BaseMetaclass(resources.ModelDeclarativeMetaclass):
     def __new__(cls, name, bases, attrs):
-        # Make serializers.DatastreamSerializer default serializer
+        # Override Meta defaults
         if attrs.get('Meta') and not getattr(attrs['Meta'], 'serializer', None):
             attrs['Meta'].serializer = serializers.DatastreamSerializer()
+        if attrs.get('Meta') and not getattr(attrs['Meta'], 'paginator_class', None):
+            attrs['Meta'].paginator_class = paginator.Paginator
         return super(BaseMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
@@ -173,3 +176,27 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
                     })
 
         return data
+
+    def apply_sorting(self, obj_list, options=None):
+        # Makes sure sorting does not loose count of all objects before filtering
+        nonfiltered_count = obj_list._nonfiltered_count
+        sorted_queryset = super(BaseResource, self).apply_sorting(obj_list, options)
+        sorted_queryset._nonfiltered_count = nonfiltered_count
+        return sorted_queryset
+
+    def apply_filters(self, request, applicable_filters):
+        queryset = self.get_object_list(request)
+        filtered_queryset = queryset.filter(**applicable_filters)
+
+        f = request.GET.get('filter', None)
+        if f and self._meta.global_filter:
+            qs = [query.Q(**{'%s__icontains' % field: f}) for field in self._meta.global_filter]
+            filter_query = qs[0]
+            for q in qs[1:]:
+                filter_query |= q
+            filtered_queryset = filtered_queryset.filter(filter_query).distinct()
+
+        # We store count of all objects before filtering to be able to provide it in paginator (used in dataStream)
+        filtered_queryset._nonfiltered_count = queryset.count()
+
+        return filtered_queryset
