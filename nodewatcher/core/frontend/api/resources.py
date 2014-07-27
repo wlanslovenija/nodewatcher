@@ -184,12 +184,18 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         sorted_queryset._nonfiltered_count = nonfiltered_count
         return sorted_queryset
 
+    # An hook so that queryset can be modified before count for _nonfiltered_count is taken
+    # (for filtering which should not be exposed through dataStream)
+    def _before_apply_filters(self, request, queryset):
+        return queryset
+
     def apply_filters(self, request, applicable_filters):
         queryset = self.get_object_list(request)
+        queryset = self._before_apply_filters(request, queryset)
         filtered_queryset = queryset.filter(**applicable_filters)
 
         f = request.GET.get('filter', None)
-        if f and self._meta.global_filter:
+        if f and getattr(self._meta, 'global_filter', None):
             qs = [query.Q(**{'%s__icontains' % field: f}) for field in self._meta.global_filter]
             filter_query = qs[0]
             for q in qs[1:]:

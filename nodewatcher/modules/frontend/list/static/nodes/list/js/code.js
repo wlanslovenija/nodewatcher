@@ -50,6 +50,15 @@
 
     $(document).ready(function () {
         $('.node-list').each(function (i, table) {
+            var source = $(table).data('source');
+            // TODO: Start using bServerSide and move limit there?
+            if (/\?/.test(source)) {
+                source += '&limit=5000';
+            }
+            else {
+                source += '?limit=5000';
+            }
+
             $(table).dataTable({
                 'bProcessing': true,
                 'bPaginate': false,
@@ -60,8 +69,7 @@
                 'bAutoWidth': true,
                 // TODO: Use our own state saving by changing URL anchor
                 'bStateSave': false,
-                // TODO: Start using bServerSide and move limit there?
-                'sAjaxSource': $(table).data('source') + '?limit=5000',
+                'sAjaxSource': source,
                 'sAjaxDataProp': 'objects',
                 // TODO: Enable Ajax caching, see http://datatables.net/forums/discussion/18899/make-cache-false-in-ajax-request-optional
                 'sDom': 'ifrtif',
@@ -83,9 +91,8 @@
                 'oLanguage': {
                     // TODO: Make strings translatable
                     'sZeroRecords': "No matching nodes found.",
-                    'sEmptyTable ': "There are currently no nodes registered/connected.",
-                    // We do not provide pagination here, so we use only __TOTAL__ here
-                    'sInfo': "_TOTAL_ nodes shown",
+                    'sEmptyTable ': "There are currently no nodes recorded/connected.",
+                    'sInfo': "_START_ to _END_ of _TOTAL_ nodes shown",
                     'sInfoEmpty': "0 nodes shown",
                     'sInfoFiltered': "(from _MAX_ all nodes)",
                     'sInfoPostFix': "",

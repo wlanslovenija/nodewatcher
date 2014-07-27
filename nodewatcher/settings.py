@@ -276,6 +276,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.display',
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
+    'nodewatcher.modules.frontend.mynodes',
     'nodewatcher.modules.frontend.statistics',
 
     # Accounts support.

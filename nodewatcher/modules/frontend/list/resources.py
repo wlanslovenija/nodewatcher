@@ -1,5 +1,8 @@
+from django.contrib.auth import models as auth_models
+
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import api
+from nodewatcher.utils import permissions
 
 # TODO: Temporary, create a way to register fields into an API
 from ...administration.status import models as status_models
@@ -26,3 +29,14 @@ class NodeResource(api.BaseResource):
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
         max_limit = 5000
+
+    def _before_apply_filters(self, request, queryset):
+        maintainer = request.GET.get('maintainer', None)
+        if maintainer:
+            try:
+                maintainer_user = auth_models.User.objects.get(username=maintainer)
+                queryset = permissions.get_objects_for_user(maintainer_user, [], queryset, use_superusers=False)
+            except auth_models.User.DoesNotExist:
+                queryset = queryset.none()
+
+        return queryset
