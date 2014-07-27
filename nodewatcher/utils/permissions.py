@@ -68,7 +68,7 @@ def get_objects_for_user(user, perms, klass=None, use_groups=True, any_perm=Fals
     permissions present at ``perms``.
 
     Similar to `shortcuts.get_objects_for_user`, but allowing ``perms`` to be an
-    empty list to get objects where an user has `any` object permission.
+    empty list to get objects where an user has *any* object permission.
 
     :param user: ``User`` or ``AnonymousUser`` instance for which objects would
       be returned.
