@@ -184,8 +184,8 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         sorted_queryset._nonfiltered_count = nonfiltered_count
         return sorted_queryset
 
-    # An hook so that queryset can be modified before count for _nonfiltered_count is taken
-    # (for filtering which should not be exposed through dataStream)
+    # A hook so that queryset can be modified before count for _nonfiltered_count is taken
+    # (for filtering which should not be exposed through dataTables)
     def _before_apply_filters(self, request, queryset):
         return queryset
 
@@ -202,7 +202,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
                 filter_query |= q
             filtered_queryset = filtered_queryset.filter(filter_query).distinct()
 
-        # We store count of all objects before filtering to be able to provide it in paginator (used in dataStream)
+        # We store count of all objects before filtering to be able to provide it in paginator (used in dataTables)
         filtered_queryset._nonfiltered_count = queryset.count()
 
         return filtered_queryset

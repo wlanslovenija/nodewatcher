@@ -1,26 +1,4 @@
 (function ($) {
-    function groupDrawCallback(table) {
-        return function (oSettings) {
-            if (oSettings.aiDisplay.length == 0) {
-                return;
-            }
-
-            var trs = $(table).find('tbody tr');
-            var colspan = trs.eq(0).find('td').length;
-            var lastGroup = null;
-            trs.each(function (i, tr) {
-                var displayIndex = oSettings._iDisplayStart + i;
-                var group = oSettings.aoData[oSettings.aiDisplay[displayIndex]]._aData[oSettings.aoColumns[0].mData];
-                if (group !== lastGroup) {
-                    $('<tr />').addClass('group').append(
-                        $('<td />').attr('colspan', colspan).html(group)
-                    ).insertBefore($(tr));
-                    lastGroup = group;
-                }
-            });
-        };
-    }
-
     function iconFromLegend(legendName) {
         return function (data, type, full) {
             if (type !== 'display') return data;
@@ -36,32 +14,14 @@
         };
     }
 
-    function nodeName(table) {
-        return function (data, type, full) {
-            if (type !== 'display') return data;
-
-            return $('<a/>').attr(
-                'href', $(table).data('node-url-template'
-            // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-            // TODO: Make string translatable
-            ).replace('{pk}', full.uuid)).text(data || "unknown").wrap('<span/>').parent().html();
-        };
-    }
-
     $(document).ready(function () {
+        // TODO: Enable Ajax caching, see http://datatables.net/forums/discussion/18899/make-cache-false-in-ajax-request-optional
         $('.node-list').each(function (i, table) {
-            var source = $(table).data('source');
-            // TODO: Start using bServerSide and move limit there?
-            if (/\?/.test(source)) {
-                source += '&limit=5000';
-            }
-            else {
-                source += '?limit=5000';
-            }
-
             $(table).dataTable({
                 'bProcessing': true,
                 'bPaginate': false,
+                'sPaginationType': 'full_numbers',
+                'iDisplayLength': 5000,
                 'bLengthChange': false,
                 'bFilter': true,
                 'bSort': true,
@@ -69,25 +29,28 @@
                 'bAutoWidth': true,
                 // TODO: Use our own state saving by changing URL anchor
                 'bStateSave': false,
-                'sAjaxSource': source,
+                'bServerSide': true,
+                'fnServerParams': $.tastypie.fnServerParams,
+                'fnServerData': $.tastypie.fnServerData,
+                'sAjaxSource': $(table).data('source'),
                 'sAjaxDataProp': 'objects',
-                // TODO: Enable Ajax caching, see http://datatables.net/forums/discussion/18899/make-cache-false-in-ajax-request-optional
+                // Set to "ifprtifp" if pagination is enabled, set to "ifrtif" if disabled
                 'sDom': 'ifrtif',
                 'aoColumns': [
                     {'mData': 'type', 'bVisible': false},
-                    {'mData': 'name', 'mRender': nodeName(table)},
+                    {'mData': 'name', 'mRender': $.tastypie.nodeName(table)},
                     {'mData': 'last_seen'},
-                    {'mData': 'status.network', 'mRender': iconFromLegend('network')},
-                    // Not really reasonable to be searchable
+                    // Status not really reasonable to be searchable
+                    {'mData': 'status.network', 'mRender': iconFromLegend('network'), 'bSearchable': false},
                     {'mData': 'status.monitored', 'mRender': iconFromLegend('monitored'), 'bSearchable': false},
-                    {'mData': 'status.health', 'mRender': iconFromLegend('health')},
+                    {'mData': 'status.health', 'mRender': iconFromLegend('health'), 'bSearchable': false},
                     {'mData': 'project'}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
                 'aaSortingFixed': [[0, 'asc']],
                 // And make default sorting by name column
                 'aaSorting': [[1, 'asc']],
-                'fnDrawCallback': groupDrawCallback(table),
+                'fnDrawCallback': $.tastypie.groupDrawCallback(table),
                 'oLanguage': {
                     // TODO: Make strings translatable
                     'sZeroRecords': "No matching nodes found.",
@@ -101,7 +64,7 @@
                 'oSearch': {
                     // Initial search string
                     'sSearch': '',
-                    // We support regex
+                    // We pass strings to the server side as they are
                     'bEscapeRegex': false
                 }
             });
