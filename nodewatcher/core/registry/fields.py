@@ -5,7 +5,7 @@ import re
 from django import db as django_db
 from django.core import exceptions
 from django.db import models
-from django.db.models import fields, query as django_query
+from django.db.models import fields
 from django.db.models.fields import related as related_fields
 from django.forms import fields as form_fields, widgets
 from django.utils import text, functional
