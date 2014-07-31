@@ -1,9 +1,11 @@
+import operator
 import os
 import re
 
+from django import db as django_db
 from django.core import exceptions
 from django.db import models
-from django.db.models import fields
+from django.db.models import fields, query as django_query
 from django.db.models.fields import related as related_fields
 from django.forms import fields as form_fields, widgets
 from django.utils import text, functional
@@ -596,17 +598,51 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
 
 
 class RegistryProxySingleDescriptor(object):
-    def __init__(self, related_model):
-        self.related_model = related_model
+    def __init__(self, field_with_rel):
+        self.related = field_with_rel.rel.to
+        self.cache_name = field_with_rel.get_cache_name()
+
+    def is_cached(self, instance):
+        return hasattr(instance, self.cache_name)
+
+    def get_queryset(self, **db_hints):
+        db = django_db.router.db_for_read(self.related, **db_hints)
+        return self.related._default_manager.using(db)
+
+    def get_prefetch_queryset(self, instances):
+        rel_field = self.related._meta.get_field('root')
+        rel_obj_attr = operator.attrgetter(rel_field.attname)
+        instance_attr = lambda obj: obj._get_pk_val()
+        instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+        qs = self.get_queryset(instance=instances[0]).filter(root__in=instances)
+        # Since we're going to assign directly in the cache,
+        # we must manage the reverse relation cache manually.
+        rel_obj_cache_name = rel_field.get_cache_name()
+        for rel_obj in qs:
+            instance = instances_dict[rel_obj_attr(rel_obj)]
+            setattr(rel_obj, rel_obj_cache_name, instance)
+        return qs, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type):
         if instance is None:
             return self
 
         try:
-            return self.related_model.objects.get(root=instance)
-        except self.related_model.DoesNotExist:
-            return self.related_model()
+            rel_obj = getattr(instance, self.cache_name)
+        except AttributeError:
+            try:
+                rel_obj = self.get_queryset(instance=instance).get(root=instance)
+            except self.related.DoesNotExist:
+                rel_obj = None
+            else:
+                setattr(rel_obj, self.related._meta.get_field('root').get_cache_name(), instance)
+
+            setattr(instance, self.cache_name, rel_obj)
+
+        if rel_obj is None:
+            rel_obj = self.related()
+
+        return rel_obj
 
 
 class RegistryRelationField(models.Field):
@@ -616,7 +652,7 @@ class RegistryRelationField(models.Field):
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(RegistryRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
-        setattr(cls, name, RegistryProxySingleDescriptor(self.rel.to))
+        setattr(cls, name, RegistryProxySingleDescriptor(self))
 
 
 # Add South introspection for our fields

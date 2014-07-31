@@ -246,6 +246,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
                 field = fields.RegistryRelationField(dst_model)
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
+                clone = clone.prefetch_related(field_name)
                 continue
             elif dst_related is None:
                 # Select destination field and install proxy field descriptor
