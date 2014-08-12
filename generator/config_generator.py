@@ -638,19 +638,19 @@ config rule
         network_config.write("""
 config rule
         option dest '{0}/32'
-        option goto '32766'
+        option lookup 'main'
         option priority 999
 """.format(server))
 
       network_config.write("""
 config rule
         option dest '{subnet}/{cidr}'
-        option goto '32766'
+        option lookup 'main'
         option priority 999
 
 config rule
         option in 'wan'
-        option goto '32766'
+        option lookup 'main'
         option priority 999
 
 config rule
