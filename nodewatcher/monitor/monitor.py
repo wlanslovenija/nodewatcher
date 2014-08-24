@@ -79,6 +79,7 @@ import time
 import multiprocessing
 import gc
 import struct
+import hashlib
 
 if Tweet.tweets_enabled():
   from lib import bitly
@@ -637,7 +638,8 @@ def process_node(node_ip, ping_results, is_duped, peers, varsize_results):
           if 'temp' in value:
             temp = safe_float_convert(value['temp'])
             serial = value['serial']
-            grapher.add_graph(GraphType.Temperature, 'Measurement ({0})'.format(serial), 'temp_{0}'.format(serial), temp, name = serial)
+            filename = "temp_%s" % hashlib.md5(serial).hexdigest()
+            grapher.add_graph(GraphType.Temperature, 'Measurement ({0})'.format(serial), filename, temp, name = serial)
 
       # XXX UGLY HACK: Some random voltage reports
       if 'voltage' in info:
