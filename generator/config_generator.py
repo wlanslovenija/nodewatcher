@@ -79,6 +79,15 @@ portLayouts = {
       2: '1 5t',
     },
   },
+
+  # TP-Link WDR4300
+  'tp-wdr4300': {
+    'switch': 'switch0',
+    'vlans': {
+      1: '0t 2 3 4 5',
+      2: '0t 1',
+    },
+  },
 }
 
 # Optional packages that should be removed when configuring a router-only node
