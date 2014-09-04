@@ -156,6 +156,7 @@ class Migration(DataMigration):
                     "tp-wr1041nd": "tp-wr1041ndv2",
                     "tp-wr1043nd": "tp-wr1043ndv1",
                     "sm-sx763v2": "sm-sx763v2",
+                    "tp-wdr4300": "tp-wdr4300v1",
                 }
                 general.router = router_map[profile.template.short_name]
                 general.platform = "openwrt"
@@ -224,6 +225,7 @@ class Migration(DataMigration):
                     "ub-bullet-m5": "ieee-80211n",
                     "ub-rocket-m5": "ieee-80211n",
                     "sm-sx763v2": "ieee-80211bg",
+                    "tp-wdr4300": "ieee-80211bg",
                 }
 
                 wifi_iface = orm['cgm.WifiInterfaceConfig'](root=node, content_type=wifiiface_ctype)
