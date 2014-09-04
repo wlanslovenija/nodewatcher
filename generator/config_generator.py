@@ -843,7 +843,7 @@ Interface "wlan0" "br-clients" {diggers} {olsr_interfaces}
         hna_subnet = self.subnets[0]['subnet'],
         hna_mask = self.subnets[0]['mask'],
         diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.tdServer))]),
-        olsr_interfaces=" ".join(olsr_interfaces),
+        olsr_interfaces=" ".join(['"%s"' % x for x in olsr_interfaces]),
       ))
       f.close()
 
