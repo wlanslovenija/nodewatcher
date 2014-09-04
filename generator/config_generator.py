@@ -1109,6 +1109,7 @@ config uhttpd main
         "tp-wr1043nd" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wr703n" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm", "telemetryd"],
+        "tp-wdr4300" : ["kmod-usb-serial", "kmod-usb-acm"],
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []) + self.packages)
 
