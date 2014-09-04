@@ -640,7 +640,7 @@ config rule
         option target   REJECT
 """.format(diggers = " ".join(['digger%d' % x for x in xrange(len(self.tdServer))])))
 
-      f.close()
+      firewall_config = f
 
       # Policy routing configuration
       for server, ports in self.tdServer:
@@ -670,10 +670,9 @@ config rule
         cidr = self.subnets[0]['cidr']
       ))
 
-      network_config.close()
-
       # Wireless configuration
       # WiFi hack script
+      olsr_interfaces = []
       inituci_path = os.path.join(directory, "init.d", "inituci")
       os.mkdir(os.path.join(directory, "init.d"))
       f = open(inituci_path, 'w')
@@ -703,6 +702,76 @@ start() {
       /sbin/wifi up
 }
 """)
+      elif self.portLayout == 'tp-wdr4300':
+        network_config.write("""
+config interface meshb
+        option proto    static
+        option ipaddr   {mesh_ip}
+        option netmask  255.255.0.0
+""".format(mesh_ip = self.ip))
+
+        firewall_config.write("""
+config zone
+        option name     meshb
+        option network  meshb
+        option input    ACCEPT
+        option output   ACCEPT
+        option forward  ACCEPT
+        option mtu_fix  1
+
+config rule
+        option src      meshb
+        option dest     wan
+        option target   REJECT
+""")
+
+        f.write("""#!/bin/sh /etc/rc.common
+START=15
+
+start() {{
+      uci delete wireless.radio0.disabled
+      uci set wireless.radio0.channel={channel}
+      uci set wireless.radio0.country=SI
+      uci set wireless.radio0.txpower=20
+
+      uci set wireless.@wifi-iface[0].device=radio0
+      uci set wireless.@wifi-iface[0].network=clients
+      uci set wireless.@wifi-iface[0].mode=ap
+      uci set wireless.@wifi-iface[0].ssid={ssid}
+      uci set wireless.@wifi-iface[0].encryption=none
+      uci set wireless.@wifi-iface[0].ifname=wlan0-1
+
+      uci set wireless.@wifi-iface[1].device=radio0
+      uci set wireless.@wifi-iface[1].network=mesh
+      uci set wireless.@wifi-iface[1].mode=adhoc
+      uci set wireless.@wifi-iface[1].ssid={mesh_ssid}
+      uci set wireless.@wifi-iface[1].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[1].encryption=none
+      uci set wireless.@wifi-iface[1].mcast_rate=6000
+      uci set wireless.@wifi-iface[1].ifname=wlan0
+
+      uci delete wireless.radio1.disabled
+      uci set wireless.radio1.channel=100
+      uci set wireless.radio1.country=SI
+      uci set wireless.radio1.txpower=20
+
+      uci add wireless wifi-iface
+      uci set wireless.@wifi-iface[2].device=radio1
+      uci set wireless.@wifi-iface[2].network=meshb
+      uci set wireless.@wifi-iface[2].mode=adhoc
+      uci set wireless.@wifi-iface[2].ssid={mesh_ssid}
+      uci set wireless.@wifi-iface[2].bssid=02:CA:FF:EE:BA:BE
+      uci set wireless.@wifi-iface[2].encryption=none
+      uci set wireless.@wifi-iface[2].mcast_rate=6000
+      uci set wireless.@wifi-iface[2].ifname=wlan1
+
+      uci commit
+      /etc/init.d/inituci disable
+      /sbin/wifi up
+}}
+""".format(ssid = self.ssid, mesh_ssid = self.ssid.replace('open', 'mesh'), channel = self.wifiChannel))
+
+        olsr_interfaces.append("wlan1")
       else:
         f.write("""#!/bin/sh /etc/rc.common
 START=15
@@ -739,6 +808,9 @@ start() {{
       f.close()
       os.chmod(inituci_path, 0755)
 
+      network_config.close()
+      firewall_config.close()
+
       # OLSRd configuration
       f = open(os.path.join(configPath, "olsrd4"), 'w')
       f.write("""
@@ -762,7 +834,7 @@ MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
 
-Interface "wlan0" "br-clients" {diggers}
+Interface "wlan0" "br-clients" {diggers} {olsr_interfaces}
 {{
   IPv4Multicast 255.255.255.255
 }}
@@ -771,6 +843,7 @@ Interface "wlan0" "br-clients" {diggers}
         hna_subnet = self.subnets[0]['subnet'],
         hna_mask = self.subnets[0]['mask'],
         diggers = " ".join(['"digger%d"' % x for x in xrange(len(self.tdServer))]),
+        olsr_interfaces=" ".join(olsr_interfaces),
       ))
       f.close()
 
