@@ -1004,6 +1004,7 @@ config uhttpd main
         "tp-wr1041nd" : "TLWR1041",
         "tp-wr1043nd" : "TLWR1043",
         "tp-wr703n" : "TLWR703",
+        "tp-wdr4300" : "TLWDR4300",
         "tp-mr3020" : "TLMR3020",
         "tp-mr3040" : "TLMR3040",
 
