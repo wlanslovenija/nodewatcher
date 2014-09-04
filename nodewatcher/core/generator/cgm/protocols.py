@@ -152,7 +152,7 @@ class WirelessProtocol(object):
 
 class IEEE80211BG(WirelessProtocol):
     """
-    IEEE 8022.11 B/G protocols.
+    IEEE 8022.11b/g protocols.
     """
 
     identifier = "ieee-80211bg"
@@ -183,13 +183,49 @@ class IEEE80211BG(WirelessProtocol):
     )
 
 
-class IEEE80211N(IEEE80211BG):
+class IEEE80211BGN(IEEE80211BG):
     """
-    IEEE 802.11 N protocol.
+    IEEE 802.11b/g + n protocol.
     """
 
-    identifier = "ieee-80211n"
-    description = _("IEEE 802.11N")
+    identifier = "ieee-80211bgn"
+    description = _("IEEE 802.11BGN")
+    capabilities = (
+        Capability("LDPC"),
+        Capability("GF"),
+        Capability("SHORT-GI-20"),
+        Capability("SHORT-GI-40"),
+        Capability("TX-STBC"),
+        Capability("TX-STBC1"),
+        Capability("RX-STBC1"),
+        Capability("RX-STBC12"),
+        Capability("RX-STBC123"),
+        Capability("DSSS_CCK-40"),
+    )
+    widths = (
+        # Limit 40 MHz channels in 2.4 GHz band to sensible choices
+        ChannelWidth(
+            "ht40l",
+            _("40 MHz (or 2x20 MHz, secondary is lower)"),
+            40,
+            limit_channels=lambda proto, channel: proto.get_channel_number(channel.number - 4) is not None,
+        ),
+        ChannelWidth(
+            "ht40u",
+            _("40 MHz (or 2x20 MHz, secondary is upper)"),
+            40,
+            limit_channels=lambda proto, channel: proto.get_channel_number(channel.number + 4) is not None,
+        )
+    )
+
+
+class IEEE80211A(WirelessProtocol):
+    """
+    IEEE 802.11a protocol.
+    """
+
+    identifier = "ieee-80211a"
+    description = _("IEEE 802.11A")
     channels = (
         Channel("ch36", 36, 5180),
         Channel("ch40", 40, 5200),
@@ -214,6 +250,20 @@ class IEEE80211N(IEEE80211BG):
         11,
         54,
     )
+    widths = (
+        ChannelWidth("nw5", _("5 MHz"), 5),
+        ChannelWidth("nw10", _("10 MHz"), 10),
+        ChannelWidth("ht20", _("20 MHz"), 20),
+    )
+
+
+class IEEE80211AN(IEEE80211A):
+    """
+    IEEE 802.11a + n protocol.
+    """
+
+    identifier = "ieee-80211an"
+    description = _("IEEE 802.11AN")
     capabilities = (
         Capability("LDPC"),
         Capability("GF"),
@@ -227,17 +277,14 @@ class IEEE80211N(IEEE80211BG):
         Capability("DSSS_CCK-40"),
     )
     widths = (
-        # Limit 40 MHz channels in 2.4 GHz band to sensible choices
         ChannelWidth(
             "ht40l",
             _("40 MHz (or 2x20 MHz, secondary is lower)"),
             40,
-            limit_channels=lambda proto, channel: channel.frequency >= 5180 or proto.get_channel_number(channel.number - 4) is not None,
         ),
         ChannelWidth(
             "ht40u",
             _("40 MHz (or 2x20 MHz, secondary is upper)"),
             40,
-            limit_channels=lambda proto, channel: channel.frequency >= 5180 or proto.get_channel_number(channel.number + 4) is not None,
         )
     )

@@ -13,16 +13,21 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
     architecture = 'ar71xx'
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
-            cgm_protocols.IEEE80211BG()
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_20,
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
+            )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
         ]),
         cgm_devices.IntegratedRadio('wifi1', "Wifi1", [
-            cgm_protocols.IEEE80211N(
-                cgm_protocols.IEEE80211N.SHORT_GI_20,
-                cgm_protocols.IEEE80211N.SHORT_GI_40,
-                cgm_protocols.IEEE80211N.RX_STBC1,
-                cgm_protocols.IEEE80211N.DSSS_CCK_40,
+            cgm_protocols.IEEE80211AN(
+                cgm_protocols.IEEE80211AN.SHORT_GI_20,
+                cgm_protocols.IEEE80211AN.SHORT_GI_40,
+                cgm_protocols.IEEE80211AN.RX_STBC1,
+                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
             )
         ], [
             cgm_devices.AntennaConnector('a2', "Antenna1")

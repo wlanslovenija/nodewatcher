@@ -13,11 +13,11 @@ class TPLinkWR703Nv1(cgm_devices.DeviceBase):
     architecture = 'ar71xx'
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
-            cgm_protocols.IEEE80211N(
-                cgm_protocols.IEEE80211N.SHORT_GI_20,
-                cgm_protocols.IEEE80211N.SHORT_GI_40,
-                cgm_protocols.IEEE80211N.RX_STBC1,
-                cgm_protocols.IEEE80211N.DSSS_CCK_40,
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_20,
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
             )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
