@@ -676,7 +676,13 @@ def network(node, cfg):
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT channel width '%s'!") % dsc_channel_width.identifier)
             elif dsc_protocol.identifier == 'ieee-80211n':
-                radio.hwmode = '11ng'
+                if dsc_channel.frequency >= 5000:
+                    radio.hwmode = '11a'
+                elif dsc_channel.frequency >= 2400:
+                    radio.hwmode = '11g'
+                else:
+                    raise cgm_base.ValidationError(_("Unsupported OpenWRT frequency '%s'!") % dsc_channel.frequency)
+
                 if dsc_channel_width.identifier == 'nw5':
                     radio.htmode = 'HT20'
                     radio.chanbw = 5
