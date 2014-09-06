@@ -267,6 +267,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.modules.monitor.http.interfaces',
+    'nodewatcher.modules.monitor.topology',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
@@ -432,7 +433,7 @@ MONITOR_RUNS = {
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             'nodewatcher.modules.monitor.measurements.rtt.processors.StoreNode',
             'nodewatcher.modules.administration.status.processors.NodeStatus',
-            'nodewatcher.modules.monitor.datastream.processors.Datastream',
+            'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
         ),
     },
 
@@ -451,7 +452,7 @@ MONITOR_RUNS = {
             'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
             'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
             'nodewatcher.modules.administration.status.processors.NodeStatus',
-            'nodewatcher.modules.monitor.datastream.processors.Datastream',
+            'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
             'nodewatcher.modules.monitor.datastream.processors.Maintenance',
         ),
     },
@@ -462,6 +463,8 @@ MONITOR_RUNS = {
         'processors': (
             'nodewatcher.modules.routing.olsr.processors.Topology',
             'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
+            'nodewatcher.modules.monitor.topology.processors.Topology',
+            'nodewatcher.modules.monitor.datastream.processors.NetworkDatastream',
         ),
     },
 }

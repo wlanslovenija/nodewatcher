@@ -1,5 +1,3 @@
-import itertools
-
 from django.db.models import signals as model_signals
 
 from django_datastream import datastream
@@ -7,7 +5,7 @@ from django_datastream import datastream
 from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.core.registry import registration
 
-from . import exceptions, models
+from . import exceptions
 from .pool import pool
 
 
@@ -55,18 +53,12 @@ class TrackRegistryModels(monitor_processors.NodeProcessor):
         model_signals.post_delete.disconnect(dispatch_uid="ds_track_models")
 
 
-class Datastream(monitor_processors.NodeProcessor):
-    """
-    A processor that stores all monitoring data into the datastream.
-    """
-
-    def process(self, context, node):
+class DatastreamBase(object):
+    def process_context(self, context):
         """
-        Called for every processed node.
+        Processes streams.
 
         :param context: Current context
-        :param node: Node that is being processed
-        :return: A (possibly) modified context
         """
 
         processed_items = set()
@@ -90,7 +82,42 @@ class Datastream(monitor_processors.NodeProcessor):
                 except exceptions.StreamDescriptorNotRegistered:
                     continue
 
+
+class NodeDatastream(DatastreamBase, monitor_processors.NodeProcessor):
+    """
+    A processor that stores all per-node monitoring data into the datastream.
+    """
+
+    def process(self, context, node):
+        """
+        Called for every processed node.
+
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
+        """
+
+        self.process_context(context)
         return context
+
+
+class NetworkDatastream(DatastreamBase, monitor_processors.NetworkProcessor):
+    """
+    A processor that stores all network-wide monitoring data into the datastream.
+    """
+
+    def process(self, context, nodes):
+        """
+        Performs network-wide processing and selects the nodes that will be processed
+        in any following processors. Context is passed between network processors.
+
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
+        """
+
+        self.process_context(context)
+        return context, nodes
 
 
 class Maintenance(monitor_processors.NetworkProcessor):
