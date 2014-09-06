@@ -1,7 +1,7 @@
 import collections
 
 from django.core import exceptions as django_exceptions
-from django.db import models
+from django.db import models as django_models
 from django.utils import datastructures as django_datastructures
 
 from . import access as registry_access, lookup as registry_lookup, models as registry_models, state as registry_state
@@ -440,7 +440,7 @@ class RegistrationPoint(object):
                 dst_field, _, _, m2m = model._meta.get_field_by_name(field)
                 # If the field exists we have found our model
                 return (model, dst_field, m2m)
-            except models.FieldDoesNotExist:
+            except django_models.FieldDoesNotExist:
                 continue
         else:
             raise ValueError("No registry item under '%s' provides field '%s'!" % (registry_id, field))
@@ -535,7 +535,7 @@ def create_point(model, namespace, mixins=None):
             {
                 '__module__': 'nodewatcher.core.registry.models',
                 'Meta': Meta,
-                'root': models.ForeignKey(
+                'root': django_models.ForeignKey(
                     model, null=False, editable=False, related_name='{0}_%(app_label)s_%(class)s'.format(namespace)
                 )
             }
@@ -556,7 +556,7 @@ def create_point(model, namespace, mixins=None):
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation
-        model = models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
+        model = django_models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
         if model:
             augment_root_model(model)
         else:
@@ -573,7 +573,7 @@ def handle_deferred_root(sender, **kwargs):
         for callback in registry_state.deferred_roots.pop(key, []):
             callback(sender)
 
-models.signals.class_prepared.connect(handle_deferred_root)
+django_models.signals.class_prepared.connect(handle_deferred_root)
 
 
 def point(name):
