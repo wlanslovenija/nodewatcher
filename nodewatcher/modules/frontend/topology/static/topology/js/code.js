@@ -17,17 +17,16 @@
                 $.each(graph.v, function(index, vertex) {
                     nodes.push({
                         'index': index,
-                        'uuid': vertex.i,
-                        'name': vertex.n,
+                        'data': vertex,
                     });
                     nodeIndex[vertex.i] = index;
                 });
 
-                $.each(graph.e, function(index, vertex) {
+                $.each(graph.e, function(index, edge) {
                     edges.push({
-                        'source': nodeIndex[vertex.f],
-                        'target': nodeIndex[vertex.t],
-                        'value': 1,
+                        'source': nodeIndex[edge.f],
+                        'target': nodeIndex[edge.t],
+                        'data': edge,
                     });
                 });
 
@@ -70,18 +69,16 @@
                 var link = svg.selectAll(".link")
                     .data(edges)
                     .enter().append("line")
-                    .attr("class", "link")
-                    .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+                    .attr("class", "link");
 
                 var node = svg.selectAll(".node")
                     .data(nodes)
                     .enter().append("circle")
                     .attr("class", "node")
-                    .attr("r", 5)
-                    .style("fill", function(d) { return "#73B55B"; });
+                    .attr("r", 5);
 
-                node.append("title")
-                    .text(function(d) { return d.name; });
+                // Apply all node and link style extenders
+                $.nodewatcher.topology.extend(node, link);
 
                 force.on("tick", function() {
                     link.attr("x1", function(d) { return d.source.x; })

@@ -75,6 +75,7 @@ class Topology(monitor_processors.NetworkProcessor):
             # Node name
             'n': 'core.general#name',
         }
+        # TODO: Make node topology storage fields extensible via the pool pattern
 
         qs = core_models.Node.objects.filter(pk__in=vertices.keys())
         qs = qs.regpoint('config').registry_fields(**NODE_ATTRIBUTES)

@@ -21,3 +21,5 @@ components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Network Topology"),
     url=urlresolvers.reverse_lazy('TopologyComponent:topology'),
 ))
+
+components.partials.register(components.Partial('network_topology_partial'))
