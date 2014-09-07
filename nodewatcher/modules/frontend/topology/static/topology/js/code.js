@@ -1,13 +1,5 @@
 (function ($) {
     $(document).ready(function () {
-        // Create the canvas
-        var width = 960;
-        var height = 1000;
-
-        var svg = d3.select("#topology").append("svg")
-            .attr("width", width)
-            .attr("height", height);
-
         // TODO: Some kind of loading indicator
 
         $.ajax({
@@ -39,6 +31,34 @@
                     });
                 });
 
+                // Create the canvas
+                var width = 960;
+                var height = 500;
+
+                var svg = d3.select("#topology").append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("pointer-events", "all")
+                    .append("g")
+                    .call(d3.behavior.zoom().on("zoom", zoom))
+                    .append("g");
+
+                // Create overlay to intercept mouse events
+                var overlay = svg.append("rect")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("fill", "white");
+
+                function zoom() {
+                    svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+                    var inverseTranslate = d3.event.translate;
+                    inverseTranslate[0] = -inverseTranslate[0];
+                    inverseTranslate[1] = -inverseTranslate[1];
+                    var inverseScale = 1.0/d3.event.scale;
+                    overlay.attr("transform", "scale(" + inverseScale + ")translate(" + inverseTranslate + ")");
+                }
+
                 var force = d3.layout.force()
                     .charge(-120)
                     .linkDistance(30)
@@ -58,8 +78,7 @@
                     .enter().append("circle")
                     .attr("class", "node")
                     .attr("r", 5)
-                    .style("fill", function(d) { return "#73B55B"; })
-                    .call(force.drag);
+                    .style("fill", function(d) { return "#73B55B"; });
 
                 node.append("title")
                     .text(function(d) { return d.name; });

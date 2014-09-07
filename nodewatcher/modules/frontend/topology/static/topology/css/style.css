@@ -1,3 +1,11 @@
+#topology {
+    text-align: center;
+}
+
+#topology svg {
+    border: 1px solid black;
+}
+
 .node {
   stroke: #fff;
   stroke-width: 1.5px;
