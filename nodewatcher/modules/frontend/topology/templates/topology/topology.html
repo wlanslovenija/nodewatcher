@@ -1,0 +1,15 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n sekizai_tags html_tags url_tags %}
+
+    {% add_data "js_data" "topology/js/d3.v3.min.js" %}
+    {% add_data "js_data" "topology/js/code.js" %}
+    {% add_data "css_data" "topology/css/style.css" %}
+
+    {% trans "Network Topology" as title %}
+{% endcontextblock %}
+
+{% block content %}
+    <div id="topology"></div>
+{% endblock %}

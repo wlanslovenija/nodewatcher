@@ -108,9 +108,12 @@ class OlsrTopologyLink(monitor_models.TopologyLink):
         """
 
         return {
-            'lq': self.lq,
-            'ilq': self.ilq,
-            'etx': self.etx,
+            'proto': 'olsr',
+            'metrics': {
+                'lq': self.lq,
+                'ilq': self.ilq,
+                'etx': self.etx,
+            },
         }
 
 
