@@ -7,6 +7,9 @@ from nodewatcher.core.monitor import processors as monitor_processors, models as
 from nodewatcher.modules.monitor.datastream import base as ds_base, fields as ds_fields
 from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
+from . import base as tp_base
+from .pool import pool as tp_pool
+
 
 class TopologyStreams(ds_base.StreamsBase):
     topology = ds_fields.GraphField(tags={
@@ -65,21 +68,28 @@ class Topology(monitor_processors.NetworkProcessor):
             # Add edges
             edge = {'f': source_id, 't': destination_id}
             # Add any extra link attributes
-            if hasattr(link, 'get_link_attributes'):
-                edge.update(link.get_link_attributes())
+            for attribute in tp_pool.get_attributes(tp_base.LinkAttribute, link_class=link.__class__):
+                if callable(attribute.value):
+                    value = attribute.value(link)
+                else:
+                    value = attribute.value
+
+                edge[attribute.name] = value
 
             edges.append(edge)
 
         # Fetch per-node attributes
-        NODE_ATTRIBUTES = {
-            # Node name
-            'n': 'core.general#name',
-        }
-        # TODO: Make node topology storage fields extensible via the pool pattern
+        node_attributes = tp_pool.get_attributes(tp_base.NodeAttribute)
 
         qs = core_models.Node.objects.filter(pk__in=vertices.keys())
-        qs = qs.regpoint('config').registry_fields(**NODE_ATTRIBUTES)
-        qs = qs.values(*(['pk'] + NODE_ATTRIBUTES.keys()))
+        qs = qs.regpoint('config')
+        for attr in node_attributes:
+            try:
+                qs = qs.registry_fields(**{attr.name: attr.field})
+            except (TypeError, ValueError):
+                pass
+
+        qs = qs.values(*(['pk'] + [a.name for a in node_attributes]))
         for node in qs:
             node_id = str(node['pk'])
             del node['pk']

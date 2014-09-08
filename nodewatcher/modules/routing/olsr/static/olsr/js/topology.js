@@ -12,7 +12,7 @@
                 return false;
             }
         }).style("stroke", function(d) {
-            var etx = d.data.metrics.etx;
+            var etx = d.data.etx;
             if (etx >= 1.0 && etx <= 2.0)
                 return "#00FF00";
             else if (etx > 2.0 && etx <= 5.0)

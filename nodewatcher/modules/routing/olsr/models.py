@@ -101,21 +101,6 @@ class OlsrTopologyLink(monitor_models.TopologyLink):
     ilq = models.FloatField(default=0.0)
     etx = models.FloatField(default=0.0)
 
-    def get_link_attributes(self):
-        """
-        Returns additional link attributes that should be included in the
-        topology link when it is transformed into a graph representation.
-        """
-
-        return {
-            'proto': 'olsr',
-            'metrics': {
-                'lq': self.lq,
-                'ilq': self.ilq,
-                'etx': self.etx,
-            },
-        }
-
 
 def peer_name(text):
     return ds_fields.TagReference(transform=lambda m: text % {'peer_name': m.peer.config.core.general().name})
