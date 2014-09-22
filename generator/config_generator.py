@@ -545,6 +545,9 @@ config alias
 
         # Setup koruza-controller configuration
         self.__copyTemplate("koruza/koruza.cfg", os.path.join(self.base, "koruza.cfg"))
+        os.mkdir(os.path.join(self.base, "koruza"))
+        self.__copyTemplate("koruza/device_reset", os.path.join(self.base, "koruza/device_reset"))
+        os.chmod(os.path.join(self.base, "koruza/device_reset"), 0755)
 
         # Setup KORUZA authorized keys
         ak = open(os.path.join(keyPath, "authorized_keys"), 'a')

@@ -1,0 +1,7 @@
+#!/bin/sh
+/usr/bin/lm4flash -r
+
+# Reset USB port 1
+echo 0 > /sys/class/gpio/gpio22/value
+sleep 5
+echo 1 > /sys/class/gpio/gpio22/value
