@@ -548,6 +548,21 @@ config alias
         ak.write("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJ19qN6CobFIsai3ZyupmiWMmDZE7bhlOIDP7zX3f1G22ZLhXr1+ZQx/oyx8drDptfugjxjObpLiHLCYcErOG6DDe++p6MiqUP0m7Mo+lkuXN+U5BTNp5cp7CO6AHEp48ggXVchsYoUJFSKuzJk7YBiTx1xhyhb9PhetrpWyU4ofnRCSZ0KdD1uuL0EZ7qIdu7JQzX5DqSm+UocyUU2RdT9OUv/DVSVEHRGCihDegwQKpPfhD1mhyrTNpvwr1exHqqqYtwyofMmO+EKCTAeyXgz9KDEsEAYDjxAyzh6unTzuVJrnKkyeMiHUelhfjdYgEfAldCR8CNyceTgqUPlyvV master@koruza.net\n")
         ak.close()
 
+        if 'mjpg-streamer' in self.packages:
+          mjpeg = open(os.path.join(configPath, "mjpg-streamer"), 'w'))
+          mjpeg.write("""
+config mjpg-streamer 'core'
+	option enabled '1'
+	option input 'uvc'
+	option output 'http'
+	option device '/dev/video0'
+	option resolution '800x600'
+	option fps '5'
+	option www '/www/webcam'
+	option port '8080'
+""")
+          mjpeg.close()
+
         if 'virtual:koruza-a' in self.packages:
           koruzaIp = '172.16.88.1'
           probeIp = '172.16.88.2'
