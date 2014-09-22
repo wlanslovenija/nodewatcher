@@ -549,7 +549,7 @@ config alias
         ak.close()
 
         if 'mjpg-streamer' in self.packages:
-          mjpeg = open(os.path.join(configPath, "mjpg-streamer"), 'w'))
+          mjpeg = open(os.path.join(configPath, "mjpg-streamer"), 'w')
           mjpeg.write("""
 config mjpg-streamer 'core'
 	option enabled '1'
