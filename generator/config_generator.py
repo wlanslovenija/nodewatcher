@@ -88,6 +88,16 @@ portLayouts = {
       2: '0t 1',
     },
   },
+
+  # TP-Link WDR4300 + KORUZA
+  'tp-wdr4300+koruza': {
+    'switch': 'switch0',
+    'vlans': {
+      1: '0t 3 4 5',
+      2: '0t 1',
+      3: '0t 2',
+    },
+  },
 }
 
 # Optional packages that should be removed when configuring a router-only node
@@ -433,9 +443,10 @@ class NodeConfig(object):
     """
     Adds packages to be installed.
     """
-    for package in args:
-      if package not in self.packages:
-        self.packages.append(package)
+    for packages in args:
+      for package in packages.split():
+        if package not in self.packages:
+          self.packages.append(package)
 
   def generate(self, directory):
     """
@@ -527,6 +538,57 @@ config alias
         vpn_ip = self.vpn['ip'],
         iface_lan = self.lanIface
       ))
+
+      if self.portLayout == 'tp-wdr4300' and 'virtual:koruza' in self.packages:
+        self.portLayout = 'tp-wdr4300+koruza'
+        self.packages.remove('virtual:koruza')
+
+        if 'virtual:koruza-a' in self.packages:
+          koruzaIp = '172.16.88.1'
+          probeIp = '172.16.88.2'
+          self.packages.remove('virtual:koruza-a')
+        elif 'virtual:koruza-b' in self.packages:
+          koruzaIp = '172.16.88.2'
+          probeIp = '172.16.88.1'
+          self.packages.remove('virtual:koruza-b')
+        else:
+          raise ValueError('One of the following packages must be selected: virtual:koruza-a, virtual:koruza-b')
+
+        f.write("""
+config interface koruza
+	option ifname eth0.3
+	option proto static
+	option ipaddr {koruza_ip}
+	option netmask 255.255.255.0
+
+config rule
+	option in 'koruza'
+	option lookup 'main'
+	option priority 999
+
+config rule
+	option dest '172.16.88.0/24'
+	option lookup 'main'
+	option priority 999
+
+""".format(koruza_ip=koruzaIp))
+
+        if 'netmeasured' in self.packages:
+          # Netmeasured configuration
+          nmd = open(os.path.join(configPath, "netmeasured"), 'w')
+          nmd.write("""
+config listener
+	option interface 'koruza'
+	option address '{koruza_ip}'
+	option port 9000
+
+config probe ping0
+	option interface 'koruza'
+	option address '{probe_ip}'
+	option port 9000
+	option interval 1000
+""".format(koruza_ip=koruzaIp, probe_ip=probeIp))
+          nmd.close()
 
       if isinstance(portLayouts.get(self.portLayout, None), dict):
         switch = portLayouts[self.portLayout]
@@ -702,7 +764,7 @@ start() {
       /sbin/wifi up
 }
 """)
-      elif self.portLayout == 'tp-wdr4300':
+      elif self.portLayout in ('tp-wdr4300', 'tp-wdr4300+koruza'):
         network_config.write("""
 config interface meshb
         option proto    static
@@ -1087,6 +1149,7 @@ config uhttpd main
         "tp-wr1043nd" : "TLWR1043",
         "tp-wr703n" : "TLWR703",
         "tp-wdr4300" : "TLWDR4300",
+        "tp-wdr4300+koruza" : "TLWDR4300",
         "tp-mr3020" : "TLMR3020",
         "tp-mr3040" : "TLMR3040",
 
@@ -1110,6 +1173,7 @@ config uhttpd main
         "tp-wr703n" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm", "telemetryd"],
         "tp-wdr4300" : ["kmod-usb-serial", "kmod-usb-acm"],
+        "tp-wdr4300+koruza" : ["kmod-usb-serial", "kmod-usb-acm"],
       }
       pkgs = " ".join(pkg_map.get(self.portLayout, []) + self.packages)
 
