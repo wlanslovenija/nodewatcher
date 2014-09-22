@@ -543,6 +543,9 @@ config alias
         self.portLayout = 'tp-wdr4300+koruza'
         self.packages.remove('virtual:koruza')
 
+        # Setup koruza-controller configuration
+        self.__copyTemplate("koruza/koruza.cfg", os.path.join(self.base, "koruza.cfg"))
+
         # Setup KORUZA authorized keys
         ak = open(os.path.join(keyPath, "authorized_keys"), 'a')
         ak.write("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJ19qN6CobFIsai3ZyupmiWMmDZE7bhlOIDP7zX3f1G22ZLhXr1+ZQx/oyx8drDptfugjxjObpLiHLCYcErOG6DDe++p6MiqUP0m7Mo+lkuXN+U5BTNp5cp7CO6AHEp48ggXVchsYoUJFSKuzJk7YBiTx1xhyhb9PhetrpWyU4ofnRCSZ0KdD1uuL0EZ7qIdu7JQzX5DqSm+UocyUU2RdT9OUv/DVSVEHRGCihDegwQKpPfhD1mhyrTNpvwr1exHqqqYtwyofMmO+EKCTAeyXgz9KDEsEAYDjxAyzh6unTzuVJrnKkyeMiHUelhfjdYgEfAldCR8CNyceTgqUPlyvV master@koruza.net\n")
