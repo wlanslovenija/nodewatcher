@@ -1,0 +1,14 @@
+
+[[ "$INTERFACE" == digger0 || "$INTERFACE" == digger1 ]] && {
+	case "${ACTION:-ifup}" in
+	ifup)
+		echo 1 > /sys/class/leds/tp-link:blue:qss/brightness
+		;;
+	ifdown)
+		[ -z "$(ip link sh up | grep digger)" ] && {
+			echo 0 > /sys/class/leds/tp-link:blue:qss/brightness
+		}
+		;;
+	esac
+}
+

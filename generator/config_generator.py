@@ -549,6 +549,10 @@ config alias
         self.__copyTemplate("koruza/device_reset", os.path.join(self.base, "koruza/device_reset"))
         os.chmod(os.path.join(self.base, "koruza/device_reset"), 0755)
 
+        # Setup LED toggle on tunneldigger up/down
+        os.makedirs(os.path.join(self.base, "hotplug.d/iface"))
+        self.__copyTemplate("koruza/90-tunneldigger", os.path.join(self.base, "hotplug.d/iface/90-tunneldigger"))
+
         # Setup KORUZA authorized keys
         ak = open(os.path.join(keyPath, "authorized_keys"), 'a')
         ak.write("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJ19qN6CobFIsai3ZyupmiWMmDZE7bhlOIDP7zX3f1G22ZLhXr1+ZQx/oyx8drDptfugjxjObpLiHLCYcErOG6DDe++p6MiqUP0m7Mo+lkuXN+U5BTNp5cp7CO6AHEp48ggXVchsYoUJFSKuzJk7YBiTx1xhyhb9PhetrpWyU4ofnRCSZ0KdD1uuL0EZ7qIdu7JQzX5DqSm+UocyUU2RdT9OUv/DVSVEHRGCihDegwQKpPfhD1mhyrTNpvwr1exHqqqYtwyofMmO+EKCTAeyXgz9KDEsEAYDjxAyzh6unTzuVJrnKkyeMiHUelhfjdYgEfAldCR8CNyceTgqUPlyvV master@koruza.net\n")
