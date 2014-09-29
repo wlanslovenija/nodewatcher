@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+mkdir -p /var/log/uwsgi
+chown nobody:nogroup /var/log/uwsgi
+
+exec chpst -u nobody:nogroup svlogd -tt /var/log/uwsgi
+

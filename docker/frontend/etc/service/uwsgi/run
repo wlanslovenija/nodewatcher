@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+mkdir -p /media
+chown -R www-data:www-data /media
+
+mkdir -p /static
+cd /code
+python manage.py collectstatic --noinput
+
+exec /usr/bin/uwsgi --plugin python --ini /etc/uwsgi/nodewatcher.ini 2>&1
+

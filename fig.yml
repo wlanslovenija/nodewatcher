@@ -12,7 +12,8 @@ tokumx:
     privileged: true
 generator:
     build: .
-    command: celery worker -A nodewatcher -l info -Q generator --autoreload
+    command: -c "celery worker -A nodewatcher -l info -Q generator --autoreload"
+    entrypoint: /bin/sh
     environment:
         # Allow celery to run under the root user in order for it to have access
         C_FORCE_ROOT: true
@@ -23,7 +24,8 @@ generator:
         - tokumx
 web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: -c "python manage.py runserver 0.0.0.0:8000"
+    entrypoint: /bin/sh
     volumes:
         - .:/code
     ports:
