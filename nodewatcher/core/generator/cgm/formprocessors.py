@@ -15,7 +15,7 @@ class NodeCgmValidator(formprocessors.RegistryFormProcessor):
         """
         Validates node's firmware configuration.
 
-        :param node: node to validate the configuration for
+        :param node: Node to validate the configuration for
         """
 
         try:

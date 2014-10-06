@@ -294,6 +294,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.sitemaps',
+    'django.contrib.admin',
     'django.contrib.gis',
 
     'tastypie',
@@ -306,6 +307,7 @@ INSTALLED_APPS = (
     'timezone_field',
     'overextends',
     'json_field',
+    'uuidfield',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -405,7 +407,6 @@ CELERY_QUEUES = {
         'exchange': 'default',
         'binding_key': 'default',
     },
-    # NOTE: Only one worker can run for processing the 'generator' jobs!
     'generator': {
         'exchange': 'generator',
         'binding_key': 'generator',
@@ -413,7 +414,7 @@ CELERY_QUEUES = {
 }
 
 CELERY_ROUTES = {
-    'core.generator.cgm.tasks.background_build': {
+    'nodewatcher.core.generator.cgm.tasks.background_build': {
         'queue': 'generator',
     },
 }
@@ -504,21 +505,6 @@ MEASUREMENT_SOURCE_NODE = ''
 
 # Storage for generated firmware images.
 GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'
-GENERATOR_BUILDERS = {
-    'openwrt': {
-        # This is the directory that contains image builders for all platforms. Directory
-        # should contain subdirectories for each version specified below.
-        'directory': os.path.abspath(os.path.join(settings_dir, '..', 'builder', 'openwrt')),
-        # Keys should be the same as subdirectories. Each subdirectory should contain
-        # multiple folders, one for each CPU platform (for example ar71xx). These versions
-        # are saved in node configuration, so take this into account when modifying them
-        # (removing versions may cause firmware generation for some nodes to fail).
-        'versions': {
-            'stable': ('stable', _("Stable")),
-            'experimental': ('experimental', _("Experimental"))
-        }
-    }
-}
 
 # Registry.
 REGISTRY_RULES_MODULES = {

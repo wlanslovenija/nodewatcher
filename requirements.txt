@@ -42,3 +42,6 @@ ujson==1.33
 wsgiref==0.1.2
 django-timezone-field==1.0
 django-json-field==0.5.5
+django-uuidfield==0.5.0
+requests==2.2.1
+paramiko==1.15.1

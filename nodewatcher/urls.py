@@ -1,8 +1,11 @@
 from django.conf import settings, urls
 from django.conf.urls import static
+from django.contrib import admin
 
 # Importing nodewatcher.core.frontend.urls auto-discovers frontend components
 from nodewatcher.core.frontend import api, urls as frontend_urls
+
+admin.autodiscover()
 
 urlpatterns = urls.patterns(
     '',
@@ -12,6 +15,9 @@ urlpatterns = urls.patterns(
 
     # API
     urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
+
+    # Django admin interface
+    urls.url(r'^admin/', urls.include(admin.site.urls)),
 
     # Frontend
     urls.url(r'^', urls.include(frontend_urls)),

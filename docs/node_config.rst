@@ -24,6 +24,8 @@ The following table represents the node configuration registry schema that is bu
 |                                      |       | platform         | | registered choice              |
 |                                      |       |                  | | (see :ref:`cgm-platforms`)     |
 +--------------------------------------+-------+------------------+----------------------------------+
+|                                      |       | build_channel    | foreign key                      |
++--------------------------------------+-------+------------------+----------------------------------+
 |                                      |       | version          | foreign key                      |
 +-------------------------+------------+-------+------------------+----------------------------------+
 | core.type               | no         |                                                             |

@@ -1,70 +1,39 @@
 import os
-import shutil
-import subprocess
-import tempfile
-
-from django.conf import settings
-
-from nodewatcher.core.generator.cgm import base as cgm_base
 
 
-def build_image(cfg, arch, version, profile, packages):
+def build_image(result, profile):
     """
     Spawns the builder process for the specified firmware image.
 
-    :param cfg: Generated configuration (per file format)
-    :param arch: Device OpenWRT architecture
-    :param version: Builder version
+    :param result: Destination build result
     :param profile: Device OpenWRT profile
-    :param packages: A list of OpenWRT packages to install
     :return: A list of output firmware files
     """
 
-    # Allocate a temporary directory
-    temp_path = tempfile.mkdtemp()
+    cfg = result.config
 
-    try:
+    with result.builder.connect() as builder:
+        temp_path = builder.create_tempdir()
+
         # Prepare configuration files
         cfg_path = os.path.join(temp_path, 'etc', 'config')
-        os.makedirs(cfg_path)
         for fname, content in cfg.items():
-            cfile = open(os.path.join(cfg_path, fname), 'w')
-            cfile.write(content)
-            cfile.close()
-
-        # Change the working directory to the proper architecture path
-        try:
-            arch_path = os.path.join(
-                settings.GENERATOR_BUILDERS['openwrt']['directory'],
-                settings.GENERATOR_BUILDERS['openwrt']['versions'][version][0],
-                arch
-            )
-            os.chdir(arch_path)
-        except KeyError:
-            # Specified version or OpenWRT platform not configured
-            raise cgm_base.BuildError
-        except OSError:
-            # Specified builder directory does not exist
-            raise cgm_base.BuildError
+            if fname.startswith('_'):
+                continue
+            builder.write_file(os.path.join(cfg_path, fname), content)
 
         # Run the build system and wait for its completion
-        try:
-            subprocess.check_call([
-                'make', 'image',
-                'PROFILE=%s' % profile["name"],
-                'FILES=%s' % temp_path,
-                'PACKAGES=%s' % " ".join(packages)
-            ])
-        except subprocess.CalledProcessError:
-            raise cgm_base.BuildError
+        builder.call(
+            'make', 'image',
+            'PROFILE=%s' % profile["name"],
+            'FILES=%s' % temp_path,
+            'PACKAGES=%s' % " ".join(cfg['_packages'])
+        )
 
         # Collect the output files and return them
         fw_files = [
-            os.path.join(arch_path, 'bin', arch, fw_file)
+            (fw_file, builder.read_result_file(os.path.join('bin', result.builder.architecture, fw_file)))
             for fw_file in profile['files']
         ]
 
         return fw_files
-    finally:
-        # Remove the temporary directory
-        shutil.rmtree(temp_path)

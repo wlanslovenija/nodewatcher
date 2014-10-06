@@ -1,3 +1,5 @@
+
+
 class RegistryFormProcessor(object):
     """
     A registry form processor can be used to hook into the form validation
@@ -10,12 +12,14 @@ class RegistryFormProcessor(object):
     order weight specified. Raising a RegistryValidationError in post-processing
     will rollback any changes performed.
     """
+
     def preprocess(self, root):
         """
         Called before user forms are generated.
 
-        :param root: registration point root instance
+        :param root: Registration point root instance
         """
+
         pass
 
     def postprocess(self, root):
@@ -25,6 +29,7 @@ class RegistryFormProcessor(object):
         RegistryValidationError will rollback any changes performed and
         will stop any further processing.
 
-        :param root: registration point root instance
+        :param root: Registration point root instance
         """
+
         pass

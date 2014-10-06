@@ -180,7 +180,8 @@ class ModelSelectorKeyField(models.ForeignKey):
         Class constructor.
         """
 
-        kwargs['on_delete'] = models.PROTECT
+        if 'on_delete' not in kwargs:
+            kwargs['on_delete'] = models.PROTECT
         super(ModelSelectorKeyField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):

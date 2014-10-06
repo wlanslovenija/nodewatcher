@@ -235,6 +235,18 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         super(UCIConfiguration, self).__init__()
         self._roots = {}
 
+    def get_build_config(self):
+        """
+        Returns a build configuration which must be JSON-serializable. This
+        configuration will be passed to the backend builder function and must
+        contain anything that the builder will need to configure the generated
+        firmware.
+        """
+
+        result = self.format(fmt=UCIFormat.FILES)
+        result.update(super(UCIConfiguration, self).get_build_config())
+        return result
+
     def __getattr__(self, root):
         """
         Returns the desired UCI root (config file).
@@ -273,24 +285,20 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 
     config_class = UCIConfiguration
 
-    def build(self, node, cfg):
+    def build(self, result):
         """
         Builds the firmware using a previously generated and properly
         formatted configuration.
 
-        :param node: Node instance to build the firmware for
-        :param cfg: Generated configuration (platform-dependent)
+        :param result: Destination build result
         :return: A list of generated firmware files
         """
 
-        # Extract the device descriptor to get architecture and profile
-        device = node.config.core.general().get_device()
+        # Extract the device descriptor to get the profile
+        device = result.node.config.core.general().get_device()
         profile = device.profiles['openwrt']
-        version = node.config.core.general().version
 
-        # Format UCI configuration and start the build process
-        formatted_cfg = cfg.format(fmt=UCIFormat.FILES)
-        return openwrt_builder.build_image(formatted_cfg, device.architecture, version, profile, cfg.packages)
+        return openwrt_builder.build_image(result, profile)
 
 cgm_base.register_platform('openwrt', _("OpenWRT"), PlatformOpenWRT())
 
@@ -318,11 +326,6 @@ def general(node, cfg):
     # Setup base packages to be installed
     # TODO: This should probably not be hardcoded (or at least moved to modules)
     cfg.packages.update([
-        'nodewatcher-agent',
-        'nodewatcher-agent-mod-general',
-        'nodewatcher-agent-mod-resources',
-        'nodewatcher-agent-mod-interfaces',
-        'nodewatcher-agent-mod-wireless',
         'nodewatcher-watchdog'
     ])
 

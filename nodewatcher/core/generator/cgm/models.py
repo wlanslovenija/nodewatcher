@@ -7,6 +7,7 @@ from django.core import exceptions
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from .. import models as generator_models
 from ... import models as core_models
 from ...allocation.ip import models as ip_models
 from ...registry import fields as registry_fields, registration, permissions
@@ -24,7 +25,18 @@ class CgmGeneralConfig(core_models.GeneralConfig):
 
     platform = registry_fields.SelectorKeyField('node.config', 'core.general#platform', blank=True)
     router = registry_fields.SelectorKeyField('node.config', 'core.general#router', blank=True)
-    version = registry_fields.SelectorKeyField('node.config', 'core.general#version', blank=True)
+    build_channel = registry_fields.ModelSelectorKeyField(
+        generator_models.BuildChannel,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    version = registry_fields.ModelSelectorKeyField(
+        generator_models.BuildVersion,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     class RegistryMeta(core_models.GeneralConfig.RegistryMeta):
         registry_name = _("CGM Configuration")
@@ -36,18 +48,6 @@ class CgmGeneralConfig(core_models.GeneralConfig):
         """
 
         return cgm_base.get_platform(self.platform).get_device(self.router)
-
-# Register all configured versions
-for platform, cfg in settings.GENERATOR_BUILDERS.items():
-    for version, (builder, name) in cfg['versions'].items():
-        registration.point('node.config').register_choice(
-            'core.general#version',
-            registration.Choice(
-                version,
-                name,
-                limited_to=('core.general#platform', platform),
-            )
-        )
 
 registration.point('node.config').register_item(CgmGeneralConfig)
 
