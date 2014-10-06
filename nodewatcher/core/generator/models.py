@@ -274,3 +274,13 @@ class BuildResultFile(models.Model):
 
     def __repr__(self):
         return '<BuildResultFile for result \'%s\'>' % self.result_id
+
+
+@dispatch.receiver(django_signals.post_delete, sender=BuildResultFile)
+def build_result_removed(sender, instance, **kwargs):
+    """
+    Removes any result files from the storage backend.
+    """
+
+    if instance.file:
+        instance.file.delete(save=False)
