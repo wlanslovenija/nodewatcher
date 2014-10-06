@@ -2,7 +2,6 @@ import hashlib
 import random
 import string
 
-from django.conf import settings
 from django.core import exceptions
 from django.db import models
 from django.utils.translation import ugettext as _
