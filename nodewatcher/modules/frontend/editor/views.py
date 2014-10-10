@@ -80,6 +80,7 @@ class NewNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailV
                 shortcuts.assign_perm('change_node', request.user, self.object)
                 shortcuts.assign_perm('delete_node', request.user, self.object)
                 shortcuts.assign_perm('reset_node', request.user, self.object)
+                signals.post_create_node.send(sender=self, request=request, node=self.object)
                 transaction.savepoint_commit(sid)
                 return self.form_valid()
             else:

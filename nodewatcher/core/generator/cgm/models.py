@@ -2,9 +2,12 @@ import hashlib
 import random
 import string
 
+from django import dispatch
 from django.core import exceptions
 from django.db import models
 from django.utils.translation import ugettext as _
+
+from guardian import shortcuts
 
 from .. import models as generator_models
 from ... import models as core_models
@@ -14,7 +17,22 @@ from ...registry import fields as registry_fields, registration, permissions
 from . import base as cgm_base
 
 # Register a new firmware-generating permission
-permissions.register(core_models.Node, 'can_generate_firmware', _("Can generate firmware"))
+permissions.register(core_models.Node, 'generate_firmware', _("Can generate firmware"))
+
+# In case we have the frontend module installed, we also subscribe to its
+# node created signal that gets called when a node is created via the editor
+try:
+    from nodewatcher.modules.frontend.editor import signals as editor_signals
+
+    @dispatch.receiver(editor_signals.post_create_node)
+    def cgm_node_created(sender, request, node, **kwargs):
+        """
+        Assign generate_firmware permission to user that has created the node.
+        """
+
+        shortcuts.assign_perm('generate_firmware', request.user, node)
+except ImportError:
+    pass
 
 
 class CgmGeneralConfig(core_models.GeneralConfig):

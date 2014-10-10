@@ -11,12 +11,21 @@ class Migration(DataMigration):
     )
 
     def forwards(self, orm):
+        names = {
+            'reset_node': 'Can reset node',
+            'generate_firmware': 'Can generate firmware',
+        }
+
         # Assign change and remove permissions to node maintainers
         for node in orm['nodes.Node'].objects.filter(owner__isnull = False):
-            for perm in ('change_node', 'delete_node', 'reset_node'):
+            for perm in ('change_node', 'delete_node', 'reset_node', 'generate_firmware'):
                 content_type = orm['contenttypes.ContentType'].objects.get(app_label = 'nodes', model = 'node')
-                if perm == 'reset_node':
-                    permission, created = orm['auth.Permission'].objects.get_or_create(content_type = content_type, codename = 'reset_node', name = "Can reset node")
+                if perm in ('reset_node', 'generate_firmware'):
+                    permission, created = orm['auth.Permission'].objects.get_or_create(
+                        content_type=content_type,
+                        codename=perm,
+                        name=names[perm],
+                    )
                 else:
                     permission = orm['auth.Permission'].objects.get(content_type = content_type, codename = perm)
 

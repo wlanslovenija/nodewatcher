@@ -1,6 +1,9 @@
 from django import dispatch
 
 
+# Called when node is created via the user interface.
+post_create_node = dispatch.Signal(providing_args=['request', 'node'])
+
 # Called when node is reset.
 pre_reset_node = dispatch.Signal(providing_args=['request', 'node'])
 reset_node = dispatch.Signal(providing_args=['request', 'node'])
