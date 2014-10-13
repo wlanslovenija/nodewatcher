@@ -1,3 +1,4 @@
+import hashlib
 import io
 import os
 
@@ -72,6 +73,8 @@ def background_build(self, result_uuid):
                 len(fw_file),
                 None
             ),
+            checksum_md5=hashlib.md5(fw_file).hexdigest(),
+            checksum_sha256=hashlib.sha256(fw_file).hexdigest(),
         )
         r_file.save()
 

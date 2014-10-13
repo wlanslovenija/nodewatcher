@@ -1,0 +1,56 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n registry path_tags %}
+
+    {% setcontext as title %}{% blocktrans with build_id=result.pk%}Build {{ build_id }}{% endblocktrans %}{% endsetcontext %}
+    {% setcontext as heading %}{% spaceless %}
+        {% blocktrans with build_id=result.pk %}Build {{ build_id }}{% endblocktrans %}
+    {% endspaceless %}{% endsetcontext %}
+{% endcontextblock %}
+
+{% block content %}
+    <dl class="build-properties">
+        {% url "DisplayComponent:node" result.node.pk as node_url %}
+        <dt>{% trans "Node" %}</dt>
+        <dd><a href="{{ node_url }}">{% registry_get result.node "config" "core.general" "name" %}</a></dd>
+
+        <dt>{% trans "Created" %}</dt>
+        <dd>{{ result.created }}</dd>
+
+        <dt>{% trans "Last updated" %}</dt>
+        <dd>{{ result.last_modified }}</dd>
+
+        <dt>{% trans "Build status" %}</dt>
+        <dd>{{ result.get_status_display }}</dd>
+
+        <dt>{% trans "Build channel" %}</dt>
+        <dd>{{ result.build_channel }}</dd>
+
+        <dt>{% trans "Builder version" %}</dt>
+        <dd>{{ result.builder.version }}</dd>
+
+        <dt>{% trans "Builder ID" %}</dt>
+        <dd>{{ result.builder.pk }}</dd>
+
+        <dt>{% trans "Build log" %}</dt>
+        <dd>{{ result.build_log|default:_("N/A") }}</dd>
+
+        <dt>{% trans "Firmware files" %}</dt>
+        <dd>
+            {% if result.files.all %}
+            <ul>
+                {% for fo in result.files.all %}
+                <li>
+                    <a href="{{ fo.file.url }}">{{ fo.file|basename }}</a><br/>
+                    MD5: {{ fo.checksum_md5 }}<br/>
+                    SHA256: {{ fo.checksum_sha256 }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            {% trans "N/A" %}
+            {% endif %}
+        </dd>
+    </dl>
+{% endblock %}

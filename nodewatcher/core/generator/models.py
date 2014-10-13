@@ -271,6 +271,8 @@ class BuildResultFile(models.Model):
         upload_to=lambda r, filename: 'generator/%s/%s' % (r.result.uuid, filename),
         max_length=200,
     )
+    checksum_md5 = models.CharField(max_length=32)
+    checksum_sha256 = models.CharField(max_length=64)
 
     def __repr__(self):
         return '<BuildResultFile for result \'%s\'>' % self.result_id

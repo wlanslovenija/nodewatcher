@@ -59,5 +59,6 @@ class GenerateFirmware(mixins.PermissionRequiredMixin,
 
 
 class ViewBuild(generic.DetailView):
-    template_name = 'nodes/view_build.html'
+    template_name = 'generator/view_build.html'
     model = generator_models.BuildResult
+    context_object_name = 'result'
