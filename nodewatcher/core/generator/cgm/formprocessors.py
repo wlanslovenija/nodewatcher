@@ -19,6 +19,6 @@ class NodeCgmValidator(formprocessors.RegistryFormProcessor):
         """
 
         try:
-            cgm_base.generate_config(node, only_validate=True)
+            cgm_base.generate_firmware(node, only_validate=True)
         except cgm_base.ValidationError, e:
             raise registry_forms.RegistryValidationError(*e.args)

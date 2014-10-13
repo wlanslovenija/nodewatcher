@@ -1,0 +1,23 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n %}
+
+    {% setcontext as title %}{% blocktrans %}Generate Firmware for Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
+    {% setcontext as heading %}{% spaceless %}
+        {% url "DisplayComponent:node" node.pk as node_url %}
+        {% blocktrans %}Generate Firmware for Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endspaceless %}{% endsetcontext %}
+{% endcontextblock %}
+
+{% block content %}
+    {% block node_snippet_wrapper %}
+        {% include "nodes/generate_firmware_snippet.html" %}
+    {% endblock node_snippet_wrapper %}
+
+    {% block generate_firmware_form_wrapper %}
+        {% with form_submit=_("Generate") %}
+            {% include "generate_firmware_form.html" %}
+        {% endwith %}
+    {% endblock generate_firmware_form_wrapper %}
+{% endblock %}

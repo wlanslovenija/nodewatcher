@@ -103,7 +103,7 @@ class PlatformBase(object):
         :return: New build result instance
         """
 
-        build_channel, builder = self.get_builder(node)
+        build_channel, builder = self.validate_build(node, cfg)
         result = generator_models.BuildResult(
             user=user,
             node=node,
@@ -118,6 +118,18 @@ class PlatformBase(object):
         tasks.background_build.delay(result.uuid)
 
         return result
+
+    def validate_build(self, node, cfg):
+        """
+        Validates the build configuration.
+
+        :param node: Node instance to generate the firmware for
+        :param cfg: Generated configuration (platform-dependent)
+        """
+
+        build_channel, builder = self.get_builder(node)
+
+        return build_channel, builder
 
     def get_builder(self, node):
         """
@@ -287,7 +299,7 @@ def iterate_devices():
             yield device
 
 
-def generate_config(node, user=None, only_validate=False):
+def generate_firmware(node, user=None, only_validate=False):
     """
     Generates configuration and/or firmware for the specified node.
 
@@ -308,5 +320,8 @@ def generate_config(node, user=None, only_validate=False):
             raise ValueError('To build firmware images, the \'user\' argument must be specified!')
 
         return platform.defer_build(user, node, cfg)
+    else:
+        # Ensure that the proper builders are available for building this firmware
+        platform.validate_build(node, cfg)
 
     return cfg
