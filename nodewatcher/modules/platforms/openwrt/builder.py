@@ -23,7 +23,7 @@ def build_image(result, profile):
             builder.write_file(os.path.join(cfg_path, fname), content)
 
         # Run the build system and wait for its completion
-        builder.call(
+        result.build_log = builder.call(
             'make', 'image',
             'PROFILE=%s' % profile["name"],
             'FILES=%s' % temp_path,

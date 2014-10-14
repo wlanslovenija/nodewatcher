@@ -33,9 +33,6 @@
         <dt>{% trans "Builder ID" %}</dt>
         <dd>{{ result.builder.pk }}</dd>
 
-        <dt>{% trans "Build log" %}</dt>
-        <dd>{{ result.build_log|default:_("N/A") }}</dd>
-
         <dt>{% trans "Firmware files" %}</dt>
         <dd>
             {% if result.files.all %}
@@ -52,5 +49,8 @@
             {% trans "N/A" %}
             {% endif %}
         </dd>
+
+        <dt>{% trans "Build log" %}</dt>
+        <dd class="build-log">{{ result.build_log|default:_("N/A") }}</dd>
     </dl>
 {% endblock %}

@@ -121,6 +121,8 @@ class BuilderConnection(object):
 
             if stdout.channel.recv_exit_status() != 0:
                 raise cgm_exceptions.BuildError(build_log)
+
+            return build_log
         except paramiko.SSHException:
             raise cgm_exceptions.BuildError('Unknown error on builder.')
 
