@@ -184,6 +184,17 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         sorted_queryset._nonfiltered_count = nonfiltered_count
         return sorted_queryset
 
+    def authorized_read_list(self, object_list, bundle):
+        # Since authorization filter is applied after the generic filters have been
+        # applied, we need to account for the difference that the auth filter causes
+        nonfiltered_count = object_list._nonfiltered_count
+        count = object_list.count()
+        filtered_queryset = super(BaseResource, self).authorized_read_list(object_list, bundle)
+        delta = count - filtered_queryset.count()
+        filtered_queryset._nonfiltered_count = nonfiltered_count - delta
+
+        return filtered_queryset
+
     # A hook so that queryset can be modified before count for _nonfiltered_count is taken
     # (for filtering which should not be exposed through dataTables)
     def _before_apply_filters(self, request, queryset):
