@@ -25,7 +25,7 @@ class UserProfileAndSettings(django_models.Model):
     This class represents an user profile and settings.
     """
 
-    user = django_models.OneToOneField(auth_models.User, editable=False)
+    user = django_models.OneToOneField(auth_models.User, editable=False, related_name='profile')
 
     phone_number = phonenumber_fields.PhoneNumberField(_('phone number'), help_text=_('Please enter your phone number in international format (e.g. +38651654321) for use in emergency. It will be visible only to network administrators.'), null=True)
     country = geographic.CountryField(_('country'), blank=True, help_text=_('Where are you from? It will be public.'))

@@ -281,6 +281,9 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.statistics',
     'nodewatcher.modules.frontend.topology',
 
+    # Importers for external data.
+    'nodewatcher.modules.importer.nw2',
+
     # Accounts support.
     'nodewatcher.extra.accounts',
 

@@ -45,7 +45,7 @@ class IpAddressAllocatorFormMixin(object):
 
         # If user has sufficient permissions, enable manual entry
         try:
-            if not request.user.has_perm('can_allocate_manually', item.pool):
+            if not request.user.has_perm('manual_allocation', item.pool):
                 del self.fields['subnet_hint']
         except pool_models.IpPool.DoesNotExist:
             del self.fields['subnet_hint']

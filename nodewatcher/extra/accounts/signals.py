@@ -28,7 +28,7 @@ def set_language(sender, request, user, **kwargs):
     Sets Django language preference based on user profile.
     """
 
-    request.session['django_language'] = user.get_profile().language
+    request.session['django_language'] = user.profile.language
 
 user_login.connect(set_language, dispatch_uid=__name__ + '.set_language')
 

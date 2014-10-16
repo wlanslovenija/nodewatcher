@@ -1,4 +1,6 @@
+from django import dispatch
 from django.db import models
+from django.db.models import signals as django_signals
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
@@ -47,6 +49,9 @@ class IpPool(allocation_models.PoolBase):
 
         self.ip_subnet = '%s/%s' % (self.network, self.prefix_length)
         super(IpPool, self).save(**kwargs)
+
+    def __contains__(self, network):
+        return network in self.to_ip_network()
 
     def _split_buddy(self):
         """
@@ -270,7 +275,7 @@ class IpPool(allocation_models.PoolBase):
         return pool
 
 # Register a new manual pool allocation permission
-permissions.register(IpPool, 'can_allocate_manually', "Can allocate manually")
+permissions.register(IpPool, 'manual_allocation', "Can allocate manually")
 
 
 class IpAddressAllocator(allocation_models.AddressAllocator):
@@ -401,3 +406,13 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         """
 
         return str(self.allocation.to_ip_network()[1])
+
+
+@dispatch.receiver(django_signals.post_delete, sender=IpAddressAllocator)
+def allocator_removed(sender, instance, **kwargs):
+    """
+    Ensure that allocations are automatically freed.
+    """
+
+    if instance.allocation is not None:
+        instance.allocation.free()

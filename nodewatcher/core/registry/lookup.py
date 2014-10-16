@@ -277,6 +277,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             clone.query.join(
                 (self.model._meta.db_table, toplevel._meta.db_table, ((self.model._meta.pk.column, 'root_id'),)),
                 join_field=RegistryJoinRelation(),
+                nullable=True,
             )
 
             if toplevel != dst_model:
@@ -284,6 +285,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 clone.query.join(
                     (toplevel._meta.db_table, dst_model._meta.db_table, ((toplevel._meta.pk.column, dst_model._meta.pk.column),)),
                     join_field=RegistryJoinRelation(),
+                    nullable=True,
                 )
 
             if dst_related is not None:
@@ -291,6 +293,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 clone.query.join(
                     (dst_model._meta.db_table, dst_field_model._meta.db_table, ((dst_field.column, dst_field_model._meta.pk.column),)),
                     join_field=RegistryJoinRelation(),
+                    nullable=True,
                 )
 
         return clone

@@ -36,7 +36,7 @@ def account(request):
 
     if request.method == 'POST':
         stored_user = copy.copy(request.user)
-        form = forms.AccountChangeForm(request.POST, instance=[request.user, request.user.get_profile()])
+        form = forms.AccountChangeForm(request.POST, instance=[request.user, request.user.profile])
         if form.is_valid():
             objs = form.save()
             messages.success(request, _("Your account has been successfully updated."), fail_silently=True)
@@ -67,7 +67,7 @@ def account(request):
                 # Invalidates profile cache
                 delattr(request.user, '_profile_cache')
     else:
-        form = forms.AccountChangeForm(instance=[request.user, request.user.get_profile()])
+        form = forms.AccountChangeForm(instance=[request.user, request.user.profile])
 
     return shortcuts.render_to_response("users/account.html", {
         'form': form,

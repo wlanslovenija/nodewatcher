@@ -1,25 +1,26 @@
-# Here we augment South migrations
 
-from south import signals as south_signals
+from django import dispatch
+from django.apps import apps
+from django.db.models import signals as django_signals
 
 from nodewatcher.core.generator.cgm import base as cgm_base
 from nodewatcher.utils import loader
 
 from .. import models as antennas_models
 
-_core_migrated = False
 
-
+@dispatch.receiver(
+    django_signals.post_migrate,
+    dispatch_uid='nodewatcher.modules.equipment.antennas.management.install_antenna_fixtures',
+)
 def install_antenna_fixtures(sender, **kwargs):
     """
     Installs fixtures for all registered internal antennas.
     """
 
-    global _core_migrated
-    if kwargs['app'] == 'core':
-        _core_migrated = True
-
-    if not _core_migrated:
+    try:
+        apps.get_model('antennas', 'Antenna')
+    except LookupError:
         return
 
     # Ensure that all CGMs are registred
@@ -28,9 +29,15 @@ def install_antenna_fixtures(sender, **kwargs):
     for device in cgm_base.iterate_devices():
         for antenna in device.antennas:
             try:
-                mdl = antennas_models.Antenna.objects.get(internal_for=device.identifier, internal_id=antenna.identifier)
+                mdl = antennas_models.Antenna.objects.get(
+                    internal_for=device.identifier,
+                    internal_id=antenna.identifier,
+                )
             except antennas_models.Antenna.DoesNotExist:
-                mdl = antennas_models.Antenna(internal_for=device.identifier, internal_id=antenna.identifier)
+                mdl = antennas_models.Antenna(
+                    internal_for=device.identifier,
+                    internal_id=antenna.identifier,
+                )
 
             # Update antenna model
             mdl.name = device.name
@@ -41,5 +48,3 @@ def install_antenna_fixtures(sender, **kwargs):
             mdl.angle_vertical = antenna.angle_vertical
             mdl.gain = antenna.gain
             mdl.save()
-
-south_signals.post_migrate.connect(install_antenna_fixtures)
