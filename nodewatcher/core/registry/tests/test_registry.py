@@ -1,7 +1,7 @@
 from django import test as django_test
+from django.apps import apps
 from django.conf import settings
 from django.core import management
-from django.db import models as django_models
 from django.test import utils
 
 from .registry_tests import models
@@ -22,7 +22,7 @@ class RegistryTestCase(django_test.TransactionTestCase):
         #registration.remove_point('thing.second')
 
     def setUp(self):
-        django_models.loading.cache.loaded = False
+        apps.clear_cache()
         management.call_command('syncdb', verbosity=0, interactive=False, load_initial_data=False)
 
     def tearDown(self):

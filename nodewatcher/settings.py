@@ -299,9 +299,7 @@ INSTALLED_APPS = (
 
     'tastypie',
     'django_datastream',
-    'djcelery',
     'guardian',
-    'south',
     'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
     'missing',
     'timezone_field',

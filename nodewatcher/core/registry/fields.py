@@ -11,8 +11,6 @@ from django.forms import fields as form_fields, widgets
 from django.utils import text, functional
 from django.utils.translation import ugettext_lazy as _
 
-import south.modelsinspector
-
 from ...utils import ipaddr
 
 from . import registration, models as registry_models
@@ -70,6 +68,11 @@ class NullBooleanChoiceField(models.NullBooleanField):
         self.enum_id = enum_id
         super(NullBooleanChoiceField, self).__init__(*args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(NullBooleanChoiceField, self).deconstruct()
+        args = [self.regpoint, self.enum_id] + args
+        return name, path, args, kwargs
+
     def contribute_to_class(self, cls, name, virtual_only=False):
         """
         Augments the containing class.
@@ -113,6 +116,11 @@ class SelectorKeyField(models.CharField):
         kwargs['max_length'] = 50
         self._rp_choices = kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id).field_tuples()
         super(SelectorKeyField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(SelectorKeyField, self).deconstruct()
+        args = [self.regpoint, self.enum_id] + args
+        return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         """
@@ -293,6 +301,13 @@ class MACAddressField(models.Field):
         kwargs['max_length'] = 17
         super(MACAddressField, self).__init__(*args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(MACAddressField, self).deconstruct()
+        if self.auto_add is not False:
+            kwargs['auto_add'] = self.auto_add
+            del kwargs['editable']
+        return name, path, args, kwargs
+
     def pre_save(self, model_instance, add):
         """
         Automatically generate a virtual MAC address when requested.
@@ -351,6 +366,14 @@ class IPAddressField(models.Field):
         self.subnet_required = subnet_required
         self.host_required = host_required
         super(IPAddressField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(IPAddressField, self).deconstruct()
+        if self.subnet_required is not False:
+            kwargs['subnet_required'] = self.subnet_required
+        if self.host_required is not False:
+            kwargs['host_required'] = self.host_required
+        return name, path, args, kwargs
 
     def db_type(self, connection):
         """
@@ -610,19 +633,23 @@ class RegistryProxySingleDescriptor(object):
         db = django_db.router.db_for_read(self.related, **db_hints)
         return self.related._default_manager.using(db)
 
-    def get_prefetch_queryset(self, instances):
+    def get_prefetch_queryset(self, instances, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset().all()
+        queryset._add_hints(instance=instances[0])
+
         rel_field = self.related._meta.get_field('root')
         rel_obj_attr = operator.attrgetter(rel_field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        qs = self.get_queryset(instance=instances[0]).filter(root__in=instances)
+        queryset = queryset.filter(root__in=instances)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = rel_field.get_cache_name()
-        for rel_obj in qs:
+        for rel_obj in queryset:
             instance = instances_dict[rel_obj_attr(rel_obj)]
             setattr(rel_obj, rel_obj_cache_name, instance)
-        return qs, rel_obj_attr, instance_attr, True, self.cache_name
+        return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type):
         if instance is None:
@@ -654,48 +681,3 @@ class RegistryRelationField(models.Field):
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(RegistryRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
         setattr(cls, name, RegistryProxySingleDescriptor(self))
-
-
-# Add South introspection for our fields
-south.modelsinspector.add_introspection_rules([
-    (
-        [SelectorKeyField],
-        [],
-        {
-            'regpoint': ['regpoint', {}],
-            'enum_id': ['enum_id', {}],
-        },
-    ),
-], [r'^nodewatcher\.core\.registry\.fields\.SelectorKeyField$'])
-south.modelsinspector.add_introspection_rules([
-    (
-        [NullBooleanChoiceField],
-        [],
-        {
-            'regpoint': ['regpoint', {}],
-            'enum_id': ['enum_id', {}],
-        },
-    ),
-], [r'^nodewatcher\.core\.registry\.fields\.NullBooleanChoiceField$'])
-south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.ModelSelectorKeyField$'])
-south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.IntraRegistryForeignKey$'])
-south.modelsinspector.add_introspection_rules([], [r'^nodewatcher\.core\.registry\.fields\.ReferenceChoiceField$'])
-south.modelsinspector.add_introspection_rules([
-    (
-        [MACAddressField],
-        [],
-        {
-            'auto_add': ['auto_add', {'default': False}],
-        },
-    ),
-], [r'^nodewatcher\.core\.registry\.fields\.MACAddressField$'])
-south.modelsinspector.add_introspection_rules([
-    (
-        [IPAddressField],
-        [],
-        {
-            'subnet_required': ['subnet_required', {'default': False}],
-            'host_required': ['host_required', {'default': False}],
-        },
-    ),
-], [r'^nodewatcher\.core\.registry\.fields\.IPAddressField$'])

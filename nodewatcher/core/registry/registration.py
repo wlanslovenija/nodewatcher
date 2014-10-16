@@ -1,5 +1,6 @@
 import collections
 
+from django import apps as django_apps
 from django.core import exceptions as django_exceptions
 from django.db import models as django_models
 from django.utils import datastructures as django_datastructures
@@ -556,24 +557,13 @@ def create_point(model, namespace, mixins=None):
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation
-        model = django_models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
-        if model:
-            augment_root_model(model)
-        else:
-            registry_state.deferred_roots.setdefault((app_label, model_name), []).append(augment_root_model)
-
-
-def handle_deferred_root(sender, **kwargs):
-    """
-    Finalizes any deferred root registrations.
-    """
-
-    key = (sender._meta.app_label, sender._meta.object_name)
-    if key in registry_state.deferred_roots:
-        for callback in registry_state.deferred_roots.pop(key, []):
-            callback(sender)
-
-django_models.signals.class_prepared.connect(handle_deferred_root)
+        try:
+            augment_root_model(django_apps.apps.get_registered_model(app_label, model_name))
+        except LookupError:
+            django_models.signals.class_prepared.connect(
+                augment_root_model,
+                sender='%s.%s' % (app_label, model_name),
+            )
 
 
 def point(name):

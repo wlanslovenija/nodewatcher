@@ -15,10 +15,11 @@ ADD ./requirements.txt /code/requirements.txt
 RUN { cat /code/requirements.txt | xargs -n 1 pip install; } || true
 
 # Remove unneeded build-time dependencies
-RUN apt-get purge git python-dev build-essential -y --force-yes && \
+RUN apt-get purge python-dev build-essential -y --force-yes && \
     apt-get autoremove -y --force-yes && \
     rm -f /code/packages.txt /code/requirements.txt
 
 # Add the current version of the code (needed for production deployments)
 WORKDIR /code
 ADD . /code
+

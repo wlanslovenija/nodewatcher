@@ -3,6 +3,7 @@ import inspect
 
 from django.contrib.gis.db import models as gis_models
 from django import db as django_db
+from django.apps import apps
 from django.db.models.sql import constants
 from django.utils import functional
 
@@ -173,8 +174,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             )
             this_class['class'] = clone.model
 
-            # Prevent proxy models from cluttering up the cache
-            del django_db.models.loading.cache.app_models['_registry_proxy_models_']
+            del apps.all_models['_registry_proxy_models_']
 
         def install_proxy_field(model, field, name):
             field = copy.deepcopy(field)
@@ -277,7 +277,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             clone.query.join(
                 (self.model._meta.db_table, toplevel._meta.db_table, ((self.model._meta.pk.column, 'root_id'),)),
                 join_field=RegistryJoinRelation(),
-                outer_if_first=True,
             )
 
             if toplevel != dst_model:
@@ -285,7 +284,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 clone.query.join(
                     (toplevel._meta.db_table, dst_model._meta.db_table, ((toplevel._meta.pk.column, dst_model._meta.pk.column),)),
                     join_field=RegistryJoinRelation(),
-                    outer_if_first=True,
                 )
 
             if dst_related is not None:
@@ -293,7 +291,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 clone.query.join(
                     (dst_model._meta.db_table, dst_field_model._meta.db_table, ((dst_field.column, dst_field_model._meta.pk.column),)),
                     join_field=RegistryJoinRelation(),
-                    outer_if_first=True,
                 )
 
         return clone

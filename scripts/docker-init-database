@@ -2,6 +2,7 @@
 
 export PGPASSWORD=${DB_1_ENV_PGSQL_SUPERUSER_PASSWORD}
 
+psql -h ${DB_1_PORT_5432_TCP_ADDR} -U nodewatcher -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'nodewatcher';" 2>/dev/null || true
 dropdb -h ${DB_1_PORT_5432_TCP_ADDR} -U nodewatcher --if-exists nodewatcher
 createdb -h ${DB_1_PORT_5432_TCP_ADDR} -U nodewatcher -E UNICODE -O nodewatcher nodewatcher
 psql -h ${DB_1_PORT_5432_TCP_ADDR} -U nodewatcher -d nodewatcher -c "CREATE EXTENSION postgis;"

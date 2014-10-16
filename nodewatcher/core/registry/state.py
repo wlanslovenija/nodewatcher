@@ -7,6 +7,3 @@ class BaseClassContainer(object):
     pass
 
 bases = BaseClassContainer()
-
-# Deferred root registrations
-deferred_roots = {}
