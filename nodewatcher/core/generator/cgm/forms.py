@@ -33,7 +33,10 @@ class CgmGeneralConfigForm(forms.ModelForm):
         """
 
         qs = self.fields['version'].queryset
-        qs = qs.filter(builders__channels=item.build_channel)
+        if item is not None:
+            qs = qs.filter(builders__channels=item.build_channel)
+        else:
+            qs = qs.none()
         self.fields['version'].queryset = qs
 
 registration.register_form_for_item(models.CgmGeneralConfig, CgmGeneralConfigForm)

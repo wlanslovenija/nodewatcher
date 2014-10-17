@@ -23,8 +23,8 @@
         </div>
 
         <div class="buttons">
-            <button role="button" onclick="document.location='/'" class="ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-button-text">{% trans "Cancel" %}</span></button>
-            <button role="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-primary"><span class="ui-button-text">{% trans "Update" %}</span></button>
+            <button type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>
+            <button type="submit">{% trans "Update" %}</button>
         </div>
     </form>
 {% endblock %}

@@ -1,36 +1,27 @@
-{% extends "my_base.html" %}
+{% extends "base.html" %}
 
-{% load future i18n gmap misc %}
+{% contextblock %}
+    {% load future i18n sekizai_tags %}
 
-{% block title %}{% trans "New Node Registration" %}{% endblock %}
+    {% add_data "js_data" "frontend/js/jquery-ui-1.8.12.custom.min.js" %}
+    {% add_data "js_data" "frontend/js/jquery.cookie.js" %}
+    {% add_data "js_data" "frontend/js/csrf.js" %}
+    {% add_data "js_data" "frontend/js/registry.js" %}
 
-{% block heading %}
-    {% with heading=_("New Node Registration") %}
-        {{ block.super }}
-    {% endwith %}
-{% endblock %}
+    {% setcontext as title %}{% trans "New Node Registration" %}{% endsetcontext %}
+    {% setcontext as heading %}{% trans "New Node Registration" %}{% endsetcontext %}
+{% endcontextblock %}
 
-{% block my_content %}
-    {% with form_errors_context="register a new node" classes="no-top-margin" %}
-        {% include "form_errors.html" %}
-    {% endwith %}
-
-    {% notice "" "no-top-margin" %}
-        {% blocktrans %}If you are unsure about any option just leave it at its default value.{% endblocktrans %}
-    {% endnotice %}
-
-    <form action="{% url "editor:new" %}" method="post">
+{% block content %}
+    <form method="post" action="{% url "EditorComponent:new" %}">
         {% csrf_token %}
         <div id="registry_forms">
             {% include "registry/forms.html" %}
         </div>
 
-        <div class="buttons"><input type="submit" value="{% trans "Register" %}" /></div>
+        <div class="buttons">
+            <button type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>
+            <button type="submit">{% trans "Register" %}</button>
+        </div>
     </form>
-{% endblock %}
-
-{% block js %}
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11ndata.js"></script>
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/n11n.js"></script>
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/unidecode.js"></script>
 {% endblock %}

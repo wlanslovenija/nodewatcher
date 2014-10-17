@@ -14,6 +14,12 @@ from . import signals
 
 class RegistryFormMixin(object):
     success_url = None
+    cancel_url = None
+
+    def get_context_data(self, **kwargs):
+        context = super(RegistryFormMixin, self).get_context_data(**kwargs)
+        context['registry_forms'] = self.dynamic_forms
+        return context
 
     def get_success_url(self):
         if self.success_url:
@@ -29,15 +35,7 @@ class RegistryFormMixin(object):
         return self.render_to_response(self.get_context_data(object=self.object))
 
 
-class NewNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailView):
-    template_name = 'nodes/new.html'
-    permission_required = 'add_node'
-
-    def get_context_data(self, **kwargs):
-        context = super(NewNode, self).get_context_data(**kwargs)
-        context['registry_forms'] = self.dynamic_forms
-        return context
-
+class RegistryCreateFormMixin(RegistryFormMixin):
     def get(self, request, *args, **kwargs):
         self.object = None
 
@@ -91,28 +89,30 @@ class NewNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailV
             transaction.savepoint_rollback(sid)
             raise
 
+
+class NewNode(mixins.PermissionRequiredMixin,
+              views.CancelableFormMixin,
+              RegistryCreateFormMixin,
+              generic.TemplateView):
+    template_name = 'nodes/new.html'
+    permission_required = 'add_node'
+
     def form_valid(self):
         return http.HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self):
         return self.render_to_response(self.get_context_data())
 
+    def get_cancel_url(self):
+        # TODO: Where should we redirect here? What if mynodes component is not enabled?
+        return urlresolvers.reverse('MyNodesComponent:mynodes')
+
     def get_success_url(self):
         # TODO: Where should we redirect here? What if display component is not enabled?
         return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.object.pk})
 
 
-class EditNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, RegistryFormMixin, generic.DetailView):
-    template_name = 'nodes/edit.html'
-    model = core_models.Node
-    permission_required = 'change_node'
-    context_object_name = 'node'
-
-    def get_context_data(self, **kwargs):
-        context = super(EditNode, self).get_context_data(**kwargs)
-        context['registry_forms'] = self.dynamic_forms
-        return context
-
+class RegistryEditFormMixin(RegistryFormMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
@@ -151,6 +151,21 @@ class EditNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, RegistryForm
         else:
             return self.form_invalid()
 
+
+class EditNode(mixins.PermissionRequiredMixin,
+               views.NodeNameMixin,
+               views.CancelableFormMixin,
+               RegistryEditFormMixin,
+               generic.DetailView):
+    template_name = 'nodes/edit.html'
+    model = core_models.Node
+    permission_required = 'change_node'
+    context_object_name = 'node'
+
+    def get_cancel_url(self):
+        # TODO: Where should we redirect here? What if display component is not enabled?
+        return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.get_object().pk})
+
     def get_success_url(self):
         # TODO: Where should we redirect here? What if display component is not enabled?
         return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.object.pk})
@@ -169,7 +184,11 @@ class ResetNodeMixin(object):
         return self.reset(request, *args, **kwargs)
 
 
-class ResetNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, views.CancelableFormMixin, ResetNodeMixin, generic.DetailView):
+class ResetNode(mixins.PermissionRequiredMixin,
+                views.NodeNameMixin,
+                views.CancelableFormMixin,
+                ResetNodeMixin,
+                generic.DetailView):
     template_name = 'nodes/reset.html'
     model = core_models.Node
     permission_required = 'reset_node'
@@ -184,7 +203,10 @@ class ResetNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, views.Cance
         return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.get_object().pk})
 
 
-class RemoveNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, views.CancelableFormMixin, generic.DeleteView):
+class RemoveNode(mixins.PermissionRequiredMixin,
+                 views.NodeNameMixin,
+                 views.CancelableFormMixin,
+                 generic.DeleteView):
     template_name = 'nodes/remove.html'
     model = core_models.Node
     permission_required = 'delete_node'

@@ -12,7 +12,7 @@ class EditorComponent(components.FrontendComponent):
         return super(EditorComponent, cls).get_urls() + urls.patterns(
             '',
 
-            urls.url(r'^node/new/$', views.NewNode.as_view(), name='new'),
+            urls.url(r'^my/nodes/new/$', views.NewNode.as_view(), name='new'),
             urls.url(r'^node/(?P<pk>[^/]+)/edit/$', views.EditNode.as_view(), name='edit'),
             urls.url(r'^node/(?P<pk>[^/]+)/reset/$', views.ResetNode.as_view(), name='reset'),
             urls.url(r'^node/(?P<pk>[^/]+)/remove/$', views.RemoveNode.as_view(), name='remove'),
@@ -20,6 +20,12 @@ class EditorComponent(components.FrontendComponent):
 
 components.pool.register(EditorComponent)
 
+
+components.menus.get_menu('accounts_menu').add(components.MenuEntry(
+    label=components.ugettext_lazy("Register New Node"),
+    url=urlresolvers.reverse_lazy('EditorComponent:new'),
+    visible=lambda menu_entry, request, context: request.user.has_perm('add_node'),
+))
 
 components.menus.get_menu('display_node_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Edit"),
