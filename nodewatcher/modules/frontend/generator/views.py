@@ -62,3 +62,7 @@ class ViewBuild(generic.DetailView):
     template_name = 'generator/view_build.html'
     model = generator_models.BuildResult
     context_object_name = 'result'
+
+
+class ListBuilds(generic.TemplateView):
+    template_name = 'generator/list_builds.html'

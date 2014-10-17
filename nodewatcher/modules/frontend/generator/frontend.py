@@ -1,9 +1,9 @@
 from django.conf import urls
 from django.core import urlresolvers
 
-from nodewatcher.core.frontend import components
+from nodewatcher.core.frontend import api, components
 
-from . import views
+from . import resources, views
 
 
 class GeneratorComponent(components.FrontendComponent):
@@ -14,14 +14,28 @@ class GeneratorComponent(components.FrontendComponent):
 
             urls.url(r'^node/(?P<pk>[^/]+)/generate_firmware/$', views.GenerateFirmware.as_view(), name='generate_firmware'),
 
+            urls.url(r'^generator/builds$', views.ListBuilds.as_view(), name='list_builds'),
             urls.url(r'^generator/build/(?P<pk>[^/]+)$', views.ViewBuild.as_view(), name='view_build'),
         )
 
 components.pool.register(GeneratorComponent)
 
 
+api.v1_api.register(resources.BuildResultResource())
+api.v1_api.register(resources.BuildResultFileResource())
+api.v1_api.register(resources.BuilderResource())
+api.v1_api.register(resources.BuildChannelResource())
+api.v1_api.register(resources.BuildVersionResource())
+
+
 components.menus.get_menu('display_node_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Generate Firmware"),
     url=lambda menu_entry, context: urlresolvers.reverse('GeneratorComponent:generate_firmware', kwargs={'pk': context['node'].pk}),
     visible=lambda menu_entry, request, context: request.user.has_perm('generate_firmware', context['node']),
+))
+
+components.menus.get_menu('accounts_menu').add(components.MenuEntry(
+    label=components.ugettext_lazy("My Firmware Builds"),
+    url=urlresolvers.reverse_lazy('GeneratorComponent:list_builds'),
+    visible=lambda menu_entry, request, context: request.user.is_authenticated(),
 ))
