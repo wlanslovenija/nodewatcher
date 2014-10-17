@@ -119,6 +119,12 @@ VPN_SERVERS = {
     "92.53.140.74": (8942, 53, 123),
 }
 
+# A list of DNS servers as nodewatcher v2 had them hardcoded
+DNS_SERVERS = {
+    "10.254.0.1",
+    "10.254.0.2",
+}
+
 
 class Command(base.BaseCommand):
     help = "Imports legacy nodewatcher v2 data."
@@ -474,6 +480,15 @@ class Command(base.BaseCommand):
                         )
                         iface_vpn.save()
 
+                        # Throughput limits
+                        if node['profile']['vpn_egress_limit'] or node['profile']['vpn_ingress_limit']:
+                            node_mdl.config.core.interfaces.limits(
+                                create=cgm_models.ThroughputInterfaceLimitConfig,
+                                interface=iface_vpn,
+                                limit_in=str(node['profile']['vpn_ingress_limit'] or ''),
+                                limit_out=str(node['profile']['vpn_egress_limit'] or ''),
+                            ).save()
+
                         for port in ports:
                             network_vpn = node_mdl.config.core.interfaces.network(
                                 create=cgm_models.VpnNetworkConfig,
@@ -483,6 +498,13 @@ class Command(base.BaseCommand):
                                 port=port,
                             )
                             network_vpn.save()
+
+                # DNS servers
+                for server in DNS_SERVERS:
+                    node_mdl.config.core.servers.dns(
+                        create=cgm_models.DnsServerConfig,
+                        address=server,
+                    ).save()
 
                 # Optional packages
                 if node['profile']['packages']:
