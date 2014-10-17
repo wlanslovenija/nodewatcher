@@ -290,7 +290,6 @@ INSTALLED_APPS = (
 
     # Legacy apps for migrations.
     'nodewatcher.legacy.nodes',
-    'nodewatcher.legacy.policy',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
