@@ -7,17 +7,13 @@
     {% add_data "js_data" "frontend/js/jquery.cookie.js" %}
     {% add_data "js_data" "frontend/js/csrf.js" %}
     {% add_data "js_data" "frontend/js/registry.js" %}
-{% endcontextblock %}
 
-{% block title %}{% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node {{ node_name }}{% endblocktrans %}{% endblock %}
-
-{% block heading %}
-    {% setcontext as heading %}
+    {% setcontext as title %}{% blocktrans %}Edit Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
+    {% setcontext as heading %}{% spaceless %}
         {% url "DisplayComponent:node" node.pk as node_url %}
-        {% blocktrans with node.name|default:_("unknown") as node_name %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
-    {% endsetcontext %}
-    {{ block.super }}
-{% endblock %}
+        {% blocktrans %}Edit Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+    {% endspaceless %}{% endsetcontext %}
+{% endcontextblock %}
 
 {% block content %}
     <form method="post" action="{% url "EditorComponent:edit" node.pk %}">

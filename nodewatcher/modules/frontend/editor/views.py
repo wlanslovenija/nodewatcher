@@ -102,7 +102,7 @@ class NewNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailV
         return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.object.pk})
 
 
-class EditNode(mixins.PermissionRequiredMixin, RegistryFormMixin, generic.DetailView):
+class EditNode(mixins.PermissionRequiredMixin, views.NodeNameMixin, RegistryFormMixin, generic.DetailView):
     template_name = 'nodes/edit.html'
     model = core_models.Node
     permission_required = 'change_node'
