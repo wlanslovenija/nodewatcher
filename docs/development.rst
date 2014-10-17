@@ -26,22 +26,18 @@ In order to prepare the database, after running the development server execute::
 
     $ fig run web scripts/docker-init-database
 
-This will recreate the `nodewatcher` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work.
+This will recreate the `nodewatcher` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call `syncdb`::
 
-Importing a database dump from version 2
-----------------------------------------
+    $ fig run web python manage.py syncdb
 
-If you have an SQL dump from nodewatcher version 2 available and would like to migrate to version 3, the procedure is as follows. Lets assume that the dump is stored in a file called `dump.sql` (note that the dump file must be located inside the toplevel directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher directory). First the dump must be preprocessed before it can be imported::
+This will initialize the database schema.
 
-    $ ./scripts/convert-wlansi-v2-dump dump.sql
+Importing the JSON database dump from version 2
+-----------------------------------------------
 
-After the script completes, the dump must be imported into the development database. This can be done by running::
+If you have a JSON data export from nodewatcher version 2 available and would like to migrate to version 3, the procedure is as follows (after you have already performed the database initialization above). Let us assume that the dump is stored in a file called `dump.json` (note that the dump file must be located inside the toplevel directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher directory). The dump can be imported by running::
 
-    $ fig run web scripts/docker-import-dump dump.sql
-
-After the dump has been imported, migrations have to be run::
-
-    $ fig run web scripts/migrate-v2-to-v3
+    $ fig run web python manage.py import_nw2 dump.json
 
 Now the database is ready for use with nodewatcher 3.
 
