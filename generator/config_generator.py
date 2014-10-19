@@ -70,6 +70,8 @@ portLayouts = {
   'ub-nano'   : None,
   'ub-bullet-m5' : None,
   'ub-rocket-m5' : None,
+  'ub-loco-m5-xw' : None,
+  'ub-nano-m5-xw' : None,
 
   # Siemens SX763v2
   'sm-sx763v2': {
@@ -769,7 +771,7 @@ config rule
       os.mkdir(os.path.join(directory, "init.d"))
       f = open(inituci_path, 'w')
 
-      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5'):
+      if self.portLayout in ('ub-nano', 'ub-bullet-m5', 'ub-rocket-m5', 'ub-loco-m5-xw', 'ub-nano-m5-xw'):
         f.write("""#!/bin/sh /etc/rc.common
 START=15
 
@@ -1187,6 +1189,8 @@ config uhttpd main
         "ub-nano" : "UBNT",
         "ub-bullet-m5" : "UBNT",
         "ub-rocket-m5" : "UBNT",
+        "ub-loco-m5-xw" : "UBNT",
+        "ub-nano-m5-xw" : "UBNT",
 
         "fonera"     : "",
 
