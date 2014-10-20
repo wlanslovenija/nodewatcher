@@ -901,6 +901,7 @@ start() {{
 
       f.close()
       os.chmod(inituci_path, 0755)
+      os.symlink('../init.d/inituci', os.path.join(directory, 'rc.d', 'S15inituci'))
 
       network_config.close()
       firewall_config.close()
