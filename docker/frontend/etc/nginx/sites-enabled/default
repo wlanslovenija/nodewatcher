@@ -1,0 +1,23 @@
+upstream nodewatcher {
+  server unix:///code/uwsgi.sock;
+}
+
+server {
+  listen 80;
+  server_name _;
+  root /tmp;
+
+  location /static {
+    alias /static;
+  }
+
+  location /media {
+    alias /media;
+  }
+
+  location / {
+    uwsgi_pass nodewatcher;
+    include /etc/nginx/uwsgi_params;
+  }
+}
+
