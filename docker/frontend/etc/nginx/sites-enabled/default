@@ -1,5 +1,5 @@
 upstream nodewatcher {
-  server unix:///code/uwsgi.sock;
+  server unix:///var/tmp/nodewatcher.sock;
 }
 
 server {
