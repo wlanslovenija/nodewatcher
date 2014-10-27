@@ -1,6 +1,4 @@
 .git
 .gitignore
 .dockerignore
-docker
-Dockerfile
 fig.yml
