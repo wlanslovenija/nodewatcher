@@ -14,16 +14,18 @@ class TopologyAttribute(object):
 
 
 class NodeAttribute(TopologyAttribute):
-    def __init__(self, name, field):
+    def __init__(self, name, field, transform=None):
         """
         Class constructor.
 
         :param name: Unique name used for storage in the topology
         :param field: Registry field reference (eg. 'core.general#name')
+        :param transform: Optional value transformation callable
         """
 
         self.name = name
         self.field = field
+        self.transform = transform
 
     @classmethod
     def get_lookup_key(cls, **kwargs):

@@ -93,6 +93,11 @@ class Topology(monitor_processors.NetworkProcessor):
         for node in qs:
             node_id = str(node['pk'])
             del node['pk']
+            # Apply any registered node attribute transformations
+            for attr in node_attributes:
+                if attr.name in node and attr.transform is not None:
+                    node[attr.name] = attr.transform(node[attr.name])
+
             vertices[node_id] = node
 
         # Prepare graph for datastream processor
