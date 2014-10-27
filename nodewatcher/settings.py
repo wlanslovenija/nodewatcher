@@ -309,6 +309,7 @@ INSTALLED_APPS = (
     'overextends',
     'json_field',
     'uuidfield',
+    'leaflet',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -519,15 +520,11 @@ SOUTH_TESTS_MIGRATE = False
 # Django's is_secure is used in the code as well. See SECURE_PROXY_SSL_HEADER configuration option.
 USE_HTTPS = False
 
-# Google Maps API key for 127.0.0.1.
-GOOGLE_MAPS_API_KEY = 'ABQIAAAAsSAo-sxy6T5T7_DN1d9N4xRi_j0U6kJrkFvY4-OX2XYmEAa76BRH5tgaUAj1SaWR_RbmjkZ4zO7dDA'
-
-# Where the map displaying all nodes is initially positioned.
-# Where the map is initially positioned when adding a new node is configured for each project in the database.
-GOOGLE_MAPS_DEFAULT_LAT = 46.05
-GOOGLE_MAPS_DEFAULT_LONG = 14.507
-GOOGLE_MAPS_DEFAULT_ZOOM = 13
-GOOGLE_MAPS_DEFAULT_NODE_ZOOM = 15 # Zoom to use when displaying one node.
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (46.05, 14.507),
+    'DEFAULT_ZOOM': 4,
+    'RESET_VIEW': False,
+}
 
 NETWORK = {
     'NAME': 'your network name',
