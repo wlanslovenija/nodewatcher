@@ -1,0 +1,24 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n sekizai_tags html_tags url_tags partial_tags leaflet_tags %}
+
+    {% addtoblock "css" %}{% leaflet_css %}{% endaddtoblock %}
+    {% addtoblock "js" %}{% leaflet_js %}{% endaddtoblock %}
+
+    {% add_data "js_data" "map/js/api.js" %}
+    {% add_data "js_data" "map/js/code.js" %}
+    {% add_data "css_data" "map/css/style.css" %}
+
+    {% trans "Map" as title %}
+{% endcontextblock %}
+
+{% block content %}
+    {% leaflet_map "map" %}
+
+    {% get_partial "map_partial" as map_partial %}
+
+    {% with partial=map_partial %}
+        {% include "base/partial.html" %}
+    {% endwith %}
+{% endblock %}

@@ -281,6 +281,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.statistics',
     'nodewatcher.modules.frontend.topology',
     'nodewatcher.modules.frontend.generator',
+    'nodewatcher.modules.frontend.map',
 
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
@@ -522,7 +523,7 @@ USE_HTTPS = False
 
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (46.05, 14.507),
-    'DEFAULT_ZOOM': 4,
+    'DEFAULT_ZOOM': 8,
     'RESET_VIEW': False,
 }
 
