@@ -89,16 +89,17 @@ class Topology(monitor_processors.NetworkProcessor):
             except (TypeError, ValueError):
                 pass
 
-        qs = qs.values(*(['pk'] + [a.name for a in node_attributes]))
         for node in qs:
-            node_id = str(node['pk'])
-            del node['pk']
-            # Apply any registered node attribute transformations
+            data = {}
             for attr in node_attributes:
-                if attr.name in node and attr.transform is not None:
-                    node[attr.name] = attr.transform(node[attr.name])
+                value = getattr(node, attr.name, None)
+                if value is not None:
+                    # Apply any registered node attribute transformations
+                    if attr.transform is not None:
+                        value = attr.transform(value)
+                    data[attr.name] = value
 
-            vertices[node_id] = node
+            vertices[node.pk] = data
 
         # Prepare graph for datastream processor
         context.datastream.topology = TopologyStreamsData(vertices, edges)
