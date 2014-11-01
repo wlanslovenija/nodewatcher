@@ -311,6 +311,7 @@ INSTALLED_APPS = (
     'json_field',
     'uuidfield',
     'leaflet',
+    'django_countries',
 )
 
 # A sample logging configuration. The only tangible logging

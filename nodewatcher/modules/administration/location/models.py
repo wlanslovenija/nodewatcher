@@ -1,11 +1,11 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 import timezone_field
+from django_countries import fields as country_field
 
 from nodewatcher.core.registry import registration
-from nodewatcher.utils.fields import geographic
 
 
 class LocationConfig(registration.bases.NodeConfigRegistryItem):
@@ -15,7 +15,7 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
 
     address = models.CharField(max_length=100)
     city = models.CharField(max_length=100) # TODO: Autocomplete city field?
-    country = geographic.CountryField()
+    country = country_field.CountryField()
     timezone = timezone_field.TimeZoneField(null=True)
     geolocation = gis_models.PointField(null=True)
     altitude = models.FloatField(default=0)
