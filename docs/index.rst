@@ -19,6 +19,7 @@ Contents
    node_config
    node_monitoring
    cgm
+   resources
 
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------

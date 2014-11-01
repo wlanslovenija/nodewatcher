@@ -1,5 +1,7 @@
-Registry
-========
+.. _registry-api:
+
+Registry ORM Extensions
+=======================
 
 The concept of modularity brings new challenges to the *nodewatcher* platform. Foremost, a question poses itself: how to enable modules to add their own configuration options to registered nodes. The platform has to provide interfaces for:
 
@@ -14,10 +16,12 @@ Extending and adding functionalities is possible at multiple points so that, for
 
 *nodewatcher* 3.0 uses this component for storing logs about nodes and for extracting configuration for all other modules (firmware generator, network monitoring, etc.).
 
-Basic Registry Structure
------------------------
+.. _registry-api-items:
 
-TODO
+Registry Items
+--------------
+
+Registry items are standard Django models that TODO.
 
 Registration Points in nodewatcher
 ----------------------------------

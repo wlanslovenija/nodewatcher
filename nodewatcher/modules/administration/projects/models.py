@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import signals as django_signals
 from django.contrib.gis.db import models as gis_models
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from nodewatcher.core.registry import fields as registry_fields, registration
 

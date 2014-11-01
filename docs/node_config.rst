@@ -1,298 +1,527 @@
 .. _registry-node-config-schema:
 
-Node Configuration Registry Schema
-==================================
+Node Configuration Schema
+=========================
 
-The following table represents the node configuration registry schema that is bundled with core nodewatcher modules. This schema is used to configure various per-node attributes and is used by the firmware image generation module (see :ref:`firmware-image-generation`) to configure firmware images for diffrent platforms.
+Per-node configuration schema in nodewatcher is built from various Django models and mixins,
+using light extensions provided by the :ref:`registry-api`. This documentation specifies,
+for each registry item identifier (see :ref:`registry-api-items`) the models that provide parts
+of the final schema.
 
-+-------------------------+------------+-------+------------------+----------------------------------+
-| Registry ID             | Multiple   | Class | Field            | Type                             |
-+=========================+============+=======+==================+==================================+
-| core.general            | no         |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || GeneralConfig                                              |
-|                                      || *provided by:* ``core``                                    |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | name             | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || CgmGeneralConfig(GeneralConfig)                            |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | router           | | registered choice              |
-|                                      |       |                  | | (see :ref:`device-descriptors`)|
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | platform         | | registered choice              |
-|                                      |       |                  | | (see :ref:`cgm-platforms`)     |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | build_channel    | foreign key                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | version          | foreign key                      |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.type               | no         |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || TypeConfig                                                 |
-|                                      || *provided by:* ``modules.administration.types``            |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | type             | registered choice                |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.project            | no         |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || ProjectConfig                                              |
-|                                      || *provided by:* ``modules.administration.projects``         |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | project          | foreign key                      |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.description        | no         |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || DescriptionConfig                                          |
-|                                      || *provided by:* ``modules.administration.description``      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | notes            | text                             |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | url              | url                              |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.location           | no         |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || LocationConfig                                             |
-|                                      || *provided by:* ``modules.administration.location``         |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | address          | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | city             | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | country          | country                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | timezone         | timezone                         |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | geolocation      | geospatial                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | altitude         | float                            |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.routerid           | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || RouterIdConfig                                             |
-|                                      || *provided by:* ``core``                                    |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | family           | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | router_id        | string                           |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.authentication     | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || *AuthenticationConfig (hidden parent)*                     |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------------------------------------------------------------+
-|                                      || PasswordAuthenticationConfig(AuthenticationConfig)         |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | password         | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || PublicKeyAuthenticationConfig(AuthenticationConfig)        |
-|                                      || *provided by:* ``modules.authentication.public_key``       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | public_key       | string                           |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.roles              | yes/static |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || *RoleConfig (hidden parent)*                               |
-|                                      || *provided by:* ``modules.administration.roles``            |
-+--------------------------------------+-------------------------------------------------------------+
-|                                      || SystemRoleConfig(RoleConfig)                               |
-|                                      || *provided by:* ``modules.administration.roles``            |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | system           | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || BorderRouterRoleConfig(RoleConfig)                         |
-|                                      || *provided by:* ``modules.administration.roles``            |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | border_router    | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || VpnServerRoleConfig(RoleConfig)                            |
-|                                      || *provided by:* ``modules.administration.roles``            |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | vpn_server       | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || RedundancyRequiredRoleConfig(RoleConfig)                   |
-|                                      || *provided by:* ``modules.administration.roles``            |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | redundancy       | boolean                          |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.interfaces         | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || InterfaceConfig                                            |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | enabled          | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || BridgeInterfaceConfig(InterfaceConfig)                     |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | name             | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | stp              | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | mac_address      | mac string                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || MobileInterfaceConfig(InterfaceConfig)                     |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | service          | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | device           | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | apn              | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | pin              | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | username         | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | password         | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || EthernetInterfaceConfig(InterfaceConfig)                   |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | eth_port         | | registered choice              |
-|                                      |       |                  | | *(depends on router model)*    |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | uplink           | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | mac_address      | mac string                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || WifiRadioDeviceConfig(InterfaceConfig)                     |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | wifi_radio       | | registered choice              |
-|                                      |       |                  | | *(depends on router model)*    |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | protocol         | | registered choice              |
-|                                      |       |                  | | *(depends on wifi radio)*      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | channel          | | registered choice              |
-|                                      |       |                  | | *(depends on protocol)*        |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | channel_width    | | registered choice              |
-|                                      |       |                  | | *(depends on protocol)*        |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | bitrate          | | registered choice              |
-|                                      |       |                  | | *(depends on protocol)*        |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | ack_distance     | integer                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | rts_threshold    | integer                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | frag_threshold   | integer                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || WifiInterfaceConfig(InterfaceConfig, RoutableInterface)    |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | device           | foreign key                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | mode             | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | essid            | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | bssid            | mac string                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || VpnInterfaceConfig(InterfaceConfig, RoutableInterface)     |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | protocol         | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | mac              | mac string                       |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.basic_addressing   | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || BasicAddressingConfig(IpAddressAllocator)                  |
-|                                      || *provided by:* ``modules.administration.addressing``       |
-|                                      ||                                                            |
-|                                      ||                                                            |
-|                                      | **Note:** *Only available if* ``core.generator.cgm``        |
-|                                      | *module is not enabled. Otherwise this registry item is     |
-|                                      | replaced by core.interfaces.network per-interface           |
-|                                      | allocators.*                                                |
-+-------------------------+------------+-------------------------------------------------------------+
-| core.interfaces.network | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || NetworkConfig                                              |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | enabled          | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | interface        | foreign key                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | description      | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || BridgedNetworkConfig(NetworkConfig)                        |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | bridge           | foreign key                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || StaticNetworkConfig(NetworkConfig)                         |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | address          | ip address                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | gateway          | ip address                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || AllocatedNetworkConfig(NetworkConfig, IpAddressAllocator)  |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | routing_announce | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || DHCPNetworkConfig(NetworkConfig)                           |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------------------------------------------------------------+
-|                                      || PPPoENetworkConfig(NetworkConfig)                          |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | username         | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | password         | string                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || VPNNetworkConfig(NetworkConfig)                            |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | address          | ip address                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | port             | integer                          |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.interfaces.limits  | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || InterfaceLimitConfig                                       |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | enabled          | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | interface        | foreign key                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      || ThroughputInterfaceLimitConfig(InterfaceLimitConfig)       |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | limit_in         | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | limit_out        | registered choice                |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.servers.dns        | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || DnsServerConfig                                            |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | address          | ip address                       |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.servers.time       | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      | TimerServerConfig                                           |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | protocol         | registered choice                |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | address          | ip address                       |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | port             | integer                          |
-+-------------------------+------------+-------+------------------+----------------------------------+
-| core.packages           | yes        |                                                             |
-+-------------------------+------------+-------------------------------------------------------------+
-|                                      || PackageConfig                                              |
-|                                      || *provided by:* ``core.generator.cgm``                      |
-+--------------------------------------+-------+------------------+----------------------------------+
-|                                      |       | enabled          | boolean                          |
-+--------------------------------------+-------+------------------+----------------------------------+
+Each node is defined as an instance of :class:`nodewatcher.core.models.Node` and represents a
+network-connected device that may be managed by nodewatcher. The model instance itself only provides
+a universally unique identifier (UUID) and has no other attributes. All configuration attributes
+are added by various models through the use of the registry.
+
+core.general
+------------
+
+The general schema contains a basic node name configuration.
+
+.. autoclass:: nodewatcher.core.models.GeneralConfig()
+
+   .. note::
+      There may be only one instance of this model (or subclasses) per node.
+
+   :param name: Name of the configured node. It may be used as a hostname when
+     configuring an actual device.
+   :type name: string
+
+In case firmware generation support is enabled (by loading the :mod:`nodewatcher.core.generator.cgm`
+module), an extended set of options becomes available. These options configure the specific target
+device and firmware version that should be generated when requested.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.CgmGeneralConfig()
+   :show-inheritance:
+
+   :param router: Type of the configured device. Available device identifiers are automatically
+     populated by the :mod:`nodewatcher.modules.devices` module. See also :ref:`cgm-devices`.
+   :type router: registered choice
+
+   :param platform: Target platform. Available platforms are populated by loading the appropriate
+     applications (for example, :mod:`nodewatcher.modules.platforms.openwrt` for OpenWrt support).
+     See also :ref:`cgm-platforms`.
+   :type platform: registered choice
+
+   :param build_channel: The firmware generator build channel (see :ref:`cgm-build-channel`) that
+     should be used to obtain new versions of firmware images for this node. The value may be
+     set to ``None`` which means that a default build channel will be used. When a build channel
+     is removed, any nodes having the specified build channel set will see it reset to ``None``.
+   :type build_channel: foreign key to :class:`~nodewatcher.core.generator.models.BuildChannel`
+
+   :param version: Specific firmware version that should be built (see :ref:`cgm-build-version`).
+     In most cases this should be set to ``None`` which means that a default version will be selected
+     based on the selected build channel. When a firmware version is removed, any nodes having the
+     specified version set will see it reset to ``None``.
+   :type version: foreign key to :class:`~nodewatcher.core.generator.models.BuildVersion`
+
+core.type
+---------
+
+The :mod:`nodewatcher.modules.administration.types` module provides a schema extension that enables
+types for each node to be configured. Currently, the following node types are registered by default:
+
+  * server,
+  * wireless,
+  * test,
+  * mobile,
+  * dead,
+  * unknown.
+
+Additional types may be registered by other modules.
+
+.. autoclass:: nodewatcher.modules.administration.types.models.TypeConfig()
+
+   .. note::
+      There may be only one instance of this model (or subclasses) per node.
+
+   :param type: Device type.
+   :type type: registered choice
+
+core.project
+------------
+
+The :mod:`nodewatcher.modules.administration.projects` module provides a schema extension that enables
+projects for each node to be configured. Projects provide logical or geographical structuring of node
+deployments.
+
+.. autoclass:: nodewatcher.modules.administration.projects.models.Project()
+
+   :param name: Name of the project.
+   :type name: string
+
+   :param description: Additional description of the project.
+   :type description: text
+
+   :param location: Geographical location of the project.
+   :type location: geometry
+
+   :param pools_core_ippool: IP allocation pools that may be used by this project.
+   :type pools_core_ippool: many to many to :class:`~nodewatcher.core.allocation.ip.models.IpPool`
+
+Each project may have multiple SSID configurations attached.
+
+.. autoclass:: nodewatcher.modules.administration.projects.models.SSID()
+
+   :param project: Reference to project.
+   :type project: foreign key to :class:`~nodewatcher.modules.administration.projects.models.Project`
+
+   :param purpose: Specifies the usage for this SSID configuration. The exact semantics of
+     this value are currently not defined.
+   :type purpose: string
+
+   :param default: Should this SSID configuration be used by default.
+   :type default: bool
+
+   :param bssid: Configured BSSID.
+   :type bssid: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+
+   :param essid: Configured ESSID.
+   :type essid: string
+
+For each node a project may then be configured.
+
+.. autoclass:: nodewatcher.modules.administration.projects.models.ProjectConfig()
+
+   .. note::
+      There may be only one instance of this model (or subclasses) per node.
+
+   :param project: The project that this node is a part of.
+   :type project: foreign key to :class:`~nodewatcher.modules.administration.projects.models.Project`
+
+core.description
+----------------
+
+The :mod:`nodewatcher.modules.administration.description` module provides a schema extension that
+enables unstructured notes and an URL to be added to any node.
+
+.. autoclass:: nodewatcher.modules.administration.description.models.DescriptionConfig()
+
+   .. note::
+      There may be only one instance of this model (or subclasses) per node.
+
+   :param notes: Unstructured human-readable notes.
+   :type notes: text
+
+   :param url: URL containing any node-specific details.
+   :type url: url
+
+core.location
+-------------
+
+The :mod:`nodewatcher.modules.administration.location` module provides a schema extension that provides
+geographical positioning of a node.
+
+.. autoclass:: nodewatcher.modules.administration.location.models.LocationConfig()
+
+   .. note::
+      There may be only one instance of this model (or subclasses) per node.
+
+   :param address: Street address.
+   :type address: string
+
+   :param city: City name.
+   :type city: string
+
+   :param country: Country name.
+   :type country: :class:`~django_countries.fields.CountryField`
+
+   :param timezone: Timezone.
+   :type timezone: :class:`~timezone_field.TimeZoneField`
+
+   :param geolocation: Geographic location.
+   :type geolocation: geometry point
+
+   :param altitude: Altitude in meters.
+   :type altitude: float
+
+core.routerid
+-------------
+
+To identify nodes within the routing protocols a configuration schema is provided to configure
+the router identifier of a node. Each node may have multiple router identifiers. The following
+router identifier families are registered by default:
+
+  * ipv4,
+  * ipv6.
+
+Additional families may be registered by other modules (for example MAC addresses for L2 routing
+protocols).
+
+.. autoclass:: nodewatcher.core.models.RouterIdConfig()
+
+   :param family: Type of the router identifier.
+   :type family: registered choice
+
+   :param router_id: Router identifier.
+   :type router_id: string
+
+core.authentication
+-------------------
+
+There are multiple options provided for configuring user authentication on the nodes. By default,
+the :mod:`nodewatcher.core.generator.cgm` module provides a base class for all authentication
+mechanisms.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.AuthenticationConfig()
+
+A password configuration option is also provided by default.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.PasswordAuthenticationConfig()
+   :show-inheritance:
+
+   .. note::
+      There may be only one instance of this model (or subclasses) per node.
+
+   :param password: Password for the root user.
+   :type password: string
+
+Public key authentication is provided by :mod:`nodewatcher.modules.authentication.public_key` module.
+It extends the schema with the public key authentication method. Multiple authentication methods
+may be configured for each node.
+
+.. autoclass:: nodewatcher.modules.authentication.public_key.models.PublicKeyAuthenticationConfig()
+   :show-inheritance:
+
+   :param public_key: Public key in SSH-compatible encoding format.
+   :type public_key: string
+
+Public keys should be provided in a SSH-compatible encoding format, for example::
+
+  ssh-rsa AAAAB3NzaC1yc2EAAAADA...Oipsw25uxIvkDKjAxzQ== user@host
+
+core.roles
+----------
+
+The module :mod:`nodewatcher.modules.administration.roles` adds support for specifying roles that
+a node may have. Several default roles are provided.
+
+.. autoclass:: nodewatcher.modules.administration.roles.models.RoleConfig()
+
+.. autoclass:: nodewatcher.modules.administration.roles.models.SystemRoleConfig()
+   :show-inheritance:
+
+   :param system: The node is a system node.
+   :type system: bool
+
+.. autoclass:: nodewatcher.modules.administration.roles.models.BorderRouterRoleConfig()
+   :show-inheritance:
+
+   :param border_router: The node is a border router node.
+   :type border_router: bool
+
+.. autoclass:: nodewatcher.modules.administration.roles.models.VpnServerRoleConfig()
+   :show-inheritance:
+
+   :param vpn_server: The node is a VPN server node.
+   :type vpn_server: bool
+
+.. autoclass:: nodewatcher.modules.administration.roles.models.RedundantNodeRoleConfig()
+   :show-inheritance:
+
+   :param redundancy: The node requires redundancy in connectivity.
+   :type redundancy: bool
+
+core.interfaces
+---------------
+
+In order to configure network interfaces, several interface types are implemented. All interface
+configurations extend a base class.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.InterfaceConfig()
+
+   :param enabled: True if the interface should be enabled.
+   :type enabled: bool
+
+An abstract mixin is provided for configuring interface which may be used for routing purposes
+by the registered routing protocols. In case an interface should support routing, it should
+include the mixin among its bases.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.RoutableInterface()
+
+   :param routing_protocol: The routing protocol that should be used over this interface. The
+     value may be ``None`` in case no routing protocol is to be used. Available routing protocols
+     are populated by modules implementing their support (for example :mod:`nodewatcher.modules.routing.olsr`
+     for OLSR support).
+   :type routing_protocol: registered choice
+
+The following interface types are currently implemented by :mod:`nodewatcher.core.generator.cgm`:
+
+  * ethernet,
+  * wifi radio,
+  * wifi virtual interface,
+  * mobile,
+  * vpn,
+  * bridge.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.EthernetInterfaceConfig()
+   :show-inheritance:
+
+   :param eth_port: Ethernet port that this interface is connected to. Available ethernet ports
+     depend on the selected device.
+   :type eth_port: registered choice
+
+   :param uplink: Should this interface be considered as a WAN uplink.
+   :type uplink: bool
+
+   :param mac_address: MAC address in case it should be configured to a fixed address.
+   :type mac_address: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+
+Wireless interfaces are split into two configuration classes. The first class instances represent
+physical wireless radios.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.WifiRadioDeviceConfig()
+   :show-inheritance:
+
+   :param wifi_radio: The physical radio that should be used by this interface. Available
+     radios depend on the selected device.
+   :type wifi_radio: registered choice
+
+   :param protocol: Wireless protocol that should be configured for this interface. Available
+     protocols depend on the selected wireless radio.
+   :type protocol: registered choice
+
+   :param channel: Wireless channel. Available channels depend on the selected protocol.
+   :type channel: registered choice
+
+   :param channel_width: Wireless channel width. Available widths depend on the selected protocol.
+   :type channel_width: registered choice
+
+   :param bitrate: Bitrate. Available bitrates depend on the selected protocol.
+   :type bitrate: registered choice
+
+   :param ack_distance: ACK distance.
+   :type ack_distance: int
+
+   :param rts_threshold: RTS threshold.
+   :type rts_threshold: int
+
+   :param frag_threshold: Fragmentation threshold.
+   :type frag_threshold: int
+
+Then, for each wireless radio, multiple wireless virtual interfaces may be configured. Each virtual
+interface will cause a new wireless network to be created. By default, the following wireless modes
+are registered:
+
+  * mesh,
+  * ap,
+  * sta.
+
+Additional modes may be registered by other modules.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.WifiInterfaceConfig()
+   :show-inheritance:
+
+   :param device: Reference to the parent wireless radio interface.
+   :type device: foreign key to :class:`~nodewatcher.core.generator.cgm.models.WifiRadioDeviceConfig`
+
+   :param mode: Wireless mode.
+   :type mode: registered choice
+
+   :param essid: Network ESSID.
+   :type essid: string
+
+   :param bssid: Network BSSID.
+   :type bssid: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+
+Support for VPN tunnel interfaces is also provided.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.VpnInterfaceConfig()
+   :show-inheritance:
+
+   :param protocol: VPN protocol that should be used. Available protocols are populated by modules
+     implementing their support (for example, :mod:`nodewatcher.modules.vpn.tunneldigger` implements
+     support for Tunneldigger).
+   :type protocol: registered choice
+
+   :param mac: MAC address of the VPN interface. By default a virtual address is automatically
+     generated.
+   :type mac: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+
+Configuration classes for mobile interfaces, like 3G, are also provided.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.MobileInterfaceConfig()
+   :show-inheritance:
+
+   :param service: Mobile service type (eg. umts, gprs, cdma).
+   :type service: registered choice
+
+   :param device: Serial/USB device that should be used for communicating with the modem. Available
+     serial devices depend on the selected router device.
+   :type device: registered choice
+
+   :param apn: APN configuration.
+   :type apn: string
+
+   :param pin: PIN configuration.
+   :type pin: string
+
+   :param username: Username.
+   :type username: string
+
+   :param password: Password.
+   :type password: string
+
+Bridges consisting of multiple other devices may also be configured.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.BridgeInterfaceConfig()
+   :show-inheritance:
+
+   :param name: Bridge name.
+   :type name: string
+
+   :param stp: Should STP be enabled.
+   :type stp: bool
+
+   :param mac_address: MAC address in case it should be configured to a fixed address.
+   :type mac_address: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+
+core.interfaces.network
+-----------------------
+
+For each of the above physical interfaces, various network configurations may be set. Note that not
+all network configurations may be used on all types of interfaces. A base class is provided for all
+network configurations.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.NetworkConfig()
+
+   :param enabled: Should this network configuration be enabled.
+   :type enabled: bool
+
+   :param interface: Parent interface that this network configuration belongs to.
+   :type interface: foreign key to :class:`~nodewatcher.core.generator.cgm.models.InterfaceConfig`
+
+   :param description: Human-readable description.
+   :type description: string
+
+The simplest is a static IP network configuration.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.StaticNetworkConfig()
+   :show-inheritance:
+
+   :param address: IP address and network mask (in CIDR notation).
+   :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
+
+   :param gateway: Gateway address.
+   :type gateway: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+
+Resources may also be configured from various pools (see :ref:`resources`).
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.AllocatedNetworkConfig()
+   :show-inheritance:
+
+   :param routing_announce: Should this network be announced via a routing protocol. Available
+     choices are provided by routing protocol implementations. In case the value is ``None``, the
+     network is not announce via any routing protocol.
+   :type routing_announce: registered choice
+
+Interfaces may also be configured to obtain addresses via DHCP.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.DHCPNetworkConfig()
+   :show-inheritance:
+
+Ethernet interfaces may also be configured via PPPoE.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.PPPoENetworkConfig()
+   :show-inheritance:
+
+   :param username: Username.
+   :type username: string
+
+   :param password: Password.
+   :type password: string
+
+For VPN interfaces, multiple servers may be configured. Note that only one of the servers will
+be used at once -- in case one wants to configure redundant links, multiple VPN interfaces should
+be created.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.VpnNetworkConfig()
+   :show-inheritance:
+
+   :param address: IP address of the VPN server.
+   :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
+
+   :param port: Port of the VPN server.
+   :type port: int
+
+For bridge slaves, network configuration specifies the master bridge interface.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.BridgedNetworkConfig()
+   :show-inheritance:
+
+   :param bridge: Master bridge interface.
+   :type bridge: foreign key to :class:`~nodewatcher.core.generator.cgm.models.BridgeInterfaceConfig`
+
+core.interfaces.limits
+----------------------
+
+Various limits (like QoS) may also be configured for each interface.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.InterfaceLimitConfig()
+
+   :param enabled: Should this interface limit be enabled.
+   :type enabled: bool
+
+   :param interface: Interface that this limit applies to.
+   :type interface: foreign key to :class:`~nodewatcher.core.generator.cgm.models.InterfaceConfig`
+
+Currently, a throughput limit may be configured.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.ThroughputInterfaceLimitConfig()
+   :show-inheritance:
+
+   :param limit_in: Inbound traffic throughput limit.
+   :type limit_in: registered choice
+
+   :param limit_out: Outbound traffic throughput limit.
+   :type limit_out: registered choice
+
+core.servers.dns
+----------------
+
+Multiple DNS servers may also be configured.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.DnsServerConfig()
+
+   :param address: IP address of the DNS server.
+   :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`

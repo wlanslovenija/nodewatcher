@@ -5,7 +5,7 @@ from django.contrib.auth import models as auth_models
 from django.core import exceptions as django_exceptions
 from django.db.models import signals as django_signals
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from uuidfield import fields as uuid_field
 import json_field

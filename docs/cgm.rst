@@ -10,6 +10,20 @@ Configuration Generating Modules
 
 TODO.
 
+.. _cgm-build-channel:
+
+Build Channel
+-------------
+
+TODO.
+
+.. _cgm-build-version:
+
+Build Version
+-------------
+
+TODO.
+
 .. _cgm-platforms:
 
 Platforms
@@ -17,7 +31,7 @@ Platforms
 
 TODO.
 
-.. _device-descriptors:
+.. _cgm-devices:
 
 Device Descriptors
 ------------------
@@ -31,15 +45,5 @@ TODO.
 
 Wireless Radios and Protocols
 :::::::::::::::::::::::::::::
-
-TODO.
-
-Image Builders
---------------
-
-TODO.
-
-Versions
---------
 
 TODO.
