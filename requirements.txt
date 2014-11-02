@@ -45,3 +45,4 @@ django-uuidfield==0.5.0
 paramiko==1.15.1
 django-leaflet==0.14.1
 django-countries==3.0.1
+django-languages==0.1
