@@ -434,6 +434,17 @@ network configurations.
    :param description: Human-readable description.
    :type description: string
 
+An abstract mixin is provided for configuring networks which may be announce via a dynamic
+routing protocol. In case a network should support such announcement, it should include the mixin
+among its bases.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.AnnouncableNetwork()
+
+   :param routing_announce: Should this network be announced via a routing protocol. Available
+     choices are provided by routing protocol implementations. In case the value is ``None``, the
+     network is not announce via any routing protocol.
+   :type routing_announce: registered choice
+
 The simplest is a static IP network configuration.
 
 .. autoclass:: nodewatcher.core.generator.cgm.models.StaticNetworkConfig()
@@ -445,15 +456,10 @@ The simplest is a static IP network configuration.
    :param gateway: Gateway address.
    :type gateway: :class:`~nodewatcher.core.registry.fields.MACAddressField`
 
-Resources may also be configured from various pools (see :ref:`resources`).
+Resources may also be configured from various pools (for available fields, see :ref:`resources`).
 
 .. autoclass:: nodewatcher.core.generator.cgm.models.AllocatedNetworkConfig()
    :show-inheritance:
-
-   :param routing_announce: Should this network be announced via a routing protocol. Available
-     choices are provided by routing protocol implementations. In case the value is ``None``, the
-     network is not announce via any routing protocol.
-   :type routing_announce: registered choice
 
 Interfaces may also be configured to obtain addresses via DHCP.
 

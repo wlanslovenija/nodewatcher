@@ -277,6 +277,16 @@ registration.point('node.config').register_choice('core.interfaces#mobile_servic
 registration.point('node.config').register_item(MobileInterfaceConfig)
 
 
+class AnnouncableNetwork(models.Model):
+    class Meta:
+        abstract = True
+
+    routing_announce = registry_fields.SelectorKeyField(
+        'node.config', 'core.interfaces.network#routing_announce',
+        blank=True, null=True, verbose_name=_("Announce Via"),
+    )
+
+
 class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     """
     Network configuration of an interface.
@@ -310,7 +320,7 @@ registration.point('node.config').register_subitem(EthernetInterfaceConfig, Brid
 registration.point('node.config').register_subitem(WifiInterfaceConfig, BridgedNetworkConfig)
 
 
-class StaticNetworkConfig(NetworkConfig):
+class StaticNetworkConfig(NetworkConfig, AnnouncableNetwork):
     """
     Static IP configuration.
     """
@@ -358,15 +368,10 @@ class DHCPNetworkConfig(NetworkConfig):
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
 
 
-class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator):
+class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator, AnnouncableNetwork):
     """
     IP configuration that gets allocated from a pool.
     """
-
-    routing_announce = registry_fields.SelectorKeyField(
-        'node.config', 'core.interfaces.network#routing_announce',
-        blank=True, null=True, verbose_name=_("Announce Via"),
-    )
 
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("Allocated Network")
