@@ -14,12 +14,12 @@ Contents
    :maxdepth: 2
 
    development
-   translation
    registry
-   node_config
-   node_monitoring
    cgm
    resources
+   node_config
+   node_monitoring
+   translation
 
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------
