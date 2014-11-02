@@ -273,7 +273,7 @@ configurations extend a base class.
    :param enabled: True if the interface should be enabled.
    :type enabled: bool
 
-An abstract mixin is provided for configuring interface which may be used for routing purposes
+An abstract mixin is provided for configuring interfaces which may be used for routing purposes
 by the registered routing protocols. In case an interface should support routing, it should
 include the mixin among its bases.
 
