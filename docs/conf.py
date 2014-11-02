@@ -21,7 +21,11 @@ class Mock(mock.Mock):
     def __getattr__(cls, name):
             return Mock()
 
-MOCK_MODULES = ['django.contrib.gis.geometry.backend.geos']
+MOCK_MODULES = [
+    'django.contrib.gis.geos',
+    'django.contrib.gis.geometry.backend.geos',
+    'requests',
+]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
