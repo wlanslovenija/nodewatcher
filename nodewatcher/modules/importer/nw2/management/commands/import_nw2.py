@@ -219,8 +219,8 @@ class Command(base.BaseCommand):
                 name=project['name'],
                 description=project['description'],
             )
-            if project['geo_lat'] and project['geo_zoom']:
-                project_mdl.location = 'POINT(%f %f)' % (project['geo_lat'], project['geo_zoom'])
+            if project['geo_lat'] and project['geo_long']:
+                project_mdl.location = 'POINT(%f %f)' % (project['geo_long'], project['geo_lat'])
 
             project_mdl.save()
             project['_model'] = project_mdl
