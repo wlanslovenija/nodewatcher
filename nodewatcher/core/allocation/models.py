@@ -80,7 +80,7 @@ class PoolBase(models.Model):
     class Meta:
         abstract = True
 
-    parent = models.ForeignKey('self', null=True, related_name='children')
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
 
     @classmethod
     def modifies_pool(cls, f):
