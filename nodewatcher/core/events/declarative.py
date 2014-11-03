@@ -3,7 +3,7 @@ import copy
 from django.core import exceptions
 from django.utils import datastructures
 
-from . import base
+from . import base as events_base
 from ..registry import registration
 
 
@@ -130,7 +130,7 @@ class NodeEventRecordMeta(type):
         return new_class
 
 
-class NodeEventRecord(base.EventRecord):
+class NodeEventRecord(events_base.EventRecord):
     """
     Base class for node event records.
     """
@@ -139,19 +139,18 @@ class NodeEventRecord(base.EventRecord):
 
     source_name = None
     source_type = None
+    description = None
 
     SEVERITY_INFO = 1
     SEVERITY_WARNING = 2
     SEVERITY_ERROR = 3
 
-    def __init__(self, related_nodes, severity, title, description=None, **kwargs):
+    def __init__(self, related_nodes, severity, **kwargs):
         """
         Class constructor.
 
         :param related_nodes: A list of related node instances
         :param severity: Event severity
-        :param title: Event title
-        :param description: Optional event description
         """
 
         if not isinstance(related_nodes, (tuple, list)):
@@ -160,10 +159,8 @@ class NodeEventRecord(base.EventRecord):
         super(NodeEventRecord, self).__init__(
             related_nodes=related_nodes,
             severity=severity,
-            title=title,
             source_name=self.source_name,
             source_type=self.source_type,
-            description=description,
             **kwargs
         )
 
@@ -185,3 +182,14 @@ class NodeEventRecord(base.EventRecord):
         """
 
         return cls._attributes[name]
+
+    @classmethod
+    def get_description(cls, data):
+        """
+        Generates a localized event-description from event data.
+        """
+
+        if cls.description is not None:
+            return cls.description % data
+
+        raise exceptions.ImproperlyConfigured("Event description not set.")

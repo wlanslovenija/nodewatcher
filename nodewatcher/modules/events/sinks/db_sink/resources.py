@@ -29,14 +29,16 @@ class RelatedNodes(str):
 
 
 class EventResource(api.BaseResource):
+    description = fields.CharField('description')
+
     class Meta:
         queryset = models.SerializedNodeEvent.objects.all().order_by('-timestamp')
         resource_name = 'event'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
-        ordering = ('timestamp', 'related_nodes', 'title')
+        ordering = ('timestamp', 'related_nodes', 'description')
         # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
-        global_filter = ('timestamp', 'related_nodes__config_core_generalconfig__name', 'title')
+        global_filter = ('timestamp', 'related_nodes__config_core_generalconfig__name', 'description')
 
     # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
     related_nodes = fields.ManyToManyField(to=NodeResource, attribute=RelatedNodes('related_nodes__config_core_generalconfig__name'), full=True, help_text=models.SerializedNodeEvent._meta.get_field('related_nodes').help_text)

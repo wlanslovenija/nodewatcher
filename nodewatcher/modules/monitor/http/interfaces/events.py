@@ -1,6 +1,6 @@
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
-from nodewatcher.core.events import events
+from nodewatcher.core.events import declarative as events, pool
 from nodewatcher.core.generator.cgm import models as cgm_models
 
 # Need models to ensure that node.monitoring registration point is available
@@ -24,18 +24,31 @@ class MissingConfiguredInterface(events.NodeEventRecord):
         """
 
         if isinstance(interface, cgm_models.EthernetInterfaceConfig):
-            msg = _("Ethernet interface '%(iface_name)s' is missing")
+            iface_type = 'ethernet'
         elif isinstance(interface, cgm_models.WifiInterfaceConfig):
-            msg = _("Wireless interface '%(iface_name)s' is missing")
+            iface_type = 'wifi'
         else:
-            msg = _("Unknown interface '%(iface_name)s' is missing")
+            iface_type = 'unknown'
 
         super(MissingConfiguredInterface, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_WARNING,
-            msg % {'iface_name': iface_name},
+            iface_type=iface_type,
             iface_name=iface_name,
         )
+
+    @classmethod
+    def get_description(cls, data):
+        if data['iface_type'] == 'ethernet':
+            msg = _("Ethernet interface '%(iface_name)s' is missing.")
+        elif data['iface_type'] == 'wifi':
+            msg = _("Wireless interface '%(iface_name)s' is missing.")
+        else:
+            msg = _("Unknown interface '%(iface_name)s' is missing.")
+
+        return msg % data
+
+pool.register_record(MissingConfiguredInterface)
 
 
 class InterfaceTypeMismatch(events.NodeEventRecord):
@@ -57,24 +70,36 @@ class InterfaceTypeMismatch(events.NodeEventRecord):
         """
 
         if isinstance(interface_cfg, cgm_models.EthernetInterfaceConfig):
-            cfg_type = _("ethernet interface")
+            cfg_type = 'ethernet'
         elif isinstance(interface_cfg, cgm_models.WifiInterfaceConfig):
-            cfg_type = _("wireless interface")
+            cfg_type = 'wifi'
 
         if isinstance(interface_mon, monitor_models.WifiInterfaceMonitor):
-            mon_type = _("wireless interface")
+            mon_type = 'ethernet'
         elif isinstance(interface_mon, monitor_models.InterfaceMonitor):
-            mon_type = _("ethernet interface")
+            mon_type = 'wifi'
 
         super(InterfaceTypeMismatch, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_WARNING,
-            _("Interface type mismatch (%(cfg_type)s - %(mon_type)s)") % {
-                'cfg_type': cfg_type,
-                'mon_type': mon_type,
-            },
             iface_name=iface_name,
+            cfg_type=cfg_type,
+            mon_type=mon_type,
         )
+
+    @classmethod
+    def get_description(cls, data):
+        type_msgs = {
+            'ethernet': _("ethernet interface"),
+            'wifi': _("wireless interface"),
+        }
+
+        return _("Interface type mismatch (%(cfg_type)s - %(mon_type)s).") % {
+            'cfg_type': type_msgs[data['cfg_type']],
+            'mon_type': type_msgs[data['mon_type']],
+        }
+
+pool.register_record(InterfaceTypeMismatch)
 
 
 class WifiInterfaceESSIDMismatch(events.NodeEventRecord):
@@ -82,6 +107,7 @@ class WifiInterfaceESSIDMismatch(events.NodeEventRecord):
     Wireless interface ESSID mismatch.
     """
 
+    description = _("Wireless interface ESSID mismatch (%(essid_configured)s - %(essid_reported)s).")
     iface_name = events.CharAttribute()
     essid_configured = events.CharAttribute()
     essid_reported = events.CharAttribute()
@@ -99,14 +125,12 @@ class WifiInterfaceESSIDMismatch(events.NodeEventRecord):
         super(WifiInterfaceESSIDMismatch, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_WARNING,
-            _("Wireless interface ESSID mismatch (%(essid_configured)s - %(essid_reported)s)") % {
-                'essid_configured': essid_configured,
-                'essid_reported': essid_reported,
-            },
             iface_name=iface_name,
             essid_configured=essid_configured,
             essid_reported=essid_reported,
         )
+
+pool.register_record(WifiInterfaceESSIDMismatch)
 
 
 class WifiInterfaceBSSIDMismatch(events.NodeEventRecord):
@@ -114,6 +138,7 @@ class WifiInterfaceBSSIDMismatch(events.NodeEventRecord):
     Wireless interface BSSID mismatch.
     """
 
+    description = _("Wireless interface BSSID mismatch (%(bssid_configured)s - %(bssid_reported)s).")
     iface_name = events.CharAttribute()
     bssid_configured = events.CharAttribute()
     bssid_reported = events.CharAttribute()
@@ -131,14 +156,12 @@ class WifiInterfaceBSSIDMismatch(events.NodeEventRecord):
         super(WifiInterfaceBSSIDMismatch, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_WARNING,
-            _("Wireless interface BSSID mismatch (%(bssid_configured)s - %(bssid_reported)s)") % {
-                'bssid_configured': bssid_configured,
-                'bssid_reported': bssid_reported,
-            },
             iface_name=iface_name,
             bssid_configured=bssid_configured,
             bssid_reported=bssid_reported,
         )
+
+pool.register_record(WifiInterfaceBSSIDMismatch)
 
 
 class WifiInterfaceModeMismatch(events.NodeEventRecord):
@@ -146,6 +169,7 @@ class WifiInterfaceModeMismatch(events.NodeEventRecord):
     Wireless interface mode mismatch.
     """
 
+    description = _("Wireless interface mode mismatch (%(mode_configured)s - %(mode_reported)s).")
     iface_name = events.CharAttribute()
     mode_configured = events.ChoiceAttribute('node.config', 'core.interfaces#wifi_mode')
     mode_reported = events.ChoiceAttribute('node.config', 'core.interfaces#wifi_mode')
@@ -163,11 +187,9 @@ class WifiInterfaceModeMismatch(events.NodeEventRecord):
         super(WifiInterfaceModeMismatch, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_WARNING,
-            _("Wireless interface mode mismatch (%(mode_configured)s - %(mode_reported)s)") % {
-                'mode_configured': mode_configured,
-                'mode_reported': mode_reported,
-            },
             iface_name=iface_name,
             mode_configured=mode_configured,
             mode_reported=mode_reported,
         )
+
+pool.register_record(WifiInterfaceModeMismatch)

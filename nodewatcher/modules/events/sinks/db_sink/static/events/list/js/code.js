@@ -24,7 +24,7 @@
                 'aoColumns': [
                     {'mData': 'timestamp'},
                     {'mData': 'related_nodes', 'mRender': $.tastypie.nodeSubdocumentName(table)},
-                    {'mData': 'title'}
+                    {'mData': 'description'}
                 ],
                 'aaSorting': [[0, 'desc']],
                 'oLanguage': {

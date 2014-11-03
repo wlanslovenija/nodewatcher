@@ -1,4 +1,4 @@
 from .pool import pool
 
-# Event sink auto-discovery
-pool.discover_sinks()
+# Event sink/record auto-discovery
+pool.discover()

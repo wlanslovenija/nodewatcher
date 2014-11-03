@@ -1,6 +1,6 @@
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
-from ..events import events
+from nodewatcher.core.events import declarative as events, pool
 
 # Need models to ensure that node.monitoring registration point is available
 from . import models
@@ -11,6 +11,7 @@ class TopologyLinkEstablished(events.NodeEventRecord):
     Topology link established event.
     """
 
+    description = _("Link between two nodes has been established.")
     routing_protocol = events.ChoiceAttribute('node.config', 'core.interfaces#routing_protocol')
 
     def __init__(self, node_a, node_b, routing_protocol):
@@ -25,15 +26,18 @@ class TopologyLinkEstablished(events.NodeEventRecord):
         super(TopologyLinkEstablished, self).__init__(
             [node_a, node_b],
             events.NodeEventRecord.SEVERITY_INFO,
-            _("Link between two nodes has been established"),
             routing_protocol=routing_protocol,
         )
+
+pool.register_record(TopologyLinkEstablished)
 
 
 class TelemetryProcessingFailed(events.NodeEventRecord):
     """
     Telemetry failure event.
     """
+
+    description = _("Telemetry processing has failed.")
 
     def __init__(self, node):
         """
@@ -45,5 +49,6 @@ class TelemetryProcessingFailed(events.NodeEventRecord):
         super(TelemetryProcessingFailed, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_ERROR,
-            _("Telemetry processing has failed"),
         )
+
+pool.register_record(TelemetryProcessingFailed)
