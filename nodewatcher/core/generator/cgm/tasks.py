@@ -57,6 +57,8 @@ def background_build(self, result_uuid):
 
         # Dispatch error signal
         signals.fail_firmware_build.send(sender=None, result=result)
+        # Dispatch the result failed event
+        generator_events.BuildResultFailed(result).post()
         return
 
     # Dispatch signal that can be used to modify files
