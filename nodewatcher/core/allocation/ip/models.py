@@ -1,8 +1,7 @@
 from django import dispatch
 from django.db import models
 from django.db.models import signals as django_signals
-from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from .. import models as allocation_models
 from ...registry import fields as registry_fields, forms as registry_forms, permissions
@@ -32,15 +31,16 @@ class IpPool(allocation_models.PoolBase):
     family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
     network = models.CharField(max_length=50)
     prefix_length = models.IntegerField()
-    status = models.IntegerField(default=IpPoolStatus.Free)
+    status = models.IntegerField(default=IpPoolStatus.Free, editable=False)
     description = models.CharField(max_length=200, null=True)
-    prefix_length_default = models.IntegerField(null=True)
-    prefix_length_minimum = models.IntegerField(default=24, null=True)
-    prefix_length_maximum = models.IntegerField(default=28, null=True)
-    ip_subnet = registry_fields.IPAddressField(null=True)
+    prefix_length_default = models.IntegerField(null=True, verbose_name=_("Default prefix length"))
+    prefix_length_minimum = models.IntegerField(default=24, null=True, verbose_name=_("Minimum prefix length"))
+    prefix_length_maximum = models.IntegerField(default=28, null=True, verbose_name=_("Maximum prefix length"))
+    ip_subnet = registry_fields.IPAddressField(editable=False, null=True)
 
     class Meta:
         app_label = 'core'
+        verbose_name = 'IP pool'
 
     def save(self, **kwargs):
         """
@@ -213,8 +213,6 @@ class IpPool(allocation_models.PoolBase):
         """
 
         self.status = IpPoolStatus.Free
-        self.allocation_content_object = None
-        self.allocation_timestamp = None
         self.save()
         self.reclaim_pools()
 
@@ -370,9 +368,6 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             self.allocation = self.pool.allocate_subnet(self.prefix_length)
 
         if self.allocation is not None:
-            self.allocation.allocation_content_object = obj
-            self.allocation.allocation_timestamp = timezone.now()
-            self.allocation.save()
             self.save()
         else:
             raise registry_forms.RegistryValidationError(

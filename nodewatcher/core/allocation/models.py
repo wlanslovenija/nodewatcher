@@ -82,12 +82,6 @@ class PoolBase(models.Model):
 
     parent = models.ForeignKey('self', null=True, related_name='children')
 
-    # Bookkeeping for allocated pools
-    allocation_content_type = models.ForeignKey(contenttypes_models.ContentType, null=True)
-    allocation_object_id = models.CharField(max_length=50, null=True)
-    allocation_content_object = generic.GenericForeignKey('allocation_content_type', 'allocation_object_id')
-    allocation_timestamp = models.DateTimeField(null=True)
-
     @classmethod
     def modifies_pool(cls, f):
         def decorator(self, *args, **kwargs):
