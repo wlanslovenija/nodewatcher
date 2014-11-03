@@ -1,4 +1,7 @@
+from django.db import models as django_models
+
 from tastypie import fields
+from tastypie import authorization as api_authorization
 
 from nodewatcher.core.frontend import api
 from nodewatcher.modules.frontend.list import resources
@@ -28,6 +31,21 @@ class RelatedNodes(str):
         )
 
 
+class EventAuthorization(api_authorization.Authorization):
+    def read_list(self, object_list, bundle):
+        if bundle.request.user.is_authenticated():
+            qs = object_list.filter(
+                django_models.Q(related_users=None) | django_models.Q(related_users=bundle.request.user)
+            )
+        else:
+            qs = object_list.filter(related_users=None)
+
+        return qs
+
+    def read_detail(self, object_list, bundle):
+        return not bundle.obj.related_users or bundle.request.user in bundle.obj.related_users
+
+
 class EventResource(api.BaseResource):
     description = fields.CharField('description')
 
@@ -39,6 +57,7 @@ class EventResource(api.BaseResource):
         ordering = ('timestamp', 'related_nodes', 'description')
         # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
         global_filter = ('timestamp', 'related_nodes__config_core_generalconfig__name', 'description')
+        authorization = EventAuthorization()
 
     # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
     related_nodes = fields.ManyToManyField(to=NodeResource, attribute=RelatedNodes('related_nodes__config_core_generalconfig__name'), full=True, help_text=models.SerializedNodeEvent._meta.get_field('related_nodes').help_text)
