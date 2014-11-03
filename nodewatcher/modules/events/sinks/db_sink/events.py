@@ -32,10 +32,14 @@ class DatabaseSink(base.EventSink):
             del record['source_name']
             del record['source_type']
             del record['related_nodes']
+            del record['related_users']
             mdl.record = record
 
             mdl.save()
             # Add related nodes
             mdl.related_nodes.add(*event.related_nodes)
+            # Add related users
+            if event.related_users is not None:
+                mdl.related_users.add(*event.related_users)
 
 pool.register_sink(DatabaseSink)

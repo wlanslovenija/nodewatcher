@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import models as auth_models
 
 import json_field
 
@@ -13,6 +14,7 @@ class SerializedNodeEvent(models.Model):
 
     timestamp = models.DateTimeField()
     related_nodes = models.ManyToManyField(core_models.Node, related_name='events')
+    related_users = models.ManyToManyField(auth_models.User, related_name='events')
     severity = models.IntegerField()
     source_name = models.CharField(max_length=200)
     source_type = models.CharField(max_length=200)

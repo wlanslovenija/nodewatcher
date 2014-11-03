@@ -12,6 +12,7 @@ from ....utils import loader
 
 from . import signals, base as cgm_base, exceptions
 from .. import models as generator_models
+from .. import events as generator_events
 
 
 @celery_task(bind=True)
@@ -83,3 +84,5 @@ def background_build(self, result_uuid):
 
     # Dispatch finalize signal
     signals.finalize_firmware_build.send(sender=None, result=result)
+    # Dispatch the result ready event
+    generator_events.BuildResultReady(result).post()

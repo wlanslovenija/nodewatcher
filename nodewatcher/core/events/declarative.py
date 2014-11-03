@@ -145,22 +145,27 @@ class NodeEventRecord(events_base.EventRecord):
     SEVERITY_WARNING = 2
     SEVERITY_ERROR = 3
 
-    def __init__(self, related_nodes, severity, **kwargs):
+    def __init__(self, related_nodes, severity, related_users=None, **kwargs):
         """
         Class constructor.
 
         :param related_nodes: A list of related node instances
         :param severity: Event severity
+        :param related_users: Optional list of user instances related to this event
         """
 
         if not isinstance(related_nodes, (tuple, list)):
             related_nodes = [related_nodes]
+
+        if related_users is not None and not isinstance(related_users, (tuple, list)):
+            related_users = [related_users]
 
         super(NodeEventRecord, self).__init__(
             related_nodes=related_nodes,
             severity=severity,
             source_name=self.source_name,
             source_type=self.source_type,
+            related_users=related_users,
             **kwargs
         )
 
