@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+mkdir -p /var/log/monitor
+chown nobody:nogroup /var/log/monitor
+
+exec chpst -u nobody:nogroup svlogd -tt /var/log/monitor
+

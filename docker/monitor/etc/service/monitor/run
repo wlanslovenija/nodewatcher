@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+cd /code
+exec chpst -u www-data:www-data /usr/bin/python manage.py monitord
+
