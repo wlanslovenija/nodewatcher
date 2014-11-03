@@ -16,8 +16,11 @@ class SSID(models.Model):
     project = models.ForeignKey('Project', related_name='ssids')
     purpose = models.CharField(max_length=50)
     default = models.BooleanField(default=False)
-    bssid = registry_fields.MACAddressField(null=True, blank=True)
-    essid = models.CharField(max_length=50)
+    bssid = registry_fields.MACAddressField(null=True, blank=True, verbose_name=_("BSSID"))
+    essid = models.CharField(max_length=50, verbose_name=_("ESSID"))
+
+    class Meta:
+        verbose_name = 'SSID'
 
     def __unicode__(self):
         return u'%s (%s)' % (self.essid, self.bssid)
@@ -47,7 +50,13 @@ class Project(models.Model):
     location = gis_models.PointField(null=True)
 
     # Pools linked to this project
-    pools_core_ippool = models.ManyToManyField('core.IpPool', related_name='projects')
+    pools_core_ippool = models.ManyToManyField(
+        'core.IpPool',
+        related_name='projects',
+        verbose_name=_("IP pools"),
+        null=True,
+        blank=True,
+    )
 
     def __unicode__(self):
         return self.name
