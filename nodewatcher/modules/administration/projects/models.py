@@ -56,6 +56,8 @@ class Project(models.Model):
         verbose_name=_("IP pools"),
         null=True,
         blank=True,
+        # Only toplevel pools should be selected
+        limit_choices_to={'parent': None},
     )
 
     def __unicode__(self):
