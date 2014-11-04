@@ -90,3 +90,16 @@ The following information should be used when adding a builder:
         IjAnJaI31jpR2GSIQ9ck5SVNRKn8TO7hGMncSq6/CCJTwdAI9pzED4typVs341Wo
         BZ9HO5E5TUQTXTKkKR4kPT2wyfsjCBEJl76RIt7WyJnEbj1fIcn+OZo=
         -----END RSA PRIVATE KEY-----
+
+    .. warning::
+
+        This public/private key pair should only be used for development. For production deployments
+        you should generate new key pairs and configure them appropriately (the public key can be
+        configured by setting the ``BUILDER_PUBLIC_KEY`` environmental variable on the builder Docker
+        container).
+
+        In order to generate a new RSA key pair, you may use::
+
+            $ ssh-keygen -f builder.key -C "builder@host"
+
+        This will generate a ``builder.key`` (private key) and ``builder.key.pub`` (public key).
