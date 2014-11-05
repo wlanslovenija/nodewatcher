@@ -1,3 +1,4 @@
+from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
 
 from nodewatcher.core.events import declarative as events, pool
@@ -25,6 +26,10 @@ class BuildResultReady(events.NodeEventRecord):
             version=build_result.builder.version.name,
         )
 
+    @classmethod
+    def get_url(cls, data):
+        return urlresolvers.reverse('GeneratorComponent:view_build', kwargs={'pk': data['build_result']})
+
 pool.register_record(BuildResultReady)
 
 
@@ -49,5 +54,9 @@ class BuildResultFailed(events.NodeEventRecord):
             build_result=str(build_result.uuid),
             version=build_result.builder.version.name,
         )
+
+    @classmethod
+    def get_url(cls, data):
+        return urlresolvers.reverse('GeneratorComponent:view_build', kwargs={'pk': data['build_result']})
 
 pool.register_record(BuildResultFailed)

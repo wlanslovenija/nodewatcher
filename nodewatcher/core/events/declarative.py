@@ -192,9 +192,23 @@ class NodeEventRecord(events_base.EventRecord):
     def get_description(cls, data):
         """
         Generates a localized event-description from event data.
+
+        :param data: Event data dictionary
         """
 
         if cls.description is not None:
             return cls.description % data
 
         raise exceptions.ImproperlyConfigured("Event description not set.")
+
+    @classmethod
+    def get_url(cls, data):
+        """
+        Returns an URL that one should be redirected to when wanting to
+        see the details about this event. The default implementation always
+        returns None.
+
+        :param data: Event data dictionary
+        """
+
+        pass
