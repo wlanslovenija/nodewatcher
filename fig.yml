@@ -60,6 +60,7 @@ generator:
     links:
         - db
         - tokumx
+        - builder
 web:
     build: .
     command: "scripts/docker-wait-pgsql; python manage.py runserver 0.0.0.0:8000"
