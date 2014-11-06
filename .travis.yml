@@ -1,7 +1,7 @@
 language: python
 python:
  - 2.7
-env: PYTHONPATH=. DB_1_ENV_PGSQL_SUPERUSER_USERNAME=postgres
+env: PYTHONPATH=. DB_1_ENV_PGSQL_ROLE_1_USERNAME=postgres
 services:
  - mongodb
  - postgresql

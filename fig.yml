@@ -1,8 +1,12 @@
 db:
-    image: kostko/postgis
+    image: wlanslovenija/postgis
     environment:
-        PGSQL_SUPERUSER_USERNAME: nodewatcher
-        PGSQL_SUPERUSER_PASSWORD: nodewatcher
+        PGSQL_ROLE_1_USERNAME: nodewatcher
+        PGSQL_ROLE_1_PASSWORD: nodewatcher
+        PGSQL_ROLE_1_FLAGS: LOGIN SUPERUSER
+        PGSQL_DB_1_NAME: nodewatcher
+        PGSQL_DB_1_OWNER: nodewatcher
+        PGSQL_DB_1_ENCODING: UNICODE
     volumes:
         # Use a volume to enable database persistency across restarts
         - /tmp/nodewatcher-db:/var/lib/postgresql/9.3/main
@@ -58,7 +62,7 @@ generator:
         - tokumx
 web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: "scripts/docker-wait-pgsql; python manage.py runserver 0.0.0.0:8000"
     entrypoint: scripts/docker-run
     volumes:
         - .:/code

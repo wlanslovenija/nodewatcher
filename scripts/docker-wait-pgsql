@@ -1,0 +1,11 @@
+#!/bin/bash
+
+retries=30
+while ! pg_isready -h db; do
+  sleep 1
+  let retries--
+  if [ $retries == 0 ]; then
+    break
+  fi
+done
+
