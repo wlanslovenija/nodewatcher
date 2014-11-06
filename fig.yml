@@ -11,7 +11,7 @@ db:
         # Use a volume to enable database persistency across restarts
         - /tmp/nodewatcher-db:/var/lib/postgresql/9.3/main
 tokumx:
-    image: kostko/tokumx
+    image: wlanslovenija/tokumx
     # A privileged container is required to disable hugepages for TokuMX
     privileged: true
 builder:
