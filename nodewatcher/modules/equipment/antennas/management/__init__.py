@@ -8,6 +8,8 @@ from nodewatcher.utils import loader
 
 from .. import models as antennas_models
 
+ANTENNA_FIXTURES_INSTALLED = False
+
 
 @dispatch.receiver(
     django_signals.post_migrate,
@@ -17,6 +19,10 @@ def install_antenna_fixtures(sender, **kwargs):
     """
     Installs fixtures for all registered internal antennas.
     """
+
+    global ANTENNA_FIXTURES_INSTALLED
+    if ANTENNA_FIXTURES_INSTALLED:
+        return
 
     try:
         apps.get_model('antennas', 'Antenna')
@@ -48,3 +54,5 @@ def install_antenna_fixtures(sender, **kwargs):
             mdl.angle_vertical = antenna.angle_vertical
             mdl.gain = antenna.gain
             mdl.save()
+
+    ANTENNA_FIXTURES_INSTALLED = True
