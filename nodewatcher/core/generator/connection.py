@@ -51,7 +51,7 @@ class BuilderConnection(object):
             transport = self.client.get_transport()
             transport.set_keepalive(60)
             self.sftp = transport.open_sftp_client()
-        except paramiko.SSHException:
+        except (paramiko.SSHException, paramiko.SFTPError):
             raise exceptions.BuilderConnectionFailed
 
         return self
