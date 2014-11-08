@@ -9,7 +9,11 @@ In order to make nodewatcher development as simple as possible, a Docker_ develo
 Running the development instance
 --------------------------------
 
-To run the development server simply execute the following command in the top-level nodewatcher directory::
+In order to ensure that you have the latest versions of all dependent Docker images, you have to first run the following command in the top-level nodewatcher directory::
+
+    $ fig pull
+
+Then, to run the development server simply execute the following command::
 
     $ fig up
 
