@@ -1,6 +1,6 @@
 #!/bin/bash
 
-retries=30
+retries=60
 while ! pg_isready -h db; do
   sleep 1
   let retries--
