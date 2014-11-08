@@ -6,16 +6,29 @@ In order to make nodewatcher development as simple as possible, a Docker_ develo
 .. _Docker: https://docker.io
 .. _fig: https://orchardup.github.io/fig
 
-Running the development server
-------------------------------
+Running the development instance
+--------------------------------
 
 To run the development server simply execute the following command in the top-level nodewatcher directory::
 
     $ fig up
 
-The first time this command is executed, a new Docker image for nodewatcher development version will be built, which might take some time. On subsequent runs, the development server will be started immediately.
+The first time this command is executed, a new Docker image for nodewatcher development version will be built, which might take some time. On subsequent runs, the development instace will be started immediately.
 
-.. note:: Default container configuration stores the database under `/tmp/nodewatcher-db`, so it will be removed on host machine restarts. You may change this location by editing `fig.yml`.
+.. note:: Default container configuration stores the database under ``/tmp/nodewatcher-db``, so it will be removed on host machine restarts. You may change this location by editing ``fig.yml``.
+
+The following containers will be created and started when you run the above command:
+
+* ``db`` contains the PostgreSQL 9.3 database server with installed extension PostGIS 2.1.
+* ``tokumx`` contains the TokuMX database server (an improved version of MongoDB).
+* ``builder`` contains a firmware builder that you can use for development (see :ref:`development-run-builder`).
+* ``generator`` contains the Celery workers for the firmware image generator. These workers connect to the ``builder`` via SSH in order to build firmware images.
+* ``web`` contains the nodewatcher frontend (Django development server), running on port ``8000`` by default.
+
+.. note::
+    The development instance uses TokuMX (an improved version of MongoDB) as a database server for storing datapoints. TokuMX requires that the use of HugePages be disabled in the kernel, otherwise the server will refuse to start. This is why the container is configured as privileged in ``fig.yml``, so that it can disable this by default. In case you need to disable HugePages manually, you should execute the following on the host::
+
+        $ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 Initializing the database
 -------------------------
@@ -47,6 +60,8 @@ Running management commands
 Don't forget to run any management command via the container as otherwise the settings will be wrong. You can do it by prefixing commands with `fig run web` like this::
 
     $ fig run web python manage.py <command...>
+
+.. _development-run-builder:
 
 Running a builder
 -----------------
