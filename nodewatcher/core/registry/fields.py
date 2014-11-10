@@ -548,6 +548,7 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
         self.choices_rid = choices_model.get_registry_id()
         self.filter_model = choices_model
         self.partially_validated_tree = None
+        kwargs['empty_value'] = None
         super(ReferenceChoiceFormField, self).__init__(*args, **kwargs)
 
     def get_dependencies(self, value):
