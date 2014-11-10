@@ -218,7 +218,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode')
     essid = models.CharField(max_length=50, verbose_name="ESSID")
-    bssid = registry_fields.MACAddressField(verbose_name="BSSID")
+    bssid = registry_fields.MACAddressField(verbose_name="BSSID", blank=True, null=True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         form_weight = 51
