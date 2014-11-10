@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Cleanup all Python compiled bytecode files
+find -name "*.pyc" | xargs rm -f
+

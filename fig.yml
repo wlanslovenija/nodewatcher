@@ -50,7 +50,7 @@ builder:
         # -----END RSA PRIVATE KEY-----
 generator:
     build: .
-    command: celery worker -A nodewatcher -l info -Q generator --autoreload
+    command: "scripts/docker-cleanup; celery worker -A nodewatcher -l info -Q generator --autoreload"
     entrypoint: scripts/docker-run
     environment:
         # Allow celery to run under the root user in order for it to have access
@@ -63,7 +63,7 @@ generator:
         - builder
 web:
     build: .
-    command: "scripts/docker-wait-pgsql; python manage.py runserver 0.0.0.0:8000"
+    command: "scripts/docker-cleanup; scripts/docker-wait-pgsql; python manage.py runserver 0.0.0.0:8000"
     entrypoint: scripts/docker-run
     volumes:
         - .:/code
