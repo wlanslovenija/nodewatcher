@@ -1,6 +1,10 @@
 
 
-class NoBuildChannelsConfigured(Exception):
+class BuilderConfigurationError(Exception):
+    pass
+
+
+class NoBuildChannelsConfigured(BuilderConfigurationError):
     """
     Exception that gets raised when no build channels are configured.
     """
@@ -8,7 +12,7 @@ class NoBuildChannelsConfigured(Exception):
     pass
 
 
-class NoBuildersConfigured(Exception):
+class NoBuildersConfigured(BuilderConfigurationError):
     """
     Exception that gets raised when no builders are configured.
     """
@@ -16,7 +20,7 @@ class NoBuildersConfigured(Exception):
     pass
 
 
-class NoSuitableBuildersFound(Exception):
+class NoSuitableBuildersFound(BuilderConfigurationError):
     """
     Exception that gets raised when no suitable builders for building for the
     specified platform and architecture are found.
