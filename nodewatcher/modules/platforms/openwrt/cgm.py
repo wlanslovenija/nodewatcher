@@ -357,6 +357,10 @@ def configure_network(cfg, network, section):
         if network.routing_announce:
             section._announce = [network.routing_announce]
 
+        # Check that the network has actually been allocated and fail validation if not so
+        if not network.allocation:
+            raise cgm_base.ValidationError(_("Missing network allocation."))
+
         if network.family in ('ipv4', 'ipv6'):
             # Make our subnet available to other modules as a resource
             res = cgm_resources.IpResource(network.family, network.allocation.ip_subnet, network)
