@@ -49,23 +49,25 @@ class WirelessProtocolMetaclass(type):
         if cls == "WirelessProtocol":
             return new_class
 
+        new_class.channels = ()
+        new_class.widths = ()
+        new_class.capabilities = set()
+        new_class.available_capabilities = set()
+
         for base in bases:
             if not hasattr(base, 'identifier'):
                 continue
 
             # Merge channels from base classes
-            new_class.channels = base.channels + new_class.channels
+            new_class.channels += base.channels
             # Merge channel widths from base classes
-            new_class.widths = base.widths + new_class.widths
+            new_class.widths += base.widths
             # Merge capabilities from base classes
-            new_class.capabilities = list(
-                getattr(base, 'capabilities', None) or []
-            ) + list(
-                getattr(new_class, 'capabilities', None) or []
-            )
+            new_class.capabilities.update(base.capabilities)
 
-        new_class.capabilities = set(getattr(new_class, 'capabilities', []) or [])
-        new_class.available_capabilities = set()
+        new_class.channels += attrs.get('channels', ())
+        new_class.widths += attrs.get('widths', ())
+        new_class.capabilities.update(attrs.get('capabilities', set()))
 
         for capability in new_class.capabilities:
             setattr(new_class, capability.identifier.replace('-', '_').upper(), capability)
@@ -82,8 +84,8 @@ class WirelessProtocol(object):
 
     channels = ()
     widths = ()
-    capabilities = None
-    available_capabilities = None
+    capabilities = ()
+    available_capabilities = ()
 
     @classmethod
     def get_channel_choices(cls, width, regulatory_filter=None):
