@@ -54,6 +54,25 @@
             forms
         ).done(function(data) {
             $('#registry_forms').html(data);
+
+            /* Ensure that on-load event handlers get called again. */
+            var event;
+
+            if (document.createEvent) {
+                event = document.createEvent("HTMLEvents");
+                event.initEvent("load", true, true);
+            } else {
+                event = document.createEventObject();
+                event.eventType = "load";
+            }
+
+            event.eventName = "load";
+
+            if (document.createEvent) {
+                window.dispatchEvent(event);
+            } else {
+                window.fireEvent("on" + event.eventType, event);
+            }
         });
     };
 }));
