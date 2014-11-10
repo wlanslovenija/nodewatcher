@@ -890,7 +890,7 @@ def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, sav
         # Process forms when saving and there are no validation errors
         if save and root is not None and not context.validation_errors:
             # Resolve form dependencies and save all forms
-            for linear_forms in toposort.topological_sort(context.pending_save_forms):
+            for layer, linear_forms in enumerate(toposort.topological_sort(context.pending_save_forms)):
                 for info in linear_forms:
                     form = info['form']
 
@@ -904,7 +904,10 @@ def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, sav
                         # Save the form and store the instance into partial configuration so
                         # dependent objects can reference the new instance
                         instance = form.save()
-                        if info['registry_id'] in context.current_config:
+                        # Only overwrite instances at the top layer (forms which have no dependencies
+                        # on anything else). Models with dependencies will already be updated when
+                        # calling save.
+                        if layer == 0 and info['registry_id'] in context.current_config:
                             context.current_config[info['registry_id']][info['index']] = instance
 
                         for form_id, field in context.pending_save_foreign_keys.get(info['form_id'], []):
