@@ -242,7 +242,7 @@ def create_config_item(cls, partial, attributes, parent=None):
     for field, value in attributes.iteritems():
         try:
             setattr(config, field, value)
-        except exceptions.ValidationError:
+        except (exceptions.ValidationError, ValueError):
             pass
 
     return config
