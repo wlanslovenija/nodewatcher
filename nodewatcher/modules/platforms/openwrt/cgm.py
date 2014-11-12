@@ -344,10 +344,12 @@ def configure_network(cfg, network, section):
         if network.family == 'ipv4':
             section.ipaddr = network.address.ip
             section.netmask = network.address.netmask
-            section.gateway = network.gateway.ip
+            if network.gateway:
+                section.gateway = network.gateway.ip
         elif network.family == 'ipv6':
             section.ip6addr = network.address
-            section.ip6gw = network.gateway.ip
+            if network.gateway:
+                section.ip6gw = network.gateway.ip
         else:
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
     elif isinstance(network, cgm_models.AllocatedNetworkConfig):

@@ -327,7 +327,7 @@ class StaticNetworkConfig(NetworkConfig, AnnouncableNetwork):
 
     family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
     address = registry_fields.IPAddressField(subnet_required=True)
-    gateway = registry_fields.IPAddressField(host_required=True)
+    gateway = registry_fields.IPAddressField(host_required=True, null=True, blank=True)
 
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("Static Network")
@@ -336,6 +336,7 @@ class StaticNetworkConfig(NetworkConfig, AnnouncableNetwork):
         """
         Verifies that gateway is in the address subnet.
         """
+
         if not self.address or not self.gateway:
             return
 

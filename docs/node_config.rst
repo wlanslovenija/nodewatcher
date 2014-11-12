@@ -453,8 +453,8 @@ The simplest is a static IP network configuration.
    :param address: IP address and network mask (in CIDR notation).
    :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
 
-   :param gateway: Gateway address.
-   :type gateway: :class:`~nodewatcher.core.registry.fields.MACAddressField`
+   :param gateway: Gateway address (may be ``None``).
+   :type gateway: :class:`~nodewatcher.core.registry.fields.IPAddressField`
 
 Resources may also be configured from various pools (for available fields, see :ref:`resources`).
 
