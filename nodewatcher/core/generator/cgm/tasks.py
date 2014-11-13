@@ -60,6 +60,16 @@ def background_build(self, result_uuid):
         # Dispatch the result failed event
         generator_events.BuildResultFailed(result).post()
         return
+    except:
+        result.build_log = 'Internal build error.'
+        result.status = generator_models.BuildResult.FAILED
+        result.save()
+
+        # Dispatch error signal
+        signals.fail_firmware_build.send(sender=None, result=result)
+        # Dispatch the result failed event
+        generator_events.BuildResultFailed(result).post()
+        return
 
     # Dispatch signal that can be used to modify files
     signals.post_firmware_build.send(sender=None, result=result, files=files)
