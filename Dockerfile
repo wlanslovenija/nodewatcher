@@ -12,7 +12,7 @@ RUN cat /code/packages.txt | xargs apt-get --no-install-recommends -y --force-ye
 
 # Install Python package dependencies (do not use pip install -r here!)
 ADD ./requirements.txt /code/requirements.txt
-RUN { cat /code/requirements.txt | xargs -n 1 pip install; } || true
+RUN cat /code/requirements.txt | xargs -n 1 pip install
 
 # Remove unneeded build-time dependencies
 RUN apt-get purge python-dev build-essential -y --force-yes && \
