@@ -1,3 +1,4 @@
+import io
 import os
 
 
@@ -21,6 +22,19 @@ def build_image(result, profile):
             if fname.startswith('_'):
                 continue
             builder.write_file(os.path.join(cfg_path, fname), content)
+
+        # Prepare user account files
+        from . import crypt
+        passwd = io.StringIO()
+        for account in cfg['_accounts'].get('users', {}).values():
+            if account['password'] != '*':
+                account['password'] = crypt.md5crypt(
+                    account['password'],
+                    os.urandom(6).encode('base_64').strip()
+                )
+
+            passwd.write('%(username)s:%(password)s:%(uid)d:%(gid)d:%(username)s:%(home)s:%(shell)s\n' % account)
+        builder.write_file(os.path.join(temp_path, 'etc', 'passwd'), passwd.getvalue().encode('ascii'))
 
         # Run the build system and wait for its completion
         result.build_log = builder.call(

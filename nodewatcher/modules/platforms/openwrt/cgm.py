@@ -330,6 +330,23 @@ def general(node, cfg):
     ])
 
 
+@cgm_base.register_platform_module('openwrt', 11)
+def user_accounts(node, cfg):
+    """
+    Configures password authentication for root user account.
+    """
+
+    cfg.accounts.add_user('nobody', '*', 65534, 65534, '/var', '/bin/false')
+
+    try:
+        auth = node.config.core.authentication(onlyclass=cgm_models.PasswordAuthenticationConfig).get()
+        cfg.accounts.add_user('root', auth.password, 0, 0, '/tmp', '/bin/ash')
+    except cgm_models.PasswordAuthenticationConfig.MultipleObjectsReturned:
+        raise cgm_base.ValidationError(_("Multiple root passwords are not supported!"))
+    except cgm_models.PasswordAuthenticationConfig.DoesNotExist:
+        pass
+
+
 def configure_network(cfg, network, section):
     """
     A helper function to configure an interface's network.

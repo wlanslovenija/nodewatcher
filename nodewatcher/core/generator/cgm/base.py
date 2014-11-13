@@ -13,6 +13,50 @@ class ValidationError(Exception):
     pass
 
 
+class PlatformAccountManager(object):
+    """
+    A simple platform-independent account manager.
+    """
+
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self._users = {}
+
+    def add_user(self, username, password, uid, gid, home, shell):
+        """
+        Creates a new user account on the device.
+
+        :param username: Username
+        :param password: Clear-text password
+        :param uid: UID
+        :param gid: GID
+        :param home: Home directory location
+        :param shell: Shell
+        """
+
+        self._users[uid] = {
+            'uid': int(uid),
+            'gid': int(gid),
+            'home': str(home).encode('ascii'),
+            'shell': str(shell).encode('ascii'),
+            'username': str(username).encode('ascii'),
+            'password': str(password),
+        }
+
+    def get_config(self):
+        """
+        Returns a configuration dictionary suitable for use in JSON
+        documents.
+        """
+
+        return {
+            'users': self._users,
+        }
+
+
 class PlatformConfiguration(object):
     """
     A flexible in-memory platform configuration store that is used
@@ -28,6 +72,7 @@ class PlatformConfiguration(object):
 
         self.resources = cgm_resources.ResourceAllocator()
         self.packages = set()
+        self.accounts = PlatformAccountManager()
 
     def get_build_config(self):
         """
@@ -39,6 +84,7 @@ class PlatformConfiguration(object):
 
         return {
             '_packages': list(self.packages),
+            '_accounts': self.accounts.get_config(),
         }
 
 
