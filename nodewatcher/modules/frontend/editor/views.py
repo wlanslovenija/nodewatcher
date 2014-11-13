@@ -213,7 +213,9 @@ class RemoveNode(mixins.PermissionRequiredMixin,
     context_object_name = 'node'
 
     def delete(self, request, *args, **kwargs):
-        signals.pre_remove_node.send(sender=self, request=request, node=self.object)
+        # Need to use get_object instead of object here, because self.object is only
+        # fetched by the super delete method
+        signals.pre_remove_node.send(sender=self, request=request, node=self.get_object())
         response = super(RemoveNode, self).delete(request, *args, **kwargs)
         signals.post_remove_node.send(sender=self, request=request, node=self.object)
         return response
