@@ -341,9 +341,9 @@ def user_accounts(node, cfg):
     try:
         auth = node.config.core.authentication(onlyclass=cgm_models.PasswordAuthenticationConfig).get()
         cfg.accounts.add_user('root', auth.password, 0, 0, '/tmp', '/bin/ash')
-    except cgm_models.PasswordAuthenticationConfig.MultipleObjectsReturned:
+    except cgm_models.AuthenticationConfig.MultipleObjectsReturned:
         raise cgm_base.ValidationError(_("Multiple root passwords are not supported!"))
-    except cgm_models.PasswordAuthenticationConfig.DoesNotExist:
+    except cgm_models.AuthenticationConfig.DoesNotExist:
         pass
 
 
