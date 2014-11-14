@@ -18,6 +18,9 @@ def olsr(node, cfg):
     except core_models.RouterIdConfig.DoesNotExist:
         return
 
+    olsrd6 = cfg.olsrd6.add('olsrd')
+    # TODO: Enable IPv6 configuration for olsrd, currently we just ignore it
+
     olsrd = cfg.olsrd.add('olsrd')
     olsrd.MainIp = router_id
     olsrd.SrcIpRoutes = 'yes'
