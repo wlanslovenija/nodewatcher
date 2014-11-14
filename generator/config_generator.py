@@ -1204,10 +1204,10 @@ config uhttpd main
           self.packages.remove(package)
 
       pkg_map = {
-        "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-acm", "telemetryd"],
+        "tp-wr842nd" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wr1043nd" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wr703n" : ["kmod-usb-serial", "kmod-usb-acm"],
-        "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm", "telemetryd"],
+        "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wdr4300" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wdr4300+koruza" : ["kmod-usb-serial", "kmod-usb-acm"],
       }
