@@ -1,5 +1,5 @@
 from django import dispatch
-from django.db import models
+from django.db import models, utils
 from django.db.models import signals as django_signals
 from django.utils.translation import ugettext_lazy as _
 
@@ -329,7 +329,13 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             return False
 
         self.allocation = other.allocation
-        self.save()
+        try:
+            # Force an update as someone may call free on an allocation object that was
+            # already deleted in the database and in this case we should not create a new one.
+            self.save(force_update=True)
+        except (ValueError, utils.DatabaseError):
+            pass
+
         return True
 
     def is_satisfied(self):
@@ -368,7 +374,12 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             self.allocation = self.pool.allocate_subnet(self.prefix_length)
 
         if self.allocation is not None:
-            self.save()
+            try:
+                # Force an update as someone may call free on an allocation object that was
+                # already deleted in the database and in this case we should not create a new one.
+                self.save(force_update=True)
+            except (ValueError, utils.DatabaseError):
+                pass
         else:
             raise registry_forms.RegistryValidationError(
                 _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
@@ -386,7 +397,13 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
 
         self.allocation.free()
         self.allocation = None
-        self.save()
+
+        try:
+            # Force an update as someone may call free on an allocation object that was
+            # already deleted in the database and in this case we should not create a new one.
+            self.save(force_update=True)
+        except (ValueError, utils.DatabaseError):
+            pass
 
     def get_routerid_family(self):
         """
