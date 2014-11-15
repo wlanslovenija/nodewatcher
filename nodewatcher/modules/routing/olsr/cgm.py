@@ -13,18 +13,7 @@ ROUTING_TABLE_PRIORITY = 1000
 
 @cgm_base.register_platform_module('openwrt', 900)
 def olsr(node, cfg):
-    try:
-        router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
-    except core_models.RouterIdConfig.DoesNotExist:
-        return
-
-    olsrd6 = cfg.olsrd6.add('olsrd')
-    # TODO: Enable IPv6 configuration for olsrd, currently we just ignore it
-
-    olsrd = cfg.olsrd.add('olsrd')
-    olsrd.MainIp = router_id
-    olsrd.SrcIpRoutes = 'yes'
-    olsrd.RtTable = ROUTING_TABLE_ID
+    olsrd_configured = False
 
     # Iterate through interfaces and decide which ones should be included
     # in the routing table; other modules must have previously set its
@@ -36,6 +25,7 @@ def olsr(node, cfg):
             hna = cfg.olsrd.add('Hna4')
             hna.netaddr = ipaddr.IPNetwork('%s/%s' % (iface.ipaddr, iface.netmask)).network
             hna.netmask = iface.netmask
+            olsrd_configured = True
 
         if iface._routable != olsr_models.OLSR_PROTOCOL_NAME:
             continue
@@ -51,6 +41,26 @@ def olsr(node, cfg):
                 raise cgm_base.ValidationError(_("Not enough IP space to allocate an address for OLSR interface!"))
 
         routable_ifaces.append(name)
+        olsrd_configured = True
+
+    if not olsrd_configured:
+        return
+
+    olsrd6 = cfg.olsrd6.add('olsrd')
+    # TODO: Enable IPv6 configuration for olsrd, currently we just ignore it
+
+    olsrd = cfg.olsrd.add('olsrd')
+    olsrd.SrcIpRoutes = 'yes'
+    olsrd.RtTable = ROUTING_TABLE_ID
+
+    # Configure main IP (router ID)
+    try:
+        router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
+        olsrd.MainIp = router_id
+    except core_models.RouterIdConfig.DoesNotExist:
+        raise cgm_base.ValidationError(
+            _("OLSR routing configured, but router ID is missing!")
+        )
 
     if routable_ifaces:
         iface = cfg.olsrd.add('Interface')
