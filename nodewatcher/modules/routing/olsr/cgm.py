@@ -59,7 +59,7 @@ def olsr(node, cfg):
         olsrd.MainIp = router_id
     except core_models.RouterIdConfig.DoesNotExist:
         raise cgm_base.ValidationError(
-            _("OLSR routing configured, but router ID is missing!")
+            _("OLSR routing configured, but router ID is missing! In order to use OLSR, the node must have a configured primary IP address.")
         )
 
     if routable_ifaces:
