@@ -20,6 +20,7 @@ from nodewatcher.modules.administration.projects import models as project_models
 from nodewatcher.modules.administration.roles import models as role_models
 from nodewatcher.modules.administration.types import models as type_models
 from nodewatcher.modules.equipment.antennas import models as antenna_models
+from nodewatcher.modules.vpn.tunneldigger import models as tunneldigger_models
 from nodewatcher.utils import ipaddr
 
 # Applications that this import process requires to be installed
@@ -474,8 +475,7 @@ class Command(base.BaseCommand):
                 if node['profile']['use_vpn']:
                     for server, ports in VPN_SERVERS.items():
                         iface_vpn = node_mdl.config.core.interfaces(
-                            create=cgm_models.VpnInterfaceConfig,
-                            protocol='tunneldigger',
+                            create=tunneldigger_models.TunneldiggerInterfaceConfig,
                             routing_protocol='olsr',
                         )
                         iface_vpn.save()
@@ -490,14 +490,13 @@ class Command(base.BaseCommand):
                             ).save()
 
                         for port in ports:
-                            network_vpn = node_mdl.config.core.interfaces.network(
-                                create=cgm_models.VpnNetworkConfig,
-                                interface=iface_vpn,
-                                description='VPN',
+                            server_vpn = node_mdl.config.core.servers.tunneldigger(
+                                create=tunneldigger_models.TunneldiggerServerConfig,
+                                tunnel=iface_vpn,
                                 address=server,
                                 port=port,
                             )
-                            network_vpn.save()
+                            server_vpn.save()
 
                 # DNS servers
                 for server in DNS_SERVERS:

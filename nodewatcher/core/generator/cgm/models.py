@@ -239,21 +239,6 @@ registration.point('node.config').register_choice('core.interfaces#wifi_mode', r
 registration.point('node.config').register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
 
 
-# TODO: Is it important if it is tap or tun? Should we have separate configs for them? Or is this more general? Maybe better name then VirtualInterface, PseudoWire, or something?
-class VpnInterfaceConfig(InterfaceConfig, RoutableInterface):
-    """
-    VPN interface.
-    """
-
-    protocol = registry_fields.SelectorKeyField('node.config', 'core.interfaces#vpn_protocol', verbose_name=_("VPN Protocol"))
-    mac = registry_fields.MACAddressField(auto_add=True)
-
-    class RegistryMeta(InterfaceConfig.RegistryMeta):
-        registry_name = _("VPN Tunnel")
-
-registration.point('node.config').register_item(VpnInterfaceConfig)
-
-
 class MobileInterfaceConfig(InterfaceConfig):
     """
     A mobile (3G/UMTS/GPRS) interface.
@@ -396,20 +381,6 @@ class PPPoENetworkConfig(NetworkConfig):
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
 
 
-class VpnNetworkConfig(NetworkConfig):
-    """
-    Configuration for a VPN uplink.
-    """
-
-    address = registry_fields.IPAddressField(host_required=True)
-    port = models.IntegerField()
-
-    class RegistryMeta(NetworkConfig.RegistryMeta):
-        registry_name = _("VPN Server")
-
-registration.point('node.config').register_subitem(VpnInterfaceConfig, VpnNetworkConfig)
-
-
 class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
     """
     Configuration of per-interface traffic limits.
@@ -454,7 +425,6 @@ registration.point('node.config').register_choice('core.interfaces.limits#speeds
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('1024', _("1 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('2048', _("2 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('4096', _("4 Mbit/s")))
-registration.point('node.config').register_subitem(VpnInterfaceConfig, ThroughputInterfaceLimitConfig)
 
 
 class DnsServerConfig(registration.bases.NodeConfigRegistryItem):

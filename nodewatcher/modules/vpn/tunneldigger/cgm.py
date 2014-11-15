@@ -1,12 +1,6 @@
-from django.utils.translation import ugettext as _
-
-from nodewatcher.core.registry import registration
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base
 
 from . import models
-
-# Register tunneldigger VPN protocol
-registration.point('node.config').register_choice('core.interfaces#vpn_protocol', registration.Choice('tunneldigger', _("Tunneldigger")))
 
 
 @cgm_base.register_platform_module('openwrt', 100)
@@ -26,10 +20,7 @@ def tunneldigger(node, cfg):
 
     # Create tunneldigger configuration
     tunneldigger_enabled = False
-    for idx, interface in enumerate(node.config.core.interfaces(onlyclass=cgm_models.VpnInterfaceConfig)):
-        if interface.protocol != 'tunneldigger':
-            continue
-
+    for idx, interface in enumerate(node.config.core.interfaces(onlyclass=models.TunneldiggerInterfaceConfig)):
         ifname = models.get_tunneldigger_interface_name(idx)
         tunneldigger_enabled = True
 
@@ -46,8 +37,7 @@ def tunneldigger(node, cfg):
         broker.address = []
         unique_brokers = set()
 
-        for network in interface.networks.filter(enabled=True):
-            network = network.cast()
+        for network in interface.servers.all():
             broker.address.append('%s:%d' % (network.address.ip, network.port))
             unique_brokers.add(network.address)
 

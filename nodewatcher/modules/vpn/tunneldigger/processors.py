@@ -70,10 +70,7 @@ class Tunneldigger(monitor_processors.NodeProcessor):
         """
 
         # Verify that configured tunneldigger interfaces are present
-        for idx, interface in enumerate(node.config.core.interfaces(onlyclass=cgm_models.VpnInterfaceConfig)):
-            if interface.protocol != 'tunneldigger':
-                continue
-
+        for idx, interface in enumerate(node.config.core.interfaces(onlyclass=models.TunneldiggerInterfaceConfig)):
             # TODO: Should we identify VPN interfaces based on configured MAC address?
             ifname = models.get_tunneldigger_interface_name(idx)
             try:

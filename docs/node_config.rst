@@ -364,15 +364,11 @@ Additional modes may be registered by other modules.
    :param bssid: Network BSSID.
    :type bssid: :class:`~nodewatcher.core.registry.fields.MACAddressField`
 
-Support for VPN tunnel interfaces is also provided.
+Modules may provide support for VPN tunnel interfaces. The :mod:`nodewatcher.modules.vpn.tunneldigger`
+module provides support for configuring Tunneldigger-based tunnels.
 
-.. autoclass:: nodewatcher.core.generator.cgm.models.VpnInterfaceConfig()
+.. autoclass:: nodewatcher.modules.vpn.tunneldigger.models.TunneldiggerInterfaceConfig()
    :show-inheritance:
-
-   :param protocol: VPN protocol that should be used. Available protocols are populated by modules
-     implementing their support (for example, :mod:`nodewatcher.modules.vpn.tunneldigger` implements
-     support for Tunneldigger).
-   :type protocol: registered choice
 
    :param mac: MAC address of the VPN interface. By default a virtual address is automatically
      generated.
@@ -477,19 +473,6 @@ Ethernet interfaces may also be configured via PPPoE.
    :param password: Password.
    :type password: string
 
-For VPN interfaces, multiple servers may be configured. Note that only one of the servers will
-be used at once -- in case one wants to configure redundant links, multiple VPN interfaces should
-be created.
-
-.. autoclass:: nodewatcher.core.generator.cgm.models.VpnNetworkConfig()
-   :show-inheritance:
-
-   :param address: IP address of the VPN server.
-   :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
-
-   :param port: Port of the VPN server.
-   :type port: int
-
 For bridge slaves, network configuration specifies the master bridge interface.
 
 .. autoclass:: nodewatcher.core.generator.cgm.models.BridgedNetworkConfig()
@@ -521,6 +504,24 @@ Currently, a throughput limit may be configured.
 
    :param limit_out: Outbound traffic throughput limit.
    :type limit_out: registered choice
+
+core.servers.tunneldigger
+-------------------------
+
+For Tunneldigger interfaces, multiple servers may be configured. Note that only one of the servers will
+be used at once -- in case one wants to configure redundant links, multiple VPN interfaces should
+be created.
+
+.. autoclass:: nodewatcher.modules.vpn.tunneldigger.models.TunneldiggerServerConfig()
+
+   :param tunnel: Tunneldigger interface that should use this server.
+   :type tunnel: foreign key to :class:`~nodewatcher.modules.vpn.tunneldigger.models.TunneldiggerInterfaceConfig`
+
+   :param address: IP address of the VPN server.
+   :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
+
+   :param port: Port of the VPN server.
+   :type port: int
 
 core.servers.dns
 ----------------

@@ -64,19 +64,6 @@ class AllocatedNetworkConfigForm(forms.ModelForm, ip_forms.IpAddressAllocatorFor
 registration.register_form_for_item(models.AllocatedNetworkConfig, AllocatedNetworkConfigForm)
 
 
-class VpnNetworkConfigForm(forms.ModelForm):
-    """
-    VPN uplink configuration form.
-    """
-
-    port = forms.IntegerField(min_value=1, max_value=49151)
-
-    class Meta:
-        model = models.VpnNetworkConfig
-
-registration.register_form_for_item(models.VpnNetworkConfig, VpnNetworkConfigForm)
-
-
 class WifiRadioDeviceConfigForm(forms.ModelForm):
     """
     A wireless radio device configuration form.
