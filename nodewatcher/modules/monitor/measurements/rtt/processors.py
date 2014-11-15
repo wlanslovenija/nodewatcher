@@ -45,7 +45,7 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
 
         # Prepare a list of node IPv4 addresses
         node_ips = [
-            str(node.config.core.routerid(queryset=True).get(family='ipv4').router_id)
+            str(node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id)
             for node in nodes
         ]
 
@@ -161,7 +161,7 @@ class StoreNode(monitor_processors.NodeProcessor):
         """
 
         try:
-            router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
+            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
             results = context.rtt.results.get(router_id, None)
             context.node_available = False
             context.node_responds = False

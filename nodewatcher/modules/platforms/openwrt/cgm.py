@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from nodewatcher.core import models as core_models
+from nodewatcher.core.allocation.ip import models as pool_models
 from nodewatcher.core.registry import exceptions as registry_exceptions
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, devices as cgm_devices
 from nodewatcher.utils import posix_tz
@@ -330,6 +332,25 @@ def general(node, cfg):
     ])
 
 
+@cgm_base.register_platform_module('openwrt', 1)
+def router_id(node, cfg):
+    """
+    Registers all router identifiers for use by routing CGMs.
+    """
+
+    for rid in node.config.core.routerid():
+        if isinstance(rid, core_models.StaticIpRouterIdConfig):
+            res = cgm_resources.IpResource(rid.rid_family, rid.address, rid)
+            cfg.resources.add(res)
+        elif isinstance(rid, pool_models.AllocatedIpRouterIdConfig):
+            # Check that the network has actually been allocated and fail validation if not so
+            if not rid.allocation:
+                raise cgm_base.ValidationError(_("Missing network allocation in router ID configuration."))
+
+            res = cgm_resources.IpResource(rid.family, rid.allocation.ip_subnet, rid)
+            cfg.resources.add(res)
+
+
 @cgm_base.register_platform_module('openwrt', 11)
 def user_accounts(node, cfg):
     """
@@ -369,6 +390,10 @@ def configure_network(cfg, network, section):
                 section.ip6gw = network.gateway.ip
         else:
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
+
+        # When network is marked to be announced, also specify it here
+        if network.routing_announce:
+            section._announce = [network.routing_announce]
     elif isinstance(network, cgm_models.AllocatedNetworkConfig):
         section.proto = 'static'
 
@@ -381,9 +406,7 @@ def configure_network(cfg, network, section):
             raise cgm_base.ValidationError(_("Missing network allocation."))
 
         if network.family in ('ipv4', 'ipv6'):
-            # Make our subnet available to other modules as a resource
             res = cgm_resources.IpResource(network.family, network.allocation.ip_subnet, network)
-            cfg.resources.add(res)
             address = res.allocate()
 
             if network.family == 'ipv4':

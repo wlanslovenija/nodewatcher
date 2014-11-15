@@ -55,7 +55,7 @@ def olsr(node, cfg):
 
     # Configure main IP (router ID)
     try:
-        router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
+        router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
         olsrd.MainIp = router_id
     except core_models.RouterIdConfig.DoesNotExist:
         raise cgm_base.ValidationError(

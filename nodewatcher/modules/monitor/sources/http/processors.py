@@ -81,7 +81,7 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                 if not node_available:
                     return context
 
-                router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
+                router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
                 parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
 
                 # Fetch information from the router and merge it into local context

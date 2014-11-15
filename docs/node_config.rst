@@ -196,6 +196,20 @@ protocols).
    :param router_id: Router identifier.
    :type router_id: string
 
+For IP based router identifiers, there exist two specializations. The first enables static IP
+based router ID configuration.
+
+.. autoclass:: nodewatcher.core.models.StaticIpRouterIdConfig()
+  :show-inheritance:
+
+  :param address: IP subnet of which the first IP should be used as router ID.
+  :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
+
+The second enables allocation of router identifiers from IP pools.
+
+.. autoclass:: nodewatcher.core.allocation.ip.models.AllocatedIpRouterIdConfig()
+  :show-inheritance:
+
 core.authentication
 -------------------
 

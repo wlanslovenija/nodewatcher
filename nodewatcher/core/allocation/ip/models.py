@@ -4,7 +4,7 @@ from django.db.models import signals as django_signals
 from django.utils.translation import ugettext_lazy as _
 
 from .. import models as allocation_models
-from ...registry import fields as registry_fields, forms as registry_forms, permissions
+from ...registry import fields as registry_fields, forms as registry_forms, permissions, registration
 from ....utils import ipaddr
 
 # Needed for node.config registration point
@@ -417,7 +417,12 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         Generates and returns a router-id from this allocation.
         """
 
-        return str(self.allocation.to_ip_network()[1])
+        subnet = self.allocation.to_ip_network()
+
+        if subnet.numhosts == 1:
+            return str(subnet.network)
+        else:
+            return str(subnet.iterhosts().next())
 
 
 @dispatch.receiver(django_signals.post_delete, sender=IpAddressAllocator)
@@ -428,3 +433,25 @@ def allocator_removed(sender, instance, **kwargs):
 
     if instance.allocation is not None:
         instance.allocation.free()
+
+
+class AllocatedIpRouterIdConfig(core_models.RouterIdConfig, IpAddressAllocator):
+    """
+    Allocated IP router identifier configuration.
+    """
+
+    class Meta:
+        app_label = 'core'
+
+    class RegistryMeta(core_models.RouterIdConfig.RegistryMeta):
+        registry_name = _("Allocated IP Router ID")
+        hidden = False
+
+    def save(self, *args, **kwargs):
+        if self.allocation is not None:
+            self.rid_family = self.get_routerid_family()
+            self.router_id = self.get_routerid()
+
+        super(AllocatedIpRouterIdConfig, self).save(*args, **kwargs)
+
+registration.point('node.config').register_item(AllocatedIpRouterIdConfig)

@@ -62,18 +62,46 @@ class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
     Router identifier configuration.
     """
 
-    router_id = models.CharField(max_length=100)
-    family = registry_fields.SelectorKeyField('node.config', 'core.routerid#family')
+    router_id = models.CharField(max_length=100, editable=False)
+    rid_family = registry_fields.SelectorKeyField('node.config', 'core.routerid#family', editable=False)
 
     class Meta:
         app_label = 'core'
 
     class RegistryMeta:
-        form_weight = 100
+        form_weight = 49
         registry_id = 'core.routerid'
+        registry_section = _("Router Identifier")
+        registry_name = _("Generic Router ID")
         multiple = True
         hidden = True
 
 registration.point('node.config').register_choice('core.routerid#family', registration.Choice('ipv4', _("IPv4")))
 registration.point('node.config').register_choice('core.routerid#family', registration.Choice('ipv6', _("IPv6")))
 registration.point('node.config').register_item(RouterIdConfig)
+
+
+class StaticIpRouterIdConfig(RouterIdConfig):
+    """
+    Static router identifier configuration.
+    """
+
+    address = registry_fields.IPAddressField(subnet_required=True)
+
+    class Meta:
+        app_label = 'core'
+
+    class RegistryMeta(RouterIdConfig.RegistryMeta):
+        registry_name = _("Static IP Router ID")
+        hidden = False
+
+    def save(self, *args, **kwargs):
+        if self.address.version == 4:
+            self.rid_family = 'ipv4'
+        elif self.address.version == 6:
+            self.rid_family = 'ipv6'
+
+        self.router_id = str(self.address.ip)
+        super(StaticIpRouterIdConfig, self).save(*args, **kwargs)
+
+registration.point('node.config').register_item(StaticIpRouterIdConfig)

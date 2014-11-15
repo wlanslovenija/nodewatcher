@@ -48,7 +48,7 @@ class Topology(monitor_processors.NetworkProcessor):
                 for node in core_models.Node.objects.regpoint('config').registry_fields(
                     router_id='core.routerid#router_id'
                 ).registry_filter(
-                    core_routerid__family='ipv4',
+                    core_routerid__rid_family='ipv4',
                     core_routerid__router_id__in=visible_routers,
                 ):
                     context.router_id_map[node.router_id[0]] = node
@@ -69,10 +69,10 @@ class Topology(monitor_processors.NetworkProcessor):
                         general_cfg.name = None
                         general_cfg.save()
 
-                        rid_cfg = node.config.core.routerid(create=core_models.RouterIdConfig)
-                        rid_cfg.router_id = router_id
-                        rid_cfg.family = 'ipv4'
-                        rid_cfg.save()
+                        node.config.core.routerid(
+                            create=core_models.StaticIpRouterIdConfig,
+                            address='%s/32' % router_id,
+                        ).save()
 
         return context, nodes
 
@@ -88,7 +88,7 @@ class NodePostprocess(monitor_processors.NodeProcessor):
         """
 
         try:
-            router_id = node.config.core.routerid(queryset=True).get(family='ipv4').router_id
+            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
             topology = context.routing.olsr.topology.get(router_id, [])
             announces = context.routing.olsr.announces.get(router_id, [])
             aliases = context.routing.olsr.aliases.get(router_id, [])

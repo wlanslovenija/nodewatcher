@@ -1,4 +1,3 @@
-from .. import models as core_models
 from ..registry import registration
 from ..registry.forms import formprocessors
 
@@ -47,20 +46,10 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
             item for item in registration.point('node.config').config_items() if issubclass(item, models.AddressAllocator)
         ]
 
-        routerid_requests = {}
         unsatisfied_requests = []
         for src in allocation_sources:
             for request in node.config.by_registry_id(src.get_registry_id()):
                 if isinstance(request, src):
-                    # Use the request/allocation with lowest identifier as a source for
-                    # node's router identifier (per family)
-                    family = request.get_routerid_family()
-                    if family in routerid_requests:
-                        if request.pk < routerid_requests[family].pk:
-                            routerid_requests[family] = request
-                    else:
-                        routerid_requests[family] = request
-
                     if not request.is_satisfied():
                         unsatisfied_requests.append(request)
                     else:
@@ -87,14 +76,3 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         # TODO: Do this only when saving for real, not on validation runs
         for unused in self.allocations:
             unused.free()
-
-        # Recompute router identifiers
-        # TODO: Do this only when saving for real, not on validation runs
-        for family, request in routerid_requests.iteritems():
-            try:
-                rid = node.config.core.routerid(queryset=True).get(family=family)
-            except core_models.RouterIdConfig.DoesNotExist:
-                rid = node.config.core.routerid(create=core_models.RouterIdConfig)
-
-            rid.router_id = request.get_routerid()
-            rid.save()

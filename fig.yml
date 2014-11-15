@@ -65,6 +65,8 @@ web:
     build: .
     command: "scripts/docker-cleanup; scripts/docker-wait-pgsql; python manage.py runserver 0.0.0.0:8000"
     entrypoint: scripts/docker-run
+    environment:
+        PYTHONUNBUFFERED: 1
     volumes:
         - .:/code
     ports:

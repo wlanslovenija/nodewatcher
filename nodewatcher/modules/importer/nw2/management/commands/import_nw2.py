@@ -248,12 +248,38 @@ class Command(base.BaseCommand):
                 project_mdl.pools_core_ippool.add(data['pools'][str(pool)]['_model'])
 
     def import_nodes(self, data):
-        self.stdout.write('Importing %d nodes...' % len(data['nodes']))
+        self.stdout.write('Importing %d nodes...\n' % len(data['nodes']))
 
         for node in data['nodes'].values():
+            # Determine router ID
+            try:
+                subnet_mesh = [x for x in node['subnets'] if x['gen_iface_type'] == 2][0]
+            except IndexError:
+                self.stdout.write('  o Skipping node %s (unable to determine router ID).\n' % node['uuid'])
+                continue
+
+            subnet_mesh = ipaddr.IPNetwork('%(subnet)s/%(cidr)s' % subnet_mesh)
+            try:
+                pool_mesh = [x['_model'] for x in data['pools'].values() if subnet_mesh in x['_model']][0]
+            except IndexError:
+                raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_mesh)
+
+            allocation = pool_mesh.reserve_subnet(str(subnet_mesh.ip), subnet_mesh.prefixlen)
+            if allocation is None:
+                raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_mesh)
+
             node_mdl = core_models.Node(uuid=node['uuid'])
             node_mdl.save()
             node['_model'] = node_mdl
+
+            # Router ID
+            node_mdl.config.core.routerid(
+                create=pool_models.AllocatedIpRouterIdConfig,
+                family='ipv4',
+                pool=pool_mesh,
+                prefix_length=subnet_mesh.prefixlen,
+                allocation=allocation,
+            ).save()
 
             # Assign default permissions
             maintainer = data['users'][str(node['owner_id'])]['_model']
@@ -325,13 +351,6 @@ class Command(base.BaseCommand):
             node_mdl.config.core.roles(create=role_models.VpnServerRoleConfig, vpn_server=node['vpn_server']).save()
             node_mdl.config.core.roles(create=role_models.RedundantNodeRoleConfig, redundancy_required=node['redundancy_req']).save()
 
-            # Router ID
-            node_mdl.config.core.routerid(
-                create=core_models.RouterIdConfig,
-                family='ipv4',
-                router_id=node['ip'],
-            ).save()
-
             if node['profile']:
                 general = node_mdl.config.core.general(
                     create=cgm_models.CgmGeneralConfig,
@@ -382,30 +401,6 @@ class Command(base.BaseCommand):
                     routing_protocol='olsr',
                 )
                 iface_mesh.save()
-
-                # Mesh network
-                subnet_mesh = [x for x in node['subnets'] if x['gen_iface_type'] == 2][0]
-                subnet_mesh = ipaddr.IPNetwork('%(subnet)s/%(cidr)s' % subnet_mesh)
-                try:
-                    pool_mesh = [x['_model'] for x in data['pools'].values() if subnet_mesh in x['_model']][0]
-                except IndexError:
-                    raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_mesh)
-
-                allocation = pool_mesh.reserve_subnet(str(subnet_mesh.ip), subnet_mesh.prefixlen)
-                if allocation is None:
-                    raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_mesh)
-
-                network_mesh = node_mdl.config.core.interfaces.network(
-                    create=cgm_models.AllocatedNetworkConfig,
-                    interface=iface_mesh,
-                    description='Mesh',
-                    routing_announce='olsr',
-                    family='ipv4',
-                    pool=pool_mesh,
-                    prefix_length=subnet_mesh.prefixlen,
-                    allocation=allocation,
-                )
-                network_mesh.save()
 
                 # WAN uplink
                 iface_wan = node_mdl.config.core.interfaces(
