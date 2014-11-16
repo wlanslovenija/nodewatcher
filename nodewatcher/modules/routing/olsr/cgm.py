@@ -74,3 +74,20 @@ def olsr(node, cfg):
 
     # Ensure that "olsrd" package is installed
     cfg.packages.update(['olsrd'])
+
+
+@cgm_base.register_platform_package('openwrt', 'olsrd-mod-txtinfo', olsr_models.OlsrdModTxtinfoPackageConfig)
+def olsrd_mod_txtinfo_package(node, pkgcfg, cfg):
+    """
+    Configures the olsrd-mod-txtinfo package.
+    """
+
+    # We only take the first package configuration into account and ignore the rest
+    pkgcfg = pkgcfg[0]
+
+    # TODO: Also support IPv6 olsrd configuration
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_txtinfo.so.0.1'
+    plugin.port = pkgcfg.port
+    plugin.accept = str(pkgcfg.allowed_host.ip)

@@ -1,10 +1,11 @@
 import uuid
 
 from django.db import models
-from django.utils.translation import ugettext as _, gettext_noop
+from django.utils.translation import ugettext_lazy as _, gettext_noop
 
+from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.monitor import models as monitor_models
-from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import registration, fields as registry_fields
 from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
 from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
@@ -176,3 +177,22 @@ class OlsrRoutingAnnounceMonitor(monitor_models.RoutingAnnounceMonitor):
     pass
 
 registration.point('node.monitoring').register_item(OlsrRoutingAnnounceMonitor)
+
+
+class OlsrdModTxtinfoPackageConfig(cgm_models.PackageConfig):
+    """
+    Configuration for olsrd-mod-txtinfo package.
+    """
+
+    port = models.IntegerField(default=2006)
+    allowed_host = registry_fields.IPAddressField(
+        default='127.0.0.1',
+        host_required=True,
+        verbose_name=_('Allowed host'),
+        help_text=_('IP of host that is allowed to connect to txtinfo feed.')
+    )
+
+    class RegistryMeta(cgm_models.PackageConfig.RegistryMeta):
+        registry_name = _("OLSRd Plugin: txtinfo")
+
+registration.point('node.config').register_item(OlsrdModTxtinfoPackageConfig)
