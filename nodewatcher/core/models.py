@@ -1,9 +1,9 @@
 import uuid
 
-from django.core import validators as django_validators
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from . import validators as core_validators
 from .registry import fields as registry_fields, registration
 
 
@@ -35,15 +35,6 @@ class Node(models.Model):
 registration.create_point(Node, 'config')
 
 
-class NodeNameValidator(django_validators.RegexValidator):
-    """
-    Validates a node's name.
-    """
-
-    regex = r'^[a-z](?:-?[a-z0-9]+)*$'
-    message = _('Node name contains invalid characters.')
-
-
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """
     General node configuration containing basic parameters about the
@@ -53,9 +44,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     name = models.CharField(
         max_length=30,
         null=True,
-        validators=[
-            NodeNameValidator()
-        ]
+        validators=[core_validators.NodeNameValidator()],
     )
 
     class Meta:

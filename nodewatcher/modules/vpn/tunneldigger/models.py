@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from nodewatcher.core import validators as core_validators
 from nodewatcher.core.registry import fields as registry_fields, registration
 from nodewatcher.core.generator.cgm import models as cgm_models
 
@@ -31,7 +32,7 @@ class TunneldiggerServerConfig(registration.bases.NodeConfigRegistryItem):
         related_name='servers'
     )
     address = registry_fields.IPAddressField(host_required=True)
-    port = models.IntegerField()
+    port = models.IntegerField(validators=[core_validators.PortNumberValidator()])
 
     class RegistryMeta:
         form_weight = 51
