@@ -148,6 +148,10 @@ class IpPool(allocation_models.PoolBase):
 
     @allocation_models.PoolBase.modifies_pool
     def reclaim_held_down(self):
+        """
+        Reclaims pools whose hold-down periods have already expired.
+        """
+
         pools = IpPool.objects.filter(
             status=IpPoolStatus.HeldDown,
             held_from__lte=timezone.now() - self.HOLD_DOWN_PERIOD,
