@@ -1,4 +1,3 @@
-from django.contrib.contenttypes import generic, models as contenttypes_models
 from django.db import models, transaction
 
 
