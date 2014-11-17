@@ -1,5 +1,6 @@
 import uuid
 
+from django.core import validators as django_validators
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,13 +35,28 @@ class Node(models.Model):
 registration.create_point(Node, 'config')
 
 
+class NodeNameValidator(django_validators.RegexValidator):
+    """
+    Validates a node's name.
+    """
+
+    regex = r'^[a-z](?:-?[a-z0-9]+)*$'
+    message = _('Node name contains invalid characters.')
+
+
 class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """
     General node configuration containing basic parameters about the
     node.
     """
 
-    name = models.CharField(max_length=30, null=True)
+    name = models.CharField(
+        max_length=30,
+        null=True,
+        validators=[
+            NodeNameValidator()
+        ]
+    )
 
     class Meta:
         app_label = 'core'
@@ -51,8 +67,6 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
         registry_section = _("General Configuration")
         registry_name = _("Basic Configuration")
         lookup_proxies = ['name']
-
-# TODO: Validate node name via regexp: NODE_NAME_RE = re.compile(r'^[a-z](?:-?[a-z0-9]+)*$')
 
 registration.point('node.config').register_item(GeneralConfig)
 
