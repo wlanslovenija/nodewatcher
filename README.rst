@@ -15,7 +15,7 @@ deployment, monitoring and maintanance platform with emphasis on community.
 
 Documentation is found at:
 
-http://nodewatcher.readthedocs.org/en/development/
+http://docs.nodewatcher.net
 
 More info on `wlan slovenija wiki`_. Use `nodewatcher mailing list`_ for
 questions and development discussions.
