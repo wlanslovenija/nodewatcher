@@ -1,3 +1,4 @@
+import datetime
 import multiprocessing
 
 from django.db import transaction, connection
@@ -10,7 +11,7 @@ from . import models
 def _concurrent_allocation_worker(pool):
     try:
         alloc = pool.allocate_subnet(prefix_len=27)
-        alloc.free()
+        alloc.free(hold_down=False)
         alloc = pool.allocate_subnet(prefix_len=27)
     except:
         return None
@@ -36,6 +37,14 @@ class IpPoolTestCase(unittest.TestCase):
             network='192.168.1.0',
             prefix_length=26,
         )
+
+        # Override hold-down period for tests
+        self._hold_down_period = models.IpPool.HOLD_DOWN_PERIOD
+        models.IpPool.HOLD_DOWN_PERIOD = datetime.timedelta(seconds=0)
+
+    def tearDown(self):
+        # Restore hold-down period
+        models.IpPool.HOLD_DOWN_PERIOD = self._hold_down_period
 
     def test_basic_allocation(self):
         # Test that we really get properly allocated objects
@@ -79,10 +88,24 @@ class IpPoolTestCase(unittest.TestCase):
         # Test that free works as expected
         a = self.pool.allocate_subnet(prefix_len=26)
         b = self.pool.allocate_subnet(prefix_len=27)
-        a.free()
+        a.free(hold_down=False)
         c = self.pool.allocate_subnet(prefix_len=26)
         self.assertEqual(c.network, a.network)
         self.assertEqual(c.prefix_length, a.prefix_length)
+        # Test that one can't free a non-leaf pool
+        with self.assertRaises(ValueError):
+            self.pool.free(hold_down=False)
+
+    def test_hold_down(self):
+        # Test that hold-down works as expected
+        a = self.pool.allocate_subnet(prefix_len=27)
+        a.free()
+        a = models.IpPool.objects.get(pk=a.pk)
+        self.assertEqual(a.status, models.IpPoolStatus.HeldDown)
+        # Test that hold-down expiry works as expected
+        self.pool.reclaim_held_down()
+        with self.assertRaises(models.IpPool.DoesNotExist):
+            a = models.IpPool.objects.get(pk=a.pk)
 
     def test_concurrent_allocation(self):
         # Close the connection to avoid sharing it with child processes

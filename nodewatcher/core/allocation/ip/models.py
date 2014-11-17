@@ -1,6 +1,9 @@
+import datetime
+
 from django import dispatch
 from django.db import models, utils
 from django.db.models import signals as django_signals
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from .. import models as allocation_models
@@ -19,6 +22,7 @@ class IpPoolStatus(object):
     Free = 0
     Full = 1
     Partial = 2
+    HeldDown = 3
 
 
 class IpPool(allocation_models.PoolBase):
@@ -27,6 +31,10 @@ class IpPool(allocation_models.PoolBase):
     allocation purpuses. Every IP block that is allocated is represented
     as an IpPool instance with proper parent pool reference.
     """
+
+    HOLD_DOWN_PERIOD = datetime.timedelta(
+        days=1,
+    )
 
     family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
     network = models.CharField(max_length=50)
@@ -37,6 +45,7 @@ class IpPool(allocation_models.PoolBase):
     prefix_length_minimum = models.IntegerField(default=24, null=True, verbose_name=_("Minimum prefix length"))
     prefix_length_maximum = models.IntegerField(default=28, null=True, verbose_name=_("Maximum prefix length"))
     ip_subnet = registry_fields.IPAddressField(editable=False, null=True)
+    held_from = models.DateTimeField(editable=False, null=True)
 
     class Meta:
         app_label = 'core'
@@ -84,6 +93,9 @@ class IpPool(allocation_models.PoolBase):
         :param prefix_len: Subnet prefix length
         :param check_only: Should only a check be performed and no actual allocation
         """
+
+        if not self.parent:
+            self.reclaim_held_down()
 
         if prefix_len == 31:
             return None
@@ -133,6 +145,19 @@ class IpPool(allocation_models.PoolBase):
                 self.save()
 
         return alloc
+
+    @allocation_models.PoolBase.modifies_pool
+    def reclaim_held_down(self):
+        pools = IpPool.objects.filter(
+            status=IpPoolStatus.HeldDown,
+            held_from__lte=timezone.now() - self.HOLD_DOWN_PERIOD,
+        )
+
+        for pool in pools.select_for_update():
+            pool.status = IpPoolStatus.Free
+            pool.held_from = None
+            pool.save()
+            pool.reclaim_pools()
 
     def _allocate_buddy(self, prefix_len):
         """
@@ -184,7 +209,7 @@ class IpPool(allocation_models.PoolBase):
         Coalesces free children back into one if possible.
         """
 
-        if self.status == IpPoolStatus.Free:
+        if self.status in (IpPoolStatus.Free, IpPoolStatus.HeldDown):
             return self.parent.reclaim_pools() if self.parent else None
 
         # When all children are free, we don't need them anymore; when only some
@@ -200,19 +225,32 @@ class IpPool(allocation_models.PoolBase):
             self.save()
             return self.parent.reclaim_pools() if self.parent else None
         else:
-            # If any of the children are partial, we are partial as well
-            if self.children.filter(status=IpPoolStatus.Partial).count() > 0:
+            # If any of the children are partial or held-down, we are partial as well
+            if self.children.filter(status__in=[IpPoolStatus.Partial, IpPoolStatus.HeldDown]).count() > 0:
                 self.status = IpPoolStatus.Partial
                 self.save()
                 return self.parent.reclaim_pools() if self.parent else None
 
     @allocation_models.PoolBase.modifies_pool
-    def free(self):
+    def free(self, hold_down=True):
         """
         Frees this allocated item and returns it to the parent pool.
+
+        :param hold_down: Should the subnet be held-down and not immediately freed
         """
 
-        self.status = IpPoolStatus.Free
+        if self.status != IpPoolStatus.Full:
+            raise ValueError('Cannot free non-full IP pools!')
+
+        if not self.is_leaf():
+            raise ValueError('Cannot free non-leaf IP pools!')
+
+        if hold_down:
+            self.status = IpPoolStatus.HeldDown
+            self.held_from = timezone.now()
+        else:
+            self.status = IpPoolStatus.Free
+
         self.save()
         self.reclaim_pools()
 
@@ -222,6 +260,13 @@ class IpPool(allocation_models.PoolBase):
         """
 
         return self.children.all().count() == 0
+
+    def is_held_down(self):
+        """
+        Returns true if this pool is currently held down.
+        """
+
+        return self.status == IpPoolStatus.HeldDown
 
     def family_as_string(self):
         """
@@ -269,6 +314,7 @@ class IpPool(allocation_models.PoolBase):
         if prefix_len == 31:
             return None
 
+        self.reclaim_held_down()
         pool = self._allocate_buddy(prefix_len)
         return pool
 
