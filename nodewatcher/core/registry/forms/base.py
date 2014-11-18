@@ -809,8 +809,8 @@ def prepare_forms(context):
     return forms
 
 
-def prepare_forms_for_regpoint_root(regpoint, request, root=None, data=None, save=False, only_rules=False, also_rules=False,
-                                    actions=None, current_config=None):
+def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only_rules=False, also_rules=False,
+                       actions=None, current_config=None):
     """
     Prepares a list of configuration forms for use on a regpoint root's
     configuration page.

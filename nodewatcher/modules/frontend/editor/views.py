@@ -39,7 +39,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
     def get(self, request, *args, **kwargs):
         self.object = None
 
-        self.dynamic_forms, self.eval_state = registry_forms.prepare_forms_for_regpoint_root(
+        self.dynamic_forms, self.eval_state = registry_forms.prepare_root_forms(
             'node.config',
             request,
             None,
@@ -56,7 +56,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
             self.object = core_models.Node()
             self.object.save()
 
-            actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
+            actions, partial_config = registry_forms.prepare_root_forms(
                 'node.config',
                 request,
                 self.object,
@@ -64,7 +64,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 only_rules=True,
             )
 
-            has_errors, self.dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
+            has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(
                 'node.config',
                 request,
                 self.object,
@@ -116,7 +116,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        self.dynamic_forms, self.eval_state = registry_forms.prepare_forms_for_regpoint_root(
+        self.dynamic_forms, self.eval_state = registry_forms.prepare_root_forms(
             'node.config',
             request,
             self.object,
@@ -128,7 +128,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        actions, partial_config = registry_forms.prepare_forms_for_regpoint_root(
+        actions, partial_config = registry_forms.prepare_root_forms(
             'node.config',
             request,
             self.object,
@@ -136,7 +136,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
             only_rules=True,
         )
 
-        has_errors, self.dynamic_forms = registry_forms.prepare_forms_for_regpoint_root(
+        has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(
             'node.config',
             request,
             self.object,
