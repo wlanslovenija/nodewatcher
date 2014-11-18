@@ -4,7 +4,7 @@ Setting up the development environment
 In order to make nodewatcher development as simple as possible, a Docker_ development environment can be built from the provided Dockerfile. To help with preparing the environment and running common tasks, fig_ configuration is also provided. This section describes how to use both to work on nodewatcher. It is assumed that Docker and fig are already installed, so in order to install them, please follow the guides on their respective pages.
 
 .. _Docker: https://docker.io
-.. _fig: https://orchardup.github.io/fig
+.. _fig: http://www.fig.sh
 
 Running the development instance
 --------------------------------
