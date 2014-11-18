@@ -69,6 +69,24 @@ class UBNTNanoM5(UBNTNano):
     identifier = 'ub-nano-m5'
     name = "Nano M5"
 
+
+class UBNTNanoM5XW(UBNTNano):
+    """
+    UBNT Nano M5 XW device descriptor.
+    """
+
+    identifier = 'ub-nano-m5-xw'
+    name = "Nano M5 XW"
+    profiles = {
+        'openwrt': {
+            'name': 'UBNT',
+            'files': [
+                'openwrt-ar71xx-generic-ubnt-nano-m-xw-squashfs-factory.bin'
+            ]
+        }
+    }
+
 # Register the UBNT Nano device
 cgm_base.register_device('openwrt', UBNTNano)
 cgm_base.register_device('openwrt', UBNTNanoM5)
+cgm_base.register_device('openwrt', UBNTNanoM5XW)
