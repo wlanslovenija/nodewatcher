@@ -225,7 +225,6 @@ def remove(_item, _cls=None, _parent=None, **kwargs):
             record_remove_cfg_item(context, cfg_items, parent_cfg, cfg, index, index_tree)
 
         # Perform actual removal of items - both in partial configuration and in forms (via actions)
-        #for (level, registry_root, parent), (container, items, indices) in index_tree.iteritems():
         for level, registry_root, parent in sorted(index_tree.keys(), key=lambda x: x[0], reverse=True):
             container, items, indices = index_tree[level, registry_root, parent]
             for item in items:
