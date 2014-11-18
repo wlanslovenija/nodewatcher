@@ -7,7 +7,7 @@ class UBNTNano(cgm_devices.DeviceBase):
     """
 
     identifier = 'ub-nano'
-    name = "Nano"
+    name = "Nanostation"
     manufacturer = "Ubiquity"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
@@ -67,7 +67,7 @@ class UBNTNanoM5(UBNTNano):
     """
 
     identifier = 'ub-nano-m5'
-    name = "Nano M5"
+    name = "Nanostation M5"
 
 
 class UBNTNanoM5XW(UBNTNano):
@@ -76,7 +76,7 @@ class UBNTNanoM5XW(UBNTNano):
     """
 
     identifier = 'ub-nano-m5-xw'
-    name = "Nano M5 XW"
+    name = "Nanostation M5 XW"
     profiles = {
         'openwrt': {
             'name': 'UBNT',
@@ -86,7 +86,43 @@ class UBNTNanoM5XW(UBNTNano):
         }
     }
 
+
+class UBNTLocoM5(UBNTNanoM5):
+    """
+    UBNT Nanostation Loco M5 device descriptor.
+    """
+
+    identifier = 'ub-loco-m5'
+    name = "Nanostation Loco M5"
+    profiles = {
+        'openwrt': {
+            'name': 'UBNT',
+            'files': [
+                'openwrt-ar71xx-generic-ubnt-loco-m-squashfs-factory.bin'
+            ]
+        }
+    }
+
+
+class UBNTLocoM5XW(UBNTNanoM5):
+    """
+    UBNT Nanostation Loco M5 XW device descriptor.
+    """
+
+    identifier = 'ub-loco-m5-xw'
+    name = "Nanostation Loco M5 XW"
+    profiles = {
+        'openwrt': {
+            'name': 'UBNT',
+            'files': [
+                'openwrt-ar71xx-generic-ubnt-loco-m-xw-squashfs-factory.bin'
+            ]
+        }
+    }
+
 # Register the UBNT Nano device
 cgm_base.register_device('openwrt', UBNTNano)
 cgm_base.register_device('openwrt', UBNTNanoM5)
 cgm_base.register_device('openwrt', UBNTNanoM5XW)
+cgm_base.register_device('openwrt', UBNTLocoM5)
+cgm_base.register_device('openwrt', UBNTLocoM5XW)
