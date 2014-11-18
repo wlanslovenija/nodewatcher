@@ -250,7 +250,9 @@ class Command(base.BaseCommand):
     def import_nodes(self, data):
         self.stdout.write('Importing %d nodes...\n' % len(data['nodes']))
 
-        for node in data['nodes'].values():
+        for idx, node in enumerate(data['nodes'].values()):
+            self.stdout.write('  o Importing node %s (%d/%d).\n' % (node['uuid'], idx + 1, len(data['nodes'])))
+
             # Determine router ID
             try:
                 subnet_mesh = [x for x in node['subnets'] if x['gen_iface_type'] == 2][0]
