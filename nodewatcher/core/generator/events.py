@@ -47,7 +47,7 @@ class BuildResultFailed(events.NodeEventRecord):
         :param build_result: Build result instance
         """
 
-        super(BuildResultReady, self).__init__(
+        super(BuildResultFailed, self).__init__(
             build_result.node,
             events.NodeEventRecord.SEVERITY_ERROR,
             related_users=build_result.user,
