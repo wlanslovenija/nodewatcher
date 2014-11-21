@@ -98,7 +98,7 @@ class UBNTLocoM5(UBNTNanoM5):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-loco-m-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin'
             ]
         }
     }
