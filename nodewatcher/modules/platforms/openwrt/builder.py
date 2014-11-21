@@ -1,6 +1,8 @@
 import io
 import os
 
+from nodewatcher.core.generator.cgm import exceptions as cgm_exceptions
+
 
 def build_image(result, profile):
     """
@@ -45,9 +47,13 @@ def build_image(result, profile):
         )
 
         # Collect the output files and return them
-        fw_files = [
-            (fw_file, builder.read_result_file(os.path.join('bin', result.builder.architecture, fw_file)))
-            for fw_file in profile['files']
-        ]
+        fw_files = []
+        for fw_file in profile['files']:
+            try:
+                fw_files.append(
+                    (fw_file, builder.read_result_file(os.path.join('bin', result.builder.architecture, fw_file)))
+                )
+            except IOError:
+                raise cgm_exceptions.BuildError('Output file \'%s\' not found!' % fw_file)
 
         return fw_files
