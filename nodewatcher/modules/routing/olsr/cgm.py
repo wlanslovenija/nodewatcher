@@ -52,6 +52,7 @@ def olsr(node, cfg):
     olsrd = cfg.olsrd.add('olsrd')
     olsrd.SrcIpRoutes = 'yes'
     olsrd.RtTable = ROUTING_TABLE_ID
+    olsrd.RtTableDefault = ROUTING_TABLE_ID
 
     # Configure main IP (router ID)
     try:
