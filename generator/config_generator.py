@@ -929,6 +929,7 @@ Hna4
 MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
+RtTableDefault 20
 
 Interface "wlan0" "br-clients" {diggers} {olsr_interfaces}
 {{
