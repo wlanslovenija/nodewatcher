@@ -908,7 +908,7 @@ start() {{
       firewall_config.close()
 
       # OLSRd configuration
-      f = open(os.path.join(configPath, "olsrd4"), 'w')
+      f = open(os.path.join(configPath, "olsrd"), 'w')
       f.write("""
 config olsrd
         option config_file      '/etc/olsrd.conf'
