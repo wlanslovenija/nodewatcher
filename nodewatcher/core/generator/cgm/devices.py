@@ -92,7 +92,7 @@ class DeviceRadio(object):
     # Radio features
     MultipleSSID = "multiple_ssid"
 
-    def __init__(self, identifier, description, protocols, connectors, features):
+    def __init__(self, identifier, description, protocols, connectors, features=None):
         """
         Class constructor.
         """
@@ -101,7 +101,7 @@ class DeviceRadio(object):
         self.description = description
         self.protocols = protocols
         self.connectors = connectors
-        self.features = features
+        self.features = features or []
         self.index = None
 
     def get_connector_choices(self):
