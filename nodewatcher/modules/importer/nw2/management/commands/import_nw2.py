@@ -12,7 +12,7 @@ from guardian import shortcuts
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.allocation.ip import models as pool_models
-from nodewatcher.core.generator.cgm import models as cgm_models
+from nodewatcher.core.generator.cgm import models as cgm_models, devices as cgm_devices
 from nodewatcher.core.monitor import models as monitor_models
 from nodewatcher.modules.administration.description import models as dsc_models
 from nodewatcher.modules.administration.location import models as location_models
@@ -130,6 +130,42 @@ DNS_SERVERS = {
     "10.254.0.2",
 }
 
+# Subnet size map
+SUBNET_SIZE_TRANSLATION = {
+    24: {
+        'rid': 29,
+        'clients': 27,
+    },
+    25: {
+        'rid': 29,
+        'clients': 27,
+    },
+    26: {
+        'rid': 29,
+        'clients': 27,
+    },
+    27: {
+        'rid': 29,
+        'clients': 28,
+    },
+    28: {
+        'rid': 29,
+        'clients': 29,
+    },
+    29: {
+        'rid': 29,
+        'clients': None,
+    },
+    30: {
+        'rid': 30,
+        'clients': None,
+    },
+    32: {
+        'rid': 32,
+        'clients': None,
+    },
+}
+
 
 class Command(base.BaseCommand):
     help = "Imports legacy nodewatcher v2 data."
@@ -233,14 +269,14 @@ class Command(base.BaseCommand):
             if project['ssid']:
                 project_mdl.ssids.create(
                     purpose='ap',
-                    default=True,
                     essid=project['ssid'],
-                    bssid='02:CA:FF:EE:BA:BE',
                 )
             if project['ssid_backbone']:
                 project_mdl.ssids.create(
-                    purpose='backbone',
+                    purpose='mesh',
+                    default=True,
                     essid=project['ssid_backbone'],
+                    bssid='02:CA:FF:EE:BA:BE',
                 )
             if project['ssid_mobile']:
                 project_mdl.ssids.create(
@@ -264,6 +300,13 @@ class Command(base.BaseCommand):
                 self.stdout.write('  o Skipping node %s (unable to determine router ID).\n' % node['uuid'])
                 continue
 
+            try:
+                translated_subnets = SUBNET_SIZE_TRANSLATION[subnet_mesh['cidr']]
+            except KeyError:
+                raise base.CommandError('Unable to translate subnet for node %s.' % node['uuid'])
+
+            # Allocate Router-ID based on subnet translation
+            subnet_mesh['cidr'] = translated_subnets['rid']
             subnet_mesh = ipaddr.IPNetwork('%(subnet)s/%(cidr)s' % subnet_mesh)
             try:
                 pool_mesh = [x['_model'] for x in data['pools'].values() if subnet_mesh in x['_model']][0]
@@ -397,7 +440,7 @@ class Command(base.BaseCommand):
                     pass
 
                 # Mesh interface
-                ssid = project.ssids.get(default=True)
+                ssid = project.ssids.get(purpose='mesh')
                 iface_mesh = node_mdl.config.core.interfaces(
                     create=cgm_models.WifiInterfaceConfig,
                     device=radio_wifi,
@@ -407,6 +450,41 @@ class Command(base.BaseCommand):
                     routing_protocol='olsr',
                 )
                 iface_mesh.save()
+
+                # Client AP interface
+                dsc_radio = device.get_radio('wifi0')
+                if translated_subnets['clients'] is not None and dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
+                    ssid = project.ssids.get(purpose='ap')
+                    iface_ap = node_mdl.config.core.interfaces(
+                        create=cgm_models.WifiInterfaceConfig,
+                        device=radio_wifi,
+                        mode='ap',
+                        essid=ssid.essid,
+                    )
+                    iface_ap.save()
+
+                    subnet_ap = ipaddr.IPNetwork('%s/%s' % (subnet_mesh.ip, translated_subnets['clients'] - 1))
+                    subnet_ap = list(subnet_ap.iter_subnets())[1]
+                    try:
+                        pool_ap = [x['_model'] for x in data['pools'].values() if subnet_ap in x['_model']][0]
+                    except IndexError:
+                        raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_ap)
+
+                    allocation = pool_ap.reserve_subnet(str(subnet_ap.ip), subnet_ap.prefixlen)
+                    if allocation is None:
+                        raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_ap)
+
+                    node_mdl.config.core.interfaces.network(
+                        create=cgm_models.AllocatedNetworkConfig,
+                        interface=iface_ap,
+                        description='AP client access',
+                        family='ipv4',
+                        pool=pool_ap,
+                        prefix_length=subnet_ap.prefixlen,
+                        allocation=allocation,
+                    ).save()
+
+                    # TODO: DHCP pool configuration
 
                 # WAN uplink
                 iface_wan = node_mdl.config.core.interfaces(
