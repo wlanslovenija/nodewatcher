@@ -312,6 +312,7 @@ INSTALLED_APPS = (
     'uuidfield',
     'leaflet',
     'django_countries',
+    'timedelta',
 )
 
 # A sample logging configuration. The only tangible logging

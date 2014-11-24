@@ -8,6 +8,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from guardian import shortcuts
+from timedelta import fields as timedelta_fields
 
 from .. import models as generator_models
 from ... import models as core_models
@@ -272,6 +273,26 @@ class AnnouncableNetwork(models.Model):
     )
 
 
+class LeasableNetwork(models.Model):
+    """
+    Abstract class for networks which may be leased to clients via DHCP.
+    """
+
+    lease_type = registry_fields.SelectorKeyField(
+        'node.config', 'core.interfaces.network#lease_type',
+        blank=True, null=True, verbose_name=_("Lease Type"),
+    )
+    lease_duration = timedelta_fields.TimedeltaField(
+        default='1h',
+        verbose_name=_('Lease Duration'),
+    )
+
+    class Meta:
+        abstract = True
+
+registration.point('node.config').register_choice('core.interfaces.network#lease_type', registration.Choice('dhcp', _("DHCP")))
+
+
 class NetworkConfig(registration.bases.NodeConfigRegistryItem):
     """
     Network configuration of an interface.
@@ -305,7 +326,7 @@ registration.point('node.config').register_subitem(EthernetInterfaceConfig, Brid
 registration.point('node.config').register_subitem(WifiInterfaceConfig, BridgedNetworkConfig)
 
 
-class StaticNetworkConfig(NetworkConfig, AnnouncableNetwork):
+class StaticNetworkConfig(NetworkConfig, AnnouncableNetwork, LeasableNetwork):
     """
     Static IP configuration.
     """
@@ -354,7 +375,7 @@ class DHCPNetworkConfig(NetworkConfig):
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
 
 
-class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator, AnnouncableNetwork):
+class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator, AnnouncableNetwork, LeasableNetwork):
     """
     IP configuration that gets allocated from a pool.
     """

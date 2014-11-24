@@ -368,13 +368,36 @@ def user_accounts(node, cfg):
         pass
 
 
-def configure_network(cfg, network, section):
+def configure_leasable_network(cfg, network, iface_name, subnet):
+    """
+    A helper function to configure network lease.
+
+    :param cfg: Platform configuration
+    :param network: Network configuration
+    :param iface_name: Name of the UCI interface
+    :param subnet: Subnet to be leased
+    """
+
+    if network.lease_type == 'dhcp':
+        try:
+            dhcp = cfg.dhcp.add(dhcp=iface_name)
+            dhcp.interface = iface_name
+        except ValueError:
+            dhcp = cfg.dhcp[iface_name]
+
+        dhcp.start = 1
+        dhcp.limit = len(list(subnet.iterhosts())) - 1
+        dhcp.leasetime = int(network.lease_duration.total_seconds())
+
+
+def configure_network(cfg, network, section, iface_name):
     """
     A helper function to configure an interface's network.
 
     :param cfg: Platform configuration
     :param network: Network configuration
     :param section: UCI interface or alias section
+    :param iface_name: Name of the UCI interface
     """
 
     if isinstance(network, cgm_models.StaticNetworkConfig):
@@ -394,6 +417,8 @@ def configure_network(cfg, network, section):
         # When network is marked to be announced, also specify it here
         if network.routing_announce:
             section._announce = [network.routing_announce]
+
+        configure_leasable_network(cfg, network, iface_name, network.address)
     elif isinstance(network, cgm_models.AllocatedNetworkConfig):
         section.proto = 'static'
 
@@ -414,6 +439,8 @@ def configure_network(cfg, network, section):
                 section.netmask = address.netmask
             elif network.family == 'ipv6':
                 section.ip6addr = address
+
+            configure_leasable_network(cfg, network, iface_name, address)
         else:
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
     elif isinstance(network, cgm_models.DHCPNetworkConfig):
@@ -445,13 +472,13 @@ def configure_interface(cfg, interface, section, iface_name):
     networks = [x.cast() for x in interface.networks.all()]
     if networks:
         network = networks[0]
-        configure_network(cfg, network, section)
+        configure_network(cfg, network, section, iface_name)
 
         # Additional network configurations are aliases
         for network in networks[1:]:
             alias = cfg.network.add('alias')
             alias.interface = iface_name
-            configure_network(cfg, network, alias)
+            configure_network(cfg, network, alias, iface_name)
     else:
         section.proto = 'none'
 

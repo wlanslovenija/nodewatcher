@@ -483,6 +483,8 @@ class Command(base.BaseCommand):
                         pool=pool_ap,
                         prefix_length=subnet_ap.prefixlen,
                         allocation=allocation,
+                        lease_type='dhcp',
+                        lease_duration='1h',
                     ).save()
 
                     # TODO: DHCP pool configuration
