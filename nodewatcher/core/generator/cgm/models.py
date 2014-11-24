@@ -231,7 +231,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         Returns a unique identifier for this virtual wifi interface.
         """
 
-        return hashlib.sha1(":".join([str(self.device.pk), self.mode, self.essid, self.bssid])).hexdigest()[:5]
+        return hashlib.sha1(":".join([str(self.device.pk), self.mode, self.essid, self.bssid or ''])).hexdigest()[:5]
 
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))
