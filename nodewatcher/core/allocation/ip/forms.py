@@ -1,7 +1,8 @@
+from django import forms
 from django.db.models import fields
 from django.utils.translation import ugettext as _
 
-from ...registry import fields as registry_fields
+from ...registry import fields as registry_fields, registration
 
 from . import models as pool_models, signals
 
@@ -49,3 +50,14 @@ class IpAddressAllocatorFormMixin(object):
                 del self.fields['subnet_hint']
         except pool_models.IpPool.DoesNotExist:
             del self.fields['subnet_hint']
+
+
+class AllocatedIpRouterIdConfigForm(forms.ModelForm, IpAddressAllocatorFormMixin):
+    """
+    Allocated IP router identifier configuration form.
+    """
+
+    class Meta:
+        model = pool_models.AllocatedIpRouterIdConfig
+
+registration.register_form_for_item(pool_models.AllocatedIpRouterIdConfig, AllocatedIpRouterIdConfigForm)
