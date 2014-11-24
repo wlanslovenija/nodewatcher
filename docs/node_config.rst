@@ -452,8 +452,21 @@ among its bases.
 
    :param routing_announce: Should this network be announced via a routing protocol. Available
      choices are provided by routing protocol implementations. In case the value is ``None``, the
-     network is not announce via any routing protocol.
+     network is not announced via any routing protocol.
    :type routing_announce: registered choice
+
+Another abstract mixin is provided for configuring networks which may be leased to clients via
+DHCP or other protocols. In case a network should support leases, it should include the mixin
+among its bases.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.LeasableNetwork()
+
+  :param lease_type: Type of network lease. In case the value is ``None``, the network will not
+    be leased to any clients.
+  :type lease_type: registered choice
+
+  :param lease_duration: Duration of each lease.
+  :type lease_duration: :class:`timedelta.fields.TimedeltaFields`
 
 The simplest is a static IP network configuration.
 
