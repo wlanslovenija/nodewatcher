@@ -478,6 +478,7 @@ class Command(base.BaseCommand):
                         create=cgm_models.AllocatedNetworkConfig,
                         interface=iface_ap,
                         description='AP client access',
+                        routing_announce='olsr',
                         family='ipv4',
                         pool=pool_ap,
                         prefix_length=subnet_ap.prefixlen,
