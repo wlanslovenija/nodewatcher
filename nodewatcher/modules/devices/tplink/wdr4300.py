@@ -21,6 +21,8 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
             )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
         ]),
         cgm_devices.IntegratedRadio('wifi1', "Wifi1", [
             cgm_protocols.IEEE80211AN(
@@ -31,6 +33,8 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
             )
         ], [
             cgm_devices.AntennaConnector('a2', "Antenna1")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
         ])
     ]
     switches = [
@@ -71,9 +75,6 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
             angle_vertical=75,
             gain=2,
         )
-    ]
-    features = [
-        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {

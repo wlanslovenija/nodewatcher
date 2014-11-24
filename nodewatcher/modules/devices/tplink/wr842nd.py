@@ -21,6 +21,8 @@ class TPLinkWR842NDv1(cgm_devices.DeviceBase):
             )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
         ])
     ]
     switches = [
@@ -49,9 +51,6 @@ class TPLinkWR842NDv1(cgm_devices.DeviceBase):
             angle_vertical=75,
             gain=2,
         )
-    ]
-    features = [
-        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {

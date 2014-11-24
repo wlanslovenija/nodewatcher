@@ -89,7 +89,10 @@ class DeviceRadio(object):
     An abstract descriptor of a device's radio.
     """
 
-    def __init__(self, identifier, description, protocols, connectors):
+    # Radio features
+    MultipleSSID = "multiple_ssid"
+
+    def __init__(self, identifier, description, protocols, connectors, features):
         """
         Class constructor.
         """
@@ -98,6 +101,7 @@ class DeviceRadio(object):
         self.description = description
         self.protocols = protocols
         self.connectors = connectors
+        self.features = features
         self.index = None
 
     def get_connector_choices(self):
@@ -124,6 +128,13 @@ class DeviceRadio(object):
         for protocol in self.protocols:
             if protocol.identifier == identifier:
                 return protocol
+
+    def has_feature(self, feature):
+        """
+        Returns true if this radio has a specific feature.
+        """
+
+        return feature in self.features
 
 
 class IntegratedRadio(DeviceRadio):
@@ -189,14 +200,6 @@ class Switch(object):
 
         self.cpu_ports = cpu_ports
         self.vlans = vlans
-
-
-class Features(object):
-    """
-    Represents features a device can have.
-    """
-
-    MultipleSSID = "multiple_ssid"
 
 # A list of attributes that are required to be defined
 REQUIRED_DEVICE_ATTRIBUTES = (
@@ -269,7 +272,6 @@ class DeviceBase(object):
 
     __metaclass__ = DeviceMetaclass
 
-    features = []
     port_map = {}
     drivers = {}
     profiles = {}

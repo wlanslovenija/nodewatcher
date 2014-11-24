@@ -691,8 +691,9 @@ def network(node, cfg):
                 configure_switch(cfg, device, port)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
             # Configure virtual interfaces on top of the same radio device
+            dsc_radio = device.get_radio(interface.wifi_radio)
             interfaces = list(interface.interfaces.all())
-            if len(interfaces) > 1 and cgm_devices.Features.MultipleSSID not in device.features:
+            if len(interfaces) > 1 and not dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
                 raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % device.name)
 
             wifi_radio = device.remap_port('openwrt', interface.wifi_radio)
@@ -710,7 +711,6 @@ def network(node, cfg):
                     _("Radio driver for '%s' not defined on OpenWRT!") % interface.wifi_radio
                 )
 
-            dsc_radio = device.get_radio(interface.wifi_radio)
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
             dsc_channel = dsc_protocol.get_channel(interface.channel)
             dsc_channel_width = dsc_protocol.get_channel_width(interface.channel_width)

@@ -16,6 +16,8 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
             cgm_protocols.IEEE80211BG()
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
         ])
     ]
     switches = [
@@ -49,9 +51,6 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
             angle_vertical=75,
             gain=2,
         )
-    ]
-    features = [
-        cgm_devices.Features.MultipleSSID,
     ]
     port_map = {
         'openwrt': {
