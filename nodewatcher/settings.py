@@ -445,8 +445,9 @@ MONITOR_RUNS = {
     },
 
     'telemetry': {
-        'workers': 20,
+        'workers': 30,
         'interval': 300,
+        'max_tasks_per_child': 50,
         'processors': (
             'nodewatcher.core.monitor.processors.GetAllNodes',
             'nodewatcher.modules.routing.olsr.processors.Topology',
@@ -460,7 +461,16 @@ MONITOR_RUNS = {
             'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
             'nodewatcher.modules.administration.status.processors.NodeStatus',
             'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
-            'nodewatcher.modules.monitor.datastream.processors.Maintenance',
+            'nodewatcher.modules.monitor.datastream.processors.MaintenanceBackprocess',
+        ),
+    },
+
+    'datastream': {
+        'workers': 10,
+        'interval': 700,
+        'max_tasks_per_child': 1,
+        'processors': (
+            'nodewatcher.modules.monitor.datastream.processors.MaintenanceDownsample',
         ),
     },
 

@@ -81,7 +81,10 @@ class MonitorRun(object):
 
         # Prepare worker processes
         try:
-            self.workers = multiprocessing.Pool(self.config['workers'], maxtasksperchild=1000)
+            self.workers = multiprocessing.Pool(
+                self.config['workers'],
+                maxtasksperchild=self.config.get('max_tasks_per_child', 100),
+            )
         except TypeError:
             # Compatibility with Python 2.6 that doesn't have the maxtasksperchild argument
             self.workers = multiprocessing.Pool(self.config['workers'])
@@ -103,8 +106,11 @@ class MonitorRun(object):
                 logger.info("Running network processor %s..." % lead_proc.__name__)
 
                 try:
-                    with transaction.atomic():
-                        context, nodes = lead_proc().process(context, nodes)
+                    if lead_proc.requires_transaction:
+                        with transaction.atomic():
+                            context, nodes = lead_proc(worker_pool=self.workers).process(context, nodes)
+                    else:
+                        context, nodes = lead_proc(worker_pool=self.workers).process(context, nodes)
                 except KeyboardInterrupt:
                     raise
                 except:

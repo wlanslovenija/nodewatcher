@@ -120,10 +120,12 @@ class NetworkDatastream(DatastreamBase, monitor_processors.NetworkProcessor):
         return context, nodes
 
 
-class Maintenance(monitor_processors.NetworkProcessor):
+class MaintenanceBackprocess(monitor_processors.NetworkProcessor):
     """
-    Datastream maintenance processor.
+    Datastream backprocessing maintenance processor.
     """
+
+    requires_transaction = False
 
     def process(self, context, nodes):
         """
@@ -137,7 +139,43 @@ class Maintenance(monitor_processors.NetworkProcessor):
 
         self.logger.info("Backprocessing streams...")
         datastream.backprocess_streams()
-        self.logger.info("Downsampling streams...")
-        datastream.downsample_streams()
+
+        return context, nodes
+
+
+def _maintenance_downsample_worker():
+    """
+    Helper function proxy that can be called by the worker pool.
+    """
+
+    datastream.downsample_streams()
+
+
+class MaintenanceDownsample(monitor_processors.NetworkProcessor):
+    """
+    Datastream downsampling maintenance processor.
+    """
+
+    requires_transaction = False
+
+    def process(self, context, nodes):
+        """
+        Performs network-wide processing and selects the nodes that will be processed
+        in any following processors. Context is passed between network processors.
+
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
+        """
+
+        # Downsample streams using multiple workers in parallel
+        results = []
+        workers = self.get_worker_pool()
+        self.logger.info("Downsampling streams with %d workers..." % workers._processes)
+        for worker in xrange(workers._processes):
+            results.append(workers.apply_async(_maintenance_downsample_worker))
+
+        for result in results:
+            result.get()
 
         return context, nodes

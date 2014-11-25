@@ -161,6 +161,24 @@ class NetworkProcessor(MonitoringProcessor):
     serially.
     """
 
+    requires_transaction = True
+
+    def __init__(self, worker_pool=None, **kwargs):
+        """
+        Class constructor.
+        """
+
+        super(NetworkProcessor, self).__init__(**kwargs)
+        self._worker_pool = worker_pool
+
+    def get_worker_pool(self):
+        """
+        Returns the worker pool instance for the run that is executing this network
+        processor. It may be used to perform tasks in parallel.
+        """
+
+        return self._worker_pool
+
     def process(self, context, nodes):
         """
         Performs network-wide processing and selects the nodes that will be processed
