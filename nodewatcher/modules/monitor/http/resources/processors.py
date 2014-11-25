@@ -33,6 +33,8 @@ class SystemStatus(monitor_processors.NodeProcessor):
             nresources.routes = None
             nresources.tcp_connections = None
             nresources.udp_connections = None
+            nresources.track_connections = None
+            nresources.track_connections_max = None
 
         # In the old version, the "core.general" module reports resource usage, where
         # in the new one, this has been moved to its own "core.resources" module
@@ -101,6 +103,12 @@ class SystemStatus(monitor_processors.NodeProcessor):
                 nresources.udp_connections = \
                     int(context.http.core.resources.connections.ipv4.udp) + \
                     int(context.http.core.resources.connections.ipv6.udp)
+
+                try:
+                    nresources.track_connections = int(context.http.core.resources.connections.tracking.count)
+                    nresources.track_connections_max = int(context.http.core.resources.connections.tracking.max)
+                except (ValueError, TypeError):
+                    pass
             else:
                 nresources.routes = int(context.http.general.routes.ipv4) + int(context.http.general.routes.ipv6)
                 nresources.tcp_connections = int(context.http.general.connections.tcp)

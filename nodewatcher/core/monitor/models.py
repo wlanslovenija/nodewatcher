@@ -107,13 +107,15 @@ registration.point('node.monitoring').register_item(GeneralResourcesMonitor)
 
 class NetworkResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
-    Network resources such as number of routes and number of tracked TCP and UDP
-    connections.
+    Network resources such as number of routes, number of local TCP and UDP
+    connections, number of tracked connections.
     """
 
     routes = models.IntegerField(null=True)
     tcp_connections = models.IntegerField(null=True)
     udp_connections = models.IntegerField(null=True)
+    track_connections = models.IntegerField(null=True)
+    track_connections_max = models.IntegerField(null=True)
 
     class RegistryMeta:
         registry_id = 'system.resources.network'

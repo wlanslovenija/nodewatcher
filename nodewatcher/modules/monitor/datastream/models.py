@@ -233,7 +233,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
     })
     tcp_connections = fields.IntegerField(tags={
         'title': gettext_noop("TCP connections"),
-        'description': gettext_noop("Number of tracked TCP connections."),
+        'description': gettext_noop("Number of local TCP connections."),
         'visualization': {
             'type': 'line',
             'time_downsamplers': ['mean'],
@@ -243,12 +243,36 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
     })
     udp_connections = fields.IntegerField(tags={
         'title': gettext_noop("UDP connections"),
-        'description': gettext_noop("Number of tracked UDP connections."),
+        'description': gettext_noop("Number of local UDP connections."),
         'visualization': {
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
+        }
+    })
+    track_connections = fields.IntegerField(tags={
+        'group': 'track_connections',
+        'title': gettext_noop("Tracked connections"),
+        'description': gettext_noop("Number of tracked connections."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'track_connections', 'node': fields.TagReference('node')},
+        }
+    })
+    track_connections_max = fields.IntegerField(tags={
+        'group': 'track_connections',
+        'title': gettext_noop("Tracked connections limit"),
+        'description': gettext_noop("Limit of the number of tracked connections."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'track_connections', 'node': fields.TagReference('node')},
         }
     })
 
