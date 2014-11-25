@@ -14,6 +14,9 @@ tokumx:
     image: wlanslovenija/tokumx
     # A privileged container is required to disable hugepages for TokuMX
     privileged: true
+    volumes:
+        # Use a volume to enable database persistency across restarts
+        - /tmp/nodewatcher-tokumx:/var/lib/tokumx
 builder:
     image: wlanslovenija/openwrt-builder:v812b02b_bb_ar71xx
     environment:
