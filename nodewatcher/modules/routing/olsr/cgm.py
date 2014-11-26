@@ -19,12 +19,14 @@ def olsr(node, cfg):
     # in the routing table; other modules must have previously set its
     # "_routable" attribute to OLSR_PROTOCOL_NAME
     routable_ifaces = []
+    announced_ifaces = []
     for name, iface in cfg.network:
         # All interfaces that are marked in _announce for this routing protocol should be added to HNA
         if olsr_models.OLSR_PROTOCOL_NAME in (iface._announce or []):
             hna = cfg.olsrd.add('Hna4')
             hna.netaddr = ipaddr.IPNetwork('%s/%s' % (iface.ipaddr, iface.netmask)).network
             hna.netmask = iface.netmask
+            announced_ifaces.append(name)
             olsrd_configured = True
 
         if iface._routable != olsr_models.OLSR_PROTOCOL_NAME:
@@ -72,6 +74,14 @@ def olsr(node, cfg):
     rt = cfg.network.add('rule')
     rt.lookup = ROUTING_TABLE_ID
     rt.priority = ROUTING_TABLE_PRIORITY
+
+    # Ensure that forwarding between all OLSR interfaces is allowed
+    firewall = cfg.firewall.add('zone')
+    firewall.name = 'olsr'
+    firewall.network = routable_ifaces + announced_ifaces
+    firewall.input = 'ACCEPT'
+    firewall.output = 'ACCEPT'
+    firewall.forward = 'ACCEPT'
 
     # Ensure that "olsrd" package is installed
     cfg.packages.update(['olsrd'])

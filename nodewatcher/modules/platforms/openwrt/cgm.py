@@ -26,11 +26,12 @@ class UCISection(object):
     Represents a configuration section in UCI.
     """
 
-    def __init__(self, typ=None):
+    def __init__(self, key=None, typ=None):
         """
         Class constructor.
         """
 
+        self.__dict__['_key'] = key
         self.__dict__['_typ'] = typ
         self.__dict__['_values'] = {}
 
@@ -57,6 +58,13 @@ class UCISection(object):
             raise AttributeError(name)
 
         return self._values.get(name, None)
+
+    def get_key(self):
+        """
+        Returns the section key.
+        """
+
+        return self._key
 
     def get_type(self):
         """
@@ -157,7 +165,7 @@ class UCIRoot(object):
         if kwargs:
             # Adding a named section
             section_key = kwargs.values()[0]
-            section = UCISection(typ=kwargs.keys()[0])
+            section = UCISection(key=section_key, typ=kwargs.keys()[0])
 
             # Check for duplicates to avoid screwing up existing lists and sections
             if section_key in self._named_sections:
@@ -184,6 +192,37 @@ class UCIRoot(object):
         """
 
         return self._ordered_sections.iteritems()
+
+    def find_named_section(self, section_type, **query):
+        """
+        Searches for the first named section having specific values of
+        attributes.
+
+        :param section_type: Section type
+        :param **query: Attribute query
+        :return: Named section or None if not found
+        """
+
+        for name, section in self.named_sections():
+            if section.get_type() != section_type:
+                continue
+
+            if all((getattr(section, a, None) == v for a, v in query.items())):
+                return section
+
+    def find_ordered_section(self, section_type, **query):
+        """
+        Searches for the first ordered section having specific values of
+        attributes.
+
+        :param section_type: Section type
+        :param **query: Attribute query
+        :return: Ordered section or None if not found
+        """
+
+        for section in self._ordered_sections.get(section_type, []):
+            if all((getattr(section, a, None) == v for a, v in query.items())):
+                return section
 
     def __iter__(self):
         return self.named_sections()
@@ -500,6 +539,21 @@ def configure_interface(cfg, interface, section, iface_name):
 
         # Only take the first bandwidth limit into account and ignore the rest
         break
+
+    # Configure firewall policy for this interface
+    if section._uplink:
+        firewall = cfg.firewall.find_ordered_section('zone', name='uplink')
+        if not firewall:
+            firewall = cfg.firewall.add('zone')
+            firewall.name = 'uplink'
+            firewall.input = 'ACCEPT'
+            firewall.output = 'ACCEPT'
+            firewall.forward = 'REJECT'
+
+        if not firewall.network:
+            firewall.network = []
+
+        firewall.network.append(iface_name)
 
 
 def configure_switch(cfg, device, port):
@@ -914,3 +968,17 @@ def dns_servers(node, cfg):
     dnsmasq.authoritative = True
     dnsmasq.lease_file = '/tmp/dhcp.leases'
     dnsmasq.server = [str(x.address.ip) for x in node.config.core.servers.dns()]
+
+
+@cgm_base.register_platform_module('openwrt', 15)
+def firewall(node, cfg):
+    """
+    Configures the firewall.
+    """
+
+    # Setup chain defaults
+    defaults = cfg.firewall.add('defaults')
+    defaults.synflood_protect = True
+    defaults.input = 'ACCEPT'
+    defaults.output = 'ACCEPT'
+    defaults.forward = 'REJECT'

@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext as _
+
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base
 
 from . import models
@@ -9,20 +11,20 @@ def tunneldigger(node, cfg):
     Configures the tunneldigger VPN solution.
     """
 
-    # Deactivate tunneldigger when no uplink interface has been configured
-    uplink_interface = None
-    for name, section in cfg.network:
-        if section.get_type() == 'interface' and section._uplink:
-            uplink_interface = name
-            break
+    # Raise validation error when no uplink interface has been configured
+    uplink_interface = cfg.network.find_named_section('interface', _uplink=True)
+    if uplink_interface:
+        uplink_interface = uplink_interface.get_key()
     else:
-        return
+        raise cgm_base.ValidationError(_("In order to use Tunneldigger interfaces, an uplink interface must be defined!"))
 
     # Create tunneldigger configuration
     tunneldigger_enabled = False
+    tunneldigger_ifaces = []
     for idx, interface in enumerate(node.config.core.interfaces(onlyclass=models.TunneldiggerInterfaceConfig)):
         ifname = models.get_tunneldigger_interface_name(idx)
         tunneldigger_enabled = True
+        tunneldigger_ifaces.append(ifname)
 
         # Create interface configurations; note that addressing configuration is routing
         # daemon dependent and as such should not be filled in here
@@ -78,6 +80,15 @@ def tunneldigger(node, cfg):
         setattr(policy, 'in', uplink_interface)
         policy.lookup = 'main'
         policy.priority = 500
+
+        # Setup firewall policy for tunneldigger traffic
+        firewall = cfg.firewall.add('zone')
+        firewall.name = 'tunneldigger'
+        firewall.network = tunneldigger_ifaces
+        firewall.input = 'ACCEPT'
+        firewall.output = 'ACCEPT'
+        firewall.forward = 'ACCEPT'
+        firewall.mtu_fix = True
 
         # Ensure that "tunneldigger" package is installed
         cfg.packages.update(['tunneldigger'])
