@@ -424,7 +424,7 @@ def configure_leasable_network(cfg, network, iface_name, subnet):
         except ValueError:
             dhcp = cfg.dhcp[iface_name]
 
-        dhcp.start = 1
+        dhcp.start = 2
         dhcp.limit = len(list(subnet.iterhosts())) - 1
         dhcp.leasetime = int(network.lease_duration.total_seconds())
 
