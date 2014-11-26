@@ -966,7 +966,7 @@ def dns_servers(node, cfg):
     dnsmasq.nonegcache = True
     dnsmasq.noresolv = True
     dnsmasq.authoritative = True
-    dnsmasq.lease_file = '/tmp/dhcp.leases'
+    dnsmasq.leasefile = '/tmp/dhcp.leases'
     dnsmasq.server = [str(x.address.ip) for x in node.config.core.servers.dns()]
 
 
