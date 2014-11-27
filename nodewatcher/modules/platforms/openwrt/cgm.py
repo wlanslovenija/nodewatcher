@@ -84,7 +84,7 @@ class UCISection(object):
             elif isinstance(value, bool):
                 value = int(value)
             else:
-                value = str(value)
+                value = str(value).strip().replace('\n', ' ')
 
             if self._typ is not None:
                 return ['{0}.{1}.{2}={3}'.format(root, section, key, value)]
@@ -96,7 +96,7 @@ class UCISection(object):
             elif isinstance(value, bool):
                 return ['\toption %s \'%s\'' % (key, int(value))]
             else:
-                return ['\toption %s \'%s\'' % (key, value)]
+                return ['\toption %s \'%s\'' % (key, str(value).strip().replace('\n', ' '))]
 
         return str(value)
 
