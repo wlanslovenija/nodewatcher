@@ -293,6 +293,9 @@ class Command(base.BaseCommand):
         for idx, node in enumerate(data['nodes'].values()):
             self.stdout.write('  o Importing node %s (%d/%d).\n' % (node['uuid'], idx + 1, len(data['nodes'])))
 
+            # Dead node flag, so we don't allocate any resources for it
+            dead_node = node['node_type'] == 6
+
             # Determine router ID
             try:
                 subnet_mesh = [x for x in node['subnets'] if x['gen_iface_type'] == 2][0]
@@ -313,22 +316,24 @@ class Command(base.BaseCommand):
             except IndexError:
                 raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_mesh)
 
-            allocation = pool_mesh.reserve_subnet(str(subnet_mesh.ip), subnet_mesh.prefixlen)
-            if allocation is None:
-                raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_mesh)
+            if not dead_node:
+                allocation = pool_mesh.reserve_subnet(str(subnet_mesh.ip), subnet_mesh.prefixlen)
+                if allocation is None:
+                    raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_mesh)
 
             node_mdl = core_models.Node(uuid=node['uuid'])
             node_mdl.save()
             node['_model'] = node_mdl
 
             # Router ID
-            node_mdl.config.core.routerid(
-                create=pool_models.AllocatedIpRouterIdConfig,
-                family='ipv4',
-                pool=pool_mesh,
-                prefix_length=subnet_mesh.prefixlen,
-                allocation=allocation,
-            ).save()
+            if not dead_node:
+                node_mdl.config.core.routerid(
+                    create=pool_models.AllocatedIpRouterIdConfig,
+                    family='ipv4',
+                    pool=pool_mesh,
+                    prefix_length=subnet_mesh.prefixlen,
+                    allocation=allocation,
+                ).save()
 
             # Assign default permissions
             maintainer = data['users'][str(node['owner_id'])]['_model']
@@ -400,7 +405,7 @@ class Command(base.BaseCommand):
             node_mdl.config.core.roles(create=role_models.VpnServerRoleConfig, vpn_server=node['vpn_server']).save()
             node_mdl.config.core.roles(create=role_models.RedundantNodeRoleConfig, redundancy_required=node['redundancy_req']).save()
 
-            if node['profile']:
+            if node['profile'] and not dead_node:
                 general = node_mdl.config.core.general(
                     create=cgm_models.CgmGeneralConfig,
                     name=node['name'],
