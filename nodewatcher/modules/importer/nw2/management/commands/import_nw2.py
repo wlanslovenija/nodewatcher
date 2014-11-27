@@ -492,8 +492,6 @@ class Command(base.BaseCommand):
                         lease_duration='1h',
                     ).save()
 
-                    # TODO: DHCP pool configuration
-
                 # WAN uplink
                 iface_wan = node_mdl.config.core.interfaces(
                     create=cgm_models.EthernetInterfaceConfig,
