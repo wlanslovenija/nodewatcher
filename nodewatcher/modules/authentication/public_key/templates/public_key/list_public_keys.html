@@ -1,0 +1,55 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n sekizai_tags html_tags url_tags %}
+
+    {% add_data "css_data" "datatables/css/jquery.dataTables.css" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
+    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "public_key/js/code.js" %}
+
+    {% trans "List of My Public Keys" as title %}
+{% endcontextblock %}
+
+{% block altlinks %}
+    {% heading 2 _("Other Formats") %}
+
+    <ul class="altlinks-list node-list-altlinks">
+        <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "user_authentication_key" %}?format=xml">{% trans "XML" %}</a></li>
+        <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "user_authentication_key" %}?format=json">{% trans "JSON" %}</a></li>
+    </ul>
+{% endblock altlinks %}
+
+{% block content_before %}
+    {{ block.super }}
+    {% block public_key_menu_wrapper %}
+        <section class="menu display-node-menu {% block public_key_menu_classes %}{% endblock public_key_menu_classes %}">
+            {% block public_key_menu %}
+                {% include "public_key/public_key_menu.html" %}
+            {% endblock public_key_menu %}
+        </section>
+    {% endblock public_key_menu_wrapper %}
+{% endblock content_before %}
+
+{% block content %}
+    <table class="key-list {% block key_list_classes %}{% endblock key_list_classes %}" data-source="{% block key_list_data_source %}{% url "api:api_dispatch_list" "v1" "user_authentication_key" %}{% endblock key_list_data_source %}" data-remove-url-template="{% urltemplate "PublicKeyComponent:remove" %}">
+        <thead>
+            <tr>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "Fingerprint" %}</th>
+                <th>{% trans "Created" %}</th>
+                <th>{% trans "Actions" %}</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>{% trans "Name" %}</th>
+                <th>{% trans "Fingerprint" %}</th>
+                <th>{% trans "Created" %}</th>
+                <th>{% trans "Actions" %}</th>
+            </tr>
+        </tfoot>
+        <tbody>
+        </tbody>
+    </table>
+{% endblock %}

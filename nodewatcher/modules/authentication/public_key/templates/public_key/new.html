@@ -1,0 +1,15 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n %}
+
+    {% trans "Add Public Key" as title %}
+{% endcontextblock %}
+
+{% block content %}
+    {% block public_key_create_form_wrapper %}
+        {% with form_submit=_("Add") %}
+            {% include "form.html" %}
+        {% endwith %}
+    {% endblock public_key_create_form_wrapper %}
+{% endblock %}

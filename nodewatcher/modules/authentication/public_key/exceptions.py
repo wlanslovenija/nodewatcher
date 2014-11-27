@@ -1,0 +1,4 @@
+
+
+class InvalidPublicKey(ValueError):
+    pass

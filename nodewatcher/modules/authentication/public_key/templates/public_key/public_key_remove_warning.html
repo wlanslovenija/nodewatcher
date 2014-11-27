@@ -1,0 +1,8 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load i18n %}
+
+{% block included_public_key_remove_warning %}
+    <p>{% trans "WARNING: This action is irreversible." %}</p>
+    <p>Permanently remove the public key?</p>
+{% endblock included_public_key_remove_warning %}
