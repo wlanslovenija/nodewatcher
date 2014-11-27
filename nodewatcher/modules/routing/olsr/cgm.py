@@ -20,12 +20,24 @@ def olsr(node, cfg):
     # "_routable" attribute to OLSR_PROTOCOL_NAME
     routable_ifaces = []
     announced_ifaces = []
-    for name, iface in cfg.network:
+    for name, iface in list(cfg.network):
+        if iface.get_type() != 'interface':
+            continue
+
         # All interfaces that are marked in _announce for this routing protocol should be added to HNA
         if olsr_models.OLSR_PROTOCOL_NAME in (iface._announce or []):
             hna = cfg.olsrd.add('Hna4')
             hna.netaddr = ipaddr.IPNetwork('%s/%s' % (iface.ipaddr, iface.netmask)).network
             hna.netmask = iface.netmask
+
+            # For each announced interface add a static route to the OLSR routing table
+            hna_route = cfg.network.add(route='olsr_hna_%s' % iface.get_key())
+            hna_route.interface = iface.get_key()
+            hna_route.target = hna.netaddr
+            hna_route.netmask = hna.netmask
+            hna_route.gateway = '0.0.0.0'
+            hna_route.table = ROUTING_TABLE_ID
+
             announced_ifaces.append(name)
             olsrd_configured = True
 
