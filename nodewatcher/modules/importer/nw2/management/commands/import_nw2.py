@@ -63,7 +63,7 @@ ROUTER_MAP = {
     "wl-500gd": "wl500gpv1",
     "rb433ah": "rb433ah",
     "tp-wr741nd": "tp-wr741ndv4",
-    "tp-wr740nd": "tp-wr740ndv1",
+    "tp-wr740nd": "tp-wr740ndv4",
     "tp-wr743nd": "tp-wr743ndv1",
     "tp-wr842nd": "tp-wr842ndv1",
     "tp-mr3020": "tp-mr3020v1",
