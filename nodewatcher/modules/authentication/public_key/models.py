@@ -38,8 +38,12 @@ class AuthenticationKey(models.Model):
         Validate the public key.
         """
 
+        if not self.public_key:
+            return
+        self.public_key = self.public_key.strip()
+
         try:
-            key = public_key.PublicKey(self.public_key.strip())
+            key = public_key.PublicKey(self.public_key)
         except exceptions.InvalidPublicKey:
             raise django_exceptions.ValidationError(_('Specified public key is malformed!'))
 
