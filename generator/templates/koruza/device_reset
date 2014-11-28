@@ -1,4 +1,9 @@
 #!/bin/sh
+
+# Unload modules
+rmmod ehci_platform
+rmmod ehci_hcd
+
 /usr/bin/lm4flash -r
 
 # Reset USB port 1
@@ -6,3 +11,9 @@ echo 0 > /sys/class/gpio/gpio22/value
 sleep 5
 echo 1 > /sys/class/gpio/gpio22/value
 sleep 5
+
+# Reload modules
+modprobe ehci_hcd
+modprobe ehci_platform
+sleep 5
+
