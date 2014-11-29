@@ -98,10 +98,7 @@ class FrontendComponentsPool(object):
         """
 
         if getattr(settings, 'FRONTEND_MAIN_COMPONENT', None):
-            try:
-                return self.get_component(getattr(settings, 'FRONTEND_MAIN_COMPONENT'))
-            except exceptions.FrontendComponentNotRegistered:
-                pass
+            return self.get_component(getattr(settings, 'FRONTEND_MAIN_COMPONENT'))
 
         try:
             return self.get_all_components()[0]
