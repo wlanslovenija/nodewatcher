@@ -69,7 +69,7 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'GIGASX76X',
             'files': [
-                'openwrt-lantiq-danube-GIGASX76X-squashfs.image',
+                'openwrt-lantiq-xway-GIGASX76X-squashfs.image',
             ]
         }
     }
