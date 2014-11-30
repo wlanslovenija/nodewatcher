@@ -63,6 +63,14 @@ def main_worker(run):
     run.start()
 
 
+def cycle_worker(run):
+    """
+    Starts a cycle of the given run.
+    """
+
+    run.cycle()
+
+
 class MonitorRun(object):
 
     def __init__(self, name, config):
@@ -83,7 +91,7 @@ class MonitorRun(object):
         try:
             self.workers = multiprocessing.Pool(
                 self.config['workers'],
-                maxtasksperchild=self.config.get('max_tasks_per_child', 100),
+                maxtasksperchild=self.config['max_tasks_per_child'],
             )
         except TypeError:
             # Compatibility with Python 2.6 that doesn't have the maxtasksperchild argument
@@ -96,71 +104,84 @@ class MonitorRun(object):
         Performs a single monitoring cycle.
         """
 
-        nodes = set()
-        context = monitor_processors.ProcessorContext()
+        logger.info("Preparing the worker pool for run '%s'..." % self.name)
+        self.prepare_workers()
 
-        for processor_list in self.config['processors']:
-            lead_proc = processor_list[0]
-            if issubclass(lead_proc, monitor_processors.NetworkProcessor):
-                # Network processors run serially and may modify the nodes list
-                logger.info("Running network processor %s..." % lead_proc.__name__)
+        try:
+            nodes = set()
+            context = monitor_processors.ProcessorContext()
 
-                try:
-                    if lead_proc.requires_transaction:
-                        with transaction.atomic():
+            for processor_list in self.config['processors']:
+                lead_proc = processor_list[0]
+                if issubclass(lead_proc, monitor_processors.NetworkProcessor):
+                    # Network processors run serially and may modify the nodes list
+                    logger.info("Running network processor %s..." % lead_proc.__name__)
+
+                    try:
+                        if lead_proc.requires_transaction:
+                            with transaction.atomic():
+                                context, nodes = lead_proc(worker_pool=self.workers).process(context, nodes)
+                        else:
                             context, nodes = lead_proc(worker_pool=self.workers).process(context, nodes)
-                    else:
-                        context, nodes = lead_proc(worker_pool=self.workers).process(context, nodes)
-                except KeyboardInterrupt:
-                    raise
-                except:
-                    logger.error("Processor has failed with exception:")
-                    logger.error(traceback.format_exc())
-            elif issubclass(lead_proc, monitor_processors.NodeProcessor):
-                # Node processors run in parallel on all nodes
-                logger.info("Running the following node processors:")
-                for p in processor_list:
-                    logger.info("  - %s" % p.__name__)
+                    except KeyboardInterrupt:
+                        raise
+                    except:
+                        logger.error("Processor has failed with exception:")
+                        logger.error(traceback.format_exc())
+                elif issubclass(lead_proc, monitor_processors.NodeProcessor):
+                    # Node processors run in parallel on all nodes
+                    logger.info("Running the following node processors:")
+                    for p in processor_list:
+                        logger.info("  - %s" % p.__name__)
 
-                if self.config['process_only_node'] is not None:
-                    logger.info("Limiting only to the following node: %s" % self.config['process_only_node'])
-                    self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
+                    if self.config['process_only_node'] is not None:
+                        logger.info("Limiting only to the following node: %s" % self.config['process_only_node'])
+                        self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
+                    else:
+                        self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes)).get(0xFFFF)
                 else:
-                    self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes)).get(0xFFFF)
-            else:
-                logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
+                    logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
+
+            self.workers.terminate()
+            self.workers = None
+        finally:
+            # Ensure that the worker pool gets cleaned up after processing is completed
+            if self.workers:
+                logger.info("Stopping worker processes...")
+                self.workers.terminate()
 
         logger.info("All done.")
 
     def start(self):
-        logger.info("Preparing the worker pool for run '%s'..." % self.name)
-        self.prepare_workers()
-
         logger.info("Run '%s' entering monitoring cycle..." % self.name)
         try:
             cycle = 0
             while True:
                 start = time.time()
-                self.cycle()
+
+                # Spawn monitoring cycle in its own process to isolate potential leaks
+                p = multiprocessing.Process(target=cycle_worker, args=(self,))
+                p.start()
+                p.join()
+                del p
 
                 # Log the amount of time a cycle took
                 cycle_duration = time.time() - start
                 logger.info("Run took %d%% of configured period time." % int(100 * cycle_duration / self.config['interval']))
 
-                cycle += 1
-                if self.config['cycles'] is not None and cycle >= self.config['cycles']:
-                    logger.info("Reached %d cycles." % cycle)
-                    break
+                if self.config['cycles'] is not None:
+                    # Only increase cycle counter when limit is set
+                    cycle += 1
+
+                    if cycle >= self.config['cycles']:
+                        logger.info("Reached %d cycles." % cycle)
+                        break
 
                 # Sleep for the right amount of time that cycles will be triggered
                 # on every "interval" seconds (but no less then 30 seconds apart)
                 time.sleep(max(30, self.config['interval'] - cycle_duration))
         except KeyboardInterrupt:
             logger.info("Aborted by user.")
-        finally:
-            # Ensure that the worker pool gets cleaned up after processing is completed
-            logger.info("Stopping worker processes...")
-            self.workers.terminate()
 
 
 class Worker(object):
@@ -202,6 +223,7 @@ class Worker(object):
             self.runs[run] = {
                 'interval': config['interval'],
                 'workers': config['workers'],
+                'max_tasks_per_child': config.get('max_tasks_per_child', 100),
                 'processors': processors,
             }
 
