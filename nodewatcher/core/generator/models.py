@@ -185,8 +185,11 @@ def builder_removed(sender, instance, **kwargs):
     Remove a version without any builders left.
     """
 
-    if not instance.version.builders.exists():
-        instance.version.delete()
+    try:
+        if not instance.version.builders.exists():
+            instance.version.delete()
+    except BuildVersion.DoesNotExist:
+        pass
 
 
 class BuildResult(models.Model):
