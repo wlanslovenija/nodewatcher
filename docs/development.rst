@@ -72,11 +72,13 @@ Running a builder
 
 In order to develop firmware generator related functions, a firmware builder is provided with the development
 installation. In order to use it, you have to configure it via the nodewatcher admin interface. First, you
-have to create a default build channel and add a builder.
+have to create a default build channel and add a builder (or multiple builders if you want support for multiple architectures).
 
 The following information should be used when adding a builder:
 
-* **Host:** builder
+* **Host:**
+    * builderar71xx
+    * builderlantiq
 *
     **Private key:**
 
