@@ -655,13 +655,18 @@ def network(node, cfg):
         if isinstance(interface, cgm_models.BridgeInterfaceConfig):
             iface_name = device.get_bridge_mapping('openwrt', interface)
             iface = cfg.network.add(interface=iface_name)
+            iface.type = 'bridge'
 
             # Configure bridge interfaces
             iface.ifname = []
             for port in interface.bridge_ports.all():
                 port = port.interface
                 if isinstance(port, cgm_models.EthernetInterfaceConfig):
-                    iface.ifname.append(device.remap_port('openwrt', port.eth_port))
+                    raw_port = device.remap_port('openwrt', port.eth_port)
+                    if isinstance(raw_port, (list, tuple)):
+                        iface.ifname += raw_port
+                    else:
+                        iface.ifname.append(raw_port)
 
                     if port.uplink:
                         iface._uplink = True
@@ -756,6 +761,9 @@ def network(node, cfg):
                 raise cgm_base.ValidationError(
                     _("No port remapping for port '%(port)s' of device '%s(device_name)' is available!") % {'port': interface.eth_port, 'device_name': device.name}
                 )
+
+            if isinstance(iface.ifname, (list, tuple)):
+                iface.type = 'bridge'
 
             if interface.uplink:
                 iface._uplink = True

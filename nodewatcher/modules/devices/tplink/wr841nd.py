@@ -25,22 +25,10 @@ class TPLinkWR841NDv1(cgm_devices.DeviceBase):
             cgm_devices.DeviceRadio.MultipleSSID,
         ])
     ]
-    switches = [
-        cgm_devices.Switch(
-            'sw0', "Switch0",
-            ports=5,
-            cpu_port=0,
-            vlans=16,
-        )
-    ]
+    switches = []
     ports = [
         cgm_devices.EthernetPort('wan0', "Wan0"),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=1,
-            ports=[0, 1, 2, 3, 4],
-        )
+        cgm_devices.EthernetPort('lan0', "Lan0"),
     ]
     antennas = [
         # TODO: This information is probably not correct
@@ -56,8 +44,8 @@ class TPLinkWR841NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'wifi0': 'radio0',
             'sw0': 'switch0',
-            'wan0': 'eth1',
-            'lan0': 'eth0',
+            'wan0': 'wan',
+            'lan0': ['lan1', 'lan2', 'lan3', 'lan4'],
         }
     }
     drivers = {
@@ -73,6 +61,16 @@ class TPLinkWR841NDv1(cgm_devices.DeviceBase):
             ]
         }
     }
+
+    @cgm_devices.register_module(platform='openwrt', weight=16)
+    def configure_network(node, cfg):
+        """
+        Configures device-specific networking.
+        """
+
+        mac = cfg.network.add(interface='mac0')
+        mac.ifname = 'eth0'
+        mac.proto = 'none'
 
 
 class TPLinkWR841NDv3(TPLinkWR841NDv1):
@@ -116,6 +114,31 @@ class TPLinkWR841NDv7(TPLinkWR841NDv1):
 
     identifier = 'tp-wr841ndv7'
     name = "WR841ND (v7)"
+    switches = [
+        cgm_devices.Switch(
+            'sw0', "Switch0",
+            ports=5,
+            cpu_port=0,
+            vlans=16,
+        )
+    ]
+    ports = [
+        cgm_devices.EthernetPort('wan0', "Wan0"),
+        cgm_devices.SwitchedEthernetPort(
+            'lan0', "Lan0",
+            switch='sw0',
+            vlan=1,
+            ports=[0, 1, 2, 3, 4],
+        )
+    ]
+    port_map = {
+        'openwrt': {
+            'wifi0': 'radio0',
+            'sw0': 'switch0',
+            'wan0': 'eth1',
+            'lan0': 'eth0',
+        }
+    }
     profiles = {
         'openwrt': {
             'name': 'TLWR841',
@@ -125,8 +148,11 @@ class TPLinkWR841NDv7(TPLinkWR841NDv1):
         }
     }
 
+    # Do not inherit network configuration
+    configure_network = None
 
-class TPLinkWR841NDv8(TPLinkWR841NDv1):
+
+class TPLinkWR841NDv8(TPLinkWR841NDv7):
     """
     TP-Link WR841NDv8 device descriptor.
     """
@@ -151,7 +177,7 @@ class TPLinkWR841NDv8(TPLinkWR841NDv1):
     }
 
 
-class TPLinkWR841NDv9(TPLinkWR841NDv1):
+class TPLinkWR841NDv9(TPLinkWR841NDv7):
     """
     TP-Link WR841NDv9 device descriptor.
     """
