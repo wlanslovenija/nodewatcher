@@ -175,7 +175,7 @@ class Switch(object):
     Describes an ethernet switch that a device has.
     """
 
-    def __init__(self, identifier, description, ports, cpu_port, vlans):
+    def __init__(self, identifier, description, ports, cpu_port, vlans, cpu_tagged=False):
         """
         Class constructor.
         """
@@ -200,6 +200,7 @@ class Switch(object):
 
         self.cpu_ports = cpu_ports
         self.vlans = vlans
+        self.cpu_tagged = cpu_tagged
 
 # A list of attributes that are required to be defined
 REQUIRED_DEVICE_ATTRIBUTES = (

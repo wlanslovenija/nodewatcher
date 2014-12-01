@@ -586,7 +586,12 @@ def configure_switch(cfg, device, port):
     vlan = cfg.network.add('switch_vlan')
     vlan.device = switch_iface
     vlan.vlan = port.vlan
-    vlan.ports = ' '.join([str(x) for x in port.ports])
+    ports = []
+    for p in port.ports:
+        if p in switch.cpu_ports and switch.cpu_tagged:
+            p = '%st' % p
+        ports.append(str(p))
+    vlan.ports = ' '.join(ports)
 
 
 def set_dhcp_ignore(cfg, iface_name):

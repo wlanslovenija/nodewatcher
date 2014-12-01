@@ -26,6 +26,7 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
             ports=[1, 2, 3, 4, 5],
             cpu_port=5,
             vlans=16,
+            cpu_tagged=True,
         )
     ]
     ports = [
