@@ -228,7 +228,7 @@ class PlatformBase(object):
         :param device: Optional device identifier
         """
 
-        if [x for x in self._modules if x[1] == module]:
+        if [x for x in self._modules if x[1] == module and x[2] == device]:
             return
 
         self._modules.append((weight, module, device))
