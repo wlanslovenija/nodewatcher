@@ -15,8 +15,6 @@ def tunneldigger(node, cfg):
     uplink_interface = cfg.network.find_named_section('interface', _uplink=True)
     if uplink_interface:
         uplink_interface = uplink_interface.get_key()
-    else:
-        raise cgm_base.ValidationError(_("In order to use Tunneldigger interfaces, an uplink interface must be defined!"))
 
     # Create tunneldigger configuration
     tunneldigger_enabled = False
@@ -75,6 +73,9 @@ def tunneldigger(node, cfg):
             policy.priority = 500
 
     if tunneldigger_enabled:
+        if not uplink_interface:
+            raise cgm_base.ValidationError(_("In order to use Tunneldigger interfaces, an uplink interface must be defined!"))
+
         # Ensure that WAN traffic is routed via the main table
         policy = cfg.network.add('rule')
         setattr(policy, 'in', uplink_interface)
