@@ -98,7 +98,7 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
 
                     # Create an event in case the router has an associated firmware configuration
                     if hasattr(node.config.core.general(), 'router'):
-                        monitor_events.TelemetryProcessingFailed(node).post()
+                        monitor_events.TelemetryProcessingFailed(node, method='http').post()
             except core_models.RouterIdConfig.DoesNotExist:
                 # No router-id for this node can be found for IPv4; this means
                 # that we have nothing to do here

@@ -39,16 +39,18 @@ class TelemetryProcessingFailed(events.NodeEventRecord):
 
     description = _("Telemetry processing has failed.")
 
-    def __init__(self, node):
+    def __init__(self, node, method):
         """
         Class constructor.
 
         :param node: Node on which the telemetry processing failed
+        :param method: Telemetry processing method
         """
 
         super(TelemetryProcessingFailed, self).__init__(
             [node],
             events.NodeEventRecord.SEVERITY_ERROR,
+            method=method,
         )
 
 pool.register_record(TelemetryProcessingFailed)
