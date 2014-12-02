@@ -47,7 +47,8 @@ def stage_worker(args):
         # Invoke all cleanup functions in reverse order
         for processor in cleanup_queue[::-1]:
             try:
-                processor.cleanup(context, node)
+                with transaction.atomic():
+                    processor.cleanup(context, node)
             except:
                 logger.warning("Processor cleanup method for node '%s' has failed with exception:" % node.pk)
                 logger.warning(traceback.format_exc())
