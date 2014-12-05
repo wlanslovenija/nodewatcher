@@ -75,5 +75,22 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
         }
     }
 
+    @cgm_devices.register_module(platform='openwrt', weight=15)
+    def configure_mac(node, cfg):
+        """
+        Configures MAC addresses that need to be loaded from flash.
+        """
+
+        lan_mac = cfg.maccfg.add(mac='lan0')
+        lan_mac.source = 'mtd-ascii'
+        lan_mac.args = 'uboot_env ethaddr'
+
+        wan_mac = cfg.maccfg.add(mac='wan0')
+        wan_mac.source = 'mtd-ascii'
+        wan_mac.args = 'uboot_env ethaddr'
+        wan_mac.offset = 1
+
+        cfg.packages.add('maccfg')
+
 # Register the Siemens SX763 device
 cgm_base.register_device('openwrt', SiemensSX763v2)
