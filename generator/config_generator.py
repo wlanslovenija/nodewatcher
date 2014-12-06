@@ -507,6 +507,9 @@ class OpenWrtConfig(NodeConfig):
       f = open(os.path.join(configPath, "system"), 'w')
       self.__generateSystemConfig(f)
 
+      if self.portLayout == 'tp-wr941nd':
+        self.lanIface = 'lan1 lan2 lan3 lan4'
+
       # Network configuration
       f = open(os.path.join(configPath, "network"), 'w')
       f.write("""
@@ -522,7 +525,7 @@ config interface mesh
         option netmask  255.255.0.0
 
 config interface clients
-        option ifname   {iface_lan}
+        option ifname   '{iface_lan}'
         option type     bridge
         option proto    static
         option ipaddr   {mesh_ip}
@@ -622,7 +625,10 @@ config probe ping0
 """.format(koruza_ip=koruzaIp, probe_ip=probeIp))
           nmd.close()
 
-      if isinstance(portLayouts.get(self.portLayout, None), dict):
+      if self.portLayout == 'tp-wr941nd':
+        # No switch configuration
+        pass
+      elif isinstance(portLayouts.get(self.portLayout, None), dict):
         switch = portLayouts[self.portLayout]
 
         f.write("config switch %s\n" % switch['switch'])
@@ -663,16 +669,19 @@ config probe ping0
           wan_interface = iface
           break
 
+      if self.portLayout == 'tp-wr941nd':
+        wan_interface['name'] = 'wan'
+
       if wan_interface.get('ip', None):
         f.write("config interface wan\n")
-        f.write("        option ifname   %s\n" % wan_interface['name'])
+        f.write("        option ifname   '%s'\n" % wan_interface['name'])
         f.write("        option proto    static\n")
         f.write("        option ipaddr   %s\n" % wan_interface['ip'])
         f.write("        option netmask  %s\n" % wan_interface['mask'])
         f.write("        option gateway  %s\n" % wan_interface['gateway'])
       else:
         f.write("config interface wan\n")
-        f.write("        option ifname   %s\n" % wan_interface['name'])
+        f.write("        option ifname   '%s'\n" % wan_interface['name'])
         f.write("        option proto    dhcp\n")
 
       f.write("\n")
