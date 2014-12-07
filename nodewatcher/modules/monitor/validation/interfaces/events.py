@@ -193,3 +193,34 @@ class WifiInterfaceModeMismatch(events.NodeEventRecord):
         )
 
 pool.register_record(WifiInterfaceModeMismatch)
+
+
+class WifiInterfaceChannelMismatch(events.NodeEventRecord):
+    """
+    Wireless interface channel mismatch.
+    """
+
+    description = _("Wireless interface channel mismatch (%(channel_configured)s - %(channel_reported)s).")
+    iface_name = events.CharAttribute()
+    channel_configured = events.CharAttribute()
+    channel_reported = events.CharAttribute()
+
+    def __init__(self, node, iface_name, channel_configured, channel_reported):
+        """
+        Class constructor.
+
+        :param node: Node on which the event ocurred
+        :param iface_name: The name of the interface
+        :param channel_configured: Configured channel
+        :param channel_reported: Reported channel
+        """
+
+        super(WifiInterfaceChannelMismatch, self).__init__(
+            [node],
+            events.NodeEventRecord.SEVERITY_WARNING,
+            iface_name=iface_name,
+            channel_configured=channel_configured,
+            channel_reported=channel_reported,
+        )
+
+pool.register_record(WifiInterfaceChannelMismatch)
