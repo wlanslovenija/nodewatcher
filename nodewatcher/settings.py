@@ -269,6 +269,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.http.interfaces',
     'nodewatcher.modules.monitor.topology',
     'nodewatcher.modules.monitor.validation.reboot',
+    'nodewatcher.modules.monitor.validation.version',
     'nodewatcher.modules.monitor.validation.interfaces',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.sensors.digitemp',
@@ -457,6 +458,7 @@ MONITOR_RUNS = {
             'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
             # Validators should start here in order to obtain previous state
             'nodewatcher.modules.monitor.validation.reboot.processors.RebootValidator',
+            'nodewatcher.modules.monitor.validation.version.processors.VersionValidator',
             'nodewatcher.modules.monitor.validation.interfaces.processors.InterfaceValidator',
             # Telemetry processors should be below this point
             'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
