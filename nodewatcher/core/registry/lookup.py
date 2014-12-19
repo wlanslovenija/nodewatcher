@@ -4,6 +4,7 @@ import inspect
 from django.contrib.gis.db import models as gis_models
 from django import db as django_db
 from django.apps import apps
+from django.db import models as django_models
 from django.db.models.sql import constants
 from django.utils import functional
 
@@ -193,15 +194,24 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             return select_name
 
         for field_name, dst in kwargs.iteritems():
-            if inspect.isclass(dst) and issubclass(dst, django_db.models.Model):
+            dst_queryset = None
+            dst_field = None
+            dst_related = None
+            m2m = False
+
+            if inspect.isclass(dst) and issubclass(dst, django_models.Model):
                 if not self._regpoint.is_item(dst):
                     raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
 
                 dst_registry_id = dst.get_registry_id()
                 dst_model = dst
-                dst_field = None
-                dst_related = None
-                m2m = False
+            elif isinstance(dst, django_models.QuerySet):
+                dst_model = dst.model
+                dst_registry_id = dst_model.get_registry_id()
+                dst_queryset = dst
+
+                if not self._regpoint.is_item(dst_model):
+                    raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
             else:
                 if '#' in dst:
                     try:
@@ -221,9 +231,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 else:
                     dst_registry_id = dst
                     dst_model = self._regpoint.get_top_level_class(dst_registry_id)
-                    dst_field = None
-                    dst_related = None
-                    m2m = False
 
             if m2m:
                 raise ValueError("Many-to-many fields not supported in registry_fields query!")
@@ -246,7 +253,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
                 field = fields.RegistryRelationField(dst_model)
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
-                clone = clone.prefetch_related(field_name)
+                clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_related is None:
                 # Select destination field and install proxy field descriptor
