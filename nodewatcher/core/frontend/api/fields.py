@@ -50,6 +50,13 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
         }
 
 
+class GeoJSON(str):
+    __slots__ = ()
+
+    def __json__(self):
+        return self
+
+
 class GeometryField(tastypie_fields.ApiField):
     """
     Tastypie field for properly serializing geometry fields with support for
@@ -76,7 +83,7 @@ class GeometryField(tastypie_fields.ApiField):
             try:
                 value = getattr(bundle.obj, '%s_geojson' % self.attribute)
                 if value is not None:
-                    return ujson.loads(value)
+                    return GeoJSON(value)
                 return None
             except AttributeError:
                 # We explicitly force users to perform this optimization.

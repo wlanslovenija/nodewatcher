@@ -13,7 +13,7 @@ defusedxml==0.4.1
 django-celery==3.1.16
 django-classy-tags==0.5.1
 git+https://github.com/wlanslovenija/django-tastypie.git@eadff29e363a6cadebe94782f0e3acd1f00c6cec#egg=django_tastypie-wlanslovenija
-git+https://github.com/wlanslovenija/django-datastream.git@79347949e54ae1ff2e97a05f6589b957bae2eda4#egg=django_datastream-master
+git+https://github.com/wlanslovenija/django-datastream.git@acb921c8d69c2af06b350839a1aa50520fc13e19#egg=django_datastream-master
 git+https://github.com/wlanslovenija/django-guardian.git@38460f0ab9c0d46e72b92a34a49d039d40a75a5e#egg=django_guardian-wlanslovenija
 git+https://github.com/wlanslovenija/django-missing.git@a068cd6f66a0b33012259ebdc335b5082b772093#egg=django_missing-master
 git+https://github.com/wlanslovenija/django-overextends.git@d70cdf44bff3fd130a0a64f4f6836ca3b8ea030f#egg=django_overextends-wlanslovenija
@@ -37,7 +37,7 @@ python-memcached==1.53
 pytz==2014.7
 six==1.8.0
 sphinx-me==0.3
-ujson==1.33
+git+https://github.com/wlanslovenija/ultrajson@946d4dfe1019b37f57a6a74328940d35b59b4245#egg=ujson-wlanslovenija
 wsgiref==0.1.2
 django-timezone-field==1.1
 django-json-field==0.5.7
