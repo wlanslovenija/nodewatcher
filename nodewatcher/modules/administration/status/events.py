@@ -21,9 +21,9 @@ class NodeStatusChange(events.NodeEventRecord):
         ('down', 'visible'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now visible.")),
         ('visible', 'up'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now reachable.")),
         ('visible', 'down'): (events.NodeEventRecord.SEVERITY_WARNING, _("Node is no longer visible.")),
-        ('unknown', 'up'): (events.NodeEventRecord.SEVERITY_INFO, _("Node has come up.")),
-        ('unknown', 'visible'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now visible.")),
-        ('unknown', 'down'): (None, None),
+        (None, 'up'): (events.NodeEventRecord.SEVERITY_INFO, _("Node has come up.")),
+        (None, 'visible'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now visible.")),
+        (None, 'down'): (None, None),
     }
 
     def __init__(self, node, old_status, new_status):
@@ -58,7 +58,7 @@ class NodeStatusChange(events.NodeEventRecord):
         Posts this event.
         """
 
-        if self.old_status == 'unknown' and self.new_status == 'down':
+        if self.old_status is None and self.new_status == 'down':
             return
 
         super(NodeStatusChange, self).post()

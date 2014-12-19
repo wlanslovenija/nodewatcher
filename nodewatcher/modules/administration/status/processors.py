@@ -39,7 +39,7 @@ class NodeStatus(monitor_processors.NodeProcessor):
                     # HTTP fetch was not tried so we don't know whether the node is monitored
                     sm.monitored = None
         # TODO: Change depending on any warning/error events
-        sm.health = 'unknown'
+        sm.health = None
         sm.save()
 
         # Emit event on node state transitions

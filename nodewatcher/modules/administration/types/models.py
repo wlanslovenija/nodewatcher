@@ -8,7 +8,7 @@ class TypeConfig(registration.bases.NodeConfigRegistryItem):
     Type configuration determines the type of the node.
     """
 
-    type = registry_fields.SelectorKeyField('node.config', 'core.type#type', default='unknown')
+    type = registry_fields.SelectorKeyField('node.config', 'core.type#type', null=True)
 
     class RegistryMeta:
         form_weight = 2
@@ -23,5 +23,5 @@ registration.point('node.config').register_choice('core.type#type', registration
 registration.point('node.config').register_choice('core.type#type', registration.Choice('test', _("Test")))
 registration.point('node.config').register_choice('core.type#type', registration.Choice('mobile', _("Mobile")))
 registration.point('node.config').register_choice('core.type#type', registration.Choice('dead', _("Dead")))
-registration.point('node.config').register_choice('core.type#type', registration.Choice('unknown', _("Unknown")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice(None, _("Unknown")))
 registration.point('node.config').register_item(TypeConfig)

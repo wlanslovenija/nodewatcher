@@ -10,9 +10,9 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     Node's status.
     """
 
-    network = registry_fields.SelectorKeyField('node.monitoring', 'core.status#network', default='unknown')
+    network = registry_fields.SelectorKeyField('node.monitoring', 'core.status#network', null=True)
     monitored = registry_fields.NullBooleanChoiceField('node.monitoring', 'core.status#monitored')
-    health = registry_fields.SelectorKeyField('node.monitoring', 'core.status#health', default='unknown')
+    health = registry_fields.SelectorKeyField('node.monitoring', 'core.status#health', null=True)
 
     class RegistryMeta:
         registry_id = 'core.status'
@@ -34,7 +34,7 @@ registration.point('node.monitoring').register_choice(
 )
 registration.point('node.monitoring').register_choice(
     'core.status#network',
-    registration.Choice('unknown', _("Unknown"), help_text=_("The network status of the node is unknown.")),
+    registration.Choice(None, _("Unknown"), help_text=_("The network status of the node is unknown.")),
 )
 
 # Register valid monitored states
@@ -66,5 +66,5 @@ registration.point('node.monitoring').register_choice(
 )
 registration.point('node.monitoring').register_choice(
     'core.status#health',
-    registration.Choice('unknown', _("Unknown"), help_text=_("The health status of the node is unknown.")),
+    registration.Choice(None, _("Unknown"), help_text=_("The health status of the node is unknown.")),
 )
