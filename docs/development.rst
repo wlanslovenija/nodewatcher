@@ -126,3 +126,25 @@ The following information should be used when adding a builder:
             $ ssh-keygen -f builder.key -C "builder@host"
 
         This will generate a ``builder.key`` (private key) and ``builder.key.pub`` (public key).
+
+Running the monitoring system
+-----------------------------
+
+In order to enable data collection from nodes, the monitoring system needs to be running. It is important that the nodewatcher instance is able to connect to the nodes directly by their IP addresses. This can usually be achieved by establishing a VPN tunnel to some server that is connected to the mesh network.
+
+Then, there are two configuration options that need to be set in ``settings.py``:
+
+* ``OLSRD_MONITOR_HOST`` should point to an IP address where an `olsrd` instance is responding to HTTP requests about the routing state using the `txtinfo` plugin. In the default configuration, this will be used by the ``modules.routing.olsr`` module to enumerate visible nodes and obtain topology information.
+* ``MEASUREMENT_SOURCE_NODE`` should be set to an UUID of a node that is performing the RTT measurements (this means that such a node must first be created using nodewatcher). This option is planned to be removed from ``settings.py`` and moved into the administration interface.
+
+After the above settings are configured, one may run the monitoring system by issuing::
+
+    $ fig run web python manage.py monitord
+
+There are some additional options which might be useful during development:
+
+* ``--run=<run>`` will only execute one run instead of all runs configured using ``MONITOR_RUNS`` setting.
+* ``--cycles=<cycles>`` will only perform a fixed amount of cycles before terminating. By default, the monitor process will run indefinitely.
+* ``--process-only-node=<node-uuid>`` may be used to only perform monitoring processing on a single node, identified by its UUID.
+
+.. note:: The monitoring system may use a lot of CPU and memory resources when there are a lot of nodes to process.
