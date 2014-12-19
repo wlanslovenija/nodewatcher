@@ -1,5 +1,6 @@
 import sys
 
+from django.contrib.gis.db import models as gis_models
 from django.db.models import query
 from django.utils import six
 
@@ -82,7 +83,12 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
         if not isinstance(field, registry_fields.RegistryRelationField):
             if isinstance(field, json_field.JSONField):
+                # TODO: Optimize this so that double conversion is not performed and that we pass raw JSON.
                 field_class = tastypie_fields.DictField
+            elif isinstance(field, gis_models.GeometryField):
+                # Override with our GeometryField that knows how to extract GeoJSON from
+                # the queryset in order to avoid slow GDAL conversions.
+                field_class = fields.GeometryField
             else:
                 field_class = parent_api_field_from_django_field()
 

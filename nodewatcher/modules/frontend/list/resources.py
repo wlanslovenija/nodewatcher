@@ -18,7 +18,11 @@ class NodeResource(api.BaseResource):
             # TODO: Should we add router id to the snippet as well?
             router_id='core.routerid#router_id',
             project='core.project#project.name',
-            location=location_models.LocationConfig,
+            location=location_models.LocationConfig.geo_objects.geojson(
+                # Request GeoJSON versions of the location.
+                field_name='geolocation',
+                model_att='geolocation_geojson',
+            ),
         ).regpoint('monitoring').registry_fields(
             last_seen='core.general#last_seen',
             status=status_models.StatusMonitor,

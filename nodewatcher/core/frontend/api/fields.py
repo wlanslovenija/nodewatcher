@@ -1,4 +1,6 @@
-from tastypie import fields as tastypie_fields
+import ujson
+
+from tastypie import fields as tastypie_fields, exceptions as tastypie_exceptions
 
 
 class ApiNameMixin(object):
@@ -46,3 +48,41 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
         return {
             'fields': self.to_class(self.get_api_name()).build_schema()['fields'],
         }
+
+
+class GeometryField(tastypie_fields.ApiField):
+    """
+    Tastypie field for properly serializing geometry fields with support for
+    leveraging precomputed GeoJSON fields specified in the queryset.
+    """
+
+    dehydrated_type = 'geometry'
+    help_text = 'GeoJSON geometry data.'
+
+    def __init__(self, *args, **kwargs):
+        super(GeometryField, self).__init__(*args, **kwargs)
+
+    def hydrate(self, bundle):
+        value = super(GeometryField, self).hydrate(bundle)
+        if value is None:
+            return value
+        return ujson.dumps(value)
+
+    def dehydrate(self, bundle, for_list=True):
+        if self.attribute is not None:
+            # We require the queryset to populate the models with a _geojson attribute
+            # which will be used here as an optimization, so expensive GDAL conversions
+            # will not be needed.
+            try:
+                value = getattr(bundle.obj, '%s_geojson' % self.attribute)
+                if value is not None:
+                    return ujson.loads(value)
+                return None
+            except AttributeError:
+                # We explicitly force users to perform this optimization.
+                raise tastypie_exceptions.ApiFieldError('Missing attribute "%s_geojson" on model. Using a GeometryField in your API resource requires the use of geojson() on the queryset!' % self.attribute)
+
+        if self.has_default():
+            return self.default
+        else:
+            return None

@@ -20,6 +20,8 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     geolocation = gis_models.PointField(null=True)
     altitude = models.FloatField(default=0)
 
+    geo_objects = gis_models.GeoManager()
+
     class RegistryMeta:
         form_weight = 3
         registry_id = 'core.location'
