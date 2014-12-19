@@ -290,9 +290,7 @@ class Command(base.BaseCommand):
     def import_nodes(self, data):
         self.stdout.write('Importing %d nodes...\n' % len(data['nodes']))
 
-        for idx, node in enumerate(data['nodes'].values()):
-            self.stdout.write('  o Importing node %s (%d/%d).\n' % (node['uuid'], idx + 1, len(data['nodes'])))
-
+        for node in data['nodes'].values():
             # Dead node flag, so we don't allocate any resources for it
             dead_node = node['node_type'] == 6
 
