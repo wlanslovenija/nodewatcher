@@ -29,7 +29,6 @@ class NodeResource(api.BaseResource):
             # TODO: Should we add peers and clients to the snippet as well?
             peers='network.routing.topology#link_count',
             # TODO: Add current clients count?
-        # TODO: We should order in the order core.type#type are registered
         ).order_by('type')
         resource_name = 'node'
         list_allowed_methods = ('get',)

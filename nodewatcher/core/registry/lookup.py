@@ -5,7 +5,7 @@ from django.contrib.gis.db import models as gis_models
 from django import db as django_db
 from django.apps import apps
 from django.db import models as django_models
-from django.db.models.sql import constants
+from django.db.models.sql import constants, query
 from django.utils import functional
 
 # Quote name
@@ -177,9 +177,12 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             del apps.all_models['_registry_proxy_models_']
 
-        def install_proxy_field(model, field, name):
+        def install_proxy_field(model, field, name, src_column=None):
             field = copy.deepcopy(field)
             field.name = None
+            # Include the source table and column name so methods like order_by can
+            # discover this and use it in queries.
+            field.src_column = src_column
             select_name = name
             # Since the field is populated by a join, it can always be null when the model doesn't exist
             field.null = True
@@ -257,8 +260,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 continue
             elif dst_related is None:
                 # Select destination field and install proxy field descriptor
-                select_name = install_proxy_field(clone.model, dst_field, field_name)
-                clone = clone.extra(select={select_name: '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))})
+                src_column = '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))
+                select_name = install_proxy_field(clone.model, dst_field, field_name, src_column=src_column)
+                clone = clone.extra(select={select_name: src_column})
             else:
                 # Traverse the relation and copy the destination field descriptor
                 dst_field_model = dst_field.rel.to
@@ -302,6 +306,57 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     join_field=RegistryJoinRelation(),
                     nullable=True,
                 )
+
+        return clone
+
+    def order_by(self, *fields):
+        """
+        Order by with special handling for SelectorKeyFields.
+        """
+
+        assert self.query.can_filter(), "Cannot reorder a query once a slice has been taken."
+
+        from . import fields as registry_fields
+        clone = self._clone()
+        clone.query.clear_ordering(force_empty=False)
+
+        final_fields = []
+        for raw_field_name in fields:
+            field_name, field_order = query.get_order_dir(raw_field_name)
+            try:
+                field = clone.model._meta.get_field(field_name)
+            except django_models.FieldDoesNotExist:
+                for f in clone.model._meta.virtual_fields:
+                    field = f
+                    if field.name == field_name:
+                        break
+                else:
+                    final_fields.append(raw_field_name)
+                    continue
+
+            if isinstance(field, registry_fields.SelectorKeyField):
+                # Ordering by SelectorKeyField should generate a specific query that will
+                # sort by the order that the choices were registered.
+                src_column = getattr(field, 'src_column', qn(field.column))
+                order_query = ['CASE', src_column]
+                order_params = []
+                for order, choice in enumerate(field.get_registered_choices()):
+                    order_query.append('WHEN %%s THEN %d' % order)
+                    order_params.append(choice.name)
+
+                order_query.append('ELSE %d END' % (order + 1))
+
+                clone = clone.extra(
+                    select={'%s_choice_order' % field_name: ' '.join(order_query)},
+                    select_params=order_params,
+                )
+                final_fields.append('%s%s_choice_order' % ('-' if field_order == 'DESC' else '', field_name))
+            else:
+                final_fields.append(raw_field_name)
+
+        # Order by all the specified fields. We must not call the super order_by method
+        # as it will reset all ordering.
+        clone = clone.extra(order_by=final_fields)
 
         return clone
 

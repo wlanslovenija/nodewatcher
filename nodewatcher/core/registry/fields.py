@@ -114,13 +114,21 @@ class SelectorKeyField(models.CharField):
         self.regpoint = regpoint
         self.enum_id = enum_id
         kwargs['max_length'] = 50
-        self._rp_choices = kwargs['choices'] = registration.point(regpoint).get_registered_choices(enum_id).field_tuples()
+        self._rp_choices = kwargs['choices'] = self.get_registered_choices().field_tuples()
         super(SelectorKeyField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(SelectorKeyField, self).deconstruct()
         args = [self.regpoint, self.enum_id] + args
         return name, path, args, kwargs
+
+    def get_registered_choices(self):
+        """
+        Returns a reference to the registered choices object that this field
+        uses to populate its list of choices.
+        """
+
+        return registration.point(self.regpoint).get_registered_choices(self.enum_id)
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         """

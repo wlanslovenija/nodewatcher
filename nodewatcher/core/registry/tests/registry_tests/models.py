@@ -1,6 +1,6 @@
 from django.db import models
 
-from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import registration, fields
 
 
 class Thing(models.Model):
@@ -22,10 +22,14 @@ registration.point('thing.first').register_item(AnotherRegistryItem)
 
 class SimpleRegistryItem(registration.bases.ThingFirstRegistryItem):
     interesting = models.CharField(max_length=30, default='nope', null=True)
+    level = fields.SelectorKeyField('thing.first', 'foo.simple#level', null=True)
 
     class RegistryMeta:
         registry_id = 'foo.simple'
 
+registration.point('thing.first').register_choice('foo.simple#level', registration.Choice('level-x', "Level 0"))
+registration.point('thing.first').register_choice('foo.simple#level', registration.Choice('level-a', "Level 1"))
+registration.point('thing.first').register_choice('foo.simple#level', registration.Choice('level-m', "Level 2"))
 registration.point('thing.first').register_item(SimpleRegistryItem)
 
 

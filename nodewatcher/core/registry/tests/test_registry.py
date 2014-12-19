@@ -1,3 +1,5 @@
+import random
+
 from django import test as django_test
 from django.apps import apps
 from django.conf import settings
@@ -44,6 +46,7 @@ class RegistryTestCase(django_test.TransactionTestCase):
             simple.interesting = 'bla'
             simple.additional = 42
             simple.another = 69
+            simple.level = 'level-x'
             simple.save()
 
             item = thing.second.foo.multiple(create=models.FirstSubRegistryItem)
@@ -120,3 +123,29 @@ class RegistryTestCase(django_test.TransactionTestCase):
 
         # Test polymorphic cascade deletions
         thing.delete()
+
+    def test_choices(self):
+        ordered_choices = ['level-x', 'level-a', 'level-m']
+        for i in xrange(30):
+            thing = models.Thing(foo='hello', bar=i)
+            thing.save()
+
+            simple = thing.first.foo.simple(create=models.DoubleChildRegistryItem)
+            simple.interesting = 'bla'
+            simple.additional = 42
+            simple.another = 69
+            simple.level = random.choice(ordered_choices)
+            simple.save()
+
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#level')
+
+        # Ensure that field descriptors are available
+        for item in qs:
+            with self.assertRaises(AttributeError):
+                item.get_level_choice()
+
+            self.assertEquals(item.get_f1_choice().name, item.f1)
+
+        # Check if ordering works properly
+        ordered = [item.f1 for item in qs.order_by('f1', 'id')]
+        self.assertEqual(ordered, sorted(ordered, key=lambda x: ordered_choices.index(x)))
