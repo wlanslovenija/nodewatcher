@@ -13,15 +13,17 @@ In order to ensure that you have the latest versions of all dependent Docker ima
 
     $ fig pull
 
-Then, to run the development server simply execute the following command::
+Then, to build the development instance, run::
+
+    $ fig build
+
+You should re-run these two commands when performing ``git pull`` if you think that the build dependencies or development environment configuration might have changed to ensure that your Docker images are synced. Finally, to run the development server simply execute the following command::
 
     $ fig up
 
-The first time this command is executed, a new Docker image for nodewatcher development version will be built, which might take some time. On subsequent runs, the development instace will be started immediately.
-
 .. note:: Default container configuration stores the database under ``/tmp/nodewatcher-db``, so it will be removed on host machine restarts. You may change this location by editing ``fig.yml``.
 
-The following containers will be created and started when you run the above command:
+The following containers will be created and started when you run the above commands:
 
 * ``db`` contains the PostgreSQL 9.3 database server with installed extension PostGIS 2.1.
 * ``tokumx`` contains the TokuMX database server (an improved version of MongoDB).
