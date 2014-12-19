@@ -1,7 +1,7 @@
 import polymorphic
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from .. import models as core_models
 from ..registry import fields as registry_fields
