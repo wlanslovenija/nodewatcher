@@ -786,6 +786,10 @@ config rule
 config rule
         option lookup '20'
         option priority 1000
+
+config rule
+        option lookup '30'
+        option priority 1100
 """.format(
         subnet = self.subnets[0]['subnet'],
         cidr = self.subnets[0]['cidr']
@@ -956,7 +960,7 @@ Hna4
 MainIp {router_id}
 SrcIpRoutes yes
 RtTable 20
-RtTableDefault 20
+RtTableDefault 30
 
 Interface "wlan0" "br-clients" {diggers} {olsr_interfaces}
 {{
