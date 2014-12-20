@@ -66,7 +66,7 @@ class RouterIdConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     router_id = models.CharField(max_length=100, editable=False)
-    rid_family = registry_fields.SelectorKeyField('node.config', 'core.routerid#family', editable=False)
+    rid_family = registry_fields.RegistryChoiceField('node.config', 'core.routerid#family', editable=False)
 
     class Meta:
         app_label = 'core'

@@ -16,7 +16,7 @@ from ...utils import ipaddr
 from . import registration, models as registry_models
 
 
-class SelectorFormField(form_fields.TypedChoiceField):
+class RegistryChoiceFormField(form_fields.TypedChoiceField):
     """
     An augmented TypedChoiceField that gets updated by client-side AJAX on every
     change and can handle dependent choices.
@@ -28,7 +28,7 @@ class SelectorFormField(form_fields.TypedChoiceField):
         """
 
         kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
-        super(SelectorFormField, self).__init__(*args, **kwargs)
+        super(RegistryChoiceFormField, self).__init__(*args, **kwargs)
 
         # Override choices so we get a lazy list instead of being evaluated right here
         self._rp_choices = None
@@ -99,7 +99,7 @@ class NullBooleanChoiceField(models.NullBooleanField):
         )
 
 
-class SelectorKeyField(models.CharField):
+class RegistryChoiceField(models.CharField):
     """
     A character field that supports choices derived from a pre-registered choice set.
     When the field is rendered inside the registry formset, any modifications to it
@@ -115,10 +115,10 @@ class SelectorKeyField(models.CharField):
         self.enum_id = enum_id
         kwargs['max_length'] = 50
         self._rp_choices = kwargs['choices'] = self.get_registered_choices().field_tuples()
-        super(SelectorKeyField, self).__init__(*args, **kwargs)
+        super(RegistryChoiceField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(SelectorKeyField, self).deconstruct()
+        name, path, args, kwargs = super(RegistryChoiceField, self).deconstruct()
         args = [self.regpoint, self.enum_id] + args
         return name, path, args, kwargs
 
@@ -135,7 +135,7 @@ class SelectorKeyField(models.CharField):
         Augments the containing class.
         """
 
-        super(SelectorKeyField, self).contribute_to_class(cls, name, virtual_only)
+        super(RegistryChoiceField, self).contribute_to_class(cls, name, virtual_only)
 
         def get_FIELD_choice(self, field):
             value = getattr(self, field.attname)
@@ -181,10 +181,10 @@ class SelectorKeyField(models.CharField):
             defaults['empty_value'] = None
 
         defaults.update(kwargs)
-        return SelectorFormField(**defaults)
+        return RegistryChoiceFormField(**defaults)
 
 
-class ModelSelectorKeyField(models.ForeignKey):
+class ModelRegistryChoiceField(models.ForeignKey):
     """
     A standard foreign key that augments the resulting form widget with a special
     selector class that will cause the forms to be recomputed when this field is
@@ -198,7 +198,7 @@ class ModelSelectorKeyField(models.ForeignKey):
 
         if 'on_delete' not in kwargs:
             kwargs['on_delete'] = models.PROTECT
-        super(ModelSelectorKeyField, self).__init__(*args, **kwargs)
+        super(ModelRegistryChoiceField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         """
@@ -207,7 +207,7 @@ class ModelSelectorKeyField(models.ForeignKey):
 
         defaults = {'widget': widgets.Select(attrs={'class': 'registry_form_selector'})}
         defaults.update(kwargs)
-        return super(ModelSelectorKeyField, self).formfield(**defaults)
+        return super(ModelRegistryChoiceField, self).formfield(**defaults)
 
 
 class IntraRegistryRelatedObjectDescriptor(models.fields.related.ForeignRelatedObjectsDescriptor):

@@ -41,15 +41,15 @@ class CgmGeneralConfig(core_models.GeneralConfig):
     Extended general configuration that contains CGM-related options.
     """
 
-    platform = registry_fields.SelectorKeyField('node.config', 'core.general#platform', blank=True)
-    router = registry_fields.SelectorKeyField('node.config', 'core.general#router', blank=True)
-    build_channel = registry_fields.ModelSelectorKeyField(
+    platform = registry_fields.RegistryChoiceField('node.config', 'core.general#platform', blank=True)
+    router = registry_fields.RegistryChoiceField('node.config', 'core.general#router', blank=True)
+    build_channel = registry_fields.ModelRegistryChoiceField(
         generator_models.BuildChannel,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
-    version = registry_fields.ModelSelectorKeyField(
+    version = registry_fields.ModelRegistryChoiceField(
         generator_models.BuildVersion,
         blank=True,
         null=True,
@@ -122,7 +122,7 @@ class RoutableInterface(models.Model):
     class Meta:
         abstract = True
 
-    routing_protocol = registry_fields.SelectorKeyField(
+    routing_protocol = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces#routing_protocol',
         blank=True, null=True,
     )
@@ -179,7 +179,7 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
     An ethernet interface.
     """
 
-    eth_port = registry_fields.SelectorKeyField('node.config', 'core.interfaces#eth_port')
+    eth_port = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#eth_port')
     uplink = models.BooleanField(default=False)
     mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
 
@@ -194,7 +194,7 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     A wireless radio device.
     """
 
-    wifi_radio = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_radio')
+    wifi_radio = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#wifi_radio')
     protocol = models.CharField(max_length=50)
     channel_width = models.CharField(max_length=50)
     channel = models.CharField(max_length=50)
@@ -217,7 +217,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         WifiRadioDeviceConfig, editable=False, null=False, related_name='interfaces'
     )
 
-    mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode')
+    mode = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#wifi_mode')
     essid = models.CharField(max_length=50, verbose_name="ESSID")
     bssid = registry_fields.MACAddressField(verbose_name="BSSID", blank=True, null=True)
 
@@ -245,8 +245,8 @@ class MobileInterfaceConfig(InterfaceConfig):
     A mobile (3G/UMTS/GPRS) interface.
     """
 
-    service = registry_fields.SelectorKeyField('node.config', 'core.interfaces#mobile_service', default='umts')
-    device = registry_fields.SelectorKeyField('node.config', 'core.interfaces#mobile_device', default='mobile0')
+    service = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_service', default='umts')
+    device = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_device', default='mobile0')
     apn = models.CharField(max_length=100, verbose_name=_("APN"))
     pin = models.CharField(max_length=4, verbose_name=_("PIN"))
     username = models.CharField(max_length=50, blank=True)
@@ -267,7 +267,7 @@ class AnnouncableNetwork(models.Model):
     class Meta:
         abstract = True
 
-    routing_announce = registry_fields.SelectorKeyField(
+    routing_announce = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.network#routing_announce',
         blank=True, null=True, verbose_name=_("Announce Via"),
     )
@@ -278,7 +278,7 @@ class LeasableNetwork(models.Model):
     Abstract class for networks which may be leased to clients via DHCP.
     """
 
-    lease_type = registry_fields.SelectorKeyField(
+    lease_type = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.network#lease_type',
         blank=True, null=True, verbose_name=_("Lease Type"),
     )
@@ -331,7 +331,7 @@ class StaticNetworkConfig(NetworkConfig, AnnouncableNetwork, LeasableNetwork):
     Static IP configuration.
     """
 
-    family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
+    family = registry_fields.RegistryChoiceField('node.config', 'core.interfaces.network#ip_family')
     address = registry_fields.IPAddressField(subnet_required=True)
     gateway = registry_fields.IPAddressField(host_required=True, null=True, blank=True)
 
@@ -426,11 +426,11 @@ class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
     Throughput limit configuration.
     """
 
-    limit_out = registry_fields.SelectorKeyField(
+    limit_out = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.limits#speeds',
         verbose_name=_("Limit OUT"), default='', blank=True,
     )
-    limit_in = registry_fields.SelectorKeyField(
+    limit_in = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.limits#speeds',
         verbose_name=_("Limit IN"), default='', blank=True,
     )

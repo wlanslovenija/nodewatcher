@@ -311,7 +311,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
     def order_by(self, *fields):
         """
-        Order by with special handling for SelectorKeyFields.
+        Order by with special handling for RegistryChoiceFields.
         """
 
         assert self.query.can_filter(), "Cannot reorder a query once a slice has been taken."
@@ -334,8 +334,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     final_fields.append(raw_field_name)
                     continue
 
-            if isinstance(field, registry_fields.SelectorKeyField):
-                # Ordering by SelectorKeyField should generate a specific query that will
+            if isinstance(field, registry_fields.RegistryChoiceField):
+                # Ordering by RegistryChoiceField should generate a specific query that will
                 # sort by the order that the choices were registered.
                 src_column = getattr(field, 'src_column', qn(field.column))
                 order_query = ['CASE', src_column]

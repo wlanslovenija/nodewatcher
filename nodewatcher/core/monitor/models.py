@@ -57,7 +57,7 @@ class RoutingAnnounceMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
 
     network = registry_fields.IPAddressField()
-    status = registry_fields.SelectorKeyField('node.monitoring', 'network.routing.announces#status', null=True)
+    status = registry_fields.RegistryChoiceField('node.monitoring', 'network.routing.announces#status', null=True)
     last_seen = models.DateTimeField(null=True)
 
     class RegistryMeta:
@@ -152,7 +152,7 @@ class WifiInterfaceMonitor(InterfaceMonitor):
     A monitored wireless interface.
     """
 
-    mode = registry_fields.SelectorKeyField('node.config', 'core.interfaces#wifi_mode', null=True)
+    mode = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#wifi_mode', null=True)
     essid = models.CharField(max_length=50, null=True)
     bssid = registry_fields.MACAddressField(null=True)
     protocol = models.CharField(max_length=50, null=True)
@@ -177,7 +177,7 @@ class NetworkAddressMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
 
     interface = registry_fields.IntraRegistryForeignKey(InterfaceMonitor, related_name='networks')
-    family = registry_fields.SelectorKeyField('node.monitoring', 'core.interfaces.network#family', null=True)
+    family = registry_fields.RegistryChoiceField('node.monitoring', 'core.interfaces.network#family', null=True)
     address = registry_fields.IPAddressField(null=True)
 
     class RegistryMeta:
@@ -244,6 +244,6 @@ class ClientAddress(models.Model):
     """
 
     client = models.ForeignKey(ClientMonitor, related_name='addresses')
-    family = registry_fields.SelectorKeyField('node.monitoring', 'core.interfaces.network#family', null=True)
+    family = registry_fields.RegistryChoiceField('node.monitoring', 'core.interfaces.network#family', null=True)
     address = registry_fields.IPAddressField()
     expiry_time = models.DateTimeField(null=True)

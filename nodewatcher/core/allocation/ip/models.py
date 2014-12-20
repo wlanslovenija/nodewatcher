@@ -36,7 +36,7 @@ class IpPool(allocation_models.PoolBase):
         days=1,
     )
 
-    family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
+    family = registry_fields.RegistryChoiceField('node.config', 'core.interfaces.network#ip_family')
     network = models.CharField(max_length=50)
     prefix_length = models.IntegerField()
     status = models.IntegerField(default=IpPoolStatus.Free, editable=False)
@@ -331,8 +331,8 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
     An abstract class defining an API for IP address allocator items.
     """
 
-    family = registry_fields.SelectorKeyField('node.config', 'core.interfaces.network#ip_family')
-    pool = registry_fields.ModelSelectorKeyField(IpPool, limit_choices_to={'parent': None})
+    family = registry_fields.RegistryChoiceField('node.config', 'core.interfaces.network#ip_family')
+    pool = registry_fields.ModelRegistryChoiceField(IpPool, limit_choices_to={'parent': None})
     prefix_length = models.IntegerField(default=27)
     subnet_hint = registry_fields.IPAddressField(null=True, blank=True, host_required=True)
     allocation = models.ForeignKey(

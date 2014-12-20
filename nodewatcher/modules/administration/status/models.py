@@ -10,9 +10,9 @@ class StatusMonitor(registration.bases.NodeMonitoringRegistryItem):
     Node's status.
     """
 
-    network = registry_fields.SelectorKeyField('node.monitoring', 'core.status#network', null=True)
+    network = registry_fields.RegistryChoiceField('node.monitoring', 'core.status#network', null=True)
     monitored = registry_fields.NullBooleanChoiceField('node.monitoring', 'core.status#monitored')
-    health = registry_fields.SelectorKeyField('node.monitoring', 'core.status#health', null=True)
+    health = registry_fields.RegistryChoiceField('node.monitoring', 'core.status#health', null=True)
 
     class RegistryMeta:
         registry_id = 'core.status'

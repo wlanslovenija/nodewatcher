@@ -83,7 +83,7 @@ class ProjectConfig(registration.bases.NodeConfigRegistryItem):
     Describes the project a node belongs to.
     """
 
-    project = registry_fields.ModelSelectorKeyField(Project)
+    project = registry_fields.ModelRegistryChoiceField(Project)
 
     class RegistryMeta:
         form_weight = 2

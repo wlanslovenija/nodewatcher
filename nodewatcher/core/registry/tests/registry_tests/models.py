@@ -22,7 +22,7 @@ registration.point('thing.first').register_item(AnotherRegistryItem)
 
 class SimpleRegistryItem(registration.bases.ThingFirstRegistryItem):
     interesting = models.CharField(max_length=30, default='nope', null=True)
-    level = fields.SelectorKeyField('thing.first', 'foo.simple#level', null=True)
+    level = fields.RegistryChoiceField('thing.first', 'foo.simple#level', null=True)
 
     class RegistryMeta:
         registry_id = 'foo.simple'

@@ -8,7 +8,7 @@ class TypeConfig(registration.bases.NodeConfigRegistryItem):
     Type configuration determines the type of the node.
     """
 
-    type = registry_fields.SelectorKeyField('node.config', 'core.type#type', null=True)
+    type = registry_fields.RegistryChoiceField('node.config', 'core.type#type', null=True)
 
     class RegistryMeta:
         form_weight = 2
