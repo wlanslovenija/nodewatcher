@@ -9,6 +9,9 @@ from . import models as olsr_models
 ROUTING_TABLE_ID = 20
 ROUTING_TABLE_NAME = 'olsr'
 ROUTING_TABLE_PRIORITY = 1000
+ROUTING_TABLE_DEFAULT_ID = 30
+ROUTING_TABLE_DEFAULT_NAME = 'olsr_default'
+ROUTING_TABLE_DEFAULT_PRIORITY = 1100
 
 
 @cgm_base.register_platform_module('openwrt', 900)
@@ -66,10 +69,11 @@ def olsr(node, cfg):
     olsrd = cfg.olsrd.add('olsrd')
     olsrd.SrcIpRoutes = 'yes'
     olsrd.RtTable = ROUTING_TABLE_ID
-    olsrd.RtTableDefault = ROUTING_TABLE_ID
+    olsrd.RtTableDefault = ROUTING_TABLE_DEFAULT_ID
 
-    # Configure routing table name
+    # Configure routing table names
     cfg.routing_tables.set_table(ROUTING_TABLE_NAME, ROUTING_TABLE_ID)
+    cfg.routing_tables.set_table(ROUTING_TABLE_DEFAULT_NAME, ROUTING_TABLE_DEFAULT_ID)
 
     # Configure main IP (router ID)
     try:
@@ -89,6 +93,10 @@ def olsr(node, cfg):
     rt = cfg.network.add('rule')
     rt.lookup = ROUTING_TABLE_ID
     rt.priority = ROUTING_TABLE_PRIORITY
+
+    rt = cfg.network.add('rule')
+    rt.lookup = ROUTING_TABLE_DEFAULT_ID
+    rt.priority = ROUTING_TABLE_DEFAULT_PRIORITY
 
     # Ensure that forwarding between all OLSR interfaces is allowed
     firewall = cfg.firewall.add('zone')
