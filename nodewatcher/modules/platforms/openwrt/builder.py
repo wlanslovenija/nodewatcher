@@ -38,6 +38,12 @@ def build_image(result, profile):
             passwd.write('%(username)s:%(password)s:%(uid)d:%(gid)d:%(username)s:%(home)s:%(shell)s\n' % account)
         builder.write_file(os.path.join(temp_path, 'etc', 'passwd'), passwd.getvalue().encode('ascii'))
 
+        # Prepare the banner file if configured
+        if cfg.get('_banner', None):
+            banner = io.StringIO()
+            banner.write(cfg['_banner'])
+            builder.write_file(os.path.join(temp_path, 'etc', 'banner'), banner.getvalue().encode('ascii'))
+
         # Run the build system and wait for its completion
         result.build_log = builder.call(
             'make', 'image',

@@ -73,6 +73,7 @@ class PlatformConfiguration(object):
         self.resources = cgm_resources.ResourceAllocator()
         self.packages = set()
         self.accounts = PlatformAccountManager()
+        self.banner = str()
 
     def get_build_config(self):
         """
@@ -85,6 +86,7 @@ class PlatformConfiguration(object):
         return {
             '_packages': list(self.packages),
             '_accounts': self.accounts.get_config(),
+            '_banner': str(self.banner),
         }
 
 
