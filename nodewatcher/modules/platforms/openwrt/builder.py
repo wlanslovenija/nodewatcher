@@ -44,6 +44,12 @@ def build_image(result, profile):
             banner.write(cfg['_banner'])
             builder.write_file(os.path.join(temp_path, 'etc', 'banner'), banner.getvalue().encode('ascii'))
 
+        # Prepare the routing table mappings
+        tables = io.StringIO()
+        for name, identifier in cfg['_routing_tables'].items():
+            tables.write('%s\t%s\n' % (identifier, name))
+        builder.write_file(os.path.join(temp_path, 'etc', 'iproute2', 'rt_tables'), tables.getvalue().encode('ascii'))
+
         # Run the build system and wait for its completion
         result.build_log = builder.call(
             'make', 'image',

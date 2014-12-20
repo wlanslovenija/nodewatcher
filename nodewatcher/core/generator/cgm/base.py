@@ -57,6 +57,37 @@ class PlatformAccountManager(object):
         }
 
 
+class PlatformRoutingTableManager(object):
+    """
+    Configure routing table mappings from name to identifier.
+    """
+
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self._tables = {}
+
+    def set_table(self, name, identifier):
+        """
+        Configures a routing table name to identifier mapping.
+
+        :param name: Routing table name
+        :param identifier: Routing table platform-specific identifier
+        """
+
+        self._tables[identifier] = name
+
+    def get_config(self):
+        """
+        Returns a configuration dictionary suitable for use in JSON
+        documents.
+        """
+
+        return self._tables
+
+
 class PlatformConfiguration(object):
     """
     A flexible in-memory platform configuration store that is used
@@ -74,6 +105,7 @@ class PlatformConfiguration(object):
         self.packages = set()
         self.accounts = PlatformAccountManager()
         self.banner = str()
+        self.routing_tables = PlatformRoutingTableManager()
 
     def get_build_config(self):
         """
@@ -87,6 +119,7 @@ class PlatformConfiguration(object):
             '_packages': list(self.packages),
             '_accounts': self.accounts.get_config(),
             '_banner': str(self.banner),
+            '_routing_tables': self.routing_tables.get_config(),
         }
 
 

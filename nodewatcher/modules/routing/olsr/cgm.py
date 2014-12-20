@@ -68,6 +68,9 @@ def olsr(node, cfg):
     olsrd.RtTable = ROUTING_TABLE_ID
     olsrd.RtTableDefault = ROUTING_TABLE_ID
 
+    # Configure routing table name
+    cfg.routing_tables.set_table(ROUTING_TABLE_NAME, ROUTING_TABLE_ID)
+
     # Configure main IP (router ID)
     try:
         router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id

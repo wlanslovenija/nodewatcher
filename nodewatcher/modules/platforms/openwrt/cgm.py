@@ -649,6 +649,12 @@ def network(node, cfg):
     lo.ipaddr = '127.0.0.1'
     lo.netmask = '255.0.0.0'
 
+    # Configure default routing table names
+    cfg.routing_tables.set_table('local', 255)
+    cfg.routing_tables.set_table('main', 254)
+    cfg.routing_tables.set_table('default', 253)
+    cfg.routing_tables.set_table('unspec', 0)
+
     # Obtain the device descriptor for this device
     device = node.config.core.general().get_device()
 
