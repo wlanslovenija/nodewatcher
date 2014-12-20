@@ -82,6 +82,24 @@ portLayouts = {
     },
   },
 
+  # TP-Link WR1043NDv1
+  'tp-wr1043nd': {
+    'switch': 'switch0',
+    'vlans': {
+      1: '1 2 3 4 5t',
+      2: '0 5t',
+    },
+  },
+
+  # TP-Link WR1043NDv2
+  'tp-wr1043ndv2': {
+    'switch': 'switch0',
+    'vlans': {
+      1: '0 1 2 3 4',
+      2: '5 6',
+    },
+  },
+
   # TP-Link WDR4300
   'tp-wdr4300': {
     'switch': 'switch0',
