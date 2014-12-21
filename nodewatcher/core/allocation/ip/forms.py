@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import fields
 from django.utils.translation import ugettext as _
 
-from ...registry import fields as registry_fields, registration
+from ...registry import forms as registry_forms, registration
 
 from . import models as pool_models, signals
 
@@ -32,7 +32,7 @@ class IpAddressAllocatorFormMixin(object):
         # Only display prefix length range that is available for the selected pool
         try:
             pool = item.pool
-            self.fields['prefix_length'] = registry_fields.RegistryChoiceFormField(
+            self.fields['prefix_length'] = registry_forms.RegistryChoiceFormField(
                 label=_("Prefix Length"),
                 choices=fields.BLANK_CHOICE_DASH + [
                     (plen, '/%s' % plen) for plen in xrange(pool.prefix_length_minimum, pool.prefix_length_maximum + 1)
@@ -42,7 +42,7 @@ class IpAddressAllocatorFormMixin(object):
                 empty_value=None,
             )
         except (pool_models.IpPool.DoesNotExist, AttributeError):
-            self.fields['prefix_length'] = registry_fields.RegistryChoiceFormField(label=_("Prefix Length"), choices=fields.BLANK_CHOICE_DASH)
+            self.fields['prefix_length'] = registry_forms.RegistryChoiceFormField(label=_("Prefix Length"), choices=fields.BLANK_CHOICE_DASH)
 
         # If user has sufficient permissions, enable manual entry
         try:
