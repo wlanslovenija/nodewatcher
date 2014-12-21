@@ -450,7 +450,7 @@ class Command(base.BaseCommand):
                     mode='mesh',
                     essid=ssid.essid,
                     bssid=ssid.bssid,
-                    routing_protocol='olsr',
+                    routing_protocols=['olsr'],
                 )
                 iface_mesh.save()
 
@@ -481,7 +481,7 @@ class Command(base.BaseCommand):
                         create=cgm_models.AllocatedNetworkConfig,
                         interface=iface_ap,
                         description='AP client access',
-                        routing_announce='olsr',
+                        routing_announces=['olsr'],
                         family='ipv4',
                         pool=pool_ap,
                         prefix_length=subnet_ap.prefixlen,
@@ -551,7 +551,7 @@ class Command(base.BaseCommand):
 
                     if not have_subnets:
                         # If no subnets are configured, designate the interface for routing
-                        iface_lan.routing_protocol = 'olsr'
+                        iface_lan.routing_protocols = ['olsr']
                         iface_lan.save()
 
                 # VPN
@@ -559,7 +559,7 @@ class Command(base.BaseCommand):
                     for server, ports in VPN_SERVERS.items():
                         iface_vpn = node_mdl.config.core.interfaces(
                             create=tunneldigger_models.TunneldiggerInterfaceConfig,
-                            routing_protocol='olsr',
+                            routing_protocols=['olsr'],
                         )
                         iface_vpn.save()
 

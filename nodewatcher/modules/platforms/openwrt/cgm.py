@@ -454,16 +454,14 @@ def configure_network(cfg, network, section, iface_name):
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
 
         # When network is marked to be announced, also specify it here
-        if network.routing_announce:
-            section._announce = [network.routing_announce]
+        section._announce = network.routing_announces
 
         configure_leasable_network(cfg, network, iface_name, network.address)
     elif isinstance(network, cgm_models.AllocatedNetworkConfig):
         section.proto = 'static'
 
         # When network is marked to be announced, also specify it here
-        if network.routing_announce:
-            section._announce = [network.routing_announce]
+        section._announce = network.routing_announces
 
         # Check that the network has actually been allocated and fail validation if not so
         if not network.allocation:
@@ -506,7 +504,7 @@ def configure_interface(cfg, interface, section, iface_name):
     :param iface_name: Name of the UCI interface
     """
 
-    section._routable = getattr(interface, 'routing_protocol', None)
+    section._routable = getattr(interface, 'routing_protocols', [])
 
     networks = [x.cast() for x in interface.networks.all()]
     if networks:
@@ -683,7 +681,7 @@ def network(node, cfg):
                         iface._uplink = True
                         set_dhcp_ignore(cfg, iface_name)
 
-                    if port.routing_protocol:
+                    if port.routing_protocols:
                         raise cgm_base.ValidationError(
                             _("Ethernet interface '%(name)s' cannot be part of a bridge and also marked as routable!") % {
                                 'name': port.eth_port,
@@ -691,7 +689,7 @@ def network(node, cfg):
                         )
                 elif isinstance(port, cgm_models.WifiInterfaceConfig):
                     # Wireless interfaces are reverse-configured to be part of a bridge
-                    if port.routing_protocol:
+                    if port.routing_protocols:
                         raise cgm_base.ValidationError(
                             _("Wireless interface under radio '%(radio)s' cannot be part of a bridge and also marked as routable!") % {
                                 'radio': port.device.wifi_radio,

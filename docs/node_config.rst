@@ -293,11 +293,11 @@ include the mixin among its bases.
 
 .. autoclass:: nodewatcher.core.generator.cgm.models.RoutableInterface()
 
-   :param routing_protocol: The routing protocol that should be used over this interface. The
-     value may be ``None`` in case no routing protocol is to be used. Available routing protocols
+   :param routing_protocols: The routing protocols that should be used over this interface. The
+     value may be ``[]`` in case no routing protocol is to be used. Available routing protocols
      are populated by modules implementing their support (for example :mod:`nodewatcher.modules.routing.olsr`
-     for OLSR support).
-   :type routing_protocol: registered choice
+     for OLSR support). Multiple protocols may be configured for an interface.
+   :type routing_protocols: registered multiple choice
 
 The following interface types are currently implemented by :mod:`nodewatcher.core.generator.cgm`:
 
@@ -450,10 +450,11 @@ among its bases.
 
 .. autoclass:: nodewatcher.core.generator.cgm.models.AnnouncableNetwork()
 
-   :param routing_announce: Should this network be announced via a routing protocol. Available
-     choices are provided by routing protocol implementations. In case the value is ``None``, the
-     network is not announced via any routing protocol.
-   :type routing_announce: registered choice
+   :param routing_announces: Should this network be announced via routing protocols. Available
+     choices are provided by routing protocol implementations. In case the value is ``[]``, the
+     network is not announced via any routing protocol. Multiple protocols may be configured for
+     a network.
+   :type routing_announces: registered multiple choice
 
 Another abstract mixin is provided for configuring networks which may be leased to clients via
 DHCP or other protocols. In case a network should support leases, it should include the mixin

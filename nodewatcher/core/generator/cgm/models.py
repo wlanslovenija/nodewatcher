@@ -122,9 +122,9 @@ class RoutableInterface(models.Model):
     class Meta:
         abstract = True
 
-    routing_protocol = registry_fields.RegistryChoiceField(
+    routing_protocols = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'core.interfaces#routing_protocol',
-        blank=True, null=True,
+        blank=True, null=True, default=[],
     )
 
 
@@ -267,9 +267,9 @@ class AnnouncableNetwork(models.Model):
     class Meta:
         abstract = True
 
-    routing_announce = registry_fields.RegistryChoiceField(
+    routing_announces = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'core.interfaces.network#routing_announce',
-        blank=True, null=True, verbose_name=_("Announce Via"),
+        blank=True, null=True, verbose_name=_("Announce Via"), default=[],
     )
 
 

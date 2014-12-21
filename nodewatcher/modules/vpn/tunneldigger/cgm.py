@@ -30,7 +30,7 @@ def tunneldigger(node, cfg):
         iface.ifname = ifname
         iface.macaddr = interface.mac
         iface.proto = 'none'
-        iface._routable = interface.routing_protocol
+        iface._routable = interface.routing_protocols
 
         # Add a broker for each configured interface
         broker = cfg.tunneldigger.add('broker')

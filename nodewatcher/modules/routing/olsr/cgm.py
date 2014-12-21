@@ -44,7 +44,7 @@ def olsr(node, cfg):
             announced_ifaces.append(name)
             olsrd_configured = True
 
-        if iface._routable != olsr_models.OLSR_PROTOCOL_NAME:
+        if olsr_models.OLSR_PROTOCOL_NAME not in (iface._routable or []):
             continue
 
         if iface.proto == 'none':
