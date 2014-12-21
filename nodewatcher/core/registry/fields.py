@@ -11,29 +11,18 @@ from django.forms import fields as form_fields, widgets
 from django.utils import text, functional
 from django.utils.translation import ugettext_lazy as _
 
+# TODO: This import will not be needed once we upgrade to Django 1.8.
+from postgres import fields as postgres_fields
+
 from ...utils import ipaddr
 
 from . import registration, models as registry_models
 
 
-class RegistryChoiceFormField(form_fields.TypedChoiceField):
-    """
-    An augmented TypedChoiceField that gets updated by client-side AJAX on every
-    change and can handle dependent choices.
-    """
+# TODO: Move this to registry.forms.
+class RegistryChoiceFormFieldMixin(object):
 
-    def __init__(self, rp_choices=None, *args, **kwargs):
-        """
-        Class constructor.
-        """
-
-        kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
-        super(RegistryChoiceFormField, self).__init__(*args, **kwargs)
-
-        # Override choices so we get a lazy list instead of being evaluated right here
-        self._rp_choices = None
-        if rp_choices is not None:
-            self._rp_choices = self._choices = self.widget.choices = rp_choices
+    accepts_multiple_choices = False
 
     def modify_to_context(self, item, cfg, request):
         """
@@ -50,7 +39,54 @@ class RegistryChoiceFormField(form_fields.TypedChoiceField):
             except (KeyError, IndexError, AttributeError):
                 return None
 
-        self.choices = fields.BLANK_CHOICE_DASH + self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
+        prepend_choices = []
+        if not self.accepts_multiple_choices:
+            prepend_choices = fields.BLANK_CHOICE_DASH
+        self.choices = prepend_choices + self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
+
+
+# TODO: Move this to registry.forms.
+class RegistryChoiceFormField(form_fields.TypedChoiceField, RegistryChoiceFormFieldMixin):
+    """
+    An augmented TypedChoiceField that gets updated by client-side AJAX on every
+    change and can handle dependent choices.
+    """
+
+    def __init__(self, rp_choices=None, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
+        super(RegistryChoiceFormField, self).__init__(*args, **kwargs)
+
+        # Override choices so we get a lazy list instead of being evaluated right here.
+        self._rp_choices = None
+        if rp_choices is not None:
+            self._rp_choices = self._choices = self.widget.choices = rp_choices
+
+
+# TODO: Move this to registry.forms.
+class RegistryMultipleChoiceFormField(form_fields.MultipleChoiceField, RegistryChoiceFormFieldMixin):
+    """
+    An augmented TypedMultipleChoiceField that gets updated by client-side AJAX on every
+    change and can handle dependent choices.
+    """
+
+    accepts_multiple_choices = True
+
+    def __init__(self, rp_choices=None, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs['widget'] = widgets.CheckboxSelectMultiple(attrs={'class': 'registry_form_selector'})
+        super(RegistryMultipleChoiceFormField, self).__init__(*args, **kwargs)
+
+        # Override choices so we get a lazy list instead of being evaluated right here.
+        self._rp_choices = None
+        if rp_choices is not None:
+            self._rp_choices = self._choices = self.widget.choices = rp_choices
 
 
 class NullBooleanChoiceField(models.NullBooleanField):
@@ -174,7 +210,6 @@ class RegistryChoiceField(models.CharField):
             else:
                 defaults['initial'] = self.get_default()
 
-        include_blank = self.blank or not (self.has_default() or 'initial' in kwargs)
         defaults['choices'] = self._rp_choices
         defaults['coerce'] = self.to_python
         if self.null:
@@ -182,6 +217,65 @@ class RegistryChoiceField(models.CharField):
 
         defaults.update(kwargs)
         return RegistryChoiceFormField(**defaults)
+
+
+class RegistryMultipleChoiceField(postgres_fields.ArrayField):
+
+    def __init__(self, regpoint, enum_id, **kwargs):
+        """
+        Class constructor.
+        """
+
+        self.regpoint = regpoint
+        self.enum_id = enum_id
+        self._rp_choices = self.get_registered_choices().field_tuples()
+        super(RegistryMultipleChoiceField, self).__init__(
+            models.CharField(max_length=50, choices=self._rp_choices),
+            **kwargs
+        )
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(RegistryMultipleChoiceField, self).deconstruct()
+        # Need to explicitly override path as ArrayField overwrites it. See Django ticket #24034.
+        path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        args = []
+        kwargs.update({
+            'regpoint': self.regpoint,
+            'enum_id': self.enum_id,
+        })
+        return name, path, args, kwargs
+
+    def get_registered_choices(self):
+        """
+        Returns a reference to the registered choices object that this field
+        uses to populate its list of choices.
+        """
+
+        return registration.point(self.regpoint).get_registered_choices(self.enum_id)
+
+    # TODO: Check if we could combine this with RegistryChoiceField.
+    def formfield(self, **kwargs):
+        """
+        Returns an augmented form field.
+        """
+
+        defaults = {
+            'required': not self.blank,
+            'label': text.capfirst(self.verbose_name),
+            'help_text': self.help_text,
+            'rp_choices': self._rp_choices,
+        }
+
+        if self.has_default():
+            if callable(self.default):
+                defaults['initial'] = self.default
+                defaults['show_hidden_initial'] = True
+            else:
+                defaults['initial'] = self.get_default()
+
+        defaults['choices'] = self._rp_choices
+        defaults.update(kwargs)
+        return RegistryMultipleChoiceFormField(**defaults)
 
 
 class ModelRegistryChoiceField(models.ForeignKey):
