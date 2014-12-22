@@ -149,3 +149,33 @@ class RegistryTestCase(django_test.TransactionTestCase):
         # Check if ordering works properly
         ordered = [item.f1 for item in qs.order_by('f1', 'id')]
         self.assertEqual(ordered, sorted(ordered, key=lambda x: ordered_choices.index(x)))
+
+    def test_prefetch_queryset(self):
+        thing = models.Thing(foo='hello', bar=1)
+        thing.save()
+
+        simple = thing.first.foo.simple(create=models.SimpleRegistryItem)
+        simple.interesting = 'foo'
+        simple.level = 'level-x'
+        simple.save()
+
+        qs = models.Thing.objects.regpoint('first').registry_fields(
+            f1=models.SimpleRegistryItem.objects.all().extra(select={'test': '42'}),
+        )
+        for thing in qs:
+            self.assertEqual(thing.f1.interesting, 'foo')
+            self.assertEqual(thing.f1.level, 'level-x')
+            self.assertEqual(thing.f1.get_level_display(), 'Level 0')
+            self.assertEqual(thing.f1.test, 42)
+
+    def test_prefetch_queryset_default(self):
+        thing = models.Thing(foo='hello', bar=1)
+        thing.save()
+
+        qs = models.Thing.objects.regpoint('first').registry_fields(
+            f1=models.SimpleRegistryItem.objects.all().extra(select={'test': '42'}),
+        )
+        for thing in qs:
+            self.assertEqual(thing.f1.interesting, 'nope')
+            self.assertEqual(thing.f1.level, None)
+            self.assertEqual(thing.f1.test, None)
