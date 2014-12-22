@@ -540,6 +540,14 @@ class RegistryProxySingleDescriptor(object):
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         queryset = queryset.filter(root__in=instances)
+
+        if queryset.query.extra:
+            # When there are extra queryset attributes to be set on the resulting instances,
+            # we store them so that we can generate default objects with these attributes
+            # set to None.
+            for instance in instances:
+                setattr(instance, '%s_extra' % self.cache_name, queryset.query.extra.keys())
+
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = rel_field.get_cache_name()
@@ -565,7 +573,12 @@ class RegistryProxySingleDescriptor(object):
             setattr(instance, self.cache_name, rel_obj)
 
         if rel_obj is None:
+            # Create a default empty object.
             rel_obj = self.related()
+            # Set any extra attributes required by the prefetch queryset to None. Otherwise
+            # these attributes would simply not be there which could cause issues.
+            for attr_name in getattr(instance, '%s_extra' % self.cache_name, []):
+                setattr(rel_obj, attr_name, None)
 
         return rel_obj
 
