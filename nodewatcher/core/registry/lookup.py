@@ -329,7 +329,12 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             # Support for direct specification of registry fields. In this case, the
             # field is first fetched into an internal field and then used for sorting.
             if '#' in field_name:
-                internal_field_name = '_order_field_%s' % field_name.replace('#', '_').replace('.', '_')
+                if ':' in field_name:
+                    # Switch to proper registration point when requested.
+                    regpoint, field_name = field_name.split(':')
+                    clone = clone.regpoint(regpoint)
+
+                internal_field_name = '_order_field_%s' % field_name.replace('#', '_').replace('.', '_').replace(':', '_')
                 clone = clone.registry_fields(
                     **{internal_field_name: field_name}
                 )

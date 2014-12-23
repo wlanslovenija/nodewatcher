@@ -167,6 +167,11 @@ class RegistryTestCase(django_test.TransactionTestCase):
         ordered = [item.pk for item in qs.order_by('foo.simple#related.level', 'id')]
         self.assertEqual(ordered, ordered_pks)
 
+        # Test regpoint specifier syntax.
+        qs = models.Thing.objects.all()
+        ordered = [item.pk for item in qs.order_by('first:foo.simple#level', 'id')]
+        self.assertEqual(ordered, ordered_pks)
+
     def test_prefetch_queryset(self):
         thing = models.Thing(foo='hello', bar=1)
         thing.save()
