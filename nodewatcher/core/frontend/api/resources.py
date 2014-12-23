@@ -74,6 +74,10 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         if isinstance(field, registry_fields.RegistryRelationField):
             return False
 
+        # Skip fields created by the registry queryset internally for sorting purposes.
+        if field.name.startswith('_'):
+            return True
+
         return parent_should_skip_field()
 
     @classmethod

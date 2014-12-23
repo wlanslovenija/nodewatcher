@@ -41,6 +41,7 @@ registration.point('thing.first').register_item(ChildRegistryItem)
 
 class RelatedModel(models.Model):
     name = models.CharField(max_length=30)
+    level = fields.RegistryChoiceField('thing.first', 'foo.simple#level', null=True)
 
 
 class DoubleChildRegistryItem(ChildRegistryItem):

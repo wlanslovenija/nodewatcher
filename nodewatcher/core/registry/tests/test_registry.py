@@ -126,16 +126,26 @@ class RegistryTestCase(django_test.TransactionTestCase):
 
     def test_choices(self):
         ordered_choices = ['level-x', 'level-a', 'level-m']
+        ordered_pks = []
+
         for i in xrange(30):
             thing = models.Thing(foo='hello', bar=i)
             thing.save()
+
+            related = models.RelatedModel(name='test', level=random.choice(ordered_choices))
+            related.save()
 
             simple = thing.first.foo.simple(create=models.DoubleChildRegistryItem)
             simple.interesting = 'bla'
             simple.additional = 42
             simple.another = 69
-            simple.level = random.choice(ordered_choices)
+            simple.level = related.level
+            simple.related = related
             simple.save()
+
+            ordered_pks.append((ordered_choices.index(simple.level), thing.id))
+
+        ordered_pks = [x[1] for x in sorted(ordered_pks)]
 
         qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#level')
 
@@ -147,8 +157,15 @@ class RegistryTestCase(django_test.TransactionTestCase):
             self.assertEquals(item.get_f1_choice().name, item.f1)
 
         # Check if ordering works properly
-        ordered = [item.f1 for item in qs.order_by('f1', 'id')]
-        self.assertEqual(ordered, sorted(ordered, key=lambda x: ordered_choices.index(x)))
+        ordered = [item.pk for item in qs.order_by('f1', 'id')]
+        self.assertEqual(ordered, ordered_pks)
+
+        # Test ordering by registry id without fetching the field explicitly
+        qs = models.Thing.objects.regpoint('first')
+        ordered = [item.pk for item in qs.order_by('foo.simple#level', 'id')]
+        self.assertEqual(ordered, ordered_pks)
+        ordered = [item.pk for item in qs.order_by('foo.simple#related.level', 'id')]
+        self.assertEqual(ordered, ordered_pks)
 
     def test_prefetch_queryset(self):
         thing = models.Thing(foo='hello', bar=1)

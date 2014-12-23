@@ -273,8 +273,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if m2m:
                     raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
-                select_name = install_proxy_field(clone.model, dst_related_field, field_name)
-                clone = clone.extra(select={select_name: '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))})
+                src_column = '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))
+                select_name = install_proxy_field(clone.model, dst_related_field, field_name, src_column=src_column)
+                clone = clone.extra(select={select_name: src_column})
 
             clone.query.get_initial_alias()
 
@@ -321,8 +322,19 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         clone.query.clear_ordering(force_empty=False)
 
         final_fields = []
-        for raw_field_name in fields:
+        for field_id, raw_field_name in enumerate(fields):
             field_name, field_order = query.get_order_dir(raw_field_name)
+            field_order = '-' if field_order == 'DESC' else ''
+
+            # Support for direct specification of registry fields. In this case, the
+            # field is first fetched into an internal field and then used for sorting.
+            if '#' in field_name:
+                internal_field_name = '_order_field_%s' % field_name.replace('#', '_').replace('.', '_')
+                clone = clone.registry_fields(
+                    **{internal_field_name: field_name}
+                )
+                field_name = internal_field_name
+
             try:
                 field = clone.model._meta.get_field(field_name)
             except django_models.FieldDoesNotExist:
@@ -350,9 +362,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     select={'%s_choice_order' % field_name: ' '.join(order_query)},
                     select_params=order_params,
                 )
-                final_fields.append('%s%s_choice_order' % ('-' if field_order == 'DESC' else '', field_name))
+                final_fields.append('%s%s_choice_order' % (field_order, field_name))
             else:
-                final_fields.append(raw_field_name)
+                final_fields.append('%s%s' % (field_order, field_name))
 
         # Order by all the specified fields. We must not call the super order_by method
         # as it will reset all ordering.
