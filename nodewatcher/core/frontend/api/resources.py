@@ -71,12 +71,12 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         def parent_should_skip_field():
             return gis_resources.ModelResource.should_skip_field.im_func(cls, field)
 
-        if isinstance(field, registry_fields.RegistryRelationField):
-            return False
-
         # Skip fields created by the registry queryset internally for sorting purposes.
         if field.name.startswith('_'):
             return True
+
+        if isinstance(field, registry_fields.RegistryRelationField):
+            return False
 
         return parent_should_skip_field()
 
