@@ -29,15 +29,21 @@ class NodeResource(api.BaseResource):
             # TODO: Should we add peers and clients to the snippet as well?
             peers='network.routing.topology#link_count',
             # TODO: Add current clients count?
-        ).order_by('type')
+        )
         resource_name = 'node'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
         max_limit = 5000
         # TODO: Sorting by status does not work, how can we map it to order_by string from registry?
         ordering = ('type', 'name', 'last_seen', 'status', 'project')
-        # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
-        global_filter = ('config_types_typeconfig__type', 'config_core_generalconfig__name', 'monitoring_monitor_generalmonitor__last_seen', 'config_projects_projectconfig__project__name')
+        # List of fields used when user is filtering using a global filter.
+        # Should be kept in sync with which are set as searchable in dataTables with bSearchable.
+        global_filter = (
+            # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
+            'config_types_typeconfig__type', # Node type
+            'config_core_generalconfig__name', # Node name
+            'config_projects_projectconfig__project__name', # Project name
+        )
 
     def _before_apply_filters(self, request, queryset):
         # Used by MyNodesComponent. We use _before_apply_filters so that queryset is modified before count
