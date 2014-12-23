@@ -141,7 +141,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         """
 
         if getattr(self, '_regpoint', None) is None:
-            raise ValueError("Calling 'registry_filter' first requires a selected registration point!")
+            raise ValueError("Calling 'registry_fields' first requires a selected registration point!")
 
         clone = self._clone()
 
