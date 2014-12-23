@@ -103,7 +103,10 @@ class NodePostprocess(monitor_processors.NodeProcessor):
             try:
                 rtm = node.monitoring.network.routing.topology(onlyclass=olsr_models.OlsrRoutingTopologyMonitor)[0]
             except IndexError:
-                rtm = node.monitoring.network.routing.topology(create=olsr_models.OlsrRoutingTopologyMonitor)
+                rtm = node.monitoring.network.routing.topology(
+                    create=olsr_models.OlsrRoutingTopologyMonitor,
+                    protocol=olsr_models.OLSR_PROTOCOL_NAME,
+                )
                 rtm.save()
 
             visible_links = []

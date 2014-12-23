@@ -82,12 +82,12 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
 
     def get_stream_query_tags(self):
         tags = super(OlsrRoutingTopologyMonitorStreams, self).get_stream_query_tags()
-        tags.update({'link': None, 'protocol': 'olsr'})
+        tags.update({'link': None, 'protocol': OLSR_PROTOCOL_NAME})
         return tags
 
     def get_stream_tags(self):
         tags = super(OlsrRoutingTopologyMonitorStreams, self).get_stream_query_tags()
-        tags.update({'link': None, 'protocol': 'olsr'})
+        tags.update({'link': None, 'protocol': OLSR_PROTOCOL_NAME})
         return tags
 
 ds_pool.register(OlsrRoutingTopologyMonitor, OlsrRoutingTopologyMonitorStreams)
@@ -158,12 +158,12 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
 
     def get_stream_query_tags(self):
         tags = super(OlsrTopologyLinkStreams, self).get_stream_query_tags()
-        tags.update({'link': self._model.peer.uuid, 'protocol': 'olsr'})
+        tags.update({'link': self._model.peer.uuid, 'protocol': OLSR_PROTOCOL_NAME})
         return tags
 
     def get_stream_tags(self):
         tags = super(OlsrTopologyLinkStreams, self).get_stream_query_tags()
-        tags.update({'link': self._model.peer.uuid, 'protocol': 'olsr'})
+        tags.update({'link': self._model.peer.uuid, 'protocol': OLSR_PROTOCOL_NAME})
         return tags
 
 ds_pool.register(OlsrTopologyLink, OlsrTopologyLinkStreams)

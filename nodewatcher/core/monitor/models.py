@@ -32,6 +32,7 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
     Routing topology.
     """
 
+    protocol = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#routing_protocol')
     link_count = models.IntegerField(default=0)
 
     class RegistryMeta:
