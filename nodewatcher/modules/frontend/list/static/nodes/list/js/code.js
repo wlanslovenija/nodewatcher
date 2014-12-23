@@ -36,10 +36,12 @@
                 'sAjaxDataProp': 'objects',
                 // Set to "ifprtifp" if pagination is enabled, set to "ifrtif" if disabled
                 'sDom': 'ifrtif',
+                // Searchable columns should be kept in sync with Tastypie global_filter list of filterable fields.
                 'aoColumns': [
                     {'mData': 'type', 'bVisible': false},
                     {'mData': 'name', 'mRender': $.tastypie.nodeName(table)},
-                    {'mData': 'last_seen'},
+                    // Last seen not really reasonable to be searchable, especially once localized
+                    {'mData': 'last_seen', 'bSearchable': false},
                     // Status not really reasonable to be searchable
                     {'mData': 'status.network', 'mRender': iconFromLegend('network'), 'bSearchable': false},
                     {'mData': 'status.monitored', 'mRender': iconFromLegend('monitored'), 'bSearchable': false},
