@@ -3,7 +3,7 @@ import random
 from django import test as django_test
 from django.apps import apps
 from django.conf import settings
-from django.core import management
+from django.core import management, exceptions as django_exceptions
 from django.test import utils
 
 from .registry_tests import models
@@ -113,6 +113,23 @@ class RegistryTestCase(django_test.TransactionTestCase):
         self.assertEquals(len(items), 99)
         items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__another=42)
         self.assertEquals(len(items), 1)
+
+        # Test proxy field filter
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name')
+        qs = qs.filter(f1__icontains='Test')
+        self.assertEqual(len(qs), 100)
+
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple')
+        qs = qs.filter(f1__related__name__icontains='Test')
+        self.assertEqual(len(qs), 100)
+
+        # Test that fallthrough fields also work
+        qs = qs.filter(id=1)
+        self.assertEqual(len(qs), 1)
+
+        # Test filter exceptions
+        with self.assertRaises(django_exceptions.FieldError):
+            qs = qs.filter(nonexistant='foo')
 
         # Test class query
         self.assertEquals(registration.point('thing.first').get_class('foo.simple', 'SimpleRegistryItem'), models.SimpleRegistryItem)

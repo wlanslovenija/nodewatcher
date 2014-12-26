@@ -4,6 +4,7 @@ import inspect
 from django.contrib.gis.db import models as gis_models
 from django import db as django_db
 from django.apps import apps
+from django.core import exceptions as django_exceptions
 from django.db import models as django_models
 from django.db.models.sql import constants, query
 from django.utils import functional
@@ -135,6 +136,63 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         # Pass transformed query into the standard filter routine
         return super(RegistryQuerySet, clone).filter(**filter_selectors)
 
+    def registry_expand_proxy_field(self, alias):
+        """
+        Expands a proxy virtual field previously setup by registry_fields into a field
+        path suitable for use in filters. In case the alias is a standard Django field or
+        a path of such fields, it is returned unmodified.
+
+        :param alias: Alias field name or a path starting with such a field
+        """
+
+        raw_alias = alias
+        alias = alias.split('__')
+        base_alias = alias[0]
+
+        try:
+            field = self.model._meta.get_field(base_alias)
+        except django_models.FieldDoesNotExist:
+            for f in self.model._meta.virtual_fields:
+                field = f
+                if field.name == base_alias:
+                    break
+            else:
+                # When a field cannot be resolved, return the alias unchanged.
+                return raw_alias
+
+        src_model = getattr(field, 'src_model', None)
+        if src_model is not None:
+            if field.src_field is None and len(alias) > 1:
+                # We need to perform model resolution again as the destination model
+                # is not known as a field name is required to resolve the proper model subclass.
+                src_model = src_model.get_registry_regpoint().get_model_with_field(
+                    src_model.get_registry_id(), alias[1]
+                )[0]
+
+            selector = [src_model.get_registry_lookup_chain()]
+            if field.src_field is not None:
+                selector.append(field.src_field)
+            if alias[1:]:
+                selector += alias[1:]
+
+            return '__'.join(selector)
+
+        return raw_alias
+
+    def filter(self, **kwargs):
+        """
+        An augmented filter method to support querying by virtual fields created
+        by registry_fields.
+        """
+
+        clone = self._clone()
+
+        filter_selectors = {}
+        for selector, value in kwargs.items():
+            filter_selectors[self.registry_expand_proxy_field(selector)] = value
+
+        return super(RegistryQuerySet, clone).filter(**filter_selectors)
+
     def registry_fields(self, **kwargs):
         """
         Select fields from the registry.
@@ -177,12 +235,14 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             del apps.all_models['_registry_proxy_models_']
 
-        def install_proxy_field(model, field, name, src_column=None):
+        def install_proxy_field(model, field, name, src_column=None, src_model=None, src_field=None):
             field = copy.deepcopy(field)
             field.name = None
             # Include the source table and column name so methods like order_by can
             # discover this and use it in queries.
             field.src_column = src_column
+            field.src_model = src_model
+            field.src_field = src_field
             select_name = name
             # Since the field is populated by a join, it can always be null when the model doesn't exist
             field.null = True
@@ -255,13 +315,23 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 from . import fields
 
                 field = fields.RegistryRelationField(dst_model)
+                # Add proxy attributes so that the field can be used in filter.
+                field.src_model = dst_model
+                field.src_field = None
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
                 clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_related is None:
                 # Select destination field and install proxy field descriptor
                 src_column = '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))
-                select_name = install_proxy_field(clone.model, dst_field, field_name, src_column=src_column)
+                select_name = install_proxy_field(
+                    clone.model,
+                    dst_field,
+                    field_name,
+                    src_column=src_column,
+                    src_model=dst_model,
+                    src_field=dst_field.name,
+                )
                 clone = clone.extra(select={select_name: src_column})
             else:
                 # Traverse the relation and copy the destination field descriptor
@@ -274,7 +344,14 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
                 src_column = '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))
-                select_name = install_proxy_field(clone.model, dst_related_field, field_name, src_column=src_column)
+                select_name = install_proxy_field(
+                    clone.model,
+                    dst_related_field,
+                    field_name,
+                    src_column=src_column,
+                    src_model=dst_model,
+                    src_field='%s__%s' % (dst_field.name, dst_related)
+                )
                 clone = clone.extra(select={select_name: src_column})
 
             clone.query.get_initial_alias()
@@ -322,7 +399,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         clone.query.clear_ordering(force_empty=False)
 
         final_fields = []
-        for field_id, raw_field_name in enumerate(fields):
+        for raw_field_name in fields:
             field_name, field_order = query.get_order_dir(raw_field_name)
             field_order = '-' if field_order == 'DESC' else ''
 
