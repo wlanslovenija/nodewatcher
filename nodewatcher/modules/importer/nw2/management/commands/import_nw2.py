@@ -203,10 +203,12 @@ class Command(base.BaseCommand):
 
         try:
             return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f').replace(
-                tzinfo=pytz.timezone('Europe/Ljubljana'))
+                tzinfo=pytz.timezone('Europe/Ljubljana')
+            )
         except ValueError:
             return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S').replace(
-                tzinfo=pytz.timezone('Europe/Ljubljana'))
+                tzinfo=pytz.timezone('Europe/Ljubljana')
+            )
 
     @transaction.atomic
     def import_users(self, data):
