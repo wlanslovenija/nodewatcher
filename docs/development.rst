@@ -63,7 +63,7 @@ stylesheets and add small changes you might want to add for your installation.
 
 To compile SCSS files into CSS files run::
 
-    fig run web python manage.py collectstatic -l --noinput
+    $ fig run web python manage.py collectstatic -l
 
 .. _Compass: http://compass-style.org/
 .. _Sass: http://sass-lang.com/
