@@ -51,6 +51,23 @@ This will recreate the `nodewatcher` database and thus erase ALL data from the d
 
 This will initialize the database schema.
 
+Compile stylesheets
+-------------------
+
+For default nodewatcher stylesheets we are using `Compass`_, which means that SCSS files have to be
+compiled into CSS files before CSS files can be served to users. Compass is built on top of `Sass`_,
+which is an an extension of CSS3 and adds nested rules, variables, mixins, selector inheritance, and more.
+Sass generates well formatted CSS and makes our stylesheets easier to organize and maintain.
+It also makes stylesheets easier to extend and reuse so it is easier to build on default nodewatcher
+stylesheets and add small changes you might want to add for your installation.
+
+To compile SCSS files into CSS files run::
+
+    $ fig run web python manage.py collectstatic -l
+
+.. _Compass: http://compass-style.org/
+.. _Sass: http://sass-lang.com/
+
 Importing the JSON database dump from version 2
 -----------------------------------------------
 
