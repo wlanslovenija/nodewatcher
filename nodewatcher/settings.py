@@ -234,9 +234,6 @@ TEST_RUNNER_FILTER = (
 )
 
 INSTALLED_APPS = (
-    # We override staticfiles runserver with default Django runserver in nodewatcher.core.frontend.
-    'django.contrib.staticfiles',
-
     # Common frontend libraries before nodewatcher.core.frontend.
     # Uses "prepend_data" to assure libraries are loaded first.
     'nodewatcher.extra.jquery',
@@ -304,6 +301,10 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
     'django.contrib.admin',
     'django.contrib.gis',
+
+    # We override staticfiles runserver with default Django runserver in
+    # nodewatcher.core.frontend, which is loaded before for this to work.
+    'django.contrib.staticfiles',
 
     'tastypie',
     'django_datastream',
