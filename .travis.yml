@@ -23,7 +23,7 @@ before_install:
 install:
  - pip install pep8
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint
- - cat requirements.txt | xargs -n 1 sh -c 'pip install $0 || exit 255'
+ - cat requirements.txt | xargs -n 1 sh -c 'CPLUS_INCLUDE_PATH=/usr/include/gdal C_INCLUDE_PATH=/usr/include/gdal pip install $0 || exit 255'
 before_script:
  - createdb nodewatcher
  - psql -U postgres -c "create extension postgis" nodewatcher
