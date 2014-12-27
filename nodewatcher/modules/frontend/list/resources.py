@@ -33,6 +33,7 @@ class NodeResource(api.BaseResource):
             # TODO: Correctly add peers (as a subdocument for each routing protocol)
             #peers='network.routing.topology#link_count',
             # TODO: Add current clients count?
+        # noqa (PEP8 ignore indentation)
         # We have to have some ordering so that pagination works correctly.
         # Otherwise SKIP and LIMIT does not necessary return expected pages.
         # Later calls to order_by override this so if user specifies an order

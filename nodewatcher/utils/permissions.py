@@ -125,19 +125,23 @@ def get_objects_for_user(user, perms, klass=None, use_groups=True, any_perm=Fals
         if '.' in perm:
             new_app_label, codename = perm.split('.', 1)
             if app_label is not None and app_label != new_app_label:
-                raise exceptions.MixedContentTypeError("Given perms must have same app "
-                    "label (%s != %s)" % (app_label, new_app_label))
+                raise exceptions.MixedContentTypeError(
+                    "Given perms must have same app label (%s != %s)" % (app_label, new_app_label)
+                )
             else:
                 app_label = new_app_label
         else:
             codename = perm
         codenames.add(codename)
         if app_label is not None:
-            new_ctype = contenttypes_models.ContentType.objects.get(app_label=app_label,
-                permission__codename=codename)
+            new_ctype = contenttypes_models.ContentType.objects.get(
+                app_label=app_label,
+                permission__codename=codename,
+            )
             if ctype is not None and ctype != new_ctype:
-                raise exceptions.MixedContentTypeError("ContentType was once computed "
-                    "to be %s and another one %s" % (ctype, new_ctype))
+                raise exceptions.MixedContentTypeError(
+                    "ContentType was once computed to be %s and another one %s" % (ctype, new_ctype)
+                )
             else:
                 ctype = new_ctype
 
@@ -152,8 +156,9 @@ def get_objects_for_user(user, perms, klass=None, use_groups=True, any_perm=Fals
     else:
         queryset = shortcuts._get_queryset(klass)
         if ctype.model_class() != queryset.model:
-            raise exceptions.MixedContentTypeError("Content type for given perms and "
-                "klass differs")
+            raise exceptions.MixedContentTypeError(
+                "Content type for given perms and klass differs"
+            )
 
     # At this point, we should have both ctype and queryset and they should
     # match which means: ctype.model_class() == queryset.model
@@ -171,9 +176,11 @@ def get_objects_for_user(user, perms, klass=None, use_groups=True, any_perm=Fals
 
     # Now we should extract list of pk values for which we would filter queryset
     user_model = guardian_utils.get_user_obj_perms_model(queryset.model)
-    user_obj_perms_queryset = (user_model
-        .objects.filter(user=user)
-        .filter(permission__content_type=ctype))
+    user_obj_perms_queryset = user_model.objects.filter(
+        user=user,
+    ).filter(
+        permission__content_type=ctype,
+    )
     if len(codenames):
         user_obj_perms_queryset = user_obj_perms_queryset.filter(permission__codename__in=codenames)
     if user_model.objects.is_generic():

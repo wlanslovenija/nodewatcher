@@ -205,6 +205,7 @@ LOGOUT_URL = '/account/logout/'
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfileAndSettings'
 
+
 def user_url(user):
     from django.core import urlresolvers
     return urlresolvers.reverse('AccountsComponent:user_page', kwargs={'username': user.username})

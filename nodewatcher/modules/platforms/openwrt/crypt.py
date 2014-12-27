@@ -11,6 +11,7 @@
 
 from hashlib import md5
 
+
 def md5crypt(password, salt, magic='$1$'):
     # /* The password first, since that is what is most unknown */ /* Then our magic string */ /* Then the raw salt */
     m = md5()
@@ -62,10 +63,12 @@ def md5crypt(password, salt, magic='$1$'):
     for a, b, c in ((0, 6, 12), (1, 7, 13), (2, 8, 14), (3, 9, 15), (4, 10, 5)):
         v = ord(final[a]) << 16 | ord(final[b]) << 8 | ord(final[c])
         for i in range(4):
-            rearranged += itoa64[v & 0x3f]; v >>= 6
+            rearranged += itoa64[v & 0x3f]
+            v >>= 6
 
     v = ord(final[11])
     for i in range(2):
-        rearranged += itoa64[v & 0x3f]; v >>= 6
+        rearranged += itoa64[v & 0x3f]
+        v >>= 6
 
     return magic + salt + '$' + rearranged

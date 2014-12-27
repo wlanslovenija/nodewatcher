@@ -19,6 +19,7 @@ from nodewatcher.modules.administration.types import models as type_models
 
 from . import resources
 
+
 class NodeResourceTest(test.ResourceTestCase):
     api_name = 'v1'
     # To always display full diff.
@@ -153,7 +154,7 @@ class NodeResourceTest(test.ResourceTestCase):
                 u'uuid': encoding.force_unicode(node.uuid),
                 u'name': node.config.core.general().name,
                 u'project': node.config.core.project().project.name,
-                u'location':  {
+                u'location': {
                     u'address': u'Location %s' % i,
                     u'altitude': 0.0,
                     u'city': u'Ljubljana',
