@@ -242,11 +242,10 @@ class NodeResourceTest(test.ResourceTestCase):
                         ('name', lambda node: node.config.core.general().name),
                         ('type', lambda node: self.types.index(node.config.core.type().type)),
                         ('project', lambda node: node.config.core.project().project.name),
-                        #('location__geolocation', lambda node: node.config.core.location().geolocation),
                         ('last_seen', lambda node: node.monitoring.core.general().last_seen),
-                        #('status__health', lambda node: self.monitoring_health.index(node.monitoring.core.status().health)),
-                        #('status__monitored', lambda node: self.monitoring_monitored.index(node.monitoring.core.status().monitored)),
-                        #('status__network', lambda node: self.monitoring_network.index(node.monitoring.core.status().network)),
+                        ('status__health', lambda node: self.monitoring_health.index(node.monitoring.core.status().health)),
+                        ('status__monitored', lambda node: self.monitoring_monitored.index(node.monitoring.core.status().monitored)),
+                        ('status__network', lambda node: self.monitoring_network.index(node.monitoring.core.status().network)),
                     ):
                         ordering = '%s%s' % ('-' if reverse else '', ordering)
                         data = self.get_list(
