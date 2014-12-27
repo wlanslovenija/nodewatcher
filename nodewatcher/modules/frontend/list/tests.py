@@ -139,12 +139,12 @@ class NodeResourceTest(test.ResourceTestCase):
         )
 
         nodes = data['objects']
-        self.assertEqual(len(nodes), len(self.nodes))
+        self.assertEqual(len(self.nodes), len(nodes))
 
         for i, json_node in enumerate(nodes):
             node = self.nodes[i]
 
-            self.assertEqual(json_node, {
+            self.assertEqual({
                 u'status': {
                     u'health': node.monitoring.core.status().health,
                     u'monitored': node.monitoring.core.status().monitored,
@@ -166,9 +166,9 @@ class NodeResourceTest(test.ResourceTestCase):
                 u'type': node.config.core.type().type,
                 # Works correctly only if i < 60.
                 u'last_seen': u'Wed, 05 Nov 2014 01:05:%02d +0000' % i,
-            })
+            }, json_node)
 
-        self.assertEqual(data['meta'], {
+        self.assertEqual({
             u'total_count': 45,
             # We specified 0 for limit in the request, so max limit should be used.
             u'limit': resources.NodeResource.Meta.max_limit,
@@ -176,7 +176,7 @@ class NodeResourceTest(test.ResourceTestCase):
             u'nonfiltered_count': 45,
             u'next': None,
             u'previous': None,
-        })
+        }, data['meta'])
 
     def test_get_list_offset(self):
         data = self.get_list(
@@ -185,9 +185,9 @@ class NodeResourceTest(test.ResourceTestCase):
         )
 
         nodes = data['objects']
-        self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in self.nodes[11:]])
+        self.assertEqual([node.uuid for node in self.nodes[11:]], [node['uuid'] for node in nodes])
 
-        self.assertEqual(data['meta'], {
+        self.assertEqual({
             u'total_count': 45,
             # We specified 0 for limit in the request, so max limit should be used.
             u'limit': resources.NodeResource.Meta.max_limit,
@@ -195,7 +195,7 @@ class NodeResourceTest(test.ResourceTestCase):
             u'nonfiltered_count': 45,
             u'next': None,
             u'previous': None,
-        })
+        }, data['meta'])
 
     def test_get_list_page(self):
         data = self.get_list(
@@ -204,16 +204,16 @@ class NodeResourceTest(test.ResourceTestCase):
         )
 
         nodes = data['objects']
-        self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in self.nodes[6:26]])
+        self.assertEqual([node.uuid for node in self.nodes[6:26]], [node['uuid'] for node in nodes])
 
-        self.assertEqual(data['meta'], {
+        self.assertEqual({
             u'total_count': 45,
             u'limit': 20,
             u'offset': 6,
             u'nonfiltered_count': 45,
             u'next': u'%s?format=json&limit=20&offset=26' % self.node_list,
             u'previous': None,
-        })
+        }, data['meta'])
 
     def test_get_list_last_page(self):
         data = self.get_list(
@@ -222,16 +222,16 @@ class NodeResourceTest(test.ResourceTestCase):
         )
 
         nodes = data['objects']
-        self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in self.nodes[40:]])
+        self.assertEqual([node.uuid for node in self.nodes[40:]], [node['uuid'] for node in nodes])
 
-        self.assertEqual(data['meta'], {
+        self.assertEqual({
             u'total_count': 45,
             u'limit': 20,
             u'offset': 40,
             u'nonfiltered_count': 45,
             u'next': None,
             u'previous': u'%s?format=json&limit=20&offset=20' % self.node_list,
-        })
+        }, data['meta'])
 
     def test_ordering(self):
         for offset in (0, 4):
@@ -255,16 +255,16 @@ class NodeResourceTest(test.ResourceTestCase):
                         )
 
                         nodes = data['objects']
-                        self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in sorted(self.nodes, key=key, reverse=reverse)[offset:offset + limit if limit else None]], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
+                        self.assertEqual([node.uuid for node in sorted(self.nodes, key=key, reverse=reverse)[offset:offset + limit if limit else None]], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
 
-                        self.assertEqual(data['meta'], {
+                        self.assertEqual({
                             u'total_count': 45,
                             u'limit': limit or resources.NodeResource.Meta.max_limit,
                             u'offset': offset,
                             u'nonfiltered_count': 45,
                             u'next': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, ordering, limit, offset + limit) if limit else None,
                             u'previous': None,
-                        })
+                        }, data['meta'])
 
     def test_ordering_multiple(self):
         for offset in (0, 4):
@@ -279,13 +279,13 @@ class NodeResourceTest(test.ResourceTestCase):
                 key = lambda node: (self.types.index(node.config.core.type().type), node.config.core.general().name)
 
                 nodes = data['objects']
-                self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in sorted(self.nodes, key=key)[offset:offset + limit if limit else None]], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
+                self.assertEqual([node.uuid for node in sorted(self.nodes, key=key)[offset:offset + limit if limit else None]], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
 
-                self.assertEqual(data['meta'], {
+                self.assertEqual({
                     u'total_count': 45,
                     u'limit': limit or resources.NodeResource.Meta.max_limit,
                     u'offset': offset,
                     u'nonfiltered_count': 45,
                     u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset + limit) if limit else None,
                     u'previous': None,
-                })
+                }, data['meta'])
