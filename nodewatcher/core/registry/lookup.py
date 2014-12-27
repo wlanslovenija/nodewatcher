@@ -14,14 +14,6 @@ from django.utils import functional
 qn = django_db.connection.ops.quote_name
 
 
-class RegistryProxyMixin(object):
-    # TODO: Needed until Django 1.7, see https://code.djangoproject.com/ticket/16458
-    def __eq__(self, other):
-        return (isinstance(other, django_db.models.Model) and
-                self._meta.concrete_model == other._meta.concrete_model and
-                self._get_pk_val() == other._get_pk_val())
-
-
 class RegistryProxyMultipleDescriptor(object):
     def __init__(self, related_model, chain, related_field=None):
         self.related_model = related_model
@@ -223,7 +215,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             clone.model = type(
                 '%sRegistryProxy' % clone.model.__name__,
-                (RegistryProxyMixin, clone.model),
+                (clone.model,),
                 {
                     '__module__': 'nodewatcher.core.registry.lookup',
                     '_registry_proxy': True,
