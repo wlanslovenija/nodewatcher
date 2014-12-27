@@ -382,7 +382,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             field_names = clone.registry_expand_proxy_field(field_name).split(constants.LOOKUP_SEP)
             field = clone.query.setup_joins(field_names, clone.model._meta, clone.query.get_initial_alias())[0]
 
-            if isinstance(field, registry_fields.RegistryChoiceField):
+            if isinstance(field, (registry_fields.RegistryChoiceField, registry_fields.NullBooleanChoiceField)):
                 # Ordering by RegistryChoiceField should generate a specific query that will
                 # sort by the order that the choices were registered.
                 order_query = ['CASE', '%s.%s' % (qn(field.model()._meta.db_table), qn(field.column))]
@@ -399,7 +399,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 )
                 final_fields.append('%s%s_choice_order' % (field_order, field_name))
             else:
-                final_fields.append('%s%s' % (field_order, field_name))
+                final_fields.append('%s%s' % (field_order, constants.LOOKUP_SEP.join(field_names)))
 
         # Order by all the specified fields. We must not call the super order_by method
         # as it will reset all ordering.

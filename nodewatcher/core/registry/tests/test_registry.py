@@ -152,15 +152,17 @@ class RegistryTestCase(django_test.TransactionTestCase):
             related = models.RelatedModel(name='test', level=random.choice(ordered_choices))
             related.save()
 
+            order = (ordered_choices.index(related.level), thing.id)
+
             simple = thing.first.foo.simple(create=models.DoubleChildRegistryItem)
-            simple.interesting = 'bla'
+            simple.interesting = '%06d-%06d' % order
             simple.additional = 42
             simple.another = 69
             simple.level = related.level
             simple.related = related
             simple.save()
 
-            ordered_pks.append((ordered_choices.index(simple.level), thing.id))
+            ordered_pks.append(order)
 
         ordered_pks = [x[1] for x in sorted(ordered_pks)]
 
@@ -180,6 +182,8 @@ class RegistryTestCase(django_test.TransactionTestCase):
         # Test ordering by using relations.
         qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple')
         ordered = [item.pk for item in qs.order_by('f1__level', 'id')]
+        self.assertEqual(ordered, ordered_pks)
+        ordered = [item.pk for item in qs.order_by('f1__interesting', 'id')]
         self.assertEqual(ordered, ordered_pks)
 
         # Test ordering by registry id without fetching the field explicitly
