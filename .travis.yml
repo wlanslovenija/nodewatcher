@@ -14,7 +14,7 @@ before_install:
 install:
  - pip install pep8 --use-mirrors
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
- - { cat requirements.txt | xargs -n 1 pip install; } || true
+ - "{ cat requirements.txt | xargs -n 1 pip install; } || true"
 before_script:
  - createdb nodewatcher
  - psql -U postgres -c "create extension postgis" nodewatcher
