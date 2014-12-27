@@ -6,6 +6,7 @@ libpcre3-dev
 libgeoip1
 libgeos-c1
 libgdal-dev
+libgdal1h
 python-gdal
 python-requests
 fping

@@ -5,16 +5,25 @@ env: PYTHONPATH=. DB_1_ENV_PGSQL_ROLE_1_USERNAME=postgres
 services:
  - mongodb
  - postgresql
+addons:
+  postgresql: "9.3"
 before_install:
  - sudo apt-get update
- - sudo apt-get install libgeoip1
- - sudo cat /code/packages.txt | DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
+ - cat packages.txt | sudo DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
+ - cat /etc/apt/sources.list.d/pgdg-source.list
+ - cat /etc/apt/sources.list.d/ubuntugis-stable-source.list
+ - sudo rm -f /etc/apt/sources.list.d/pgdg-source.list /etc/apt/sources.list.d/ubuntugis-stable-source.list
+ - sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ trusty main restricted universe" >> /etc/apt/sources.list.d/pgdg-source.list'
+ - sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg-source.list'
+ - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
+ - sudo apt-get update
+ - sudo DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -y --force-yes install postgresql-9.3-postgis-2.1 libgeos-c1
  - sudo rm -rf /dev/shm
  - sudo ln -s /run/shm /dev/shm
 install:
- - pip install pep8 --use-mirrors
- - pip install https://github.com/lamby/django-lint/archive/master.zip pylint --use-mirrors
- - "{ cat requirements.txt | xargs -n 1 pip install; } || true"
+ - pip install pep8
+ - pip install https://github.com/lamby/django-lint/archive/master.zip pylint
+ - cat requirements.txt | xargs -n 1 sh -c 'pip install $0 || exit 255'
 before_script:
  - createdb nodewatcher
  - psql -U postgres -c "create extension postgis" nodewatcher
