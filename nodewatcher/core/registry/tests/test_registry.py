@@ -4,6 +4,7 @@ from django import test as django_test
 from django.apps import apps
 from django.conf import settings
 from django.core import management, exceptions as django_exceptions
+from django.db.models import query
 from django.test import utils
 
 from .registry_tests import models
@@ -126,6 +127,10 @@ class RegistryTestCase(django_test.TransactionTestCase):
         # Test that fallthrough fields also work
         qs = qs.filter(id=1)
         self.assertEqual(len(qs), 1)
+
+        # Test that passing Q objects work.
+        qs = qs.filter(query.Q(id=2))
+        self.assertEqual(len(qs), 0)
 
         # Test filter exceptions
         with self.assertRaises(django_exceptions.FieldError):

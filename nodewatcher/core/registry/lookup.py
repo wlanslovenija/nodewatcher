@@ -172,7 +172,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         return raw_alias
 
-    def filter(self, **kwargs):
+    def filter(self, *args, **kwargs):
         """
         An augmented filter method to support querying by virtual fields created
         by registry_fields.
@@ -184,7 +184,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         for selector, value in kwargs.items():
             filter_selectors[self.registry_expand_proxy_field(selector)] = value
 
-        return super(RegistryQuerySet, clone).filter(**filter_selectors)
+        return super(RegistryQuerySet, clone).filter(*args, **filter_selectors)
 
     def registry_fields(self, **kwargs):
         """
