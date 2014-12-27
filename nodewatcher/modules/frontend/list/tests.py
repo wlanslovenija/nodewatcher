@@ -1,5 +1,6 @@
 import datetime
 import json
+import uuid
 
 from django.core import urlresolvers
 from django.contrib.auth import models as auth_models
@@ -20,41 +21,45 @@ from . import resources
 
 class NodeResourceTest(test.ResourceTestCase):
     api_name = 'v1'
-    # To display full diff always.
+    # To always display full diff.
     maxDiff = None
 
-    def setUp(self):
-        super(NodeResourceTest, self).setUp()
+    @classmethod
+    def setUpClass(cls):
+        super(NodeResourceTest, cls).setUpClass()
 
-        self.node_list = self.resource_list_uri('node')
+        cls.node_list = cls.resource_list_uri('node')
 
-        self.projects = []
+        cls.projects = []
         for i in range(2):
             project = project_models.Project(
                 name='Project name %s' % i,
                 description='Project description %s' % i,
             )
             project.save()
-            self.projects.append(project)
+            cls.projects.append(project)
 
-        self.users = []
+        cls.users = []
         for i in range(3):
             user = auth_models.User.objects.create_user(
                 username='username%s' % i,
             )
             user.save()
-            self.users.append(user)
+            cls.users.append(user)
 
-        self.types = [typ.name for typ in type_models.TypeConfig._meta.get_field('type').get_registered_choices()]
-        self.monitoring_network = [status.name for status in status_models.StatusMonitor._meta.get_field('network').get_registered_choices()]
-        self.monitoring_monitored = [True, False, None]
-        self.monitoring_health = [status.name for status in status_models.StatusMonitor._meta.get_field('health').get_registered_choices()]
+        # Registered choices are ordered based on their registration order.
+        cls.types = [typ.name for typ in type_models.TypeConfig._meta.get_field('type').get_registered_choices()]
+        cls.monitoring_network = [status.name for status in status_models.StatusMonitor._meta.get_field('network').get_registered_choices()]
+        cls.monitoring_monitored = [True, False, None]
+        cls.monitoring_health = [status.name for status in status_models.StatusMonitor._meta.get_field('health').get_registered_choices()]
 
-        self.initial_time = datetime.datetime(2014, 11, 5, 1, 5, 0, tzinfo=timezone.utc)
+        cls.initial_time = datetime.datetime(2014, 11, 5, 1, 5, 0, tzinfo=timezone.utc)
 
-        self.nodes = []
+        cls.nodes = []
         for i in range(45):
-            node = core_models.Node()
+            # We generate UUIDs so that they are nicely in sequence so that
+            # default REST API ordering does not really change the order.
+            node = core_models.Node(uuid=str(uuid.UUID(int=i, version=1)))
             node.save()
 
             node.config.core.general(
@@ -62,7 +67,7 @@ class NodeResourceTest(test.ResourceTestCase):
                 name='Node %s' % i,
             )
 
-            maintainer = self.users[i % len(self.users)]
+            maintainer = cls.users[i % len(cls.users)]
             shortcuts.assign_perm('change_node', maintainer, node)
             shortcuts.assign_perm('delete_node', maintainer, node)
             shortcuts.assign_perm('reset_node', maintainer, node)
@@ -71,28 +76,28 @@ class NodeResourceTest(test.ResourceTestCase):
             # Last seen / first seen
             node.monitoring.core.general(
                 create=monitor_models.GeneralMonitor,
-                first_seen=self.initial_time,
-                last_seen=self.initial_time + datetime.timedelta(seconds=i),
+                first_seen=cls.initial_time,
+                last_seen=cls.initial_time + datetime.timedelta(seconds=i),
             )
 
             # Status
             node.monitoring.core.status(
                 create=status_models.StatusMonitor,
-                network=self.monitoring_network[i % len(self.monitoring_network)],
-                monitored=self.monitoring_monitored[i % len(self.monitoring_monitored)],
-                health=self.monitoring_health[i % len(self.monitoring_health)],
+                network=cls.monitoring_network[i % len(cls.monitoring_network)],
+                monitored=cls.monitoring_monitored[i % len(cls.monitoring_monitored)],
+                health=cls.monitoring_health[i % len(cls.monitoring_health)],
             )
 
             # Type config
             node.config.core.type(
                 create=type_models.TypeConfig,
-                type=self.types[i % len(self.types)],
+                type=cls.types[i % len(cls.types)],
             )
 
             # Project config
             node.config.core.project(
                 create=project_models.ProjectConfig,
-                project=self.projects[i % len(self.projects)],
+                project=cls.projects[i % len(cls.projects)],
             )
 
             # Location config
@@ -106,10 +111,17 @@ class NodeResourceTest(test.ResourceTestCase):
                 geolocation='POINT(%f %f)' % (10 + (i / 100.0), 40 + (i / 100.0)),
             )
 
-            self.nodes.append(node)
+            cls.nodes.append(node)
 
-    def resource_list_uri(self, resource_name):
-        return urlresolvers.reverse('api:api_dispatch_list', kwargs={'api_name': self.api_name, 'resource_name': resource_name})
+        # By default we have nodes ordered by UUID in the REST API.
+        sorted_nodes = sorted(cls.nodes, key=lambda node: node.uuid)
+
+        # But it should not really change the ordering, because we are generating UUIDs in sequence.
+        assert [node.uuid for node in sorted_nodes] == [node.uuid for node in cls.nodes]
+
+    @classmethod
+    def resource_list_uri(cls, resource_name):
+        return urlresolvers.reverse('api:api_dispatch_list', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
 
     def get_list(self, **kwargs):
         kwargs['format'] = 'json'
@@ -189,7 +201,6 @@ class NodeResourceTest(test.ResourceTestCase):
         data = self.get_list(
             offset=6,
             limit=20,
-            order_by='last_seen', # TODO: Remove last_seen
         )
 
         nodes = data['objects']
@@ -200,8 +211,7 @@ class NodeResourceTest(test.ResourceTestCase):
             u'limit': 20,
             u'offset': 6,
             u'nonfiltered_count': 45,
-            # TODO: Remove last_seen
-            u'next': u'%s?order_by=last_seen&format=json&limit=20&offset=26' % self.node_list,
+            u'next': u'%s?format=json&limit=20&offset=26' % self.node_list,
             u'previous': None,
         })
 
@@ -209,7 +219,6 @@ class NodeResourceTest(test.ResourceTestCase):
         data = self.get_list(
             offset=40,
             limit=20,
-            order_by='last_seen', # TODO: Remove last_seen
         )
 
         nodes = data['objects']
@@ -221,8 +230,7 @@ class NodeResourceTest(test.ResourceTestCase):
             u'offset': 40,
             u'nonfiltered_count': 45,
             u'next': None,
-            # TODO: Remove last_seen
-            u'previous': u'%s?order_by=last_seen&format=json&limit=20&offset=20' % self.node_list,
+            u'previous': u'%s?format=json&limit=20&offset=20' % self.node_list,
         })
 
     def test_ordering(self):
@@ -243,19 +251,41 @@ class NodeResourceTest(test.ResourceTestCase):
                         data = self.get_list(
                             offset=offset,
                             limit=limit,
-                            order_by=[ordering, 'last_seen'] # TODO: Remove last_seen
+                            order_by=ordering
                         )
 
                         nodes = data['objects']
-                        self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in sorted(self.nodes, key=key, reverse=reverse)[offset:offset + limit if limit else None]], ordering)
+                        self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in sorted(self.nodes, key=key, reverse=reverse)[offset:offset + limit if limit else None]], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
 
                         self.assertEqual(data['meta'], {
                             u'total_count': 45,
                             u'limit': limit or resources.NodeResource.Meta.max_limit,
                             u'offset': offset,
                             u'nonfiltered_count': 45,
-                            # TODO: Remove last_seen
-                            u'next': u'%s?order_by=%s&order_by=last_seen&format=json&limit=%s&offset=%s' % (self.node_list, ordering, limit, offset + limit) if limit else None,
+                            u'next': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, ordering, limit, offset + limit) if limit else None,
                             u'previous': None,
                         })
 
+    def test_ordering_multiple(self):
+        for offset in (0, 4):
+            for limit in (0, 20):
+                ordering = ['type', 'name']
+                data = self.get_list(
+                    offset=offset,
+                    limit=limit,
+                    order_by=ordering
+                )
+
+                key = lambda node: (self.types.index(node.config.core.type().type), node.config.core.general().name)
+
+                nodes = data['objects']
+                self.assertEqual([node['uuid'] for node in nodes], [node.uuid for node in sorted(self.nodes, key=key)[offset:offset + limit if limit else None]], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
+
+                self.assertEqual(data['meta'], {
+                    u'total_count': 45,
+                    u'limit': limit or resources.NodeResource.Meta.max_limit,
+                    u'offset': offset,
+                    u'nonfiltered_count': 45,
+                    u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset + limit) if limit else None,
+                    u'previous': None,
+                })
