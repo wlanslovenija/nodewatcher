@@ -133,6 +133,19 @@ class NodeResourceTest(test.ResourceTestCase):
 
         return self.deserialize(response)
 
+    def test_api_uris(self):
+        # URIs have to be stable.
+
+        self.assertEqual(self.node_list, '/api/v1/node/')
+
+    def test_read_only(self):
+        node_uri = '%s%s/' % (self.node_list, self.nodes[0].uuid)
+
+        self.assertHttpMethodNotAllowed(self.api_client.post(self.node_list, format='json', data={}))
+        self.assertHttpMethodNotAllowed(self.api_client.put(node_uri, format='json', data={}))
+        self.assertHttpMethodNotAllowed(self.api_client.patch(node_uri, format='json', data={}))
+        self.assertHttpMethodNotAllowed(self.api_client.delete(node_uri, format='json'))
+
     def test_get_list_all(self):
         data = self.get_list(
             offset=0,
