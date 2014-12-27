@@ -187,11 +187,50 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
         return data
 
+    # A hook so that queryset can be further sorted after basic sorting has been
+    # applied. This allows us to assure that there is always a defined order for
+    # all objects even if basic sorting does not sort all objects (for example,
+    # because key to sort on is the same for multiple objects). This is necessary
+    # for pagination to work correctly, because SKIP and LIMIT works well for
+    # pagination only when all objects have a defined order.
+    def _after_apply_sorting(self, obj_list, options, order_by_args):
+        return obj_list
+
     def apply_sorting(self, obj_list, options=None):
-        # Makes sure sorting does not loose count of all objects before filtering
+        # Makes sure sorting does not loose count of all objects before filtering.
         nonfiltered_count = obj_list._nonfiltered_count
-        sorted_queryset = super(BaseResource, self).apply_sorting(obj_list, options)
+
+        # To be able to assign the args below, we have to access the
+        # variable as a reference, otherwise a new local variable is
+        # created inside a function scope. So we create a dummy dict
+        # which wraps the real value. This can be done better in Python 3.
+        stored_order_by = {
+            'value': []
+        }
+
+        # We temporary replace order_by method on the queryset to hijack
+        # the arguments passed to the order_by so that we can pass them
+        # to _after_apply_sorting.
+        obj_list_order_by = obj_list.order_by
+
+        def order_by(*args):
+            stored_order_by['value'] = args
+            return obj_list_order_by(*args)
+
+        obj_list.order_by = order_by
+
+        try:
+            sorted_queryset = super(BaseResource, self).apply_sorting(obj_list, options)
+        finally:
+            # Restore the original order_by method. Just to be sure
+            # if it is reused somewhere else as well.
+            obj_list.order_by = obj_list_order_by
+
+        sorted_queryset = self._after_apply_sorting(sorted_queryset, options, stored_order_by['value'])
+
+        # Restore the count of all objects.
         sorted_queryset._nonfiltered_count = nonfiltered_count
+
         return sorted_queryset
 
     def authorized_read_list(self, object_list, bundle):

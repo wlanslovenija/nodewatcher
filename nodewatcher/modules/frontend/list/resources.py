@@ -29,7 +29,11 @@ class NodeResource(api.BaseResource):
             # TODO: Should we add peers and clients to the snippet as well?
             peers='network.routing.topology#link_count',
             # TODO: Add current clients count?
-        )
+        # We have to have some ordering so that pagination works correctly.
+        # Otherwise SKIP and LIMIT does not necessary return expected pages.
+        # Later calls to order_by override this so if user specifies an order
+        # things work as expected as well.
+        ).order_by('uuid')
         resource_name = 'node'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
@@ -44,6 +48,13 @@ class NodeResource(api.BaseResource):
             'config_core_generalconfig__name', # Node name
             'config_projects_projectconfig__project__name', # Project name
         )
+
+    def _after_apply_sorting(self, obj_list, options, order_by_args):
+        # We want to augment sorting so that it is always sorted at the end by "uuid" to have a defined order
+        # even for keys which are equal between multiple objects. This is necessary for pagination to work correctly,
+        # because SKIP and LIMIT works well for pagination only when all objects have a defined order.
+        extended_order = list(order_by_args) + ['uuid']
+        return obj_list.order_by(*extended_order)
 
     def _before_apply_filters(self, request, queryset):
         # Used by MyNodesComponent. We use _before_apply_filters so that queryset is modified before count
