@@ -48,6 +48,16 @@ def trim(docstring):
     return '\n'.join(trimmed).split('\n\n')[0]
 
 
+class AllFiltering(object):
+    # Special class which makes Tastypie allow filtering on all
+    # fields, including all related fields, of a given resource.
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return resources.ALL_WITH_RELATIONS
+
 class BaseMetaclass(resources.ModelDeclarativeMetaclass):
     def __new__(cls, name, bases, attrs):
         # Override Meta defaults
@@ -114,6 +124,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
                         serializer = serializers.DatastreamSerializer()
                         excludes = ['id']
                         include_resource_uri = False
+                        filtering = AllFiltering()
 
                 f = fields.RegistryRelationField(Resource, **kwargs)
                 f.model_field = field
@@ -267,3 +278,30 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         filtered_queryset._nonfiltered_count = queryset.count()
 
         return filtered_queryset
+
+    def basic_filter_value_to_python(self, value):
+        if value in ['true', 'True', True]:
+            return True
+        elif value in ['false', 'False', False]:
+            return False
+        elif value in ('none', 'None', 'null', None):
+            return None
+        else:
+            return value
+
+    def filter_value_to_python(self, value, field_name, filters, filter_expr, filter_type):
+        if filter_type in ('in', 'range') and value:
+            if hasattr(filters, 'getlist'):
+                value = []
+
+                for part in filters.getlist(filter_expr):
+                    value.extend(part.split(','))
+            else:
+                value = value.split(',')
+
+            value = [self.basic_filter_value_to_python(v) for v in value]
+
+        else:
+            value = self.basic_filter_value_to_python(value)
+
+        return value

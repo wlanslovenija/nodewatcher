@@ -17,7 +17,6 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
     Tastypie field for registry relation field.
     """
 
-    is_related = False
     dehydrated_type = 'registry'
 
     def __init__(self, to, attribute, default=tastypie_fields.NOT_PROVIDED, null=False, blank=False, readonly=False, unique=False, help_text=None):

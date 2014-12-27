@@ -1,5 +1,6 @@
 import datetime
 import json
+import urlparse
 import uuid
 
 from django.core import urlresolvers
@@ -50,9 +51,9 @@ class NodeResourceTest(test.ResourceTestCase):
 
         # Registered choices are ordered based on their registration order.
         cls.types = [typ.name for typ in type_models.TypeConfig._meta.get_field('type').get_registered_choices()]
-        cls.monitoring_network = [status.name for status in status_models.StatusMonitor._meta.get_field('network').get_registered_choices()]
+        cls.monitoring_network = [status.name for status in status_models.StatusMonitor._meta.get_field('network').get_registered_choices()] + [None]
         cls.monitoring_monitored = [True, False, None]
-        cls.monitoring_health = [status.name for status in status_models.StatusMonitor._meta.get_field('health').get_registered_choices()]
+        cls.monitoring_health = [status.name for status in status_models.StatusMonitor._meta.get_field('health').get_registered_choices()] + [None]
 
         cls.initial_time = datetime.datetime(2014, 11, 5, 1, 5, 0, tzinfo=timezone.utc)
 
@@ -123,6 +124,38 @@ class NodeResourceTest(test.ResourceTestCase):
     @classmethod
     def resource_list_uri(cls, resource_name):
         return urlresolvers.reverse('api:api_dispatch_list', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
+
+    def assertMetaEqual(self, meta1, meta2):
+        meta1next = meta1.pop('next')
+        meta2next = meta2.pop('next')
+        meta1previous = meta1.pop('previous')
+        meta2previous = meta2.pop('previous')
+
+        meta1next_query = None
+        meta2next_query = None
+        meta1previous_query = None
+        meta2previous_query = None
+
+        self.assertEqual(meta1, meta2)
+
+        if meta1next is not None:
+            meta1next = urlparse.urlparse(meta1next)
+            meta1next_query = urlparse.parse_qs(meta1next.query, strict_parsing=True)
+        if meta2next is not None:
+            meta2next = urlparse.urlparse(meta2next)
+            meta2next_query = urlparse.parse_qs(meta2next.query, strict_parsing=True)
+        if meta1previous is not None:
+            meta1previous = urlparse.urlparse(meta1previous)
+            meta1previous_query = urlparse.parse_qs(meta1previous.query, strict_parsing=True)
+        if meta2previous is not None:
+            meta2previous = urlparse.urlparse(meta2previous)
+            meta2previous_query = urlparse.parse_qs(meta2previous.query, strict_parsing=True)
+
+        self.assertEqual(getattr(meta1next, 'path', None), getattr(meta2next, 'path', None))
+        self.assertEqual(getattr(meta1previous, 'path', None), getattr(meta2previous, 'path', None))
+
+        self.assertEqual(meta1next_query, meta2next_query)
+        self.assertEqual(meta1previous_query, meta2previous_query)
 
     def get_list(self, **kwargs):
         kwargs['format'] = 'json'
@@ -201,7 +234,7 @@ class NodeResourceTest(test.ResourceTestCase):
         nodes = data['objects']
         self.assertEqual([node.uuid for node in self.nodes[11:]], [node['uuid'] for node in nodes])
 
-        self.assertEqual({
+        self.assertMetaEqual({
             u'total_count': 45,
             # We specified 0 for limit in the request, so max limit should be used.
             u'limit': resources.NodeResource.Meta.max_limit,
@@ -220,7 +253,7 @@ class NodeResourceTest(test.ResourceTestCase):
         nodes = data['objects']
         self.assertEqual([node.uuid for node in self.nodes[6:26]], [node['uuid'] for node in nodes])
 
-        self.assertEqual({
+        self.assertMetaEqual({
             u'total_count': 45,
             u'limit': 20,
             u'offset': 6,
@@ -238,7 +271,7 @@ class NodeResourceTest(test.ResourceTestCase):
         nodes = data['objects']
         self.assertEqual([node.uuid for node in self.nodes[40:]], [node['uuid'] for node in nodes])
 
-        self.assertEqual({
+        self.assertMetaEqual({
             u'total_count': 45,
             u'limit': 20,
             u'offset': 40,
@@ -270,7 +303,7 @@ class NodeResourceTest(test.ResourceTestCase):
                         nodes = data['objects']
                         self.assertEqual([node.uuid for node in sorted(self.nodes, key=key, reverse=reverse)[offset:offset + limit if limit else None]], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
 
-                        self.assertEqual({
+                        self.assertMetaEqual({
                             u'total_count': 45,
                             u'limit': limit or resources.NodeResource.Meta.max_limit,
                             u'offset': offset,
@@ -294,7 +327,7 @@ class NodeResourceTest(test.ResourceTestCase):
                 nodes = data['objects']
                 self.assertEqual([node.uuid for node in sorted(self.nodes, key=key)[offset:offset + limit if limit else None]], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
 
-                self.assertEqual({
+                self.assertMetaEqual({
                     u'total_count': 45,
                     u'limit': limit or resources.NodeResource.Meta.max_limit,
                     u'offset': offset,
@@ -325,11 +358,67 @@ class NodeResourceTest(test.ResourceTestCase):
                     nodes = data['objects']
                     self.assertEqual(filtered_nodes[offset:offset + limit if limit else None], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, filter=%s' % (offset, limit, global_filter))
 
-                    self.assertEqual({
+                    self.assertMetaEqual({
                         u'total_count': len(filtered_nodes),
                         u'limit': limit or resources.NodeResource.Meta.max_limit,
                         u'offset': offset,
                         u'nonfiltered_count': 45,
                         u'next': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, global_filter.replace(' ', '+'), limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
+                        u'previous': None,
+                    }, data['meta'])
+
+    def test_field_filters(self):
+        health_filter = [str(h) for h in self.monitoring_health[0:2]]
+
+        for offset in (0, 7):
+            for limit in (0, 20):
+                for field_filter, filter_function in (
+                    ({'project': 'Project name 0'}, lambda node: node.config.core.project().project.name == 'Project name 0'),
+                    ({'type': 'wireless'}, lambda node: node.config.core.type().type == 'wireless'),
+                    ({'name': 'Node 5'}, lambda node: node.config.core.general().name == 'Node 5'),
+                    ({'project__exact': 'Project name 0'}, lambda node: node.config.core.project().project.name == 'Project name 0'),
+                    ({'type__exact': 'wireless'}, lambda node: node.config.core.type().type == 'wireless'),
+                    ({'name__exact': 'Node 5'}, lambda node: node.config.core.general().name == 'Node 5'),
+                    ({'project__iexact': 'Project NAME 0'}, lambda node: node.config.core.project().project.name == 'Project name 0'),
+                    ({'type__iexact': 'wireLess'}, lambda node: node.config.core.type().type == 'wireless'),
+                    ({'name__iexact': 'nODe 5'}, lambda node: node.config.core.general().name == 'Node 5'),
+                    ({'project__icontains': 'ProjecT'}, lambda node: True), # All nodes are in projects.
+                    ({'type__in': 'wireless,server'}, lambda node: node.config.core.type().type in ('wireless', 'server')),
+                    ({'type__in': ['wireless', 'server']}, lambda node: node.config.core.type().type in ('wireless', 'server')),
+                    ({'status__monitored__in': 'true,false'}, lambda node: node.monitoring.core.status().monitored in (True, False)),
+                    ({'status__monitored__in': ['true', 'false']}, lambda node: node.monitoring.core.status().monitored in (True, False)),
+                    ({'status__health__in': ','.join(health_filter)}, lambda node: node.monitoring.core.status().health in health_filter),
+                    ({'status__health__in': health_filter}, lambda node: node.monitoring.core.status().health in health_filter),
+                    ({'status__monitored__isnull': 'true'}, lambda node: node.monitoring.core.status().monitored is None),
+                    ({'last_seen__year': '2014'}, lambda node: True), # All nodes are in 2014.
+                    ({'last_seen__year': '2013'}, lambda node: False), # No nodes are in 2014.
+                    ({'last_seen__gt': '2014-11-05 01:05:10+0000'}, lambda node: node.monitoring.core.general().last_seen > self.initial_time + datetime.timedelta(seconds=10)),
+                    ({'last_seen__range': '2014-11-05 01:05:10+0000,2014-11-05 01:05:20+0000'}, lambda node: self.initial_time + datetime.timedelta(seconds=10) <= node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=20)),
+                    ({'last_seen__range': ['2014-11-05 01:05:10+0000', '2014-11-05 01:05:20+0000']}, lambda node: self.initial_time + datetime.timedelta(seconds=10) <= node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=20)),
+                ):
+                    kwargs = {
+                        'offset': offset,
+                        'limit': limit,
+                    }
+                    kwargs.update(field_filter)
+                    data = self.get_list(**kwargs)
+
+                    filtered_nodes = [node.uuid for node in filter(filter_function, self.nodes)]
+                    nodes = data['objects']
+
+                    self.assertEqual(filtered_nodes[offset:offset + limit if limit else None], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, filter=%s' % (offset, limit, field_filter))
+
+                    key = field_filter.keys()[0]
+                    value = field_filter.values()[0]
+                    if not isinstance(value, list):
+                        value = [value]
+                    uri_filter = '&'.join(['%s=%s' % (key, v.replace('+', '%2B').replace(' ', '%20')) for v in value])
+
+                    self.assertMetaEqual({
+                        u'total_count': len(filtered_nodes),
+                        u'limit': limit or resources.NodeResource.Meta.max_limit,
+                        u'offset': offset,
+                        u'nonfiltered_count': 45,
+                        u'next': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
                         u'previous': None,
                     }, data['meta'])
