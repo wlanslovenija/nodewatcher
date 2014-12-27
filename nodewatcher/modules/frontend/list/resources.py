@@ -4,6 +4,8 @@ from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import api
 from nodewatcher.utils import permissions
 
+from tastypie import resources
+
 # TODO: Temporary, create a way to register fields into an API
 from ...administration.status import models as status_models
 from ...administration.location import models as location_models
@@ -16,7 +18,8 @@ class NodeResource(api.BaseResource):
             name='core.general#name',
             type='core.type#type',
             # TODO: Should we add router id to the snippet as well?
-            router_id='core.routerid#router_id',
+            # TODO: Why it is not visible?
+            #router_id='core.routerid#router_id',
             project='core.project#project.name',
             location=location_models.LocationConfig.geo_objects.geojson(
                 # Request GeoJSON versions of the location.
@@ -27,7 +30,8 @@ class NodeResource(api.BaseResource):
             last_seen='core.general#last_seen',
             status=status_models.StatusMonitor,
             # TODO: Should we add peers and clients to the snippet as well?
-            peers='network.routing.topology#link_count',
+            # TODO: Correctly add peers (as a subdocument for each routing protocol)
+            #peers='network.routing.topology#link_count',
             # TODO: Add current clients count?
         # We have to have some ordering so that pagination works correctly.
         # Otherwise SKIP and LIMIT does not necessary return expected pages.
@@ -38,15 +42,27 @@ class NodeResource(api.BaseResource):
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
         max_limit = 5000
-        # TODO: Sorting by status does not work, how can we map it to order_by string from registry?
-        ordering = ('type', 'name', 'last_seen', 'status', 'project')
-        # List of fields used when user is filtering using a global filter.
-        # Should be kept in sync with which are set as searchable in dataTables with bSearchable.
+        ordering = (
+            'name',
+            'type',
+            'project',
+            'location',
+            'last_seen',
+            'status',
+        )
+        filtering = {
+            'uuid': resources.ALL,
+            'name': resources.ALL,
+            'type': resources.ALL,
+            'project': resources.ALL,
+            'location': resources.ALL_WITH_RELATIONS,
+            'last_seen': resources.ALL,
+            'status': resources.ALL_WITH_RELATIONS,
+        }
         global_filter = (
-            # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
-            'config_types_typeconfig__type', # Node type
-            'config_core_generalconfig__name', # Node name
-            'config_projects_projectconfig__project__name', # Project name
+            'name',
+            'type',
+            'project',
         )
 
     def _after_apply_sorting(self, obj_list, options, order_by_args):

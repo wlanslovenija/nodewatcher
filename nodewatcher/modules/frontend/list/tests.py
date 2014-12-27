@@ -289,3 +289,34 @@ class NodeResourceTest(test.ResourceTestCase):
                     u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset + limit) if limit else None,
                     u'previous': None,
                 }, data['meta'])
+
+    def test_global_filter(self):
+        for offset in (0, 4):
+            for limit in (0, 20):
+                for global_filter, filter_function in (
+                    ('project name 0', lambda node: node.config.core.project().project.name == 'Project name 0'),
+                    ('wireless', lambda node: node.config.core.type().type == 'wireless'),
+                    ('node 5', lambda node: node.config.core.general().name == 'Node 5'),
+                    ('Project NAME 0', lambda node: node.config.core.project().project.name == 'Project name 0'),
+                    ('wireLess', lambda node: node.config.core.type().type == 'wireless'),
+                    ('nODe 5', lambda node: node.config.core.general().name == 'Node 5'),
+                    ('ProjecT', lambda node: True), # All nodes are in projects.
+                ):
+                    data = self.get_list(
+                        offset=offset,
+                        limit=limit,
+                        filter=global_filter,
+                    )
+
+                    filtered_nodes = [node.uuid for node in filter(filter_function, self.nodes)]
+                    nodes = data['objects']
+                    self.assertEqual(filtered_nodes[offset:offset + limit if limit else None], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, filter=%s' % (offset, limit, global_filter))
+
+                    self.assertEqual({
+                        u'total_count': len(filtered_nodes),
+                        u'limit': limit or resources.NodeResource.Meta.max_limit,
+                        u'offset': offset,
+                        u'nonfiltered_count': 45,
+                        u'next': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, global_filter.replace(' ', '+'), limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
+                        u'previous': None,
+                    }, data['meta'])
