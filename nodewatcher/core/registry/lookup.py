@@ -33,7 +33,7 @@ class RegistryProxyMultipleDescriptor(object):
             return self
 
         if self.related_field is not None:
-            chain = "__".join(self.chain + ['root'])
+            chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
             qs = self.related_model.objects.filter(**{chain: instance})
             qs = qs.values_list(self.related_field, flat=True)
             return list(qs)
@@ -46,7 +46,7 @@ class RegistryProxyMultipleDescriptor(object):
         # manager.
         superclass = self.related_model._default_manager.__class__
         rel_model = self.related_model
-        chain = "__".join(self.chain + ['root'])
+        chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
 
         class RelatedManager(superclass):
             def __init__(self, instance):
@@ -105,8 +105,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         # Resolve fields from kwargs that are virtual aliases for registry fields
         filter_selectors = {}
         for selector, value in kwargs.items():
-            if '__' in selector:
-                field, selector = selector.split('__', 1)
+            if constants.LOOKUP_SEP in selector:
+                field, selector = selector.split(constants.LOOKUP_SEP, 1)
             else:
                 field = selector
                 selector = None
@@ -119,8 +119,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 else:
                     # Not a lookup proxy, check if this is a valid registry identifier
                     registry_id = field.replace('_', '.')
-                    if '__' in selector:
-                        dst_field, selector = selector.split('__', 1)
+                    if constants.LOOKUP_SEP in selector:
+                        dst_field, selector = selector.split(constants.LOOKUP_SEP, 1)
                     else:
                         dst_field = selector
                         selector = None
@@ -128,9 +128,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     dst_model, dst_field, m2m = self._regpoint.get_model_with_field(registry_id, dst_field)
                     dst_field = dst_field.name
 
-            new_selector = dst_model.get_registry_lookup_chain() + '__' + dst_field
+            new_selector = dst_model.get_registry_lookup_chain() + constants.LOOKUP_SEP + dst_field
             if selector is not None:
-                new_selector += '__' + selector
+                new_selector += constants.LOOKUP_SEP + selector
 
             filter_selectors[new_selector] = value
 
@@ -147,7 +147,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         """
 
         raw_alias = alias
-        alias = alias.split('__')
+        alias = alias.split(constants.LOOKUP_SEP)
         base_alias = alias[0]
 
         try:
@@ -176,7 +176,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             if alias[1:]:
                 selector += alias[1:]
 
-            return '__'.join(selector)
+            return constants.LOOKUP_SEP.join(selector)
 
         return raw_alias
 
@@ -347,7 +347,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     dst_related_field,
                     field_name,
                     src_model=dst_model,
-                    src_field='%s__%s' % (dst_field.name, dst_related)
+                    src_field=constants.LOOKUP_SEP.join((dst_field.name, dst_related))
                 )
                 clone = clone.extra(select={select_name: src_column})
 
