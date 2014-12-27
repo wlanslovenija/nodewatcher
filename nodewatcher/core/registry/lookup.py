@@ -351,36 +351,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 )
                 clone = clone.extra(select={select_name: src_column})
 
-            clone.query.get_initial_alias()
-
-            # Dummy join relation descriptor
-            class RegistryJoinRelation(object):
-                def get_extra_restriction(*args, **kwargs):
-                    return None
-
-            # Join with top-level item
-            toplevel = dst_model.get_registry_toplevel()
-            clone.query.join(
-                (self.model._meta.db_table, toplevel._meta.db_table, ((self.model._meta.pk.column, 'root_id'),)),
-                join_field=RegistryJoinRelation(),
-                nullable=True,
-            )
-
-            if toplevel != dst_model:
-                # Join with lower-level item
-                clone.query.join(
-                    (toplevel._meta.db_table, dst_model._meta.db_table, ((toplevel._meta.pk.column, dst_model._meta.pk.column),)),
-                    join_field=RegistryJoinRelation(),
-                    nullable=True,
-                )
-
-            if dst_related is not None:
-                dst_field_model = dst_field.rel.to
-                clone.query.join(
-                    (dst_model._meta.db_table, dst_field_model._meta.db_table, ((dst_field.column, dst_field_model._meta.pk.column),)),
-                    join_field=RegistryJoinRelation(),
-                    nullable=True,
-                )
+            # Setup required joins
+            field_names = clone.registry_expand_proxy_field(field_name).split(constants.LOOKUP_SEP)
+            clone.query.setup_joins(field_names, clone.model._meta, clone.query.get_initial_alias())
 
         return clone
 
