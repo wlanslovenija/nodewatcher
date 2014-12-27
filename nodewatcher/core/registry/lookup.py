@@ -6,7 +6,8 @@ from django import db as django_db
 from django.apps import apps
 from django.core import exceptions as django_exceptions
 from django.db import models as django_models
-from django.db.models.sql import constants, query
+from django.db.models import constants
+from django.db.models.sql import query
 from django.utils import functional
 
 # Quote name
@@ -235,12 +236,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             del apps.all_models['_registry_proxy_models_']
 
-        def install_proxy_field(model, field, name, src_column=None, src_model=None, src_field=None):
+        def install_proxy_field(model, field, name, src_model=None, src_field=None):
             field = copy.deepcopy(field)
             field.name = None
-            # Include the source table and column name so methods like order_by can
-            # discover this and use it in queries.
-            field.src_column = src_column
+            # Include src_model and src_field to enable destination field resolution.
             field.src_model = src_model
             field.src_field = src_field
             select_name = name
@@ -328,7 +327,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     clone.model,
                     dst_field,
                     field_name,
-                    src_column=src_column,
                     src_model=dst_model,
                     src_field=dst_field.name,
                 )
@@ -348,7 +346,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     clone.model,
                     dst_related_field,
                     field_name,
-                    src_column=src_column,
                     src_model=dst_model,
                     src_field='%s__%s' % (dst_field.name, dst_related)
                 )
@@ -417,22 +414,13 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 )
                 field_name = internal_field_name
 
-            try:
-                field = clone.model._meta.get_field(field_name)
-            except django_models.FieldDoesNotExist:
-                for f in clone.model._meta.virtual_fields:
-                    field = f
-                    if field.name == field_name:
-                        break
-                else:
-                    final_fields.append(raw_field_name)
-                    continue
+            field_names = clone.registry_expand_proxy_field(field_name).split(constants.LOOKUP_SEP)
+            field = clone.query.setup_joins(field_names, clone.model._meta, clone.query.get_initial_alias())[0]
 
             if isinstance(field, registry_fields.RegistryChoiceField):
                 # Ordering by RegistryChoiceField should generate a specific query that will
                 # sort by the order that the choices were registered.
-                src_column = getattr(field, 'src_column', qn(field.column))
-                order_query = ['CASE', src_column]
+                order_query = ['CASE', '%s.%s' % (qn(field.model()._meta.db_table), qn(field.column))]
                 order_params = []
                 for order, choice in enumerate(field.get_registered_choices()):
                     order_query.append('WHEN %%s THEN %d' % order)

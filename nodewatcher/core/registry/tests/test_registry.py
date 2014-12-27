@@ -177,6 +177,11 @@ class RegistryTestCase(django_test.TransactionTestCase):
         ordered = [item.pk for item in qs.order_by('f1', 'id')]
         self.assertEqual(ordered, ordered_pks)
 
+        # Test ordering by using relations.
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple')
+        ordered = [item.pk for item in qs.order_by('f1__level', 'id')]
+        self.assertEqual(ordered, ordered_pks)
+
         # Test ordering by registry id without fetching the field explicitly
         qs = models.Thing.objects.regpoint('first')
         ordered = [item.pk for item in qs.order_by('foo.simple#level', 'id')]
