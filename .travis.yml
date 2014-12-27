@@ -30,4 +30,4 @@ before_script:
  - pep8 nodewatcher
  - pylint nodewatcher || true
 script:
- - python -W error manage.py test
+ - python -Wall manage.py test
