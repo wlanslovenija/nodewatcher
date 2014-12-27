@@ -18,32 +18,21 @@ from . import registration, models as registry_models
 from .forms import fields as form_fields
 
 
-class NullBooleanChoiceField(models.NullBooleanField):
-    """
-    A null boolean field that is linked to a registered choice. For use in
-    this field, registered choices should cover True/False/None values.
-    """
-
-    def __init__(self, regpoint, enum_id, *args, **kwargs):
+class RegistryChoiceFieldMixin(object):
+    def get_registered_choices(self):
         """
-        Class constructor.
+        Returns a reference to the registered choices object that this field
+        uses to populate its list of choices.
         """
 
-        self.regpoint = regpoint
-        self.enum_id = enum_id
-        super(NullBooleanChoiceField, self).__init__(*args, **kwargs)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super(NullBooleanChoiceField, self).deconstruct()
-        args = [self.regpoint, self.enum_id] + args
-        return name, path, args, kwargs
+        return registration.point(self.regpoint).get_registered_choices(self.enum_id)
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         """
         Augments the containing class.
         """
 
-        super(NullBooleanChoiceField, self).contribute_to_class(cls, name, virtual_only)
+        super(RegistryChoiceFieldMixin, self).contribute_to_class(cls, name, virtual_only)
 
         def get_FIELD_choice(self, field):
             value = getattr(self, field.attname)
@@ -64,7 +53,28 @@ class NullBooleanChoiceField(models.NullBooleanField):
         )
 
 
-class RegistryChoiceField(models.CharField):
+class NullBooleanChoiceField(RegistryChoiceFieldMixin, models.NullBooleanField):
+    """
+    A null boolean field that is linked to a registered choice. For use in
+    this field, registered choices should cover True/False/None values.
+    """
+
+    def __init__(self, regpoint, enum_id, *args, **kwargs):
+        """
+        Class constructor.
+        """
+
+        self.regpoint = regpoint
+        self.enum_id = enum_id
+        super(NullBooleanChoiceField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(NullBooleanChoiceField, self).deconstruct()
+        args = [self.regpoint, self.enum_id] + args
+        return name, path, args, kwargs
+
+
+class RegistryChoiceField(RegistryChoiceFieldMixin, models.CharField):
     """
     A character field that supports choices derived from a pre-registered choice set.
     When the field is rendered inside the registry formset, any modifications to it
@@ -86,39 +96,6 @@ class RegistryChoiceField(models.CharField):
         name, path, args, kwargs = super(RegistryChoiceField, self).deconstruct()
         args = [self.regpoint, self.enum_id] + args
         return name, path, args, kwargs
-
-    def get_registered_choices(self):
-        """
-        Returns a reference to the registered choices object that this field
-        uses to populate its list of choices.
-        """
-
-        return registration.point(self.regpoint).get_registered_choices(self.enum_id)
-
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        """
-        Augments the containing class.
-        """
-
-        super(RegistryChoiceField, self).contribute_to_class(cls, name, virtual_only)
-
-        def get_FIELD_choice(self, field):
-            value = getattr(self, field.attname)
-            choices = registration.point(field.regpoint).get_registered_choices(field.enum_id)
-
-            try:
-                return choices.resolve(value)
-            except KeyError:
-                try:
-                    return choices.resolve(field.default)
-                except KeyError:
-                    return None
-
-        setattr(
-            cls,
-            'get_%s_choice' % self.name,
-            functional.curry(get_FIELD_choice, field=self)
-        )
 
     def formfield(self, **kwargs):
         """
