@@ -51,8 +51,8 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
     def dehydrate(self, bundle, for_list=True):
         # Because bundle.request is the only state which is passed through all
         # dehydration process, we are using it to pass the current path while we
-        # are walking the related resources. This is needed when filtering fields
-        # in field_use_in_factory to determine to filter a field or not.
+        # are walking the related resources. This is needed when selecting fields
+        # in field_use_in_factory to determine to select a field or not.
 
         if not hasattr(bundle.request, '_field_in_use_path'):
             bundle.request._field_in_use_path = []

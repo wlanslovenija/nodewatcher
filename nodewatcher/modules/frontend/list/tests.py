@@ -169,8 +169,8 @@ class NodeResourceTest(test.ResourceTestCase):
         self.assertEqual(meta1next_query, meta2next_query)
         self.assertEqual(meta1previous_query, meta2previous_query)
 
-    def assertNodeEqual(self, i, node, json_node):
-        self.assertEqual({
+    def assertNodeEqual(self, i, node, json_node, selection=lambda node: node):
+        self.assertEqual(selection({
             u'status': {
                 u'health': node.monitoring.core.status().health,
                 u'monitored': node.monitoring.core.status().monitored,
@@ -192,7 +192,7 @@ class NodeResourceTest(test.ResourceTestCase):
             u'type': node.config.core.type().type,
             # Works correctly only if i < 60.
             u'last_seen': u'Wed, 05 Nov 2014 01:05:%02d +0000' % i,
-        }, json_node)
+        }), json_node)
 
     def get_list(self, **kwargs):
         kwargs['format'] = 'json'
@@ -220,6 +220,31 @@ class NodeResourceTest(test.ResourceTestCase):
         self.assertValidJSONResponse(response)
 
         return self.deserialize(response)
+
+    def project(self, source, projection):
+        # Based on https://gist.github.com/bauman/2f68cebfddf9dc9c763a
+
+        # resource_uri is always included.
+        projection['resource_uri'] = 1
+
+        result = {}
+        for key in projection:
+            path = key.split('.')
+            path_length = len(path)
+            source_pointer = source
+            result_pointer = result
+            for level in range(path_length):
+                if level == path_length - 1:
+                    if path[level] in source_pointer:
+                        result_pointer[path[level]] = source_pointer[path[level]]
+                    else:
+                        result_pointer[path[level]] = None
+                else:
+                    if path[level] not in result_pointer:
+                        result_pointer[path[level]] = {}
+                    result_pointer = result_pointer[path[level]]
+                    source_pointer = source_pointer[path[level]]
+        return result
 
     def test_api_uris(self):
         # URIs have to be stable.
@@ -514,3 +539,42 @@ class NodeResourceTest(test.ResourceTestCase):
             data = self.get_detail(node.uuid)
 
             self.assertNodeEqual(i, node, data)
+
+    def test_fields_selection(self):
+        for fields, selection in (
+            ('', lambda node: self.project(node, {})),
+            ('__', lambda node: node),
+            ('__uuid', lambda node: self.project(node, {'uuid': 1})),
+            ('uuid', lambda node: self.project(node, {'uuid': 1})),
+            (['uuid', 'name'], lambda node: self.project(node, {'uuid': 1, 'name': 1})),
+            (['uuid', 'status'], lambda node: dict(self.project(node, {'uuid': 1}), status={})),
+            (['uuid', 'status__'], lambda node: self.project(node, {'uuid': 1, 'status': 1})),
+            (['uuid', 'status__health', 'status__monitored'], lambda node: self.project(node, {'uuid': 1, 'status.health': 1, 'status.monitored': 1})),
+            (['uuid', '__health', '__monitored'], lambda node: self.project(node, {'uuid': 1})), # Invalid.
+            (['uuid', 'health', 'monitored'], lambda node: self.project(node, {'uuid': 1})), # Invalid.
+            ('uuid,status', lambda node: dict(self.project(node, {'uuid': 1}), status={})),
+            ('uuid,status__', lambda node: self.project(node, {'uuid': 1, 'status': 1})),
+            (['uuid', 'status__health,status__monitored'], lambda node: self.project(node, {'uuid': 1, 'status.health': 1, 'status.monitored': 1})),
+        ):
+            data = self.get_list(
+                offset=0,
+                limit=0,
+                fields=fields,
+            )
+
+            nodes = data['objects']
+            self.assertEqual(len(self.nodes), len(nodes))
+
+            for i, json_node in enumerate(nodes):
+                node = self.nodes[i]
+                self.assertNodeEqual(i, node, json_node, selection)
+
+            self.assertEqual({
+                u'total_count': 45,
+                # We specified 0 for limit in the request, so max limit should be used.
+                u'limit': resources.NodeResource.Meta.max_limit,
+                u'offset': 0,
+                u'nonfiltered_count': 45,
+                u'next': None,
+                u'previous': None,
+            }, data['meta'])

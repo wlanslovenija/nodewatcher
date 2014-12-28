@@ -135,7 +135,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
     @classmethod
     def field_use_in_factory(cls, field_name, field_use_in):
-        def filtering_field_use_in(bundle):
+        def select_field_use_in(bundle):
             if callable(field_use_in) and not field_use_in(bundle):
                 return False
 
@@ -150,26 +150,60 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             # other related fields by augmenting their dehydrate method.
             field_path = getattr(bundle.request, '_field_in_use_path', [])
 
-            current_path = field_path + [field_name]
+            # We prepend the path with '' so that it is easier to traverse
+            # later on. All our non-empty field selectors start with "__",
+            # which makes the first element ''.
+            current_path = [''] + field_path + [field_name]
+
+            # We select the field (return True) if current_path is a prefix to only_field.
+            # If the last bit is empty (field selection ends with "__", like "foobar__")
+            # and current_path is below the rest of only_field, then we select it as well.
+            # This makes possible to allow all subfields of a given field, without
+            # having to list them all. In the above example, "foobar" and all fields
+            # below "foobar" would be allowed. This also means that "__" selection
+            # string allow all fields of a resource (same as if field selection would
+            # not be specified at all). This is different to the empty field selection
+            # ("") which does not match any field and does not select any field at all.
 
             for only_field in only_fields:
+                # All our non-empty field selectors start with "__" internally,
+                # so "foobar" and "__foobar" are in fact the same. A top-level
+                # "foobar" field is selected.
+                if only_field and not only_field.startswith('__'):
+                    only_field = '__%s' % only_field
+                # For non empty field selectors this will make the first element
+                # ''. Because we prefixed current_path the same, traversal below
+                # will work well (first corresponding elements will be equal, '').
+                # If field selector is empty, bits will be [''], which will match
+                # in the first iteration, but nothing else will match in the next
+                # iteration, selecting no fields.
                 bits = only_field.split('__')
-                # If current_path is a prefix to only_field it is allowed.
-                if bits[0:len(current_path)] == current_path:
-                    return True
-                # If the last bit is empty (field filter ends with "__", like "foobar__"
-                # and current path is below the rest of only_field, then allow it.
-                # This makes possible to allow all subfields of a given field, without
-                # having to list them all. In the above example, all fields below
-                # "foobar" would be allowed. This also means that empty filter string
-                # allow all fields of a resource (same as if it would not be specified
-                # at all).
-                if bits[-1] == '' and bits[0:-1] == current_path[0:len(bits) - 1]:
-                    return True
+
+                for i, path_segment in enumerate(current_path):
+                    if i >= len(bits):
+                        # We got to the end of bits and haven't yet returned
+                        # True, so this only_field does not seem right. Let's
+                        # try the next one.
+                        break
+                    elif path_segment == bits[i]:
+                        if i == len(current_path) - 1:
+                            # All bits until now matched and we are at the end
+                            # of the current_path, return True.
+                            return True
+                        else:
+                            # Otherwise let's continue with the next bit.
+                            continue
+                    elif bits[i] == '':
+                        # The current bit is a wildcard bit. All subfields from
+                        # here one match. We return True.
+                        return True
+                    else:
+                        # This only_field does not seem right. Let's try the next one.
+                        break
 
             return False
 
-        return filtering_field_use_in
+        return select_field_use_in
 
     @classmethod
     def get_fields(cls, fields=None, excludes=None):
