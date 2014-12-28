@@ -43,7 +43,8 @@
                     {'mData': 'status.network', 'mRender': iconFromLegend('network')},
                     {'mData': 'status.monitored', 'mRender': iconFromLegend('monitored')},
                     {'mData': 'status.health', 'mRender': iconFromLegend('health')},
-                    {'mData': 'project'}
+                    {'mData': 'project'},
+                    {'mData': 'uuid', 'bVisible': false}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
                 'aaSortingFixed': [[0, 'asc']],

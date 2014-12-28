@@ -61,6 +61,7 @@ class NodeResource(api.BaseResource):
             'status': resources.ALL_WITH_RELATIONS,
         }
         global_filter = (
+            'uuid',
             'name',
             'type',
             'project',
