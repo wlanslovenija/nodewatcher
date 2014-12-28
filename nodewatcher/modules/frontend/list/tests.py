@@ -1,9 +1,11 @@
 import datetime
 import json
+import os
 import urllib
 import urlparse
 import uuid
 
+from django.apps import apps
 from django.core import urlresolvers
 from django.contrib.auth import models as auth_models
 from django.utils import encoding, timezone
@@ -32,6 +34,7 @@ class NodeResourceTest(test.ResourceTestCase):
         super(NodeResourceTest, cls).setUpClass()
 
         cls.node_list = cls.resource_list_uri('node')
+        cls.node_schema = cls.resource_schema_uri('node')
 
         cls.projects = []
         for i in range(2):
@@ -126,6 +129,10 @@ class NodeResourceTest(test.ResourceTestCase):
     def resource_list_uri(cls, resource_name):
         return urlresolvers.reverse('api:api_dispatch_list', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
 
+    @classmethod
+    def resource_schema_uri(cls, resource_name):
+        return urlresolvers.reverse('api:api_get_schema', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
+
     def assertMetaEqual(self, meta1, meta2):
         meta1next = meta1.pop('next')
         meta2next = meta2.pop('next')
@@ -167,10 +174,20 @@ class NodeResourceTest(test.ResourceTestCase):
 
         return self.deserialize(response)
 
+    def get_schema(self, **kwargs):
+        kwargs['format'] = 'json'
+
+        response = self.api_client.get(self.node_schema, data=kwargs)
+
+        self.assertValidJSONResponse(response)
+
+        return self.deserialize(response)
+
     def test_api_uris(self):
         # URIs have to be stable.
 
         self.assertEqual(self.node_list, '/api/v1/node/')
+        self.assertEqual(self.node_schema, '/api/v1/node/schema/')
 
     def test_read_only(self):
         node_uri = '%s%s/' % (self.node_list, self.nodes[0].uuid)
@@ -468,3 +485,11 @@ class NodeResourceTest(test.ResourceTestCase):
                                 urllib.quote(maintainer), limit, offset - limit
                             ) if limit and offset - limit >= 0 else None,
                         }, data['meta'])
+
+    def test_schema(self):
+        with file(os.path.join(apps.get_app_config('frontend_list').path, 'tests', 'schema.json'), 'r') as f:
+            schema = json.load(f)
+
+        data = self.get_schema()
+
+        self.assertEqual(schema, data)

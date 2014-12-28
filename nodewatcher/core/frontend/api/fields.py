@@ -40,7 +40,7 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
     @property
     def help_text(self):
         if not self._help_text:
-            self._help_text = "Registry model (%s)." % (self.to_class(self.get_api_name())._meta.resource_name,)
+            self._help_text = "Registry model (%s)" % (self.to_class(self.get_api_name())._meta.resource_name,)
         return self._help_text
 
     def build_schema(self):
