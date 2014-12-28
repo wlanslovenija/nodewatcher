@@ -427,3 +427,44 @@ class NodeResourceTest(test.ResourceTestCase):
                         u'next': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
                         u'previous': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset - limit) if limit and offset - limit >= 0 else None,
                     }, data['meta'])
+
+    def test_maintainer(self):
+        for offset in (0, 4, 7):
+            for limit in (0, 5, 20):
+                for user in self.users:
+                    for global_filter, filter_function in (
+                        ('', lambda node: True),
+                        ('wireless', lambda node: node.config.core.type().type == 'wireless'),
+                        ('node 5', lambda node: node.config.core.general().name == 'Node 5'),
+                    ):
+                        maintainer = user.username
+                        data = self.get_list(
+                            offset=offset,
+                            limit=limit,
+                            maintainer=maintainer,
+                            filter=global_filter,
+                        )
+
+                        # Nodes for which the user has any permission defined for.
+                        all_nodes = [node for node in self.nodes if shortcuts.get_perms(user, node)]
+                        filtered_nodes = [node.uuid for node in filter(filter_function, all_nodes)]
+                        nodes = data['objects']
+                        self.assertEqual(filtered_nodes[offset:offset + limit if limit else None], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, maintainer=%s' % (offset, limit, maintainer))
+
+                        self.assertMetaEqual({
+                            u'total_count': len(filtered_nodes),
+                            u'limit': limit or resources.NodeResource.Meta.max_limit,
+                            u'offset': offset,
+                            # A special case, we want maintainer filter to filter also nonfiltered_count.
+                            u'nonfiltered_count': len(all_nodes),
+                            u'next': u'%s?%smaintainer=%s&format=json&limit=%s&offset=%s' % (
+                                self.node_list,
+                                'filter=%s&' % urllib.quote(global_filter) if global_filter else '',
+                                urllib.quote(maintainer), limit, offset + limit,
+                            ) if limit and len(filtered_nodes) > offset + limit else None,
+                            u'previous': u'%s?%smaintainer=%s&format=json&limit=%s&offset=%s' % (
+                                self.node_list,
+                                'filter=%s&' % urllib.quote(global_filter) if global_filter else '',
+                                urllib.quote(maintainer), limit, offset - limit
+                            ) if limit and offset - limit >= 0 else None,
+                        }, data['meta'])
