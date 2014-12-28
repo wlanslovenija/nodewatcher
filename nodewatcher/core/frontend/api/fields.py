@@ -63,6 +63,7 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
         finally:
             bundle.request._field_in_use_path.pop()
 
+
 class GeoJSON(str):
     __slots__ = ()
 
