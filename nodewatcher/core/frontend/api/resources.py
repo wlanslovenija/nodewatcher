@@ -150,10 +150,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             # other related fields by augmenting their dehydrate method.
             field_path = getattr(bundle.request, '_field_in_use_path', [])
 
-            # We prepend the path with '' so that it is easier to traverse
-            # later on. All our non-empty field selectors start with "__",
-            # which makes the first element ''.
-            current_path = [''] + field_path + [field_name]
+            current_path = field_path + [field_name]
 
             # We select the field (return True) if current_path is a prefix to only_field.
             # If the last bit is empty (field selection ends with "__", like "foobar__")
@@ -164,19 +161,23 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             # string allow all fields of a resource (same as if field selection would
             # not be specified at all). This is different to the empty field selection
             # ("") which does not match any field and does not select any field at all.
+            # In addition, we allow also "__foobar", which is the same as "foobar".
 
             for only_field in only_fields:
-                # All our non-empty field selectors start with "__" internally,
-                # so "foobar" and "__foobar" are in fact the same. A top-level
-                # "foobar" field is selected.
-                if only_field and not only_field.startswith('__'):
-                    only_field = '__%s' % only_field
-                # For non empty field selectors this will make the first element
-                # ''. Because we prefixed current_path the same, traversal below
-                # will work well (first corresponding elements will be equal, '').
-                # If field selector is empty, bits will be [''], which will match
-                # in the first iteration, but nothing else will match in the next
-                # iteration, selecting no fields.
+                if not only_field:
+                    # Empty selection does not match any field. But let's check if there
+                    # is some other which do match. (It is a bit pointless then to list
+                    # an empty only_field as well, but, let's be generous about the input.
+                    continue
+
+                # Remove any trailing "__" (both "__foobar" and "foobar" are the same).
+                # This makes "__" become an empty string, but we took care of that as
+                # as special case above, so an empty string from here on matches everything
+                # (while above matches nothing).
+                if only_field.startswith('__'):
+                    only_field = only_field[2:]
+
+                # If field selector is empty, bits will be [''].
                 bits = only_field.split('__')
 
                 for i, path_segment in enumerate(current_path):
