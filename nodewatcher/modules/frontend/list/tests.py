@@ -578,3 +578,31 @@ class NodeResourceTest(test.ResourceTestCase):
                 u'next': None,
                 u'previous': None,
             }, data['meta'])
+
+    def test_ordering_with_fields_selection(self):
+        # Testing if we can still order by a field which is not selected in the output.
+
+        for offset in (0, 4, 7):
+            for limit in (0, 5, 20):
+                for reverse in (False, True):
+                    ordering = '-name' if reverse else 'name'
+                    data = self.get_list(
+                        offset=offset,
+                        limit=limit,
+                        order_by=ordering,
+                        fields='uuid',
+                    )
+
+                    key = lambda node: node.config.core.general().name
+
+                    nodes = data['objects']
+                    self.assertEqual([node.uuid for node in sorted(self.nodes, key=key, reverse=reverse)[offset:offset + limit if limit else None]], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, ordering=%s' % (offset, limit, ordering))
+
+                    self.assertMetaEqual({
+                        u'total_count': 45,
+                        u'limit': limit or resources.NodeResource.Meta.max_limit,
+                        u'offset': offset,
+                        u'nonfiltered_count': 45,
+                        u'next': u'%s?fields=uuid&order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
+                        u'previous': u'%s?fields=uuid&order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset - limit) if limit and offset - limit >= 0 else None,
+                    }, data['meta'])
