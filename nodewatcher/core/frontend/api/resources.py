@@ -58,6 +58,7 @@ class AllFiltering(object):
     def __getitem__(self, item):
         return resources.ALL_WITH_RELATIONS
 
+
 class BaseMetaclass(resources.ModelDeclarativeMetaclass):
     def __new__(cls, name, bases, attrs):
         # Override Meta defaults
