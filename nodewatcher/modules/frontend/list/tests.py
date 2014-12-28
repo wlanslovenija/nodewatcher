@@ -133,6 +133,10 @@ class NodeResourceTest(test.ResourceTestCase):
     def resource_schema_uri(cls, resource_name):
         return urlresolvers.reverse('api:api_get_schema', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
 
+    @classmethod
+    def resource_detail_uri(cls, resource_name, pk):
+        return urlresolvers.reverse('api:api_dispatch_detail', kwargs={'api_name': cls.api_name, 'resource_name': resource_name, 'pk': pk})
+
     def assertMetaEqual(self, meta1, meta2):
         meta1next = meta1.pop('next')
         meta2next = meta2.pop('next')
@@ -165,6 +169,31 @@ class NodeResourceTest(test.ResourceTestCase):
         self.assertEqual(meta1next_query, meta2next_query)
         self.assertEqual(meta1previous_query, meta2previous_query)
 
+    def assertNodeEqual(self, i, node, json_node):
+        self.assertEqual({
+            u'status': {
+                u'health': node.monitoring.core.status().health,
+                u'monitored': node.monitoring.core.status().monitored,
+                u'network': node.monitoring.core.status().network,
+            },
+            u'uuid': encoding.force_unicode(node.uuid),
+            u'name': node.config.core.general().name,
+            u'project': node.config.core.project().project.name,
+            u'location': {
+                u'address': u'Location %s' % i,
+                u'altitude': 0.0,
+                u'city': u'Ljubljana',
+                u'country': u'SI',
+                u'geolocation': json.loads(node.config.core.location().geolocation.geojson),
+                u'timezone': u'Europe/Ljubljana',
+            },
+            # We manually construct URI to make sure it is like we assume it is.
+            u'resource_uri': u'%s%s/' % (self.node_list, node.uuid),
+            u'type': node.config.core.type().type,
+            # Works correctly only if i < 60.
+            u'last_seen': u'Wed, 05 Nov 2014 01:05:%02d +0000' % i,
+        }, json_node)
+
     def get_list(self, **kwargs):
         kwargs['format'] = 'json'
 
@@ -178,6 +207,15 @@ class NodeResourceTest(test.ResourceTestCase):
         kwargs['format'] = 'json'
 
         response = self.api_client.get(self.node_schema, data=kwargs)
+
+        self.assertValidJSONResponse(response)
+
+        return self.deserialize(response)
+
+    def get_detail(self, pk, **kwargs):
+        kwargs['format'] = 'json'
+
+        response = self.api_client.get(self.resource_detail_uri('node', pk), data=kwargs)
 
         self.assertValidJSONResponse(response)
 
@@ -208,30 +246,7 @@ class NodeResourceTest(test.ResourceTestCase):
 
         for i, json_node in enumerate(nodes):
             node = self.nodes[i]
-
-            self.assertEqual({
-                u'status': {
-                    u'health': node.monitoring.core.status().health,
-                    u'monitored': node.monitoring.core.status().monitored,
-                    u'network': node.monitoring.core.status().network,
-                },
-                u'uuid': encoding.force_unicode(node.uuid),
-                u'name': node.config.core.general().name,
-                u'project': node.config.core.project().project.name,
-                u'location': {
-                    u'address': u'Location %s' % i,
-                    u'altitude': 0.0,
-                    u'city': u'Ljubljana',
-                    u'country': u'SI',
-                    u'geolocation': json.loads(node.config.core.location().geolocation.geojson),
-                    u'timezone': u'Europe/Ljubljana',
-                },
-                # We manually construct URI to make sure it is like we assume it is.
-                u'resource_uri': u'%s%s/' % (self.node_list, node.uuid),
-                u'type': node.config.core.type().type,
-                # Works correctly only if i < 60.
-                u'last_seen': u'Wed, 05 Nov 2014 01:05:%02d +0000' % i,
-            }, json_node)
+            self.assertNodeEqual(i, node, json_node)
 
         self.assertEqual({
             u'total_count': 45,
@@ -493,3 +508,9 @@ class NodeResourceTest(test.ResourceTestCase):
         data = self.get_schema()
 
         self.assertEqual(schema, data)
+
+    def test_get_detail(self):
+        for i, node in enumerate(self.nodes[0:5]):
+            data = self.get_detail(node.uuid)
+
+            self.assertNodeEqual(i, node, data)
