@@ -134,7 +134,57 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             return create_field
 
     @classmethod
+    def field_use_in_factory(cls, field_name, field_use_in):
+        def filtering_field_use_in(bundle):
+            if callable(field_use_in) and not field_use_in(bundle):
+                return False
+
+            only_fields = cls.value_to_list(getattr(bundle.request, 'GET', {}), 'fields')
+            if not only_fields:
+                return True
+
+            # In RegistryRelationField.dehydrate we are storing the path as we are walking
+            # related fields so that we can have full path available here. bundle.request
+            # is the only state available through all dehydration process so we are using it.
+            # This currently works only with RegistryRelationField, but can be ported to
+            # other related fields by augmenting their dehydrate method.
+            field_path = getattr(bundle.request, '_field_in_use_path', [])
+
+            current_path = field_path + [field_name]
+
+            for only_field in only_fields:
+                bits = only_field.split('__')
+                # If current_path is a prefix to only_field it is allowed.
+                if bits[0:len(current_path)] == current_path:
+                    return True
+                # If the last bit is empty (field filter ends with "__", like "foobar__"
+                # and current path is below the rest of only_field, then allow it.
+                # This makes possible to allow all subfields of a given field, without
+                # having to list them all. In the above example, all fields below
+                # "foobar" would be allowed. This also means that empty filter string
+                # allow all fields of a resource (same as if it would not be specified
+                # at all).
+                if bits[-1] == '' and bits[0:-1] == current_path[0:len(bits) - 1]:
+                    return True
+
+            return False
+
+        return filtering_field_use_in
+
+    @classmethod
     def get_fields(cls, fields=None, excludes=None):
+        final_fields = {}
+
+        for field_name, field in cls._get_fields(fields, excludes).items():
+            # We override use_in function on all fields to be able
+            # to limit the fields user wants in the output.
+            field.use_in = cls.field_use_in_factory(field_name, getattr(field, 'use_in', None))
+            final_fields[field_name] = field
+
+        return final_fields
+
+    @classmethod
+    def _get_fields(cls, fields, excludes):
         # Registry stores additional fields in as virtual fields and we reuse Tastypie
         # code to parse them by temporary assigning them to local fields
 
@@ -280,6 +330,18 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
         return filtered_queryset
 
+    @staticmethod
+    def value_to_list(params, field):
+        if hasattr(params, 'getlist'):
+            value = []
+
+            for part in params.getlist(field):
+                value.extend(part.split(','))
+        else:
+            value = params.get(field, '').split(',')
+
+        return value
+
     def basic_filter_value_to_python(self, value):
         if value in ['true', 'True', True]:
             return True
@@ -291,15 +353,8 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             return value
 
     def filter_value_to_python(self, value, field_name, filters, filter_expr, filter_type):
-        if filter_type in ('in', 'range') and value:
-            if hasattr(filters, 'getlist'):
-                value = []
-
-                for part in filters.getlist(filter_expr):
-                    value.extend(part.split(','))
-            else:
-                value = value.split(',')
-
+        if filter_type in ('in', 'range'):
+            value = self.value_to_list(filters, filter_expr)
             value = [self.basic_filter_value_to_python(v) for v in value]
 
         else:

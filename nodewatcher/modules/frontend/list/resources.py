@@ -76,7 +76,7 @@ class NodeResource(api.BaseResource):
     def _before_apply_filters(self, request, queryset):
         # Used by MyNodesComponent. We use _before_apply_filters so that queryset is modified before count
         # for _nonfiltered_count is taken, so that maintainer filter is not exposed through dataTables.
-        maintainer = request.GET.get('maintainer', None)
+        maintainer = getattr(request, 'GET', {}).get('maintainer', None)
         if maintainer:
             try:
                 maintainer_user = auth_models.User.objects.get(username=maintainer)

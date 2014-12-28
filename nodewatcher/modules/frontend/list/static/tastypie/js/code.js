@@ -3,6 +3,14 @@
         $.tastypie = {};
     }
 
+    function pathToRelation(path) {
+        var bits = path.split('.');
+        return $.map(bits, function (bit, j) {
+            if ($.isNumeric(bit)) return null;
+            return bit;
+        }).join('__');
+    }
+
     $.extend($.tastypie, {
         // Uses top-level object's uuid for a link
         'nodeName': function (table) {
@@ -110,13 +118,15 @@
                         break;
                 }
             }
+            $.each(columns, function (i, column) {
+                aoData.push({
+                    'name': 'fields',
+                    'value': pathToRelation(column)
+                })
+            });
             $.each(sorting, function (i, sort) {
                 var s = sort.direction === 'desc' ? '-' : '';
-                var bits = columns[sort.column].split('.');
-                s += $.map(bits, function (bit, j) {
-                    if ($.isNumeric(bit)) return null;
-                    return bit;
-                }).join('__');
+                s += pathToRelation(columns[sort.column]);
                 aoData.push({
                     'name': 'order_by',
                     'value': s
