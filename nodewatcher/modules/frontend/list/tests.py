@@ -1,5 +1,6 @@
 import datetime
 import json
+import urllib
 import urlparse
 import uuid
 
@@ -281,8 +282,8 @@ class NodeResourceTest(test.ResourceTestCase):
         }, data['meta'])
 
     def test_ordering(self):
-        for offset in (0, 4):
-            for limit in (0, 20):
+        for offset in (0, 4, 7):
+            for limit in (0, 5, 20):
                 for reverse in (False, True):
                     for ordering, key in (
                         ('name', lambda node: node.config.core.general().name),
@@ -308,13 +309,13 @@ class NodeResourceTest(test.ResourceTestCase):
                             u'limit': limit or resources.NodeResource.Meta.max_limit,
                             u'offset': offset,
                             u'nonfiltered_count': 45,
-                            u'next': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, ordering, limit, offset + limit) if limit else None,
-                            u'previous': None,
+                            u'next': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
+                            u'previous': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset - limit) if limit and offset - limit >= 0 else None,
                         }, data['meta'])
 
     def test_ordering_multiple(self):
-        for offset in (0, 4):
-            for limit in (0, 20):
+        for offset in (0, 4, 7):
+            for limit in (0, 5, 20):
                 ordering = ['type', 'name']
                 data = self.get_list(
                     offset=offset,
@@ -332,13 +333,13 @@ class NodeResourceTest(test.ResourceTestCase):
                     u'limit': limit or resources.NodeResource.Meta.max_limit,
                     u'offset': offset,
                     u'nonfiltered_count': 45,
-                    u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset + limit) if limit else None,
-                    u'previous': None,
+                    u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
+                    u'previous': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset - limit) if limit and offset - limit >= 0 else None,
                 }, data['meta'])
 
     def test_global_filter(self):
-        for offset in (0, 4):
-            for limit in (0, 20):
+        for offset in (0, 4, 7):
+            for limit in (0, 5, 20):
                 for global_filter, filter_function in (
                     ('project name 0', lambda node: node.config.core.project().project.name == 'Project name 0'),
                     ('wireless', lambda node: node.config.core.type().type == 'wireless'),
@@ -363,15 +364,15 @@ class NodeResourceTest(test.ResourceTestCase):
                         u'limit': limit or resources.NodeResource.Meta.max_limit,
                         u'offset': offset,
                         u'nonfiltered_count': 45,
-                        u'next': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, global_filter.replace(' ', '+'), limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
-                        u'previous': None,
+                        u'next': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(global_filter), limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
+                        u'previous': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(global_filter), limit, offset - limit) if limit and offset - limit >= 0 else None,
                     }, data['meta'])
 
     def test_field_filters(self):
         health_filter = [str(h) for h in self.monitoring_health[0:2]]
 
-        for offset in (0, 7):
-            for limit in (0, 20):
+        for offset in (0, 4, 7):
+            for limit in (0, 5, 20):
                 for field_filter, filter_function in (
                     ({'project': 'Project name 0'}, lambda node: node.config.core.project().project.name == 'Project name 0'),
                     ({'type': 'wireless'}, lambda node: node.config.core.type().type == 'wireless'),
@@ -395,6 +396,10 @@ class NodeResourceTest(test.ResourceTestCase):
                     ({'last_seen__gt': '2014-11-05 01:05:10+0000'}, lambda node: node.monitoring.core.general().last_seen > self.initial_time + datetime.timedelta(seconds=10)),
                     ({'last_seen__range': '2014-11-05 01:05:10+0000,2014-11-05 01:05:20+0000'}, lambda node: self.initial_time + datetime.timedelta(seconds=10) <= node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=20)),
                     ({'last_seen__range': ['2014-11-05 01:05:10+0000', '2014-11-05 01:05:20+0000']}, lambda node: self.initial_time + datetime.timedelta(seconds=10) <= node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=20)),
+                    # Nodes in the space interval match nodes in the time interval, so we can use that to filter the test list.
+                    ({'location__geolocation__contained': json.dumps({'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]})}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
+                    ({'location__geolocation__contained': str({'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]})}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
+                    ({'location__geolocation__contained': {'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]}}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
                 ):
                     kwargs = {
                         'offset': offset,
@@ -405,14 +410,14 @@ class NodeResourceTest(test.ResourceTestCase):
 
                     filtered_nodes = [node.uuid for node in filter(filter_function, self.nodes)]
                     nodes = data['objects']
-
                     self.assertEqual(filtered_nodes[offset:offset + limit if limit else None], [node['uuid'] for node in nodes], 'offset=%s, limit=%s, filter=%s' % (offset, limit, field_filter))
 
                     key = field_filter.keys()[0]
                     value = field_filter.values()[0]
                     if not isinstance(value, list):
                         value = [value]
-                    uri_filter = '&'.join(['%s=%s' % (key, v.replace('+', '%2B').replace(' ', '%20')) for v in value])
+                    value = [v if isinstance(v, basestring) else str(v) for v in value]
+                    uri_filter = '&'.join(['%s=%s' % (key, urllib.quote(v)) for v in value])
 
                     self.assertMetaEqual({
                         u'total_count': len(filtered_nodes),
@@ -420,5 +425,5 @@ class NodeResourceTest(test.ResourceTestCase):
                         u'offset': offset,
                         u'nonfiltered_count': 45,
                         u'next': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
-                        u'previous': None,
+                        u'previous': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset - limit) if limit and offset - limit >= 0 else None,
                     }, data['meta'])
