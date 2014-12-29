@@ -1,8 +1,8 @@
 import datetime
 import multiprocessing
+import unittest
 
 from django.db import transaction, connection
-from django.utils import unittest
 
 from . import models
 

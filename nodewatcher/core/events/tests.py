@@ -1,8 +1,8 @@
-from django.conf import settings
-from django.utils import unittest
+import unittest
+
 from django import test as django_test
 
-from . import base, exceptions, events
+from . import base, declarative, exceptions
 from .pool import pool
 
 
@@ -32,14 +32,14 @@ class TestEventFilter(base.EventFilter):
         return True
 
 
-class TestNodeEvent(events.NodeEventRecord):
-    foo = events.CharAttribute()
-    bar = events.CharAttribute()
+class TestNodeEvent(declarative.NodeEventRecord):
+    foo = declarative.CharAttribute()
+    bar = declarative.CharAttribute()
 
     def __init__(self, foo, bar):
         super(TestNodeEvent, self).__init__(
             None,
-            events.NodeEventRecord.SEVERITY_INFO,
+            declarative.NodeEventRecord.SEVERITY_INFO,
             "Test event",
             foo=foo,
             bar=bar

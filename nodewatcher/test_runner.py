@@ -2,7 +2,6 @@ import unittest
 
 from django.conf import settings
 from django.test import testcases, runner
-from django.utils import unittest as django_unittest
 
 
 class FilteredTestSuiteRunner(runner.DiscoverRunner):
@@ -21,10 +20,10 @@ class FilteredTestSuiteRunner(runner.DiscoverRunner):
         # Add unittest prefix to not filter special tests like unittest.loader.ModuleImportFailure
         filters += ('unittest.',)
 
-        filtered = django_unittest.TestSuite()
+        filtered = unittest.TestSuite()
 
         for test in suite:
-            if isinstance(test, (unittest.TestSuite, django_unittest.TestSuite)):
+            if isinstance(test, (unittest.TestSuite, unittest.TestSuite)):
                 filtered.addTests(self._filter_suite(test))
             else:
                 for f in filters:

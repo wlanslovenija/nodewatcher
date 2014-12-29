@@ -355,7 +355,7 @@ class NodeResourceTest(test.ResourceTestCase):
                         data = self.get_list(
                             offset=offset,
                             limit=limit,
-                            order_by=ordering
+                            order_by=ordering,
                         )
 
                         nodes = data['objects']
@@ -377,7 +377,7 @@ class NodeResourceTest(test.ResourceTestCase):
                 data = self.get_list(
                     offset=offset,
                     limit=limit,
-                    order_by=ordering
+                    order_by=ordering,
                 )
 
                 key = lambda node: (self.types.index(node.config.core.type().type), node.config.core.general().name)
