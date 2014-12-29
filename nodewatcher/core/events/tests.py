@@ -54,18 +54,18 @@ class EventsTestCase(unittest.TestCase):
     def setUp(self):
         # Unregister any other sinks
         self._previous_sinks = [sink.__class__ for sink in pool.get_all_sinks()]
-        pool.unregister(self._previous_sinks)
+        pool.unregister_sink(self._previous_sinks)
         # Setup a test sink
-        pool.register(TestEventSink)
+        pool.register_sink(TestEventSink)
         pool.get_sink('TestEventSink').add_filter(TestEventFilter)
         # Fake discovery
         pool._discovered = True
 
     def tearDown(self):
-        pool.unregister(TestEventSink)
+        pool.unregister_sink(TestEventSink)
         # Register the previous sinks back
         for sink in self._previous_sinks:
-            pool.register(sink)
+            pool.register_sink(sink)
 
     def test_event_processing(self):
         # Check basic event propagation
@@ -110,7 +110,7 @@ class EventsTestCase(unittest.TestCase):
 
     def test_exceptions(self):
         with self.assertRaises(exceptions.InvalidEventSink):
-            pool.register(TestInvalidSubclass)
+            pool.register_sink(TestInvalidSubclass)
 
         with self.assertRaises(exceptions.InvalidEventFilter):
             pool.get_sink('TestEventSink').add_filter(TestEventFilter())
@@ -119,7 +119,7 @@ class EventsTestCase(unittest.TestCase):
             pool.get_sink('TestEventSink').add_filter(TestInvalidSubclass)
 
         with self.assertRaises(exceptions.EventSinkAlreadyRegistered):
-            pool.register(TestEventSink)
+            pool.register_sink(TestEventSink)
 
         with self.assertRaises(exceptions.EventSinkNotRegistered):
             pool.get_sink('TestUnregisteredSink')
@@ -142,14 +142,14 @@ class EventsSettingsTestCase(django_test.TestCase):
     def setUp(self):
         # Unregister any other sinks
         self._previous_sinks = [sink.__class__ for sink in pool.get_all_sinks()]
-        pool.unregister(self._previous_sinks)
+        pool.unregister_sink(self._previous_sinks)
         # Fake discovery
         pool._discovered = True
 
     def tearDown(self):
         # Register the previous sinks back
         for sink in self._previous_sinks:
-            pool.register(sink)
+            pool.register_sink(sink)
 
     def test_settings(self):
         # Test disabled sink via settings
@@ -158,13 +158,13 @@ class EventsSettingsTestCase(django_test.TestCase):
                 'disable': True
             }
         }):
-            pool.register(TestEventSink)
+            pool.register_sink(TestEventSink)
             try:
                 base.EventRecord(a=1, b=2, message="Hello event world!").post()
                 sink = pool.get_sink('TestEventSink')
                 self.assertEqual(len(sink.events), 0)
             finally:
-                pool.unregister(TestEventSink)
+                pool.unregister_sink(TestEventSink)
 
         # Test settings argument override
         with self.settings(EVENT_SINKS={
@@ -176,14 +176,14 @@ class EventsSettingsTestCase(django_test.TestCase):
                 }
             }
         }):
-            pool.register(TestEventSink)
+            pool.register_sink(TestEventSink)
             pool.get_sink('TestEventSink').add_filter(TestEventFilter, pass_everything=True)
             try:
                 base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
                 sink = pool.get_sink('TestEventSink')
                 self.assertEqual(len(sink.events), 1)
             finally:
-                pool.unregister(TestEventSink)
+                pool.unregister_sink(TestEventSink)
 
         # Test disabled filter via settings
         with self.settings(EVENT_SINKS={
@@ -195,11 +195,11 @@ class EventsSettingsTestCase(django_test.TestCase):
                 }
             }
         }):
-            pool.register(TestEventSink)
+            pool.register_sink(TestEventSink)
             pool.get_sink('TestEventSink').add_filter(TestEventFilter)
             try:
                 base.EventRecord(a=1, b=2, c=True, message="Hello event world!").post()
                 sink = pool.get_sink('TestEventSink')
                 self.assertEqual(len(sink.events), 1)
             finally:
-                pool.unregister(TestEventSink)
+                pool.unregister_sink(TestEventSink)
