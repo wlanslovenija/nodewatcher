@@ -37,7 +37,7 @@ python-memcached==1.53
 pytz==2014.7
 six==1.8.0
 sphinx-me==0.3
-git+https://github.com/wlanslovenija/ultrajson@946d4dfe1019b37f57a6a74328940d35b59b4245#egg=ujson-wlanslovenija
+git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb84e273a#egg=ujson-wlanslovenija
 wsgiref==0.1.2
 django-timezone-field==1.1
 django-json-field==0.5.7
