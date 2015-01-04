@@ -5,6 +5,7 @@ from tastypie import authorization as api_authorization, authentication as api_a
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import api
+from nodewatcher.core.frontend.api import fields as api_fields
 from nodewatcher.core.generator import models as generator_models
 from nodewatcher.modules.frontend.list import resources
 
@@ -79,9 +80,9 @@ class BuildResultFileResource(api.BaseResource):
 
 
 class BuildResultResource(api.BaseResource):
-    node = fields.ToOneField(NodeResource, 'node', full=True)
-    build_channel = fields.ToOneField(BuildChannelResource, 'build_channel', full=True)
-    builder = fields.ToOneField(BuilderResource, 'builder', full=True)
+    node = api_fields.ToOneField(NodeResource, 'node', full=True)
+    build_channel = api_fields.ToOneField(BuildChannelResource, 'build_channel', full=True)
+    builder = api_fields.ToOneField(BuilderResource, 'builder', full=True)
     files = fields.ToManyField(BuildResultFileResource, 'files', full=True, use_in='detail')
     build_log = fields.CharField('build_log', use_in='detail')
     config = fields.DictField('config', use_in='detail')
@@ -97,7 +98,12 @@ class BuildResultResource(api.BaseResource):
             'build_channel',
             'builder',
             'builder__version',
-        )
+        # noqa (PEP8 ignore indentation)
+        # We have to have some ordering so that pagination works correctly.
+        # Otherwise SKIP and LIMIT does not necessary return expected pages.
+        # Later calls to order_by override this so if user specifies an order
+        # things work as expected as well.
+        ).order_by('uuid')
         resource_name = 'build_result'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
