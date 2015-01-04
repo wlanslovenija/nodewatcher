@@ -12,7 +12,45 @@ class ApiNameMixin(object):
         return None
 
 
-class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
+class ToOneField(ApiNameMixin, tastypie_fields.ToOneField):
+    """
+    Extended tastypie ToOneField with support for nested schema and field
+    filtering.
+    """
+
+    def contribute_to_class(self, cls, name):
+        from . import resources
+
+        super(ToOneField, self).contribute_to_class(cls, name)
+
+        # Update use_in in order to support field filtering.
+        self.use_in = resources.BaseResource.field_use_in_factory(
+            name,
+            self.use_in
+        )
+
+    def build_schema(self):
+        return {
+            'fields': self.to_class(self.get_api_name()).build_schema()['fields'],
+        }
+
+    def dehydrate(self, bundle, for_list=True):
+        # Because bundle.request is the only state which is passed through all
+        # dehydration process, we are using it to pass the current path while we
+        # are walking the related resources. This is needed when selecting fields
+        # in field_use_in_factory to determine to select a field or not.
+
+        if not hasattr(bundle.request, '_field_in_use_path'):
+            bundle.request._field_in_use_path = []
+
+        bundle.request._field_in_use_path.append(self.instance_name)
+        try:
+            return super(ToOneField, self).dehydrate(bundle, for_list)
+        finally:
+            bundle.request._field_in_use_path.pop()
+
+
+class RegistryRelationField(ToOneField):
     """
     Tastypie field for registry relation field.
     """
@@ -42,26 +80,6 @@ class RegistryRelationField(ApiNameMixin, tastypie_fields.ToOneField):
         if not self._help_text:
             self._help_text = "Registry model (%s)" % (self.to_class(self.get_api_name())._meta.resource_name,)
         return self._help_text
-
-    def build_schema(self):
-        return {
-            'fields': self.to_class(self.get_api_name()).build_schema()['fields'],
-        }
-
-    def dehydrate(self, bundle, for_list=True):
-        # Because bundle.request is the only state which is passed through all
-        # dehydration process, we are using it to pass the current path while we
-        # are walking the related resources. This is needed when selecting fields
-        # in field_use_in_factory to determine to select a field or not.
-
-        if not hasattr(bundle.request, '_field_in_use_path'):
-            bundle.request._field_in_use_path = []
-
-        bundle.request._field_in_use_path.append(self.instance_name)
-        try:
-            return super(RegistryRelationField, self).dehydrate(bundle, for_list)
-        finally:
-            bundle.request._field_in_use_path.pop()
 
 
 class GeoJSON(str):
