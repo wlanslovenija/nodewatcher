@@ -1,7 +1,7 @@
-from tastypie import paginator
+from django_datastream import test_runner
 
 
-class Paginator(paginator.Paginator):
+class Paginator(test_runner.Paginator):
     def page(self):
         # We add count of all objects before filtering (used in dataTables)
         page = super(Paginator, self).page()

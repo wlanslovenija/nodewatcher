@@ -7,7 +7,7 @@ from django.utils import six
 from tastypie import fields as tastypie_fields, resources
 from tastypie.contrib.gis import resources as gis_resources
 
-from django_datastream import serializers
+from django_datastream import resources as datastream_resources, serializers
 
 import json_field
 
@@ -69,7 +69,7 @@ class BaseMetaclass(resources.ModelDeclarativeMetaclass):
         return super(BaseMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelResource, gis_resources.ModelResource)):
+class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelResource, gis_resources.ModelResource, datastream_resources.BaseResource)):
     # In class methods which are called from a metaclass we cannot use super() because BaseResource is not
     # yet defined then. We cannot call gis_resources.ModelResource.<method>() either, because then our current
     # cls is not given, but gis_resources.ModelResource is used instead. So we create a custom function where skip
@@ -364,28 +364,6 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         filtered_queryset._nonfiltered_count = queryset.count()
 
         return filtered_queryset
-
-    @staticmethod
-    def value_to_list(params, field):
-        if hasattr(params, 'getlist'):
-            value = []
-
-            for part in params.getlist(field):
-                value.extend(part.split(','))
-        else:
-            value = params.get(field, '').split(',')
-
-        return value
-
-    def basic_filter_value_to_python(self, value):
-        if value in ['true', 'True', True]:
-            return True
-        elif value in ['false', 'False', False]:
-            return False
-        elif value in ('none', 'None', 'null', None):
-            return None
-        else:
-            return value
 
     def filter_value_to_python(self, value, field_name, filters, filter_expr, filter_type):
         if filter_type in ('in', 'range'):

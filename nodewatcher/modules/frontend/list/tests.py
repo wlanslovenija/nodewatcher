@@ -1,18 +1,17 @@
 import datetime
 import json
 import os
+import unittest
 import urllib
-import urlparse
 import uuid
 
 from django.apps import apps
-from django.core import urlresolvers
 from django.contrib.auth import models as auth_models
 from django.utils import encoding, timezone
 
-from tastypie import test
-
 from guardian import shortcuts
+
+from django_datastream import test_runner
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.monitor import models as monitor_models
@@ -24,17 +23,10 @@ from nodewatcher.modules.administration.types import models as type_models
 from . import resources
 
 
-class NodeResourceTest(test.ResourceTestCase):
-    api_name = 'v1'
-    # To always display full diff.
-    maxDiff = None
-
+class NodeResourceTest(test_runner.ResourceTestCase):
     @classmethod
     def setUpClass(cls):
         super(NodeResourceTest, cls).setUpClass()
-
-        cls.node_list = cls.resource_list_uri('node')
-        cls.node_schema = cls.resource_schema_uri('node')
 
         cls.projects = []
         for i in range(2):
@@ -125,50 +117,6 @@ class NodeResourceTest(test.ResourceTestCase):
         # But it should not really change the ordering, because we are generating UUIDs in sequence.
         assert [node.uuid for node in sorted_nodes] == [node.uuid for node in cls.nodes]
 
-    @classmethod
-    def resource_list_uri(cls, resource_name):
-        return urlresolvers.reverse('api:api_dispatch_list', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
-
-    @classmethod
-    def resource_schema_uri(cls, resource_name):
-        return urlresolvers.reverse('api:api_get_schema', kwargs={'api_name': cls.api_name, 'resource_name': resource_name})
-
-    @classmethod
-    def resource_detail_uri(cls, resource_name, pk):
-        return urlresolvers.reverse('api:api_dispatch_detail', kwargs={'api_name': cls.api_name, 'resource_name': resource_name, 'pk': pk})
-
-    def assertMetaEqual(self, meta1, meta2):
-        meta1next = meta1.pop('next')
-        meta2next = meta2.pop('next')
-        meta1previous = meta1.pop('previous')
-        meta2previous = meta2.pop('previous')
-
-        meta1next_query = None
-        meta2next_query = None
-        meta1previous_query = None
-        meta2previous_query = None
-
-        self.assertEqual(meta1, meta2)
-
-        if meta1next is not None:
-            meta1next = urlparse.urlparse(meta1next)
-            meta1next_query = urlparse.parse_qs(meta1next.query, strict_parsing=True)
-        if meta2next is not None:
-            meta2next = urlparse.urlparse(meta2next)
-            meta2next_query = urlparse.parse_qs(meta2next.query, strict_parsing=True)
-        if meta1previous is not None:
-            meta1previous = urlparse.urlparse(meta1previous)
-            meta1previous_query = urlparse.parse_qs(meta1previous.query, strict_parsing=True)
-        if meta2previous is not None:
-            meta2previous = urlparse.urlparse(meta2previous)
-            meta2previous_query = urlparse.parse_qs(meta2previous.query, strict_parsing=True)
-
-        self.assertEqual(getattr(meta1next, 'path', None), getattr(meta2next, 'path', None))
-        self.assertEqual(getattr(meta1previous, 'path', None), getattr(meta2previous, 'path', None))
-
-        self.assertEqual(meta1next_query, meta2next_query)
-        self.assertEqual(meta1previous_query, meta2previous_query)
-
     def assertNodeEqual(self, i, node, json_node, selection=lambda node: node):
         self.assertEqual(selection({
             u'status': {
@@ -188,38 +136,11 @@ class NodeResourceTest(test.ResourceTestCase):
                 u'timezone': u'Europe/Ljubljana',
             },
             # We manually construct URI to make sure it is like we assume it is.
-            u'resource_uri': u'%s%s/' % (self.node_list, node.uuid),
+            u'resource_uri': u'%s%s/' % (self.resource_list_uri('node'), node.uuid),
             u'type': node.config.core.type().type,
             # Works correctly only if i < 60.
             u'last_seen': u'Wed, 05 Nov 2014 01:05:%02d +0000' % i,
         }), json_node)
-
-    def get_list(self, **kwargs):
-        kwargs['format'] = 'json'
-
-        response = self.api_client.get(self.node_list, data=kwargs)
-
-        self.assertValidJSONResponse(response)
-
-        return self.deserialize(response)
-
-    def get_schema(self, **kwargs):
-        kwargs['format'] = 'json'
-
-        response = self.api_client.get(self.node_schema, data=kwargs)
-
-        self.assertValidJSONResponse(response)
-
-        return self.deserialize(response)
-
-    def get_detail(self, pk, **kwargs):
-        kwargs['format'] = 'json'
-
-        response = self.api_client.get(self.resource_detail_uri('node', pk), data=kwargs)
-
-        self.assertValidJSONResponse(response)
-
-        return self.deserialize(response)
 
     def project(self, source, projection):
         # Based on https://gist.github.com/bauman/2f68cebfddf9dc9c763a
@@ -249,19 +170,19 @@ class NodeResourceTest(test.ResourceTestCase):
     def test_api_uris(self):
         # URIs have to be stable.
 
-        self.assertEqual(self.node_list, '/api/v1/node/')
-        self.assertEqual(self.node_schema, '/api/v1/node/schema/')
+        self.assertEqual('/api/v1/node/', self.resource_list_uri('node'))
+        self.assertEqual('/api/v1/node/schema/', self.resource_schema_uri('node'))
 
     def test_read_only(self):
-        node_uri = '%s%s/' % (self.node_list, self.nodes[0].uuid)
+        node_uri = '%s%s/' % (self.resource_list_uri('node'), self.nodes[0].uuid)
 
-        self.assertHttpMethodNotAllowed(self.api_client.post(self.node_list, format='json', data={}))
+        self.assertHttpMethodNotAllowed(self.api_client.post(self.resource_list_uri('node'), format='json', data={}))
         self.assertHttpMethodNotAllowed(self.api_client.put(node_uri, format='json', data={}))
         self.assertHttpMethodNotAllowed(self.api_client.patch(node_uri, format='json', data={}))
         self.assertHttpMethodNotAllowed(self.api_client.delete(node_uri, format='json'))
 
     def test_get_list_all(self):
-        data = self.get_list(
+        data = self.get_list('node',
             offset=0,
             limit=0,
         )
@@ -276,7 +197,7 @@ class NodeResourceTest(test.ResourceTestCase):
         self.assertEqual({
             u'total_count': 45,
             # We specified 0 for limit in the request, so max limit should be used.
-            u'limit': resources.NodeResource.Meta.max_limit,
+            u'limit': resources.NodeResource._meta.max_limit,
             u'offset': 0,
             u'nonfiltered_count': 45,
             u'next': None,
@@ -284,7 +205,7 @@ class NodeResourceTest(test.ResourceTestCase):
         }, data['meta'])
 
     def test_get_list_offset(self):
-        data = self.get_list(
+        data = self.get_list('node',
             offset=11,
             limit=0,
         )
@@ -295,7 +216,7 @@ class NodeResourceTest(test.ResourceTestCase):
         self.assertMetaEqual({
             u'total_count': 45,
             # We specified 0 for limit in the request, so max limit should be used.
-            u'limit': resources.NodeResource.Meta.max_limit,
+            u'limit': resources.NodeResource._meta.max_limit,
             u'offset': 11,
             u'nonfiltered_count': 45,
             u'next': None,
@@ -303,7 +224,7 @@ class NodeResourceTest(test.ResourceTestCase):
         }, data['meta'])
 
     def test_get_list_page(self):
-        data = self.get_list(
+        data = self.get_list('node',
             offset=6,
             limit=20,
         )
@@ -316,12 +237,12 @@ class NodeResourceTest(test.ResourceTestCase):
             u'limit': 20,
             u'offset': 6,
             u'nonfiltered_count': 45,
-            u'next': u'%s?format=json&limit=20&offset=26' % self.node_list,
+            u'next': u'%s?format=json&limit=20&offset=26' % self.resource_list_uri('node'),
             u'previous': None,
         }, data['meta'])
 
     def test_get_list_last_page(self):
-        data = self.get_list(
+        data = self.get_list('node',
             offset=40,
             limit=20,
         )
@@ -335,7 +256,7 @@ class NodeResourceTest(test.ResourceTestCase):
             u'offset': 40,
             u'nonfiltered_count': 45,
             u'next': None,
-            u'previous': u'%s?format=json&limit=20&offset=20' % self.node_list,
+            u'previous': u'%s?format=json&limit=20&offset=20' % self.resource_list_uri('node'),
         }, data['meta'])
 
     def test_ordering(self):
@@ -352,7 +273,7 @@ class NodeResourceTest(test.ResourceTestCase):
                         ('status__network', lambda node: self.monitoring_network.index(node.monitoring.core.status().network)),
                     ):
                         ordering = '%s%s' % ('-' if reverse else '', ordering)
-                        data = self.get_list(
+                        data = self.get_list('node',
                             offset=offset,
                             limit=limit,
                             order_by=ordering,
@@ -363,18 +284,18 @@ class NodeResourceTest(test.ResourceTestCase):
 
                         self.assertMetaEqual({
                             u'total_count': 45,
-                            u'limit': limit or resources.NodeResource.Meta.max_limit,
+                            u'limit': limit or resources.NodeResource._meta.max_limit,
                             u'offset': offset,
                             u'nonfiltered_count': 45,
-                            u'next': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
-                            u'previous': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset - limit) if limit and offset - limit >= 0 else None,
+                            u'next': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), urllib.quote(ordering), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
+                            u'previous': u'%s?order_by=%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), urllib.quote(ordering), limit, offset - limit) if limit and offset - limit >= 0 else None,
                         }, data['meta'])
 
     def test_ordering_multiple(self):
         for offset in (0, 4, 7):
             for limit in (0, 5, 20):
                 ordering = ['type', 'name']
-                data = self.get_list(
+                data = self.get_list('node',
                     offset=offset,
                     limit=limit,
                     order_by=ordering,
@@ -387,11 +308,11 @@ class NodeResourceTest(test.ResourceTestCase):
 
                 self.assertMetaEqual({
                     u'total_count': 45,
-                    u'limit': limit or resources.NodeResource.Meta.max_limit,
+                    u'limit': limit or resources.NodeResource._meta.max_limit,
                     u'offset': offset,
                     u'nonfiltered_count': 45,
-                    u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
-                    u'previous': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.node_list, limit, offset - limit) if limit and offset - limit >= 0 else None,
+                    u'next': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
+                    u'previous': u'%s?order_by=type&order_by=name&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), limit, offset - limit) if limit and offset - limit >= 0 else None,
                 }, data['meta'])
 
     def test_global_filter(self):
@@ -406,7 +327,7 @@ class NodeResourceTest(test.ResourceTestCase):
                     ('nODe 5', lambda node: node.config.core.general().name == 'Node 5'),
                     ('ProjecT', lambda node: True), # All nodes are in projects.
                 ):
-                    data = self.get_list(
+                    data = self.get_list('node',
                         offset=offset,
                         limit=limit,
                         filter=global_filter,
@@ -418,11 +339,11 @@ class NodeResourceTest(test.ResourceTestCase):
 
                     self.assertMetaEqual({
                         u'total_count': len(filtered_nodes),
-                        u'limit': limit or resources.NodeResource.Meta.max_limit,
+                        u'limit': limit or resources.NodeResource._meta.max_limit,
                         u'offset': offset,
                         u'nonfiltered_count': 45,
-                        u'next': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(global_filter), limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
-                        u'previous': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(global_filter), limit, offset - limit) if limit and offset - limit >= 0 else None,
+                        u'next': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), urllib.quote(global_filter), limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
+                        u'previous': u'%s?filter=%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), urllib.quote(global_filter), limit, offset - limit) if limit and offset - limit >= 0 else None,
                     }, data['meta'])
 
     def test_field_filters(self):
@@ -463,7 +384,7 @@ class NodeResourceTest(test.ResourceTestCase):
                         'limit': limit,
                     }
                     kwargs.update(field_filter)
-                    data = self.get_list(**kwargs)
+                    data = self.get_list('node', **kwargs)
 
                     filtered_nodes = [node.uuid for node in filter(filter_function, self.nodes)]
                     nodes = data['objects']
@@ -478,11 +399,11 @@ class NodeResourceTest(test.ResourceTestCase):
 
                     self.assertMetaEqual({
                         u'total_count': len(filtered_nodes),
-                        u'limit': limit or resources.NodeResource.Meta.max_limit,
+                        u'limit': limit or resources.NodeResource._meta.max_limit,
                         u'offset': offset,
                         u'nonfiltered_count': 45,
-                        u'next': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
-                        u'previous': u'%s?%s&format=json&limit=%s&offset=%s' % (self.node_list, uri_filter, limit, offset - limit) if limit and offset - limit >= 0 else None,
+                        u'next': u'%s?%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), uri_filter, limit, offset + limit) if limit and len(filtered_nodes) > offset + limit else None,
+                        u'previous': u'%s?%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), uri_filter, limit, offset - limit) if limit and offset - limit >= 0 else None,
                     }, data['meta'])
 
     def test_maintainer(self):
@@ -495,7 +416,7 @@ class NodeResourceTest(test.ResourceTestCase):
                         ('node 5', lambda node: node.config.core.general().name == 'Node 5'),
                     ):
                         maintainer = user.username
-                        data = self.get_list(
+                        data = self.get_list('node',
                             offset=offset,
                             limit=limit,
                             maintainer=maintainer,
@@ -510,17 +431,17 @@ class NodeResourceTest(test.ResourceTestCase):
 
                         self.assertMetaEqual({
                             u'total_count': len(filtered_nodes),
-                            u'limit': limit or resources.NodeResource.Meta.max_limit,
+                            u'limit': limit or resources.NodeResource._meta.max_limit,
                             u'offset': offset,
                             # A special case, we want maintainer filter to filter also nonfiltered_count.
                             u'nonfiltered_count': len(all_nodes),
                             u'next': u'%s?%smaintainer=%s&format=json&limit=%s&offset=%s' % (
-                                self.node_list,
+                                self.resource_list_uri('node'),
                                 'filter=%s&' % urllib.quote(global_filter) if global_filter else '',
                                 urllib.quote(maintainer), limit, offset + limit,
                             ) if limit and len(filtered_nodes) > offset + limit else None,
                             u'previous': u'%s?%smaintainer=%s&format=json&limit=%s&offset=%s' % (
-                                self.node_list,
+                                self.resource_list_uri('node'),
                                 'filter=%s&' % urllib.quote(global_filter) if global_filter else '',
                                 urllib.quote(maintainer), limit, offset - limit
                             ) if limit and offset - limit >= 0 else None,
@@ -530,13 +451,13 @@ class NodeResourceTest(test.ResourceTestCase):
         with file(os.path.join(apps.get_app_config('frontend_list').path, 'tests', 'schema.json'), 'r') as f:
             schema = json.load(f)
 
-        data = self.get_schema()
+        data = self.get_schema('node')
 
         self.assertEqual(schema, data)
 
     def test_get_detail(self):
         for i, node in enumerate(self.nodes[0:5]):
-            data = self.get_detail(node.uuid)
+            data = self.get_detail('node', node.uuid)
 
             self.assertNodeEqual(i, node, data)
 
@@ -556,7 +477,7 @@ class NodeResourceTest(test.ResourceTestCase):
             ('uuid,status__', lambda node: self.project(node, {'uuid': 1, 'status': 1})),
             (['uuid', 'status__health,status__monitored'], lambda node: self.project(node, {'uuid': 1, 'status.health': 1, 'status.monitored': 1})),
         ):
-            data = self.get_list(
+            data = self.get_list('node',
                 offset=0,
                 limit=0,
                 fields=fields,
@@ -572,7 +493,7 @@ class NodeResourceTest(test.ResourceTestCase):
             self.assertEqual({
                 u'total_count': 45,
                 # We specified 0 for limit in the request, so max limit should be used.
-                u'limit': resources.NodeResource.Meta.max_limit,
+                u'limit': resources.NodeResource._meta.max_limit,
                 u'offset': 0,
                 u'nonfiltered_count': 45,
                 u'next': None,
@@ -586,7 +507,7 @@ class NodeResourceTest(test.ResourceTestCase):
             for limit in (0, 5, 20):
                 for reverse in (False, True):
                     ordering = '-name' if reverse else 'name'
-                    data = self.get_list(
+                    data = self.get_list('node',
                         offset=offset,
                         limit=limit,
                         order_by=ordering,
@@ -600,9 +521,9 @@ class NodeResourceTest(test.ResourceTestCase):
 
                     self.assertMetaEqual({
                         u'total_count': 45,
-                        u'limit': limit or resources.NodeResource.Meta.max_limit,
+                        u'limit': limit or resources.NodeResource._meta.max_limit,
                         u'offset': offset,
                         u'nonfiltered_count': 45,
-                        u'next': u'%s?fields=uuid&order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
-                        u'previous': u'%s?fields=uuid&order_by=%s&format=json&limit=%s&offset=%s' % (self.node_list, urllib.quote(ordering), limit, offset - limit) if limit and offset - limit >= 0 else None,
+                        u'next': u'%s?fields=uuid&order_by=%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), urllib.quote(ordering), limit, offset + limit) if limit and len(self.nodes) > offset + limit else None,
+                        u'previous': u'%s?fields=uuid&order_by=%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), urllib.quote(ordering), limit, offset - limit) if limit and offset - limit >= 0 else None,
                     }, data['meta'])
