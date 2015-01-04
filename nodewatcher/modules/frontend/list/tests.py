@@ -182,7 +182,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
         self.assertHttpMethodNotAllowed(self.api_client.delete(node_uri, format='json'))
 
     def test_get_list_all(self):
-        data = self.get_list('node',
+        data = self.get_list(
+            'node',
             offset=0,
             limit=0,
         )
@@ -205,7 +206,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
         }, data['meta'])
 
     def test_get_list_offset(self):
-        data = self.get_list('node',
+        data = self.get_list(
+            'node',
             offset=11,
             limit=0,
         )
@@ -224,7 +226,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
         }, data['meta'])
 
     def test_get_list_page(self):
-        data = self.get_list('node',
+        data = self.get_list(
+            'node',
             offset=6,
             limit=20,
         )
@@ -242,7 +245,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
         }, data['meta'])
 
     def test_get_list_last_page(self):
-        data = self.get_list('node',
+        data = self.get_list(
+            'node',
             offset=40,
             limit=20,
         )
@@ -273,7 +277,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                         ('status__network', lambda node: self.monitoring_network.index(node.monitoring.core.status().network)),
                     ):
                         ordering = '%s%s' % ('-' if reverse else '', ordering)
-                        data = self.get_list('node',
+                        data = self.get_list(
+                            'node',
                             offset=offset,
                             limit=limit,
                             order_by=ordering,
@@ -295,7 +300,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
         for offset in (0, 4, 7):
             for limit in (0, 5, 20):
                 ordering = ['type', 'name']
-                data = self.get_list('node',
+                data = self.get_list(
+                    'node',
                     offset=offset,
                     limit=limit,
                     order_by=ordering,
@@ -327,7 +333,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                     ('nODe 5', lambda node: node.config.core.general().name == 'Node 5'),
                     ('ProjecT', lambda node: True), # All nodes are in projects.
                 ):
-                    data = self.get_list('node',
+                    data = self.get_list(
+                        'node',
                         offset=offset,
                         limit=limit,
                         filter=global_filter,
@@ -416,7 +423,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                         ('node 5', lambda node: node.config.core.general().name == 'Node 5'),
                     ):
                         maintainer = user.username
-                        data = self.get_list('node',
+                        data = self.get_list(
+                            'node',
                             offset=offset,
                             limit=limit,
                             maintainer=maintainer,
@@ -477,7 +485,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
             ('uuid,status__', lambda node: self.project(node, {'uuid': 1, 'status': 1})),
             (['uuid', 'status__health,status__monitored'], lambda node: self.project(node, {'uuid': 1, 'status.health': 1, 'status.monitored': 1})),
         ):
-            data = self.get_list('node',
+            data = self.get_list(
+                'node',
                 offset=0,
                 limit=0,
                 fields=fields,
@@ -507,7 +516,8 @@ class NodeResourceTest(test_runner.ResourceTestCase):
             for limit in (0, 5, 20):
                 for reverse in (False, True):
                     ordering = '-name' if reverse else 'name'
-                    data = self.get_list('node',
+                    data = self.get_list(
+                        'node',
                         offset=offset,
                         limit=limit,
                         order_by=ordering,
