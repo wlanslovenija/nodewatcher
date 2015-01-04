@@ -443,6 +443,24 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                         u'previous': u'%s?%s&format=json&limit=%s&offset=%s' % (self.resource_list_uri('node'), uri_filter, previous_limit, offset - previous_limit) if offset != 0 else None,
                     }, data['meta'])
 
+    @unittest.skip("Does not work, see https://code.djangoproject.com/ticket/22352")
+    def test_distance(self):
+        for distance in (
+            json.dumps(json.dumps({'type': 'Point', 'coordinates': [10.1, 40.1]})),
+            str(json.dumps({'type': 'Point', 'coordinates': [10.1, 40.1]})),
+            json.dumps({'type': 'Point', 'coordinates': [10.1, 40.1]}),
+        ):
+            data = self.get_list(
+                'node',
+                offset=0,
+                limit=0,
+                distance=distance,
+            )
+
+        # TODO: Distance field for each node should be available through API only when it exists (when is enabled through query parameter)
+        # TODO: Test sorting by distance
+        # TODO: Test filtering by distance
+
     def test_maintainer(self):
         for offset in (0, 4, 7):
             for limit in (0, 5, 20):

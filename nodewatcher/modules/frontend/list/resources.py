@@ -86,3 +86,15 @@ class NodeResource(api.BaseResource):
                 queryset = queryset.none()
 
         return queryset
+
+    def get_object_list(self, request):
+        queryset = super(NodeResource, self).get_object_list(self)
+
+        # If user specifies a distance parameter, we populate a field with distance from the given
+        # geometry to the node. This can then be used to order or filter nodes.
+        distance = getattr(request, 'GET', {}).get('distance', None)
+        if distance:
+            # TODO: GeoQuerySet queries should transform registry field names automatically, so that we do not have to call registry_expand_proxy_field
+            queryset = queryset.distance(distance, field_name=queryset.registry_expand_proxy_field('location__geolocation'), model_att='distance')
+
+        return queryset
