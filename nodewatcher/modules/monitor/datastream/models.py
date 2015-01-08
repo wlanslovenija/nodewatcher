@@ -289,6 +289,7 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
+            'maximum': 100.0,
             'with': {'group': 'packet_loss', 'node': fields.TagReference('node')},
         }
     })

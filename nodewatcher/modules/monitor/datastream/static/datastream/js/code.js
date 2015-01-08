@@ -8,7 +8,7 @@
                 'tags__node': $nodeGraphs.data('node'),
                 // TODO: We currently support only line visualization type
                 'tags__visualization__type': 'line',
-                // TODO: Code should support automatic loading of multiple pages of stream
+                // More streams per page.
                 'limit': 100
             }
         });

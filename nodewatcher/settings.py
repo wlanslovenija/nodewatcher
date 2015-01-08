@@ -507,12 +507,6 @@ DATASTREAM_BACKEND_SETTINGS = {
     'tz_aware': USE_TZ,
 }
 
-# We use RFC 2822 for better parsing in JavaScript and time-zone support.
-TASTYPIE_DATETIME_FORMATTING = 'rfc-2822'
-
-# JSONP support as well.
-TASTYPIE_DEFAULT_FORMATS = ('json', 'jsonp', 'xml')
-
 # Registry form processors hook into configuration changes
 # performed by users via the forms user interface.
 REGISTRY_FORM_PROCESSORS = {

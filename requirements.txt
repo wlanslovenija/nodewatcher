@@ -8,13 +8,13 @@ amqp==1.4.6
 anyjson==0.3.3
 billiard==3.3.0.18
 celery==3.1.16
-datastream==0.4.0
+datastream==0.4.1
 defusedxml==0.4.1
 django-celery==3.1.16
 django-classy-tags==0.5.1
 git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb84e273a#egg=ujson-wlanslovenija
 git+https://github.com/wlanslovenija/django-tastypie.git@61e8f18ffd525dbabb16f13ad5978f451f2d5a18#egg=django_tastypie-wlanslovenija
-git+https://github.com/wlanslovenija/django-datastream.git@f225cef5c408d3a07d3ab0b353262f8d8eb4c412#egg=django_datastream-master
+git+https://github.com/wlanslovenija/django-datastream.git@e17aaf6f4cb9e2842c7ae20c37217d62db107ab5#egg=django_datastream-master
 git+https://github.com/wlanslovenija/django-guardian.git@38460f0ab9c0d46e72b92a34a49d039d40a75a5e#egg=django_guardian-wlanslovenija
 git+https://github.com/wlanslovenija/django-missing.git@a068cd6f66a0b33012259ebdc335b5082b772093#egg=django_missing-master
 git+https://github.com/wlanslovenija/django-overextends.git@d70cdf44bff3fd130a0a64f4f6836ca3b8ea030f#egg=django_overextends-wlanslovenija
