@@ -42,7 +42,7 @@ class GeneralConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     name = models.CharField(
-        max_length=30,
+        max_length=50,
         null=True,
         validators=[core_validators.NodeNameValidator()],
     )
