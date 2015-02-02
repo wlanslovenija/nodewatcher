@@ -1,5 +1,4 @@
 #!/bin/bash -e
 
 cd /code
-exec chpst -u www-data:www-data /usr/local/bin/celery worker -A nodewatcher -l info -Q generator
-
+exec chpst -u www-data:www-data /usr/local/bin/celery worker -A nodewatcher -l info -Q generator 2>&1
