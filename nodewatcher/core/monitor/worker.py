@@ -3,6 +3,7 @@ import multiprocessing
 import time
 import traceback
 
+from django import db
 from django.conf import settings
 from django.core import exceptions
 from django.db import connection, transaction
@@ -243,6 +244,15 @@ class Worker(object):
         """
         Runs the monitoring process.
         """
+
+        # Before running the process, ensure that the database is ready. This
+        # is so we fail early instead of later when calling a processor.
+        try:
+            with transaction.atomic():
+                pass
+        except db.DatabaseError:
+            logger.error("Failed to establish a database connection, exiting.")
+            return
 
         # Show the welcome banner
         print BANNER
