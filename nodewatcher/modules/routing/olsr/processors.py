@@ -66,7 +66,8 @@ class Topology(monitor_processors.NetworkProcessor):
 
                     if created:
                         general_cfg = node.config.core.general(create=core_models.GeneralConfig)
-                        general_cfg.name = None
+                        # Name the nodes using their IP address by default
+                        general_cfg.name = str(router_id)
                         general_cfg.save()
 
                         node.config.core.routerid(
