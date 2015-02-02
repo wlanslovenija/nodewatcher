@@ -237,7 +237,7 @@ class Worker(object):
         """
         Runs the monitoring process.
         """
-        
+
         logger.info("Starting the nodewatcher monitoring system.")
 
         # Before running the process, ensure that the database is ready. This
