@@ -12,13 +12,6 @@ from django.utils import importlib
 from . import processors as monitor_processors
 from .. import models as core_models
 
-# Welcome banner
-BANNER = """
---------------------------------------------------------
-            nodewatcher monitoring system
---------------------------------------------------------
-"""
-
 # Logger instance
 logger = logging.getLogger('monitor.worker')
 
@@ -244,6 +237,8 @@ class Worker(object):
         """
         Runs the monitoring process.
         """
+        
+        logger.info("Starting the nodewatcher monitoring system.")
 
         # Before running the process, ensure that the database is ready. This
         # is so we fail early instead of later when calling a processor.
@@ -253,9 +248,6 @@ class Worker(object):
         except db.DatabaseError:
             logger.error("Failed to establish a database connection, exiting.")
             return
-
-        # Show the welcome banner
-        print BANNER
 
         logger.info("Loading processors...")
         self.prepare_processors()
