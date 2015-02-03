@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.monitor import processors as monitor_processors, events as monitor_events
+from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors, events as monitor_events
 
 from . import models as olsr_models, parser as olsr_parser
 
@@ -99,6 +99,11 @@ class NodePostprocess(monitor_processors.NodeProcessor):
                 return context
             else:
                 context.node_available = True
+
+            # Update last seen timestamp as the router is at least visible
+            general = node.monitoring.core.general(create=monitor_models.GeneralMonitor)
+            general.last_seen = timezone.now()
+            general.save()
 
             # Setup links in topology tables
             try:
