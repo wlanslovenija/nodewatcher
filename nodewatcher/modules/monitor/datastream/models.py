@@ -364,6 +364,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'packets_rate',
                 'interface': fields.TagReference('interface'),
@@ -380,6 +381,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'packets_rate',
                 'interface': fields.TagReference('interface'),
@@ -396,6 +398,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'bytes_rate',
                 'interface': fields.TagReference('interface'),
@@ -412,6 +415,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'bytes_rate',
                 'interface': fields.TagReference('interface'),
@@ -428,6 +432,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'errors_rate',
                 'interface': fields.TagReference('interface'),
@@ -444,6 +449,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'errors_rate',
                 'interface': fields.TagReference('interface'),
@@ -460,6 +466,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'drops_rate',
                 'interface': fields.TagReference('interface'),
@@ -476,6 +483,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
             'with': {
                 'group': 'drops_rate',
                 'interface': fields.TagReference('interface'),

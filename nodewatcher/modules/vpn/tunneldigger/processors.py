@@ -20,6 +20,7 @@ try:
                 'type': 'line',
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
+                'minimum': 0.0,
                 'with': {'group': 'tunneldigger_bytes_rate'},
             }
         })
@@ -31,6 +32,7 @@ try:
                 'type': 'line',
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
+                'minimum': 0.0,
                 'with': {'group': 'tunneldigger_bytes_rate'},
             }
         })
