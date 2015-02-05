@@ -295,13 +295,15 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
     })
     rtt = fields.MultiPointField(
         tags={
+            'group': 'rtt',
             'title': fields.TagReference('packet_size', gettext_noop("RTT (%(packet_size)s bytes)")),
-            'description': gettext_noop("Minimum measured RTT."),
+            'description': gettext_noop("Measured round-trip time."),
             'visualization': {
                 'type': 'line',
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
+                'with': {'group': 'rtt', 'node': fields.TagReference('node')},
             }
         },
         value_downsamplers=['mean', 'sum', 'min', 'max', 'sum_squares', 'std_dev', 'count'],
