@@ -313,8 +313,8 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
             'l': model.rtt_minimum,
             'u': model.rtt_maximum,
             'd': model.rtt_std,
-            's': model.rtt_average * model.successful_packets if model.rtt_average else None,
-            'q': (model.rtt_average ** 2 * model.successful_packets + (model.rtt_std ** 2) * (model.successful_packets - 1)) if model.rtt_std else None,
+            's': model.rtt_average * model.successful_packets if model.rtt_average is not None else None,
+            'q': (model.rtt_average ** 2 * model.successful_packets + (model.rtt_std ** 2) * (model.successful_packets - 1)) if model.rtt_std is not None else None,
         }
     )
 
