@@ -12,7 +12,9 @@ RUN cat /code/packages.txt | xargs apt-get --no-install-recommends -y --force-ye
 
 # Install Python package dependencies (do not use pip install -r here!)
 ADD ./requirements.txt /code/requirements.txt
-RUN cat /code/requirements.txt | xargs -n 1 sh -c 'CPLUS_INCLUDE_PATH=/usr/include/gdal C_INCLUDE_PATH=/usr/include/gdal pip install $0 || exit 255'
+ADD ./requirements-readthedocs.txt /code/requirements-readthedocs.txt
+RUN sed -i 's/^-r.*$//g' /code/requirements.txt && \
+    cat /code/requirements-readthedocs.txt /code/requirements.txt | xargs -n 1 sh -c 'CPLUS_INCLUDE_PATH=/usr/include/gdal C_INCLUDE_PATH=/usr/include/gdal pip install $0 || exit 255'
 
 # Remove unneeded build-time dependencies
 RUN apt-get purge python-dev build-essential -y --force-yes && \
