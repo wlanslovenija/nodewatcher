@@ -7,9 +7,6 @@ import os
 
 settings_dir = os.path.abspath(os.path.dirname(__file__))
 
-import djcelery
-djcelery.setup_loader()
-
 # Dummy function, so that "makemessages" can find strings which should be translated.
 _ = lambda s: s
 
