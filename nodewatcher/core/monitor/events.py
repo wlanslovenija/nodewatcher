@@ -43,12 +43,14 @@ class TopologyLinkEstablished(events.NodeEventRecord):
 pool.register_record(TopologyLinkEstablished)
 
 
-class TelemetryProcessingFailed(events.NodeEventRecord):
+class TelemetryProcessingFailed(events.NodeWarningRecord):
     """
     Telemetry failure event.
     """
 
     description = _("Telemetry processing has failed.")
+    # TODO: Should this be changed into a choice attribute?
+    method = events.CharAttribute(primary_key=True)
 
     def __init__(self, node, method):
         """
@@ -60,7 +62,7 @@ class TelemetryProcessingFailed(events.NodeEventRecord):
 
         super(TelemetryProcessingFailed, self).__init__(
             [node],
-            events.NodeEventRecord.SEVERITY_ERROR,
+            events.NodeWarningRecord.SEVERITY_ERROR,
             method=method,
         )
 

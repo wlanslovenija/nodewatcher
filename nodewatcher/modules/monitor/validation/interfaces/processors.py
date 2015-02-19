@@ -45,21 +45,29 @@ class InterfaceValidator(monitor_processors.NodeProcessor):
 
                     try:
                         iface_mon = node.monitoring.core.interfaces().get(name=iface_name)
+                        # Interface is present.
+                        events.MissingConfiguredInterface(node, iface_cfg, iface_name).absent()
 
                         # Perform interface validation
                         if isinstance(iface_cfg, cgm_models.WifiInterfaceConfig):
                             # Check if interface type matches
                             if isinstance(iface_mon, monitor_models.WifiInterfaceMonitor):
+                                # Interface type matches.
+                                events.InterfaceTypeMismatch(node, iface_cfg, iface_mon, iface_name).absent()
+
                                 # Check if mode matches
-                                if iface_cfg.mode != iface_mon.mode:
-                                    events.WifiInterfaceModeMismatch(node, iface_name, iface_cfg.mode, iface_mon.mode).post()
+                                events.WifiInterfaceModeMismatch(node, iface_name, iface_cfg.mode, iface_mon.mode).post_or_absent(
+                                    iface_cfg.mode != iface_mon.mode
+                                )
 
                                 # Check if ESSID/BSSID matches
-                                if iface_cfg.essid != iface_mon.essid:
-                                    events.WifiInterfaceESSIDMismatch(node, iface_name, iface_cfg.essid, iface_mon.essid).post()
+                                events.WifiInterfaceESSIDMismatch(node, iface_name, iface_cfg.essid, iface_mon.essid).post_or_absent(
+                                    iface_cfg.essid != iface_mon.essid
+                                )
 
-                                if iface_cfg.bssid != iface_mon.bssid:
-                                    events.WifiInterfaceBSSIDMismatch(node, iface_name, iface_cfg.bssid, iface_mon.bssid).post()
+                                events.WifiInterfaceBSSIDMismatch(node, iface_name, iface_cfg.bssid, iface_mon.bssid).post_or_absent(
+                                    iface_cfg.bssid != iface_mon.bssid
+                                )
 
                                 # Check if channel matches
                                 wifi_device = iface_cfg.device
@@ -74,8 +82,9 @@ class InterfaceValidator(monitor_processors.NodeProcessor):
                                 except AttributeError:
                                     channel = None
 
-                                if channel is not None and channel.number != iface_mon.channel:
-                                    events.WifiInterfaceChannelMismatch(node, iface_name, channel.number, iface_mon.channel).post()
+                                events.WifiInterfaceChannelMismatch(node, iface_name, channel.number, iface_mon.channel).post_or_absent(
+                                    channel is not None and channel.number != iface_mon.channel
+                                )
                             else:
                                 # Generate interface type mismatch event
                                 events.InterfaceTypeMismatch(node, iface_cfg, iface_mon, iface_name).post()

@@ -1,24 +1,25 @@
 from django.db import models
 from django.contrib.auth import models as auth_models
 
+from uuidfield import fields as uuid_field
 import json_field
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.events import pool
 
 
-class SerializedNodeEvent(models.Model):
+class SerializedEvent(models.Model):
     """
-    A serialized version of node events.
+    Base class for serialized events.
     """
 
-    timestamp = models.DateTimeField()
-    related_nodes = models.ManyToManyField(core_models.Node, related_name='events')
-    related_users = models.ManyToManyField(auth_models.User, related_name='events')
     severity = models.IntegerField()
     source_name = models.CharField(max_length=200)
     source_type = models.CharField(max_length=200)
-    record = json_field.JSONField()
+    record = json_field.JSONField(null=True)
+
+    class Meta:
+        abstract = True
 
     @property
     def description(self):
@@ -34,3 +35,24 @@ class SerializedNodeEvent(models.Model):
         """
 
         return pool.get_record(self.source_name, self.source_type)
+
+
+class SerializedNodeEvent(SerializedEvent):
+    """
+    A serialized version of node events.
+    """
+
+    timestamp = models.DateTimeField()
+    related_nodes = models.ManyToManyField(core_models.Node, related_name='events')
+    related_users = models.ManyToManyField(auth_models.User, related_name='events')
+
+
+class SerializedNodeWarning(SerializedEvent):
+    """
+    A serialized version of node warnings.
+    """
+
+    uuid = uuid_field.UUIDField(hyphenate=True, primary_key=True)
+    first_seen = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now=True)
+    related_nodes = models.ManyToManyField(core_models.Node, related_name='warnings')

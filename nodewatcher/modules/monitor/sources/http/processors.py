@@ -91,12 +91,16 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                         # TODO: Add a warning that the node is using a legacy feed
                         pass
                     context.successfully_parsed = True
+
+                    # Remove the warning if it is present.
+                    if hasattr(node.config.core.general(), 'router'):
+                        monitor_events.TelemetryProcessingFailed(node, method='http').absent()
                 except telemetry_parser.HttpTelemetryParseFailed:
                     # Parsing has failed, log this; all components that did not get parsed
                     # will be missing from context and so depending modules will not process them
                     self.logger.error("Failed to parse HTTP telemetry feed from %s!" % router_id)
 
-                    # Create an event in case the router has an associated firmware configuration
+                    # Create a warning in case the router has an associated firmware configuration.
                     if hasattr(node.config.core.general(), 'router'):
                         monitor_events.TelemetryProcessingFailed(node, method='http').post()
             except core_models.RouterIdConfig.DoesNotExist:

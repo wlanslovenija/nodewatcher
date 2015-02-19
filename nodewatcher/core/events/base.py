@@ -26,12 +26,30 @@ class EventRecord(object):
             'timestamp': timezone.now(),
         }
         self.record.update(kwargs)
+        self._complement = False
 
     def __getattr__(self, key):
         try:
             return self.record[key]
         except KeyError:
             raise AttributeError(key)
+
+    def __invert__(self):
+        """
+        Returns a complementary event (absence of an event).
+        """
+
+        klass = EventRecord()
+        klass.record = self.record
+        klass._complement = True
+        return klass
+
+    def is_absent(self):
+        """
+        Does this event record specify a complementary event (absence of an event).
+        """
+
+        return self._complement
 
     def post(self):
         """
@@ -40,6 +58,30 @@ class EventRecord(object):
 
         for sink in pool.get_all_sinks():
             sink.post(self)
+
+    def absent(self):
+        """
+        Posts the complementary event (absence of event) to subscribed sinks.
+        """
+
+        # Generate the complementary event.
+        complement = ~self
+
+        for sink in pool.get_all_sinks():
+            sink.post(complement)
+
+    def post_or_absent(self, condition):
+        """
+        Posts either the event (if the condition is True) or the complementary event
+        (if the condition is False) based on the passed condition variable.
+
+        :param condition: Condition variable
+        """
+
+        if condition:
+            self.post()
+        else:
+            self.absent()
 
 
 class EventFilter(object):

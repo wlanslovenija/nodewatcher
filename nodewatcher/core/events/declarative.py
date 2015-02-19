@@ -1,10 +1,14 @@
 import copy
+import uuid
 
 from django.core import exceptions
 from django.utils import datastructures
 
 from . import base as events_base
 from ..registry import registration
+
+# Randomly generated UUID for generating UUIDs for uniquely identifying events.
+EVENT_UUID_NAMESPACE = uuid.UUID('766d8c80-17e8-4778-af77-d5eee53bca05')
 
 
 class Attribute(object):
@@ -16,12 +20,13 @@ class Attribute(object):
 
     _creation_order = 0
 
-    def __init__(self):
+    def __init__(self, primary_key=False):
         """
         Class constructor.
         """
 
         self.name = None
+        self.primary_key = primary_key
         self._order = Attribute._creation_order
         Attribute._creation_order += 1
 
@@ -86,7 +91,7 @@ class NodeEventRecordMeta(type):
         Constructs a new streams descriptor type.
         """
 
-        if classname == "NodeEventRecord":
+        if classname in ('NodeEventRecord', 'NodeWarningRecord'):
             return type.__new__(cls, classname, bases, attrs)
 
         # Create the actual class
@@ -212,3 +217,44 @@ class NodeEventRecord(events_base.EventRecord):
         """
 
         pass
+
+    def get_primary_key(self):
+        """
+        Returns an UUID value uniquely identifying this specific event.
+        """
+
+        primary_key = [
+            self.source_type,
+            self.source_name,
+        ]
+
+        for node in self.related_nodes:
+            primary_key.append(str(node.uuid))
+
+        for attribute in self.get_attributes():
+            if not attribute.primary_key:
+                continue
+
+            primary_key.append(str(getattr(self, attribute.name, None)))
+
+        return uuid.uuid5(EVENT_UUID_NAMESPACE, ','.join(primary_key))
+
+
+class NodeWarningRecord(NodeEventRecord):
+    """
+    Base class for node warning records.
+    """
+
+    def __init__(self, related_nodes, severity, **kwargs):
+        """
+        Class constructor.
+
+        :param related_nodes: A list of related node instances
+        :param severity: Warning severity
+        """
+
+        super(NodeWarningRecord, self).__init__(
+            related_nodes=related_nodes,
+            severity=severity,
+            **kwargs
+        )
