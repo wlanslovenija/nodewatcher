@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from nodewatcher.core.events import declarative as events, pool
 
 # Need models to ensure that node.monitoring registration point is available
-from . import models
+from . import models as monitor_models
 
 
 class TopologyLinkEstablished(events.NodeEventRecord):
@@ -28,6 +28,17 @@ class TopologyLinkEstablished(events.NodeEventRecord):
             events.NodeEventRecord.SEVERITY_INFO,
             routing_protocol=routing_protocol,
         )
+
+    def post(self):
+        # Only post events if this is a new adjacency that we have never seen before.
+        adjacency, created = monitor_models.AdjancencyHistory.objects.get_or_create(
+            node_a=self.related_nodes[0],
+            node_b=self.related_nodes[1],
+            protocol=self.routing_protocol,
+        )
+
+        if created:
+            super(TopologyLinkEstablished, self).post()
 
 pool.register_record(TopologyLinkEstablished)
 

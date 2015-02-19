@@ -248,3 +248,17 @@ class ClientAddress(models.Model):
     family = registry_fields.RegistryChoiceField('node.monitoring', 'core.interfaces.network#family', null=True)
     address = registry_fields.IPAddressField()
     expiry_time = models.DateTimeField(null=True)
+
+
+class AdjancencyHistory(models.Model):
+    """
+    Determines if two nodes were adjacent anytime in history.
+    """
+
+    node_a = models.ForeignKey(core_models.Node, related_name='+')
+    node_b = models.ForeignKey(core_models.Node, related_name='+')
+    protocol = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#routing_protocol')
+    first_seen = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('node_a', 'node_b', 'protocol')

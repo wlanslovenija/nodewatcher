@@ -132,7 +132,6 @@ class NodePostprocess(monitor_processors.NodeProcessor):
 
                 if created:
                     # TODO: This will still create one event for each end of the link
-                    # TODO: We should probably have a history of adjancencies (as in v2) to avoid repeating these events
                     monitor_events.TopologyLinkEstablished(node, dst_node, olsr_models.OLSR_PROTOCOL_NAME).post()
 
             # Compute average values
