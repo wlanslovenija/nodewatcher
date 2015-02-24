@@ -1,6 +1,6 @@
+import errno
 import json
-import socket
-import urllib
+import httplib
 
 
 class HttpTelemetryParseFailed(Exception):
@@ -24,6 +24,7 @@ class HttpTelemetryParser(object):
         self.host = host
         self.port = port
         self.data = data
+        self.node_responds = False
 
     def parse_into(self, tree=None):
         """
@@ -50,8 +51,27 @@ class HttpTelemetryParser(object):
         if self.data is not None:
             return self.data
 
-        socket.setdefaulttimeout(15)
-        return urllib.urlopen(url.format(host=self.host, port=self.port)).read()
+        # Create our own HTTP connection so we can use a successful TCP connection as
+        # a signal that the node is up.
+        connection = httplib.HTTPConnection(self.host, self.port, timeout=15)
+        try:
+            try:
+                connection.connect()
+                self.node_responds = True
+            except IOError, error:
+                # Receiving a TCP RST is also a response.
+                if error.errno in (errno.ECONNREFUSED, errno.ECONNRESET):
+                    self.node_responds = True
+
+                raise HttpTelemetryParseFailed
+
+            try:
+                connection.request('GET', url)
+                return connection.getresponse().read()
+            except (httplib.HTTPException, IOError):
+                raise HttpTelemetryParseFailed
+        finally:
+            connection.close()
 
     def parse_into_v3(self, tree=None):
         """
@@ -61,11 +81,11 @@ class HttpTelemetryParser(object):
         :return: Dictionary with parsed data
         """
 
+        data = self.fetch_data('/nodewatcher/feed')
+
         try:
-            data = json.loads(self.fetch_data("http://{host}:{port}/nodewatcher/feed"))
-        except KeyboardInterrupt:
-            raise
-        except:
+            data = json.loads(data)
+        except ValueError:
             raise HttpTelemetryParseFailed
 
         if tree is None:
@@ -101,12 +121,7 @@ class HttpTelemetryParser(object):
         :return: Dictionary with parsed data
         """
 
-        try:
-            data = self.fetch_data("http://{host}:{port}/cgi-bin/nodewatcher")
-        except KeyboardInterrupt:
-            raise
-        except:
-            raise HttpTelemetryParseFailed
+        data = self.fetch_data('/cgi-bin/nodewatcher')
 
         if tree is None:
             tree = {}

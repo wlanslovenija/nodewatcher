@@ -7,39 +7,10 @@ from nodewatcher.core import models as core_models
 
 class ProcessorContext(dict):
     """
-    A simple dictionary wrapper that supports automatic nesting
-    of namespaces and attribute access.
+    A simple dictionary wrapper to support attribute access.
     """
 
-    def __new__(cls, *args, **kwargs):
-        """
-        Class instance creator. This is overriden so we ensure that the namespace
-        attribute is present - which is required in case of unpickling instances.
-        """
-
-        instance = dict.__new__(cls, *args, **kwargs)
-        instance._namespace = []
-        return instance
-
     def __getitem__(self, key):
-        """
-        Namespace-aware __getitem__.
-        """
-
-        if self._namespace:
-            return self._ns().__getitem__(key)
-        return self._get(key)
-
-    def __setitem__(self, key, value):
-        """
-        Namespace-aware __setitem__.
-        """
-
-        if self._namespace:
-            return self._ns().__setitem__(key, value)
-        super(ProcessorContext, self).__setitem__(key, value)
-
-    def _get(self, key):
         """
         Get that automatically creates ProcessorContexts when key doesn't exist.
         """
@@ -51,22 +22,6 @@ class ProcessorContext(dict):
                 raise
 
             return super(ProcessorContext, self).setdefault(key, ProcessorContext())
-
-    def __contains__(self, item):
-        """
-        Namespace-aware __contains__.
-        """
-
-        if self._namespace:
-            return self._ns().__contains__(item)
-        return super(ProcessorContext, self).__contains__(item)
-
-    def _ns(self):
-        """
-        Namespace resolution.
-        """
-
-        return self._namespace[-1] if self._namespace else self
 
     def __getattr__(self, name):
         """
@@ -86,15 +41,6 @@ class ProcessorContext(dict):
             return super(ProcessorContext, self).__setattr__(name, value)
         self[name] = value
 
-    def setdefault(self, k, d=None):
-        """
-        Namespace-aware setdefault.
-        """
-
-        if self._namespace:
-            return self._ns().setdefault(k, d)
-        return super(ProcessorContext, self).setdefault(k, d)
-
     def merge_with(self, other):
         """
         Merges this dictionary with another (recursively).
@@ -112,23 +58,24 @@ class ProcessorContext(dict):
         return self
 
     @contextlib.contextmanager
-    def in_namespace(self, namespace, ctx_class=None):
+    def create(self, namespace, ctx_class=None):
         """
-        Starts a new namespace.
+        Creates a new sub-context.
 
-        :param namespace: Namespace name
+        :param namespace: Namespace
         :param ctx_class: Optional context class to use for this namespace root (should
           be a subclass of `ProcessorContext`)
         """
 
-        # Create a new instance
-        ns = ctx_class() if ctx_class else ProcessorContext()
-        self[namespace] = ns
+        if ctx_class is None:
+            ctx_class = ProcessorContext
 
-        # Append to list of namespaces and enter the context
-        self._namespace.append(ns)
-        yield
-        self._namespace.pop()
+        ctx = self
+        parts = namespace.split('.')
+        for part in parts:
+            ctx = ctx.setdefault(part, ctx_class())
+
+        yield ctx
 
 
 class MonitoringProcessor(object):

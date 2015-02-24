@@ -16,10 +16,10 @@ class NodeStatusChange(events.NodeEventRecord):
 
     TRANSITIONS = {
         ('up', 'down'): (events.NodeEventRecord.SEVERITY_WARNING, _("Node has gone down.")),
-        ('up', 'visible'): (events.NodeEventRecord.SEVERITY_WARNING, _("Node is no longer reachable.")),
+        ('up', 'visible'): (None, None),
         ('down', 'up'): (events.NodeEventRecord.SEVERITY_INFO, _("Node has come up.")),
         ('down', 'visible'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now visible.")),
-        ('visible', 'up'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now reachable.")),
+        ('visible', 'up'): (None, None),
         ('visible', 'down'): (events.NodeEventRecord.SEVERITY_WARNING, _("Node is no longer visible.")),
         (None, 'up'): (events.NodeEventRecord.SEVERITY_INFO, _("Node has come up.")),
         (None, 'visible'): (events.NodeEventRecord.SEVERITY_INFO, _("Node is now visible.")),
@@ -58,7 +58,8 @@ class NodeStatusChange(events.NodeEventRecord):
         Posts this event.
         """
 
-        if self.old_status is None and self.new_status == 'down':
+        # Ignore certain transitions.
+        if self.TRANSITIONS.get((self.old_status, self.new_status), (None, None)) == (None, None):
             return
 
         super(NodeStatusChange, self).post()

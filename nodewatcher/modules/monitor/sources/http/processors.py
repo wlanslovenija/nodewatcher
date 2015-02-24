@@ -73,9 +73,9 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
 
         node_available = context.node_available
 
-        with context.in_namespace("http", HTTPTelemetryContext):
+        with context.create('http', HTTPTelemetryContext) as http_context:
             try:
-                context.successfully_parsed = False
+                http_context.successfully_parsed = False
 
                 # If the node is not marked as available, we should skip telemetry parsing
                 if not node_available:
@@ -86,22 +86,23 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
 
                 # Fetch information from the router and merge it into local context
                 try:
-                    parser.parse_into(context)
-                    if context._meta.version == 2:
+                    parser.parse_into(http_context)
+                    if http_context._meta.version == 2:
                         # TODO: Add a warning that the node is using a legacy feed
                         pass
-                    context.successfully_parsed = True
+                    http_context.successfully_parsed = True
+                    context.node_responds = True
 
                     # Remove the warning if it is present.
                     if hasattr(node.config.core.general(), 'router'):
                         monitor_events.TelemetryProcessingFailed(node, method='http').absent()
                 except telemetry_parser.HttpTelemetryParseFailed:
-                    # Parsing has failed, log this; all components that did not get parsed
-                    # will be missing from context and so depending modules will not process them
-                    self.logger.error("Failed to parse HTTP telemetry feed from %s!" % router_id)
+                    # If the node responded in some way, set the appropriate flag.
+                    if parser.node_responds:
+                        context.node_responds = True
 
                     # Create a warning in case the router has an associated firmware configuration.
-                    if hasattr(node.config.core.general(), 'router'):
+                    if hasattr(node.config.core.general(), 'router') and context.node_responds:
                         monitor_events.TelemetryProcessingFailed(node, method='http').post()
             except core_models.RouterIdConfig.DoesNotExist:
                 # No router-id for this node can be found for IPv4; this means
