@@ -46,7 +46,7 @@ def build_image(result, profile):
 
         # Prepare the routing table mappings
         tables = io.StringIO()
-        for name, identifier in cfg['_routing_tables'].items():
+        for identifier, name in cfg['_routing_tables'].items():
             tables.write('%s\t%s\n' % (identifier, name))
         builder.write_file(os.path.join(temp_path, 'etc', 'iproute2', 'rt_tables'), tables.getvalue().encode('ascii'))
 
