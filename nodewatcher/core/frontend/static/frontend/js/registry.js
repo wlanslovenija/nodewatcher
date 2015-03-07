@@ -30,11 +30,20 @@
         $('.registry_form_selector').change(function() {
             $.registry.evaluate_rules({});
         });
-        $('.registry_form_adder').click(function() {
-            $.registry.evaluate_rules({ 'append' : $(this).attr('name') });
+        $('.registry_add_item').click(function() {
+            $.registry.evaluate_rules({
+                append: {
+                    registry_id: $(this).data('registry-id'),
+                    parent_id: $(this).data('parent')
+                }
+            });
         });
-        $('.registry_form_remover').click(function() {
-            $.registry.evaluate_rules({ 'remove_last' : $(this).attr('name') });
+        $('.registry_remove_item').click(function() {
+            $.registry.evaluate_rules({
+                remove: {
+                    index: $(this).data('index')
+                }
+            });
         });
     };
 

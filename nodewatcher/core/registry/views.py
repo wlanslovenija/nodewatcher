@@ -30,7 +30,7 @@ def evaluate_forms(request, regpoint_id, root_id):
             root.save()
 
         # First perform partial validation and rule evaluation
-        actions, partial_config = registry_forms.prepare_root_forms(
+        form_state = registry_forms.prepare_root_forms(
             regpoint,
             request,
             root,
@@ -41,11 +41,11 @@ def evaluate_forms(request, regpoint_id, root_id):
         # Merge in client actions when available
         try:
             # TODO: Maybe actions should be registered and each action should have something like Action.name that would then call Action.prepare(...)
-            for action, prefix in json.loads(request.POST['ACTIONS']).iteritems():
+            for action, options in json.loads(request.POST['ACTIONS']).iteritems():
                 if action == 'append':
-                    actions.setdefault(prefix, []).insert(0, registry_forms.AppendFormAction(None))
-                elif action == 'remove_last':
-                    actions.setdefault(prefix, []).insert(0, registry_forms.RemoveLastFormAction())
+                    form_state.append_default_item(options['registry_id'], options['parent_id'])
+                elif action == 'remove':
+                    form_state.remove_item(options['index'])
         except AttributeError:
             pass
 
@@ -56,8 +56,8 @@ def evaluate_forms(request, regpoint_id, root_id):
             root,
             request.POST,
             save=True,
-            actions=actions,
-            current_config=partial_config,
+            form_state=form_state,
+            flags=registry_forms.FORM_OUTPUT,
         )
 
         if temp_root:

@@ -95,6 +95,41 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
         return getattr(cls.RegistryMeta, 'multiple', False)
 
     @classmethod
+    def is_registry_multiple_static(cls):
+        """
+        Returns true if the item's registry id can contain multiple items and
+        should always contain all the possible items.
+        """
+
+        return getattr(cls.RegistryMeta, 'multiple_static', False)
+
+    @classmethod
+    def has_registry_parent(cls):
+        """
+        Returns true if the item has a parent.
+        """
+
+        return hasattr(cls, '_registry_object_parent')
+
+    def get_registry_parent(self):
+        """
+        Returns the registry parent item instance.
+        """
+
+        if not self.has_registry_parent():
+            return None
+
+        return getattr(self, self._registry_object_parent_link.name, None)
+
+    @classmethod
+    def has_registry_children(cls):
+        """
+        Returns true if the item has children.
+        """
+
+        return getattr(cls, '_registry_has_children', False)
+
+    @classmethod
     def is_registry_toplevel(cls):
         """
         Returns true if the item is a toplevel item for its registry id.

@@ -72,7 +72,7 @@ def assign(_item, _cls=None, _parent=None, _index=0, _set=None, **kwargs):
         except MissingValueError:
             return
 
-        cfg_items = context.partial_config.get(_item, [])
+        cfg_items = context.form_state.get(_item, [])
         indices, items = filter_cfg_items(cfg_items, _cls, parent_cfg, **kwargs)
         try:
             item = items[_index]
@@ -85,13 +85,15 @@ def assign(_item, _cls=None, _parent=None, _index=0, _set=None, **kwargs):
 
             setattr(item, key, value)
 
-        context.results.setdefault(_item, []).append(registry_forms.AssignToFormAction(
+        # TODO: Do not modify this directly, move all this logic into FormState.
+        context.form_state.form_actions.setdefault(_item, []).append(registry_forms.AssignToFormAction(
             item, indices[_index], _set, parent=parent_cfg,
         ))
 
     return engine.Action(action_assign)
 
 
+# TODO: Remove this function in favor of FormState.
 def filter_cfg_items(cfg_items, _cls=None, _parent=None, **kwargs):
     """
     A helper function for filtering partial configuration items based on
@@ -137,6 +139,7 @@ def filter_cfg_items(cfg_items, _cls=None, _parent=None, **kwargs):
     return indices, items
 
 
+# TODO: Remove this function in favor of FormState.
 def resolve_parent_item(context, parent):
     """
     A helper function for resolving the parent item in partial configuration.
@@ -151,7 +154,7 @@ def resolve_parent_item(context, parent):
         if '_item' not in parent:
             raise engine.EvaluationError("Parent specifier must contain an '_item' entry!")
 
-        cfg_items = context.partial_config.get(parent['_item'], [])
+        cfg_items = context.form_state.get(parent['_item'], [])
         item_index = parent.get('_index', 0)
         indices, items = filter_cfg_items(cfg_items, **parent)
 
@@ -163,42 +166,6 @@ def resolve_parent_item(context, parent):
     return parent_cfg
 
 
-def record_remove_cfg_item(context, container, parent, item, index, index_tree, level=0):
-    """
-    A helper function for removing an item from the partial configuration. It
-    doesn't actually remove any items, but records all operations that are
-    needed for a successfull removal.
-
-    :param context: Rules evaluation context
-    :param container: Container of partial configuration items
-    :param parent: Parent configuration item (or None)
-    :param item: The configuration item being removed
-    :param index: Item's index in the container
-    :param index_tree: A dictionary where operations will be recorded
-    """
-
-    reg_id = item.RegistryMeta.registry_id
-
-    # Record this removal into the index tree, but do not remove any items as this
-    # could change indices and this would cause subsequent removals to be wrong
-    _, instances, indices = index_tree.setdefault((level, reg_id, parent), (container, [], []))
-    instances.append(item)
-    indices.append(index)
-
-    # Discover which registry roots hold the item's children
-    registry_children = set()
-    if hasattr(item, '_registry_virtual_relation'):
-        for children in item._registry_virtual_relation.values():
-            for child in children:
-                registry_children.add(child.RegistryMeta.registry_id)
-
-    # Recursively remove all children
-    for rid in registry_children:
-        citems = context.partial_config[rid]
-        for index, child in zip(*filter_cfg_items(citems, _parent=item)):
-            record_remove_cfg_item(context, citems, item, child, index, index_tree, level + 1)
-
-
 def remove(_item, _cls=None, _parent=None, **kwargs):
     """
     Action that removes specific configuration items.
@@ -206,31 +173,9 @@ def remove(_item, _cls=None, _parent=None, **kwargs):
 
     def action_remove(context):
         try:
-            tlc = context.regpoint.get_top_level_class(_item)
-            if not getattr(tlc.RegistryMeta, 'multiple', False):
-                raise engine.EvaluationError("Attempted to use clear_config predicate on singular registry item '{0}'!".format(_item))
-        except registry_exceptions.RegistryItemNotRegistered:
-            raise engine.EvaluationError("Registry location '{0}' is invalid!".format(_item))
-
-        # Resolve parent item
-        try:
-            parent_cfg = resolve_parent_item(context, _parent)
-        except MissingValueError:
-            return
-
-        cfg_items = context.partial_config.get(_item, [])
-        indices, items = filter_cfg_items(cfg_items, _cls, parent_cfg, **kwargs)
-        index_tree = {}
-        for index, cfg in zip(indices, items):
-            record_remove_cfg_item(context, cfg_items, parent_cfg, cfg, index, index_tree)
-
-        # Perform actual removal of items - both in partial configuration and in forms (via actions)
-        for level, registry_root, parent in sorted(index_tree.keys(), key=lambda x: x[0], reverse=True):
-            container, items, indices = index_tree[level, registry_root, parent]
-            for item in items:
-                container.remove(item)
-
-            context.results.setdefault(registry_root, []).append(registry_forms.RemoveFormAction(indices, parent=parent))
+            context.form_state.remove_items(_item, _class_name=_cls, _parent=_parent, **kwargs)
+        except Exception, e:
+            raise engine.EvaluationError(*e.args)
 
     return engine.Action(action_remove)
 
@@ -268,8 +213,9 @@ def append(_item, _cls=None, _parent=None, **kwargs):
                 kwargs[key] = value(context)
 
         # Create the partial model and action
-        mdl = registry_forms.create_config_item(cls, context.partial_config, kwargs, parent_cfg)
-        context.results.setdefault(_item, []).append(registry_forms.AppendFormAction(mdl, parent_cfg))
+        mdl = context.form_state.create_item(cls, kwargs, parent_cfg)
+        # TODO: Do not modify this directly, move all this logic into FormState.
+        context.form_state.form_actions.setdefault(_item, []).append(registry_forms.AppendFormAction(mdl, parent_cfg))
 
     return engine.Action(action_append)
 
@@ -301,8 +247,8 @@ def value(location):
         registry_id, attribute = location.split('#') if '#' in location else (location, None)
 
         # First check the partial configuration store
-        if registry_id in context.partial_config and attribute is not None:
-            obj = context.partial_config[registry_id]
+        if registry_id in context.form_state and attribute is not None:
+            obj = context.form_state[registry_id]
             if len(obj) > 1:
                 raise engine.EvaluationError("Registry identifier '%s' evaluates to a list but an attribute access is requested!" % registry_id)
 

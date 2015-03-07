@@ -10,7 +10,13 @@ from django.utils import datastructures, importlib
 
 from ....utils import loader, toposort
 
+from . import formstate
 from .. import rules as registry_rules, registration
+
+
+# Form generation flags.
+FORM_INITIAL = 0x01
+FORM_OUTPUT = 0x02
 
 
 class RegistryValidationError(Exception):
@@ -75,7 +81,7 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
 
     template = 'registry/nested_render_item.html'
 
-    def __init__(self, form, meta_form, children):
+    def __init__(self, form, meta_form, children, **kwargs):
         """
         Class constructor.
 
@@ -84,7 +90,7 @@ class NestedRegistryRenderItem(BasicRegistryRenderItem):
         :param children: A list of child form descriptors
         """
 
-        super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms=children)
+        super(NestedRegistryRenderItem, self).__init__(form, meta_form, registry_forms=children, **kwargs)
         self.children = children
 
     @property
@@ -207,48 +213,7 @@ class RegistrySetMetaForm(django_forms.Form):
     )
 
 
-def create_config_item(cls, partial, attributes, parent=None):
-    """
-    A helper function for creating a temporary virtual model in the partially
-    validated configuration tree.
-
-    :param cls: Configuration item class
-    :param partial: Partial configuration dictionary
-    :param attributes: Attributes dictionary to set for the new item
-    :param parent: Optional parent configuration item
-    :return: Created virtual configuration item
-    """
-
-    config = cls()
-    config._registry_virtual_model = True
-    if parent is not None:
-        setattr(
-            config,
-            cls._registry_object_parent_link.name,
-            parent,
-        )
-
-        # Create a virtual reverse relation in the parent object
-        virtual_relation = getattr(parent, '_registry_virtual_relation', {})
-        desc = getattr(
-            parent.__class__,
-            cls._registry_object_parent_link.rel.related_name,
-        )
-        virtual_relation.setdefault(desc, []).append(config)
-        parent._registry_virtual_relation = virtual_relation
-    else:
-        partial.setdefault(cls.get_registry_id(), []).append(config)
-
-    for field, value in attributes.iteritems():
-        try:
-            setattr(config, field, value)
-        except (exceptions.ValidationError, ValueError):
-            pass
-
-    return config
-
-
-def generate_form_for_class(context, prefix, data, index, instance=None, validate=False, partial=None,
+def generate_form_for_class(context, prefix, data, index, instance=None,
                             force_selector_widget=False, static=False):
     """
     A helper function for generating a form for a specific registry item class.
@@ -265,7 +230,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
         force_selector_widget=force_selector_widget,
         static=static, instance_mid=existing_mid,
     )
-    if validate and not static:
+    if not (context.flags & FORM_INITIAL) and not static:
         if not meta_form.is_valid():
             context.validation_errors = True
         else:
@@ -296,7 +261,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
                 data[context.get_prefix(prefix, selected_item, field)] = data[prev_item_field]
 
     # When there is no instance, we should create one so we will be able to save somewhere
-    if validate and partial is None and instance is None:
+    if not (context.flags & FORM_INITIAL) and context.flags & FORM_OUTPUT and instance is None:
         # Check if we can reuse an existing instance
         existing_instance = context.existing_models.get(existing_mid, None)
         if isinstance(existing_instance, selected_item):
@@ -321,33 +286,21 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
         prefix=form_prefix,
     )
 
-    # Discover the current item model in the partially validated config hierarchy
+    # Fetch the current item in form state representation.
     form_modified = False
-    current_config_item = None
-    if context.current_config is not None:
-        try:
-            if context.hierarchy_parent_current is not None:
-                current_config_item = getattr(
-                    context.hierarchy_parent_current,
-                    selected_item._registry_object_parent_link.rel.related_name,
-                )[index]
-            else:
-                current_config_item = context.current_config[selected_item.get_registry_id()][index]
-        except (IndexError, KeyError):
-            current_config_item = None
-    else:
-        current_config_item = None
+    form_attributes = {}
+    if context.flags & FORM_OUTPUT:
+        state_item = context.form_state.lookup_item(selected_item, index, context.hierarchy_parent_current)
+        if state_item is not None:
+            form_attributes['index'] = state_item._id
 
-    def modify_to_context(obj):
-        if not hasattr(obj, 'modify_to_context'):
-            return False
+        def modify_to_context(obj):
+            if not hasattr(obj, 'modify_to_context'):
+                return False
 
-        item = current_config_item or instance
-        cfg = context.current_config or context.existing_partial_config
-        obj.modify_to_context(item, cfg, context.request)
-        return True
+            obj.modify_to_context(state_item, context.form_state, context.request)
+            return True
 
-    if partial is None:
         # Enable forms to modify themselves accoording to current context
         form_modified = modify_to_context(form)
 
@@ -355,10 +308,12 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
         for name, field in form.fields.iteritems():
             if modify_to_context(field):
                 form_modified = True
+    else:
+        state_item = None
 
     config = None
-    if validate:
-        if partial is None:
+    if not (context.flags & FORM_INITIAL):
+        if context.flags & FORM_OUTPUT:
             # Perform a full validation and save the form
             if form.is_valid():
                 form_id = (instance.get_registry_id(), id(context.hierarchy_parent_obj), index)
@@ -393,28 +348,28 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
             else:
                 context.validation_errors = True
 
-            # Update the current config item as it may have changed due to modify_to_context calls
-            if form_modified and current_config_item is not None:
+            # Update the current config item as it may have changed due to modify_to_context calls.
+            if form_modified and state_item is not None:
                 pform = copy.copy(form)
                 pform.cleaned_data = {}
                 pform._errors = {}
                 pform._clean_fields()
 
-                for field in current_config_item._meta.fields:
+                for field in state_item._meta.fields:
                     if not field.editable or field.rel is not None:
                         continue
 
                     try:
-                        setattr(current_config_item, field.name, pform.cleaned_data.get(field.name, None))
+                        setattr(state_item, field.name, pform.cleaned_data.get(field.name, None))
                     except AttributeError:
                         pass
         else:
             # We are only interested in all the current values even if they might be incomplete
-            # and/or invalid, so we can't do full form validation
+            # and/or invalid, so we can't do full form validation.
             form.cleaned_data = {}
             form._errors = {}
             form._clean_fields()
-            config = create_config_item(selected_item, partial, form.cleaned_data, context.hierarchy_parent_partial)
+            config = context.form_state.create_item(selected_item, form.cleaned_data, context.hierarchy_parent_partial, index)
 
     # Generate a new meta form, since the previous item has now changed
     meta_form = RegistryMetaForm(
@@ -425,7 +380,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
     )
 
     # Pack forms into a proper abstract representation
-    if hasattr(selected_item, '_registry_has_children'):
+    if selected_item.has_registry_children():
         sub_context = RegistryFormContext(
             regpoint=context.regpoint,
             request=context.request,
@@ -433,30 +388,28 @@ def generate_form_for_class(context, prefix, data, index, instance=None, validat
             data=context.data,
             save=context.save,
             only_rules=context.only_rules,
-            also_rules=context.also_rules,
-            actions=context.actions,
-            current_config=context.current_config,
-            partial_config=context.partial_config,
-            existing_partial_config=context.existing_partial_config,
             hierarchy_prefix=form_prefix,
             hierarchy_parent_cls=selected_item,
             hierarchy_parent_obj=instance,
             hierarchy_parent_partial=config,
-            hierarchy_parent_current=current_config_item,
+            hierarchy_parent_current=state_item,
             hierarchy_parent_index=index,
             hierarchy_grandparent_obj=context.hierarchy_parent_obj,
             validation_errors=False,
             pending_save_forms=context.pending_save_forms,
             pending_save_foreign_keys=context.pending_save_foreign_keys,
+
+            form_state=context.form_state,
+            flags=context.flags,
         )
 
-        forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context))
+        forms = NestedRegistryRenderItem(form, meta_form, prepare_forms(sub_context), **form_attributes)
 
         # Validation errors flag must propagate upwards
         if sub_context.validation_errors:
             context.validation_errors = True
     else:
-        forms = BasicRegistryRenderItem(form, meta_form)
+        forms = BasicRegistryRenderItem(form, meta_form, **form_attributes)
 
     return forms
 
@@ -471,11 +424,10 @@ class RegistryFormContext(object):
     data = None
     save = False
     only_rules = False
-    also_rules = False
-    actions = None
-    current_config = None
-    partial_config = None
-    existing_partial_config = None
+
+    form_state = None
+    flags = 0
+
     validation_errors = False
     subforms = None
     hierarchy_parent_cls = None
@@ -489,7 +441,6 @@ class RegistryFormContext(object):
     default_item_cls = None
     force_selector_widget = False
     items = None
-    item_actions = None
     existing_items = None
     existing_models = None
     pending_save_forms = None
@@ -679,8 +630,6 @@ def prepare_forms(context):
                         context.data,
                         index,
                         instance=mdl,
-                        validate=context.save or context.only_rules,
-                        partial=context.partial_config,
                         static=True,
                     ))
             else:
@@ -720,18 +669,14 @@ def prepare_forms(context):
                             initial={'form_count': 0},
                         )
 
-                    # Merge user actions with rules actions
-                    context.item_actions = \
-                        context.actions.get(context.base_prefix, []) + \
-                        context.actions.get(cls_meta.registry_id, [])
+                    # Setup the expected number of forms if only user-supplied forms are counted;
+                    # this might not be correct when rules have changed the partial configuration.
+                    context.user_form_count = form_count
                     meta_modified = False
 
-                    # Setup the expected number of forms if only user-supplied forms are counted;
-                    # this might not be correct when rules have changed the partial configuration
-                    context.user_form_count = form_count
-
-                    # Execute before actions
-                    for action in context.item_actions:
+                    # Execute before actions.
+                    for action in context.form_state.get_form_actions(cls_meta.registry_id):
+                        # TODO: Context should be passed as an argument.
                         action.context = context
                         if action.modify_forms_before():
                             meta_modified = True
@@ -747,8 +692,6 @@ def prepare_forms(context):
                             form_prefix,
                             context.data,
                             index,
-                            validate=True,
-                            partial=context.partial_config,
                             force_selector_widget=context.force_selector_widget,
                         ))
 
@@ -757,8 +700,9 @@ def prepare_forms(context):
                         if not getattr(mdl, '_skip_delete', False):
                             mdl.delete()
 
-                    # Check for any actions and execute them
-                    for action in context.item_actions:
+                    # Check for any actions and execute them.
+                    for action in context.form_state.get_form_actions(cls_meta.registry_id):
+                        # TODO: Context should be passed as an argument.
                         action.context = context
                         if action.modify_forms_after():
                             meta_modified = True
@@ -790,8 +734,6 @@ def prepare_forms(context):
                 context.data,
                 0,
                 instance=mdl,
-                validate=context.save or context.only_rules,
-                partial=context.partial_config,
             ))
 
             submeta = None
@@ -804,13 +746,14 @@ def prepare_forms(context):
             'subforms': context.subforms,
             'submeta': submeta,
             'prefix': context.base_prefix,
+            'parent_id': context.hierarchy_parent_current._id if context.hierarchy_parent_current else '',
         })
 
     return forms
 
 
 def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only_rules=False, also_rules=False,
-                       actions=None, current_config=None):
+                       form_state=None, flags=0):
     """
     Prepares a list of configuration forms for use on a regpoint root's
     configuration page.
@@ -822,8 +765,6 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
     :param save: Are we performing a save or rendering an initial form
     :param only_rules: Should only rules be evaluated and a partial config generated
     :param also_rules: Should rules be evaluated (use only for initial state)
-    :param actions: A list of actions that can modify forms
-    :param current_config: An existing partial config dictionary
     """
 
     # Ensure that all registry forms and CGMs are registred
@@ -837,7 +778,6 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
 
     # Transform data into a mutable dictionary in case an immutable one is passed
     data = copy.copy(data)
-    actions = actions if actions is not None else {}
 
     # Prepare context
     context = RegistryFormContext(
@@ -847,15 +787,16 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
         data=data,
         save=save,
         only_rules=only_rules,
-        also_rules=also_rules,
-        actions=actions,
-        current_config=current_config,
-        partial_config={} if only_rules else None,
-        existing_partial_config=regpoint.get_accessor(root).to_partial() if root is not None else {},
         validation_errors=False,
         pending_save_forms={},
         pending_save_foreign_keys={},
+        form_state=form_state if form_state is not None else formstate.FormState(regpoint),
+        flags=flags,
     )
+
+    # Load initial form state when requested and available.
+    if flags & FORM_INITIAL and root is not None:
+        context.form_state = formstate.FormState.from_db(regpoint, root)
 
     # Prepare form processors
     form_processors = []
@@ -879,13 +820,11 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
         if only_rules:
             # If only rule validation is requested, we should evaluate rules and then rollback
             # the savepoint in any case; all validation errors are ignored
-            actions = registry_rules.evaluate(regpoint, root, context.state, context.partial_config)
+            context.state = registry_rules.evaluate(regpoint, root, context.form_state, context.state),
             transaction.savepoint_rollback(sid)
-            context.state = actions['STATE']
-            return actions, context.partial_config
+            return context.form_state
         elif also_rules:
-            actions = registry_rules.evaluate(regpoint, root)
-            context.state = actions['STATE']
+            context.state = registry_rules.evaluate(regpoint, root, context.form_state)
 
         # Process forms when saving and there are no validation errors
         if save and root is not None and not context.validation_errors:
@@ -907,8 +846,8 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
                         # Only overwrite instances at the top layer (forms which have no dependencies
                         # on anything else). Models with dependencies will already be updated when
                         # calling save.
-                        if layer == 0 and info['registry_id'] in context.current_config:
-                            context.current_config[info['registry_id']][info['index']] = instance
+                        if layer == 0 and info['registry_id'] in context.form_state:
+                            context.form_state[info['registry_id']][info['index']] = instance
 
                         for form_id, field in context.pending_save_foreign_keys.get(info['form_id'], []):
                             setattr(
@@ -937,9 +876,5 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
     except:
         transaction.savepoint_rollback(sid)
         raise
-
-    # Also return (initial) evaluation state when requested
-    if also_rules:
-        return forms, actions['STATE']
 
     return forms if not save else (context.validation_errors, forms)

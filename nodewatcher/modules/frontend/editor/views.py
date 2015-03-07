@@ -39,11 +39,12 @@ class RegistryCreateFormMixin(RegistryFormMixin):
     def get(self, request, *args, **kwargs):
         self.object = None
 
-        self.dynamic_forms, self.eval_state = registry_forms.prepare_root_forms(
+        self.dynamic_forms = registry_forms.prepare_root_forms(
             'node.config',
             request,
             None,
             also_rules=True,
+            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT,
         )
 
         return self.render_to_response(self.get_context_data())
@@ -56,7 +57,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
             self.object = core_models.Node()
             self.object.save()
 
-            actions, partial_config = registry_forms.prepare_root_forms(
+            form_state = registry_forms.prepare_root_forms(
                 'node.config',
                 request,
                 self.object,
@@ -70,8 +71,8 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 self.object,
                 data=request.POST,
                 save=True,
-                actions=actions,
-                current_config=partial_config,
+                form_state=form_state,
+                flags=registry_forms.FORM_OUTPUT,
             )
 
             if not has_errors:
@@ -116,11 +117,12 @@ class RegistryEditFormMixin(RegistryFormMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        self.dynamic_forms, self.eval_state = registry_forms.prepare_root_forms(
+        self.dynamic_forms = registry_forms.prepare_root_forms(
             'node.config',
             request,
             self.object,
             also_rules=True,
+            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT,
         )
 
         return self.render_to_response(self.get_context_data(object=self.object))
@@ -128,7 +130,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        actions, partial_config = registry_forms.prepare_root_forms(
+        form_state = registry_forms.prepare_root_forms(
             'node.config',
             request,
             self.object,
@@ -142,8 +144,8 @@ class RegistryEditFormMixin(RegistryFormMixin):
             self.object,
             data=request.POST,
             save=True,
-            actions=actions,
-            current_config=partial_config,
+            form_state=form_state,
+            flags=registry_forms.FORM_OUTPUT,
         )
 
         if not has_errors:

@@ -15,8 +15,7 @@
     {% if descriptor.multiple %}
         {% if not descriptor.hide_multiple_controls %}
         <div class="buttons">
-            <button type="button" name="{{ descriptor.prefix }}" class="registry_form_adder ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-icon ui-icon-plusthick"></span><span class="ui-button-text">{% trans 'Add' %}</span></button>
-            <button type="button" name="{{ descriptor.prefix }}" class="registry_form_remover ui-button ui-widget ui-state-default ui-corner-all"><span class="ui-icon ui-icon-minusthick"></span><span class="ui-button-text">{% trans 'Remove Last' %}</span></button>
+            <button type="button" class="registry_add_item ui-button ui-widget ui-state-default ui-corner-all" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}"><span class="ui-icon ui-icon-plusthick"></span><span class="ui-button-text">{% trans 'Add' %}</span></button>
         </div>
         {% endif %}
         {{ descriptor.submeta }}
@@ -24,7 +23,14 @@
     {% endif %}
 
     {% for subform in descriptor.subforms %}
-        {{ subform }}
+        <div class="registry-item">
+            {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
+            <div>
+                <button type="button" class="registry_remove_item" data-index="{{ subform.args.index }}">Remove this item</button>
+            </div>
+            {% endif %}
+            {{ subform }}
+        </div>
     {% empty %}
         <div class="ui-widget">
             <div class="registry_nested_empty ui-state-highlight ui-corner-all">{% trans 'This category is currently empty.' %}</div>

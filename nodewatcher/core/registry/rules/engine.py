@@ -219,30 +219,27 @@ class EngineContext(object):
         self._levels = []
         self._rules = []
 
-    def run(self, regpoint, root, state, partial_config):
+    def run(self, regpoint, root, state, form_state):
         """
         Evaluates rules on a specific regpoint root object.
 
         :param regpoint: Registration point instance
         :param root: Regpoint root object to evaluate the rules on
         :param state: Current evaluation state
-        :param partial_config: Optional partial updated configuration
+        :param form_state: Optional form state
         """
 
         self.regpoint = regpoint
         self.root = root
         self.state = state or {}
         self.new_state = copy.deepcopy(self.state)
-        self.partial_config = partial_config
-        self.results = {}
+        self.form_state = form_state
         self.force_evaluate = False
 
         for idx, rule in enumerate(self._rules):
             self.enter_sublevel("rule" + str(idx))
             rule(self)
             self.leave_sublevel()
-
-        self.results['STATE'] = self.new_state
 
     def enter_sublevel(self, name):
         """

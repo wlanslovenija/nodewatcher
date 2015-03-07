@@ -18,25 +18,6 @@ class RegistryResolver(object):
         self._root = root
         self._registry_id = registry_id
 
-    def to_partial(self):
-        """
-        Formats the root's registry hierarchy to partial config format.
-        """
-
-        partial = {}
-        for cls in self._regpoint.get_children():
-            cls = cls.values()[0]
-            items = []
-
-            for item in self.by_registry_id(cls.get_registry_id(), queryset=True):
-                if hasattr(item, '_registry_object_parent_link'):
-                    continue
-                items.append(item)
-
-            partial[cls.get_registry_id()] = items
-
-        return partial
-
     def by_registry_id(self, registry_id, queryset=False, onlyclass=None, create=None, default=None, **kwargs):
         """
         Resolves the registry hierarchy.
