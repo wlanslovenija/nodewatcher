@@ -489,7 +489,7 @@ class DynamicSumField(Field):
             )
         except ds_exceptions.InconsistentStreamConfiguration:
             # Drop the existing stream and re-create it
-            stream.remove_streams(query_tags)
+            stream.delete_streams(query_tags)
             return stream.ensure_stream(
                 query_tags,
                 tags,
