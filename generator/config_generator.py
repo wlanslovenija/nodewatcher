@@ -63,6 +63,7 @@ portLayouts = {
   'rb433'       : True, # ('1 5*',       '2 5')
   'rb411'       : None,
 
+  'gl-inet': None,
   'tp-wr703n' : None,
   'tp-mr3020' : None,
   'tp-mr3040' : None,
@@ -1218,6 +1219,7 @@ config uhttpd main
         "tp-wdr4300+koruza" : "TLWDR4300",
         "tp-mr3020" : "TLMR3020",
         "tp-mr3040" : "TLMR3040",
+        "gl-inet": "GLINET",
 
         "ub-bullet" : "UBNT",
         "ub-nano" : "UBNT",
@@ -1240,6 +1242,7 @@ config uhttpd main
         "tp-wr1043nd" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wr703n" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-mr3020" : ["kmod-usb-serial", "kmod-usb-acm"],
+        "gl-inet": ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wdr4300" : ["kmod-usb-serial", "kmod-usb-acm"],
         "tp-wdr4300+koruza" : ["kmod-usb-serial", "kmod-usb-acm"],
       }
