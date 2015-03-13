@@ -82,6 +82,7 @@ ROUTER_MAP = {
     "tp-wr1043nd": "tp-wr1043ndv1",
     "sm-sx763v2": "sm-sx763v2",
     "tp-wdr4300": "tp-wdr4300v1",
+    "gl-inet": "gl-inetv1",
 }
 
 # Mapping of v2 device identifiers to v3 wireless protocol identifiers
@@ -116,6 +117,7 @@ WIFI_PROTOCOL_MAP = {
     "ub-rocket-m5": "ieee-80211an",
     "sm-sx763v2": "ieee-80211bg",
     "tp-wdr4300": "ieee-80211bgn",
+    "gl-inet": "ieee-80211bgn",
 }
 
 # A list of VPN servers as nodewatcher v2 had them hardcoded
