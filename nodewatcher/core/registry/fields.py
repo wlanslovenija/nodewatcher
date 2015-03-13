@@ -4,6 +4,7 @@ import os
 from django import db as django_db
 from django.core import exceptions
 from django.db import models
+from django.db.models import constants
 from django.db.models.fields import related as related_fields
 from django.forms import fields as widgets
 from django.utils import text, functional
@@ -568,3 +569,57 @@ class RegistryRelationField(models.Field):
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(RegistryRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
         setattr(cls, name, RegistryProxySingleDescriptor(self))
+
+
+class RegistryProxyMultipleDescriptor(object):
+    def __init__(self, related_model, related_field=None):
+        self.related_model = related_model
+        self.related_field = related_field
+
+        # Generate a chain that can be used to generate the filter query.
+        toplevel = related_model.get_registry_toplevel()
+        self.chain = ['%s_ptr' % x._meta.model_name for x in related_model._meta.get_base_chain(toplevel) or []]
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            return self
+
+        if self.related_field is not None:
+            chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
+            qs = self.related_model.objects.filter(**{chain: instance})
+            qs = qs.values_list(self.related_field, flat=True)
+            return list(qs)
+
+        return self.related_manager_cls(instance)
+
+    @functional.cached_property
+    def related_manager_cls(self):
+        # Dynamically create a class that subclasses the related model's default
+        # manager.
+        superclass = self.related_model._default_manager.__class__
+        rel_model = self.related_model
+        chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
+
+        class RelatedManager(superclass):
+            def __init__(self, instance):
+                super(RelatedManager, self).__init__()
+                self.instance = instance
+                self.core_filters = {chain: instance}
+                self.model = rel_model
+
+            def get_queryset(self):
+                db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
+                return super(RelatedManager, self).get_queryset().using(db).filter(**self.core_filters)
+
+        return RelatedManager
+
+
+class RegistryMultipleRelationField(models.Field):
+    def __init__(self, to, *args, **kwargs):
+        self.related_field = kwargs.pop('related_field', None)
+        kwargs['rel'] = related_fields.ForeignObjectRel(self, to)
+        super(RegistryMultipleRelationField, self).__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        super(RegistryMultipleRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+        setattr(cls, name, RegistryProxyMultipleDescriptor(self.rel.to, self.related_field))

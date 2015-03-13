@@ -4,54 +4,12 @@ import inspect
 from django.contrib.gis.db import models as gis_models
 from django import db as django_db
 from django.apps import apps
-from django.core import exceptions as django_exceptions
 from django.db import models as django_models
 from django.db.models import constants
 from django.db.models.sql import query
-from django.utils import functional
 
 # Quote name
 qn = django_db.connection.ops.quote_name
-
-
-class RegistryProxyMultipleDescriptor(object):
-    def __init__(self, related_model, chain, related_field=None):
-        self.related_model = related_model
-        self.related_field = related_field
-        self.chain = chain
-
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
-
-        if self.related_field is not None:
-            chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
-            qs = self.related_model.objects.filter(**{chain: instance})
-            qs = qs.values_list(self.related_field, flat=True)
-            return list(qs)
-
-        return self.related_manager_cls(instance)
-
-    @functional.cached_property
-    def related_manager_cls(self):
-        # Dynamically create a class that subclasses the related model's default
-        # manager.
-        superclass = self.related_model._default_manager.__class__
-        rel_model = self.related_model
-        chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
-
-        class RelatedManager(superclass):
-            def __init__(self, instance):
-                super(RelatedManager, self).__init__()
-                self.instance = instance
-                self.core_filters = {chain: instance}
-                self.model = rel_model
-
-            def get_queryset(self):
-                db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
-                return super(RelatedManager, self).get_queryset().using(db).filter(**self.core_filters)
-
-        return RelatedManager
 
 
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
@@ -295,13 +253,16 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if dst_related is not None:
                     raise ValueError("Related fields on registry items with multiple models not supported!")
 
-                # Generate a chain that can be used to generate the filter query
-                toplevel = dst_model.get_registry_toplevel()
-                chain = ['%s_ptr' for x in dst_model._meta.get_base_chain(toplevel) or []]
-                setattr(clone.model, field_name, RegistryProxyMultipleDescriptor(dst_model, chain, dst_field.name if dst_field else None))
-                continue
+                from . import fields
 
-            if dst_field is None:
+                dst_field_name = dst_field.name if dst_field else None
+                field = fields.RegistryMultipleRelationField(dst_model, related_field=dst_field_name)
+                field.src_model = dst_model
+                field.src_field = dst_field_name
+                field.contribute_to_class(clone.model, field_name, virtual_only=True)
+                # TODO: Support prefetching.
+                continue
+            elif dst_field is None:
                 # If there can only be one item and no field is requested, create a descriptor
                 from . import fields
 
