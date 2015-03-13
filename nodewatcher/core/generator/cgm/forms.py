@@ -1,7 +1,10 @@
 from django import forms
 from django.db.models import fields
+from django.forms import fields as widgets
+from django.utils import encoding
 from django.utils.translation import ugettext as _
 
+from ... import models as core_models
 from ...allocation.ip import forms as ip_forms
 from ...registry import forms as registry_forms, registration
 
@@ -42,6 +45,30 @@ class CgmGeneralConfigForm(forms.ModelForm):
 registration.register_form_for_item(models.CgmGeneralConfig, CgmGeneralConfigForm)
 
 
+class AccessPointSelectionField(forms.ModelChoiceField):
+    def __init__(self, protocol, **kwargs):
+        kwargs['queryset'] = core_models.Node.objects.regpoint('config').registry_fields(
+            name='core.general#name',
+            wifi_interface='core.interfaces',
+            wifi_mode='core.interfaces#mode',
+        ).filter(
+            # Only show nodes which have access point interfaces configured.
+            wifi_mode='ap',
+            # Only show access point interfaces that are of the same mode as the station.
+            wifi_interface__device__protocol=protocol,
+        ).order_by(
+            # TODO: Nodes should be sorted by distance from current node.
+            'name'
+        )
+
+        kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
+
+        super(AccessPointSelectionField, self).__init__(**kwargs)
+
+    def label_from_instance(self, obj):
+        return encoding.smart_text(obj.name)
+
+
 class WifiInterfaceConfigForm(forms.ModelForm):
     """
     Wifi interface configuration form.
@@ -49,6 +76,27 @@ class WifiInterfaceConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.WifiInterfaceConfig
+
+    def modify_to_context(self, item, cfg, request):
+        """
+        Handles "connect to existing AP" functionality for STA VIFs.
+        """
+
+        if item.mode == 'sta':
+            self.fields['connect_to'] = AccessPointSelectionField(
+                protocol=item.device.protocol,
+                empty_label=_("[manually configured AP]"),
+                label=_("Connect to existing AP"),
+                required=False,
+            )
+
+            # If any node is actually selected, we should hide manual configuration options.
+            if item.connect_to is not None:
+                del self.fields['essid']
+                del self.fields['bssid']
+        else:
+            # If mode is not set to STA, hide the connect to field.
+            del self.fields['connect_to']
 
 registration.register_form_for_item(models.WifiInterfaceConfig, WifiInterfaceConfigForm)
 

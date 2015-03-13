@@ -218,6 +218,8 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
     )
 
     mode = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#wifi_mode')
+    # For STA nodes, store (optional) where they are connected to.
+    connect_to = models.ForeignKey(core_models.Node, blank=True, null=True, related_name='+')
     essid = models.CharField(max_length=50, verbose_name="ESSID")
     bssid = registry_fields.MACAddressField(verbose_name="BSSID", blank=True, null=True)
 
@@ -226,6 +228,25 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         registry_name = _("Wireless Interface")
         multiple = True
         hidden = False
+
+    def get_target_interface(self):
+        """
+        Retrieve target (AP) node's interface configuration (for STA interfaces).
+        """
+
+        if self.connect_to is None:
+            return
+
+        try:
+            target_node = self.connect_to
+            # Retrieve the target wireless interface (the first AP interface for the same
+            # protocol as this one).
+            return target_node.config.core.interfaces(queryset=True).filter(
+                WifiInterfaceConfig___mode='ap',
+                WifiInterfaceConfig___device__protocol=self.device.protocol,
+            )[0]
+        except (core_models.Node.DoesNotExist, IndexError):
+            return
 
     def get_unique_id(self):
         """

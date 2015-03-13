@@ -881,8 +881,21 @@ def network(node, cfg):
                     wif.mcast_rate = 6000
                 elif vif.mode == 'sta':
                     wif.mode = 'sta'
+
+                    # Support automatic configuration from another AP node.
+                    if vif.connect_to is not None:
+                        target_interface = vif.get_target_interface()
+                        if target_interface is None:
+                            node_name = vif.connect_to.config.core.general().name
+                            raise cgm_base.ValidationError(_("AP interface of node '%s' that this node is connecting to does not exist!") % node_name)
+
+                        wif.ssid = target_interface.essid
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
+
+                # Ensure that ESSID is not empty.
+                if not wif.ssid:
+                    raise cgm_base.ValidationError(_("ESSID of a wireless interface must not be empty!"))
 
                 # Configure network interface for each vif, first being the primary network
                 vif_name = device.get_vif_mapping('openwrt', interface.wifi_radio, vif)
