@@ -144,6 +144,20 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         return super(RegistryQuerySet, clone).filter(*args, **filter_selectors)
 
+    def exclude(self, *args, **kwargs):
+        """
+        An augmented exclude method to support querying by virtual fields created
+        by registry_fields.
+        """
+
+        clone = self._clone()
+
+        exclude_selectors = {}
+        for selector, value in kwargs.items():
+            exclude_selectors[self.registry_expand_proxy_field(selector)] = value
+
+        return super(RegistryQuerySet, clone).exclude(*args, **exclude_selectors)
+
     def registry_fields(self, **kwargs):
         """
         Select fields from the registry.
