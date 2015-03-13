@@ -197,7 +197,7 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     wifi_radio = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#wifi_radio')
     protocol = models.CharField(max_length=50)
     channel_width = models.CharField(max_length=50)
-    channel = models.CharField(max_length=50)
+    channel = models.CharField(max_length=50, blank=True, null=True)
     bitrate = models.IntegerField(default=11)
     antenna_connector = models.CharField(max_length=50, null=True)
     ack_distance = models.IntegerField(null=True, blank=True, verbose_name=_("ACK Distance"))

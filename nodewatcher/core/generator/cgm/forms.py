@@ -115,7 +115,7 @@ class WifiRadioDeviceConfigForm(forms.ModelForm):
         except (KeyError, IndexError, AttributeError):
             # Create empty fields on error
             self.fields['protocol'] = registry_forms.RegistryChoiceFormField(label=_("Protocol"), choices=fields.BLANK_CHOICE_DASH)
-            self.fields['channel'] = registry_forms.RegistryChoiceFormField(label=_("Channel"), choices=fields.BLANK_CHOICE_DASH)
+            self.fields['channel'] = registry_forms.RegistryChoiceFormField(label=_("Channel"), choices=fields.BLANK_CHOICE_DASH, required=True)
             self.fields['antenna_connector'] = registry_forms.RegistryChoiceFormField(label=_("Connector"), choices=fields.BLANK_CHOICE_DASH)
             return
 
@@ -138,14 +138,15 @@ class WifiRadioDeviceConfigForm(forms.ModelForm):
             channel_width = radio.get_protocol(item.protocol).get_channel_width(item.channel_width)
             self.fields['channel'] = registry_forms.RegistryChoiceFormField(
                 label=_("Channel"),
-                choices=fields.BLANK_CHOICE_DASH + list(
+                choices=[("", _("[auto-select]"))] + list(
                     radio.get_protocol(item.protocol).get_channel_choices(channel_width, self.regulatory_filter(request))
                 ),
                 coerce=str,
                 empty_value=None,
+                required=False,
             )
         except (KeyError, AttributeError):
             # Create empty field on error
-            self.fields['channel'] = registry_forms.RegistryChoiceFormField(label=_("Channel"), choices=fields.BLANK_CHOICE_DASH)
+            self.fields['channel'] = registry_forms.RegistryChoiceFormField(label=_("Channel"), choices=fields.BLANK_CHOICE_DASH, required=True)
 
 registration.register_form_for_item(models.WifiRadioDeviceConfig, WifiRadioDeviceConfigForm)

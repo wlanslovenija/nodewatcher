@@ -810,7 +810,7 @@ def network(node, cfg):
                 )
 
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
-            dsc_channel = dsc_protocol.get_channel(interface.channel)
+            dsc_channel = dsc_protocol.get_channel(interface.channel) if interface.channel else None
             dsc_channel_width = dsc_protocol.get_channel_width(interface.channel_width)
 
             # Select proper hardware mode
@@ -857,7 +857,7 @@ def network(node, cfg):
                 raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless protocol '%s'!") % dsc_protocol.identifier)
 
             radio.phy = 'phy%d' % dsc_radio.index
-            radio.channel = dsc_channel.number
+            radio.channel = dsc_channel.number if dsc_channel is not None else 'auto'
             if interface.ack_distance:
                 radio.distance = interface.ack_distance
 
@@ -866,6 +866,10 @@ def network(node, cfg):
                 wif.device = wifi_radio
                 wif.encryption = 'none'
                 wif.ssid = vif.essid
+
+                # We only allow automatic channel selection when all VIFs are in STA mode.
+                if dsc_channel is None and vif.mode != 'sta':
+                    raise cgm_base.ValidationError(_("Automatic channel selection is only allowed when all VIFs are in STA mode!"))
 
                 if vif.mode == 'ap':
                     wif.mode = 'ap'
