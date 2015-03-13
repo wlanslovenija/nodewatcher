@@ -493,28 +493,31 @@ class Command(base.BaseCommand):
                     ).save()
 
                 # WAN uplink
-                iface_wan = node_mdl.config.core.interfaces(
-                    create=cgm_models.EthernetInterfaceConfig,
-                    eth_port='wan0',
-                    uplink=True,
-                )
-                iface_wan.save()
+                uplink_configured = False
+                if device.get_port('wan0'):
+                    iface_wan = node_mdl.config.core.interfaces(
+                        create=cgm_models.EthernetInterfaceConfig,
+                        eth_port='wan0',
+                        uplink=True,
+                    )
+                    iface_wan.save()
+                    uplink_configured = True
 
-                if node['profile']['wan_dhcp']:
-                    node_mdl.config.core.interfaces.network(
-                        create=cgm_models.DHCPNetworkConfig,
-                        interface=iface_wan,
-                        description='WAN',
-                    ).save()
-                else:
-                    node_mdl.config.core.interfaces.network(
-                        create=cgm_models.StaticNetworkConfig,
-                        interface=iface_wan,
-                        description='WAN',
-                        family='ipv4',
-                        address='%(wan_ip)s/%(wan_cidr)s' % node['profile'],
-                        gateway=node['profile']['wan_gw']
-                    ).save()
+                    if node['profile']['wan_dhcp']:
+                        node_mdl.config.core.interfaces.network(
+                            create=cgm_models.DHCPNetworkConfig,
+                            interface=iface_wan,
+                            description='WAN',
+                        ).save()
+                    else:
+                        node_mdl.config.core.interfaces.network(
+                            create=cgm_models.StaticNetworkConfig,
+                            interface=iface_wan,
+                            description='WAN',
+                            family='ipv4',
+                            address='%(wan_ip)s/%(wan_cidr)s' % node['profile'],
+                            gateway=node['profile']['wan_gw']
+                        ).save()
 
                 # LAN subnets
                 if device.get_port('lan0'):
@@ -556,8 +559,8 @@ class Command(base.BaseCommand):
                         iface_lan.routing_protocols = ['olsr']
                         iface_lan.save()
 
-                # VPN
-                if node['profile']['use_vpn']:
+                # VPN (only configure when an uplink exists)
+                if node['profile']['use_vpn'] and uplink_configured:
                     for server, ports in VPN_SERVERS.items():
                         iface_vpn = node_mdl.config.core.interfaces(
                             create=tunneldigger_models.TunneldiggerInterfaceConfig,
