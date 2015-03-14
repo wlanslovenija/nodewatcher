@@ -168,6 +168,14 @@ SUBNET_SIZE_TRANSLATION = {
     },
 }
 
+# Node metadata encoded in notes.
+NODE_NOTES_METADATA = {
+    'AP SSID': 'ap_ssid',
+    'STA SSID': 'sta_ssid',
+    'STA LINK': 'sta_link',
+    'CHANNEL': 'channel',
+}
+
 
 class Command(base.BaseCommand):
     help = "Imports legacy nodewatcher v2 data."
@@ -294,6 +302,15 @@ class Command(base.BaseCommand):
     def import_nodes(self, data):
         self.stdout.write('Importing %d nodes...\n' % len(data['nodes']))
 
+        # Preprocess nodes and create instances.
+        name_model_map = {}
+        for node in data['nodes'].values():
+            node_mdl = core_models.Node(uuid=node['uuid'])
+            node_mdl.save()
+            node['_model'] = node_mdl
+
+            name_model_map[node['name']] = node_mdl
+
         for node in data['nodes'].values():
             # Dead node flag, so we don't allocate any resources for it
             dead_node = node['node_type'] == 6
@@ -303,6 +320,9 @@ class Command(base.BaseCommand):
                 subnet_mesh = [x for x in node['subnets'] if x['gen_iface_type'] == 2][0]
             except IndexError:
                 self.stdout.write('  o Skipping node %s (unable to determine router ID).\n' % node['uuid'])
+
+                node['_model'].delete()
+                node['_model'] = None
                 continue
 
             try:
@@ -323,9 +343,7 @@ class Command(base.BaseCommand):
                 if allocation is None:
                     raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_mesh)
 
-            node_mdl = core_models.Node(uuid=node['uuid'])
-            node_mdl.save()
-            node['_model'] = node_mdl
+            node_mdl = node['_model']
 
             # Router ID
             if not dead_node:
@@ -422,16 +440,108 @@ class Command(base.BaseCommand):
                     password=node['profile']['root_pass'],
                 ).save()
 
-                # Wireless interface config
-                radio_wifi = node_mdl.config.core.interfaces(
-                    create=cgm_models.WifiRadioDeviceConfig,
-                    wifi_radio='wifi0',
-                    protocol=WIFI_PROTOCOL_MAP[node['profile']['template']],
-                    channel_width='ht20',
-                    channel='ch%d' % node['profile']['channel'],
-                    antenna_connector='a1',
-                )
-                radio_wifi.save()
+                # Parse any metadata contained in notes.
+                metadata = {}
+                for notes_line in node['notes'].split('\n'):
+                    for key, meta_key in NODE_NOTES_METADATA.items():
+                        if notes_line.startswith('%s:' % key):
+                            metadata[meta_key] = notes_line.split(':')[1].strip()
+
+                # Determine whether the imported node should be configured as AP/STA.
+                if 'ap_ssid' in metadata or 'sta_ssid' in metadata:
+                    # Backbone node.
+                    radio_wifi = node_mdl.config.core.interfaces(
+                        create=cgm_models.WifiRadioDeviceConfig,
+                        wifi_radio='wifi0',
+                        protocol=WIFI_PROTOCOL_MAP[node['profile']['template']],
+                        channel_width='ht20',
+                        channel=('ch%d' % int(metadata['channel'])) if metadata['channel'] != 'auto' else None,
+                        antenna_connector='a1',
+                    )
+                    radio_wifi.save()
+
+                    if 'ap_ssid' in metadata:
+                        # AP interface.
+                        iface_ap = node_mdl.config.core.interfaces(
+                            create=cgm_models.WifiInterfaceConfig,
+                            device=radio_wifi,
+                            mode='ap',
+                            essid=metadata['ap_ssid'],
+                            routing_protocols=['olsr'],
+                        )
+                        iface_ap.save()
+                    elif 'sta_ssid' in metadata:
+                        # STA interface.
+                        iface_sta = node_mdl.config.core.interfaces(
+                            create=cgm_models.WifiInterfaceConfig,
+                            device=radio_wifi,
+                            mode='sta',
+                            essid=metadata['sta_ssid'],
+                            connect_to=name_model_map[metadata['sta_link']],
+                            routing_protocols=['olsr'],
+                        )
+                        iface_sta.save()
+                    else:
+                        assert False
+                else:
+                    # Wireless interface config
+                    radio_wifi = node_mdl.config.core.interfaces(
+                        create=cgm_models.WifiRadioDeviceConfig,
+                        wifi_radio='wifi0',
+                        protocol=WIFI_PROTOCOL_MAP[node['profile']['template']],
+                        channel_width='ht20',
+                        channel='ch%d' % node['profile']['channel'],
+                        antenna_connector='a1',
+                    )
+                    radio_wifi.save()
+
+                    # Mesh interface
+                    ssid = project.ssids.get(purpose='mesh')
+                    iface_mesh = node_mdl.config.core.interfaces(
+                        create=cgm_models.WifiInterfaceConfig,
+                        device=radio_wifi,
+                        mode='mesh',
+                        essid=ssid.essid,
+                        bssid=ssid.bssid,
+                        routing_protocols=['olsr'],
+                    )
+                    iface_mesh.save()
+
+                    # Client AP interface
+                    dsc_radio = device.get_radio('wifi0')
+                    if translated_subnets['clients'] is not None and dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
+                        ssid = project.ssids.get(purpose='ap')
+                        iface_ap = node_mdl.config.core.interfaces(
+                            create=cgm_models.WifiInterfaceConfig,
+                            device=radio_wifi,
+                            mode='ap',
+                            essid=ssid.essid,
+                        )
+                        iface_ap.save()
+
+                        subnet_ap = ipaddr.IPNetwork('%s/%s' % (subnet_mesh.ip, translated_subnets['clients'] - 1))
+                        subnet_ap = list(subnet_ap.iter_subnets())[1]
+                        try:
+                            pool_ap = [x['_model'] for x in data['pools'].values() if subnet_ap in x['_model']][0]
+                        except IndexError:
+                            raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_ap)
+
+                        allocation = pool_ap.reserve_subnet(str(subnet_ap.ip), subnet_ap.prefixlen)
+                        if allocation is None:
+                            raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_ap)
+
+                        node_mdl.config.core.interfaces.network(
+                            create=cgm_models.AllocatedNetworkConfig,
+                            interface=iface_ap,
+                            description='AP client access',
+                            routing_announces=['olsr'],
+                            family='ipv4',
+                            pool=pool_ap,
+                            prefix_length=subnet_ap.prefixlen,
+                            allocation=allocation,
+                            lease_type='dhcp',
+                            lease_duration='1h',
+                        ).save()
 
                 # Antenna
                 try:
@@ -445,54 +555,6 @@ class Command(base.BaseCommand):
                     ).save()
                 except antenna_models.Antenna.DoesNotExist:
                     pass
-
-                # Mesh interface
-                ssid = project.ssids.get(purpose='mesh')
-                iface_mesh = node_mdl.config.core.interfaces(
-                    create=cgm_models.WifiInterfaceConfig,
-                    device=radio_wifi,
-                    mode='mesh',
-                    essid=ssid.essid,
-                    bssid=ssid.bssid,
-                    routing_protocols=['olsr'],
-                )
-                iface_mesh.save()
-
-                # Client AP interface
-                dsc_radio = device.get_radio('wifi0')
-                if translated_subnets['clients'] is not None and dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
-                    ssid = project.ssids.get(purpose='ap')
-                    iface_ap = node_mdl.config.core.interfaces(
-                        create=cgm_models.WifiInterfaceConfig,
-                        device=radio_wifi,
-                        mode='ap',
-                        essid=ssid.essid,
-                    )
-                    iface_ap.save()
-
-                    subnet_ap = ipaddr.IPNetwork('%s/%s' % (subnet_mesh.ip, translated_subnets['clients'] - 1))
-                    subnet_ap = list(subnet_ap.iter_subnets())[1]
-                    try:
-                        pool_ap = [x['_model'] for x in data['pools'].values() if subnet_ap in x['_model']][0]
-                    except IndexError:
-                        raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_ap)
-
-                    allocation = pool_ap.reserve_subnet(str(subnet_ap.ip), subnet_ap.prefixlen)
-                    if allocation is None:
-                        raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_ap)
-
-                    node_mdl.config.core.interfaces.network(
-                        create=cgm_models.AllocatedNetworkConfig,
-                        interface=iface_ap,
-                        description='AP client access',
-                        routing_announces=['olsr'],
-                        family='ipv4',
-                        pool=pool_ap,
-                        prefix_length=subnet_ap.prefixlen,
-                        allocation=allocation,
-                        lease_type='dhcp',
-                        lease_duration='1h',
-                    ).save()
 
                 # WAN uplink
                 uplink_configured = False
