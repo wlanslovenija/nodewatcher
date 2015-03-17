@@ -840,9 +840,6 @@ def network(node, cfg):
                     radio.chanbw = 10
                 elif dsc_channel_width.identifier == 'ht20':
                     radio.htmode = 'HT20'
-                    radio.chanbw = 20
-                elif dsc_channel_width.identifier == 'ht20':
-                    radio.htmode = 'HT20'
                 elif dsc_channel_width.identifier == 'ht40l':
                     radio.htmode = 'HT40-'
                 elif dsc_channel_width.identifier == 'ht40u':
