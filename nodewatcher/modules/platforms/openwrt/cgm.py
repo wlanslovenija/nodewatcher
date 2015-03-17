@@ -860,6 +860,8 @@ def network(node, cfg):
             radio.channel = dsc_channel.number if dsc_channel is not None else 'auto'
             if interface.ack_distance:
                 radio.distance = interface.ack_distance
+            if interface.tx_power:
+                radio.txpower = interface.tx_power
 
             for vif in interfaces:
                 wif = cfg.wireless.add('wifi-iface')
@@ -890,6 +892,8 @@ def network(node, cfg):
                             raise cgm_base.ValidationError(_("AP interface of node '%s' that this node is connecting to does not exist!") % node_name)
 
                         wif.ssid = target_interface.essid
+                        if target_interface.ack_distance:
+                            radio.distance = target_interface.ack_distance
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
 

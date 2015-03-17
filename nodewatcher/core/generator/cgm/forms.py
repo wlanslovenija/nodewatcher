@@ -117,6 +117,8 @@ class WifiRadioDeviceConfigForm(forms.ModelForm):
     A wireless radio device configuration form.
     """
 
+    tx_power = widgets.IntegerField(min_value=1, max_value=27, required=False)
+
     class Meta:
         model = models.WifiRadioDeviceConfig
 

@@ -174,6 +174,8 @@ NODE_NOTES_METADATA = {
     'STA SSID': 'sta_ssid',
     'STA LINK': 'sta_link',
     'CHANNEL': 'channel',
+    'TXPOWER': 'tx_power',
+    'DISTANCE': 'distance',
 }
 
 
@@ -457,6 +459,8 @@ class Command(base.BaseCommand):
                         channel_width='ht20',
                         channel=('ch%d' % int(metadata['channel'])) if metadata['channel'] != 'auto' else None,
                         antenna_connector='a1',
+                        ack_distance=int(metadata['distance']) if 'distance' in metadata else None,
+                        tx_power=int(metadata['tx_power']) if 'tx_power' in metadata else None,
                     )
                     radio_wifi.save()
 
