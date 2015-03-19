@@ -341,9 +341,6 @@ physical wireless radios.
    :param channel_width: Wireless channel width. Available widths depend on the selected protocol.
    :type channel_width: registered choice
 
-   :param bitrate: Bitrate. Available bitrates depend on the selected protocol.
-   :type bitrate: registered choice
-
    :param ack_distance: ACK distance.
    :type ack_distance: int
 

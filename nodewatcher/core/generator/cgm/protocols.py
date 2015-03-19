@@ -174,10 +174,6 @@ class IEEE80211BG(WirelessProtocol):
         Channel("ch12", 12, 2467),
         Channel("ch13", 13, 2472),
     )
-    bitrates = (
-        11,
-        54,
-    )
     widths = (
         ChannelWidth("nw5", _("5 MHz"), 5),
         ChannelWidth("nw10", _("10 MHz"), 10),
@@ -247,10 +243,6 @@ class IEEE80211A(WirelessProtocol):
         Channel("ch132", 132, 5660),
         Channel("ch136", 136, 5680),
         Channel("ch140", 140, 5700),
-    )
-    bitrates = (
-        11,
-        54,
     )
     widths = (
         ChannelWidth("nw5", _("5 MHz"), 5),

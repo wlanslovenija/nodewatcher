@@ -198,7 +198,6 @@ class WifiRadioDeviceConfig(InterfaceConfig):
     protocol = models.CharField(max_length=50)
     channel_width = models.CharField(max_length=50)
     channel = models.CharField(max_length=50, blank=True, null=True)
-    bitrate = models.IntegerField(default=11)
     antenna_connector = models.CharField(max_length=50, null=True)
     tx_power = models.PositiveSmallIntegerField(blank=True, null=True)
     ack_distance = models.IntegerField(null=True, blank=True, verbose_name=_("ACK Distance"))
