@@ -203,12 +203,31 @@ class UCIRoot(object):
         :return: Named section or None if not found
         """
 
+        sections = self.find_all_named_sections(section_type, **query)
+        if not sections:
+            return None
+
+        return sections[0]
+
+    def find_all_named_sections(self, section_type, **query):
+        """
+        Searches for all named sections having specific values of
+        attributes.
+
+        :param section_type: Section type
+        :param **query: Attribute query
+        :return: A list of named sections matching the criteria
+        """
+
+        sections = []
         for name, section in self.named_sections():
             if section.get_type() != section_type:
                 continue
 
             if all((getattr(section, a, None) == v for a, v in query.items())):
-                return section
+                sections.append(section)
+
+        return sections
 
     def find_ordered_section(self, section_type, **query):
         """
@@ -220,9 +239,28 @@ class UCIRoot(object):
         :return: Ordered section or None if not found
         """
 
+        sections = self.find_all_ordered_sections(section_type, **query)
+        if not sections:
+            return None
+
+        return sections[0]
+
+    def find_all_ordered_sections(self, section_type, **query):
+        """
+        Searches for all ordered section having specific values of
+        attributes.
+
+        :param section_type: Section type
+        :param **query: Attribute query
+        :return: List of ordered sections matching the criteria
+        """
+
+        sections = []
         for section in self._ordered_sections.get(section_type, []):
             if all((getattr(section, a, None) == v for a, v in query.items())):
-                return section
+                sections.append(section)
+
+        return sections
 
     def __iter__(self):
         return self.named_sections()
@@ -245,6 +283,12 @@ class UCIRoot(object):
                 return self._ordered_sections[section]
             except KeyError:
                 raise AttributeError(section)
+
+    def __getitem__(self, section):
+        try:
+            return self.__getattr__(section)
+        except AttributeError:
+            raise KeyError(section)
 
     def format(self, fmt=UCIFormat.DUMP):
         """
