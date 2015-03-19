@@ -458,7 +458,7 @@ class Command(base.BaseCommand):
                         protocol=WIFI_PROTOCOL_MAP[node['profile']['template']],
                         channel_width='ht20',
                         channel=('ch%d' % int(metadata['channel'])) if metadata['channel'] != 'auto' else None,
-                        antenna_connector='a1',
+                        antenna_connector=None,
                         ack_distance=int(metadata['distance']) if 'distance' in metadata else None,
                         tx_power=int(metadata['tx_power']) if 'tx_power' in metadata else None,
                     )
@@ -495,7 +495,7 @@ class Command(base.BaseCommand):
                         protocol=WIFI_PROTOCOL_MAP[node['profile']['template']],
                         channel_width='ht20',
                         channel='ch%d' % node['profile']['channel'],
-                        antenna_connector='a1',
+                        antenna_connector=None,
                     )
                     radio_wifi.save()
 
