@@ -933,8 +933,8 @@ def network(node, cfg):
                             raise cgm_base.ValidationError(_("AP interface of node '%s' that this node is connecting to does not exist!") % node_name)
 
                         wif.ssid = target_interface.essid
-                        if target_interface.ack_distance:
-                            radio.distance = target_interface.ack_distance
+                        if target_interface.device.ack_distance:
+                            radio.distance = target_interface.device.ack_distance
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless interface mode '%s'!") % vif.mode)
 
