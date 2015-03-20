@@ -54,7 +54,8 @@ class UBNTRocketM5(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-rocket-m-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-rocket-m-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-rocket-m-squashfs-sysupgrade.bin',
             ]
         }
     }

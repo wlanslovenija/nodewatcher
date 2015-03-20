@@ -54,7 +54,8 @@ class UBNTNano(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -80,7 +81,8 @@ class UBNTNanoM5XW(UBNTNano):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-xw-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-nano-m-xw-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-nano-m-xw-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -97,7 +99,8 @@ class UBNTLocoM5(UBNTNanoM5):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -114,7 +117,8 @@ class UBNTLocoM5XW(UBNTNanoM5):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-loco-m-xw-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-loco-m-xw-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-loco-m-xw-squashfs-sysupgrade.bin',
             ]
         }
     }

@@ -54,7 +54,8 @@ class UBNTBullet(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-sysupgrade.bin',
             ]
         }
     }
