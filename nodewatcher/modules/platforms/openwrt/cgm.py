@@ -533,7 +533,11 @@ def configure_network(cfg, network, section, iface_name):
         section.password = network.password
 
         # Package 'ppp-mod-pppoe' is required for using PPPoE
-        cfg.packages.update(['ppp-mod-pppoe'])
+        cfg.packages.update([
+            'kmod-pppoe',
+            'ppp-mod-pppoe',
+            'ppp'
+        ])
     else:
         section.proto = 'none'
 
