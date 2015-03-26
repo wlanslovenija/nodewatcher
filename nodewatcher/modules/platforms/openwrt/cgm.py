@@ -955,6 +955,11 @@ def network(node, cfg):
                     wif.network = vif_name
                     configure_interface(cfg, vif, iface, vif_name)
 
+            # Include some wireless related packages.
+            cfg.packages.update([
+                'wireless-tools'
+            ])
+
 
 @cgm_base.register_platform_module('openwrt', 15)
 def qos_base(node, cfg):
