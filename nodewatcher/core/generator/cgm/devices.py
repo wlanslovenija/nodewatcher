@@ -363,7 +363,7 @@ class DeviceBase(object):
         :param vif: Wireless virtual interface model
         """
 
-        return 'vif%s' % vif.get_unique_id()
+        return ('%s%d' % (vif.mode, vif.get_index())).lower().replace(' ', '')
 
     @classmethod
     def get_bridge_mapping(cls, platform, bridge):

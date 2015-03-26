@@ -248,12 +248,19 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         except (core_models.Node.DoesNotExist, IndexError):
             return
 
-    def get_unique_id(self):
+    def get_index(self):
         """
-        Returns a unique identifier for this virtual wifi interface.
+        Returns the index of this interface among all of the node's VIFs of
+        the same mode.
         """
 
-        return hashlib.sha1(":".join([str(self.device.pk), self.mode, self.essid, self.bssid or ''])).hexdigest()[:5]
+        vifs = self.root.config.core.interfaces(
+            onlyclass=WifiInterfaceConfig,
+        ).filter(
+            WifiInterfaceConfig___mode=self.mode,
+        ).order_by('pk').values_list('pk', flat=True)
+
+        return list(vifs).index(self.pk)
 
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))
