@@ -35,14 +35,14 @@ class FormState(dict):
 
         self._form_actions.setdefault(registry_id, []).append(action)
 
-    def filter_items(self, registry_id, _id=None, _class_name=None, _parent=None, **kwargs):
+    def filter_items(self, registry_id, item_id=None, klass=None, parent=None, **kwargs):
         """
         Filters form state items based on specified criteria.
 
         :param registry_id: Registry identifier
-        :param _id: Optional item identifier filter
-        :param _class_name: Optional class name filter
-        :param _parent: Optional parent instance filter
+        :param item_id: Optional item identifier filter
+        :param klass: Optional item class filter
+        :param parent: Optional parent instance filter
         :return: A list of form state items
         """
 
@@ -52,30 +52,25 @@ class FormState(dict):
         self.registration_point.get_top_level_class(registry_id)
 
         # When an item identifier is passed in, we can get the item directly.
-        if _id is not None:
-            items.append(self.lookup_item_by_id(_id))
+        if item_id is not None:
+            items.append(self.lookup_item_by_id(item_id))
         else:
             # Resolve parent item when specified as a filter expression.
-            if isinstance(_parent, dict):
-                if '_rid' not in _parent:
-                    raise ValueError("Parent specifier must contain an '_rid' entry containing a registry id!")
+            if isinstance(parent, basestring):
+                parent = self.lookup_item_by_id(parent)
+                if parent is None:
+                    raise ValueError("Parent item cannot be found.")
+            elif parent is not None and not hasattr(parent, '_registry_virtual_relation'):
+                raise TypeError("Parent must be either an item instance or an item identifier.")
 
-                try:
-                    _parent = self.filter_items(_parent['_rid'], **_parent)[0]
-                except IndexError:
-                    # Parent could not be resolved.
-                    return []
-            elif _parent is not None:
-                raise TypeError("Parent should be either None or a dictionary!")
-
-            if _parent is not None:
-                items_container = itertools.chain(*_parent._registry_virtual_relation.values())
+            if parent is not None:
+                items_container = itertools.chain(*parent._registry_virtual_relation.values())
             else:
                 items_container = self.get(registry_id, [])
 
             for item in items_container:
-                # Filter based on specified class name.
-                if _class_name is not None and item.__class__.__name__ != _class_name:
+                # Filter based on specified class.
+                if klass is not None and item.__class__ != klass:
                     continue
 
                 # Filter based on partial values.
@@ -129,15 +124,48 @@ class FormState(dict):
                 sibling._id = self.get_identifier(sibling)
                 self._item_map[sibling._id] = sibling
 
-    def remove_item(self, identifier):
+    def remove_item(self, identifier_or_item):
         """
-        Removes a form state item based on its identifier.
+        Removes a form state item.
 
-        :param identifier: Item identifier
+        :param identifier_or_item: Item identifier or instance
         """
 
-        item = self.lookup_item_by_id(identifier)
-        self.remove_items(item.get_registry_id(), _id=identifier)
+        if hasattr(identifier_or_item, '_id'):
+            item = identifier_or_item
+        else:
+            item = self.lookup_item_by_id(identifier_or_item)
+
+        self.remove_items(item.get_registry_id(), _id=item._id)
+
+    def update_item(self, identifier_or_item, **attributes):
+        """
+        Updates a form state item's attributes.
+
+        :param identifier_or_item: Item identifier or instance
+        """
+
+        from . import actions
+
+        if hasattr(identifier_or_item, '_id'):
+            item = identifier_or_item
+        else:
+            item = self.lookup_item_by_id(identifier_or_item)
+
+        # Update item attributes.
+        for key, value in attributes.items():
+            setattr(item, key, value)
+
+        # Add form action to modify data.
+        self.add_form_action(
+            item.get_registry_id(),
+            actions.AssignToFormAction(
+                item,
+                item._registry_virtual_child_index,
+                attributes,
+                parent=item.get_registry_parent(),
+            )
+        )
 
     def append_default_item(self, registry_id, parent_identifier=None):
         """

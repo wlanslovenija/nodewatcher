@@ -1,5 +1,11 @@
 from . import base
 
+__all__ = (
+    'RemoveFormAction',
+    'AppendFormAction',
+    'AssignToFormAction',
+)
+
 
 class RegistryFormAction(object):
     """
@@ -23,20 +29,6 @@ class RegistryFormAction(object):
         """
 
         pass
-
-
-class ClearFormsAction(RegistryFormAction):
-    """
-    An action that clears all subforms for the specified registry class.
-    """
-
-    def modify_forms_after(self):
-        """
-        Clears all subforms.
-        """
-
-        self.context.subforms = []
-        return True
 
 
 class RemoveFormAction(RegistryFormAction):
@@ -91,23 +83,6 @@ class RemoveFormAction(RegistryFormAction):
 
         # Reduce form count depending on how many forms have been removed
         self.context.user_form_count -= len(self.indices)
-        return True
-
-
-class RemoveLastFormAction(RegistryFormAction):
-    """
-    An action that removes the last subform.
-    """
-
-    def modify_forms_after(self):
-        """
-        Removes the last subform.
-        """
-
-        if not self.context.subforms:
-            return False
-
-        self.context.subforms.pop()
         return True
 
 
@@ -185,7 +160,7 @@ class AssignToFormAction(RegistryFormAction):
             return False
 
         form_prefix = self.context.base_prefix + '_mu_' + str(self.index)
-        for field, value in self.attributes.iteritems():
+        for field, value in self.attributes.items():
             self.context.data[form_prefix + '_' + self.item._meta.model_name + '-' + field] = value
 
         return True

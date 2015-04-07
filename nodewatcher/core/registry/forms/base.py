@@ -11,7 +11,13 @@ from django.utils import datastructures, importlib
 from ....utils import loader, toposort
 
 from . import formstate
-from .. import rules as registry_rules, registration
+from .. import registration
+
+__all__ = (
+    'prepare_root_forms',
+    'FORM_INITIAL',
+    'FORM_OUTPUT',
+)
 
 
 # Form generation flags.
@@ -817,14 +823,17 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
         sid = transaction.savepoint()
         forms = RootRegistryRenderItem(context, prepare_forms(context))
 
-        if only_rules:
-            # If only rule validation is requested, we should evaluate rules and then rollback
-            # the savepoint in any case; all validation errors are ignored
-            context.state = registry_rules.evaluate(regpoint, root, context.form_state, context.state),
-            transaction.savepoint_rollback(sid)
-            return context.form_state
-        elif also_rules:
-            context.state = registry_rules.evaluate(regpoint, root, context.form_state)
+        # TODO: Move this to flags instead of these variables. (FORM_DEFAULTS, FORM_ONLY_DEFAULTS)
+        if only_rules or also_rules:
+            # Set form defaults.
+            for form_default in regpoint.get_form_defaults():
+                form_default.set_defaults(context.form_state)
+
+            if only_rules:
+                # If only rule validation is requested, we should set defaults and then rollback
+                # the savepoint in any case; all validation errors are ignored.
+                transaction.savepoint_rollback(sid)
+                return context.form_state
 
         # Process forms when saving and there are no validation errors
         if save and root is not None and not context.validation_errors:

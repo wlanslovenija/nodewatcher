@@ -282,6 +282,9 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.map',
     'nodewatcher.modules.administration.banner',
 
+    # Defaults for wlan slovenia network.
+    'nodewatcher.modules.defaults.wlansi',
+
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
 
@@ -522,11 +525,6 @@ MEASUREMENT_SOURCE_NODE = ''
 
 # Storage for generated firmware images.
 GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-# Registry.
-REGISTRY_RULES_MODULES = {
-    'node.config': 'nodewatcher.rules',
-}
 
 # Disable South migrations during unit tests as they will fail
 SOUTH_TESTS_MIGRATE = False
