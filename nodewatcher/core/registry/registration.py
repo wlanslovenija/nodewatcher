@@ -110,6 +110,7 @@ class RegistrationPoint(object):
         self.flat_lookup_proxies = {}
 
         self._form_defaults = []
+        self._form_processors = []
 
     def _register_item_to_container(self, item, container):
         item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
@@ -501,6 +502,26 @@ class RegistrationPoint(object):
         """
 
         return self._form_defaults
+
+    def add_form_processor(self, processor, order=1000):
+        """
+        Adds a new form processor class.
+
+        :param processor: Form processor class
+        :param order: Optional order specifier (defaults to 1000)
+        """
+
+        self._form_processors.append({
+            'order': order,
+            'processor': processor,
+        })
+
+    def get_form_processors(self):
+        """
+        Returns any form processor classes.
+        """
+
+        return [p['processor'] for p in sorted(self._form_processors, key=lambda p: p['order'])]
 
     def __repr__(self):
         return "<RegistrationPoint '%s'>" % self.name

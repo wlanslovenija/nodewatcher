@@ -507,15 +507,6 @@ DATASTREAM_BACKEND_SETTINGS = {
     'tz_aware': USE_TZ,
 }
 
-# Registry form processors hook into configuration changes
-# performed by users via the forms user interface.
-REGISTRY_FORM_PROCESSORS = {
-    'node.config': (
-        'nodewatcher.core.allocation.formprocessors.AutoPoolAllocator',
-        'nodewatcher.core.generator.cgm.formprocessors.NodeCgmValidator',
-    )
-}
-
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
 

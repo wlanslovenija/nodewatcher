@@ -76,3 +76,5 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         # TODO: Do this only when saving for real, not on validation runs
         for unused in self.allocations:
             unused.free()
+
+registration.point('node.config').add_form_processor(AutoPoolAllocator, order=100)

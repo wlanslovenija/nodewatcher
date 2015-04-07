@@ -773,8 +773,8 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
     :param save: Are we performing a save or rendering an initial form
     """
 
-    # Ensure that all registry forms and CGMs are registred
-    loader.load_modules('forms', 'cgm')
+    # Ensure that all registry forms, form processors and CGMs are registered.
+    loader.load_modules('forms', 'formprocessors', 'cgm')
 
     if save and flags & FORM_ONLY_DEFAULTS:
         raise ValueError("You cannot use save and FORM_ONLY_DEFAULTS at the same time!")
@@ -803,20 +803,12 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
     if flags & FORM_INITIAL and root is not None:
         context.form_state = formstate.FormState.from_db(regpoint, root)
 
-    # Prepare form processors
+    # Prepare form processors.
     form_processors = []
-    for proc_module in settings.REGISTRY_FORM_PROCESSORS.get(regpoint.name, []):
-        i = proc_module.rfind('.')
-        module, attr = proc_module[:i], proc_module[i + 1:]
-        try:
-            module = importlib.import_module(module)
-            form_processors.append(getattr(module, attr)())
-        except (ImportError, AttributeError):
-            raise exceptions.ImproperlyConfigured("Error importing registry form processor %s!" % proc_module)
-
-    # Execute form preprocessing
-    for processor in form_processors:
-        processor.preprocess(root)
+    for form_processor in regpoint.get_form_processors():
+        form_processor = form_processor()
+        form_processor.preprocess(root)
+        form_processors.append(form_processor)
 
     try:
         sid = transaction.savepoint()
@@ -865,7 +857,7 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
                     else:
                         context.validation_errors = True
 
-            # Execute any validation hooks
+            # Execute any validation hooks.
             for processor in form_processors:
                 try:
                     processor.postprocess(root)
