@@ -17,6 +17,6 @@ class STAChannelAutoselect(registry_forms.FormDefaults):
                     continue
 
                 # Ensure that the parent radio has the channel set to auto.
-                state.update_item(vif.device, channel=None)
+                state.update_item(vif.device, channel='')
 
 registration.point('node.config').add_form_defaults(STAChannelAutoselect())

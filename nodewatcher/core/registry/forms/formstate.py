@@ -153,19 +153,23 @@ class FormState(dict):
             item = self.lookup_item_by_id(identifier_or_item)
 
         # Update item attributes.
+        modified = {}
         for key, value in attributes.items():
-            setattr(item, key, value)
+            if getattr(item, key, None) != value:
+                setattr(item, key, value)
+                modified[key] = value
 
-        # Add form action to modify data.
-        self.add_form_action(
-            item.get_registry_id(),
-            actions.AssignToFormAction(
-                item,
-                item._registry_virtual_child_index,
-                attributes,
-                parent=item.get_registry_parent(),
+        if modified:
+            # Add form action to modify data.
+            self.add_form_action(
+                item.get_registry_id(),
+                actions.AssignToFormAction(
+                    item,
+                    item._registry_virtual_child_index,
+                    modified,
+                    parent=item.get_registry_parent(),
+                )
             )
-        )
 
     def append_default_item(self, registry_id, parent_identifier=None):
         """
