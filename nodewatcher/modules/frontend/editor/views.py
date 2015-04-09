@@ -43,8 +43,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
             'node.config',
             request,
             None,
-            also_rules=True,
-            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT,
+            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT | registry_forms.FORM_DEFAULTS,
         )
 
         return self.render_to_response(self.get_context_data())
@@ -62,7 +61,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 request,
                 self.object,
                 data=request.POST,
-                only_rules=True,
+                flags=registry_forms.FORM_ONLY_DEFAULTS,
             )
 
             has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(
@@ -121,8 +120,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
             'node.config',
             request,
             self.object,
-            also_rules=True,
-            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT,
+            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT | registry_forms.FORM_DEFAULTS,
         )
 
         return self.render_to_response(self.get_context_data(object=self.object))
@@ -135,7 +133,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
             request,
             self.object,
             data=request.POST,
-            only_rules=True,
+            flags=registry_forms.FORM_ONLY_DEFAULTS,
         )
 
         has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(

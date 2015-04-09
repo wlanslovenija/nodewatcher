@@ -11,12 +11,23 @@ from django.utils import datastructures, importlib
 from ....utils import loader, toposort
 
 from . import formstate
-from .. import rules as registry_rules, registration
+from .. import registration
+
+__all__ = (
+    'RegistryValidationError',
+    'prepare_root_forms',
+    'FORM_INITIAL',
+    'FORM_OUTPUT',
+    'FORM_DEFAULTS',
+    'FORM_ONLY_DEFAULTS',
+)
 
 
 # Form generation flags.
 FORM_INITIAL = 0x01
 FORM_OUTPUT = 0x02
+FORM_DEFAULTS = 0x04
+FORM_ONLY_DEFAULTS = 0x08
 
 
 class RegistryValidationError(Exception):
@@ -387,7 +398,6 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
             root=context.root,
             data=context.data,
             save=context.save,
-            only_rules=context.only_rules,
             hierarchy_prefix=form_prefix,
             hierarchy_parent_cls=selected_item,
             hierarchy_parent_obj=instance,
@@ -423,7 +433,6 @@ class RegistryFormContext(object):
     root = None
     data = None
     save = False
-    only_rules = False
 
     form_state = None
     flags = 0
@@ -634,7 +643,7 @@ def prepare_forms(context):
                     ))
             else:
                 # Dynamically modifiable multiple objects
-                if not context.save and not context.only_rules:
+                if not context.save and not context.flags & FORM_ONLY_DEFAULTS:
                     # We are generating forms for first-time display purpuses, only include forms for
                     # existing models
                     for index, mdl in enumerate(context.existing_models.values()):
@@ -722,7 +731,7 @@ def prepare_forms(context):
             try:
                 mdl = context.existing_models.values()[0]
 
-                if context.save or context.only_rules:
+                if context.save or context.flags & FORM_ONLY_DEFAULTS:
                     mdl = None
             except IndexError:
                 mdl = None
@@ -752,8 +761,7 @@ def prepare_forms(context):
     return forms
 
 
-def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only_rules=False, also_rules=False,
-                       form_state=None, flags=0):
+def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form_state=None, flags=0):
     """
     Prepares a list of configuration forms for use on a regpoint root's
     configuration page.
@@ -763,15 +771,13 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
     :param root: Registration point root instance for which to generate forms
     :param data: User-supplied POST data
     :param save: Are we performing a save or rendering an initial form
-    :param only_rules: Should only rules be evaluated and a partial config generated
-    :param also_rules: Should rules be evaluated (use only for initial state)
     """
 
-    # Ensure that all registry forms and CGMs are registred
-    loader.load_modules('forms', 'cgm')
+    # Ensure that all registry forms, form processors and CGMs are registered.
+    loader.load_modules('forms', 'formprocessors', 'cgm')
 
-    if save and only_rules:
-        raise ValueError("You cannot use save and only_rules at the same time!")
+    if save and flags & FORM_ONLY_DEFAULTS:
+        raise ValueError("You cannot use save and FORM_ONLY_DEFAULTS at the same time!")
 
     if isinstance(regpoint, basestring):
         regpoint = registration.point(regpoint)
@@ -786,7 +792,6 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
         root=root,
         data=data,
         save=save,
-        only_rules=only_rules,
         validation_errors=False,
         pending_save_forms={},
         pending_save_foreign_keys={},
@@ -798,33 +803,27 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
     if flags & FORM_INITIAL and root is not None:
         context.form_state = formstate.FormState.from_db(regpoint, root)
 
-    # Prepare form processors
+    # Prepare form processors.
     form_processors = []
-    for proc_module in settings.REGISTRY_FORM_PROCESSORS.get(regpoint.name, []):
-        i = proc_module.rfind('.')
-        module, attr = proc_module[:i], proc_module[i + 1:]
-        try:
-            module = importlib.import_module(module)
-            form_processors.append(getattr(module, attr)())
-        except (ImportError, AttributeError):
-            raise exceptions.ImproperlyConfigured("Error importing registry form processor %s!" % proc_module)
-
-    # Execute form preprocessing
-    for processor in form_processors:
-        processor.preprocess(root)
+    for form_processor in regpoint.get_form_processors():
+        form_processor = form_processor()
+        form_processor.preprocess(root)
+        form_processors.append(form_processor)
 
     try:
         sid = transaction.savepoint()
         forms = RootRegistryRenderItem(context, prepare_forms(context))
 
-        if only_rules:
-            # If only rule validation is requested, we should evaluate rules and then rollback
-            # the savepoint in any case; all validation errors are ignored
-            context.state = registry_rules.evaluate(regpoint, root, context.form_state, context.state),
-            transaction.savepoint_rollback(sid)
-            return context.form_state
-        elif also_rules:
-            context.state = registry_rules.evaluate(regpoint, root, context.form_state)
+        if flags & FORM_DEFAULTS | FORM_ONLY_DEFAULTS:
+            # Set form defaults.
+            for form_default in regpoint.get_form_defaults():
+                form_default.set_defaults(context.form_state)
+
+            if flags & FORM_ONLY_DEFAULTS:
+                # If only defaults application is requested, we should set defaults and then rollback
+                # the savepoint in any case; all validation errors are ignored.
+                transaction.savepoint_rollback(sid)
+                return context.form_state
 
         # Process forms when saving and there are no validation errors
         if save and root is not None and not context.validation_errors:
@@ -858,7 +857,7 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, only
                     else:
                         context.validation_errors = True
 
-            # Execute any validation hooks
+            # Execute any validation hooks.
             for processor in form_processors:
                 try:
                     processor.postprocess(root)

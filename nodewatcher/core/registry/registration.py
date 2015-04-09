@@ -109,6 +109,9 @@ class RegistrationPoint(object):
         self.choices_registry = {}
         self.flat_lookup_proxies = {}
 
+        self._form_defaults = []
+        self._form_processors = []
+
     def _register_item_to_container(self, item, container):
         item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
         item_dict[item._meta.model_name] = item
@@ -479,6 +482,46 @@ class RegistrationPoint(object):
         """
 
         self.item_base.__bases__ += tuple(mixins)
+
+    # TODO: Should we support some kind of order specification?
+    def add_form_defaults(self, defaults):
+        """
+        Adds a new form defaults setter.
+
+        :param defaults: Form defaults instance
+        """
+
+        if not hasattr(defaults, 'set_defaults'):
+            raise TypeError("Form defaults instance should implement method 'set_defaults'.")
+
+        self._form_defaults.append(defaults)
+
+    def get_form_defaults(self):
+        """
+        Returns any form defaults setters.
+        """
+
+        return self._form_defaults
+
+    def add_form_processor(self, processor, order=1000):
+        """
+        Adds a new form processor class.
+
+        :param processor: Form processor class
+        :param order: Optional order specifier (defaults to 1000)
+        """
+
+        self._form_processors.append({
+            'order': order,
+            'processor': processor,
+        })
+
+    def get_form_processors(self):
+        """
+        Returns any form processor classes.
+        """
+
+        return [p['processor'] for p in sorted(self._form_processors, key=lambda p: p['order'])]
 
     def __repr__(self):
         return "<RegistrationPoint '%s'>" % self.name

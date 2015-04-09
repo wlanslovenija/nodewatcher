@@ -1,4 +1,4 @@
-from ...registry import forms as registry_forms
+from ...registry import forms as registry_forms, registration
 from ...registry.forms import formprocessors
 
 from . import base as cgm_base, exceptions
@@ -22,7 +22,9 @@ class NodeCgmValidator(formprocessors.RegistryFormProcessor):
             cgm_base.generate_firmware(node, only_validate=True)
         except exceptions.BuilderConfigurationError:
             # Ignore builder configuration errors at this point as we are only trying
-            # to validate configuration, not actually generating anything
+            # to validate configuration, not actually generating anything.
             pass
         except cgm_base.ValidationError, e:
             raise registry_forms.RegistryValidationError(*e.args)
+
+registration.point('node.config').add_form_processor(NodeCgmValidator, order=9000)

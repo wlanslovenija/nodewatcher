@@ -282,6 +282,9 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.map',
     'nodewatcher.modules.administration.banner',
 
+    # Defaults for wlan slovenia network.
+    'nodewatcher.modules.defaults.wlansi',
+
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
 
@@ -504,15 +507,6 @@ DATASTREAM_BACKEND_SETTINGS = {
     'tz_aware': USE_TZ,
 }
 
-# Registry form processors hook into configuration changes
-# performed by users via the forms user interface.
-REGISTRY_FORM_PROCESSORS = {
-    'node.config': (
-        'nodewatcher.core.allocation.formprocessors.AutoPoolAllocator',
-        'nodewatcher.core.generator.cgm.formprocessors.NodeCgmValidator',
-    )
-}
-
 OLSRD_MONITOR_HOST = '127.0.0.1'
 OLSRD_MONITOR_PORT = 2006
 
@@ -522,11 +516,6 @@ MEASUREMENT_SOURCE_NODE = ''
 
 # Storage for generated firmware images.
 GENERATOR_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-# Registry.
-REGISTRY_RULES_MODULES = {
-    'node.config': 'nodewatcher.rules',
-}
 
 # Disable South migrations during unit tests as they will fail
 SOUTH_TESTS_MIGRATE = False
