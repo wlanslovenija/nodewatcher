@@ -38,6 +38,7 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
             class DefaultRegistryItemForm(forms.ModelForm):
                 class Meta:
                     model = cls
+                    fields = '__all__'
 
             form = DefaultRegistryItemForm
 

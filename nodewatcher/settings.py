@@ -179,8 +179,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'nodewatcher.core.frontend.middleware.ClientNodeMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
 )
+
+# TODO: We should not use this everywhere, only on specific views.
+ATOMIC_REQUESTS = True
 
 ROOT_URLCONF = 'nodewatcher.urls'
 

@@ -59,5 +59,6 @@ class AllocatedIpRouterIdConfigForm(forms.ModelForm, IpAddressAllocatorFormMixin
 
     class Meta:
         model = pool_models.AllocatedIpRouterIdConfig
+        fields = '__all__'
 
 registration.register_form_for_item(pool_models.AllocatedIpRouterIdConfig, AllocatedIpRouterIdConfigForm)

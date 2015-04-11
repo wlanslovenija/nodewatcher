@@ -14,6 +14,7 @@ class LocationConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.LocationConfig
+        fields = '__all__'
         widgets = {
             'geolocation': registry_widgets.LocationWidget(
                 map_width=400,
