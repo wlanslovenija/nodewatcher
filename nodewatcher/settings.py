@@ -422,11 +422,20 @@ CELERY_QUEUES = {
         'exchange': 'generator',
         'binding_key': 'generator',
     },
+    'monitor': {
+        'exchange': 'monitor',
+        'binding_key': 'monitor',
+    },
 }
 
 CELERY_ROUTES = {
+    # Generator.
     'nodewatcher.core.generator.cgm.tasks.background_build': {
         'queue': 'generator',
+    },
+    # Monitoring.
+    'nodewatcher.core.monitor.tasks.deferred_request': {
+        'queue': 'monitor',
     },
 }
 
@@ -435,7 +444,26 @@ CELERY_ROUTES = {
 # executed in parallel for all nodes that have been chosen so far by network processors. Only
 # processors that are specified here will be called.
 #
-# Multiple runs are executed in parallel, each with its own worker pool and on a preconfigured interval
+# Multiple runs are executed in parallel, each with its own worker pool and on a preconfigured interval.
+
+TELEMETRY_PROCESSOR_PIPELINE = (
+    'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
+    'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
+    # Validators should start here in order to obtain previous state
+    'nodewatcher.modules.monitor.validation.reboot.processors.RebootValidator',
+    'nodewatcher.modules.monitor.validation.version.processors.VersionValidator',
+    'nodewatcher.modules.monitor.validation.interfaces.processors.InterfaceValidator',
+    # Telemetry processors should be below this point
+    'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
+    'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
+    'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
+    'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
+    'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
+    'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
+    'nodewatcher.modules.administration.status.processors.NodeStatus',
+    'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
+)
+
 MONITOR_RUNS = {
     'latency': {
         'workers': 10,
@@ -457,22 +485,17 @@ MONITOR_RUNS = {
         'processors': (
             'nodewatcher.core.monitor.processors.GetAllNodes',
             'nodewatcher.modules.routing.olsr.processors.Topology',
-            'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
-            'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
-            # Validators should start here in order to obtain previous state
-            'nodewatcher.modules.monitor.validation.reboot.processors.RebootValidator',
-            'nodewatcher.modules.monitor.validation.version.processors.VersionValidator',
-            'nodewatcher.modules.monitor.validation.interfaces.processors.InterfaceValidator',
-            # Telemetry processors should be below this point
-            'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
-            'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
-            'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
-            'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
-            'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
-            'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
-            'nodewatcher.modules.administration.status.processors.NodeStatus',
-            'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
+            TELEMETRY_PROCESSOR_PIPELINE,
             'nodewatcher.modules.monitor.datastream.processors.MaintenanceBackprocess',
+        ),
+    },
+
+    'telemetry-push': {
+        # This run does not define any scheduling or worker information, so it will only be
+        # executed on demand.
+        'processors': (
+            'nodewatcher.core.monitor.processors.GetPushedNode',
+            TELEMETRY_PROCESSOR_PIPELINE,
         ),
     },
 

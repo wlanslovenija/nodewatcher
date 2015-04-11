@@ -4,12 +4,10 @@ import time
 import traceback
 
 from django import db
-from django.conf import settings
-from django.core import exceptions
 from django.db import connection, transaction
-from django.utils import importlib
 
 from . import processors as monitor_processors
+from .config import config as monitor_config
 from .. import models as core_models
 
 # Logger instance
@@ -68,8 +66,8 @@ def cycle_worker(run):
 
 class MonitorRun(object):
 
-    def __init__(self, name, config):
-        self.name = name
+    def __init__(self, config):
+        self.name = config['name']
         self.config = config
 
     def prepare_workers(self):
@@ -184,56 +182,19 @@ class Worker(object):
     Monitoring daemon.
     """
 
-    def prepare_processors(self):
-        """
-        Loads all processors as specified in configuration and groups them
-        accoording to their types.
-        """
-
-        self.runs = {}
-        for run, config in settings.MONITOR_RUNS.iteritems():
-            processors = []
-            for proc_module in config['processors']:
-                i = proc_module.rfind('.')
-                module, attr = proc_module[:i], proc_module[i + 1:]
-                try:
-                    module = importlib.import_module(module)
-                    processor = getattr(module, attr)
-                except (ImportError, AttributeError):
-                    raise exceptions.ImproperlyConfigured("Error importing monitoring processor %s!" % proc_module)
-
-                if not processors:
-                    processors.append([processor])
-                else:
-                    prev_class = processors[-1][-1]
-                    curr_class = processor
-
-                    # Consecutive node processors are grouped together so they will all be run in parallel
-                    # on the list of nodes that has been prepared by recent network processor invocations
-                    if issubclass(prev_class, monitor_processors.NodeProcessor) and issubclass(curr_class, monitor_processors.NodeProcessor):
-                        processors[-1].append(processor)
-                    else:
-                        processors.append([processor])
-
-            self.runs[run] = {
-                'interval': config['interval'],
-                'workers': config['workers'],
-                'max_tasks_per_child': config.get('max_tasks_per_child', 100),
-                'processors': processors,
-            }
-
     def start_run(self, run, cycles=None, process_only_node=None):
-        # Create a run descriptor
-        self.runs[run]['cycles'] = cycles
-        self.runs[run]['process_only_node'] = process_only_node
-        rd = MonitorRun(run, self.runs[run])
+        # Create a run descriptor.
+        run_info = run.copy()
+        run_info['cycles'] = cycles
+        run_info['process_only_node'] = process_only_node
+        rd = MonitorRun(run_info)
 
         # Fork a process for this run
         p = multiprocessing.Process(target=main_worker, args=(rd,))
         p.start()
         return p
 
-    def run(self, cycles=None, process_only_node=None, run=None):
+    def run(self, cycles=None, process_only_node=None, filter_run=None):
         """
         Runs the monitoring process.
         """
@@ -249,15 +210,17 @@ class Worker(object):
             logger.error("Failed to establish a database connection, exiting.")
             return
 
-        logger.info("Loading processors...")
-        self.prepare_processors()
-
         logger.info("Starting monitoring runs...")
         runs = []
-        for r in self.runs.keys():
-            if run is not None and r != run:
+        for run in monitor_config.get_runs():
+            if filter_run is not None and run != filter_run:
                 continue
-            runs.append(self.start_run(r, cycles, process_only_node))
+
+            # Ignore runs without any scheduling information.
+            if run['on_demand']:
+                continue
+
+            runs.append(self.start_run(run, cycles, process_only_node))
 
         for p in runs:
             p.join()
