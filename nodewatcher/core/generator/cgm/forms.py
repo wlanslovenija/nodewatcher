@@ -18,6 +18,7 @@ class CgmGeneralConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.CgmGeneralConfig
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         """
@@ -76,6 +77,7 @@ class WifiInterfaceConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.WifiInterfaceConfig
+        fields = '__all__'
 
     def modify_to_context(self, item, cfg, request):
         """
@@ -108,6 +110,7 @@ class AllocatedNetworkConfigForm(forms.ModelForm, ip_forms.IpAddressAllocatorFor
 
     class Meta:
         model = models.AllocatedNetworkConfig
+        fields = '__all__'
 
 registration.register_form_for_item(models.AllocatedNetworkConfig, AllocatedNetworkConfigForm)
 
@@ -121,6 +124,7 @@ class WifiRadioDeviceConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.WifiRadioDeviceConfig
+        fields = '__all__'
 
     def regulatory_filter(self, request):
         """

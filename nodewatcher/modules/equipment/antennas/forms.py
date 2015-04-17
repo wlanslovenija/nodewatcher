@@ -30,6 +30,7 @@ class AntennaEquipmentConfigForm(forms.ModelForm):
 
     class Meta:
         model = antenna_models.AntennaEquipmentConfig
+        fields = '__all__'
 
     __metaclass__ = AntennaEquipmentConfigFormMeta
 

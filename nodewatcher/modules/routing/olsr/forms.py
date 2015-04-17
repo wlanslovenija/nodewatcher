@@ -14,5 +14,6 @@ class OlsrdModTxtinfoPackageConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.OlsrdModTxtinfoPackageConfig
+        fields = '__all__'
 
 registration.register_form_for_item(models.OlsrdModTxtinfoPackageConfig, OlsrdModTxtinfoPackageConfigForm)

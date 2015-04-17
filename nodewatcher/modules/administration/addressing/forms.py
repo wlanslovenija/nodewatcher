@@ -13,5 +13,6 @@ class BasicAddressingConfigForm(forms.ModelForm, ip_forms.IpAddressAllocatorForm
 
     class Meta:
         model = models.BasicAddressingConfig
+        fields = '__all__'
 
 registration.register_form_for_item(models.BasicAddressingConfig, BasicAddressingConfigForm)

@@ -12,6 +12,7 @@ class PublicKeyAuthenticationConfigForm(forms.ModelForm):
 
     class Meta:
         model = models.PublicKeyAuthenticationConfig
+        fields = '__all__'
 
     def modify_to_context(self, item, cfg, request):
         """
