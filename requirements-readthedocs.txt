@@ -42,7 +42,7 @@ django-timezone-field==1.2
 django-json-field==0.5.7
 django-uuidfield==0.5.0
 paramiko==1.15.2
-django-leaflet==0.15.2
+django-leaflet==0.14.1
 django-countries==3.3
 django-languages==0.1
 django-timedeltafield==0.7.3
