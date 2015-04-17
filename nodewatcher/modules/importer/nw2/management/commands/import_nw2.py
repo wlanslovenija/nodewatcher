@@ -442,6 +442,9 @@ class Command(base.BaseCommand):
                     password=node['profile']['root_pass'],
                 ).save()
 
+                # Bridge for clients.
+                iface_clients_bridge = None
+
                 # Parse any metadata contained in notes.
                 metadata = {}
                 for notes_line in node['notes'].split('\n'):
@@ -514,14 +517,12 @@ class Command(base.BaseCommand):
                     # Client AP interface
                     dsc_radio = device.get_radio('wifi0')
                     if translated_subnets['clients'] is not None and dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
-                        ssid = project.ssids.get(purpose='ap')
-                        iface_ap = node_mdl.config.core.interfaces(
-                            create=cgm_models.WifiInterfaceConfig,
-                            device=radio_wifi,
-                            mode='ap',
-                            essid=ssid.essid,
+                        # In version 2 AP and LAN were bridged, so we also create a bridge on import.
+                        iface_clients_bridge = node_mdl.config.core.interfaces(
+                            create=cgm_models.BridgeInterfaceConfig,
+                            name='clients0',
                         )
-                        iface_ap.save()
+                        iface_clients_bridge.save()
 
                         subnet_ap = ipaddr.IPNetwork('%s/%s' % (subnet_mesh.ip, translated_subnets['clients'] - 1))
                         subnet_ap = list(subnet_ap.iter_subnets())[1]
@@ -536,8 +537,8 @@ class Command(base.BaseCommand):
 
                         node_mdl.config.core.interfaces.network(
                             create=cgm_models.AllocatedNetworkConfig,
-                            interface=iface_ap,
-                            description='AP client access',
+                            interface=iface_clients_bridge,
+                            description='AP-LAN Client Access',
                             routing_announces=['olsr'],
                             family='ipv4',
                             pool=pool_ap,
@@ -545,6 +546,23 @@ class Command(base.BaseCommand):
                             allocation=allocation,
                             lease_type='dhcp',
                             lease_duration='1h',
+                        ).save()
+
+                        # Create the AP VIF and put it into the bridge.
+                        ssid = project.ssids.get(purpose='ap')
+                        iface_ap = node_mdl.config.core.interfaces(
+                            create=cgm_models.WifiInterfaceConfig,
+                            device=radio_wifi,
+                            mode='ap',
+                            essid=ssid.essid,
+                        )
+                        iface_ap.save()
+
+                        node_mdl.config.core.interfaces.network(
+                            create=cgm_models.BridgedNetworkConfig,
+                            interface=iface_ap,
+                            description='',
+                            bridge=iface_clients_bridge,
                         ).save()
 
                 # Antenna
@@ -595,37 +613,46 @@ class Command(base.BaseCommand):
                     )
                     iface_lan.save()
 
-                    have_subnets = False
-                    for subnet in node['subnets']:
-                        if subnet['gen_iface_type'] != 0:
-                            continue
-
-                        subnet_lan = ipaddr.IPNetwork('%(subnet)s/%(cidr)s' % subnet)
-                        try:
-                            pool_lan = [x['_model'] for x in data['pools'].values() if subnet_lan in x['_model']][0]
-                        except IndexError:
-                            raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_lan)
-
-                        allocation = pool_lan.reserve_subnet(str(subnet_lan.ip), subnet_lan.prefixlen)
-                        if allocation is None:
-                            raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_lan)
-
-                        subnet_lan = node_mdl.config.core.interfaces.network(
-                            create=cgm_models.AllocatedNetworkConfig,
+                    if iface_clients_bridge is not None:
+                        # LAN interface should be a part of the clients bridge.
+                        node_mdl.config.core.interfaces.network(
+                            create=cgm_models.BridgedNetworkConfig,
                             interface=iface_lan,
-                            description='LAN',
-                            family='ipv4',
-                            pool=pool_lan,
-                            prefix_length=subnet_lan.prefixlen,
-                            allocation=allocation,
-                        )
-                        subnet_lan.save()
-                        have_subnets = True
+                            description='',
+                            bridge=iface_clients_bridge,
+                        ).save()
+                    else:
+                        have_subnets = False
+                        for subnet in node['subnets']:
+                            if subnet['gen_iface_type'] != 0:
+                                continue
 
-                    if not have_subnets:
-                        # If no subnets are configured, designate the interface for routing
-                        iface_lan.routing_protocols = ['olsr']
-                        iface_lan.save()
+                            subnet_lan = ipaddr.IPNetwork('%(subnet)s/%(cidr)s' % subnet)
+                            try:
+                                pool_lan = [x['_model'] for x in data['pools'].values() if subnet_lan in x['_model']][0]
+                            except IndexError:
+                                raise base.CommandError('Failed to find pool instance for subnet \'%s\'!' % subnet_lan)
+
+                            allocation = pool_lan.reserve_subnet(str(subnet_lan.ip), subnet_lan.prefixlen)
+                            if allocation is None:
+                                raise base.CommandError('Failed to allocate subnet \'%s\'!' % subnet_lan)
+
+                            subnet_lan = node_mdl.config.core.interfaces.network(
+                                create=cgm_models.AllocatedNetworkConfig,
+                                interface=iface_lan,
+                                description='LAN',
+                                family='ipv4',
+                                pool=pool_lan,
+                                prefix_length=subnet_lan.prefixlen,
+                                allocation=allocation,
+                            )
+                            subnet_lan.save()
+                            have_subnets = True
+
+                        if not have_subnets:
+                            # If no subnets are configured, designate the interface for routing
+                            iface_lan.routing_protocols = ['olsr']
+                            iface_lan.save()
 
                 # VPN (only configure when an uplink exists)
                 if node['profile']['use_vpn'] and uplink_configured:
