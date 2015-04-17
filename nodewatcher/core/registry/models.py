@@ -75,19 +75,6 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
         return cls._registry_regpoint.get_top_level_class(cls.get_registry_id())
 
     @classmethod
-    def can_add(cls, user):
-        """
-        Returns True if the user has permissions to add this registry item.
-        """
-
-        return user.has_perm(
-            "%(app_label)s.add_%(model_name)s" % {
-                "app_label": cls._meta.app_label,
-                "model_name": cls._meta.model_name,
-            }
-        )
-
-    @classmethod
     def has_registry_multiple(cls):
         """
         Returns true if the item's registry id can contain multiple items.
