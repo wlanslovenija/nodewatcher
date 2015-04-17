@@ -48,6 +48,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
 
         return self.render_to_response(self.get_context_data())
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         self.object = None
 
@@ -125,6 +126,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
 
         return self.render_to_response(self.get_context_data(object=self.object))
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 

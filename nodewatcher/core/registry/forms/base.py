@@ -761,6 +761,7 @@ def prepare_forms(context):
     return forms
 
 
+@transaction.atomic(savepoint=False)
 def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form_state=None, flags=0):
     """
     Prepares a list of configuration forms for use on a regpoint root's

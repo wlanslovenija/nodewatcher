@@ -8,6 +8,7 @@ from . import forms as registry_forms, registration
 
 
 @auth_decorators.login_required
+@transaction.atomic
 def evaluate_forms(request, regpoint_id, root_id):
     """
     This view gets called via an AJAX request to update configuration forms.
