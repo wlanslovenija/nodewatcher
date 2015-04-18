@@ -521,6 +521,7 @@ class Command(base.BaseCommand):
                         iface_clients_bridge = node_mdl.config.core.interfaces(
                             create=cgm_models.BridgeInterfaceConfig,
                             name='clients0',
+                            routing_protocols=['olsr'],
                         )
                         iface_clients_bridge.save()
 
