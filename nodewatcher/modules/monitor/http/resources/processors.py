@@ -1,5 +1,5 @@
-
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
+from nodewatcher.modules.monitor.sources.http import processors as http_processors
 
 
 class SystemStatus(monitor_processors.NodeProcessor):
@@ -8,7 +8,7 @@ class SystemStatus(monitor_processors.NodeProcessor):
     monitor module has previously fetched data.
     """
 
-    @monitor_processors.depends_on_context("http")
+    @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
         Called for every processed node.

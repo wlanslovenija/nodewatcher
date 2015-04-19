@@ -73,9 +73,9 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
 
         if not context.push.source:
             # This processor is not being invoked from a push handler, check if the node is configured
-            # for pulling telemetry and ignore it if it is not.
+            # for periodically polling telemetry and ignore it if it is not.
             telemetry_source = node.config.core.telemetry.http()
-            if telemetry_source.source != 'pull':
+            if not telemetry_source or telemetry_source.source != 'poll':
                 return context
 
             push = False
