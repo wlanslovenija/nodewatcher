@@ -49,6 +49,7 @@ class HttpTelemetryParser(object):
         """
 
         if self.data is not None:
+            self.node_responds = True
             return self.data
 
         # Create our own HTTP connection so we can use a successful TCP connection as

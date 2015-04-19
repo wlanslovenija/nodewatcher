@@ -191,33 +191,6 @@ class GetAllNodes(NetworkProcessor):
         return context, nodes
 
 
-class GetPushedNode(NetworkProcessor):
-    """
-    A processor that populates the nodes set with the node that is set as the push
-    source in the context.
-    """
-
-    def process(self, context, nodes):
-        """
-        Performs network-wide processing and selects the nodes that will be processed
-        in any following processors. Context is passed between network processors.
-
-        :param context: Current context
-        :param nodes: A set of nodes that are to be processed
-        :return: A (possibly) modified context and a (possibly) modified set of nodes
-        """
-
-        if context.push.source:
-            # Fetch a node based on the UUID set in the context and add it to the set.
-            try:
-                node = core_models.Node.objects.get(uuid=context.push.source)
-                nodes.add(node)
-            except core_models.Node.DoesNotExist:
-                self.logger.error("Node with UUID '%s' does not exist." % context.push.source)
-
-        return context, nodes
-
-
 def depends_on_context(*keys):
     """
     A decorator that augments methods which receive context as a first

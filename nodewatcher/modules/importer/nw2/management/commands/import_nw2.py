@@ -21,6 +21,7 @@ from nodewatcher.modules.administration.roles import models as role_models
 from nodewatcher.modules.administration.types import models as type_models
 from nodewatcher.modules.equipment.antennas import models as antenna_models
 from nodewatcher.modules.vpn.tunneldigger import models as tunneldigger_models
+from nodewatcher.modules.monitor.sources.http import models as telemetry_http_models
 from nodewatcher.utils import ipaddr
 
 # Applications that this import process requires to be installed
@@ -39,6 +40,7 @@ REQUIRED_APPS = [
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
+    'nodewatcher.modules.monitor.sources.http',
 ]
 
 # Mapping of nodewatcher v2 node types to v3 node types
@@ -426,6 +428,12 @@ class Command(base.BaseCommand):
             node_mdl.config.core.roles(create=role_models.BorderRouterRoleConfig, border_router=node['border_router']).save()
             node_mdl.config.core.roles(create=role_models.VpnServerRoleConfig, vpn_server=node['vpn_server']).save()
             node_mdl.config.core.roles(create=role_models.RedundantNodeRoleConfig, redundancy_required=node['redundancy_req']).save()
+
+            # HTTP telemetry source config.
+            node_mdl.config.core.telemetry.http(
+                create=telemetry_http_models.HttpTelemetrySourceConfig,
+                source='poll',
+            ).save()
 
             if node['profile'] and not dead_node:
                 general = node_mdl.config.core.general(

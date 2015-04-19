@@ -436,7 +436,7 @@ CELERY_ROUTES = {
         'queue': 'generator',
     },
     # Monitoring.
-    'nodewatcher.core.monitor.tasks.deferred_request': {
+    'nodewatcher.core.monitor.tasks.run_pipeline': {
         'queue': 'monitor',
     },
 }
@@ -449,13 +449,11 @@ CELERY_ROUTES = {
 # Multiple runs are executed in parallel, each with its own worker pool and on a preconfigured interval.
 
 TELEMETRY_PROCESSOR_PIPELINE = (
-    'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
-    'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
-    # Validators should start here in order to obtain previous state
+    # Validators should start here in order to obtain previous state.
     'nodewatcher.modules.monitor.validation.reboot.processors.RebootValidator',
     'nodewatcher.modules.monitor.validation.version.processors.VersionValidator',
     'nodewatcher.modules.monitor.validation.interfaces.processors.InterfaceValidator',
-    # Telemetry processors should be below this point
+    # Telemetry processors should be below this point.
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
@@ -487,6 +485,8 @@ MONITOR_RUNS = {
         'processors': (
             'nodewatcher.core.monitor.processors.GetAllNodes',
             'nodewatcher.modules.routing.olsr.processors.Topology',
+            'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
+            'nodewatcher.modules.routing.olsr.processors.NodePostprocess',
             TELEMETRY_PROCESSOR_PIPELINE,
             'nodewatcher.modules.monitor.datastream.processors.MaintenanceBackprocess',
         ),
@@ -496,7 +496,8 @@ MONITOR_RUNS = {
         # This run does not define any scheduling or worker information, so it will only be
         # executed on demand.
         'processors': (
-            'nodewatcher.core.monitor.processors.GetPushedNode',
+            'nodewatcher.modules.monitor.sources.http.processors.HTTPGetPushedNode',
+            'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             TELEMETRY_PROCESSOR_PIPELINE,
         ),
     },
