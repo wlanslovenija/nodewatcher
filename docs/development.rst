@@ -29,6 +29,7 @@ The following containers will be created and started when you run the above comm
 * ``tokumx`` contains the TokuMX database server (an improved version of MongoDB).
 * ``builder{ar71xx,lantiq}`` contain firmware builders that you can use for development (see :ref:`development-run-builder`).
 * ``generator`` contains the Celery workers for the firmware image generator. These workers connect to the ``builder`` via SSH in order to build firmware images.
+* ``monitorq`` contains the Celery workers for handling monitoring push requests.
 * ``web`` contains the nodewatcher frontend (Django development server), running on port ``8000`` by default.
 
 .. note::

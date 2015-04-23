@@ -523,6 +523,11 @@ MONITOR_RUNS = {
     },
 }
 
+# Identifier of the run that should be used to handle HTTP pushes.
+MONITOR_HTTP_PUSH_RUN = 'telemetry-push'
+# Base host that should be used for HTTP push. Must be reachable from nodes.
+MONITOR_HTTP_PUSH_HOST = '127.0.0.1'
+
 # Backend for the monitoring data archive.
 DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
 # Each backend can have backend-specific settings that can be specified here.

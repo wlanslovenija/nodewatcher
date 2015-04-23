@@ -53,6 +53,11 @@ class ProcessorContext(dict):
                 except AttributeError:
                     self[k] = v
             else:
+                if isinstance(v, dict):
+                    # Convert dictionaries to context instances.
+                    context = ProcessorContext()
+                    v = context.merge_with(v)
+
                 self[k] = v
 
         return self
