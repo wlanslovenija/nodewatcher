@@ -55,6 +55,9 @@ def general(node, cfg):
         ))
         agent.push_interval = 300
 
+        # Ensure that HTTP push module is installed.
+        cfg.packages.add('nodewatcher-agent-mod-http_push')
+
     cfg.packages.update([
         'uhttpd',
         'nodewatcher-agent',
