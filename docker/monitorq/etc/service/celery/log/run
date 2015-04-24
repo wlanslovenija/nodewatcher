@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+mkdir -p /var/log/celery
+chown nobody:nogroup /var/log/celery
+
+exec chpst -u nobody:nogroup svlogd -tt /var/log/celery
+
