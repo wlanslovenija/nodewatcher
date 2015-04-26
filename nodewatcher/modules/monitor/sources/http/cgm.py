@@ -44,9 +44,22 @@ def general(node, cfg):
                 _("HTTP push host must be configured in order to configure push.")
             )
 
+        # Configure secure transport when enabled.
+        schema = 'http'
+        if getattr(settings, 'HTTPS_PUBLIC_KEY', None):
+            schema = 'https'
+            # Install server's public key.
+            pubkey = cfg.crypto.add_object(
+                cgm_base.PlatformCryptoManager.PUBLIC_KEY,
+                settings.HTTPS_PUBLIC_KEY,
+                'server.nodewatcher',
+            )
+            # Setup public key pinning.
+            agent.push_server_pubkey = pubkey.path()
+
         # Configure agent for periodic push.
         agent.push_url = urlparse.urlunparse((
-            'http',
+            schema,
             settings.MONITOR_HTTP_PUSH_HOST,
             urlresolvers.reverse('HttpPushComponent:endpoint', kwargs={'uuid': str(node.uuid)}),
             None,

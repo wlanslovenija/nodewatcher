@@ -555,6 +555,10 @@ SOUTH_TESTS_MIGRATE = False
 # Django's is_secure is used in the code as well. See SECURE_PROXY_SSL_HEADER configuration option.
 USE_HTTPS = False
 
+# Server's public key. This is used for certificate pinning when provisioning nodes. If this is not
+# set, nodes may be configured to access the server via insecure HTTP instead.
+HTTPS_PUBLIC_KEY = None
+
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (46.05, 14.507),
     'DEFAULT_ZOOM': 8,

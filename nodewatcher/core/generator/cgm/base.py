@@ -88,6 +88,98 @@ class PlatformRoutingTableManager(object):
         return self._tables
 
 
+class PlatformCryptoManager(object):
+    """
+    Configure platform cryptographic objects like certificates, public and
+    private keys.
+    """
+
+    # Object types.
+    CERTIFICATE = 1
+    PUBLIC_KEY = 2
+    PRIVATE_KEY = 3
+
+    class CryptoObject(object):
+        def __init__(self, object_type, content, name):
+            """
+            Class constructor.
+            """
+
+            self.object_type = object_type
+            self.content = content
+            self.name = name
+
+        def path(self):
+            """
+            This method should be overriden by the platform-specific implementation
+            to return the path to the crypto object on the filesystem.
+            """
+
+            raise NotImplementedError
+
+        def get_config(self):
+            """
+            Returns a configuration dictionary suitable for use in JSON
+            documents.
+            """
+
+            return {
+                'type': self.object_type,
+                'name': self.name,
+                'content': self.content,
+            }
+
+    object_class = CryptoObject
+
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self._objects = {}
+
+    def add_object(self, object_type, content, name):
+        """
+        Adds a new crypto object.
+
+        :param object_type: Type of the crypto object
+        :param content: Object content
+        :param name: Unique object name
+        :return: Crypto object instance
+        """
+
+        # TODO: Perform object validation and raise ValidationErrors.
+
+        crypto_object = self.object_class(object_type, content.strip(), name)
+        objects = self._objects.setdefault(object_type, {})
+        objects[name] = crypto_object
+
+        return crypto_object
+
+    def get_object(self, object_type, name):
+        """
+        Returns an existing crypto object.
+
+        :param object_type: Type of the crypto object
+        :param name: Unique object name
+        :return: Crypto object instance
+        """
+
+        return self._objects[object_type][name]
+
+    def get_config(self):
+        """
+        Returns a list of crypto objects suitable for use in JSON documents.
+        """
+
+        config = []
+        for object_type, objects in self._objects.items():
+            for crypto_object in objects.values():
+                config.append(crypto_object.get_config())
+
+        return config
+
+
 class PlatformConfiguration(object):
     """
     A flexible in-memory platform configuration store that is used
@@ -96,16 +188,23 @@ class PlatformConfiguration(object):
     methods.
     """
 
+    resources_class = cgm_resources.ResourceAllocator
+    packages_class = set
+    accounts_class = PlatformAccountManager
+    routing_table_manager_class = PlatformRoutingTableManager
+    crypto_manager_class = PlatformCryptoManager
+
     def __init__(self):
         """
         Class constructor.
         """
 
-        self.resources = cgm_resources.ResourceAllocator()
-        self.packages = set()
-        self.accounts = PlatformAccountManager()
+        self.resources = self.resources_class()
+        self.packages = self.packages_class()
+        self.accounts = self.accounts_class()
         self.banner = str()
-        self.routing_tables = PlatformRoutingTableManager()
+        self.routing_tables = self.routing_table_manager_class()
+        self.crypto = self.crypto_manager_class()
 
     def get_build_config(self):
         """
@@ -120,6 +219,7 @@ class PlatformConfiguration(object):
             '_accounts': self.accounts.get_config(),
             '_banner': str(self.banner),
             '_routing_tables': self.routing_tables.get_config(),
+            '_crypto': self.crypto.get_config(),
         }
 
 
