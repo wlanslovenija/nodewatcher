@@ -1,5 +1,6 @@
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 from nodewatcher.utils import ipaddr
+from nodewatcher.modules.monitor.sources.http import processors as http_processors
 
 DATASTREAM_SUPPORTED = False
 try:
@@ -14,7 +15,7 @@ class Interfaces(monitor_processors.NodeProcessor):
     Stores interface monitoring data.
     """
 
-    @monitor_processors.depends_on_context("http")
+    @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
         Called for every processed node.

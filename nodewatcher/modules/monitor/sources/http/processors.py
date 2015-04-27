@@ -71,6 +71,18 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
+        if not context.push.source:
+            # This processor is not being invoked from a push handler, check if the node is configured
+            # for periodically polling telemetry and ignore it if it is not.
+            telemetry_source = node.config.core.telemetry.http()
+            if not telemetry_source or telemetry_source.source != 'poll':
+                return context
+
+            push = False
+        else:
+            context.node_available = True
+            push = True
+
         node_available = context.node_available
 
         with context.create('http', HTTPTelemetryContext) as http_context:
@@ -81,8 +93,11 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                 if not node_available:
                     return context
 
-                router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-                parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
+                if not push:
+                    router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+                    parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
+                else:
+                    parser = telemetry_parser.HttpTelemetryParser(data=context.push.data)
 
                 # Fetch information from the router and merge it into local context
                 try:
@@ -110,3 +125,35 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
                 pass
 
         return context
+
+
+class HTTPGetPushedNode(monitor_processors.NetworkProcessor):
+    """
+    A processor that populates the nodes set with the node that is set as the push
+    source in the context.
+    """
+
+    def process(self, context, nodes):
+        """
+        Performs network-wide processing and selects the nodes that will be processed
+        in any following processors. Context is passed between network processors.
+
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
+        """
+
+        if context.push.source:
+            # Fetch a node based on the UUID set in the context and add it to the set.
+            try:
+                node = core_models.Node.objects.get(uuid=context.push.source)
+                telemetry_source = node.config.core.telemetry.http()
+                if telemetry_source.source != 'push':
+                    # If the node is not configured to push, we ignore it.
+                    return context, nodes
+
+                nodes.add(node)
+            except core_models.Node.DoesNotExist:
+                self.logger.error("Node with UUID '%s' does not exist." % context.push.source)
+
+        return context, nodes

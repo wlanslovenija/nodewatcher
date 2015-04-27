@@ -308,10 +308,49 @@ class UCIRoot(object):
         return output
 
 
+class OpenWrtCryptoManager(cgm_base.PlatformCryptoManager):
+    class CryptoObject(cgm_base.PlatformCryptoManager.CryptoObject):
+        def __init__(self, *args, **kwargs):
+            super(OpenWrtCryptoManager.CryptoObject, self).__init__(*args, **kwargs)
+
+            # If path is never requested, we will not generate a file at all.
+            self._path = None
+
+        def path(self):
+            """
+            Returns the path to the crypto object.
+            """
+
+            type_map = {
+                cgm_base.PlatformCryptoManager.CERTIFICATE: 'certificate',
+                cgm_base.PlatformCryptoManager.PUBLIC_KEY: 'public_key',
+                cgm_base.PlatformCryptoManager.PRIVATE_KEY: 'private_key',
+            }
+            self._path = '/etc/crypto/%s/%s' % (type_map[self.object_type], self.name)
+            return self._path
+
+        def get_config(self):
+            """
+            Returns a configuration dictionary suitable for use in JSON
+            documents.
+            """
+
+            config = super(OpenWrtCryptoManager.CryptoObject, self).get_config()
+            config.update({
+                'path': self._path,
+            })
+
+            return config
+
+    object_class = CryptoObject
+
+
 class UCIConfiguration(cgm_base.PlatformConfiguration):
     """
     An in-memory implementation of UCI configuration.
     """
+
+    crypto_manager_class = OpenWrtCryptoManager
 
     def __init__(self):
         """

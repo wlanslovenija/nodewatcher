@@ -53,6 +53,11 @@ class ProcessorContext(dict):
                 except AttributeError:
                     self[k] = v
             else:
+                if isinstance(v, dict):
+                    # Convert dictionaries to context instances.
+                    context = ProcessorContext()
+                    v = context.merge_with(v)
+
                 self[k] = v
 
         return self
@@ -191,20 +196,22 @@ class GetAllNodes(NetworkProcessor):
         return context, nodes
 
 
-def depends_on_context(*keys):
+def depends_on_context(key_name, key_type):
     """
     A decorator that augments methods which receive context as a first
     argument and return a context. It ensures that the method is only called
-    when certain keys are present in the method's context.
+    when a key of a certain type exists in the context.
     """
+
+    # Fail early if the second argument to isinstance is not a valid class/type.
+    isinstance(None, key_type)
 
     def decorator(f):
         def wrapper(self, context, *args, **kwargs):
-            for key in keys:
-                if key not in context:
-                    return context
+            if key_name in context and isinstance(context[key_name], key_type):
+                return f(self, context, *args, **kwargs)
 
-            return f(self, context, *args, **kwargs)
+            return context
 
         return wrapper
 

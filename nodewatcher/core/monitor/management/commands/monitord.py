@@ -32,4 +32,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         w = worker.Worker()
-        w.run(cycles=options['cycles'], process_only_node=options['process_only_node'], run=options['run'])
+        w.run(cycles=options['cycles'], process_only_node=options['process_only_node'], filter_run=options['run'])

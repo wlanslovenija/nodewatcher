@@ -69,6 +69,18 @@ generator:
         - tokumx
         - builderar71xx
         - builderlantiq
+monitorq:
+    build: .
+    command: "scripts/docker-cleanup; celery worker -A nodewatcher -l info -Q monitor --autoreload"
+    entrypoint: scripts/docker-run
+    environment:
+        # Allow celery to run under the root user in order for it to have access
+        C_FORCE_ROOT: true
+    volumes:
+        - .:/code
+    links:
+        - db
+        - tokumx
 web:
     build: .
     command: "scripts/docker-cleanup; scripts/docker-wait-pgsql; python manage.py runserver 0.0.0.0:8000"

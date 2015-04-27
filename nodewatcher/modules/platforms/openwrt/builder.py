@@ -50,6 +50,13 @@ def build_image(result, profile):
             tables.write('%s\t%s\n' % (identifier, name))
         builder.write_file(os.path.join(temp_path, 'etc', 'iproute2', 'rt_tables'), tables.getvalue().encode('ascii'))
 
+        # Prepare the crypto objects.
+        for crypto_object in cfg['_crypto']:
+            if not crypto_object['path']:
+                continue
+
+            builder.write_file(os.path.join(temp_path, crypto_object['path'][1:]), crypto_object['content'].encode('ascii'))
+
         # Run the build system and wait for its completion
         result.build_log = builder.call(
             'make', 'image',
