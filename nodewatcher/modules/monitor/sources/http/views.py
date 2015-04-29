@@ -1,5 +1,3 @@
-import ujson
-
 from django import http
 from django.conf import settings
 from django.views import generic
