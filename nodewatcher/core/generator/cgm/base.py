@@ -98,6 +98,7 @@ class PlatformCryptoManager(object):
     CERTIFICATE = 1
     PUBLIC_KEY = 2
     PRIVATE_KEY = 3
+    SYMMETRIC_KEY = 4
 
     class CryptoObject(object):
         def __init__(self, object_type, content, name):
