@@ -283,6 +283,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.generator',
     'nodewatcher.modules.frontend.map',
     'nodewatcher.modules.administration.banner',
+    'nodewatcher.modules.sensors.generic',
 
     # Defaults for wlan slovenia network.
     'nodewatcher.modules.defaults.wlansi',
@@ -459,6 +460,7 @@ TELEMETRY_PROCESSOR_PIPELINE = (
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
+    'nodewatcher.modules.sensors.generic.processors.GenericSensors',
     'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
     'nodewatcher.modules.administration.status.processors.NodeStatus',
     'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
