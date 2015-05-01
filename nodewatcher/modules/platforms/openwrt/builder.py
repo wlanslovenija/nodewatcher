@@ -18,14 +18,14 @@ def build_image(result, profile):
     with result.builder.connect() as builder:
         temp_path = builder.create_tempdir()
 
-        # Prepare configuration files
+        # Prepare configuration files.
         cfg_path = os.path.join(temp_path, 'etc', 'config')
         for fname, content in cfg.items():
             if fname.startswith('_'):
                 continue
             builder.write_file(os.path.join(cfg_path, fname), content)
 
-        # Prepare user account files
+        # Prepare user account files.
         from . import crypt
         passwd = io.StringIO()
         for account in cfg['_accounts'].get('users', {}).values():
@@ -38,13 +38,13 @@ def build_image(result, profile):
             passwd.write('%(username)s:%(password)s:%(uid)d:%(gid)d:%(username)s:%(home)s:%(shell)s\n' % account)
         builder.write_file(os.path.join(temp_path, 'etc', 'passwd'), passwd.getvalue().encode('ascii'))
 
-        # Prepare the banner file if configured
+        # Prepare the banner file if configured.
         if cfg.get('_banner', None):
             banner = io.StringIO()
             banner.write(cfg['_banner'])
             builder.write_file(os.path.join(temp_path, 'etc', 'banner'), banner.getvalue().encode('ascii'))
 
-        # Prepare the routing table mappings
+        # Prepare the routing table mappings.
         tables = io.StringIO()
         for identifier, name in cfg['_routing_tables'].items():
             tables.write('%s\t%s\n' % (identifier, name))
@@ -57,7 +57,7 @@ def build_image(result, profile):
 
             builder.write_file(os.path.join(temp_path, crypto_object['path'][1:]), crypto_object['content'].encode('ascii'))
 
-        # Run the build system and wait for its completion
+        # Run the build system and wait for its completion.
         result.build_log = builder.call(
             'make', 'image',
             'PROFILE=%s' % profile["name"],
@@ -65,7 +65,7 @@ def build_image(result, profile):
             'PACKAGES=%s' % " ".join(cfg['_packages'])
         )
 
-        # Collect the output files and return them
+        # Collect the output files and return them.
         fw_files = []
         for fw_file in profile['files']:
             try:
