@@ -1,3 +1,5 @@
+import collections
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
@@ -33,7 +35,7 @@ class UCISection(object):
 
         self.__dict__['_key'] = key
         self.__dict__['_typ'] = typ
-        self.__dict__['_values'] = {}
+        self.__dict__['_values'] = collections.OrderedDict()
 
     def __setattr__(self, name, value):
         """
@@ -148,8 +150,8 @@ class UCIRoot(object):
         """
 
         self._root = root
-        self._named_sections = {}
-        self._ordered_sections = {}
+        self._named_sections = collections.OrderedDict()
+        self._ordered_sections = collections.OrderedDict()
 
     def add(self, *args, **kwargs):
         """
