@@ -1,7 +1,7 @@
 import io
 import os
 
-from nodewatcher.core.generator.cgm import exceptions as cgm_exceptions
+from nodewatcher.core.generator.cgm import base as cgm_base, exceptions as cgm_exceptions
 
 
 def build_image(result, profile):
@@ -51,11 +51,29 @@ def build_image(result, profile):
         builder.write_file(os.path.join(temp_path, 'etc', 'iproute2', 'rt_tables'), tables.getvalue().encode('ascii'))
 
         # Prepare the crypto objects.
+        ssh_authorized_keys = io.StringIO()
         for crypto_object in cfg['_crypto']:
+            # Populate SSH authorized keys.
+            if crypto_object['type'] == cgm_base.PlatformCryptoManager.SSH_AUTHORIZED_KEY:
+                ssh_authorized_keys.write('%s\n' % crypto_object['content'])
+
             if not crypto_object['path']:
                 continue
 
             builder.write_file(os.path.join(temp_path, crypto_object['path'][1:]), crypto_object['content'].encode('ascii'))
+
+        builder.write_file(
+            os.path.join(temp_path, 'etc', 'dropbear', 'authorized_keys'),
+            ssh_authorized_keys.getvalue().encode('ascii'),
+            mode=0600,
+        )
+
+        # Create empty dropbear_ecdsa_host_key file to enable ECDSA.
+        builder.write_file(
+            os.path.join(temp_path, 'etc', 'dropbear', 'dropbear_ecdsa_host_key'),
+            '',
+            mode=0600,
+        )
 
         # Run the build system and wait for its completion.
         result.build_log = builder.call(

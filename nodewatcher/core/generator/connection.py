@@ -81,12 +81,13 @@ class BuilderConnection(object):
         self.tempdirs.append(dirname)
         return dirname
 
-    def write_file(self, path, content):
+    def write_file(self, path, content, mode=None):
         """
         Creates a file with specific content on the builder.
 
         :param path: File path
         :param content: File content
+        :param mode: File mode
         """
 
         # Ensure that all directories leading up to the file are created
@@ -101,6 +102,9 @@ class BuilderConnection(object):
         try:
             with self.sftp.open(path, 'w') as fobj:
                 fobj.write(content)
+
+            if mode is not None:
+                self.sftp.chmod(path, mode)
         except IOError:
             raise cgm_exceptions.BuildError('Failed to write file: %s' % path)
 

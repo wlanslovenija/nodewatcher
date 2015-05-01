@@ -99,6 +99,7 @@ class PlatformCryptoManager(object):
     PUBLIC_KEY = 2
     PRIVATE_KEY = 3
     SYMMETRIC_KEY = 4
+    SSH_AUTHORIZED_KEY = 5
 
     class CryptoObject(object):
         def __init__(self, object_type, content, name):
@@ -150,6 +151,8 @@ class PlatformCryptoManager(object):
         """
 
         # TODO: Perform object validation and raise ValidationErrors.
+
+        name = str(name)
 
         crypto_object = self.object_class(object_type, content.strip(), name)
         objects = self._objects.setdefault(object_type, {})

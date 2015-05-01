@@ -328,6 +328,7 @@ class OpenWrtCryptoManager(cgm_base.PlatformCryptoManager):
                 cgm_base.PlatformCryptoManager.PUBLIC_KEY: 'public_key',
                 cgm_base.PlatformCryptoManager.PRIVATE_KEY: 'private_key',
                 cgm_base.PlatformCryptoManager.SYMMETRIC_KEY: 'symmetric_key',
+                cgm_base.PlatformCryptoManager.SSH_AUTHORIZED_KEY: 'ssh_authorized_key',
             }
             self._path = '/etc/crypto/%s/%s' % (type_map[self.object_type], self.name)
             return self._path
