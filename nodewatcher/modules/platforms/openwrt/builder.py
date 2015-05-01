@@ -68,13 +68,6 @@ def build_image(result, profile):
             mode=0600,
         )
 
-        # Create empty dropbear_ecdsa_host_key file to enable ECDSA.
-        builder.write_file(
-            os.path.join(temp_path, 'etc', 'dropbear', 'dropbear_ecdsa_host_key'),
-            '',
-            mode=0600,
-        )
-
         # Run the build system and wait for its completion.
         result.build_log = builder.call(
             'make', 'image',
