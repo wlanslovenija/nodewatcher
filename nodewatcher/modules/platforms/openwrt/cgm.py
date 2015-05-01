@@ -61,6 +61,10 @@ class UCISection(object):
 
         return self._values.get(name, None)
 
+    __setitem__ = __setattr__
+    __delitem__ = __delattr__
+    __getitem__ = __getattr__
+
     def get_key(self):
         """
         Returns the section key.
