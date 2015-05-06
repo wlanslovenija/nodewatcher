@@ -83,8 +83,7 @@ def babel(node, cfg):
     for net in announced_networks:
         rule = cfg.babeld.add('filter')
         rule.type = 'redistribute'
-        rule.ip = net.network
-        rule.eq = net.prefixlen
+        rule.ip = net
         rule.local = 'true'
         # Protocol number '4' means 'static' routes.
         rule.proto = 4
@@ -109,6 +108,8 @@ def babel(node, cfg):
     firewall.output = 'ACCEPT'
     firewall.forward = 'ACCEPT'
 
-    # Ensure that "babeld" package is installed.
-    # TODO: Also add the nodewatcher-agent-mod-routing_babel package.
-    cfg.packages.update(['babeld'])
+    # Ensure that Babel packages are installed.
+    cfg.packages.update([
+        'babeld',
+        'nodewatcher-agent-mod-routing_babel',
+    ])

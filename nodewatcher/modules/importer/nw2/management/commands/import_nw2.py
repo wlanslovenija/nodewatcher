@@ -37,6 +37,7 @@ REQUIRED_APPS = [
     'nodewatcher.modules.administration.status',
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.routing.olsr',
+    'nodewatcher.modules.routing.babel',
     'nodewatcher.modules.sensors.digitemp',
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
@@ -482,7 +483,7 @@ class Command(base.BaseCommand):
                             device=radio_wifi,
                             mode='ap',
                             essid=metadata['ap_ssid'],
-                            routing_protocols=['olsr'],
+                            routing_protocols=['olsr', 'babel'],
                         )
                         iface_ap.save()
                     elif 'sta_ssid' in metadata:
@@ -493,7 +494,7 @@ class Command(base.BaseCommand):
                             mode='sta',
                             essid=metadata['sta_ssid'],
                             connect_to=name_model_map[metadata['sta_link']],
-                            routing_protocols=['olsr'],
+                            routing_protocols=['olsr', 'babel'],
                         )
                         iface_sta.save()
                     else:
@@ -518,7 +519,7 @@ class Command(base.BaseCommand):
                         mode='mesh',
                         essid=ssid.essid,
                         bssid=ssid.bssid,
-                        routing_protocols=['olsr'],
+                        routing_protocols=['olsr', 'babel'],
                     )
                     iface_mesh.save()
 
@@ -529,7 +530,7 @@ class Command(base.BaseCommand):
                         iface_clients_bridge = node_mdl.config.core.interfaces(
                             create=cgm_models.BridgeInterfaceConfig,
                             name='clients0',
-                            routing_protocols=['olsr'],
+                            routing_protocols=['olsr', 'babel'],
                         )
                         iface_clients_bridge.save()
 
@@ -548,7 +549,7 @@ class Command(base.BaseCommand):
                             create=cgm_models.AllocatedNetworkConfig,
                             interface=iface_clients_bridge,
                             description='AP-LAN Client Access',
-                            routing_announces=['olsr'],
+                            routing_announces=['olsr', 'babel'],
                             family='ipv4',
                             pool=pool_ap,
                             prefix_length=subnet_ap.prefixlen,
@@ -660,7 +661,7 @@ class Command(base.BaseCommand):
 
                         if not have_subnets:
                             # If no subnets are configured, designate the interface for routing
-                            iface_lan.routing_protocols = ['olsr']
+                            iface_lan.routing_protocols = ['olsr', 'babel']
                             iface_lan.save()
 
                 # VPN (only configure when an uplink exists)
@@ -668,7 +669,7 @@ class Command(base.BaseCommand):
                     for server, ports in VPN_SERVERS.items():
                         iface_vpn = node_mdl.config.core.interfaces(
                             create=tunneldigger_models.TunneldiggerInterfaceConfig,
-                            routing_protocols=['olsr'],
+                            routing_protocols=['olsr', 'babel'],
                         )
                         iface_vpn.save()
 

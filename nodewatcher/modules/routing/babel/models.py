@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, gettext_noop
 
 from nodewatcher.core.monitor import models as monitor_models
-from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import registration, fields as registry_fields
 from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
 from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
@@ -27,6 +27,16 @@ class BabelRoutingTopologyMonitor(monitor_models.RoutingTopologyMonitor):
     average_cost = models.IntegerField(null=True)
 
 registration.point('node.monitoring').register_item(BabelRoutingTopologyMonitor)
+
+
+class LinkLocalAddress(models.Model):
+    """
+    A link-local address belonging to a Babel router.
+    """
+
+    router = models.ForeignKey(BabelRoutingTopologyMonitor, related_name='link_local')
+    address = registry_fields.IPAddressField(host_required=True, db_index=True)
+    interface = models.CharField(max_length=50, null=True)
 
 
 class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):

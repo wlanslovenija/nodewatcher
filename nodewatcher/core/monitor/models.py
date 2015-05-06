@@ -35,6 +35,10 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
     protocol = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#routing_protocol')
     link_count = models.IntegerField(default=0)
 
+    class Meta:
+        # There can only be one routing topology monitor for each protocol.
+        unique_together = ('root', 'protocol')
+
     class RegistryMeta:
         registry_id = 'network.routing.topology'
         multiple = True
