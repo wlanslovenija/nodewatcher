@@ -136,7 +136,7 @@ class FormState(dict):
         else:
             item = self.lookup_item_by_id(identifier_or_item)
 
-        self.remove_items(item.get_registry_id(), _id=item._id)
+        self.remove_items(item.get_registry_id(), item_id=item._id)
 
     def update_item(self, identifier_or_item, **attributes):
         """
