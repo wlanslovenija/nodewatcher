@@ -68,6 +68,8 @@ def build_image(result, profile):
             mode=0600,
         )
 
+        builder.chmod(os.path.join(temp_path, 'etc', 'dropbear'), 0755)
+
         # Run the build system and wait for its completion.
         result.build_log = builder.call(
             'make', 'image',

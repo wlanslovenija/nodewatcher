@@ -108,6 +108,19 @@ class BuilderConnection(object):
         except IOError:
             raise cgm_exceptions.BuildError('Failed to write file: %s' % path)
 
+    def chmod(self, path, mode):
+        """
+        Changes the permissions of a file.
+
+        :param path: File path
+        :param mode: New permissions
+        """
+
+        try:
+            self.sftp.chmod(path, mode)
+        except IOError:
+            raise cgm_exceptions.BuildError('Failed to chmod file: %s' % path)
+
     def call(self, *args):
         """
         Executes a builder command.
