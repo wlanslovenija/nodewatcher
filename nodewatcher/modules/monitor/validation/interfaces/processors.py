@@ -55,21 +55,22 @@ class InterfaceValidator(monitor_processors.NodeProcessor):
                                 # Interface type matches.
                                 events.InterfaceTypeMismatch(node, iface_cfg, iface_mon, iface_name).absent()
 
-                                # Check if mode matches
+                                # Check if mode matches.
                                 events.WifiInterfaceModeMismatch(node, iface_name, iface_cfg.mode, iface_mon.mode).post_or_absent(
                                     iface_cfg.mode != iface_mon.mode
                                 )
 
-                                # Check if ESSID/BSSID matches
+                                # Check if ESSID matches.
                                 events.WifiInterfaceESSIDMismatch(node, iface_name, iface_cfg.essid, iface_mon.essid).post_or_absent(
                                     iface_cfg.essid != iface_mon.essid
                                 )
 
+                                # In case it is configured, check if BSSID matches.
                                 events.WifiInterfaceBSSIDMismatch(node, iface_name, iface_cfg.bssid, iface_mon.bssid).post_or_absent(
-                                    iface_cfg.bssid != iface_mon.bssid
+                                    iface_cfg.bssid and iface_cfg.bssid != iface_mon.bssid
                                 )
 
-                                # Check if channel matches
+                                # Check if channel matches.
                                 wifi_device = iface_cfg.device
                                 try:
                                     channel = device.get_radio(

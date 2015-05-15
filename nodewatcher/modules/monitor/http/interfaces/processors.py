@@ -120,7 +120,7 @@ class Interfaces(monitor_processors.NodeProcessor):
                 iface.mode = None
                 self.logger.warning("Ignoring unknown wifi mode '%s' on node '%s' interface '%s'!" % (wdata.mode, node.pk, iface.name))
 
-            iface.essid = str(wdata.essid) if wdata.essid else None
+            iface.essid = str(wdata.ssid) if wdata.ssid else None
             iface.bssid = str(wdata.bssid) if wdata.bssid else None
             iface.channel = int(wdata.channel) if wdata.channel else None
             iface.channel_width = int(wdata.channel_width) if wdata.channel_width else None
