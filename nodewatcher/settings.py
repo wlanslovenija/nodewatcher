@@ -260,6 +260,8 @@ INSTALLED_APPS = (
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.platforms.openwrt',
     'nodewatcher.modules.devices',
+    'nodewatcher.modules.identity.base',
+    'nodewatcher.modules.identity.public_key',
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
@@ -501,6 +503,7 @@ MONITOR_RUNS = {
         # executed on demand.
         'processors': (
             'nodewatcher.modules.monitor.sources.http.processors.HTTPGetPushedNode',
+            'nodewatcher.modules.identity.public_key.processors.VerifyNodePublicKey',
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             TELEMETRY_PROCESSOR_PIPELINE,
         ),

@@ -22,6 +22,7 @@ from nodewatcher.modules.administration.types import models as type_models
 from nodewatcher.modules.equipment.antennas import models as antenna_models
 from nodewatcher.modules.vpn.tunneldigger import models as tunneldigger_models
 from nodewatcher.modules.monitor.sources.http import models as telemetry_http_models
+from nodewatcher.modules.identity.base import models as identity_base_models
 from nodewatcher.utils import ipaddr
 
 # Applications that this import process requires to be installed
@@ -42,6 +43,7 @@ REQUIRED_APPS = [
     'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.monitor.sources.http',
+    'nodewatcher.modules.identity.base',
 ]
 
 # Mapping of nodewatcher v2 node types to v3 node types
@@ -434,6 +436,13 @@ class Command(base.BaseCommand):
             node_mdl.config.core.telemetry.http(
                 create=telemetry_http_models.HttpTelemetrySourceConfig,
                 source='poll',
+            ).save()
+
+            # Node identity config.
+            node_mdl.config.core.identity(
+                create=identity_base_models.IdentityConfig,
+                trust_policy='first',
+                store_unknown=True,
             ).save()
 
             if node['profile'] and not dead_node:

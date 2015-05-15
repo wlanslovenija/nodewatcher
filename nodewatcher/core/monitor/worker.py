@@ -6,7 +6,7 @@ import traceback
 from django import db
 from django.db import connection, transaction
 
-from . import processors as monitor_processors
+from . import processors as monitor_processors, exceptions
 from .config import config as monitor_config
 from .. import models as core_models
 
@@ -25,10 +25,19 @@ def stage_worker(args):
     try:
         for p in processors:
             try:
+                abort_requested = False
                 with transaction.atomic():
                     processor = p()
-                    context = processor.process(context, node)
+                    try:
+                        context = processor.process(context, node)
+                    except exceptions.NodeProcessorAbort:
+                        # Do not run any further processors, but do not report this as an error and
+                        # do not rollback the transaction.
+                        abort_requested = True
+
                 cleanup_queue.append(processor)
+                if abort_requested:
+                    break
             except KeyboardInterrupt:
                 raise
             except:

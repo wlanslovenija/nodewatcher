@@ -8,3 +8,4 @@ libgeos-c1
 libgdal-dev
 libgdal1h
 fping
+libffi-dev

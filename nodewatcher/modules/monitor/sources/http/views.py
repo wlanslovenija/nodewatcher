@@ -17,8 +17,6 @@ class HttpPushEndpoint(generic.View):
         Handles HTTP push requests from nodewatcher-agent.
         """
 
-        # TODO: Support client certificate validation.
-
         # Schedule a new push task.
         monitor_tasks.run_pipeline.delay(
             run_id=settings.MONITOR_HTTP_PUSH_RUN,
@@ -26,6 +24,11 @@ class HttpPushEndpoint(generic.View):
                 'push': {
                     'source': uuid,
                     'data': request.body,
+                },
+                'identity': {
+                    # We assume that the HTTP server is configured so that it populates
+                    # the X-SSL-Certificate header with the PEM-encoded certificate.
+                    'certificate': request.META.get('HTTP_X_SSL_CERTIFICATE', None),
                 }
             }
         )

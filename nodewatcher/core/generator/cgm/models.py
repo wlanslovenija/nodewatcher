@@ -78,7 +78,7 @@ class AuthenticationConfig(registration.bases.NodeConfigRegistryItem):
         form_weight = 10
         registry_id = 'core.authentication'
         registry_section = _("Authentication")
-        registry_name = _("Basic Authentication")
+        registry_name = _("Null Authentication")
         multiple = True
         hidden = True
 
