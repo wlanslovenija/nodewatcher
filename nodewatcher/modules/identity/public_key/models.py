@@ -2,6 +2,7 @@ from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat import backends
 
+from django.core import exceptions as django_exceptions
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -21,6 +22,19 @@ class PublicKeyIdentityConfig(base_models.IdentityMechanismConfig):
 
     class RegistryMeta(base_models.IdentityMechanismConfig.RegistryMeta):
         registry_name = _("Public Key")
+
+    def clean(self):
+        """
+        Validate that the public key is correct.
+        """
+
+        try:
+            key = self._extract_public_key(self.public_key.encode('ascii'))
+            self.public_key = key.public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.PKCS1)
+        except ValueError:
+            raise django_exceptions.ValidationError({
+                'public_key': _("Specified public key is not valid.")
+            })
 
     @classmethod
     def _extract_public_key(cls, data):
