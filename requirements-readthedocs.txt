@@ -30,7 +30,7 @@ mock==1.0.1
 mongoengine==0.8.1
 phonenumbers==6.1.0
 psycopg2==2.6
-git+https://github.com/wlanslovenija/pyScss.git@b84cf224eec73df01241a4c7fecc064dcafd6c4d#egg=pyScss-wlanslovenija
+git+https://github.com/wlanslovenija/pyScss.git@026664cf390ffb6883994cbc54c5b3d3f507a48d#egg=pyScss-wlanslovenija
 pymongo==2.6.3
 python-dateutil==2.2
 python-memcached==1.53
