@@ -455,10 +455,11 @@ def general(node, cfg):
         if not system.timezone:
             system.timezone = 'UTC'
 
-    # Setup base packages to be installed
-    # TODO: This should probably not be hardcoded (or at least moved to modules)
+    # Setup base packages to be installed.
     cfg.packages.update([
-        'nodewatcher-watchdog'
+        'nodeupgrade',
+        # TODO: This should probably not be hardcoded (or at least moved to modules).
+        'nodewatcher-watchdog',
     ])
 
 
