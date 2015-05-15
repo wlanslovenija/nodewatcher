@@ -1,3 +1,5 @@
+import copy
+
 from django.utils import timezone
 
 from . import exceptions
@@ -39,10 +41,9 @@ class EventRecord(object):
         Returns a complementary event (absence of an event).
         """
 
-        klass = EventRecord()
-        klass.record = self.record
-        klass._complement = True
-        return klass
+        clone = copy.copy(self)
+        clone._complement = True
+        return clone
 
     def is_absent(self):
         """
