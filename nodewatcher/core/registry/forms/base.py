@@ -3,10 +3,8 @@ import hashlib
 import os
 
 from django import forms as django_forms, template
-from django.conf import settings
-from django.core import exceptions
 from django.db import transaction
-from django.utils import datastructures, importlib
+from django.utils import datastructures
 
 from ....utils import loader, toposort
 
