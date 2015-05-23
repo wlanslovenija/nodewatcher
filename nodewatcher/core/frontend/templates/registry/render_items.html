@@ -15,7 +15,12 @@
     {% if descriptor.multiple %}
         {% if not descriptor.hide_multiple_controls %}
         <div class="buttons">
-            <button type="button" class="registry_add_item ui-button ui-widget ui-state-default ui-corner-all" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}"><span class="ui-icon ui-icon-plusthick"></span><span class="ui-button-text">{% trans 'Add' %}</span></button>
+            <button type="button" class="registry_add_item ui-button ui-widget ui-state-default ui-corner-all" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}">
+                <span class="ui-icon ui-icon-plusthick"></span>
+                <span class="ui-button-text">
+                    {% blocktrans with name=descriptor.name %}Add "{{name}}"{% endblocktrans %}
+                </span>
+            </button>
         </div>
         {% endif %}
         {{ descriptor.submeta }}

@@ -224,6 +224,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         form_weight = 51
+        registry_section = _("Wireless Sub-Interfaces")
         registry_name = _("Wireless Interface")
         multiple = True
         hidden = False
