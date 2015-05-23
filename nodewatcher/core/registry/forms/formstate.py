@@ -60,11 +60,12 @@ class FormState(dict):
                 parent = self.lookup_item_by_id(parent)
                 if parent is None:
                     raise ValueError("Parent item cannot be found.")
-            elif parent is not None and not hasattr(parent, '_registry_virtual_relation'):
+            elif parent is not None and not hasattr(parent, '_registry_virtual_model'):
                 raise TypeError("Parent must be either an item instance or an item identifier.")
 
             if parent is not None:
-                items_container = itertools.chain(*parent._registry_virtual_relation.values())
+                children = getattr(parent, '_registry_virtual_relation', {})
+                items_container = itertools.chain(*children.values())
             else:
                 items_container = self.get(registry_id, [])
 
@@ -153,11 +154,11 @@ class FormState(dict):
             item = self.lookup_item_by_id(identifier_or_item)
 
         # Update item attributes.
-        modified = {}
+        modified = []
         for key, value in attributes.items():
             if getattr(item, key, None) != value:
                 setattr(item, key, value)
-                modified[key] = value
+                modified.append(key)
 
         if modified:
             # Add form action to modify data.
@@ -170,6 +171,22 @@ class FormState(dict):
                     parent=item.get_registry_parent(),
                 )
             )
+
+    def append_item(self, cls, parent=None, **attributes):
+        """
+        Appends a new item to a specified part of form state.
+
+        :param cls: The class of the new item
+        :param parent: Optional parent item
+        :return: The newly created item instance
+        """
+
+        from . import actions
+
+        item = self.create_item(cls, attributes, parent=parent)
+        self.add_form_action(cls.get_registry_id(), actions.AppendFormAction(item, parent))
+
+        return item
 
     def append_default_item(self, registry_id, parent_identifier=None):
         """
@@ -358,3 +375,13 @@ class FormState(dict):
             convert_child_item(*pending_children.pop())
 
         return form_state
+
+    def apply_form_defaults(self, registration_point):
+        """
+        Applies form defaults.
+
+        :param registration_point: Registration point instance
+        """
+
+        for form_default in registration_point.get_form_defaults():
+            form_default.set_defaults(self)

@@ -127,8 +127,15 @@ WIFI_PROTOCOL_MAP = {
 
 # A list of VPN servers as nodewatcher v2 had them hardcoded
 VPN_SERVERS = {
-    "46.54.226.43": (8942, 53, 123),
-    "92.53.140.74": (8942, 53, 123),
+    "46.54.226.43": {
+        'name': 'a.vpn.wlan-si.net',
+        'ports': (8942, 53, 123),
+    },
+
+    "92.53.140.74": {
+        'name': 'b.vpn.wlan-si.net',
+        'ports': (8942, 53, 123),
+    }
 }
 
 # A list of DNS servers as nodewatcher v2 had them hardcoded
@@ -210,6 +217,7 @@ class Command(base.BaseCommand):
             self.import_users(data)
             self.import_pools(data)
             self.import_projects(data)
+            self.import_vpn_servers(data)
             self.import_nodes(data)
 
         self.stdout.write('Import completed.\n')
@@ -305,6 +313,20 @@ class Command(base.BaseCommand):
 
             for pool in project['pools']:
                 project_mdl.pools_core_ippool.add(data['pools'][str(pool)]['_model'])
+
+    def import_vpn_servers(self, data):
+        self.stdout.write('Importing %d VPN servers...\n' % len(VPN_SERVERS))
+
+        data['vpn_servers'] = []
+        for address, server in VPN_SERVERS.items():
+            server = tunneldigger_models.TunneldiggerServer(
+                name=server['name'],
+                address=address,
+                ports=server['ports'],
+            )
+            server.save()
+
+            data['vpn_servers'].append(server)
 
     def import_nodes(self, data):
         self.stdout.write('Importing %d nodes...\n' % len(data['nodes']))
@@ -675,9 +697,10 @@ class Command(base.BaseCommand):
 
                 # VPN (only configure when an uplink exists)
                 if node['profile']['use_vpn'] and uplink_configured:
-                    for server, ports in VPN_SERVERS.items():
+                    for server in data['vpn_servers']:
                         iface_vpn = node_mdl.config.core.interfaces(
                             create=tunneldigger_models.TunneldiggerInterfaceConfig,
+                            server=server,
                             routing_protocols=['olsr', 'babel'],
                         )
                         iface_vpn.save()
@@ -690,15 +713,6 @@ class Command(base.BaseCommand):
                                 limit_in=str(node['profile']['vpn_ingress_limit'] or ''),
                                 limit_out=str(node['profile']['vpn_egress_limit'] or ''),
                             ).save()
-
-                        for port in ports:
-                            server_vpn = node_mdl.config.core.servers.tunneldigger(
-                                create=tunneldigger_models.TunneldiggerServerConfig,
-                                tunnel=iface_vpn,
-                                address=server,
-                                port=port,
-                            )
-                            server_vpn.save()
 
                 # DNS servers
                 for server in DNS_SERVERS:

@@ -679,24 +679,36 @@ def prepare_forms(context):
 
                     # Execute before actions.
                     for action in context.form_state.get_form_actions(cls_meta.registry_id):
-                        # TODO: Context should be passed as an argument.
-                        action.context = context
-                        if action.modify_forms_before():
+                        if action.modify_forms_before(context):
                             meta_modified = True
 
-                    # Actions might have changed form count
+                    # Actions might have changed form count.
                     form_count = context.user_form_count
 
-                    # Generate the right amount of forms
+                    # Generate the right amount of forms.
                     for index in xrange(form_count):
+                        # Generate form prefix.
                         form_prefix = context.base_prefix + '_mu_' + str(index)
-                        context.subforms.append(generate_form_for_class(
-                            context,
-                            form_prefix,
-                            context.data,
-                            index,
-                            force_selector_widget=context.force_selector_widget,
-                        ))
+
+                        updated_form = None
+                        for action in context.form_state.get_form_actions(cls_meta.registry_id):
+                            form = action.modify_form(context, index, form_prefix)
+                            if form is not None:
+                                updated_form = form
+
+                        if updated_form:
+                            # In case an action generates the form for us, we can just use it instead
+                            # of generating the default form.
+                            context.subforms.append(updated_form)
+                        else:
+                            # Otherwise, we generate a default form.
+                            context.subforms.append(generate_form_for_class(
+                                context,
+                                form_prefix,
+                                context.data,
+                                index,
+                                force_selector_widget=context.force_selector_widget,
+                            ))
 
                     # Delete existing models
                     for mdl in context.existing_models.values():
@@ -705,9 +717,7 @@ def prepare_forms(context):
 
                     # Check for any actions and execute them.
                     for action in context.form_state.get_form_actions(cls_meta.registry_id):
-                        # TODO: Context should be passed as an argument.
-                        action.context = context
-                        if action.modify_forms_after():
+                        if action.modify_forms_after(context):
                             meta_modified = True
 
                     if meta_modified:
@@ -811,8 +821,7 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
 
         if flags & FORM_DEFAULTS | FORM_ONLY_DEFAULTS:
             # Set form defaults.
-            for form_default in regpoint.get_form_defaults():
-                form_default.set_defaults(context.form_state)
+            context.form_state.apply_form_defaults(regpoint)
 
             if flags & FORM_ONLY_DEFAULTS:
                 # If only defaults application is requested, we should set defaults and then rollback

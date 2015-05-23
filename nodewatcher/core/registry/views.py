@@ -39,15 +39,19 @@ def evaluate_forms(request, regpoint_id, root_id):
         )
 
         # Merge in client actions when available.
-        try:
-            # TODO: Maybe actions should be registered and each action should have something like Action.name that would then call Action.prepare(...)
-            for action, options in json.loads(request.POST['ACTIONS']).iteritems():
-                if action == 'append':
-                    form_state.append_default_item(options['registry_id'], options['parent_id'])
-                elif action == 'remove':
-                    form_state.remove_item(options['index'])
-        except AttributeError:
-            pass
+        # TODO: Maybe actions should be registered and each action should have something like Action.name that would then call Action.prepare(...)
+        changed = False
+        for action, options in json.loads(request.POST.get('ACTIONS', '')).iteritems():
+            if action == 'append':
+                form_state.append_default_item(options['registry_id'], options['parent_id'])
+                changed = True
+            elif action == 'remove':
+                form_state.remove_item(options['index'])
+                changed = True
+
+        # Re-apply form defaults in case client actions have changed something.
+        if changed:
+            form_state.apply_form_defaults(regpoint)
 
         # Apply defaults and fully validate processed forms.
         _, forms = registry_forms.prepare_root_forms(
