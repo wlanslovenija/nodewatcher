@@ -313,6 +313,7 @@ INSTALLED_APPS = (
     # nodewatcher.core.frontend, which is loaded before for this to work.
     'django.contrib.staticfiles',
 
+    'polymorphic',
     'tastypie',
     'django_datastream',
     'guardian',
