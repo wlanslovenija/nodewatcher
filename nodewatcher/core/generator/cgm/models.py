@@ -474,20 +474,3 @@ registration.point('node.config').register_choice('core.interfaces.limits#speeds
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('1024', _("1 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('2048', _("2 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('4096', _("4 Mbit/s")))
-
-
-class DnsServerConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    DNS server address configuration.
-    """
-
-    address = registry_fields.IPAddressField(host_required=True)
-
-    class RegistryMeta:
-        form_weight = 60
-        registry_id = 'core.servers.dns'
-        registry_section = _("DNS Servers")
-        registry_name = _("DNS Server")
-        multiple = True
-
-registration.point('node.config').register_item(DnsServerConfig)

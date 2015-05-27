@@ -23,6 +23,7 @@ from nodewatcher.modules.equipment.antennas import models as antenna_models
 from nodewatcher.modules.vpn.tunneldigger import models as tunneldigger_models
 from nodewatcher.modules.monitor.sources.http import models as telemetry_http_models
 from nodewatcher.modules.identity.base import models as identity_base_models
+from nodewatcher.modules.services.dns import models as dns_models
 from nodewatcher.utils import ipaddr
 
 # Applications that this import process requires to be installed
@@ -44,6 +45,7 @@ REQUIRED_APPS = [
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.identity.base',
+    'nodewatcher.modules.services.dns',
 ]
 
 # Mapping of nodewatcher v2 node types to v3 node types
@@ -138,10 +140,14 @@ VPN_SERVERS = {
     }
 }
 
-# A list of DNS servers as nodewatcher v2 had them hardcoded
+# A list of DNS servers as nodewatcher v2 had them hardcoded.
 DNS_SERVERS = {
-    "10.254.0.1",
-    "10.254.0.2",
+    "10.254.0.1": {
+        'name': "a.root-servers.wlan",
+    },
+    "10.254.0.2": {
+        'name': "b.root-servers.wlan",
+    },
 }
 
 # Subnet size map
@@ -218,6 +224,7 @@ class Command(base.BaseCommand):
             self.import_pools(data)
             self.import_projects(data)
             self.import_vpn_servers(data)
+            self.import_dns_servers(data)
             self.import_nodes(data)
 
         self.stdout.write('Import completed.\n')
@@ -327,6 +334,19 @@ class Command(base.BaseCommand):
             server.save()
 
             data['vpn_servers'].append(server)
+
+    def import_dns_servers(self, data):
+        self.stdout.write('Importing %d DNS servers...\n' % len(DNS_SERVERS))
+
+        data['dns_servers'] = []
+        for address, server in DNS_SERVERS.items():
+            server = dns_models.DnsServer(
+                name=server['name'],
+                address=address,
+            )
+            server.save()
+
+            data['dns_servers'].append(server)
 
     def import_nodes(self, data):
         self.stdout.write('Importing %d nodes...\n' % len(data['nodes']))
@@ -714,11 +734,11 @@ class Command(base.BaseCommand):
                                 limit_out=str(node['profile']['vpn_egress_limit'] or ''),
                             ).save()
 
-                # DNS servers
-                for server in DNS_SERVERS:
+                # DNS servers.
+                for server in data['dns_servers']:
                     node_mdl.config.core.servers.dns(
-                        create=cgm_models.DnsServerConfig,
-                        address=server,
+                        create=dns_models.DnsServerConfig,
+                        server=server,
                     ).save()
 
                 # Optional packages

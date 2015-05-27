@@ -270,6 +270,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.validation.reboot',
     'nodewatcher.modules.monitor.validation.version',
     'nodewatcher.modules.monitor.validation.interfaces',
+    'nodewatcher.modules.services.dns',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
     'nodewatcher.modules.sensors.digitemp',
