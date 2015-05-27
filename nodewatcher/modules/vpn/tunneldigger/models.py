@@ -25,7 +25,7 @@ class TunneldiggerServer(polymorphic.PolymorphicModel):
     enabled = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = _("Tunneldigger Server")
+        verbose_name = _("Tunneldigger server")
 
     def __unicode__(self):
         return u"%s (%s)" % (self.name, self.address)
@@ -38,7 +38,7 @@ if apps.is_installed('nodewatcher.modules.administration.projects'):
         project = models.ForeignKey(projects_models.Project, related_name='+')
 
         class Meta:
-            verbose_name = _("Project-specific Tunneldigger Server")
+            verbose_name = _("Project-specific tunneldigger server")
 
 
 class TunneldiggerInterfaceConfig(cgm_models.InterfaceConfig, cgm_models.RoutableInterface):
