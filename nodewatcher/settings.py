@@ -290,7 +290,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.sensors.generic',
 
     # Defaults for wlan slovenia network.
-    'nodewatcher.modules.defaults.wlansi',
+    'nodewatcher.extra.wlansi',
 
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
