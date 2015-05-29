@@ -298,9 +298,6 @@ INSTALLED_APPS = (
     # Accounts support.
     'nodewatcher.extra.accounts',
 
-    # Legacy apps for migrations.
-    'nodewatcher.legacy.nodes',
-
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
