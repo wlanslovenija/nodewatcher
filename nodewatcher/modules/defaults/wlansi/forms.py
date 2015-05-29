@@ -4,6 +4,7 @@ from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.registry import forms as registry_forms, registration
 
 from nodewatcher.modules.vpn.tunneldigger import models as td_models
+from nodewatcher.modules.services.dns import models as dns_models
 
 
 class STAChannelAutoselect(registry_forms.FormDefaults):
@@ -41,7 +42,10 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
 
     def get_servers(self, state):
         # Get the currently configured project.
-        project = state.filter_items('core.project')[0]
+        try:
+            project = state.filter_items('core.project')[0]
+        except IndexError:
+            project = None
 
         query = models.Q(PerProjectTunneldiggerServer___project=None)
         if project:
@@ -82,3 +86,44 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
                 state.remove_item(td_iface)
 
 registration.point('node.config').add_form_defaults(TunneldiggerServersOnUplink())
+
+
+class DnsServers(registry_forms.FormDefaults):
+    """
+    Automatically configures DNS servers.
+    """
+
+    def set_defaults(self, state):
+        # Get the DNS servers that should be configured on the current node.
+        existing_servers = state.filter_items('core.servers.dns', klass=dns_models.DnsServerConfig)
+        configured = self.get_servers(state)
+
+        # Update existing servers.
+        for index, server in enumerate(configured):
+            if index >= len(existing_servers):
+                # We need to create a new server.
+                state.append_item(dns_models.DnsServerConfig, server=server)
+            else:
+                # Update server configuration for an existing element.
+                state.update_item(existing_servers[index], server=server)
+
+        delta = len(existing_servers) - len(configured)
+        if delta > 0:
+            # Remove the last few servers.
+            for server in existing_servers[-delta:]:
+                state.remove_item(server)
+
+    def get_servers(self, state):
+        # Get the currently configured project.
+        try:
+            project = state.filter_items('core.project')[0]
+        except IndexError:
+            project = None
+
+        query = models.Q(PerProjectDnsServer___project=None)
+        if project:
+            query |= models.Q(PerProjectDnsServer___project=project)
+
+        return dns_models.DnsServer.objects.filter(query)
+
+registration.point('node.config').add_form_defaults(DnsServers())
