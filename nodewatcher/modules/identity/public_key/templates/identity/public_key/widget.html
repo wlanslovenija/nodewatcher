@@ -1,0 +1,13 @@
+{% load i18n %}
+
+{% if valid %}
+    <ul class="public-key">
+        <li>{% trans "Algorithm:" %} <b>{{ key_algorithm }}</b></li>
+        <li>{% trans "Size:" %} <b>{{ key_size }} bits</b></li>
+        <li>{% trans "SHA-256 Fingerprint:" %} <span class="fingerprint">{{ fingerprint_sha256 }}</span></li>
+        <li>{% trans "SHA-1 Fingerprint:" %} <span class="fingerprint">{{ fingerprint_sha1 }}</span></li>
+    </ul>
+    <textarea name="{{ name }}" style="display: none">{{ raw }}</textarea>
+{% else %}
+    <textarea name="{{ name }}">{{ raw }}</textarea>
+{% endif %}

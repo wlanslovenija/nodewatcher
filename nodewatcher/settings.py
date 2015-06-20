@@ -270,6 +270,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.validation.reboot',
     'nodewatcher.modules.monitor.validation.version',
     'nodewatcher.modules.monitor.validation.interfaces',
+    'nodewatcher.modules.services.dns',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
     'nodewatcher.modules.sensors.digitemp',
@@ -289,16 +290,13 @@ INSTALLED_APPS = (
     'nodewatcher.modules.sensors.generic',
 
     # Defaults for wlan slovenia network.
-    'nodewatcher.modules.defaults.wlansi',
+    'nodewatcher.extra.wlansi',
 
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
 
     # Accounts support.
     'nodewatcher.extra.accounts',
-
-    # Legacy apps for migrations.
-    'nodewatcher.legacy.nodes',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -313,6 +311,7 @@ INSTALLED_APPS = (
     # nodewatcher.core.frontend, which is loaded before for this to work.
     'django.contrib.staticfiles',
 
+    'polymorphic',
     'tastypie',
     'django_datastream',
     'guardian',

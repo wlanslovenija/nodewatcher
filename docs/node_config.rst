@@ -385,6 +385,9 @@ module provides support for configuring Tunneldigger-based tunnels.
      generated.
    :type mac: :class:`~nodewatcher.core.registry.fields.MACAddressField`
 
+   :param server: Reference to VPN server configuration that this interface should connect to.
+   :type server: foreign key to :class:`~nodewatcher.modules.vpn.tunneldigger.models.TunneldiggerServer`
+
 Configuration classes for mobile interfaces, like 3G, are also provided.
 
 .. autoclass:: nodewatcher.core.generator.cgm.models.MobileInterfaceConfig()
@@ -529,24 +532,6 @@ Currently, a throughput limit may be configured.
 
    :param limit_out: Outbound traffic throughput limit.
    :type limit_out: registered choice
-
-core.servers.tunneldigger
--------------------------
-
-For Tunneldigger interfaces, multiple servers may be configured. Note that only one of the servers will
-be used at once -- in case one wants to configure redundant links, multiple VPN interfaces should
-be created.
-
-.. autoclass:: nodewatcher.modules.vpn.tunneldigger.models.TunneldiggerServerConfig()
-
-   :param tunnel: Tunneldigger interface that should use this server.
-   :type tunnel: foreign key to :class:`~nodewatcher.modules.vpn.tunneldigger.models.TunneldiggerInterfaceConfig`
-
-   :param address: IP address of the VPN server.
-   :type address: :class:`~nodewatcher.core.registry.fields.IPAddressField`
-
-   :param port: Port of the VPN server.
-   :type port: int
 
 core.servers.dns
 ----------------

@@ -444,6 +444,8 @@ def general(node, cfg):
     system = cfg.system.add('system')
     system.hostname = node.config.core.general().name
     system.uuid = node.uuid
+    # Enable bigger logs by default.
+    system.log_size = 256
 
     try:
         zone = node.config.core.location().timezone.zone
@@ -1088,12 +1090,12 @@ def qos_base(node, cfg):
 
 
 @cgm_base.register_platform_module('openwrt', 15)
-def dns_servers(node, cfg):
+def dns_base(node, cfg):
     """
     Configures DNS servers.
     """
 
-    # DNS configuration is part of the DHCP config
+    # DNS configuration is part of the DHCP config.
     dnsmasq = cfg.dhcp.add('dnsmasq')
     dnsmasq.domainneeded = False
     dnsmasq.boguspriv = False
@@ -1103,7 +1105,6 @@ def dns_servers(node, cfg):
     dnsmasq.noresolv = True
     dnsmasq.authoritative = True
     dnsmasq.leasefile = '/tmp/dhcp.leases'
-    dnsmasq.server = [str(x.address.ip) for x in node.config.core.servers.dns()]
 
 
 @cgm_base.register_platform_module('openwrt', 15)

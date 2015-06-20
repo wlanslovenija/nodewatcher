@@ -1,9 +1,44 @@
+from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+import polymorphic
+
+# TODO: This import will not be needed once we upgrade to Django 1.8.
+from postgres import fields as postgres_fields
 
 from nodewatcher.core import validators as core_validators
 from nodewatcher.core.registry import fields as registry_fields, registration
 from nodewatcher.core.generator.cgm import models as cgm_models
+
+
+class TunneldiggerServer(polymorphic.PolymorphicModel):
+    """
+    Tunneldigger server configuration.
+    """
+
+    name = models.CharField(max_length=100)
+    address = registry_fields.IPAddressField(host_required=True)
+    ports = postgres_fields.ArrayField(
+        models.IntegerField(validators=[core_validators.PortNumberValidator()])
+    )
+    enabled = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _("Tunneldigger server")
+
+    def __unicode__(self):
+        return u"%s (%s)" % (self.name, self.address)
+
+# In case projects module is installed, we support per-project server configuration.
+if apps.is_installed('nodewatcher.modules.administration.projects'):
+    from nodewatcher.modules.administration.projects import models as projects_models
+
+    class PerProjectTunneldiggerServer(TunneldiggerServer):
+        project = models.ForeignKey(projects_models.Project, related_name='+')
+
+        class Meta:
+            verbose_name = _("Project-specific tunneldigger server")
 
 
 class TunneldiggerInterfaceConfig(cgm_models.InterfaceConfig, cgm_models.RoutableInterface):
@@ -12,36 +47,13 @@ class TunneldiggerInterfaceConfig(cgm_models.InterfaceConfig, cgm_models.Routabl
     """
 
     mac = registry_fields.MACAddressField(auto_add=True)
+    server = registry_fields.ModelRegistryChoiceField(TunneldiggerServer, limit_choices_to={'enabled': True})
 
     class RegistryMeta(cgm_models.InterfaceConfig.RegistryMeta):
         registry_name = _("Tunneldigger Interface")
 
 registration.point('node.config').register_item(TunneldiggerInterfaceConfig)
 registration.point('node.config').register_subitem(TunneldiggerInterfaceConfig, cgm_models.ThroughputInterfaceLimitConfig)
-
-
-class TunneldiggerServerConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    Tunneldigger server configuration.
-    """
-
-    tunnel = registry_fields.IntraRegistryForeignKey(
-        TunneldiggerInterfaceConfig,
-        editable=False,
-        null=False,
-        related_name='servers'
-    )
-    address = registry_fields.IPAddressField(host_required=True)
-    port = models.IntegerField(validators=[core_validators.PortNumberValidator()])
-
-    class RegistryMeta:
-        form_weight = 51
-        registry_id = 'core.servers.tunneldigger'
-        registry_section = _("Tunneldigger Servers")
-        registry_name = _("Tunneldigger Server")
-        multiple = True
-
-registration.point('node.config').register_subitem(TunneldiggerInterfaceConfig, TunneldiggerServerConfig)
 
 
 def get_tunneldigger_interface_name(index):

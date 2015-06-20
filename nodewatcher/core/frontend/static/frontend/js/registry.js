@@ -30,6 +30,9 @@
         $('.registry_form_selector').change(function() {
             $.registry.evaluate_rules({});
         });
+        $('input[type="checkbox"]').change(function() {
+            $.registry.evaluate_rules({});
+        });
         $('.registry_add_item').click(function() {
             $.registry.evaluate_rules({
                 append: {
