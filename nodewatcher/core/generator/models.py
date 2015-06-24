@@ -126,9 +126,6 @@ class Builder(models.Model):
         help_text=_('Private key for SSH authentication.'),
     )
 
-    class Meta:
-        unique_together = ('platform', 'architecture', 'version')
-
     def get_metadata(self):
         """
         Establishes a connection with the builder and fetches metadata.
