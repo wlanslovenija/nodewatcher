@@ -1,27 +1,27 @@
 Setting up the development environment
 ======================================
 
-In order to make nodewatcher development as simple as possible, a Docker_ development environment can be built from the provided Dockerfile. To help with preparing the environment and running common tasks, fig_ configuration is also provided. This section describes how to use both to work on nodewatcher. It is assumed that Docker and fig are already installed, so in order to install them, please follow the guides on their respective pages.
+In order to make nodewatcher development as simple as possible, a Docker_ development environment can be built from the provided Dockerfile. To help with preparing the environment and running common tasks, `Docker Compose`_ configuration is also provided. This section describes how to use both to work on nodewatcher. It is assumed that Docker and `Docker Compose` are already installed, so in order to install them, please follow the guides on their respective pages.
 
-.. _Docker: https://docker.io
-.. _fig: http://www.fig.sh
+.. _Docker: https://www.docker.com
+.. _Docker Compose: https://docs.docker.com/compose/
 
 Running the development instance
 --------------------------------
 
 In order to ensure that you have the latest versions of all dependent Docker images, you have to first run the following command in the top-level nodewatcher directory::
 
-    $ fig pull
+    $ docker-compose pull
 
 Then, to build the development instance, run::
 
-    $ fig build
+    $ docker-compose build
 
 You should re-run these two commands when performing ``git pull`` if you think that the build dependencies or development environment configuration might have changed to ensure that your Docker images are synced. Finally, to run the development server simply execute the following command::
 
-    $ fig up
+    $ docker-compose up
 
-.. note:: Default container configuration stores the database under ``/tmp/nodewatcher-db``, so it will be removed on host machine restarts. You may change this location by editing ``fig.yml``.
+.. note:: Default container configuration stores the database under ``/tmp/nodewatcher-db``, so it will be removed on host machine restarts. You may change this location by editing ``docker-compose.yml``.
 
 The following containers will be created and started when you run the above commands:
 
@@ -33,22 +33,22 @@ The following containers will be created and started when you run the above comm
 * ``web`` contains the nodewatcher frontend (Django development server), running on port ``8000`` by default.
 
 .. note::
-    The development instance uses TokuMX (an improved version of MongoDB) as a database server for storing datapoints. TokuMX requires that the use of HugePages be disabled in the kernel, otherwise the server will refuse to start. This is why the container is configured as privileged in ``fig.yml``, so that it can disable this by default. In case you need to disable HugePages manually, you should execute the following on the host::
+    The development instance uses TokuMX (an improved version of MongoDB) as a database server for storing datapoints. TokuMX requires that the use of HugePages be disabled in the kernel, otherwise the server will refuse to start. This is why the container is configured as privileged in ``docker-compose.yml``, so that it can disable this by default. In case you need to disable HugePages manually, you should execute the following on the host::
 
         $ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 Initializing the database
 -------------------------
 
-.. note:: This and all further sections assume that the development environment has been started via `fig up` and is running (in the background or in another terminal). If the environment is not running, some of the following commands will fail.
+.. note:: This and all further sections assume that the development environment has been started via `docker-compose up` and is running (in the background or in another terminal). If the environment is not running, some of the following commands will fail.
 
 In order to prepare the database, after running the development server execute::
 
-    $ fig run web scripts/docker-init-database
+    $ docker-compose run web scripts/docker-init-database
 
 This will recreate the `nodewatcher` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call `syncdb`::
 
-    $ fig run web python manage.py syncdb
+    $ docker-compose run web python manage.py syncdb
 
 This will initialize the database schema.
 
@@ -64,7 +64,7 @@ stylesheets and add small changes you might want to add for your installation.
 
 To compile SCSS files into CSS files run::
 
-    $ fig run web python manage.py collectstatic -l
+    $ docker-compose run web python manage.py collectstatic -l
 
 .. _Compass: http://compass-style.org/
 .. _Sass: http://sass-lang.com/
@@ -74,16 +74,16 @@ Importing the JSON database dump from version 2
 
 If you have a JSON data export from nodewatcher version 2 available and would like to migrate to version 3, the procedure is as follows (after you have already performed the database initialization above). Let us assume that the dump is stored in a file called `dump.json` (note that the dump file must be located inside the toplevel directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher directory). The dump can be imported by running::
 
-    $ fig run web python manage.py import_nw2 dump.json
+    $ docker-compose run web python manage.py import_nw2 dump.json
 
 Now the database is ready for use with nodewatcher 3.
 
 Running management commands
 ---------------------------
 
-Don't forget to run any management command via the container as otherwise the settings will be wrong. You can do it by prefixing commands with `fig run web` like this::
+Don't forget to run any management command via the container as otherwise the settings will be wrong. You can do it by prefixing commands with `docker-compose run web` like this::
 
-    $ fig run web python manage.py <command...>
+    $ docker-compose run web python manage.py <command...>
 
 .. _development-run-builder:
 
@@ -157,7 +157,7 @@ Then, there are two configuration options that need to be set in ``settings.py``
 
 After the above settings are configured, one may run the monitoring system by issuing::
 
-    $ fig run web python manage.py monitord
+    $ docker-compose run web python manage.py monitord
 
 There are some additional options which might be useful during development:
 
