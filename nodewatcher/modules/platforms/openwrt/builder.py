@@ -70,6 +70,17 @@ def build_image(result, profile):
 
         builder.chmod(os.path.join(temp_path, 'etc', 'dropbear'), 0755)
 
+        # Prepare any custom files.
+        for path, custom_file in cfg['_files'].items():
+            if path[0] == '/':
+                path = path[1:]
+
+            builder.write_file(
+                os.path.join(temp_path, path),
+                custom_file['content'].encode('utf8'),
+                mode=custom_file['mode'],
+            )
+
         # Run the build system and wait for its completion.
         result.build_log = builder.call(
             'make', 'image',

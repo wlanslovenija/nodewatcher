@@ -38,7 +38,7 @@ class CgmGeneralConfigForm(forms.ModelForm):
 
         qs = self.fields['version'].queryset
         if item is not None:
-            qs = qs.filter(builders__channels=item.build_channel)
+            qs = qs.filter(builders__channels=item.build_channel).distinct()
         else:
             qs = qs.none()
         self.fields['version'].queryset = qs

@@ -18,7 +18,7 @@ tokumx:
         # Use a volume to enable database persistency across restarts
         - /tmp/nodewatcher-tokumx:/var/lib/tokumx
 builderar71xx:
-    image: wlanslovenija/openwrt-builder:v0da52e3_bb_ar71xx
+    image: wlanslovenija/openwrt-builder:v566fee7_bb_ar71xx
     environment:
         BUILDER_PUBLIC_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCho6FII0iKbpU+DpJqS9ARtn4jaXZAuc86QkaCc0FCKaaQh2QofgzTsibPICksyXfxRJM5rlEwwAf6RweGrtqM49pZGvmhS0fhoComGNC2qANDkAPlvAhs2JPp/jFeH7wDVUQr+D1Noc4daObddC7rrRtNa0ch9nAfYCTJcxSFp69VcUij9IX7O660w4CL2fL8ya/P43f2IZVqcFefPeY5/TydeE8GMZQo5L+7RKMR9rhZ4JY9CQbQgCkhl9IQ2Oc46dTDoUtxe556EWp3gqBRvd4CXcMlDS3jd1OvW5HHJLIgQ66uuS8C9I5VbzcpxpV+qfOxEeWXGRhd0V9H6/2n builder@wlan-si.net
         # To configure this builder in nodewatcher development instance,
@@ -52,7 +52,7 @@ builderar71xx:
         # BZ9HO5E5TUQTXTKkKR4kPT2wyfsjCBEJl76RIt7WyJnEbj1fIcn+OZo=
         # -----END RSA PRIVATE KEY-----
 builderlantiq:
-    image: wlanslovenija/openwrt-builder:v0da52e3_bb_lantiq
+    image: wlanslovenija/openwrt-builder:v566fee7_bb_lantiq
     environment:
         BUILDER_PUBLIC_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCho6FII0iKbpU+DpJqS9ARtn4jaXZAuc86QkaCc0FCKaaQh2QofgzTsibPICksyXfxRJM5rlEwwAf6RweGrtqM49pZGvmhS0fhoComGNC2qANDkAPlvAhs2JPp/jFeH7wDVUQr+D1Noc4daObddC7rrRtNa0ch9nAfYCTJcxSFp69VcUij9IX7O660w4CL2fL8ya/P43f2IZVqcFefPeY5/TydeE8GMZQo5L+7RKMR9rhZ4JY9CQbQgCkhl9IQ2Oc46dTDoUtxe556EWp3gqBRvd4CXcMlDS3jd1OvW5HHJLIgQ66uuS8C9I5VbzcpxpV+qfOxEeWXGRhd0V9H6/2n builder@wlan-si.net
 generator:
