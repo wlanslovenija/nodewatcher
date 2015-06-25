@@ -1,3 +1,5 @@
+from django.template import loader as template_loader
+
 from ....utils import loader
 
 from ...registry import registration
@@ -184,6 +186,44 @@ class PlatformCryptoManager(object):
         return config
 
 
+class PlatformFileManager(object):
+    """
+    Configure platform custom files.
+    """
+
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self._files = {}
+
+    def install(self, destination, template, context=None, mode=0644):
+        """
+        Installs a file to the destination device.
+
+        :param destination: Platform-specific destination path
+        :param template: Template that will render the file content
+        :param context: Template context dictionary
+        :param mode: File mode
+        """
+
+        if context is None:
+            context = {}
+
+        self._files[destination] = {
+            'content': template_loader.render_to_string(template, context).encode('utf8'),
+            'mode': mode,
+        }
+
+    def get_config(self):
+        """
+        Returns installed custom files suitable for use in JSON documents.
+        """
+
+        return self._files
+
+
 class PlatformConfiguration(object):
     """
     A flexible in-memory platform configuration store that is used
@@ -197,6 +237,7 @@ class PlatformConfiguration(object):
     accounts_class = PlatformAccountManager
     routing_table_manager_class = PlatformRoutingTableManager
     crypto_manager_class = PlatformCryptoManager
+    file_manager_class = PlatformFileManager
 
     def __init__(self):
         """
@@ -209,6 +250,7 @@ class PlatformConfiguration(object):
         self.banner = str()
         self.routing_tables = self.routing_table_manager_class()
         self.crypto = self.crypto_manager_class()
+        self.files = self.file_manager_class()
 
     def get_build_config(self):
         """
@@ -224,6 +266,7 @@ class PlatformConfiguration(object):
             '_banner': str(self.banner),
             '_routing_tables': self.routing_tables.get_config(),
             '_crypto': self.crypto.get_config(),
+            '_files': self.files.get_config(),
         }
 
 

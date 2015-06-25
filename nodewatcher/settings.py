@@ -292,6 +292,9 @@ INSTALLED_APPS = (
     # Defaults for wlan slovenia network.
     'nodewatcher.extra.wlansi',
 
+    # IRNAS extra modules.
+    'nodewatcher.extra.irnas.koruza',
+
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
 
