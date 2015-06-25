@@ -6,6 +6,18 @@
 
 {% block included_accounts_menu %}
     {% with menu=accounts_menu %}
-        {% include "base/menu.html" %}
+        {% spaceless %}
+            {% if menu %}
+                <ul class="nav navbar-nav navbar-right menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
+                    {% block included_menu %}
+                        {% for menu_entry in menu %}
+                            {% block included_menu_entry %}
+                                {% render_menu_entry menu_entry %}
+                            {% endblock included_menu_entry %}
+                        {% endfor %}
+                    {% endblock included_menu %}
+                </ul>
+            {% endif %}
+        {% endspaceless %}
     {% endwith %}
 {% endblock included_accounts_menu %}

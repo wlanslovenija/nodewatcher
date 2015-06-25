@@ -1,0 +1,46 @@
+
+.altlinks {
+    text-align: center;
+    .altlinks-list {
+        li {
+            display: inline-block;
+            list-style-type: none;
+            padding: 5px;
+            margin: 5px;
+        }
+        padding: 5px;
+        margin: 5px;
+    }
+
+}
+
+footer {
+    color: $gray-darker;
+    margin: 40px 0;
+    text-align: center;
+}
+
+.registry-item {
+    padding-left: 30px;
+}
+
+.registry-item:hover {
+    background: $gray-lighter;
+}
+
+.header-heading {
+    a {
+        color: $brand-primary;
+    }
+    a:hover {
+        text-decoration: none;
+        color: $brand-primary;
+    }
+}
+
+.header-heading h2 {
+    a {
+        font-size: $font-size-h4;
+        color: $gray;
+    }
+}

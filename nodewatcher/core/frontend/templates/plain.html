@@ -28,12 +28,15 @@
 
     <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_classes %}{% endblock body_classes %}">
         {% block header_wrapper %}
-            <header class="{% block header_classes %}{% endblock header_classes %}">
+            <header role="navigation" class="{% block header_classes %}{% endblock header_classes %} navbar navbar-default navbar-static-top">
+                <div  class="container">
                 {% block header %}
                     {% include "header.html" %}
                 {% endblock header %}
+                </div>
             </header>
         {% endblock header_wrapper %}
+    <div class="container">
         {% block content_wrapper %}
             <section class="content {% block content_classes %}{% endblock content_classes %}">
                 {% block content_before %}{% endblock content_before %}
@@ -50,5 +53,6 @@
                 {% endblock footer %}
             </footer>
         {% endblock footer_wrapper %}
+    </div>
     </body>
 </html>

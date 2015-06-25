@@ -3,8 +3,11 @@
 {% contextblock %}
     {% load sekizai_tags %}
 
+    {% add_data "css_data" "bootstrap/css/bootstrap.css" %}
     {% add_data "css_data" "frontend/css/style.css" %}
     {% add_data "js_data" "frontend/js/code.js" %}
+
+    {% add_data "js_data" "bootstrap/js/bootstrap.js" %}
 {% endcontextblock %}
 
 {% block header %}
@@ -16,9 +19,6 @@
         </section>
     {% endblock accounts_menu_wrapper %}
     {{ block.super }}
-{% endblock header %}
-
-{% block content_wrapper %}
     {% block main_menu_wrapper %}
         <section class="menu main-menu {% block main_menu_classes %}{% endblock main_menu_classes %}">
             {% block main_menu %}
@@ -26,6 +26,9 @@
             {% endblock main_menu %}
         </section>
     {% endblock main_menu_wrapper %}
+{% endblock header %}
+
+{% block content_wrapper %}
     {% block messages_wrapper %}
         {% if messages %}
             <section class="messages {% block messages_classes %}{% endblock messages_classes %}">

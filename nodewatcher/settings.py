@@ -119,8 +119,7 @@ STATIC_URL = '/static/'
 
 # SCSS libraries to include in SCSSStaticFilesStorage.
 SCSS_PATHS = [
-    os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'compass')),
-    os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'scss', 'blueprint')),
+    os.path.abspath(os.path.join(settings_dir, 'core', 'frontend', 'static')),
 ]
 
 # Additional locations of static files
