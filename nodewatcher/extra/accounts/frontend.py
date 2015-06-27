@@ -37,12 +37,12 @@ def logout_url(menu_entry, context):
     return url
 
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
-    label='logged_in',
+    label=components.ugettext_lazy("Profile"), weight=-100,
+    url=lambda menu_entry, context: urlresolvers.reverse('AccountsComponent:user_page', kwargs={'username' : context['request'].user.get_username()}),
     visible=lambda menu_entry, request, context: request.user.is_authenticated(),
-    template='menu_entry_logged_in.html',
 ))
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
-    label=components.ugettext_lazy("Logout"),
+    label=components.ugettext_lazy("Logout"), weight=100,
     url=logout_url,
     visible=lambda menu_entry, request, context: request.user.is_authenticated(),
 ))

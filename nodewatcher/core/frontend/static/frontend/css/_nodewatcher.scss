@@ -20,14 +20,6 @@ footer {
     text-align: center;
 }
 
-.registry-item {
-    padding-left: 30px;
-}
-
-.registry-item:hover {
-    background: $gray-lighter;
-}
-
 .header-heading {
     a {
         color: $brand-primary;
@@ -38,9 +30,19 @@ footer {
     }
 }
 
-.header-heading h2 {
-    a {
-        font-size: $font-size-h4;
-        color: $gray;
+.header-heading {
+    .network-name {
+        font-size: $font-size-h2;
+        color: $brand-primary;
     }
+    .network-description {
+        font-size: $font-size-h4;
+        color: $gray-lighter;
+    }
+    margin-bottom: 25px;
+}
+
+.container > .accounts-menu > .btn-group {
+    float: right; 
+    margin: 10px;
 }

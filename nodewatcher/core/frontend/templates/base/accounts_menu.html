@@ -1,22 +1,26 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
 {% load menu_tags %}
-
+{% load i18n %}
 {% get_menu "accounts_menu" as accounts_menu %}
 
 {% block included_accounts_menu %}
     {% with menu=accounts_menu %}
         {% spaceless %}
             {% if menu %}
-                <ul class="nav navbar-nav navbar-right menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
-                    {% block included_menu %}
-                        {% for menu_entry in menu %}
-                            {% block included_menu_entry %}
-                                {% render_menu_entry menu_entry %}
-                            {% endblock included_menu_entry %}
-                        {% endfor %}
-                    {% endblock included_menu %}
-                </ul>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if user.is_authenticated %}{{ user }}{% else %}{% trans 'User' %}{% endif %}&nbsp;<span class="caret"></span>
+          </button>
+        <ul class="dropdown-menu dropdown-right menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
+            {% block included_menu %}
+                {% for menu_entry in menu %}
+                    {% block included_menu_entry %}
+                        {% render_menu_entry menu_entry %}
+                    {% endblock included_menu_entry %}
+                {% endfor %}
+            {% endblock included_menu %}
+        </ul>
+        </div>
             {% endif %}
         {% endspaceless %}
     {% endwith %}

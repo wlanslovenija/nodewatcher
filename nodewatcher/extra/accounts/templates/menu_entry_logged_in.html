@@ -1,8 +1,0 @@
-{% overextends "menu_entry.html" %}
-
-{% load future i18n %}
-
-{% block menu_entry_content %}
-    {% url "AccountsComponent:user_page" user.username as user_page_url %}
-    {% blocktrans with username=user.username %}logged in as <a href="{{ user_page_url }}">{{ username }}</a>{% endblocktrans %}
-{% endblock menu_entry_content %}
