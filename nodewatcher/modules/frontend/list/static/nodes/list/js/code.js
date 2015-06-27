@@ -18,10 +18,11 @@
         // TODO: Enable Ajax caching, see http://datatables.net/forums/discussion/18899/make-cache-false-in-ajax-request-optional
         $('.node-list').each(function (i, table) {
             $(table).dataTable({
+                'paging' : true,
                 'bProcessing': true,
                 'bPaginate': false,
                 'sPaginationType': 'full_numbers',
-                'iDisplayLength': 5000,
+                'iDisplayLength': 100,
                 'bLengthChange': false,
                 'bFilter': true,
                 'bSort': true,
@@ -30,9 +31,10 @@
                 // TODO: Use our own state saving by changing URL anchor
                 'bStateSave': false,
                 'bServerSide': true,
+                'ajax' : {'url' : $(table).data('source'), 'data' : $.tastypie.fnServerParams},
                 'fnServerParams': $.tastypie.fnServerParams,
-                'fnServerData': $.tastypie.fnServerData,
-                'sAjaxSource': $(table).data('source'),
+//                'fnServerData': $.tastypie.fnServerData,
+                //'sAjaxSource': $(table).data('source'),
                 'sAjaxDataProp': 'objects',
                 // Set to "ifprtifp" if pagination is enabled, set to "ifrtif" if disabled
                 'sDom': 'ifrtif',

@@ -3,9 +3,9 @@
 {% contextblock %}
     {% load future i18n sekizai_tags html_tags url_tags %}
 
-    {% add_data "css_data" "datatables/css/jquery.dataTables.css" %}
-    {% add_data "css_data" "datatables/css/datatables.css" %}
+    {% add_data "css_data" "datatables/css/style.css" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
+    {% add_data "js_data" "datatables/js/code.js" %}
     {% add_data "js_data" "tastypie/js/code.js" %}
     {% add_data "js_data" "nodes/list/js/code.js" %}
 
@@ -13,8 +13,6 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% heading 2 _("Other Formats") %}
-
     <ul class="altlinks-list node-list-altlinks">
         <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=xml">{% trans "XML" %}</a></li>
         <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?format=json">{% trans "JSON" %}</a></li>
@@ -22,44 +20,20 @@
 {% endblock altlinks %}
 
 {% block content %}
-    <table class="node-list {% block node_list_classes %}{% endblock node_list_classes %}" data-source="{% block node_list_data_source %}{% url "api:api_dispatch_list" "v1" "node" %}{% endblock node_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}">
+    <table class="node-list {% block node_list_classes %}{% endblock node_list_classes %}" data-source="{% block node_list_data_source %}{% url "api:api_dispatch_list" "v1" "node" %}{% endblock node_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
         <thead>
             <tr>
-                <th rowspan="2">{# Hidden node type #}</th>
-                <th rowspan="2" title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
-                <th rowspan="2" title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
-                <th colspan="3">{% trans "Status" %}</th>
-                <th rowspan="2" title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
-            </tr>
-            <tr>
+                <th>{# Hidden node type #}</th>
+                <th title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
+                <th title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
                 <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
                 <th title="{% filter striptags %}{% trans "Is the node monitored by <i>nodewatcher</i>." %}{% endfilter %}">{% trans "Monitored" %}</th>
                 <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
+                <th title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr>
-                <th rowspan="2">{# Hidden node type #}</th>
-                <th rowspan="2" title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
-                <th rowspan="2" title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
-                <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
-                <th title="{% filter striptags %}{% trans "Is the node monitored by <i>nodewatcher</i>." %}{% endfilter %}">{% trans "Monitored" %}</th>
-                <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
-                <th rowspan="2" title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
-            </tr>
-            <tr>
-                <th colspan="3">{% trans "Status" %}</th>
-            </tr>
-        </tfoot>
         <tbody>
         </tbody>
     </table>
 
-    {% block node_list_legend_wrapper %}
-        <div class="node-list-legend {% block node_list_legend_classes %}{% endblock node_list_legend_classes %}">
-            {% block node_list_legend %}
-                {% include "nodes/legend.html" %}
-            {% endblock node_list_legend %}
-        </div>
-    {% endblock node_list_legend_wrapper %}
 {% endblock %}

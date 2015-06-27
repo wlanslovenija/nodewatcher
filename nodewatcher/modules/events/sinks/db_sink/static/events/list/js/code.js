@@ -16,8 +16,9 @@
                 'bStateSave': false,
                 'bServerSide': true,
                 'fnServerParams': $.tastypie.fnServerParams,
-                'fnServerData': $.tastypie.fnServerData,
-                'sAjaxSource': $(table).data('source'),
+                'ajax' : {'url' : $(table).data('source'), 'data' : $.tastypie.fnServerParams},
+//                'fnServerData': $.tastypie.fnServerData,
+//                'sAjaxSource': $(table).data('source'),
                 'sAjaxDataProp': 'objects',
                 // Set to "ifprtifp" if pagination is enabled, set to "ifrtif" if disabled
                 'sDom': 'ifprtifp',

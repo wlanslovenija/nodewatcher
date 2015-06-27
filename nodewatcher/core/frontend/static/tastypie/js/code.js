@@ -59,8 +59,8 @@
             var sorting = [];
             var search = null;
             var columnSearch = [];
-            for (var i = 0; i < aoData.length; i++) {
-                switch (aoData[i].name) {
+            for (var i in aoData) {
+                switch (i) {
                     case 'iDisplayStart':
                         aoData[i].name = 'offset';
                         break;
@@ -71,12 +71,12 @@
                             aoData[i].value = 0;
                         }
                         break;
-                    case (match = aoData[i].name.match(/^mDataProp_(\d+)$/) || {}).input:
+                    case (match = i.match(/^mDataProp_(\d+)$/) || {}).input:
                         // We store the mapping, but then remove it from
                         // aoData below by falling through the switch
                         columns[match[1]] = aoData[i].value;
                         match = null;
-                    case (match = aoData[i].name.match(/^iSortCol_(\d+)$/) || {}).input:
+                    case (match = i.match(/^iSortCol_(\d+)$/) || {}).input:
                         if (match) {
                             // We store the sorting column, but then remove it
                             // from aoData below by falling through the switch
@@ -84,7 +84,7 @@
                             sorting[match[1]].column = aoData[i].value;
                             match = null;
                         }
-                    case (match = aoData[i].name.match(/^sSortDir_(\d+)$/) || {}).input:
+                    case (match = i.match(/^sSortDir_(\d+)$/) || {}).input:
                         if (match) {
                             // We store the sorting direction, but then remove it
                             // from aoData below by falling through the switch
@@ -92,7 +92,7 @@
                             sorting[match[1]].direction = aoData[i].value;
                             match = null;
                         }
-                    case (match = aoData[i].name.match(/^sSearch_(\d+)$/) || {}).input:
+                    case (match = i.match(/^sSearch_(\d+)$/) || {}).input:
                         if (match) {
                             // We store the column search, but then remove it
                             // from aoData below by falling through the switch
@@ -100,7 +100,7 @@
                             match = null;
                         }
                     case 'sSearch':
-                        if (aoData[i].name === 'sSearch') {
+                        if (i === 'sSearch') {
                             // We store the global search, but then remove it
                             // from aoData below by falling through the switch
                             search = aoData[i].value;
@@ -108,9 +108,9 @@
                     case 'iColumns':
                     case 'sColumns':
                     case 'iSortingCols':
-                    case (aoData[i].name.match(/^bRegex/) || {}).input:
-                    case (aoData[i].name.match(/^bSortable/) || {}).input:
-                    case (aoData[i].name.match(/^bSearchable/) || {}).input:
+                    case (i.match(/^bRegex/) || {}).input:
+                    case (i.match(/^bSortable/) || {}).input:
+                    case (i.match(/^bSearchable/) || {}).input:
                         aoData.splice(i, 1);
                         i--;
                         break;
@@ -147,6 +147,37 @@
             }
         },
 
+        'serverData': function (aoData) {
+            // Instead of passing sEcho to the server and breaking caching, we set
+            // it in JavaScript, which still makes clear to dataTables which request
+            // is returning and when, but does not modify HTTP request
+            var echo = null;
+            for (var i = 0; i < aoData.length; i++) {
+                switch (aoData[i].name) {
+                    case 'sEcho':
+                        echo = aoData[i].value;
+                        aoData.splice(i, 1);
+                        i--;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+            return aoData;
+//console.log(oSettings);
+            /*$.ajax(sSource, {'data' : aoData, 'success' : function (json) {
+                json.sEcho = echo;
+                // nonfiltered_count is our addition to Tastypie for better integration with dataTables
+                json.iTotalRecords = json.meta.nonfiltered_count;
+                json.iTotalDisplayRecords = json.meta.total_count;
+console.log(json);
+                fnCallback(json);
+            }});*/
+
+        },
+
         'fnServerData': function (sSource, aoData, fnCallback, oSettings) {
             // Instead of passing sEcho to the server and breaking caching, we set
             // it in JavaScript, which still makes clear to dataTables which request
@@ -163,6 +194,7 @@
                         break;
                 }
             }
+
             $.fn.dataTable.defaults.fnServerData(sSource, aoData, function (json) {
                 json.sEcho = echo;
                 // nonfiltered_count is our addition to Tastypie for better integration with dataTables
@@ -170,6 +202,7 @@
                 json.iTotalDisplayRecords = json.meta.total_count;
                 fnCallback(json);
             }, oSettings);
+
         },
 
         // Groups rows based on the first column (you have to use 'aaSortingFixed': [[0, 'asc']]
