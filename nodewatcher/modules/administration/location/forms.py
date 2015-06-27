@@ -16,10 +16,7 @@ class LocationConfigForm(forms.ModelForm):
         model = models.LocationConfig
         fields = '__all__'
         widgets = {
-            'geolocation': registry_widgets.LocationWidget(
-                map_width=400,
-                map_height=300
-            )
+            'geolocation': registry_widgets.LocationWidget()
         }
 
     def modify_to_context(self, item, cfg, request):
