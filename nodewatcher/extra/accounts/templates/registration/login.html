@@ -10,7 +10,7 @@
 {% block content %}
     {% url "AccountsComponent:registration_register" as registration_register_url %}
     <p>{% blocktrans %}To log in, please enter your username and password in the form bellow. Don't have them yet? In that case please <a href="{{ registration_register_url }}">register</a>.{% endblocktrans %}</p>
-    <div class="login-form">
+    <div class="login-form form-narrow">
         {% with form_submit=_("Log in") %}
             {% include "form.html" %}
         {% endwith %}

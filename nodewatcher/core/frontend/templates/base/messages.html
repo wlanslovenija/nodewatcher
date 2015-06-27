@@ -2,16 +2,17 @@
 
 {% load forloop_tags %}
 
-{% block included_messages_wrapper %}
-    {% spaceless %}
-        <ul class="messages-list">
-            {% block included_messages %}
-                {% for message in messages %}
-                    {% block included_messages_entry %}
-                        <li class="message {{ message.tags }} {% css_classes "first" "last" "odd" "even" %} {% block included_messages_entry_classes %}{% endblock included_messages_entry_classes %}">{{ message }}</li>
-                    {% endblock included_messages_entry %}
-                {% endfor %}
-            {% endblock included_messages %}
-        </ul>
-    {% endspaceless %}
-{% endblock included_messages_wrapper %}
+
+{% spaceless %}
+        {% block included_messages %}
+            {% for message in messages %}
+                {% block included_messages_entry %}
+<div class="alert {{ message.tags }} alert-{{ message.tags }} alert-dismissible {% block included_messages_entry_classes %}{% endblock included_messages_entry_classes %}" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {{ message }}
+</div>
+                {% endblock included_messages_entry %}
+            {% endfor %}
+        {% endblock included_messages %}
+{% endspaceless %}
+
