@@ -1,7 +1,6 @@
 {{ meta.item }}
 {{ meta.prev_item }}
 {{ meta.mid }}
-{{ form.errors }}
-<table border="0">
-    {{ form.as_table }}
-</table>
+{% load theme_tags %}
+{% theme_form form layout="horizontal" %}
+
