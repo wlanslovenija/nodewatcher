@@ -1,4 +1,52 @@
 
+@media (max-width: $screen-xs-max) {
+    .form-narrow, .form-wide {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+@media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+    .form-narrow {
+        margin-right: $screen-lg-min / 8;
+        margin-left: $screen-lg-min / 8;
+    }
+
+    .form-wide {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+@media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+    .form-narrow {
+        margin-right: $screen-lg-min / 6;
+        margin-left: $screen-lg-min / 6;
+    }
+
+    .form-wide {
+        margin-right: $screen-lg-min / 15;
+        margin-left: $screen-lg-min / 15;
+    }
+}
+
+@media (min-width: $screen-lg-min) {
+    .form-narrow {
+        margin-right: $screen-lg-min / 4;
+        margin-left: $screen-lg-min / 4;
+    }
+
+    .form-wide {
+        margin-right: $screen-lg-min / 10;
+        margin-left: $screen-lg-min / 10;
+    }
+}
+
+.login-form {
+    margin-bottom: 20px;
+    margin-top: 30px;
+}
+
 
 .btn-row {
     margin: 20px 0;
