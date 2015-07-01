@@ -59,4 +59,5 @@ def koruza(node, pkgcfg, cfg):
     cfg.packages.update([
         'koruza-controller',
         'lm4flash',
+        'kmod-usb-acm'
     ])
