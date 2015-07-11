@@ -5,23 +5,13 @@
 {% get_menu "accounts_menu" as accounts_menu %}
 
 {% block included_accounts_menu %}
-    {% with menu=accounts_menu %}
-        {% spaceless %}
-            {% if menu %}
-        <div class="btn-group">
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if user.is_authenticated %}{{ user }}{% else %}{% trans 'User' %}{% endif %}&nbsp;<span class="caret"></span>
-          </button>
-        <ul class="dropdown-menu dropdown-right menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
-            {% block included_menu %}
-                {% for menu_entry in menu %}
-                    {% block included_menu_entry %}
-                        {% render_menu_entry menu_entry %}
-                    {% endblock included_menu_entry %}
-                {% endfor %}
-            {% endblock included_menu %}
-        </ul>
-        </div>
-            {% endif %}
-        {% endspaceless %}
+{% if user.is_authenticated %}
+    {% with menu=accounts_menu icon="user" title=user %}
+    {% include "base/dropdown_menu.html" %}
     {% endwith %}
+{% else %}
+    {% with menu=accounts_menu icon="user" title="" %}
+    {% include "base/dropdown_menu.html" %}
+    {% endwith %}
+{% endif %}
 {% endblock included_accounts_menu %}

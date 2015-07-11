@@ -9,7 +9,7 @@ This template uses `menu` (menu object) in the context.
 {% block included_menu_wrapper %}
     {% spaceless %}
         {% if menu %}
-            <ul class="nav navbar-nav menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
+            <ul class="menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
                 {% block included_menu %}
                     {% for menu_entry in menu %}
                         {% block included_menu_entry %}
