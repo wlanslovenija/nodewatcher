@@ -47,11 +47,35 @@
     margin-top: 30px;
 }
 
-
 .btn-row {
     margin: 20px 0;
 }
 
 form .btn-row {
     text-align: right;
+}
+
+textarea .form-control {
+    resize: vertical;
+}
+
+.registry-item .panel-heading {
+    
+    button.close {
+        font-size: 200%;
+    }
+
+    .form-group {
+        width: auto;
+        margin: 0;
+        display: inline-block;
+        label {
+            display: none;
+        }
+
+        select {
+            width: auto;
+            display: inline-block;
+        }
+    }
 }

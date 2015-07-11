@@ -1,4 +1,4 @@
-{% load i18n html_tags %}
+{% load i18n html_tags theme_tags %}
 
 {% if errors %}
     <div class="alert alert-danger">
@@ -20,12 +20,12 @@
     {% for subform in descriptor.subforms %}
        {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
         <div class="registry-item panel panel-default">
-            <div class="panel-heading"> &nbsp;
+            <div class="panel-heading">{% theme_field subform.meta_form.item %}{{ subform.meta_form.prev_item }}{{ subform.meta_form.mid }} &nbsp;
                 <button type="button" class="close registry_remove_item" data-index="{{ subform.args.index }}" aria-label="Remove"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="panel-body">
         {% else %}
-            <div class="registry-item">
+            <div class="registry-item">{% theme_field subform.meta_form.item %}{{ subform.meta_form.prev_item }}{{ subform.meta_form.mid }}
         {% endif %}
             {{ subform }}
        {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
@@ -41,9 +41,7 @@
     {% if descriptor.multiple %}
         {% if not descriptor.hide_multiple_controls %}
         <p class="btn-row">
-            <button type="button" class="registry_add_item btn btn-default" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}">
-            {% blocktrans with name=descriptor.name %}Add "{{name}}"{% endblocktrans %}
-            </button>
+            <button type="button" class="registry_add_item btn btn-default" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}" title="{% blocktrans with name=descriptor.name %}Add '{{name}}'{% endblocktrans %}">{% theme_icon icon='plus' %}</button>
         </p>
         {% endif %}
         </div>

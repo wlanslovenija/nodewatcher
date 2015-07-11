@@ -14,6 +14,10 @@ from ..forms import (
     render_label, render_form_errors, render_formset_errors
 )
 
+from .. import (
+    render_icon
+)
+
 register = template.Library()
 
 

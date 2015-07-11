@@ -127,12 +127,12 @@ def render_tag(tag, attrs=None, content=None, close=True):
     )
 
 
-def render_icon(icon, title=''):
+def render_icon(icon, title='', icons='glyphicon'):
     """
-    Render a Bootstrap glyphicon icon
+    Render a font icon
     """
     attrs = {
-        'class': 'glyphicon glyphicon-{icon}'.format(icon=icon),
+        'class': '{icons} {icons}-{icon}'.format(icon=icon, icons=icons),
     }
     if title:
         attrs['title'] = title
