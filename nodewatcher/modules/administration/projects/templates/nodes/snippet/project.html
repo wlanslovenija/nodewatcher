@@ -1,4 +1,5 @@
 {% load i18n %}
-
-<dt class="node-project">{% trans "Project" %}</dt>
-<dd class="node-project">{{ node_project.name|default:_("unknown") }}</dd>
+<div class="row snippet node-project">
+<div class="col-md-2 key">{% trans "Project" %}</div>
+<div class="col-md-10 value">{{ node_project.name|default:_("unknown") }}</div>
+</div>

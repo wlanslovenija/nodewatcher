@@ -1,4 +1,5 @@
 {% load i18n %}
-
-<dt class="node-type">{% trans "Node type" %}</dt>
-<dd class="node-type">{{ node_type.get_type_display|default:_("unknown") }}</dd>
+<div class="row snippet node-type">
+<div class="col-md-2 key">{% trans "Node type" %}</div>
+<div class="col-md-10 value">{{ node_type.get_type_display|default:_("unknown") }}</div>
+</div>

@@ -1,4 +1,5 @@
 {% load i18n %}
-
-<dt class="node-location">{% trans "Location" %}</dt>
-<dd class="node-location">{% blocktrans with node_address=node_location.address|default:_("unknown") node_city=node_location.city|default:_("unknown") node_country=node_location.get_country_display|default:_("unknown") %}{{ node_address }}, {{ node_city }}, {{ node_country }}{% endblocktrans %}</dd>
+<div class="row snippet node-location">
+<div class="col-md-2 key">{% trans "Location" %}</div>
+<div class="col-md-10 value">{% blocktrans with node_address=node_location.address|default:_("unknown") node_city=node_location.city|default:_("unknown") node_country=node_location.get_country_display|default:_("unknown") %}{{ node_address }}, {{ node_city }}, {{ node_country }}{% endblocktrans %}</div>
+</div>

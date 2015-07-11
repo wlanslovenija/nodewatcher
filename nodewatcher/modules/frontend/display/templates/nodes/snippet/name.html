@@ -1,4 +1,5 @@
 {% load i18n %}
-
-<dt class="node-name">{% trans "Node name" %}</dt>
-<dd class="node-name">{{ node_name }}</dd>
+<div class="row snippet node-name">
+<div class="col-md-2 key">{% trans "Node name" %}</div>
+<div class="col-md-10 value">{{ node_name }}</div>
+</div>

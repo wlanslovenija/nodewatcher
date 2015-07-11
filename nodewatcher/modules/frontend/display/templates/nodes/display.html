@@ -17,7 +17,6 @@
 {% endblock altlinks %}
 
 {% block content_before %}
-    {{ block.super }}
     {% block display_node_menu_wrapper %}
         <section class="menu display-node-menu {% block display_node_menu_classes %}{% endblock display_node_menu_classes %}">
             {% block display_node_menu %}
@@ -25,10 +24,13 @@
             {% endblock display_node_menu %}
         </section>
     {% endblock display_node_menu_wrapper %}
+    {{ block.super }}
 {% endblock content_before %}
 
 {% block content %}
+    <section class="node">
     {% block display_partial_wrapper %}
         {% include "nodes/display_partial.html" %}
     {% endblock display_partial_wrapper %}
+    </section>
 {% endblock content %}

@@ -1,0 +1,27 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load menu_tags forloop_tags url_tags theme_tags %}
+
+{% comment %}
+This template uses `menu` (menu object) in the context.
+{% endcomment %}
+
+{% block included_menu_wrapper %}
+    {% spaceless %}
+        {% if menu %}
+    <div class="btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if icon %}{% theme_icon icon %}&nbsp;{% endif %}{% if title %}{{ title }}{% endif %}&nbsp;<span class="caret"></span>
+      </button>
+    <ul class="dropdown-menu dropdown-right menu-list menu-{{ menu.name }} {% block included_menu_classes %}{% endblock included_menu_classes %}">
+        {% block included_menu %}
+            {% for menu_entry in menu %}
+                {% block included_menu_entry %}
+                    {% render_menu_entry menu_entry %}
+                {% endblock included_menu_entry %}
+            {% endfor %}
+        {% endblock included_menu %}
+    </ul>
+    </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock included_menu_wrapper %}

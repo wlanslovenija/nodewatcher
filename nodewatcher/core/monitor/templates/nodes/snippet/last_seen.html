@@ -1,4 +1,5 @@
 {% load i18n %}
-
-<dt class="node-last-seen">{% trans "Last seen" %}</dt>
-<dd class="node-last-seen">{{ node_last_seen|default:_("unknown") }}</dd>
+<div class="row snippet node-last-seen">
+<div class="col-md-2 key">{% trans "Last seen" %}</div>
+<div class="col-md-10 value">{{ node_last_seen|default:_("unknown") }}</div>
+</div>
