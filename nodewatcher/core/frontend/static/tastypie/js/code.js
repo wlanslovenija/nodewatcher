@@ -13,14 +13,14 @@
 
     $.extend($.tastypie, {
         // Uses top-level object's uuid for a link
-        'nodeName': function (table) {
-            return function (data, type, full) {
+        'nodeNameRender': function (table) {
+            return function (data, type, row, meta) {
                 if (type === 'display') {
                     return $('<a/>').attr(
                         'href', $(table).data('node-url-template'
                     // TODO: Make "unknown" string translatable
                     // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-                    ).replace('{pk}', full.uuid)).text(data || "unknown").wrap('<span/>').parent().html();
+                    ).replace('{pk}', row.uuid)).text(data || "unknown").wrap('<span/>').parent().html();
                 }
                 else {
                     // TODO: Make "unknown" string translatable
@@ -31,7 +31,7 @@
 
         // Uses subdocument uuid for a link (or links)
         'nodeSubdocumentName': function (table) {
-            return function (data, type, full) {
+            return function (data, type, row, meta) {
                 if (!$.isArray(data)) {
                     data = [data];
                 }
@@ -53,176 +53,79 @@
             };
         },
 
-        'fnServerParams': function (aoData) {
-            var match = null;
-            var columns = [];
-            var sorting = [];
-            var search = null;
-            var columnSearch = [];
-            for (var i in aoData) {
-                switch (i) {
-                    case 'iDisplayStart':
-                        aoData[i].name = 'offset';
-                        break;
-                    case 'iDisplayLength':
-                        aoData[i].name = 'limit';
-                        // In Tastypie, max limit is set with limit=0, but dataTables uses -1
-                        if (aoData[i].value === -1) {
-                            aoData[i].value = 0;
-                        }
-                        break;
-                    case (match = i.match(/^mDataProp_(\d+)$/) || {}).input:
-                        // We store the mapping, but then remove it from
-                        // aoData below by falling through the switch
-                        columns[match[1]] = aoData[i].value;
-                        match = null;
-                    case (match = i.match(/^iSortCol_(\d+)$/) || {}).input:
-                        if (match) {
-                            // We store the sorting column, but then remove it
-                            // from aoData below by falling through the switch
-                            if (!sorting[match[1]]) sorting[match[1]] = {};
-                            sorting[match[1]].column = aoData[i].value;
-                            match = null;
-                        }
-                    case (match = i.match(/^sSortDir_(\d+)$/) || {}).input:
-                        if (match) {
-                            // We store the sorting direction, but then remove it
-                            // from aoData below by falling through the switch
-                            if (!sorting[match[1]]) sorting[match[1]] = {};
-                            sorting[match[1]].direction = aoData[i].value;
-                            match = null;
-                        }
-                    case (match = i.match(/^sSearch_(\d+)$/) || {}).input:
-                        if (match) {
-                            // We store the column search, but then remove it
-                            // from aoData below by falling through the switch
-                            columnSearch[match[1]] = aoData[i].value;
-                            match = null;
-                        }
-                    case 'sSearch':
-                        if (i === 'sSearch') {
-                            // We store the global search, but then remove it
-                            // from aoData below by falling through the switch
-                            search = aoData[i].value;
-                        }
-                    case 'iColumns':
-                    case 'sColumns':
-                    case 'iSortingCols':
-                    case (i.match(/^bRegex/) || {}).input:
-                    case (i.match(/^bSortable/) || {}).input:
-                    case (i.match(/^bSearchable/) || {}).input:
-                        aoData.splice(i, 1);
-                        i--;
-                        break;
-                    default:
-                        break;
+        // Converts dataTables server-side parameters to Tastypie parameters
+        'ajaxData': function (table) {
+            return function (data, settings) {
+                var tastypieParams = {
+                    'order_by': [],
+                    'fields': []
+                };
+
+                if ('length' in data) {
+                    // In Tastypie, max limit is set with limit=0, but dataTables uses -1
+                    if (data.length === -1) {
+                        tastypieParams.length = 0;
+                    }
+                    else {
+                        tastypieParams.limit = data.length;
+                    }
                 }
-            }
-            $.each(columns, function (i, column) {
-                aoData.push({
-                    'name': 'fields',
-                    'value': pathToRelation(column)
-                })
-            });
-            $.each(sorting, function (i, sort) {
-                var s = sort.direction === 'desc' ? '-' : '';
-                s += pathToRelation(columns[sort.column]);
-                aoData.push({
-                    'name': 'order_by',
-                    'value': s
-                })
-            });
-            $.each(columnSearch, function (i, search) {
-                if (!search) return;
-                aoData.push({
-                    'name': columns[i] + '__icontains',
-                    'value': search
-                })
-            });
-            if (search) {
-                aoData.push({
-                    'name': 'filter',
-                    'value': search
-                });
-            }
+
+                if ('start' in data) {
+                    tastypieParams.offset = data.start;
+                }
+
+                if (data.search && data.search.value && data.search.value.length) {
+                    tastypieParams.filter = data.search.value;
+                }
+
+                var columns = data.columns || [];
+                for (var i = 0; i < columns.length; i++) {
+                    var path = pathToRelation(columns[i].data);
+                    tastypieParams.fields.push(path);
+                    if (columns[i].search && columns[i].search.value && columns[i].search.value.length) {
+                        tastypieParams[path + '__icontains'] = columns[i].search.value;
+                    }
+                }
+
+                var order = data.order || [];
+                for (var i = 0; i < order.length; i++) {
+                    var s = order[i].dir === 'desc' ? '-' : '';
+                    s += pathToRelation(columns[order[i].column].data);
+                    tastypieParams.order_by.push(s);
+                }
+
+                return tastypieParams;
+            };
         },
 
-        'serverData': function (aoData) {
-            // Instead of passing sEcho to the server and breaking caching, we set
-            // it in JavaScript, which still makes clear to dataTables which request
-            // is returning and when, but does not modify HTTP request
-            var echo = null;
-            for (var i = 0; i < aoData.length; i++) {
-                switch (aoData[i].name) {
-                    case 'sEcho':
-                        echo = aoData[i].value;
-                        aoData.splice(i, 1);
-                        i--;
-                        break;
-                    default:
-                        break;
+        // Processes data returned from the server before dataTables processes it
+        'xhrCallback': function (table) {
+            return function (event, settings, data, jqXHR, context) {
+                if (data.meta) {
+                    // "nonfiltered_count" is our addition to Tastypie for better integration with dataTables
+                    data.recordsTotal = data.meta.nonfiltered_count;
+                    data.recordsFiltered = data.meta.total_count;
                 }
-            }
-
-
-            return aoData;
-//console.log(oSettings);
-            /*$.ajax(sSource, {'data' : aoData, 'success' : function (json) {
-                json.sEcho = echo;
-                // nonfiltered_count is our addition to Tastypie for better integration with dataTables
-                json.iTotalRecords = json.meta.nonfiltered_count;
-                json.iTotalDisplayRecords = json.meta.total_count;
-console.log(json);
-                fnCallback(json);
-            }});*/
-
+            };
         },
 
-        'fnServerData': function (sSource, aoData, fnCallback, oSettings) {
-            // Instead of passing sEcho to the server and breaking caching, we set
-            // it in JavaScript, which still makes clear to dataTables which request
-            // is returning and when, but does not modify HTTP request
-            var echo = null;
-            for (var i = 0; i < aoData.length; i++) {
-                switch (aoData[i].name) {
-                    case 'sEcho':
-                        echo = aoData[i].value;
-                        aoData.splice(i, 1);
-                        i--;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            $.fn.dataTable.defaults.fnServerData(sSource, aoData, function (json) {
-                json.sEcho = echo;
-                // nonfiltered_count is our addition to Tastypie for better integration with dataTables
-                json.iTotalRecords = json.meta.nonfiltered_count;
-                json.iTotalDisplayRecords = json.meta.total_count;
-                fnCallback(json);
-            }, oSettings);
-
-        },
-
-        // Groups rows based on the first column (you have to use 'aaSortingFixed': [[0, 'asc']]
-        // to fix ordering primarily to the first column)
+        // Groups rows based on the first column (you have to use 'orderFixed': [[0, 'asc']]
+        // to fix ordering primarily to the first column). Based on
+        // https://datatables.net/examples/advanced_init/row_grouping.html
         'groupDrawCallback': function (table) {
-            return function (oSettings) {
-                if (oSettings.aiDisplay.length == 0) {
-                    return;
-                }
-
-                var trs = $(table).find('tbody tr');
-                var colspan = trs.eq(0).find('td').length;
+            return function (settings) {
+                var api = this.api();
+                var rows = api.rows({page: 'current'}).nodes();
+                var $rows = $(rows);
                 var lastGroup = null;
-                trs.each(function (i, tr) {
-                    var displayIndex = oSettings._iDisplayStart + i;
-                    var group = oSettings.aoData[oSettings.aiDisplay[displayIndex]]._aData[oSettings.aoColumns[0].mData];
-                    if (group !== lastGroup) {
+                var colspan = $rows.eq(0).find('td').length;
+
+                api.column(0, {page: 'current'}).data().each(function (group, i) {
+                    if (lastGroup !== group) {
                         $('<tr />').addClass('group').append(
                             $('<td />').attr('colspan', colspan).html(group)
-                        ).insertBefore($(tr));
+                        ).insertBefore($rows.eq(i));
                         lastGroup = group;
                     }
                 });

@@ -1,75 +1,64 @@
 (function ($) {
-    function iconFromLegend(legendName) {
-        return function (data, type, full) {
-            if (type !== 'display') return data;
-
-            switch (data) {
-                case true: data = 'True'; break;
-                case false: data = 'False'; break;
-                case null: data = 'None'; break;
-                default: break;
-            }
-
-            return $('.node-list-legend .' + legendName + '-status dt.' + data).html();
-        };
-    }
-
     $(document).ready(function () {
-        // TODO: Enable Ajax caching, see http://datatables.net/forums/discussion/18899/make-cache-false-in-ajax-request-optional
         $('.node-list').each(function (i, table) {
             $(table).dataTable({
-                'paging' : true,
-                'bProcessing': true,
-                'bPaginate': false,
-                'sPaginationType': 'full_numbers',
-                'iDisplayLength': 100,
-                'bLengthChange': false,
-                'bFilter': true,
-                'bSort': true,
-                'bInfo': true,
-                'bAutoWidth': true,
+                'processing': true,
+                'paging': true,
+                'pagingType': 'full_numbers',
+                // We effectively disable pagination by specifying large page length
+                // Additionally, we hide pages buttons themselves below
+                'pageLength': 5000,
+                // Set to "ifrtif" if pagination (page buttons) are not wanted, set to "ifprtifp" if pagination is wanted
+                'dom': 'ifrtif',
+                'lengthChange': false,
+                'searching': true,
+                'ordering': true,
+                'info': true,
+                'autoWidth': true,
                 // TODO: Use our own state saving by changing URL anchor
-                'bStateSave': false,
-                'bServerSide': true,
-                'ajax' : {'url' : $(table).data('source'), 'data' : $.tastypie.fnServerParams},
-                'fnServerParams': $.tastypie.fnServerParams,
-//                'fnServerData': $.tastypie.fnServerData,
-                //'sAjaxSource': $(table).data('source'),
-                'sAjaxDataProp': 'objects',
-                // Set to "ifprtifp" if pagination is enabled, set to "ifrtif" if disabled
-                'sDom': 'ifrtif',
-                'aoColumns': [
-                    {'mData': 'type', 'bVisible': false},
-                    {'mData': 'name', 'mRender': $.tastypie.nodeName(table)},
-                    {'mData': 'last_seen'},
-                    {'mData': 'status.network', 'mRender': iconFromLegend('network')},
-                    {'mData': 'status.monitored', 'mRender': iconFromLegend('monitored')},
-                    {'mData': 'status.health', 'mRender': iconFromLegend('health')},
-                    {'mData': 'project'},
-                    {'mData': 'uuid', 'bVisible': false}
+                'stateSave': false,
+                'serverSide': true,
+                'ajax': {
+                    'url': $(table).data('source'),
+                    'data': $.tastypie.ajaxData(table),
+                    'dataSrc': 'objects',
+                    'cache': true,
+                    'traditional': true
+                },
+                'columns': [
+                    {'data': 'type', 'visible': false},
+                    {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
+                    {'data': 'last_seen'},
+                    {'data': 'status.network'},
+                    {'data': 'status.monitored'},
+                    {'data': 'status.health'},
+                    {'data': 'project'},
+                    // So that user can search by UUID
+                    {'data': 'uuid', 'visible': false}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
-                'aaSortingFixed': [[0, 'asc']],
+                'orderFixed': [[0, 'asc']],
                 // And make default sorting by name column
-                'aaSorting': [[1, 'asc']],
-                'fnDrawCallback': $.tastypie.groupDrawCallback(table),
-                'oLanguage': {
+                'order': [[1, 'asc']],
+                'drawCallback': $.tastypie.groupDrawCallback(table),
+                'language': {
                     // TODO: Make strings translatable
-                    'sZeroRecords': "No matching nodes found.",
-                    'sEmptyTable ': "There are currently no nodes recorded/connected.",
-                    'sInfo': "_START_ to _END_ of _TOTAL_ nodes shown",
-                    'sInfoEmpty': "0 nodes shown",
-                    'sInfoFiltered': "(from _MAX_ all nodes)",
-                    'sInfoPostFix': "",
-                    'sSearch': "Filter:"
+                    'zeroRecords': "No matching nodes found.",
+                    'emptyTable ': "There are currently no nodes recorded/connected.",
+                    'info': "_START_ to _END_ of _TOTAL_ nodes shown",
+                    'infoEmpty': "0 nodes shown",
+                    'infoFiltered': "(from _MAX_ all nodes)",
+                    'infoPostFix': "",
+                    'search': "Filter:"
                 },
-                'oSearch': {
+                'search': {
                     // Initial search string
-                    'sSearch': '',
+                    'search': '',
                     // We pass strings to the server side as they are
-                    'bEscapeRegex': false
+                    'regex': true,
+                    'smart': false
                 }
-            });
+            }).on('xhr.dt', $.tastypie.xhrCallback(table));
         });
     });
 })(jQuery);
