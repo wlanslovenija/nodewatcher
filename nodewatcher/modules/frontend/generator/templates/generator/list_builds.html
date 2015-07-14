@@ -3,8 +3,9 @@
 {% contextblock %}
     {% load future i18n sekizai_tags html_tags url_tags %}
 
-    {% add_data "css_data" "datatables/css/jquery.dataTables.css" %}
+    {% add_data "css_data" "datatables/css/style.css" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "tastypie/js/code.js" %}
     {% add_data "js_data" "generator/list_builds/js/code.js" %}
 
@@ -12,8 +13,6 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% heading 2 _("Other Formats") %}
-
     <ul class="altlinks-list node-list-altlinks">
         <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "build_result" %}?format=xml">{% trans "XML" %}</a></li>
         <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "build_result" %}?format=json">{% trans "JSON" %}</a></li>
@@ -21,7 +20,7 @@
 {% endblock altlinks %}
 
 {% block content %}
-    <table class="build-list {% block build_list_classes %}{% endblock build_list_classes %}" data-source="{% block build_list_data_source %}{% url "api:api_dispatch_list" "v1" "build_result" %}{% endblock build_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" data-build-url-template="{% urltemplate "GeneratorComponent:view_build" %}">
+    <table class="build-list {% block build_list_classes %}{% endblock build_list_classes %}" data-source="{% block build_list_data_source %}{% url "api:api_dispatch_list" "v1" "build_result" %}{% endblock build_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" data-build-url-template="{% urltemplate "GeneratorComponent:view_build" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Build ID" %}</th>
@@ -32,16 +31,6 @@
                 <th>{% trans "Created" %}</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr>
-                <th>{% trans "Build ID" %}</th>
-                <th title="{% trans "The name of the node." %}">{% trans "Node" %}</th>
-                <th>{% trans "Build Channel" %}</th>
-                <th>{% trans "Version" %}</th>
-                <th>{% trans "Status" %}</th>
-                <th>{% trans "Created" %}</th>
-            </tr>
-        </tfoot>
         <tbody>
         </tbody>
     </table>

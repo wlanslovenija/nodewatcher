@@ -11,7 +11,7 @@
                     {'data': 'status.health'},
                     {'data': 'project'},
                     // So that user can search by UUID
-                    {'data': 'uuid', 'visible': false, 'orderable': false}
+                    {'data': 'uuid', 'visible': false}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
                 'orderFixed': [[0, 'asc']],

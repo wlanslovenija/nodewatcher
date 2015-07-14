@@ -1,15 +1,16 @@
 (function ($) {
     function renderActions(table) {
         return function (data, type, row, meta) {
-            if (type !== 'display') {
+            if (type === 'display') {
+                return $('<a/>').attr(
+                    'href', $(table).data('remove-url-template').replace('{pk}', row.id)
+                // TODO: Make "remove" string translatable
+                // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
+                ).text("remove").wrap('<span/>').parent().html();
+            }
+            else {
                 return data;
             }
-
-            return $('<a/>').attr(
-                'href', $(table).data('remove-url-template'
-            // TODO: Make "remove" string translatable
-            // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-            ).replace('{pk}', row.id)).text("remove").wrap('<span/>').parent().html();
         };
     }
 
@@ -21,7 +22,7 @@
                     {'data': 'fingerprint'},
                     {'data': 'created'},
                     {'data': null, 'render': renderActions(table), 'orderable': false, 'searchable': false},
-                    {'data': 'id', 'visible': false, 'orderable': false, 'searchable': false}
+                    {'data': 'id', 'visible': false}
                 ],
                 // And make default sorting by name column
                 'order': [[0, 'asc']],

@@ -52,10 +52,10 @@
             return function (data, type, row, meta) {
                 if (type === 'display') {
                     return $('<a/>').attr(
-                        'href', $(table).data('node-url-template'
+                        'href', $(table).data('node-url-template').replace('{pk}', row.uuid)
                     // TODO: Make "unknown" string translatable
                     // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-                    ).replace('{pk}', row.uuid)).text(data || "unknown").wrap('<span/>').parent().html();
+                    ).text(data || "unknown").wrap('<span/>').parent().html();
                 }
                 else {
                     // TODO: Make "unknown" string translatable
@@ -73,10 +73,10 @@
                 if (type === 'display') {
                     return $.map(data, function (node, i) {
                         return $('<a/>').attr(
-                            'href', $(table).data('node-url-template'
+                            'href', $(table).data('node-url-template').replace('{pk}', node.uuid)
                         // TODO: Make "unknown" string translatable
                         // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-                        ).replace('{pk}', node.uuid)).text(node.name || "unknown").wrap('<span/>').parent().html();
+                        ).text(node.name || "unknown").wrap('<span/>').parent().html();
                     }).join(", ");
                 }
                 else {
@@ -141,7 +141,7 @@
         // Processes data returned from the server before dataTables processes it
         'xhrCallback': function (table) {
             return function (event, settings, data, jqXHR, context) {
-                if (data.meta) {
+                if (data && data.meta) {
                     // "nonfiltered_count" is our addition to Tastypie for better integration with dataTables
                     data.recordsTotal = data.meta.nonfiltered_count;
                     data.recordsFiltered = data.meta.total_count;
