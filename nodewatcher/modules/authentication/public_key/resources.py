@@ -16,7 +16,7 @@ class UserAuthenticationKeyAuthorization(api_authorization.Authorization):
 class UserAuthenticationKeyResource(api.BaseResource):
 
     class Meta:
-        queryset = models.UserAuthenticationKey.objects.all()
+        queryset = models.UserAuthenticationKey.objects.all().order_by('pk')
         resource_name = 'user_authentication_key'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
