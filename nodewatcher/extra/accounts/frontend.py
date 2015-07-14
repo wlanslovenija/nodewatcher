@@ -38,7 +38,7 @@ def logout_url(menu_entry, context):
 
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Profile"), weight=-100,
-    url=lambda menu_entry, context: urlresolvers.reverse('AccountsComponent:user_page', kwargs={'username' : context['request'].user.get_username()}),
+    url=lambda menu_entry, context: urlresolvers.reverse('AccountsComponent:user_page', kwargs={'username': context['request'].user.get_username()}),
     visible=lambda menu_entry, request, context: request.user.is_authenticated(),
 ))
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
