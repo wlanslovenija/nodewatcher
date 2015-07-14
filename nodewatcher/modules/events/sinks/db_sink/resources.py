@@ -55,9 +55,9 @@ class EventResource(api.BaseResource):
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
         ordering = ('timestamp', 'related_nodes', 'description')
-        # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
+        # TODO: How can we generate string from registry, without hardcoding registry relations?
         global_filter = ('timestamp', 'related_nodes__config_core_generalconfig__name', 'description')
         authorization = EventAuthorization()
 
-    # TODO: How can we generate order_by string from registry, without hardcoding registry relations?
+    # TODO: How can we generate string from registry, without hardcoding registry relations?
     related_nodes = fields.ManyToManyField(to=NodeResource, attribute=RelatedNodes('related_nodes__config_core_generalconfig__name'), full=True, help_text=models.SerializedNodeEvent._meta.get_field('related_nodes').help_text)

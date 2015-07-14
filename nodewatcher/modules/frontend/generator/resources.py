@@ -108,6 +108,15 @@ class BuildResultResource(api.BaseResource):
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
         max_limit = 5000
-        ordering = ('uuid', 'build_channel', 'builder', 'status', 'created',)
+        ordering = ('uuid', 'node', 'build_channel', 'builder', 'status', 'created')
+        # TODO: How can we generate string from registry, without hardcoding registry relations?
+        global_filter = ('uuid', 'node__config_core_generalconfig__name', 'build_channel__name', 'builder__version__name', 'status')
         authentication = api_authentication.SessionAuthentication()
         authorization = BuildResultAuthorization()
+
+    def _after_apply_sorting(self, obj_list, options, order_by_args):
+        # We want to augment sorting so that it is always sorted at the end by "uuid" to have a defined order
+        # even for keys which are equal between multiple objects. This is necessary for pagination to work correctly,
+        # because SKIP and LIMIT works well for pagination only when all objects have a defined order.
+        extended_order = list(order_by_args) + ['uuid']
+        return obj_list.order_by(*extended_order)

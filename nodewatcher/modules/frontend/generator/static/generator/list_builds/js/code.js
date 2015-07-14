@@ -18,13 +18,13 @@
             $.tastypie.newDataTable(table, $(table).data('source'), {
                 'columns': [
                     {'data': 'uuid', 'render': renderBuilderUuid(table)},
-                    {'data': 'node', 'render': $.tastypie.nodeSubdocumentName(table)},
+                    // TODO: How can we generate string from registry, without hardcoding registry relations?
+                    {'data': 'node.name', 'render': $.tastypie.nodeSubdocumentName(table, 'node'), 'orderByField': 'node__config_core_generalconfig__name'},
                     {'data': 'build_channel.name'},
                     {'data': 'builder.version.name'},
                     {'data': 'status'},
                     {'data': 'created'},
                     // We need extra data to render the node column
-                    {'data': 'node.name', 'visible': false},
                     {'data': 'node.uuid', 'visible': false}
                 ],
                 // And make default sorting by created column

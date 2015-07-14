@@ -353,8 +353,12 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
         f = request.GET.get('filter', None)
         if f and getattr(self._meta, 'global_filter', None):
+            if hasattr(filtered_queryset, 'registry_expand_proxy_field'):
+                expand_proxy_field = filtered_queryset.registry_expand_proxy_field
+            else:
+                expand_proxy_field = lambda x: x
             # TODO: Q objects should transform registry field names automatically, so that we do not have to call registry_expand_proxy_field
-            qs = [query.Q(**{filtered_queryset.registry_expand_proxy_field('%s__icontains' % field): f}) for field in self._meta.global_filter]
+            qs = [query.Q(**{expand_proxy_field('%s__icontains' % field): f}) for field in self._meta.global_filter]
             filter_query = qs[0]
             for q in qs[1:]:
                 filter_query |= q

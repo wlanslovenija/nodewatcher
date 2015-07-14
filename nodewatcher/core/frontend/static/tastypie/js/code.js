@@ -64,9 +64,13 @@
             };
         },
 
-        // Uses subdocument uuid for a link (or links)
-        'nodeSubdocumentName': function (table) {
+        // Uses subdocument uuid for a link (or links). If nodeField is specified, it will use that row
+        // field instead of current data.
+        'nodeSubdocumentName': function (table, nodeField) {
             return function (data, type, row, meta) {
+                if (nodeField) {
+                    data = row[nodeField];
+                }
                 if (!$.isArray(data)) {
                     data = [data];
                 }
@@ -130,7 +134,7 @@
                     if (!columns[order[i].column].data) continue;
 
                     var s = order[i].dir === 'desc' ? '-' : '';
-                    s += pathToRelation(columns[order[i].column].data);
+                    s += settings.aoColumns[order[i].column].orderByField || pathToRelation(columns[order[i].column].data);
                     tastypieParams.order_by.push(s);
                 }
 

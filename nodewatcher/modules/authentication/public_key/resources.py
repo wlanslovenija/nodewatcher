@@ -1,4 +1,3 @@
-from tastypie import fields
 from tastypie import authorization as api_authorization, authentication as api_authentication
 
 from nodewatcher.core.frontend import api
@@ -23,5 +22,6 @@ class UserAuthenticationKeyResource(api.BaseResource):
         detail_allowed_methods = ('get',)
         max_limit = 5000
         ordering = ('pk', 'name', 'fingerprint', 'created')
+        global_filter = ('name', 'fingerprint', 'created')
         authentication = api_authentication.SessionAuthentication()
         authorization = UserAuthenticationKeyAuthorization()
