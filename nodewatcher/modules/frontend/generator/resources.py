@@ -56,7 +56,7 @@ class BuildVersionResource(api.BaseResource):
 class BuilderResource(api.BaseResource):
     platform = fields.CharField('platform')
     architecture = fields.CharField('architecture')
-    version = fields.ToOneField(BuildVersionResource, 'version', full=True)
+    version = api_fields.ToOneField(BuildVersionResource, 'version', full=True)
 
     class Meta:
         resource_name = 'builder'

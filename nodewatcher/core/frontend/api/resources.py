@@ -66,7 +66,15 @@ class BaseMetaclass(resources.ModelDeclarativeMetaclass):
             attrs['Meta'].serializer = serializers.DatastreamSerializer()
         if attrs.get('Meta') and not getattr(attrs['Meta'], 'paginator_class', None):
             attrs['Meta'].paginator_class = paginator.Paginator
-        return super(BaseMetaclass, cls).__new__(cls, name, bases, attrs)
+
+        new_class = super(BaseMetaclass, cls).__new__(cls, name, bases, attrs)
+
+        # We override use_in function on all fields to be able to limit the fields user
+        # wants in the output.
+        for name, field in new_class.base_fields.items():
+            field.use_in = new_class.field_use_in_factory(name, getattr(field, 'use_in', None))
+
+        return new_class
 
 
 class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelResource, gis_resources.ModelResource, datastream_resources.BaseResource)):
@@ -208,18 +216,6 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
     @classmethod
     def get_fields(cls, fields=None, excludes=None):
-        final_fields = {}
-
-        for field_name, field in cls._get_fields(fields, excludes).items():
-            # We override use_in function on all fields to be able
-            # to limit the fields user wants in the output.
-            field.use_in = cls.field_use_in_factory(field_name, getattr(field, 'use_in', None))
-            final_fields[field_name] = field
-
-        return final_fields
-
-    @classmethod
-    def _get_fields(cls, fields, excludes):
         # Registry stores additional fields in as virtual fields and we reuse Tastypie
         # code to parse them by temporary assigning them to local fields
 
