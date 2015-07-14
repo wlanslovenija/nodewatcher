@@ -72,6 +72,9 @@ class BaseMetaclass(resources.ModelDeclarativeMetaclass):
         # We override use_in function on all fields to be able to limit the fields user
         # wants in the output.
         for name, field in new_class.base_fields.items():
+            # These are provided by Tastypie and we want to show them always if they are enabled through resource options.
+            if name in ['resource_uri', 'absolute_url']:
+                continue
             field.use_in = new_class.field_use_in_factory(name, getattr(field, 'use_in', None))
 
         return new_class
