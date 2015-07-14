@@ -2434,9 +2434,9 @@
 		var ajaxData;
 		var ajax = oSettings.ajax;
 		var instance = oSettings.oInstance;
-		var callback = function ( json ) {
-			_fnCallbackFire( oSettings, null, 'xhr', [oSettings, json, oSettings.jqXHR] );
-			fn( json );
+		var callback = function ( json, jqXHR, context ) {
+			_fnCallbackFire( oSettings, null, 'xhr', [oSettings, json, jqXHR, context] );
+			fn( json, context );
 		};
 	
 		if ( $.isPlainObject( ajax ) && ajax.data )
@@ -2459,26 +2459,27 @@
 	
 		var baseAjax = {
 			"data": data,
-			"success": function (json) {
+			"draw": oSettings.iDraw,
+			"success": function (json, textStatus, jqXHR) {
 				var error = json.error || json.sError;
 				if ( error ) {
 					_fnLog( oSettings, 0, error );
 				}
 	
 				oSettings.json = json;
-				callback( json );
+				callback( json, jqXHR, this );
 			},
 			"dataType": "json",
 			"cache": false,
 			"type": oSettings.sServerMethod,
-			"error": function (xhr, error, thrown) {
-				var ret = _fnCallbackFire( oSettings, null, 'xhr', [oSettings, null, oSettings.jqXHR] );
+			"error": function (jqXHR, error, thrown) {
+				var ret = _fnCallbackFire( oSettings, null, 'xhr', [oSettings, null, jqXHR, this] );
 	
 				if ( $.inArray( true, ret ) === -1 ) {
 					if ( error == "parsererror" ) {
 						_fnLog( oSettings, 0, 'Invalid JSON response', 1 );
 					}
-					else if ( xhr.readyState === 4 ) {
+					else if ( jqXHR.readyState === 4 ) {
 						_fnLog( oSettings, 0, 'Ajax error', 7 );
 					}
 				}
@@ -2543,8 +2544,8 @@
 			_fnBuildAjax(
 				settings,
 				_fnAjaxParameters( settings ),
-				function(json) {
-					_fnAjaxUpdateDraw( settings, json );
+				function(json, context) {
+					_fnAjaxUpdateDraw( settings, json, context );
 				}
 			);
 	
@@ -2585,7 +2586,6 @@
 		};
 	
 		// DataTables 1.9- compatible method
-		param( 'sEcho',          settings.iDraw );
 		param( 'iColumns',       columnCount );
 		param( 'sColumns',       _pluck( columns, 'sName' ).join(',') );
 		param( 'iDisplayStart',  displayStart );
@@ -2593,7 +2593,6 @@
 	
 		// DataTables 1.10+ method
 		var d = {
-			draw:    settings.iDraw,
 			columns: [],
 			order:   [],
 			start:   displayStart,
@@ -2666,14 +2665,13 @@
 	 * Data the data from the server (nuking the old) and redraw the table
 	 *  @param {object} oSettings dataTables settings object
 	 *  @param {object} json json data return from the server.
-	 *  @param {string} json.sEcho Tracking flag for DataTables to match requests
 	 *  @param {int} json.iTotalRecords Number of records in the data set, not accounting for filtering
 	 *  @param {int} json.iTotalDisplayRecords Number of records in the data set, accounting for filtering
 	 *  @param {array} json.aaData The data to display on this page
 	 *  @param {string} [json.sColumns] Column ordering (sName, comma separated)
 	 *  @memberof DataTable#oApi
 	 */
-	function _fnAjaxUpdateDraw ( settings, json )
+	function _fnAjaxUpdateDraw ( settings, json, context )
 	{
 		// v1.10 uses camelCase variables, while 1.9 uses Hungarian notation.
 		// Support both
@@ -2682,18 +2680,15 @@
 		};
 	
 		var data = _fnAjaxDataSrc( settings, json );
-		var draw            = compat( 'sEcho',                'draw' );
 		var recordsTotal    = compat( 'iTotalRecords',        'recordsTotal' );
 		var recordsFiltered = compat( 'iTotalDisplayRecords', 'recordsFiltered' );
-	
-		if ( draw ) {
-			// Protect against out of sequence returns
-			if ( draw*1 < settings.iDraw ) {
-				return;
-			}
-			settings.iDraw = draw * 1;
+
+		// Protect against out of sequence returns
+		if ( context.draw < settings.iDraw ) {
+			return;
 		}
-	
+		settings.iDraw = context.draw;
+
 		_fnClearTable( settings );
 		settings._iRecordsTotal   = parseInt(recordsTotal, 10);
 		settings._iRecordsDisplay = parseInt(recordsFiltered, 10);
@@ -3307,7 +3302,7 @@
 		if ( dataSrc != 'ssp' ) {
 			// if there is an ajax source load the data
 			if ( dataSrc == 'ajax' ) {
-				_fnBuildAjax( settings, [], function(json) {
+				_fnBuildAjax( settings, [], function(json, context) {
 					var aData = _fnAjaxDataSrc( settings, json );
 	
 					// Got the data - add it to the table
@@ -7407,7 +7402,7 @@
 			// Trigger xhr
 			_fnProcessingDisplay( settings, true );
 	
-			_fnBuildAjax( settings, [], function( json ) {
+			_fnBuildAjax( settings, [], function( json, context ) {
 				_fnClearTable( settings );
 	
 				var data = _fnAjaxDataSrc( settings, json );
@@ -14889,16 +14884,19 @@
 	 *  @param {event} e jQuery event object
 	 *  @param {object} o DataTables settings object {@link DataTable.models.oSettings}
 	 *  @param {object} json JSON returned from the server
+	 *  @param {object} jqXHR jQuery Ajax object
+	 *  @param {object} context context of the Ajax request, by default, the context is an
+	 *    object that represents the Ajax settings used in the call
 	 *
 	 *  @example
 	 *     // Use a custom property returned from the server in another DOM element
-	 *     $('#table').dataTable().on('xhr.dt', function (e, settings, json) {
+	 *     $('#table').dataTable().on('xhr.dt', function (e, settings, json, jqXHR, context) {
 	 *       $('#status').html( json.status );
 	 *     } );
 	 *
 	 *  @example
 	 *     // Pre-process the data returned from the server
-	 *     $('#table').dataTable().on('xhr.dt', function (e, settings, json) {
+	 *     $('#table').dataTable().on('xhr.dt', function (e, settings, json, jqXHR, context) {
 	 *       for ( var i=0, ien=json.aaData.length ; i<ien ; i++ ) {
 	 *         json.aaData[i].sum = json.aaData[i].one + json.aaData[i].two;
 	 *       }
