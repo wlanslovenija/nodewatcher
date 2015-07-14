@@ -8,7 +8,10 @@
                     {'data': 'timestamp'},
                     // TODO: Correctly render names and links
                     {'data': 'related_nodes', 'render': $.tastypie.nodeSubdocumentName(table)},
-                    {'data': 'description'}
+                    {'data': 'description'},
+                    // We need extra data to render the related nodes column
+                    {'data': 'related_nodes.name', 'visible': false},
+                    {'data': 'related_nodes.uuid', 'visible': false}
                 ],
                 'aaSorting': [[0, 'desc']],
                 'language': {
