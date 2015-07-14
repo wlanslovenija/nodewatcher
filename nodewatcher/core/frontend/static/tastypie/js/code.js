@@ -12,6 +12,41 @@
     }
 
     $.extend($.tastypie, {
+        'newDataTable': function (table, ajaxUrl, options) {
+            return $(table).dataTable($.extend({
+                'processing': true,
+                'paging': true,
+                'pagingType': 'full_numbers',
+                // We effectively disable pagination by specifying large page length
+                // Additionally, we hide pages buttons themselves below
+                'pageLength': 5000,
+                // Set to "ifrtif" if pagination (page buttons) are not wanted, set to "ifprtifp" if pagination is wanted
+                'dom': 'ifrtif',
+                'lengthChange': false,
+                'searching': true,
+                'ordering': true,
+                'info': true,
+                'autoWidth': true,
+                // TODO: Use our own state saving by changing URL anchor
+                'stateSave': false,
+                'serverSide': true,
+                'ajax': {
+                    'url': ajaxUrl,
+                    'data': $.tastypie.ajaxData(table),
+                    'dataSrc': 'objects',
+                    'cache': true,
+                    'traditional': true
+                },
+                'search': {
+                    // Initial search string
+                    'search': '',
+                    // We pass strings to the server side as they are
+                    'regex': true,
+                    'smart': false
+                }
+            }, options)).on('xhr.dt', $.tastypie.xhrCallback(table));
+        },
+
         // Uses top-level object's uuid for a link
         'nodeNameRender': function (table) {
             return function (data, type, row, meta) {
@@ -81,6 +116,8 @@
 
                 var columns = data.columns || [];
                 for (var i = 0; i < columns.length; i++) {
+                    if (!columns[i].data) continue;
+
                     var path = pathToRelation(columns[i].data);
                     tastypieParams.fields.push(path);
                     if (columns[i].search && columns[i].search.value && columns[i].search.value.length) {
@@ -90,6 +127,8 @@
 
                 var order = data.order || [];
                 for (var i = 0; i < order.length; i++) {
+                    if (!columns[order[i].column].data) continue;
+
                     var s = order[i].dir === 'desc' ? '-' : '';
                     s += pathToRelation(columns[order[i].column].data);
                     tastypieParams.order_by.push(s);
