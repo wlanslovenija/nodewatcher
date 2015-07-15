@@ -12,27 +12,21 @@ class ApiNameMixin(object):
         return None
 
 
-class ToOneField(ApiNameMixin, tastypie_fields.ToOneField):
+class FieldInUsePathMixin(object):
     """
-    Extended tastypie ToOneField with support for nested schema and field
-    filtering.
+    Support for field filtering.
     """
 
     def contribute_to_class(self, cls, name):
         from . import resources
 
-        super(ToOneField, self).contribute_to_class(cls, name)
+        super(FieldInUsePathMixin, self).contribute_to_class(cls, name)
 
         # Update use_in in order to support field filtering.
         self.use_in = resources.BaseResource.field_use_in_factory(
             name,
             self.use_in
         )
-
-    def build_schema(self):
-        return {
-            'fields': self.to_class(self.get_api_name()).build_schema()['fields'],
-        }
 
     def dehydrate(self, bundle, for_list=True):
         # Because bundle.request is the only state which is passed through all
@@ -45,9 +39,27 @@ class ToOneField(ApiNameMixin, tastypie_fields.ToOneField):
 
         bundle.request._field_in_use_path.append(self.instance_name)
         try:
-            return super(ToOneField, self).dehydrate(bundle, for_list)
+            return super(FieldInUsePathMixin, self).dehydrate(bundle, for_list)
         finally:
             bundle.request._field_in_use_path.pop()
+
+
+class ToOneField(FieldInUsePathMixin, ApiNameMixin, tastypie_fields.ToOneField):
+    """
+    Extended tastypie ToOneField with support for nested schema and field
+    filtering.
+    """
+
+    def build_schema(self):
+        return {
+            'fields': self.to_class(self.get_api_name()).build_schema()['fields'],
+        }
+
+
+class ManyToManyField(FieldInUsePathMixin, tastypie_fields.ManyToManyField):
+    """
+    Extended tastypie ManyToManyField with support field filtering.
+    """
 
 
 class RegistryRelationField(ToOneField):

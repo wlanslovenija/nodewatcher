@@ -7,7 +7,8 @@
         var bits = path.split('.');
         return $.map(bits, function (bit, j) {
             if ($.isNumeric(bit)) return null;
-            return bit;
+            // We just skip over the array suffix if it is there.
+            return bit.replace(/\[.*\]$/, '');
         }).join('__');
     }
 

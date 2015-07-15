@@ -154,10 +154,10 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             if not only_fields:
                 return True
 
-            # In RegistryRelationField.dehydrate we are storing the path as we are walking
-            # related fields so that we can have full path available here. bundle.request
-            # is the only state available through all dehydration process so we are using it.
-            # This currently works only with RegistryRelationField, but can be ported to
+            # In ToOneField.dehydrate and ManyToManyField.dehydrate we are storing the path
+            # as we are walking related fields so that we can have full path available here.
+            # bundle.request is the only state available through all dehydration process so
+            # we are using it. This currently works only on our fields, but can be ported to
             # other related fields by augmenting their dehydrate method.
             field_path = getattr(bundle.request, '_field_in_use_path', [])
 

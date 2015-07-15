@@ -1,9 +1,10 @@
 from django.db import models as django_models
 
-from tastypie import fields
+from tastypie import fields as tastypie_fields
 from tastypie import authorization as api_authorization
 
 from nodewatcher.core.frontend import api
+from nodewatcher.core.frontend.api import fields as api_fields
 from nodewatcher.modules.frontend.list import resources
 
 from . import models
@@ -47,17 +48,18 @@ class EventAuthorization(api_authorization.Authorization):
 
 
 class EventResource(api.BaseResource):
-    description = fields.CharField('description')
+    description = tastypie_fields.CharField('description')
 
     class Meta:
         queryset = models.SerializedNodeEvent.objects.all().order_by('-timestamp')
         resource_name = 'event'
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
-        ordering = ('timestamp', 'related_nodes', 'description')
+        ordering = ('timestamp', 'related_nodes')
         # TODO: How can we generate string from registry, without hardcoding registry relations?
-        global_filter = ('timestamp', 'related_nodes__config_core_generalconfig__name', 'description')
+        # TODO: How could we allow filtering on the description?
+        global_filter = ('timestamp', 'related_nodes__config_core_generalconfig__name')
         authorization = EventAuthorization()
 
     # TODO: How can we generate string from registry, without hardcoding registry relations?
-    related_nodes = fields.ManyToManyField(to=NodeResource, attribute=RelatedNodes('related_nodes__config_core_generalconfig__name'), full=True, help_text=models.SerializedNodeEvent._meta.get_field('related_nodes').help_text)
+    related_nodes = api_fields.ManyToManyField(to=NodeResource, attribute=RelatedNodes('related_nodes__config_core_generalconfig__name'), full=True, help_text=models.SerializedNodeEvent._meta.get_field('related_nodes').help_text)
