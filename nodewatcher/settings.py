@@ -590,13 +590,33 @@ IMAGE_GENERATOR_EMAIL = DEFAULT_FROM_EMAIL
 FRONTEND_MAIN_COMPONENT = 'ListComponent'
 
 MENUS = {
-    #'main_menu': [
-    #    {
-    #        'name': ...,
-    #        'weight': ...,
-    #        'visible': True,
-    #    },
-    #],
+    'main_menu': [
+        {
+            'name': 'Node List',
+            'weight': 10,
+            'visible': True,
+        },
+        {
+            'name': 'Network Statistics',
+            'weight': 20,
+            'visible': True,
+        },
+        {
+            'name': 'Events',
+            'weight': 30,
+            'visible': True,
+        },
+        {
+            'name': 'Network Topology',
+            'weight': 40,
+            'visible': True,
+        },
+        {
+            'name': 'Map',
+            'weight': 50,
+            'visible': True,
+        },
+    ],
     #'accounts_menu': [
     #    ...
     #],
