@@ -14,7 +14,7 @@
 
     $.extend($.tastypie, {
         'newDataTable': function (table, ajaxUrl, options) {
-            return $(table).dataTable($.extend({
+            var $table = $(table).dataTable($.extend({
                 'processing': true,
                 'paging': true,
                 'pagingType': 'full_numbers',
@@ -46,6 +46,10 @@
                     'smart': false
                 }
             }, options)).on('xhr.dt', $.tastypie.xhrCallback(table));
+            var api = $table.api();
+            // TODO: Disabled for now. See https://github.com/DataTables/FixedHeader/issues/57
+            // var fixedHeader = new $.fn.dataTable.FixedHeader(api);
+            return $table;
         },
 
         // Uses top-level object's uuid for a link
