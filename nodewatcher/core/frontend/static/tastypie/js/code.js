@@ -48,6 +48,7 @@
             }, options)).on('xhr.dt', $.tastypie.xhrCallback(table));
             var api = $table.api();
             // TODO: Disabled for now. See https://github.com/DataTables/FixedHeader/issues/57
+            // TODO: After fixed header is enabled, link processing pop-up position to be linked with header's position.
             // var fixedHeader = new $.fn.dataTable.FixedHeader(api);
             return $table;
         },
