@@ -46,7 +46,7 @@ class AntennaEquipmentConfig(registration.bases.NodeConfigRegistryItem):
     device = registry_fields.IntraRegistryForeignKey(
         cgm_models.WifiRadioDeviceConfig, editable=False, null=False, related_name='antennas'
     )
-    antenna = registry_fields.ModelRegistryChoiceField(Antenna)
+    antenna = registry_fields.ModelRegistryChoiceField(Antenna, null=True, blank=True)
     azimuth = models.FloatField(null=True, blank=True)
     elevation_angle = models.FloatField(null=True, blank=True)
     rotation = models.FloatField(null=True, blank=True)
