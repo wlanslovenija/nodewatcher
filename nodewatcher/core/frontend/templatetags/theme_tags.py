@@ -6,16 +6,17 @@ import re
 from math import floor
 
 from django import template
+from django.template import Context
 from django.template.loader import get_template
 
 from ..forms import (
     render_button, render_field, render_field_and_label, render_form,
-    render_form_group, render_formset,
+    render_form_group, render_formset, 
     render_label, render_form_errors, render_formset_errors
 )
 
 from .. import (
-    render_icon
+    render_icon, render_alert
 )
 
 register = template.Library()
@@ -224,7 +225,7 @@ def theme_icon(icon, **kwargs):
 
 
 @register.simple_tag
-def theme_alert(content, alert_type='info', dismissable=True):
+def theme_alert(content, type='info', dismissable=True):
     """
     Render an alert
 
@@ -235,7 +236,7 @@ def theme_alert(content, alert_type='info', dismissable=True):
     **Parameters**:
 
         :content: HTML content of alert
-        :alert_type: one of 'info', 'warning', 'danger' or 'success'
+        :type: one of 'info', 'warning', 'danger' or 'success'
         :dismissable: boolean, is alert dismissable
 
     **usage**::
@@ -247,7 +248,7 @@ def theme_alert(content, alert_type='info', dismissable=True):
         {% theme_alert "Something went wrong" alert_type='error' %}
 
     """
-    return render_alert(content, alert_type, dismissable)
+    return render_alert(content, type, dismissable)
 
 
 @register.tag('buttons')
@@ -309,6 +310,46 @@ class ButtonsNode(template.Node):
         else:
             return output
 
+@register.tag('alert')
+def theme_alert(parser, token):
+    """
+    Render buttons for form
+
+    **Tag name**::
+
+        alert
+
+    **Parameters**:
+
+        :parser:
+        :token:
+
+    **usage**::
+
+        {% alert type %} ...  {% endalert %}
+
+    **example**::
+
+        {% alert %} ... {% endalert %}
+    """
+    #kwargs = parse_token_contents(parser, token)
+    kwargs = {}
+    kwargs['dismissable'] = False
+    kwargs['type'] = False
+    kwargs['nodelist'] = parser.parse(('endalert', ))
+    parser.delete_first_token()
+    return AlertNode(**kwargs)
+
+class AlertNode(template.Node):
+
+    def __init__(self, nodelist, alert_type="info", icon=None, dismissable=False):
+        self.nodelist = nodelist
+        self.alert_type = alert_type
+        self.icon = icon
+        self.dismissable = closeable
+
+    def render(self, context):
+        return render_alert(content, alert_type=self.alert_type, dismissable=self.dismissable)
 
 @register.simple_tag(takes_context=True)
 def theme_messages(context, *args, **kwargs):
@@ -335,7 +376,6 @@ def theme_messages(context, *args, **kwargs):
 
     **example**::
 
-        {% theme_javascript jquery=1 %}
         {% theme_messages FIXTHIS %}
 
     """

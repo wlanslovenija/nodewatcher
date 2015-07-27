@@ -1,16 +1,13 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load forloop_tags %}
+{% load forloop_tags theme_tags %}
 
 
 {% spaceless %}
         {% block included_messages %}
             {% for message in messages %}
                 {% block included_messages_entry %}
-<div class="alert {{ message.tags }} alert-{{ message.tags }} alert-dismissible {% block included_messages_entry_classes %}{% endblock included_messages_entry_classes %}" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  {{ message }}
-</div>
+                {% theme_alert message type=message.tags %}
                 {% endblock included_messages_entry %}
             {% endfor %}
         {% endblock included_messages %}
