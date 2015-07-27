@@ -21,7 +21,7 @@
 {% endblock altlinks %}
 
 {% block content %}
-    <table class="events-list" data-source="{% url "api:api_dispatch_list" "v1" "event" %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
+    <table class="table table-striped events-list" data-source="{% url "api:api_dispatch_list" "v1" "event" %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Timestamp" %}</th>

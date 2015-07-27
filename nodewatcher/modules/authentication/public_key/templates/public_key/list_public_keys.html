@@ -32,7 +32,7 @@
 {% endblock content_before %}
 
 {% block content %}
-    <table class="key-list {% block key_list_classes %}{% endblock key_list_classes %}" data-source="{% block key_list_data_source %}{% url "api:api_dispatch_list" "v1" "user_authentication_key" %}{% endblock key_list_data_source %}" data-remove-url-template="{% urltemplate "PublicKeyComponent:remove" %}" width="100%">
+    <table class="table table-striped key-list {% block key_list_classes %}{% endblock key_list_classes %}" data-source="{% block key_list_data_source %}{% url "api:api_dispatch_list" "v1" "user_authentication_key" %}{% endblock key_list_data_source %}" data-remove-url-template="{% urltemplate "PublicKeyComponent:remove" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Name" %}</th>

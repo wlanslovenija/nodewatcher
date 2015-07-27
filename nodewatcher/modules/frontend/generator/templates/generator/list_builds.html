@@ -21,7 +21,7 @@
 {% endblock altlinks %}
 
 {% block content %}
-    <table class="build-list {% block build_list_classes %}{% endblock build_list_classes %}" data-source="{% block build_list_data_source %}{% url "api:api_dispatch_list" "v1" "build_result" %}{% endblock build_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" data-build-url-template="{% urltemplate "GeneratorComponent:view_build" %}" width="100%">
+    <table class="table table-striped build-list {% block build_list_classes %}{% endblock build_list_classes %}" data-source="{% block build_list_data_source %}{% url "api:api_dispatch_list" "v1" "build_result" %}{% endblock build_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" data-build-url-template="{% urltemplate "GeneratorComponent:view_build" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Build ID" %}</th>

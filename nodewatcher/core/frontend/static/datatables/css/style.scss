@@ -84,10 +84,6 @@ table.dataTable {
 	max-width: none !important;
 }
 
-table.dataTable thead th {
-    background-color: $gray-lighter;
-}
-
 table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
     color: $brand-primary;
@@ -223,13 +219,13 @@ div.dataTables_scrollHead table.table-bordered {
  */
 .table.dataTable tbody tr.active td,
 .table.dataTable tbody tr.active th {
-	background-color: $brand-light;
+	background-color: $brand-primary;
 	color: white;
 }
 
 .table.dataTable tbody tr.active:hover td,
 .table.dataTable tbody tr.active:hover th {
-	background-color: $brand-lighter !important;
+	background-color: $brand-primary !important;
 }
 
 .table.dataTable tbody tr.active th > a,
@@ -239,7 +235,7 @@ div.dataTables_scrollHead table.table-bordered {
 
 .table-striped.dataTable tbody tr.active:nth-child(odd) td,
 .table-striped.dataTable tbody tr.active:nth-child(odd) th {
-	background-color: $brand-light;
+	background-color: $brand-primary;
 }
 
 table.DTTT_selectable tbody tr {
@@ -259,7 +255,7 @@ ul.DTTT_dropdown.dropdown-menu li {
 }
 
 ul.DTTT_dropdown.dropdown-menu li:hover a {
-	background-color: $brand-lighter;
+	background-color: $brand-primary;
 	color: white !important;
 }
 
