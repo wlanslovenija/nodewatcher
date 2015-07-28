@@ -21,7 +21,6 @@
 {% endblock altlinks %}
 
 {% block content_before %}
-    {{ block.super }}
     {% block public_key_menu_wrapper %}
         <section class="menu display-node-menu {% block public_key_menu_classes %}{% endblock public_key_menu_classes %}">
             {% block public_key_menu %}
@@ -29,6 +28,7 @@
             {% endblock public_key_menu %}
         </section>
     {% endblock public_key_menu_wrapper %}
+    {{ block.super }}
 {% endblock content_before %}
 
 {% block content %}

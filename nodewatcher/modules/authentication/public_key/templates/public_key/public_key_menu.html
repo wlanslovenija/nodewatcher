@@ -5,7 +5,7 @@
 {% get_menu "public_key_menu" as public_key_menu %}
 
 {% block included_public_key_menu %}
-    {% with menu=public_key_menu %}
-        {% include "base/menu.html" %}
+    {% with menu=public_key_menu icon="cog" title="" %}
+        {% include "base/dropdown_menu.html" %}
     {% endwith %}
 {% endblock included_public_key_menu %}
