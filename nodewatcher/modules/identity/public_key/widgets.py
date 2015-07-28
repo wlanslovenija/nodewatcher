@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from . import models
 
 
-class PublicKeyWidget(widgets.Widget):
+class PublicKeyWidget(widgets.Textarea):
     """
     A simple widget which renders the public key more nicely.
     """
@@ -37,13 +37,13 @@ class PublicKeyWidget(widgets.Widget):
             'name': name,
             'raw': value,
         }
-
+        print value
         try:
             public_key = models.PublicKeyIdentityConfig._extract_public_key(value.encode('ascii'))
-            context['valid'] = True
+            valid = True
         except ValueError:
             public_key = None
-            context['valid'] = False
+            valid = False
 
         if public_key is not None:
             der = public_key.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.PKCS1)
@@ -64,4 +64,9 @@ class PublicKeyWidget(widgets.Widget):
                 context['key_algorithm'] = _("Unknown")
                 context['key_size'] = _("unknown")
 
-        return template_loader.render_to_string('identity/public_key/widget.html', context)
+        widget = super(PublicKeyWidget, self).render(name, value, attrs)
+
+        if valid:
+            return template_loader.render_to_string('identity/public_key/public_key.html', context) + widget
+        else:
+            return widget

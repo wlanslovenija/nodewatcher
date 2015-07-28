@@ -1,0 +1,8 @@
+{% load i18n %}
+
+<ul class="public-key">
+    <li>{% trans "Algorithm:" %} <b>{{ key_algorithm }}</b></li>
+    <li>{% trans "Size:" %} <b>{{ key_size }} bits</b></li>
+    <li>{% trans "SHA-256 Fingerprint:" %} <tt class="fingerprint">{{ fingerprint_sha256 }}</tt></li>
+    <li>{% trans "SHA-1 Fingerprint:" %} <tt class="fingerprint">{{ fingerprint_sha1 }}</tt></li>
+</ul>
