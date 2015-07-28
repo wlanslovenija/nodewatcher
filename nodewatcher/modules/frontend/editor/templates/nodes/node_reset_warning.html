@@ -1,8 +1,8 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load i18n %}
+{% load i18n theme_tags %}
 
 {% block included_node_reset_warning %}
-    <p>{% trans "WARNING: This action is irreversible." %}</p>
-    <p>Reset the node to the initial state?</p>
+    <p>{% trans "Reset the node to the initial state?" %}</p>
+    {% theme_alert _("Warning: This action is irreversible.") type="warning" dismissable=False %}
 {% endblock included_node_reset_warning %}

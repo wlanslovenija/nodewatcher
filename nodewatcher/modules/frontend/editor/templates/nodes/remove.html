@@ -5,8 +5,7 @@
 
     {% setcontext as title %}{% blocktrans %}Remove Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
     {% setcontext as heading %}{% spaceless %}
-        {% url "DisplayComponent:node" node.pk as node_url %}
-        {% blocktrans %}Remove Node <a href="{{ node_url }}">{{ node_name }}</a>{% endblocktrans %}
+        {% blocktrans %}Remove Node{% endblocktrans %}
     {% endspaceless %}{% endsetcontext %}
 {% endcontextblock %}
 
@@ -19,9 +18,11 @@
         </div>
     {% endblock node_remove_warning_wrapper %}
 
+    <section class="node">
     {% block node_snippet_wrapper %}
         {% include "nodes/node_remove_snippet.html" %}
     {% endblock node_snippet_wrapper %}
+    </section>
 
     {% block node_remove_form_wrapper %}
         {% with form_submit=_("Remove") %}
