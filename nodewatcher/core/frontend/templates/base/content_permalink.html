@@ -1,9 +1,9 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load i18n %}
+{% load i18n theme_tags %}
 
 {% block included_content_permalink %}
     {% if permalink %}
-        <div class="permalink {% block included_content_permalink_classes %}{% endblock included_content_permalink_classes %}">[<a href="{{ permalink }}">{% trans "permalink" %}</a>]</div>
+        <a class="btn btn-default permalink" href="{{ permalink }}">{% theme_icon "link" %}</a>
     {% endif %}
 {% endblock included_content_permalink %}
