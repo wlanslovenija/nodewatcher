@@ -16,7 +16,7 @@ from ..forms import (
 )
 
 from .. import (
-    render_icon, render_alert
+    render_icon, render_alert, parse_token_contents
 )
 
 register = template.Library()
@@ -245,11 +245,34 @@ def theme_alert(content, type='info', dismissable=True):
 
     **example**::
 
-        {% theme_alert "Something went wrong" alert_type='error' %}
+        {% theme_alert "Something went wrong" type='error' %}
 
     """
     return render_alert(content, type, dismissable)
 
+@register.simple_tag
+def theme_legend(content):
+    """
+    Render a legend
+
+    **Tag name**::
+
+        theme_title
+
+    **Parameters**:
+
+        :content: HTML content
+        
+    **usage**::
+
+        {% theme_legend "my_content" %}
+
+    **example**::
+
+        {% theme_legend "Title" %}
+
+    """
+    return "<legend>%s</legend>" % content
 
 @register.tag('buttons')
 def theme_buttons(parser, token):
@@ -342,14 +365,14 @@ def theme_alert(parser, token):
 
 class AlertNode(template.Node):
 
-    def __init__(self, nodelist, alert_type="info", icon=None, dismissable=False):
+    def __init__(self, nodelist, type="info", icon=None, dismissable=False):
         self.nodelist = nodelist
-        self.alert_type = alert_type
+        self.alert_type = type
         self.icon = icon
-        self.dismissable = closeable
+        self.dismissable = dismissable
 
     def render(self, context):
-        return render_alert(content, alert_type=self.alert_type, dismissable=self.dismissable)
+        return render_alert(self.nodelist.render(context), alert_type=self.alert_type, dismissable=self.dismissable)
 
 @register.simple_tag(takes_context=True)
 def theme_messages(context, *args, **kwargs):

@@ -80,6 +80,35 @@ def text_concat(*args, **kwargs):
     values = filter(None, [text_value(v) for v in args])
     return separator.join(values)
 
+def parse_token_contents(parser, token):
+    """
+    Parse template tag contents
+    """
+    bits = token.split_contents()
+    tag = bits.pop(0)
+    args = []
+    kwargs = {}
+    asvar = None
+    if len(bits) >= 2 and bits[-2] == 'as':
+        asvar = bits[-1]
+        bits = bits[:-2]
+    if len(bits):
+        for bit in bits:
+            match = kwarg_re.match(bit)
+            if not match:
+                raise TemplateSyntaxError(
+                    'Malformed arguments to tag "{}"'.format(tag))
+            name, value = match.groups()
+            if name:
+                kwargs[name] = parser.compile_filter(value)
+            else:
+                args.append(parser.compile_filter(value))
+    return {
+        'tag': tag,
+        'args': args,
+        'kwargs': kwargs,
+        'asvar': asvar,
+    }
 
 def split_css_classes(css_classes):
     """

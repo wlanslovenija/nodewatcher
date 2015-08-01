@@ -1,6 +1,6 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load sekizai_tags html_tags %}
+{% load sekizai_tags html_tags theme_tags %}
 
 {% add_data "js_data" "datastream/underscore/underscore.js" %}
 {% add_data "js_data" "datastream/moment/moment.js" %}
@@ -13,7 +13,7 @@
 {% add_data "js_data" "datastream/js/code.js" %}
 
 {% block included_graphs %}
-    {% heading 2 _("Graphs") %}
+    {% theme_legend _("Graphs") %}
 
     <div class="node-graphs {% block node_graphs_classes %}{% endblock node_graphs_classes %}" data-source="{% block node_graphs_data_source %}{% url "api:api_dispatch_list" "v1" "stream" %}{% endblock node_graphs_data_source %}" data-node="{% block node_graphs_data_node %}{{ node.pk }}{% endblock node_graphs_data_node %}"></div>
 {% endblock included_graphs %}

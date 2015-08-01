@@ -1,10 +1,10 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load i18n %}
+{% load i18n theme_tags %}
 
 {% block included_maintainers %}
     {% if maintainers.exists %}
-        <legend>{% trans "Maintainers" %}</legend>
+        {% theme_legend _("Maintainers") %}
 
         <ul class="maintainers users">
             {% for maintainer in maintainers %}
