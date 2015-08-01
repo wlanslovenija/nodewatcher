@@ -1,0 +1,9 @@
+{% load i18n %}
+<div class="row snippet router-id">
+    <div class="col-md-2 key">{% trans "Router IDs" %}</div>
+    <div class="col-md-10 value">
+        {% for router_id in router_ids %}
+            {{ router_id.router_id }} ({{ router_id.get_rid_family_display }})<br/>
+        {% endfor %}
+    </div>
+</div>

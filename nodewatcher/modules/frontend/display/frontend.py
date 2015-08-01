@@ -34,6 +34,15 @@ components.partials.get_partial('node_snippet_partial').add(components.PartialEn
     },
 ))
 
+components.partials.get_partial('node_snippet_partial').add(components.PartialEntry(
+    name='router_id',
+    template='nodes/snippet/router_id.html',
+    weight=100,
+    extra_context=lambda context: {
+        'router_ids': context['node'].config.core.routerid()
+    },
+))
+
 
 components.partials.register(components.Partial('node_display_partial'))
 
