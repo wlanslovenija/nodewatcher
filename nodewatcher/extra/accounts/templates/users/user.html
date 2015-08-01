@@ -3,15 +3,21 @@
 {% contextblock %}
     {% load future i18n theme_tags %}
 
-    {% setcontext as title %}{% blocktrans %}User {{ username }}{% endblocktrans %}{% endsetcontext %}
+    {% setcontext as title %}{% blocktrans %}User {{ profileuser.username }}{% endblocktrans %}{% endsetcontext %}
 {% endcontextblock %}
 
 {% block content %}
     {% url "AccountsComponent:user_account" as user_account_url %}
-    {% if user.username == username %}
+    {% if user.username == profileuser.username %}
     	{% alert type="info" %}
         {% blocktrans %}Do you want to <a href="{{ user_account_url }}">update your account</a>?{% endblocktrans %}
     	{% endalert %}
     {% endif %}
-    <p>{% trans "Username" %} {{ username }}.</p>
+    {% theme_legend _("General") %}
+    <div class="snippet-list">
+	    <div class="row snippet user-username">
+			<div class="col-md-2 key">{% trans "Username" %}</div>
+			<div class="col-md-10 value">{{ profileuser.username }}</div>
+	    </div>
+    </div>
 {% endblock %}

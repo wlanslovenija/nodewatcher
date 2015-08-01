@@ -5,9 +5,11 @@ from django import template
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.models import User
 from django.contrib.sites import models as sites_models
 from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 
 from registration import models as registration_models
 
@@ -19,8 +21,10 @@ def user(request, username):
     This view displays a public page for a given user.
     """
 
+    user = get_object_or_404(User, username=username)
+
     return shortcuts.render_to_response("users/user.html", {
-        'username': username,
+        'profileuser': user,
     }, context_instance=template.RequestContext(request))
 
 
