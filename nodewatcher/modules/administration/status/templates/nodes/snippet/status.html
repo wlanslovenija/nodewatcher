@@ -2,8 +2,8 @@
 <div class="row snippet node-status">
 <div class="col-md-2 key">{% trans "Status" %}</div>
 <div class="col-md-10 value">
-	{% network_status_icon node_status.get_network_choice "small" %} {% network_status_description node_status.get_network_choice %} <br/>
-    {% monitored_status_icon node_status.get_monitored_choice "small" %} {% monitored_status_description node_status.get_monitored_choice %} <br/>
-    {% health_status_icon node_status.get_health_choice "small" %} {% health_status_description node_status.get_health_choice %} 
+	{% network_status_icon node_status.get_network_choice "normal" %} {% network_status_description node_status.get_network_choice %} <br/>
+    {% monitored_status_icon node_status.get_monitored_choice "normal" %} {% monitored_status_description node_status.get_monitored_choice %} <br/>
+    {% health_status_icon node_status.get_health_choice "normal" %} {% health_status_description node_status.get_health_choice %} 
 </div>
 </div>
