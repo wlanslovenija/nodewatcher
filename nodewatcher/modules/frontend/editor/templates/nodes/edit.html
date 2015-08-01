@@ -14,6 +14,17 @@
     {% endspaceless %}{% endsetcontext %}
 {% endcontextblock %}
 
+{% block content_before %}
+    {% block node_menu_wrapper %}
+        <section class="menu node-menu">
+            {% block node_menu %}
+                {% include "nodes/node_menu.html" %}
+            {% endblock node_menu %}
+        </section>
+    {% endblock node_menu_wrapper %}
+    {{ block.super }}
+{% endblock content_before %}
+
 {% block content %}
     <form class="form-horizontal" method="post" action="{% url "EditorComponent:edit" node.pk %}">
         {% csrf_token %}

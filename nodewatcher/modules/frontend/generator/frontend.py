@@ -28,7 +28,7 @@ api.v1_api.register(resources.BuildChannelResource())
 api.v1_api.register(resources.BuildVersionResource())
 
 
-components.menus.get_menu('display_node_menu').add(components.MenuEntry(
+components.menus.get_menu('node_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Generate Firmware"),
     url=lambda menu_entry, context: urlresolvers.reverse('GeneratorComponent:generate_firmware', kwargs={'pk': context['node'].pk}),
     visible=lambda menu_entry, request, context: request.user.has_perm('generate_firmware', context['node']),

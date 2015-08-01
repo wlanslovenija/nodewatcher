@@ -17,13 +17,13 @@
 {% endblock altlinks %}
 
 {% block content_before %}
-    {% block display_node_menu_wrapper %}
-        <section class="menu display-node-menu {% block display_node_menu_classes %}{% endblock display_node_menu_classes %}">
-            {% block display_node_menu %}
-                {% include "nodes/display_node_menu.html" %}
-            {% endblock display_node_menu %}
+    {% block node_menu_wrapper %}
+        <section class="menu node-menu">
+            {% block node_menu %}
+                {% include "nodes/node_menu.html" %}
+            {% endblock node_menu %}
         </section>
-    {% endblock display_node_menu_wrapper %}
+    {% endblock node_menu_wrapper %}
     {{ block.super }}
 {% endblock content_before %}
 
