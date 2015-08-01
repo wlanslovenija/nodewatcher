@@ -2,6 +2,8 @@ import hashlib
 import io
 import os
 
+import unidecode
+
 from celery.task import task as celery_task
 
 from django.core.files import uploadedfile
@@ -70,6 +72,13 @@ def background_build(self, result_uuid):
         # Dispatch the result failed event
         generator_events.BuildResultFailed(result).post()
         return
+
+    # By default, prepend node name and version before firmware filenames.
+    node_name = unidecode.unidecode(result.node.config.core.general().name)
+    fw_version = result.builder.version.name.replace('.', '')
+
+    for index, (fw_name, fw_file) in enumerate(files[:]):
+        files[index] = ('%s-v%s-%s' % (node_name, fw_version, fw_name), fw_file)
 
     # Dispatch signal that can be used to modify files
     signals.post_firmware_build.send(sender=None, result=result, files=files)
