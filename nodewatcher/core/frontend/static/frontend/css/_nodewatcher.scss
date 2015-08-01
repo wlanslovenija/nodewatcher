@@ -33,13 +33,29 @@ footer {
 .header-heading {
     .network-name {
         font-size: $font-size-h2;
-        color: $brand-primary;
+        color: white;
     }
     .network-description {
         font-size: $font-size-h4;
-        color: $gray-lighter;
+        color: black;
     }
     margin: 15px 5px;
+}
+
+.navbar-static-top .container {
+    position: relative;
+}
+
+.navbar-static-top #skyline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: -10;
+}
+
+.navbar-static-top {
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .container > .accounts-menu > .btn-group {

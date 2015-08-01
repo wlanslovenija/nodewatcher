@@ -1,0 +1,32 @@
+$bootstrap-sass-asset-helper: true;
+
+@import "brand";
+@import "variables";
+
+@keyframes wifi {
+  0% { opacity: 0; }
+  5% { opacity: 0.2; }
+  10% { opacity: 0.2; }
+  15% { opacity: 0; }
+  100% { opacity: 0; }
+} 
+
+#skyline {
+	fill: darken($brand-primary, 3%);
+	fill-opacity: 1;
+	stroke: none;
+}
+
+.wifi {
+	opacity: 0;
+	fill: lighten($brand-primary, 10%);
+	animation-name: wifi;
+    animation-iteration-count: infinite;
+}
+
+@for $i from 1 through 15 {
+    #wifi#{$i} {
+        animation-delay: (($i % 4) + ($i % 6)) * 1s;
+        animation-duration: (13 + ($i % 5)) * 1s;
+    }
+}
