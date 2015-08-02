@@ -4,6 +4,6 @@
 
 {% block included_content_permalink %}
     {% if permalink %}
-        <a class="btn btn-default permalink" href="{{ permalink }}">{% theme_icon "link" %}</a>
+        <a class="btn btn-default permalink" href="{{ permalink }}" title="{% trans "Permalink" %}">{% theme_icon "link" %}</a>
     {% endif %}
 {% endblock included_content_permalink %}
