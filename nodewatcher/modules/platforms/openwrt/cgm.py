@@ -853,6 +853,11 @@ def network(node, cfg):
                 'kmod-usb2',
             ])
         elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
+            # Check if we need to configure the switch.
+            port = device.get_port(interface.eth_port)
+            if isinstance(port, cgm_devices.SwitchedEthernetPort):
+                configure_switch(cfg, device, port)
+
             if check_interface_bridged(interface) is not None:
                 continue
 
@@ -880,11 +885,6 @@ def network(node, cfg):
                 iface.macaddr = interface.mac_address
 
             configure_interface(cfg, interface, iface, interface.eth_port)
-
-            # Check if we need to configure the switch
-            port = device.get_port(interface.eth_port)
-            if isinstance(port, cgm_devices.SwitchedEthernetPort):
-                configure_switch(cfg, device, port)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
             # Configure virtual interfaces on top of the same radio device
             dsc_radio = device.get_radio(interface.wifi_radio)
