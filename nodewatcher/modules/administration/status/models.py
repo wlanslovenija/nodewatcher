@@ -22,15 +22,15 @@ registration.point('node.monitoring').register_item(StatusMonitor)
 # Register valid network states
 registration.point('node.monitoring').register_choice(
     'core.status#network',
-    registration.Choice('up', _("Up"), help_text=_("The node is reachable."), icon='network_up'),
+    registration.Choice('up', _("Up"), help_text=_("The node is reachable."), icon='up'),
 )
 registration.point('node.monitoring').register_choice(
     'core.status#network',
-    registration.Choice('down', _("Down"), help_text=_("The node is not connected to the network."), icon='network_down'),
+    registration.Choice('down', _("Down"), help_text=_("The node is not connected to the network."), icon='down'),
 )
 registration.point('node.monitoring').register_choice(
     'core.status#network',
-    registration.Choice('visible', _("Visible"), help_text=_("The node is connected to the network but a network connection to it cannot be established."), icon='network_visible'),
+    registration.Choice('visible', _("Visible"), help_text=_("The node is connected to the network but a network connection to it cannot be established."), icon='visible'),
 )
 registration.point('node.monitoring').register_choice(
     'core.status#network',

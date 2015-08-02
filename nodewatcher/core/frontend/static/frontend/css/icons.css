@@ -23,6 +23,12 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.nw-visible:before {
+	content: "\e600";
+}
+.nw-down:before {
+	content: "\e601";
+}
 .nw-errors:before {
 	content: "\f057";
 }
@@ -38,6 +44,9 @@
 .nw-monitored:before {
 	content: "\f06e";
 }
-.nw-notmonitored:before {
+.nw-unmonitored:before {
 	content: "\f070";
+}
+.nw-up:before {
+	content: "\f1eb";
 }
