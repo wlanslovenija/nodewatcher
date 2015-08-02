@@ -2,17 +2,16 @@
 
 {% contextblock %}
     {% load future i18n sekizai_tags html_tags %}
-
     {% trans "My Nodes" as title %}
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% heading 2 _("Other Formats") %}
-
-    <ul class="altlinks-list mynodes-list-altlinks">
-        <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?maintainer={{ request.user.username|urlencode }}&format=xml">{% trans "XML" %}</a></li>
-        <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "node" %}?maintainer={{ request.user.username|urlencode }}&format=json">{% trans "JSON" %}</a></li>
-    </ul>
+    {% url "api:api_dispatch_list" "v1" "node" as api_url %}
+    {% with username=request.user.username|urlencode %}
+    {% with api_url|add:"?maintainer="|add:username as url %}
+    {% include "formats.html" %}
+    {% endwith %}
+    {% endwith %}
 {% endblock altlinks %}
 
 {% block node_list_data_source %}{{ block.super }}?maintainer={{ request.user.username|urlencode }}{% endblock node_list_data_source %}

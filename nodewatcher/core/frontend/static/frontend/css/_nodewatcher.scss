@@ -1,17 +1,43 @@
 
 .altlinks {
     text-align: center;
+    margin-top: 10px;
+
     .altlinks-list {
         li {
             display: inline-block;
             list-style-type: none;
-            padding: 5px;
-            margin: 5px;
+            padding: 0;
+            margin: 0;
         }
-        padding: 5px;
-        margin: 5px;
+
+        li:before {
+            content: "\000B7";
+            color: $gray-light;
+            padding-right: 5px;
+        }
+
+        li:first-child:before {
+            content: "";
+            padding-right: 0;
+        }
+
+        display: inline-block;
+        padding: 2px;
+        margin: 2px;
     }
 
+    color: $gray-light;
+
+    h2 {
+        font-size: inherit;
+        display: inline-block;
+        width: auto;
+    }
+
+    h2:after {
+        content: ":";
+    }
 }
 
 footer {

@@ -8,12 +8,10 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% heading 2 _("Other Formats") %}
-
-    <ul class="altlinks-list node-display-altlinks">
-        <li class="xml"><a href="{% url "api:api_dispatch_detail" "v1" "node" node.pk %}?format=xml">{% trans "XML" %}</a></li>
-        <li class="json"><a href="{% url "api:api_dispatch_detail" "v1" "node" node.pk %}?format=json">{% trans "JSON" %}</a></li>
-    </ul>
+    {% url "api:api_dispatch_detail" "v1" "node" node.pk as api_url %}
+    {% with api_url as url %}
+    {% include "formats.html" %}
+    {% endwith %}
 {% endblock altlinks %}
 
 {% block content_before %}

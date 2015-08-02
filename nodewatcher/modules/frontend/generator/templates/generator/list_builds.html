@@ -14,10 +14,10 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    <ul class="altlinks-list node-list-altlinks">
-        <li class="xml"><a href="{% url "api:api_dispatch_list" "v1" "build_result" %}?format=xml">{% trans "XML" %}</a></li>
-        <li class="json"><a href="{% url "api:api_dispatch_list" "v1" "build_result" %}?format=json">{% trans "JSON" %}</a></li>
-    </ul>
+    {% url "api:api_dispatch_list" "v1" "build_result" as api_url %}
+    {% with api_url as url %}
+    {% include "formats.html" %}
+    {% endwith %}
 {% endblock altlinks %}
 
 {% block content %}

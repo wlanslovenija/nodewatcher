@@ -1,0 +1,12 @@
+{% load i18n url_tools %}
+{% if url %}
+{% block formats_wrapper %}
+	<div class="formats">
+	<h2>{% trans "Other Formats" %}</h2>
+    <ul class="altlinks-list">
+        <li class="xml"><a href="{% url_add_params url format="xml" %}">{% trans "XML" %}</a></li>
+        <li class="json"><a href="{% url_add_params url format="json" %}">{% trans "JSON" %}</a></li>
+    </ul>
+    </div>
+{% endblock formats_wrapper %}
+{% endif %}
