@@ -1,0 +1,27 @@
+{% load i18n node_status_tags registry %}
+<script type="text/javascript">
+(function ($) {
+    if (!$.nodewatcher) { $.nodewatcher = {}; }
+    $.extend($.nodewatcher, {
+        'nodeStatusNetwork' : {
+            {% registry_get_choices "node.monitoring" "core.status#network" as network_status_choices %}
+            {% for choice in network_status_choices %}
+                "{{ choice.name }}" : { 'description' : "{{ choice.help_text|safe }}", 'icon' : '{{ choice.icon }}' } {% if not forloop.last %},{% endif %}
+            {% endfor %}
+
+        },
+        'nodeStatusMonitored' : {
+            {% registry_get_choices "node.monitoring" "core.status#monitored" as monitored_status_choices %}            
+            {% for choice in monitored_status_choices %}
+                "{{ choice.name }}" : { 'description' : "{{ choice.help_text|safe }}", 'icon' : '{{ choice.icon }}' } {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        },
+        'nodeStatusHealth' : {
+            {% registry_get_choices "node.monitoring" "core.status#health" as health_status_choices %}
+            {% for choice in health_status_choices %}
+                "{{ choice.name }}" : { 'description' : "{{ choice.help_text|safe }}", 'icon' : '{{ choice.icon }}' } {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        }
+    })
+})(jQuery);
+</script>

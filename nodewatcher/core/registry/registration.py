@@ -13,11 +13,12 @@ bases = registry_state.bases
 
 
 class Choice(object):
-    def __init__(self, name, verbose_name, help_text=None, limited_to=None):
+    def __init__(self, name, verbose_name, help_text=None, limited_to=None, icon=None):
         self.name = name
         self.verbose_name = verbose_name
         self.help_text = help_text
         self.limited_to = limited_to
+        self.icon = icon
 
     def get_field_tuple(self):
         return (self.name, self.verbose_name)

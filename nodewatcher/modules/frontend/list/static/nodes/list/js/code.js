@@ -6,9 +6,9 @@
                     {'data': 'type', 'visible': false},
                     {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
                     {'data': 'last_seen'},
-                    {'data': 'status.network'},
-                    {'data': 'status.monitored'},
-                    {'data': 'status.health'},
+                    {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network') },
+                    {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored')},
+                    {'data': 'status.health', 'render': $.nodewatcher.renderStatus(table, 'Health')},
                     {'data': 'project'},
                     // So that user can search by UUID
                     {'data': 'uuid', 'visible': false}

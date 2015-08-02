@@ -8,9 +8,11 @@
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
     {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "nodes/js/status.js" %}
     {% add_data "js_data" "nodes/list/js/code.js" %}
 
     {% trans "Node List" as title %}
+
 {% endcontextblock %}
 
 {% block altlinks %}
@@ -21,13 +23,14 @@
 {% endblock altlinks %}
 
 {% block content %}
+    {% include "nodes/status/definitions.html" %}
     <table class="table table-striped node-list {% block node_list_classes %}{% endblock node_list_classes %}" data-source="{% block node_list_data_source %}{% url "api:api_dispatch_list" "v1" "node" %}{% endblock node_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
         <thead>
             <tr>
                 <th>{# Hidden node type #}</th>
                 <th title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
                 <th title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
-                <th title="{% trans "Current status of the node's connection to the network." %}">{% trans "Network" %}</th>
+                <th title="{% trans "Current status of the connection to the network." %}">{% trans "Network" %}</th>
                 <th title="{% filter striptags %}{% trans "Is the node monitored by <i>nodewatcher</i>." %}{% endfilter %}">{% trans "Monitored" %}</th>
                 <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
                 <th title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
