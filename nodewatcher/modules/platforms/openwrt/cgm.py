@@ -353,18 +353,50 @@ class OpenWrtCryptoManager(cgm_base.PlatformCryptoManager):
     object_class = CryptoObject
 
 
+class OpenWrtSysctlManager(object):
+    """
+    OpenWrt-specific sysctl manager.
+    """
+
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self._settings = {}
+
+    def set_variable(self, key, value):
+        """
+        Sets a sysctl variable.
+
+        :param key: Variable key
+        :param value: Variable value
+        """
+
+        self._settings[key] = value
+
+    def get_config(self):
+        """
+        Returns sysctl configuration suitable for use in JSON documents.
+        """
+
+        return self._settings
+
+
 class UCIConfiguration(cgm_base.PlatformConfiguration):
     """
     An in-memory implementation of UCI configuration.
     """
 
     crypto_manager_class = OpenWrtCryptoManager
+    sysctl_manager_class = OpenWrtSysctlManager
 
     def __init__(self):
         """
         Class constructor.
         """
         super(UCIConfiguration, self).__init__()
+        self.sysctl = self.sysctl_manager_class()
         self._roots = {}
 
     def get_build_config(self):
@@ -377,6 +409,9 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
 
         result = self.format(fmt=UCIFormat.FILES)
         result.update(super(UCIConfiguration, self).get_build_config())
+        result.update({
+            '_sysctl': self.sysctl.get_config(),
+        })
         return result
 
     def __getattr__(self, root):
@@ -456,6 +491,9 @@ def general(node, cfg):
         system.timezone = posix_tz.get_posix_tz(settings.TIME_ZONE)
         if not system.timezone:
             system.timezone = 'UTC'
+
+    # Reboot system in 3 seconds after a kernel panic.
+    cfg.sysctl.set_variable('kernel.panic', 3)
 
     # Setup base packages to be installed.
     cfg.packages.update([
@@ -745,11 +783,34 @@ def network(node, cfg):
     lo.ipaddr = '127.0.0.1'
     lo.netmask = '255.0.0.0'
 
-    # Configure default routing table names
+    # Configure default routing table names.
     cfg.routing_tables.set_table('local', 255)
     cfg.routing_tables.set_table('main', 254)
     cfg.routing_tables.set_table('default', 253)
     cfg.routing_tables.set_table('unspec', 0)
+
+    # Configure IPv4 defaults.
+    cfg.sysctl.set_variable('net.ipv4.conf.default.arp_ignore', 1)
+    cfg.sysctl.set_variable('net.ipv4.conf.all.arp_ignore', 1)
+    cfg.sysctl.set_variable('net.ipv4.icmp_echo_ignore_broadcasts', 1)
+    cfg.sysctl.set_variable('net.ipv4.icmp_ignore_bogus_error_responses', 1)
+    cfg.sysctl.set_variable('net.ipv4.igmp_max_memberships', 100)
+    cfg.sysctl.set_variable('net.ipv4.tcp_ecn', 0)
+    cfg.sysctl.set_variable('net.ipv4.tcp_fin_timeout', 30)
+    cfg.sysctl.set_variable('net.ipv4.tcp_keepalive_time', 120)
+    cfg.sysctl.set_variable('net.ipv4.tcp_syncookies', 1)
+    cfg.sysctl.set_variable('net.ipv4.tcp_timestamps', 1)
+    cfg.sysctl.set_variable('net.ipv4.tcp_sack', 1)
+    cfg.sysctl.set_variable('net.ipv4.tcp_dsack', 1)
+
+    # Enable forwarding for IPv4 and IPv6.
+    cfg.sysctl.set_variable('net.ipv4.ip_forward', 1)
+    cfg.sysctl.set_variable('net.ipv6.conf.default.forwarding', 1)
+    cfg.sysctl.set_variable('net.ipv6.conf.all.forwarding', 1)
+
+    # Ensure IPv6 DAD (Duplicate Address Detection) is disabled as it may cause problems.
+    cfg.sysctl.set_variable('net.ipv6.conf.default.accept_dad', 0)
+    cfg.sysctl.set_variable('net.ipv6.conf.all.accept_dad', 0)
 
     # Obtain the device descriptor for this device
     device = node.config.core.general().get_device()
@@ -1113,7 +1174,20 @@ def firewall(node, cfg):
     Configures the firewall.
     """
 
-    # Setup chain defaults
+    # Configure netfilter defaults.
+    cfg.sysctl.set_variable('net.netfilter.nf_conntrack_acct', 1)
+    cfg.sysctl.set_variable('net.netfilter.nf_conntrack_checksum', 0)
+    cfg.sysctl.set_variable('net.netfilter.nf_conntrack_max', 16384)
+    cfg.sysctl.set_variable('net.netfilter.nf_conntrack_tcp_timeout_established', 7440)
+    cfg.sysctl.set_variable('net.netfilter.nf_conntrack_udp_timeout', 60)
+    cfg.sysctl.set_variable('net.netfilter.nf_conntrack_udp_timeout_stream', 180)
+
+    # Disable bridge firewalling by default.
+    cfg.sysctl.set_variable('net.bridge.bridge-nf-call-arptables', 0)
+    cfg.sysctl.set_variable('net.bridge.bridge-nf-call-ip6tables', 0)
+    cfg.sysctl.set_variable('net.bridge.bridge-nf-call-iptables', 0)
+
+    # Setup chain defaults.
     defaults = cfg.firewall.add('defaults')
     defaults.synflood_protect = True
     defaults.input = 'ACCEPT'

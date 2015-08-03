@@ -101,7 +101,7 @@ def olsr(node, cfg):
     # Ensure that forwarding between all OLSR interfaces is allowed
     firewall = cfg.firewall.add('zone')
     firewall.name = 'olsr'
-    firewall.network = routable_ifaces + announced_ifaces
+    firewall.network = list(set(routable_ifaces + announced_ifaces))
     firewall.input = 'ACCEPT'
     firewall.output = 'ACCEPT'
     firewall.forward = 'ACCEPT'
