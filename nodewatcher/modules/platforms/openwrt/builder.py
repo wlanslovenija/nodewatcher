@@ -44,6 +44,13 @@ def build_image(result, profile):
             banner.write(cfg['_banner'])
             builder.write_file(os.path.join(temp_path, 'etc', 'banner'), banner.getvalue().encode('ascii'))
 
+        # Prepare the sysctl configuration.
+        if cfg.get('_sysctl', None):
+            sysctl = io.StringIO()
+            for key, value in cfg['_sysctl'].items():
+                sysctl.write('%s=%s\n' % (key, value))
+            builder.write_file(os.path.join(temp_path, 'etc', 'sysctl.conf'), sysctl.getvalue().encode('ascii'))
+
         # Prepare the routing table mappings.
         tables = io.StringIO()
         for identifier, name in cfg['_routing_tables'].items():
