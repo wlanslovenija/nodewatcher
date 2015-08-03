@@ -41,11 +41,6 @@
         {% endif %}
     {% endblock messages_wrapper %}
     {{ block.super }}
-    {% block altlinks_wrapper %}
-        <section class="altlinks {% block altlinks_classes %}{% endblock altlinks_classes %}">
-            {% block altlinks %}{% endblock altlinks %}
-        </section>
-    {% endblock altlinks_wrapper %}
 {% endblock content_wrapper %}
 
 {% block content_before %}
@@ -67,3 +62,12 @@
     {% endblock %}
     {{ block.super }}
 {% endblock content_before %}
+
+{% block footer %}
+    {% block altlinks_wrapper %}
+        <section class="altlinks {% block altlinks_classes %}{% endblock altlinks_classes %}">
+            {% block altlinks %}{% endblock altlinks %}
+        </section>
+    {% endblock altlinks_wrapper %}
+    {{ block.super }}
+{% endblock footer %}
