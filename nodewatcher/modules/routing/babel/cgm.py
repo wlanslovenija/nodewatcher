@@ -103,7 +103,7 @@ def babel(node, cfg):
     # Ensure that forwarding between all Babel interfaces is allowed.
     firewall = cfg.firewall.add('zone')
     firewall.name = 'babel'
-    firewall.network = routable_ifaces + announced_ifaces
+    firewall.network = list(set(routable_ifaces + announced_ifaces))
     firewall.input = 'ACCEPT'
     firewall.output = 'ACCEPT'
     firewall.forward = 'ACCEPT'
