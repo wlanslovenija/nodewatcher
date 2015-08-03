@@ -26,7 +26,9 @@
 {% endblock content_before %}
 
 {% block content %}
-    <form class="form-horizontal" method="post" action="{% url "EditorComponent:edit" node.pk %}">
+<div class="row">
+<div class="col-md-9" role="main">
+    <form class="form-horizontal registry" method="post" action="{% url "EditorComponent:edit" node.pk %}">
         {% csrf_token %}
         <div id="registry_forms">
             {% include "registry/forms.html" %}
@@ -38,4 +40,9 @@
         </p>
 
     </form>
+</div>
+<div class="col-md-3" role="complementary">
+    {% include "registry/menu.html" %}
+</div>
+</div>
 {% endblock %}

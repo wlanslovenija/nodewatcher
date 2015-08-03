@@ -11,7 +11,7 @@
 {% endif %}
 
 {% for descriptor in registry_forms %}
-    <legend>{{ descriptor.name }}</legend>
+    <legend id="registry_{{ descriptor.id|anchorify }}"><a name="registry_{{ descriptor.id|anchorify }}"></a>{{ descriptor.name }}</legend>
     {% if descriptor.multiple %}
         {{ descriptor.submeta }}
         <div id="{{ descriptor.prefix }}_mu_container">
