@@ -238,6 +238,9 @@ INSTALLED_APPS = (
     'nodewatcher.extra.jquery',
     'nodewatcher.extra.normalize',
 
+    # Extend the default frontend with skyline banner
+    'nodewatcher.modules.frontend.skyline', 
+
     # Ours are at the beginning so that we can override default templates in 3rd party Django apps.
     'nodewatcher.core',
     'nodewatcher.core.allocation',

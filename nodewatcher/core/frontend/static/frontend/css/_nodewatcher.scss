@@ -72,16 +72,9 @@ footer {
     position: relative;
 }
 
-.navbar-static-top #skyline {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: -10;
-}
-
 .navbar-static-top {
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+    @include gradient(saturate($brand-primary, 15%), lighten($brand-primary, 15%))
 }
 
 .container > .accounts-menu > .btn-group {

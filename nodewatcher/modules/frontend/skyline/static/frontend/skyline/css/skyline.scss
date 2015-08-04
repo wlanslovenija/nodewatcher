@@ -12,14 +12,14 @@ $bootstrap-sass-asset-helper: true;
 } 
 
 #skyline {
-	fill: darken($brand-primary, 3%);
+	fill: $brand-primary;
 	fill-opacity: 1;
 	stroke: none;
 }
 
 .wifi {
 	opacity: 0;
-	fill: lighten($brand-primary, 10%);
+	fill: $brand-primary;
 	animation-name: wifi;
     animation-iteration-count: infinite;
 }
