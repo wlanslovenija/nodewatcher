@@ -39,7 +39,7 @@ def account(request):
     assert request.user.is_authenticated()
 
     if request.method == 'POST':
-        stored_user = copy.copy(request.user)
+        stored_user = User.objects.get(pk=request.user.pk)
         form = forms.AccountChangeForm(request.POST, instance=[request.user, request.user.profile])
         if form.is_valid():
             objs = form.save()
