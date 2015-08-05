@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="row snippet node-name">
+<div class="col-md-2 key">{% trans "Maintainers" %}</div>
+<div class="col-md-10 value">
+<ul class="maintainers users">
+    {% for maintainer in maintainers %}
+        <li><a class="user maintainer" href="{{ maintainer.get_absolute_url }}">{{ maintainer.username }}</a></li>
+    {% endfor %}
+</ul>
+</div>
+</div>

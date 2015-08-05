@@ -1,0 +1,12 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load partial_tags theme_tags %}
+
+{% get_partial "node_general_partial" as node_general_partial %}
+
+{% block included_node_general %}
+	{% theme_legend _("General information") %}
+    {% with partial=node_general_partial %}
+        {% include "base/partial.html" %}
+    {% endwith %}
+{% endblock included_node_general %}

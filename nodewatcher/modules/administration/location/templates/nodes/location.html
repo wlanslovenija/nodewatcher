@@ -1,0 +1,32 @@
+{% contextblock %}
+    {% load sekizai_tags html_tags leaflet_tags theme_tags %}
+    {% addtoblock "css" %}{% leaflet_css %}{% endaddtoblock %}
+    {% addtoblock "js" %}{% leaflet_js %}{% endaddtoblock %}
+    {% add_data "js_data" "map/js/api.js" %}
+    {% add_data "js_data" "location/js/map.js" %}
+{% endcontextblock %}
+
+{% load i18n %}
+{% theme_legend _("Location") %}
+<div class="location">
+{% if node_location.geolocation %}
+{% with node.name|anchorify as widget_id %}
+<a href="#" class="reset address" onclick="snippet_map_{{ widget_id }}_center(); return false;">{% blocktrans with node_address=node_location.address|default:_("unknown") node_city=node_location.city|default:_("unknown") node_country=node_location.get_country_display|default:_("unknown") %}{{ node_address }}, {{ node_city }}, {{ node_country }}{% endblocktrans %}</a>
+<script type="text/javascript">
+	snippet_map_{{ widget_id }}_map = null;
+    function snippet_map_{{ widget_id }} (map, options) {
+    	snippet_map_{{ widget_id }}_map = map;
+        new L.marker([{{ node_location.geolocation.y }}, {{ node_location.geolocation.x }}]).addTo(map);
+    	snippet_map_{{ widget_id }}_center ();        
+    }
+    function snippet_map_{{ widget_id }}_center () {
+    	if (snippet_map_{{ widget_id }}_map)
+    	snippet_map_{{ widget_id }}_map.setView([{{ node_location.geolocation.y }}, {{ node_location.geolocation.x }}], 18);        
+    }
+</script>
+{% leaflet_map widget_id callback="snippet_map_"|add:widget_id %}
+{% endwith %}
+{% else %}
+{% blocktrans with node_address=node_location.address|default:_("unknown") node_city=node_location.city|default:_("unknown") node_country=node_location.get_country_display|default:_("unknown") %}{{ node_address }}, {{ node_city }}, {{ node_country }}{% endblocktrans %}
+{% endif %}
+</div>
