@@ -1,7 +1,7 @@
 import datetime
 
 from django import dispatch
-from django.db import models, utils
+from django.db import models, transaction
 from django.db.models import signals as django_signals
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -355,6 +355,15 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
 
         return self.allocation == other.allocation
 
+    def update_if_exists(self):
+        with transaction.atomic():
+            # Check if an object actually exists in the database. It may have already been removed
+            # from the database and in this case, we should not do anything.
+            if not self.__class__.objects.filter(pk=self.pk).exists():
+                return
+
+            self.save()
+
     def satisfy_from(self, other):
         """
         Attempts to satisfy this request by taking resources from an existing one.
@@ -379,12 +388,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             return False
 
         self.allocation = other.allocation
-        try:
-            # Force an update as someone may call free on an allocation object that was
-            # already deleted in the database and in this case we should not create a new one.
-            self.save(force_update=True)
-        except (ValueError, utils.DatabaseError):
-            pass
+        self.update_if_exists()
 
         return True
 
@@ -424,12 +428,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             self.allocation = self.pool.allocate_subnet(self.prefix_length)
 
         if self.allocation is not None:
-            try:
-                # Force an update as someone may call free on an allocation object that was
-                # already deleted in the database and in this case we should not create a new one.
-                self.save(force_update=True)
-            except (ValueError, utils.DatabaseError):
-                pass
+            self.update_if_exists()
         else:
             raise registry_forms.RegistryValidationError(
                 _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
@@ -448,12 +447,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         self.allocation.free()
         self.allocation = None
 
-        try:
-            # Force an update as someone may call free on an allocation object that was
-            # already deleted in the database and in this case we should not create a new one.
-            self.save(force_update=True)
-        except (ValueError, utils.DatabaseError):
-            pass
+        self.update_if_exists()
 
     def get_routerid_family(self):
         """
