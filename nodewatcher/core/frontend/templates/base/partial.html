@@ -1,6 +1,6 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load partial_tags %}
+{% load partial_tags i18n %}
 
 {% comment %}
 This template uses `partial` (partial object) in the context.
@@ -8,7 +8,7 @@ This template uses `partial` (partial object) in the context.
 
 {% block included_partial_wrapper %}
     {% if partial %}
-        <section class="partial-section partial-{{ partial.name }} {% block included_partial_classes %}{% endblock included_partial_classes %}">
+        <section class="partial partial-{{ partial.name }} {% block included_partial_classes %}{% endblock included_partial_classes %}">
             {% block included_partial %}
                 {% for partial_entry in partial %}
                     {% block included_partial_entry %}

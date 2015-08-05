@@ -1,7 +1,7 @@
 {% overextends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n %}
+    {% load future i18n partial_tags %}
 
     {% setcontext as title %}{% blocktrans %}Reset Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
     {% setcontext as heading %}{% spaceless %}
@@ -18,9 +18,12 @@
     {% endblock node_reset_warning_wrapper %}
 
     <section class="node">
-    {% block node_snippet_wrapper %}
-        {% include "nodes/node_reset_snippet.html" %}
-    {% endblock node_snippet_wrapper %}
+    {% block node_information_wrapper %}
+        {% get_partial "node_general_partial" as node_general_partial %}
+        {% with partial=node_general_partial %}
+            {% include "base/partial.html" %}
+        {% endwith %}
+    {% endblock node_information_wrapper %}
     </section>
 
     {% block node_reset_form_wrapper %}

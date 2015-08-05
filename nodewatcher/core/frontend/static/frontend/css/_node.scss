@@ -4,6 +4,38 @@
 	margin: 10px 10px 10px 0;
 }
 
+.partial {
+	.leaflet-container {
+		margin: 20px 0;
+	}
+
+	ul.users {
+
+		li {
+            display: inline-block;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li:before {
+            content: ", ";
+            color: $gray-light;
+            padding-right: 5px;
+        }
+
+        li:first-child:before {
+            content: "";
+            padding-right: 0;
+        }
+
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+
+	}
+}
+
 .icon.nw-unknown {
 	color: $gray;
 }

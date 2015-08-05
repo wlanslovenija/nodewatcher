@@ -9,7 +9,7 @@ from . import resources
 statistics_pool.register(resources.NodesByProjectResource())
 
 
-components.partials.get_partial('node_snippet_partial').add(components.PartialEntry(
+components.partials.get_partial('node_general_partial').add(components.PartialEntry(
     name='project',
     template='nodes/snippet/project.html',
     extra_context=lambda context: {
