@@ -36,15 +36,39 @@ class RegistryFormMixin(object):
 
 
 class RegistryCreateFormMixin(RegistryFormMixin):
+    @transaction.atomic
     def get(self, request, *args, **kwargs):
         self.object = None
 
-        self.dynamic_forms = registry_forms.prepare_root_forms(
-            'node.config',
-            request,
-            None,
-            flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT | registry_forms.FORM_DEFAULTS,
-        )
+        sid = transaction.savepoint()
+        try:
+            self.object = core_models.Node()
+            self.object.save()
+
+            form_state = registry_forms.prepare_root_forms(
+                'node.config',
+                request,
+                self.object,
+                flags=registry_forms.FORM_INITIAL | registry_forms.FORM_ONLY_DEFAULTS | registry_forms.FORM_ROOT_CREATE,
+            )
+
+            has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(
+                'node.config',
+                request,
+                self.object,
+                save=True,
+                form_state=form_state,
+                flags=registry_forms.FORM_OUTPUT,
+            )
+
+            self.dynamic_forms.root = None
+        finally:
+            try:
+                transaction.savepoint_rollback(sid)
+            except transaction.TransactionManagementError:
+                # Rollback will fail if some query caused a database error and the whole
+                # transaction is aborted anyway.
+                pass
 
         return self.render_to_response(self.get_context_data())
 
@@ -62,7 +86,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 request,
                 self.object,
                 data=request.POST,
-                flags=registry_forms.FORM_ONLY_DEFAULTS,
+                flags=registry_forms.FORM_ONLY_DEFAULTS | registry_forms.FORM_ROOT_CREATE,
             )
 
             has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(
@@ -87,7 +111,13 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 self.dynamic_forms.root = None
                 return self.form_invalid()
         except:
-            transaction.savepoint_rollback(sid)
+            try:
+                transaction.savepoint_rollback(sid)
+            except transaction.TransactionManagementError:
+                # Rollback will fail if some query caused a database error and the whole
+                # transaction is aborted anyway.
+                pass
+
             raise
 
 

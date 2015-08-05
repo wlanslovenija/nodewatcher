@@ -23,7 +23,11 @@ def evaluate_forms(request, regpoint_id, root_id):
 
     sid = transaction.savepoint()
     try:
+        additional_flags = 0
+
         if root is None:
+            # If there is no root then we must be just creating it.
+            additional_flags = registry_forms.FORM_ROOT_CREATE
             # Create a fake temporary root (will not be saved because the transaction will be rolled back).
             temp_root = True
             root = regpoint.model()
@@ -35,7 +39,7 @@ def evaluate_forms(request, regpoint_id, root_id):
             request,
             root,
             request.POST,
-            flags=registry_forms.FORM_ONLY_DEFAULTS,
+            flags=registry_forms.FORM_ONLY_DEFAULTS | additional_flags,
         )
 
         # Merge in client actions when available.
@@ -67,7 +71,12 @@ def evaluate_forms(request, regpoint_id, root_id):
         if temp_root:
             forms.root = None
     finally:
-        transaction.savepoint_rollback(sid)
+        try:
+            transaction.savepoint_rollback(sid)
+        except transaction.TransactionManagementError:
+            # Rollback will fail if some query caused a database error and the whole
+            # transaction is aborted anyway.
+            pass
 
     # Render forms and return them.
     return shortcuts.render_to_response(

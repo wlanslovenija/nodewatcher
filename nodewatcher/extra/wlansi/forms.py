@@ -1,10 +1,91 @@
 from django.db import models
 
+from nodewatcher.core.allocation.ip import models as ip_models
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.registry import forms as registry_forms, registration
 
+from nodewatcher.modules.administration.types import models as type_models
+from nodewatcher.modules.administration.projects import models as project_models
 from nodewatcher.modules.vpn.tunneldigger import models as td_models
 from nodewatcher.modules.services.dns import models as dns_models
+
+
+class DefaultType(registry_forms.FormDefaults):
+    def set_defaults(self, state, create):
+        # If we are not creating a new node, ignore this.
+        if not create:
+            return
+
+        # Choose a default type.
+        type_config = state.lookup_item(type_models.TypeConfig)
+        if not type_config:
+            state.append_item(type_models.TypeConfig, type='wireless')
+        elif not type_config.type:
+            state.update_item(type_config, type='wireless')
+
+registration.point('node.config').add_form_defaults(DefaultType())
+
+
+class DefaultProject(registry_forms.FormDefaults):
+    def set_defaults(self, state, create):
+        # If we are not creating a new node, ignore this.
+        if not create:
+            return
+
+        # Default to project 'Slovenia' in case it exists.
+        try:
+            slovenia_project = project_models.Project.objects.get(name='Slovenija')
+        except project_models.Project.DoesNotExist:
+            return
+
+        # Choose a default project.
+        project_config = state.lookup_item(project_models.ProjectConfig)
+        if not project_config:
+            state.append_item(project_models.ProjectConfig, project=slovenia_project)
+        else:
+            try:
+                if project_config.project:
+                    return
+            except project_models.Project.DoesNotExist:
+                state.update_item(project_config, project=slovenia_project)
+
+registration.point('node.config').add_form_defaults(DefaultProject())
+
+
+class DefaultRouterID(registry_forms.FormDefaults):
+    def set_defaults(self, state, create):
+        # If we are not creating a new node, ignore this.
+        if not create:
+            return
+
+        # Ensure there is one router ID allocated from the default pool.
+        router_ids = state.filter_items('core.routerid')
+
+        # Check if we have a project selected.
+        project_config = state.lookup_item(project_models.ProjectConfig)
+        try:
+            if not project_config or not project_config.project:
+                return
+        except project_models.Project.DoesNotExist:
+            return
+
+        # Create a new allocated router identifier from the default IP pool.
+        if router_ids:
+            state.update_item(
+                router_ids[0],
+                family='ipv4',
+                pool=project_config.project.default_ip_pool,
+                prefix_length=29,
+            )
+        else:
+            state.append_item(
+                ip_models.AllocatedIpRouterIdConfig,
+                family='ipv4',
+                pool=project_config.project.default_ip_pool,
+                prefix_length=29,
+            )
+
+registration.point('node.config').add_form_defaults(DefaultRouterID())
 
 
 class STAChannelAutoselect(registry_forms.FormDefaults):
@@ -13,7 +94,7 @@ class STAChannelAutoselect(registry_forms.FormDefaults):
     channel selection.
     """
 
-    def set_defaults(self, state):
+    def set_defaults(self, state, create):
         # Iterate over all configured radios and VIFs.
         for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
             # TODO: Improve this filtering.
@@ -33,7 +114,7 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
     uplink interface is configured.
     """
 
-    def set_defaults(self, state):
+    def set_defaults(self, state, create):
         # Check if there are any uplink interfaces.
         if state.filter_items('core.interfaces', uplink=True):
             self.update_tunneldigger(state)
@@ -93,7 +174,7 @@ class DnsServers(registry_forms.FormDefaults):
     Automatically configures DNS servers.
     """
 
-    def set_defaults(self, state):
+    def set_defaults(self, state, create):
         # Get the DNS servers that should be configured on the current node.
         existing_servers = state.filter_items('core.servers.dns', klass=dns_models.DnsServerConfig)
         configured = self.get_servers(state)

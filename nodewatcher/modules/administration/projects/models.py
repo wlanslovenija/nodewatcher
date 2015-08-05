@@ -49,14 +49,23 @@ class Project(models.Model):
     description = models.TextField(null=True, blank=True)
     location = gis_models.PointField(null=True)
 
-    # Pools linked to this project
-    pools_core_ippool = models.ManyToManyField(
+    # Pools linked to this project.
+    ip_pools = models.ManyToManyField(
         'core.IpPool',
         related_name='projects',
         verbose_name=_("IP pools"),
         null=True,
         blank=True,
-        # Only toplevel pools should be selected
+        # Only toplevel pools should be selected.
+        limit_choices_to={'parent': None},
+    )
+
+    # Default pool.
+    default_ip_pool = models.ForeignKey(
+        'core.IpPool',
+        related_name='+',
+        verbose_name=_("Default IP pool"),
+        # Only toplevel pools should be selected.
         limit_choices_to={'parent': None},
     )
 

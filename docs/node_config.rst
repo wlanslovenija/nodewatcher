@@ -96,8 +96,11 @@ deployments.
    :param location: Geographical location of the project.
    :type location: geometry
 
-   :param pools_core_ippool: IP allocation pools that may be used by this project.
-   :type pools_core_ippool: many to many to :class:`~nodewatcher.core.allocation.ip.models.IpPool`
+   :param ip_pools: IP allocation pools that may be used by this project.
+   :type ip_pools: many to many to :class:`~nodewatcher.core.allocation.ip.models.IpPool`
+
+   :param default_ip_pool: Default IP allocation pool.
+   :type default_ip_pool: foreign key to :class:`~nodewatcher.core.allocation.ip.models.IpPool`
 
 Each project may have multiple SSID configurations attached.
 

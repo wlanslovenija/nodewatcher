@@ -8,5 +8,5 @@ class FormDefaults(object):
     An abstract class for defining form defaults setters.
     """
 
-    def set_defaults(self, state):
+    def set_defaults(self, state, create):
         raise NotImplementedError

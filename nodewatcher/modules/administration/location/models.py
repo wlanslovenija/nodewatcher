@@ -13,11 +13,11 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     Describes the location of a node.
     """
 
-    address = models.CharField(max_length=100)
-    city = models.CharField(max_length=100) # TODO: Autocomplete city field?
-    country = country_field.CountryField()
-    timezone = timezone_field.TimeZoneField(null=True)
-    geolocation = gis_models.PointField(null=True)
+    address = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True) # TODO: Autocomplete city field?
+    country = country_field.CountryField(null=True, blank=True)
+    timezone = timezone_field.TimeZoneField(null=True, blank=True)
+    geolocation = gis_models.PointField(null=True, blank=True)
     altitude = models.FloatField(default=0)
 
     geo_objects = gis_models.GeoManager()

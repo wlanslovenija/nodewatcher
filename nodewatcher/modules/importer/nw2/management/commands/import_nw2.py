@@ -297,6 +297,8 @@ class Command(base.BaseCommand):
             if project['geo_lat'] and project['geo_long']:
                 project_mdl.location = 'POINT(%f %f)' % (project['geo_long'], project['geo_lat'])
 
+            project_mdl.default_ip_pool = data['pools'][str(project['pool_id'])]['_model']
+
             project_mdl.save()
             project['_model'] = project_mdl
 
@@ -319,7 +321,7 @@ class Command(base.BaseCommand):
                 )
 
             for pool in project['pools']:
-                project_mdl.pools_core_ippool.add(data['pools'][str(pool)]['_model'])
+                project_mdl.ip_pools.add(data['pools'][str(pool)]['_model'])
 
     def import_vpn_servers(self, data):
         self.stdout.write('Importing %d VPN servers...\n' % len(VPN_SERVERS))

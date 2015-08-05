@@ -283,7 +283,7 @@ class FormState(dict):
 
         return item
 
-    def lookup_item(self, cls, index, parent=None):
+    def lookup_item(self, cls, index=0, parent=None):
         """
         Performs a form state item lookup.
 
@@ -376,12 +376,13 @@ class FormState(dict):
 
         return form_state
 
-    def apply_form_defaults(self, registration_point):
+    def apply_form_defaults(self, registration_point, create):
         """
         Applies form defaults.
 
         :param registration_point: Registration point instance
+        :param create: True if the root is just being created
         """
 
         for form_default in registration_point.get_form_defaults():
-            form_default.set_defaults(self)
+            form_default.set_defaults(self, create)

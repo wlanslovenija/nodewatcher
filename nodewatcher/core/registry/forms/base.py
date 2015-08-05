@@ -18,6 +18,7 @@ __all__ = (
     'FORM_OUTPUT',
     'FORM_DEFAULTS',
     'FORM_ONLY_DEFAULTS',
+    'FORM_ROOT_CREATE',
 )
 
 
@@ -26,6 +27,7 @@ FORM_INITIAL = 0x01
 FORM_OUTPUT = 0x02
 FORM_DEFAULTS = 0x04
 FORM_ONLY_DEFAULTS = 0x08
+FORM_ROOT_CREATE = 0x10
 
 
 class RegistryValidationError(Exception):
@@ -740,14 +742,25 @@ def prepare_forms(context):
             except IndexError:
                 mdl = None
 
+            assert not context.subforms
             form_prefix = context.base_prefix + '_mu_0'
-            context.subforms.append(generate_form_for_class(
-                context,
-                form_prefix,
-                context.data,
-                0,
-                instance=mdl,
-            ))
+
+            # Execute form actions.
+            for action in context.form_state.get_form_actions(cls_meta.registry_id):
+                action.modify_forms_before(context)
+                action.modify_form(context, 0, form_prefix)
+                action.modify_forms_after(context)
+
+            assert len(context.subforms) <= 1
+
+            if not context.subforms:
+                context.subforms.append(generate_form_for_class(
+                    context,
+                    form_prefix,
+                    context.data,
+                    0,
+                    instance=mdl,
+                ))
 
             submeta = None
 
@@ -821,7 +834,7 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
 
         if flags & FORM_DEFAULTS | FORM_ONLY_DEFAULTS:
             # Set form defaults.
-            context.form_state.apply_form_defaults(regpoint)
+            context.form_state.apply_form_defaults(regpoint, flags & FORM_ROOT_CREATE)
 
             if flags & FORM_ONLY_DEFAULTS:
                 # If only defaults application is requested, we should set defaults and then rollback
@@ -876,6 +889,8 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
             transaction.savepoint_rollback(sid)
     except RegistryValidationError:
         transaction.savepoint_rollback(sid)
+    except transaction.TransactionManagementError:
+        raise
     except:
         transaction.savepoint_rollback(sid)
         raise
