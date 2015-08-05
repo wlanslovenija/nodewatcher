@@ -23,6 +23,18 @@ class Choice(object):
     def get_field_tuple(self):
         return (self.name, self.verbose_name)
 
+    def get_json(self):
+        """
+        Returns the choice suitable for JSON serialization.
+        """
+
+        return {
+            'name': self.name,
+            'verbose_name': self.verbose_name,
+            'help_text': self.help_text,
+            'icon': self.icon,
+        }
+
     def __repr__(self):
         return "<Choice '%s'>" % self.name
 
@@ -42,6 +54,13 @@ class LazyChoiceList(collections.Sequence):
         lazy_choices._dependent_choices = self._dependent_choices
         lazy_choices._returns_field_tuples = True
         return lazy_choices
+
+    def get_json(self):
+        """
+        Returns a list of choices suitable for JSON serialization.
+        """
+
+        return [choice.get_json() for choice in self._list]
 
     def resolve(self, choice_name):
         """

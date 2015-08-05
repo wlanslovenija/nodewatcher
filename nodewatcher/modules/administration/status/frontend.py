@@ -1,6 +1,12 @@
 from nodewatcher.core.frontend import components
 
-from . import models
+# TODO: Should we make this conditional, so only in case the statistics module is loaded?
+from nodewatcher.modules.frontend.statistics.pool import pool as statistics_pool
+
+from . import models, resources
+
+
+statistics_pool.register(resources.NodesByStatusResource())
 
 
 components.partials.get_partial('node_snippet_partial').add(components.PartialEntry(
@@ -15,6 +21,4 @@ components.partials.get_partial('node_snippet_partial').add(components.PartialEn
 components.partials.get_partial('network_statistics_partial').add(components.PartialEntry(
     name='status',
     template='network/statistics/status.html',
-    # TODO: Provide counts for each status for each state
-    extra_context=lambda context: {},
 ))

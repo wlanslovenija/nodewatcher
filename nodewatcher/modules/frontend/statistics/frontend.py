@@ -1,8 +1,9 @@
 from django.core import urlresolvers
 
-from nodewatcher.core.frontend import components
+from nodewatcher.core import models as core_models
+from nodewatcher.core.frontend import api, components
 
-from . import views
+from . import views, resources
 
 
 class NetworkStatisticsComponent(components.FrontendComponent):
@@ -17,6 +18,9 @@ class NetworkStatisticsComponent(components.FrontendComponent):
 components.pool.register(NetworkStatisticsComponent)
 
 
+api.v1_api.register(resources.StatisticsPoolResource())
+
+
 components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Network Statistics"),
     url=urlresolvers.reverse_lazy('NetworkStatisticsComponent:statistics'),
@@ -24,3 +28,13 @@ components.menus.get_menu('main_menu').add(components.MenuEntry(
 
 
 components.partials.register(components.Partial('network_statistics_partial'))
+
+
+components.partials.get_partial('network_statistics_partial').add(components.PartialEntry(
+    name='general',
+    template='network/statistics/general.html',
+    weight=-1,
+    extra_context=lambda context: {
+        'count': core_models.Node.objects.count(),
+    },
+))

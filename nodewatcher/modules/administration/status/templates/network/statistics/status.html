@@ -1,0 +1,16 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load i18n sekizai_tags %}
+
+{% add_data "js_data" "datastream/underscore/underscore.js" %}
+{% add_data "js_data" "datastream/highstock/highstock.js" %}
+{% add_data "js_data" "datastream/highstock/highcharts-more.js" %}
+{% add_data "js_data" "datastream/highstock/exporting.js" %}
+{% add_data "js_data" "network/statistics/status.js" %}
+
+<div class="row snippet node-status">
+    <div class="col-md-2 key"></div>
+    <div class="col-md-10 value">
+        <div id="statistics-nodes-by-status" data-url="{% url "api:api_dispatch_detail" "v1" "statistics" "nodes_by_status" %}"></div>
+    </div>
+</div>
