@@ -55,7 +55,7 @@ def evaluate_forms(request, regpoint_id, root_id):
 
         # Re-apply form defaults in case client actions have changed something.
         if changed:
-            form_state.apply_form_defaults(regpoint)
+            form_state.apply_form_defaults(regpoint, additional_flags & registry_forms.FORM_ROOT_CREATE)
 
         # Apply defaults and fully validate processed forms.
         _, forms = registry_forms.prepare_root_forms(
