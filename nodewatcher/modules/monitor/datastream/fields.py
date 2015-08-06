@@ -88,7 +88,7 @@ class Field(object):
                     'std_dev',
                     'count',
                 ]
-            elif value_type == 'graph':
+            elif value_type in ('graph', 'nominal'):
                 value_downsamplers = [
                     'count',
                 ]
@@ -202,6 +202,24 @@ class Field(object):
 
         value = self.prepare_value(value)
         stream.append(self.ensure_stream(descriptor, stream), value)
+
+    def fill_tags(self, **tags):
+        """
+        Only sets tags which are not already set.
+
+        :param **tags: Keyword arguments describing the tags to fill
+        """
+
+        def update(d, u):
+            for k, v in u.iteritems():
+                if isinstance(v, collections.Mapping):
+                    r = update(d.get(k, {}), v)
+                    d[k] = r
+                elif k not in d:
+                    d[k] = u[k]
+            return d
+
+        update(self.custom_tags, tags)
 
     def set_tags(self, **tags):
         """
@@ -527,3 +545,26 @@ class GraphField(Field):
 
     def prepare_value(self, value):
         return dict(value)
+
+
+class NominalField(Field):
+    """
+    A field that can contain any value.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs['value_type'] = 'nominal'
+        super(NominalField, self).__init__(**kwargs)
+
+
+class IntegerArrayNominalField(NominalField):
+    """
+    A field that contains an array of integers.
+    """
+
+    def prepare_value(self, value):
+        return list([int(x) for x in value])

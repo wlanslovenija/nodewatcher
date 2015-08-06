@@ -119,10 +119,15 @@ class BabelTopologyLink(monitor_models.TopologyLink):
     """
 
     interface = models.CharField(max_length=50, null=True)
-    rxcost = models.IntegerField(default=0.0)
-    txcost = models.IntegerField(default=0.0)
-    rttcost = models.IntegerField(default=0.0)
-    cost = models.IntegerField(default=0.0)
+    rxcost = models.IntegerField(default=0)
+    txcost = models.IntegerField(default=0)
+    rtt = models.IntegerField(default=0, null=True)
+    rttcost = models.IntegerField(default=0, null=True)
+    cost = models.IntegerField(default=0)
+    # Reachability is not actually an integer but a bit field of 16 binary values,
+    # representing a history of successfully received HELLOs. A value of 0 indicates
+    # a lost packet, while a 1 indicates a successfully received packet.
+    reachability = models.IntegerField(default=0)
 
 
 def peer_name(text):
@@ -195,6 +200,19 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
             'minimum': 1.0,
         }
     })
+    reachability = ds_fields.IntegerArrayNominalField(
+        tags={
+            'title': peer_name(gettext_noop("Reachability of %(peer_name)s")),
+            'description': gettext_noop("Babel reachability for this link."),
+            'visualization': {
+                'type': 'heatmap',
+                'minimum': 0,
+                'maximum': 1,
+            }
+        },
+        # Convert the integer into a list of bit values. Also see model documentation.
+        attribute=lambda model: [int(x) for x in list(bin(model.reachability & 0xFFFF | 0x10000)[3:])]
+    )
 
     def get_base(self, model):
         return model.monitor.cast()
