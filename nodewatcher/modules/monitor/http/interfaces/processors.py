@@ -188,23 +188,25 @@ if DATASTREAM_SUPPORTED:
             """
 
             descriptor = ds_pool.get_descriptor(iface)
-            descriptor.tx_packets.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_packets_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_packets.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_packets_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_bytes.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_bytes_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_bytes.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_bytes_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_errors.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_errors_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_errors.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_errors_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_drops.set_tags(visualization={'hidden': hidden})
-            descriptor.tx_drops_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_drops.set_tags(visualization={'hidden': hidden})
-            descriptor.rx_drops_rate.set_tags(visualization={'hidden': hidden})
-            descriptor.mtu.set_tags(visualization={'hidden': hidden})
+            # We are using fill_tags instead of set_tags so that things which are hidden by
+            # default also stay hidden.
+            descriptor.tx_packets.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_packets_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_packets.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_packets_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_bytes.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_bytes_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_bytes.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_bytes_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_errors.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_errors_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_errors.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_errors_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_drops.fill_tags(visualization={'hidden': hidden})
+            descriptor.tx_drops_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_drops.fill_tags(visualization={'hidden': hidden})
+            descriptor.rx_drops_rate.fill_tags(visualization={'hidden': hidden})
+            descriptor.mtu.fill_tags(visualization={'hidden': hidden})
 
         def interface_enabled(self, context, node, iface):
             """
