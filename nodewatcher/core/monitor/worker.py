@@ -1,3 +1,4 @@
+import copy
 import logging
 import multiprocessing
 import time
@@ -20,6 +21,7 @@ def stage_worker(args):
     """
 
     context, node_pk, processors = args
+    context = copy.copy(context)
     node = core_models.Node.objects.get(pk=node_pk)
     cleanup_queue = []
     try:
