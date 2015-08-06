@@ -2,6 +2,7 @@ import datetime
 import ijson
 import traceback
 import math
+import time
 
 from django.core.management import base
 
@@ -23,10 +24,16 @@ class Command(base.BaseCommand):
             raise base.CommandError("Unable to open file '%s'!" % input_filename)
 
         self.stdout.write("Starting import process...\n")
+        start_time = time.time()
         item_index = 0
+        data_points = 0
+        ensured_streams = {}
         for item in ijson.items(input_file, 'items.item'):
             timestamp = datetime.datetime.utcfromtimestamp(item['s'])
             item_index += 1
+            if item_index % 100 == 0:
+                self.stdout.write("[%d/s]\n" % (data_points / (time.time() - start_time)))
+
             try:
                 streams = self.import_data(item)
             except:
@@ -42,23 +49,29 @@ class Command(base.BaseCommand):
                 raise base.CommandError("Exception ocurred, terminating import.")
 
             for stream in streams:
-                stream_id = datastream.ensure_stream(
-                    stream['tags'],
-                    stream['tags'],
-                    stream.get('value_downsamplers', [
-                        'mean',
-                        'sum',
-                        'min',
-                        'max',
-                        'sum_squares',
-                        'std_dev',
-                        'count'
-                    ]),
-                    datastream.Granularity.Minutes
-                )
+                stream_key = tuple(sorted([x for x in stream['tags'].items() if type(x[1]) != dict]))
+                if stream_key not in ensured_streams:
+                    stream_id = datastream.ensure_stream(
+                        stream['tags'],
+                        stream['tags'],
+                        stream.get('value_downsamplers', [
+                            'mean',
+                            'sum',
+                            'min',
+                            'max',
+                            'sum_squares',
+                            'std_dev',
+                            'count'
+                        ]),
+                        datastream.Granularity.Minutes
+                    )
+                    ensured_streams[stream_key] = stream_id
+                else:
+                    stream_id = ensured_streams[stream_key]
 
                 try:
                     datastream.append(stream_id, stream['value'], timestamp)
+                    data_points += 1
                 except:
                     # Skip datapoints on errors
                     self.stdout.write("=== WARNING: Skipping datapoint due to exception!\n")
@@ -255,7 +268,7 @@ class Command(base.BaseCommand):
         l = float(item['d']['rtt_min']) if item['d'] is not None else None
         u = float(item['d']['rtt_max']) if item['d'] is not None else None
 
-        points = [l, m, u]
+        points = [point for point in [l, m, u] if point is not None]
         s = sum(points)
         ss = sum([x ** 2 for x in points])
         try:
@@ -294,7 +307,7 @@ class Command(base.BaseCommand):
                     'name': 'packet_loss',
                     'packet_size': 56,
                 },
-                'value': float(item['d']['loss_def']) if item['d'] is not None else None,
+                'value': float(item['d']['loss_def']) if (item['d'] or {}).get('loss_def', None) is not None else None,
             },
             # Stream for packet_loss field
             {
@@ -304,7 +317,7 @@ class Command(base.BaseCommand):
                     'name': 'packet_loss',
                     'packet_size': 100,
                 },
-                'value': float(item['d']['loss_100']) if item['d'] is not None else None,
+                'value': float(item['d']['loss_100']) if (item['d'] or {}).get('loss_100', None) is not None else None,
             },
             # Stream for packet_loss field
             {
@@ -314,7 +327,7 @@ class Command(base.BaseCommand):
                     'name': 'packet_loss',
                     'packet_size': 500,
                 },
-                'value': float(item['d']['loss_500']) if item['d'] is not None else None,
+                'value': float(item['d']['loss_500']) if (item['d'] or {}).get('loss_500', None) is not None else None,
             },
             # Stream for packet_loss field
             {
@@ -324,7 +337,7 @@ class Command(base.BaseCommand):
                     'name': 'packet_loss',
                     'packet_size': 1000,
                 },
-                'value': float(item['d']['loss_1000']) if item['d'] is not None else None,
+                'value': float(item['d']['loss_1000']) if (item['d'] or {}).get('loss_1000', None) is not None else None,
             },
             # Stream for packet_loss field
             {
@@ -334,6 +347,6 @@ class Command(base.BaseCommand):
                     'name': 'packet_loss',
                     'packet_size': 1480,
                 },
-                'value': float(item['d']['loss_1480']) if item['d'] is not None else None,
+                'value': float(item['d']['loss_1480']) if (item['d'] or {}).get('loss_1480', None) is not None else None,
             },
         ]
