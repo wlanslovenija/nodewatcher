@@ -206,6 +206,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
             'description': gettext_noop("Babel reachability for this link."),
             'visualization': {
                 'type': 'heatmap',
+                'hidden': True,
                 'minimum': 0,
                 'maximum': 1,
             }
