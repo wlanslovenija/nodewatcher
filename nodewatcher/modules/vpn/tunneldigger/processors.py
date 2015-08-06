@@ -22,7 +22,8 @@ try:
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
                 'with': {'group': 'tunneldigger_bytes_rate'},
-            }
+            },
+            'unit': 'Bps',
         })
         rx_bytes_rate = ds_fields.DynamicSumField(tags={
             'group': 'tunneldigger_bytes_rate',
@@ -34,7 +35,8 @@ try:
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
                 'with': {'group': 'tunneldigger_bytes_rate'},
-            }
+            },
+            'unit': 'Bps',
         })
 
         def get_stream_query_tags(self):
