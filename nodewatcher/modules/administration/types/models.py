@@ -18,10 +18,10 @@ class TypeConfig(registration.bases.NodeConfigRegistryItem):
         lookup_proxies = ['type']
 
 # Register possible node types
-registration.point('node.config').register_choice('core.type#type', registration.Choice('server', _("Server")))
-registration.point('node.config').register_choice('core.type#type', registration.Choice('wireless', _("Wireless")))
-registration.point('node.config').register_choice('core.type#type', registration.Choice('test', _("Test")))
-registration.point('node.config').register_choice('core.type#type', registration.Choice('mobile', _("Mobile")))
-registration.point('node.config').register_choice('core.type#type', registration.Choice('dead', _("Dead")))
-registration.point('node.config').register_choice('core.type#type', registration.Choice(None, _("Unknown")))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('server', _("Server"), icon="node-type-server"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('wireless', _("Wireless"), icon="node-type-wireless"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('test', _("Test"), icon="node-type-test"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('mobile', _("Mobile"), icon="node-type-mobile"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('dead', _("Dead"), icon="node-type-dead"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice(None, _("Unknown"), icon="node-unknown"))
 registration.point('node.config').register_item(TypeConfig)

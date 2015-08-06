@@ -5,8 +5,13 @@
 }
 
 .partial {
-	.leaflet-container {
-		margin: 20px 0;
+
+	.location {
+		margin-bottom: 20px;
+
+		.leaflet-container {
+			margin-top: 20px;
+		}
 	}
 
 	ul.users {
@@ -36,38 +41,38 @@
 	}
 }
 
-.icon.nw-unknown {
+.icon.nw-node-unknown {
 	color: $gray;
 }
 
-.icon.nw-healty {
+.icon.nw-node-health-healty {
 	color: $brand-success;
 }
 
-.icon.nw-warnings {
+.icon.nw-node-health-warnings {
 	color: $brand-warning;
 }
 
-.icon.nw-errors {
+.icon.nw-node-health-errors {
 	color: $brand-danger;
 }
 
-.icon.nw-monitored {
+.icon.nw-node-monitoring-monitored {
 	color: $brand-primary;
 }
 
-.icon.nw-unmonitored {
+.icon.nw-node-monitoring-unmonitored {
 	color: $gray-light;
 }
 
-.icon.nw-up {
+.icon.nw-node-network-up {
 	color: $brand-success;
 }
 
-.icon.nw-down {
+.icon.nw-node-network-down {
 	color: $gray-light;
 }
 
-.icon.nw-visible {
+.icon.nw-node-network-visible {
 	color: $brand-warning;
 }

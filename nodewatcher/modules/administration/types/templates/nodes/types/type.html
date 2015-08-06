@@ -1,0 +1,5 @@
+{% load i18n node_type_tags %}
+<div class="row snippet node-type">
+<div class="col-md-2 key">{% trans "Node type" %}</div>
+<div class="col-md-10 value">{% node_type_icon node_type.get_type_choice "normal" %} {{ node_type.get_type_display|default:_("unknown") }}</div>
+</div>
