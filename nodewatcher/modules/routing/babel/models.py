@@ -56,10 +56,10 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average Babel RX link cost."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-            'maximum': 1.0,
             'with': {'group': 'avg_link_cost', 'node': ds_fields.TagReference('node')},
         }
     })
@@ -69,10 +69,10 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average Babel TX link cost."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-            'maximum': 1.0,
             'with': {'group': 'avg_link_cost', 'node': ds_fields.TagReference('node')},
         }
     })
@@ -82,10 +82,10 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average Babel RTT link cost."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-            'maximum': 1.0,
             'with': {'group': 'avg_link_cost', 'node': ds_fields.TagReference('node')},
         }
     })
@@ -136,6 +136,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("Babel link RX cost."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -153,6 +154,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("Babel link TX cost."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -170,6 +172,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("Babel link RTT cost."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -186,6 +189,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("Babel cost for this link."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 1.0,

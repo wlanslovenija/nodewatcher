@@ -49,6 +49,7 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average OLSR link quality."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -62,6 +63,7 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         'description': gettext_noop("Average OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -114,6 +116,7 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("OLSR link quality."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -131,6 +134,7 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("OLSR inverse link quality."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -147,6 +151,7 @@ class OlsrTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         'description': gettext_noop("OLSR ETX metric for this link."),
         'visualization': {
             'type': 'line',
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 1.0,
