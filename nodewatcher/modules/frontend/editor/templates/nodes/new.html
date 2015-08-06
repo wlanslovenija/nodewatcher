@@ -12,6 +12,8 @@
 {% endcontextblock %}
 
 {% block content %}
+<div class="row">
+<div class="col-md-9" role="main">
     <form class="form-horizontal" method="post" action="{% url "EditorComponent:new" %}">
         {% csrf_token %}
         <div id="registry_forms">
@@ -24,4 +26,9 @@
         </p>
 
     </form>
+</div>
+<div class="col-md-3" role="complementary">
+    {% include "registry/menu.html" %}
+</div>
+</div>
 {% endblock %}
