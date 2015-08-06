@@ -76,6 +76,9 @@ class BabelTopology(monitor_processors.NodeProcessor):
                 elink.interface = neighbour['interface']
                 elink.rxcost = neighbour['rxcost']
                 elink.txcost = neighbour['txcost']
+                elink.reachability = neighbour['reachability']
+                elink.rtt = neighbour.get('rtt', None)
+                elink.rttcost = neighbour.get('rttcost', None)
                 elink.cost = neighbour['cost']
                 elink.last_seen = timezone.now()
                 elink.save()
@@ -89,6 +92,7 @@ class BabelTopology(monitor_processors.NodeProcessor):
             if visible_links:
                 rtm.average_rxcost = float(sum([link.rxcost for link in visible_links])) / len(visible_links)
                 rtm.average_txcost = float(sum([link.txcost for link in visible_links])) / len(visible_links)
+                rtm.average_rttcost = float(sum([link.rttcost for link in visible_links if link.rttcost is not None])) / len(visible_links)
                 rtm.average_cost = float(sum([link.cost for link in visible_links])) / len(visible_links)
 
             rtm.link_count = len(visible_links)

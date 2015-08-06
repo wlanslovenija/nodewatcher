@@ -88,7 +88,7 @@ class Field(object):
                     'std_dev',
                     'count',
                 ]
-            elif value_type == 'graph':
+            elif value_type in ('graph', 'nominal'):
                 value_downsamplers = [
                     'count',
                 ]
@@ -527,3 +527,26 @@ class GraphField(Field):
 
     def prepare_value(self, value):
         return dict(value)
+
+
+class NominalField(Field):
+    """
+    A field that can contain any value.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Class constructor.
+        """
+
+        kwargs['value_type'] = 'nominal'
+        super(NominalField, self).__init__(**kwargs)
+
+
+class IntegerArrayNominalField(NominalField):
+    """
+    A field that contains an array of integers.
+    """
+
+    def prepare_value(self, value):
+        return list([int(x) for x in value])
