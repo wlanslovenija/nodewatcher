@@ -23,9 +23,6 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.nw-node-type-dead:before {
-	content: "\e602";
-}
 .nw-node:before {
 	content: "\e603";
 }
@@ -40,6 +37,21 @@
 }
 .nw-user:before {
 	content: "\f007";
+}
+.nw-check:before {
+	content: "\f00c";
+}
+.nw-close:before {
+	content: "\f00d";
+}
+.nw-remove:before {
+	content: "\f00d";
+}
+.nw-times:before {
+	content: "\f00d";
+}
+.nw-node-type-dead:before {
+	content: "\f00d";
 }
 .nw-times-circle:before {
 	content: "\f057";
@@ -83,20 +95,17 @@
 .nw-node-type-test:before {
 	content: "\f0c3";
 }
-.nw-automobile:before {
-	content: "\f1b9";
-}
-.nw-car:before {
-	content: "\f1b9";
-}
-.nw-node-type-mobile:before {
-	content: "\f1b9";
-}
 .nw-wifi:before {
 	content: "\f1eb";
 }
 .nw-node-network-up:before {
 	content: "\f1eb";
+}
+.nw-bicycle:before {
+	content: "\f206";
+}
+.nw-node-type-mobile:before {
+	content: "\f206";
 }
 .nw-server:before {
 	content: "\f233";
