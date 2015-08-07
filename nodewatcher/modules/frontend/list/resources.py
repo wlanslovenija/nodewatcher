@@ -31,7 +31,7 @@ class NodeResource(api.BaseResource):
             status=status_models.StatusMonitor,
             # TODO: Should we add peers and clients to the snippet as well?
             # TODO: Correctly add peers (as a subdocument for each routing protocol)
-            #peers='network.routing.topology#link_count',
+            routing_topology='network.routing.topology',
             # TODO: Add current clients count?
         # noqa (PEP8 ignore indentation)
         # We have to have some ordering so that pagination works correctly.
@@ -50,6 +50,7 @@ class NodeResource(api.BaseResource):
             'location',
             'last_seen',
             'status',
+            'routing_topology',
         )
         filtering = {
             'uuid': resources.ALL,
@@ -59,6 +60,7 @@ class NodeResource(api.BaseResource):
             'location': resources.ALL_WITH_RELATIONS,
             'last_seen': resources.ALL,
             'status': resources.ALL_WITH_RELATIONS,
+            'routing_topology': resources.ALL_WITH_RELATIONS,
         }
         global_filter = (
             'uuid',

@@ -94,6 +94,38 @@ class RegistryRelationField(ToOneField):
         return self._help_text
 
 
+class RegistryMultipleRelationField(ManyToManyField):
+    """
+    Tastypie field for registry multiple relation field.
+    """
+
+    dehydrated_type = 'registry'
+
+    def __init__(self, to, attribute, default=tastypie_fields.NOT_PROVIDED, null=False, blank=False, readonly=False, unique=False, help_text=None):
+        """
+        The ``to`` argument should point to a ``Resource`` class, not to a ``document``. Required.
+        """
+
+        super(RegistryMultipleRelationField, self).__init__(
+            to=to,
+            attribute=attribute,
+            default=default,
+            null=null,
+            blank=blank,
+            readonly=readonly,
+            unique=unique,
+            full=True,
+        )
+
+        self._help_text = help_text
+
+    @property
+    def help_text(self):
+        if not self._help_text:
+            self._help_text = "Registry model (%s)" % (self.to_class(self.get_api_name())._meta.resource_name,)
+        return self._help_text
+
+
 class GeoJSON(str):
     __slots__ = ()
 

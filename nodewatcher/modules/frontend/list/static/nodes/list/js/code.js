@@ -1,4 +1,25 @@
 (function ($) {
+    function renderRoutingTopology(data, type, row, meta) {
+        var output = $('<span/>');
+
+        // Sort by protocol name to get a consistent order everywhere.
+        data = _.sortBy(data, 'protocol');
+
+        _.each(data, function (info, index) {
+            // TODO: Structure this better. Use <dl>, <dt> and <dd>.
+            var obj = $('<span />');
+            obj.attr('title', info.protocol);
+            obj.append(info.link_count);
+
+            if (index < data.length - 1)
+                obj.append('&nbsp;·&nbsp;');
+
+            output.append(obj);
+        });
+
+        return output.html();
+    }
+
     $(document).ready(function () {
         $('.node-list').each(function (i, table) {
             $.tastypie.newDataTable(table, $(table).data('source'), {
@@ -9,6 +30,7 @@
                     {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network') },
                     {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored')},
                     {'data': 'status.health', 'render': $.nodewatcher.renderStatus(table, 'Health')},
+                    {'data': 'routing_topology.', 'render': renderRoutingTopology, 'orderByField': 'routing_topology__link_count'},
                     {'data': 'project'},
                     // So that user can search by UUID
                     {'data': 'uuid', 'visible': false}
