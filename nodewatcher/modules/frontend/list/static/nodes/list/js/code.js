@@ -26,6 +26,7 @@
                 'columns': [
                     {'data': 'type', 'visible': false},
                     {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
+                    {'data': 'router_id[].router_id', 'orderByField': 'router_id__router_id'},
                     {'data': 'last_seen'},
                     {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network') },
                     {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored')},
