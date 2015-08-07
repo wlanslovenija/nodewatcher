@@ -113,7 +113,8 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 's',
     })
     reboots = fields.ResetField("#uptime", tags={
         'title': gettext_noop("Reboots"),
@@ -121,7 +122,7 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
         'visualization': {
             'type': 'event',
             'with': {'node': fields.TagReference('node')},
-        }
+        },
     })
 
 pool.register(models.SystemStatusMonitor, SystemStatusMonitorStreams)
@@ -140,7 +141,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'load_average', 'node': fields.TagReference('node')},
-        }
+        },
     })
     loadavg_5min = fields.FloatField(tags={
         'group': 'load_average',
@@ -154,7 +155,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'load_average', 'node': fields.TagReference('node')},
-        }
+        },
     })
     loadavg_15min = fields.FloatField(tags={
         'group': 'load_average',
@@ -168,7 +169,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'load_average', 'node': fields.TagReference('node')},
-        }
+        },
     })
     memory_free = fields.IntegerField(tags={
         'group': 'memory',
@@ -182,7 +183,8 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'memory', 'node': fields.TagReference('node')},
-        }
+        },
+        'unit': 'B',
     })
     memory_buffers = fields.IntegerField(tags={
         'group': 'memory',
@@ -196,7 +198,8 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'memory', 'node': fields.TagReference('node')},
-        }
+        },
+        'unit': 'B',
     })
     memory_cache = fields.IntegerField(tags={
         'group': 'memory',
@@ -210,7 +213,8 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'memory', 'node': fields.TagReference('node')},
-        }
+        },
+        'unit': 'B',
     })
     processes = fields.IntegerField(tags={
         'title': gettext_noop("Processes"),
@@ -221,7 +225,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-        }
+        },
     })
 
 pool.register(models.GeneralResourcesMonitor, GeneralResourcesMonitorStreams)
@@ -237,7 +241,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-        }
+        },
     })
     tcp_connections = fields.IntegerField(tags={
         'title': gettext_noop("TCP connections"),
@@ -248,7 +252,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-        }
+        },
     })
     udp_connections = fields.IntegerField(tags={
         'title': gettext_noop("UDP connections"),
@@ -259,7 +263,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
-        }
+        },
     })
     track_connections = fields.IntegerField(tags={
         'group': 'track_connections',
@@ -272,7 +276,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'track_connections', 'node': fields.TagReference('node')},
-        }
+        },
     })
     track_connections_max = fields.IntegerField(tags={
         'group': 'track_connections',
@@ -285,7 +289,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
             'with': {'group': 'track_connections', 'node': fields.TagReference('node')},
-        }
+        },
     })
 
 pool.register(models.NetworkResourcesMonitor, NetworkResourcesMonitorStreams)
@@ -303,7 +307,8 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
             'minimum': 0.0,
             'maximum': 100.0,
             'with': {'group': 'packet_loss', 'node': fields.TagReference('node')},
-        }
+        },
+        'unit': '%',
     })
     rtt = fields.MultiPointField(
         tags={
@@ -316,7 +321,8 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
                 'with': {'group': 'rtt', 'node': fields.TagReference('node')},
-            }
+            },
+            'unit': 'ms',
         },
         value_downsamplers=['mean', 'sum', 'min', 'max', 'sum_squares', 'std_dev', 'count'],
         attribute=lambda model: {
@@ -385,7 +391,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'pps',
     })
     rx_packets = fields.CounterField()
     rx_packets_rate = fields.RateField("system.status#reboots", "#rx_packets", tags={
@@ -403,7 +410,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'pps',
     })
     tx_bytes = fields.CounterField()
     tx_bytes_rate = fields.RateField("system.status#reboots", "#tx_bytes", tags={
@@ -420,7 +428,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'Bps',
     })
     rx_bytes = fields.CounterField()
     rx_bytes_rate = fields.RateField("system.status#reboots", "#rx_bytes", tags={
@@ -437,7 +446,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'Bps',
     })
     tx_errors = fields.CounterField()
     tx_errors_rate = fields.RateField("system.status#reboots", "#tx_errors", tags={
@@ -455,7 +465,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'Hz',
     })
     rx_errors = fields.CounterField()
     rx_errors_rate = fields.RateField("system.status#reboots", "#rx_errors", tags={
@@ -473,7 +484,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'Hz',
     })
     tx_drops = fields.CounterField()
     tx_drops_rate = fields.RateField("system.status#reboots", "#tx_drops", tags={
@@ -491,7 +503,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'Hz',
     })
     rx_drops = fields.CounterField()
     rx_drops_rate = fields.RateField("system.status#reboots", "#rx_drops", tags={
@@ -509,7 +522,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
                 'interface': fields.TagReference('interface'),
                 'node': fields.TagReference('node'),
             },
-        }
+        },
+        'unit': 'Hz',
     })
     mtu = fields.IntegerField(tags={
         'title': fields.TagReference('interface', gettext_noop("MTU (%(interface)s)")),
@@ -519,7 +533,8 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'B',
     })
 
 pool.register(models.InterfaceMonitor, InterfaceMonitorStreams)
@@ -534,7 +549,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
     })
     channel_width = fields.IntegerField(tags={
         'title': fields.TagReference('interface', gettext_noop("Channel width (%(interface)s)")),
@@ -544,7 +559,8 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'MHz',
     })
     bitrate = fields.FloatField(tags={
         'title': fields.TagReference('interface', gettext_noop("Bitrate (%(interface)s)")),
@@ -554,7 +570,8 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'Mbps',
     })
     rts_threshold = fields.IntegerField(tags={
         'title': fields.TagReference('interface', gettext_noop("RTS threshold (%(interface)s)")),
@@ -564,7 +581,8 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'B',
     })
     frag_threshold = fields.IntegerField(tags={
         'title': fields.TagReference('interface', gettext_noop("Fragmentation threshold (%(interface)s)")),
@@ -574,27 +592,30 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'B',
     })
     signal = fields.IntegerField(tags={
         'title': fields.TagReference('interface', gettext_noop("Signal (%(interface)s)")),
-        'description': gettext_noop("Amount of signal in dBm."),
+        'description': gettext_noop("Amount of signal."),
         'visualization': {
             'type': 'line',
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'dBm',
     })
     noise = fields.IntegerField(tags={
         'title': fields.TagReference('interface', gettext_noop("Noise (%(interface)s)")),
-        'description': gettext_noop("Amount of noise in dBm."),
+        'description': gettext_noop("Amount of noise."),
         'visualization': {
             'type': 'line',
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'dBm',
     })
     snr = fields.FloatField(tags={
         'title': fields.TagReference('interface', gettext_noop("Signal-to-noise ratio (%(interface)s)")),
@@ -603,7 +624,8 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'type': 'line',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        }
+        },
+        'unit': 'dBm',
     })
 
 pool.register(models.WifiInterfaceMonitor, WifiInterfaceMonitorStreams)

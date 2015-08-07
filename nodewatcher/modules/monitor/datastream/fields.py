@@ -197,11 +197,13 @@ class Field(object):
             value = attribute(descriptor.get_model())
         else:
             value = getattr(descriptor.get_model(), attribute)
+
+        stream_id = self.ensure_stream(descriptor, stream)
         if value is None:
             return
 
         value = self.prepare_value(value)
-        stream.append(self.ensure_stream(descriptor, stream), value)
+        stream.append(stream_id, value)
 
     def fill_tags(self, **tags):
         """

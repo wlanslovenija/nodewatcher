@@ -34,6 +34,7 @@ registration.point('node.monitoring').register_item(OlsrRoutingTopologyMonitor)
 
 class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     link_count = ds_fields.IntegerField(tags={
+        'group': 'link_count',
         'title': gettext_noop("Link count (OLSR)"),
         'description': gettext_noop("Number of links to other nodes in OLSR routing topology."),
         'visualization': {
@@ -41,6 +42,7 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
+            'with': {'group': 'link_count', 'node': ds_fields.TagReference('node')},
         }
     })
     average_lq = ds_fields.FloatField(tags={
