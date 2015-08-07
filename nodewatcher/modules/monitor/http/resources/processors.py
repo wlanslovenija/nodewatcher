@@ -26,6 +26,7 @@ class SystemStatus(monitor_processors.NodeProcessor):
             gresources.memory_free = None
             gresources.memory_buffers = None
             gresources.memory_cache = None
+            gresources.memory_total = None
             gresources.processes = None
 
         nresources = node.monitoring.system.resources.network()
@@ -68,16 +69,19 @@ class SystemStatus(monitor_processors.NodeProcessor):
             memory_free = int(context.http.core.resources.memory.free)
             memory_buffers = int(context.http.core.resources.memory.buffers)
             memory_cache = int(context.http.core.resources.memory.cache)
+            memory_total = int(context.http.core.resources.memory.total)
         elif version >= 2:
             # Process memory resources (v2+, old version)
             memory_free = int(context.http.general.memory.free)
             memory_buffers = int(context.http.general.memory.buffers)
             memory_cache = int(context.http.general.memory.cache)
+            memory_total = None
         else:
             # Process memory resources (v1, old version)
             memory_free = int(context.http.general.memfree)
             memory_buffers = int(context.http.general.buffers)
             memory_cache = int(context.http.general.cached)
+            memory_total = None
 
         # Schema update for general resources
         gresources.loadavg_1min = loadavg[0]
@@ -86,6 +90,7 @@ class SystemStatus(monitor_processors.NodeProcessor):
         gresources.memory_free = memory_free
         gresources.memory_buffers = memory_buffers
         gresources.memory_cache = memory_cache
+        gresources.memory_total = memory_total
         gresources.processes = processes
         gresources.save()
 
