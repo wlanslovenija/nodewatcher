@@ -129,8 +129,10 @@ class Interfaces(monitor_processors.NodeProcessor):
             iface.frag_threshold = int(wdata.frag_threshold) if wdata.frag_threshold else None
             iface.signal = int(wdata.signal) if wdata.signal else None
             iface.noise = int(wdata.noise) if wdata.noise else None
-            # TODO: Calculate signal-to-noise ratio
-            iface.snr = None
+            if iface.signal is not None and iface.noise:
+                iface.snr = float(iface.signal) / iface.noise
+            else:
+                iface.snr = None
             iface.protocol = "".join(sorted(wdata.protocols)) if wdata.protocols else None
 
         if data.addresses:
