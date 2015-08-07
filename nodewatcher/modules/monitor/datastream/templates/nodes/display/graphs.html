@@ -1,6 +1,6 @@
 {% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
 
-{% load sekizai_tags html_tags theme_tags %}
+{% load i18n sekizai_tags html_tags theme_tags %}
 
 {% add_data "js_data" "datastream/underscore/underscore.js" %}
 {% add_data "js_data" "datastream/moment/moment.js" %}
@@ -8,6 +8,7 @@
 {% add_data "js_data" "datastream/assert/assert.js" %}
 {% add_data "js_data" "datastream/highstock/highstock.js" %}
 {% add_data "js_data" "datastream/highstock/highcharts-more.js" %}
+{% add_data "js_data" "datastream/highstock/highcharts-legend-yaxis.js" %}
 {% add_data "js_data" "datastream/highstock/exporting.js" %}
 {% add_data "js_data" "datastream/js/datastream.js" %}
 {% add_data "js_data" "datastream/js/code.js" %}
@@ -15,5 +16,7 @@
 {% block included_graphs %}
     {% theme_legend _("Graphs") %}
 
-    <div class="node-graphs {% block node_graphs_classes %}{% endblock node_graphs_classes %}" data-source="{% block node_graphs_data_source %}{% url "api:api_dispatch_list" "v1" "stream" %}{% endblock node_graphs_data_source %}" data-node="{% block node_graphs_data_node %}{{ node.pk }}{% endblock node_graphs_data_node %}"></div>
+    <div class="node-graphs {% block node_graphs_classes %}{% endblock node_graphs_classes %}" data-source="{% block node_graphs_data_source %}{% url "api:api_dispatch_list" "v1" "stream" %}{% endblock node_graphs_data_source %}" data-node="{% block node_graphs_data_node %}{{ node.pk }}{% endblock node_graphs_data_node %}">
+        <p class="loading">{% trans "Loading..." %}</p>
+    </div>
 {% endblock included_graphs %}
