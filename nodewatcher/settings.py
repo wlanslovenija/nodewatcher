@@ -329,6 +329,7 @@ INSTALLED_APPS = (
     'leaflet',
     'django_countries',
     'timedelta',
+    'registration',
 )
 
 # A sample logging configuration. The only tangible logging
