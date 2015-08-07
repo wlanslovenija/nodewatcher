@@ -1,4 +1,15 @@
 (function ($) {
+    function renderTimeAgo(data, type, row, meta) {
+        if (type !== 'display') 
+            return data;
+
+        if (data == '')
+            return "";
+        
+        return moment(data).fromNow();
+
+    }
+
     function renderRoutingTopology(data, type, row, meta) {
         var output = $('<span/>');
 
@@ -27,7 +38,7 @@
                     {'data': 'type', 'width': 0, 'render': $.nodewatcher.renderNodeType(table)},
                     {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
                     {'data': 'router_id[].router_id', 'orderByField': 'router_id__router_id'},
-                    {'data': 'last_seen'},
+                    {'data': 'last_seen', 'render': renderTimeAgo},
                     {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network') },
                     {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored')},
                     {'data': 'status.health', 'render': $.nodewatcher.renderStatus(table, 'Health')},
