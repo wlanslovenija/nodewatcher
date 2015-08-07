@@ -24,7 +24,7 @@
         $('.node-list').each(function (i, table) {
             $.tastypie.newDataTable(table, $(table).data('source'), {
                 'columns': [
-                    {'data': 'type', 'visible': false},
+                    {'data': 'type', 'width': 0, 'render': $.nodewatcher.renderNodeType(table)},
                     {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
                     {'data': 'router_id[].router_id', 'orderByField': 'router_id__router_id'},
                     {'data': 'last_seen'},
@@ -37,10 +37,10 @@
                     {'data': 'uuid', 'visible': false}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
-                'orderFixed': [[0, 'asc']],
+                'orderFixed': [],
                 // And make default sorting by name column
-                'order': [[1, 'asc']],
-                'drawCallback': $.tastypie.groupDrawCallback(table),
+                'order': [[0, 'asc'],[1, 'asc']],
+                //'drawCallback': $.tastypie.groupDrawCallback(table),
                 'language': {
                     // TODO: Make strings translatable
                     'zeroRecords': "No matching nodes found.",
