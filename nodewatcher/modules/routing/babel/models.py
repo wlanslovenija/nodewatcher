@@ -54,7 +54,7 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     })
     average_rxcost = ds_fields.IntegerField(tags={
         'group': 'avg_link_cost',
-        'title': gettext_noop("Average RX link cost"),
+        'title': gettext_noop("Average RX link cost (Babel)"),
         'description': gettext_noop("Average Babel RX link cost."),
         'visualization': {
             'type': 'line',
@@ -67,7 +67,7 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     })
     average_txcost = ds_fields.IntegerField(tags={
         'group': 'avg_link_cost',
-        'title': gettext_noop("Average TX link cost"),
+        'title': gettext_noop("Average TX link cost (Babel)"),
         'description': gettext_noop("Average Babel TX link cost."),
         'visualization': {
             'type': 'line',
@@ -80,7 +80,7 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     })
     average_rttcost = ds_fields.IntegerField(tags={
         'group': 'avg_link_cost',
-        'title': gettext_noop("Average RTT link cost"),
+        'title': gettext_noop("Average RTT link cost (Babel)"),
         'description': gettext_noop("Average Babel RTT link cost."),
         'visualization': {
             'type': 'line',
@@ -92,7 +92,7 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         }
     })
     average_cost = ds_fields.IntegerField(tags={
-        'title': gettext_noop("Average cost"),
+        'title': gettext_noop("Average cost (Babel)"),
         'description': gettext_noop("Average Babel cost."),
         'visualization': {
             'type': 'line',
@@ -139,7 +139,7 @@ def peer_name(text):
 class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     rxcost = ds_fields.IntegerField(tags={
         'group': 'link_cost',
-        'title': peer_name(gettext_noop("RX cost to %(peer_name)s")),
+        'title': peer_name(gettext_noop("RX cost to %(peer_name)s (Babel)")),
         'description': gettext_noop("Babel link RX cost."),
         'visualization': {
             'type': 'line',
@@ -157,7 +157,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     })
     txcost = ds_fields.IntegerField(tags={
         'group': 'link_cost',
-        'title': peer_name(gettext_noop("TX cost to %(peer_name)s")),
+        'title': peer_name(gettext_noop("TX cost to %(peer_name)s (Babel)")),
         'description': gettext_noop("Babel link TX cost."),
         'visualization': {
             'type': 'line',
@@ -175,7 +175,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     })
     rttcost = ds_fields.IntegerField(tags={
         'group': 'link_cost',
-        'title': peer_name(gettext_noop("RTT cost to %(peer_name)s")),
+        'title': peer_name(gettext_noop("RTT cost to %(peer_name)s (Babel)")),
         'description': gettext_noop("Babel link RTT cost."),
         'visualization': {
             'type': 'line',
@@ -192,7 +192,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         }
     })
     cost = ds_fields.IntegerField(tags={
-        'title': peer_name(gettext_noop("Cost to %(peer_name)s")),
+        'title': peer_name(gettext_noop("Cost to %(peer_name)s (Babel)")),
         'description': gettext_noop("Babel cost for this link."),
         'visualization': {
             'type': 'line',
@@ -204,7 +204,7 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
     })
     reachability = ds_fields.IntegerArrayNominalField(
         tags={
-            'title': peer_name(gettext_noop("Reachability of %(peer_name)s")),
+            'title': peer_name(gettext_noop("Reachability of %(peer_name)s (Babel)")),
             'description': gettext_noop("Babel reachability for this link."),
             'visualization': {
                 'type': 'heatmap',

@@ -178,7 +178,6 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'visualization': {
             # TODO: Change back to stack when supported
             'type': 'line',
-            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -193,7 +192,6 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'visualization': {
             # TODO: Change back to stack when supported
             'type': 'line',
-            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -208,7 +206,6 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'visualization': {
             # TODO: Change back to stack when supported
             'type': 'line',
-            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -596,34 +593,51 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'unit': 'B',
     })
     signal = fields.IntegerField(tags={
+        'group': 'signal_noise',
         'title': fields.TagReference('interface', gettext_noop("Signal (%(interface)s)")),
         'description': gettext_noop("Amount of signal."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'with': {
+                'group': 'signal_noise',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         },
         'unit': 'dBm',
     })
     noise = fields.IntegerField(tags={
+        'group': 'signal_noise',
         'title': fields.TagReference('interface', gettext_noop("Noise (%(interface)s)")),
         'description': gettext_noop("Amount of noise."),
+        'visualization': {
+            'type': 'line',
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'with': {
+                'group': 'signal_noise',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
+        },
+        'unit': 'dBm',
+    })
+    snr = fields.FloatField(tags={
+        'group': 'signal_noise',
+        'title': fields.TagReference('interface', gettext_noop("Signal-to-noise ratio (%(interface)s)")),
+        'description': gettext_noop("Signal-to-noise ratio."),
         'visualization': {
             'type': 'line',
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
-        },
-        'unit': 'dBm',
-    })
-    snr = fields.FloatField(tags={
-        'title': fields.TagReference('interface', gettext_noop("Signal-to-noise ratio (%(interface)s)")),
-        'description': gettext_noop("Signal-to-noise ratio."),
-        'visualization': {
-            'type': 'line',
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
+            'with': {
+                'group': 'signal_noise',
+                'interface': fields.TagReference('interface'),
+                'node': fields.TagReference('node'),
+            },
         },
         'unit': 'dBm',
     })

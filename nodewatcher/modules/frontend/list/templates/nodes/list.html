@@ -4,6 +4,7 @@
     {% load future i18n sekizai_tags html_tags url_tags %}
 
     {% add_data "css_data" "datatables/css/style.css" %}
+    {% add_data "js_data" "datastream/underscore/underscore.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
@@ -29,10 +30,12 @@
             <tr>
                 <th>{# Hidden node type #}</th>
                 <th title="{% trans "The name of the node." %}">{% trans "Name" %}</th>
+                <th title="{% trans "The router IDs of the node." %}">{% trans "Router IDs" %}</th>
                 <th title="{% trans "When was the node last seen connected to the network." %}">{% trans "Last seen" %}</th>
                 <th title="{% trans "Current status of the connection to the network." %}">{% trans "Network" %}</th>
                 <th title="{% filter striptags %}{% trans "Is the node monitored by <i>nodewatcher</i>." %}{% endfilter %}">{% trans "Monitored" %}</th>
                 <th title="{% trans "Are there any detected issues with the node." %}">{% trans "Health" %}</th>
+                <th title="{% trans "Routing topology summary for the node." %}">{% trans "Links" %}</th>
                 <th title="{% trans "The project to which the node belongs." %}">{% trans "Project" %}</th>
             </tr>
         </thead>

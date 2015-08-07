@@ -17,9 +17,7 @@ class NodeResource(api.BaseResource):
         queryset = core_models.Node.objects.regpoint('config').registry_fields(
             name='core.general#name',
             type='core.type#type',
-            # TODO: Should we add router id to the snippet as well?
-            # TODO: Why it is not visible?
-            #router_id='core.routerid#router_id',
+            router_id='core.routerid',
             project='core.project#project.name',
             location=location_models.LocationConfig.geo_objects.geojson(
                 # Request GeoJSON versions of the location.
@@ -29,9 +27,7 @@ class NodeResource(api.BaseResource):
         ).regpoint('monitoring').registry_fields(
             last_seen='core.general#last_seen',
             status=status_models.StatusMonitor,
-            # TODO: Should we add peers and clients to the snippet as well?
-            # TODO: Correctly add peers (as a subdocument for each routing protocol)
-            #peers='network.routing.topology#link_count',
+            routing_topology='network.routing.topology',
             # TODO: Add current clients count?
         # noqa (PEP8 ignore indentation)
         # We have to have some ordering so that pagination works correctly.
@@ -50,6 +46,8 @@ class NodeResource(api.BaseResource):
             'location',
             'last_seen',
             'status',
+            'routing_topology',
+            'router_id',
         )
         filtering = {
             'uuid': resources.ALL,
@@ -59,6 +57,8 @@ class NodeResource(api.BaseResource):
             'location': resources.ALL_WITH_RELATIONS,
             'last_seen': resources.ALL,
             'status': resources.ALL_WITH_RELATIONS,
+            'routing_topology': resources.ALL_WITH_RELATIONS,
+            'router_id': resources.ALL_WITH_RELATIONS,
         }
         global_filter = (
             'uuid',

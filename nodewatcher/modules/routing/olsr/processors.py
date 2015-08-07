@@ -50,8 +50,9 @@ class Topology(monitor_processors.NetworkProcessor):
                 core_routerid__rid_family='ipv4',
                 core_routerid__router_id__in=visible_routers,
             ):
-                olsr_context.router_id_map[node.router_id[0]] = node
-                registered_routers.add(node.router_id[0])
+                first_router_id = node.router_id.all()[0]
+                olsr_context.router_id_map[first_router_id] = node
+                registered_routers.add(first_router_id)
                 nodes.add(node)
 
             self.logger.info("Creating unknown node instances...")
