@@ -110,7 +110,7 @@ table.dataTable thead .sorting_asc:after,
 table.dataTable thead .sorting_desc:after {
 	position: absolute;
 	bottom: 5px;
-	right: 8px;
+	right: 12px;
 	display: block;
 	font-family: 'Glyphicons Halflings';
 	opacity: 0.5;
@@ -308,9 +308,16 @@ div.dataTables_processing {
     position: absolute;
     top: 0;
     left: 50%;
-    width: 100%;
-    margin-left: -50%;
+    width: 300px;
+    margin-left: -150px;
     text-align: center;
+	padding: 5px;
+	margin-bottom: $line-height-computed;
+	border: 1px solid transparent;
+	border-radius: $alert-border-radius;
+	background-color: $alert-info-bg;
+	border-color: $alert-info-border;
+	color: $alert-info-text;
 }
 
 /*
