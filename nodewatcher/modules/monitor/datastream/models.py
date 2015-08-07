@@ -134,7 +134,6 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Load average (1 min)"),
         'description': gettext_noop("1 minute load average."),
         'visualization': {
-            # TODO: Change back to stack when supported
             'type': 'line',
             'hidden': True,
             'time_downsamplers': ['mean'],
@@ -148,7 +147,6 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Load average (5 min)"),
         'description': gettext_noop("5 minute load average."),
         'visualization': {
-            # TODO: Change back to stack when supported
             'type': 'line',
             'hidden': True,
             'time_downsamplers': ['mean'],
@@ -162,7 +160,6 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Load average (15 min)"),
         'description': gettext_noop("15 minute load average."),
         'visualization': {
-            # TODO: Change back to stack when supported
             'type': 'line',
             'hidden': True,
             'time_downsamplers': ['mean'],
@@ -176,8 +173,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Free memory"),
         'description': gettext_noop("Amount of free memory."),
         'visualization': {
-            # TODO: Change back to stack when supported
-            'type': 'line',
+            'type': 'stack',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -190,8 +186,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Buffers memory"),
         'description': gettext_noop("Amount of memory used for kernel buffers."),
         'visualization': {
-            # TODO: Change back to stack when supported
-            'type': 'line',
+            'type': 'stack',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -204,8 +199,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'title': gettext_noop("Cache memory"),
         'description': gettext_noop("Amount of memory used for cache."),
         'visualization': {
-            # TODO: Change back to stack when supported
-            'type': 'line',
+            'type': 'stack',
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
