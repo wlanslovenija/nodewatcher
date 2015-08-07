@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db.models import fields
-from django.utils import encoding as translation
+from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 
