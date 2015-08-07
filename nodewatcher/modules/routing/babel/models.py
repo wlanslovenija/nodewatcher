@@ -41,6 +41,7 @@ class LinkLocalAddress(models.Model):
 
 class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
     link_count = ds_fields.IntegerField(tags={
+        'group': 'link_count',
         'title': gettext_noop("Link count (Babel)"),
         'description': gettext_noop("Number of links to other nodes in Babel routing topology."),
         'visualization': {
@@ -48,6 +49,7 @@ class BabelRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
+            'with': {'group': 'link_count', 'node': ds_fields.TagReference('node')},
         }
     })
     average_rxcost = ds_fields.IntegerField(tags={

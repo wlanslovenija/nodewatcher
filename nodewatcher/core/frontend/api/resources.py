@@ -97,7 +97,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         if field.name.startswith('_'):
             return True
 
-        if isinstance(field, registry_fields.RegistryRelationField):
+        if isinstance(field, (registry_fields.RegistryRelationField, registry_fields.RegistryMultipleRelationField)):
             return False
 
         return parent_should_skip_field()
@@ -107,7 +107,31 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         def parent_api_field_from_django_field():
             return gis_resources.ModelResource.api_field_from_django_field.im_func(cls, field, default)
 
-        if not isinstance(field, registry_fields.RegistryRelationField):
+        if isinstance(field, (registry_fields.RegistryRelationField, registry_fields.RegistryMultipleRelationField)):
+            model2resource = {
+                registry_fields.RegistryRelationField: fields.RegistryRelationField,
+                registry_fields.RegistryMultipleRelationField: fields.RegistryMultipleRelationField,
+            }
+
+            def create_field(**kwargs):
+                # TODO: Make this work for polymorphic models.
+                class Resource(BaseResource):
+                    class Meta:
+                        object_class = field.rel.to
+                        resource_name = '%s.%s' % (field.rel.to.__module__, field.rel.to.__name__)
+                        list_allowed_methods = ('get',)
+                        detail_allowed_methods = ('get',)
+                        serializer = serializers.DatastreamSerializer()
+                        excludes = ['id']
+                        include_resource_uri = False
+                        filtering = AllFiltering()
+
+                f = model2resource[field.__class__](Resource, **kwargs)
+                f.model_field = field
+                return f
+
+            return create_field
+        else:
             if isinstance(field, json_field.JSONField):
                 # TODO: Optimize this so that double conversion is not performed and that we pass raw JSON.
                 field_class = tastypie_fields.DictField
@@ -120,25 +144,6 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
             def create_field(**kwargs):
                 f = field_class(**kwargs)
-                f.model_field = field
-                return f
-
-            return create_field
-
-        else:
-            def create_field(**kwargs):
-                class Resource(BaseResource):
-                    class Meta:
-                        object_class = field.rel.to
-                        resource_name = '%s.%s' % (field.rel.to.__module__, field.rel.to.__name__)
-                        list_allowed_methods = ('get',)
-                        detail_allowed_methods = ('get',)
-                        serializer = serializers.DatastreamSerializer()
-                        excludes = ['id']
-                        include_resource_uri = False
-                        filtering = AllFiltering()
-
-                f = fields.RegistryRelationField(Resource, **kwargs)
                 f.model_field = field
                 return f
 
