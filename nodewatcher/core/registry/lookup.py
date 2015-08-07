@@ -274,7 +274,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 field.src_model = dst_model
                 field.src_field = dst_field_name
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
-                # TODO: Support prefetching.
+                clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_field is None:
                 # If there can only be one item and no field is requested, create a descriptor

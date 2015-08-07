@@ -572,25 +572,25 @@ class RegistryRelationField(models.Field):
 
 
 class RegistryProxyMultipleDescriptor(object):
-    def __init__(self, related_model, related_field=None):
-        self.related_model = related_model
-        self.related_field = related_field
+    def __init__(self, field_with_rel):
+        self.related_model = field_with_rel.rel.to
+        self.related_field = field_with_rel.related_field
+        self.cache_name = field_with_rel.get_cache_name()
 
         # Generate a chain that can be used to generate the filter query.
-        toplevel = related_model.get_registry_toplevel()
-        self.chain = ['%s_ptr' % x._meta.model_name for x in related_model._meta.get_base_chain(toplevel) or []]
+        toplevel = self.related_model.get_registry_toplevel()
+        self.chain = ['%s_ptr' % x._meta.model_name for x in self.related_model._meta.get_base_chain(toplevel) or []]
+        self.chain.append('root')
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
 
+        manager = self.related_manager_cls(instance)
         if self.related_field is not None:
-            chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
-            qs = self.related_model.objects.filter(**{chain: instance})
-            qs = qs.values_list(self.related_field, flat=True)
-            return list(qs)
+            return list(manager.all().values_list(self.related_field, flat=True))
 
-        return self.related_manager_cls(instance)
+        return manager
 
     @functional.cached_property
     def related_manager_cls(self):
@@ -598,7 +598,9 @@ class RegistryProxyMultipleDescriptor(object):
         # manager.
         superclass = self.related_model._default_manager.__class__
         rel_model = self.related_model
-        chain = constants.LOOKUP_SEP.join(self.chain + ['root'])
+        rel_field = rel_model._meta.get_field('root')
+        chain = constants.LOOKUP_SEP.join(self.chain)
+        cache_name = self.cache_name
 
         class RelatedManager(superclass):
             def __init__(self, instance):
@@ -607,9 +609,52 @@ class RegistryProxyMultipleDescriptor(object):
                 self.core_filters = {chain: instance}
                 self.model = rel_model
 
+            def __call__(self, **kwargs):
+                raise Exception
+
             def get_queryset(self):
-                db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
-                return super(RelatedManager, self).get_queryset().using(db).filter(**self.core_filters)
+                try:
+                    return self.instance._prefetched_objects_cache[cache_name]
+                except (AttributeError, KeyError):
+                    db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
+                    empty_strings_as_null = django_db.connections[db].features.interprets_empty_strings_as_nulls
+                    qs = super(RelatedManager, self).get_queryset()
+                    # Disable polymorphic queries as they can be very expensive in this case.
+                    qs = qs.non_polymorphic()
+
+                    qs._add_hints(instance=self.instance)
+                    if self._db:
+                        qs = qs.using(self._db)
+                    qs = qs.filter(**self.core_filters)
+
+                    for field in rel_field.foreign_related_fields:
+                        val = getattr(self.instance, field.attname)
+                        if val is None or (val == '' and empty_strings_as_null):
+                            return qs.none()
+                    qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
+                    return qs
+
+            def get_prefetch_queryset(self, instances, queryset=None):
+                if queryset is None:
+                    queryset = super(RelatedManager, self).get_queryset().all()
+
+                queryset._add_hints(instance=instances[0])
+                queryset = queryset.using(queryset._db or self._db)
+                # Disable polymorphic queries as they can be very expensive in this case.
+                queryset = queryset.non_polymorphic()
+
+                rel_obj_attr = operator.attrgetter(rel_field.attname)
+                instance_attr = lambda obj: obj._get_pk_val()
+                instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+                queryset = queryset.filter(**{'%s__in' % chain: instances})
+
+                # Since we just bypassed this class' get_queryset(), we must manage
+                # the reverse relation manually.
+                for rel_obj in queryset:
+                    instance = instances_dict[rel_obj_attr(rel_obj)]
+                    setattr(rel_obj, rel_field.name, instance)
+
+                return queryset, rel_obj_attr, instance_attr, False, cache_name
 
         return RelatedManager
 
@@ -622,4 +667,4 @@ class RegistryMultipleRelationField(models.Field):
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(RegistryMultipleRelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
-        setattr(cls, name, RegistryProxyMultipleDescriptor(self.rel.to, self.related_field))
+        setattr(cls, name, RegistryProxyMultipleDescriptor(self))
