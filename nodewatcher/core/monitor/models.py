@@ -102,6 +102,7 @@ class GeneralResourcesMonitor(registration.bases.NodeMonitoringRegistryItem):
     memory_free = models.PositiveIntegerField(null=True)
     memory_buffers = models.PositiveIntegerField(null=True)
     memory_cache = models.PositiveIntegerField(null=True)
+    memory_total = models.PositiveIntegerField(null=True)
     processes = models.PositiveIntegerField(null=True)
 
     class RegistryMeta:

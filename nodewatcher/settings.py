@@ -239,7 +239,7 @@ INSTALLED_APPS = (
     'nodewatcher.extra.normalize',
 
     # Extend the default frontend with skyline banner
-    'nodewatcher.modules.frontend.skyline', 
+    'nodewatcher.modules.frontend.skyline',
 
     # Ours are at the beginning so that we can override default templates in 3rd party Django apps.
     'nodewatcher.core',
@@ -329,6 +329,7 @@ INSTALLED_APPS = (
     'leaflet',
     'django_countries',
     'timedelta',
+    'registration',
 )
 
 # A sample logging configuration. The only tangible logging

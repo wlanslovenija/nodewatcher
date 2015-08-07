@@ -364,7 +364,8 @@ class Command(base.BaseCommand):
 
         for node in data['nodes'].values():
             # Dead node flag, so we don't allocate any resources for it
-            dead_node = node['node_type'] == 6
+            #dead_node = node['node_type'] == 6
+            dead_node = False
 
             # Determine router ID
             try:
