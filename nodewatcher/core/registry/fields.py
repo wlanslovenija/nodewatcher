@@ -586,11 +586,7 @@ class RegistryProxyMultipleDescriptor(object):
         if instance is None:
             return self
 
-        manager = self.related_manager_cls(instance)
-        if self.related_field is not None:
-            return list(manager.all().values_list(self.related_field, flat=True))
-
-        return manager
+        return self.related_manager_cls(instance)
 
     @functional.cached_property
     def related_manager_cls(self):
@@ -599,6 +595,7 @@ class RegistryProxyMultipleDescriptor(object):
         superclass = self.related_model._default_manager.__class__
         rel_model = self.related_model
         rel_field = rel_model._meta.get_field('root')
+        rel_subfield = self.related_field
         chain = constants.LOOKUP_SEP.join(self.chain)
         cache_name = self.cache_name
 
@@ -614,7 +611,7 @@ class RegistryProxyMultipleDescriptor(object):
 
             def get_queryset(self):
                 try:
-                    return self.instance._prefetched_objects_cache[cache_name]
+                    qs = self.instance._prefetched_objects_cache[cache_name]
                 except (AttributeError, KeyError):
                     db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
                     empty_strings_as_null = django_db.connections[db].features.interprets_empty_strings_as_nulls
@@ -632,7 +629,11 @@ class RegistryProxyMultipleDescriptor(object):
                         if val is None or (val == '' and empty_strings_as_null):
                             return qs.none()
                     qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
-                    return qs
+
+                if rel_subfield is not None:
+                    return qs.values_list(rel_subfield, flat=True)
+
+                return qs
 
             def get_prefetch_queryset(self, instances, queryset=None):
                 if queryset is None:
