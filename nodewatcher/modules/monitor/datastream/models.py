@@ -213,6 +213,20 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         },
         'unit': 'B',
     })
+    memory_total = fields.IntegerField(tags={
+        'group': 'memory',
+        'title': gettext_noop("Total memory"),
+        'description': gettext_noop("Total amount of memory."),
+        'visualization': {
+            'type': 'line',
+            'hidden': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
+            'with': {'group': 'memory', 'node': fields.TagReference('node')},
+        },
+        'unit': 'B',
+    })
     processes = fields.IntegerField(tags={
         'title': gettext_noop("Processes"),
         'description': gettext_noop("Number of running processes."),
