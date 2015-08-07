@@ -11,7 +11,7 @@ statistics_pool.register(resources.NodesByStatusResource())
 
 components.partials.get_partial('node_general_partial').add(components.PartialEntry(
     name='status',
-    template='nodes/status.html',
+    template='nodes/status/status.html',
     extra_context=lambda context: {
         'node_status': context['node'].monitoring.core.status(default=models.StatusMonitor),
     },

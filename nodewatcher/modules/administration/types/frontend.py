@@ -3,7 +3,7 @@ from nodewatcher.core.frontend import components
 
 components.partials.get_partial('node_general_partial').add(components.PartialEntry(
     name='type',
-    template='nodes/type.html',
+    template='nodes/types/type.html',
     extra_context=lambda context: {
         'node_type': context['node'].config.core.type(),
     }

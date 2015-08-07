@@ -1,0 +1,14 @@
+{% load i18n registry %}
+<script type="text/javascript">
+(function ($) {
+    if (!$.nodewatcher) { $.nodewatcher = {}; }
+    $.extend($.nodewatcher, {
+        'nodeType' : {
+            {% registry_get_choices "node.config" "core.type#type" as type_choices %}
+            {% for choice in type_choices %}
+                "{{ choice.name }}" : { 'name': "{{ choice.verbose_name|striptags }}", 'description': "{{ choice.help_text|striptags }}", 'icon': '{{ choice.icon }}' } {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        }
+    })
+})(jQuery);
+</script>

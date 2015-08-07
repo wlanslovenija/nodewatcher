@@ -23,30 +23,84 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.nw-visible:before {
+.nw-node-type-dead:before {
+	content: "\e602";
+}
+.nw-node:before {
+	content: "\e603";
+}
+.nw-node-type-wireless:before {
+	content: "\e603";
+}
+.nw-node-network-visible:before {
 	content: "\e600";
 }
-.nw-down:before {
+.nw-node-network-down:before {
 	content: "\e601";
 }
-.nw-errors:before {
+.nw-user:before {
+	content: "\f007";
+}
+.nw-times-circle:before {
 	content: "\f057";
 }
-.nw-healthy:before {
+.nw-node-health-errors:before {
+	content: "\f057";
+}
+.nw-check-circle:before {
 	content: "\f058";
 }
-.nw-unknown:before {
+.nw-node-health-healthy:before {
+	content: "\f058";
+}
+.nw-question-circle:before {
 	content: "\f059";
 }
-.nw-warnings:before {
+.nw-node-unknown:before {
+	content: "\f059";
+}
+.nw-exclamation-circle:before {
 	content: "\f06a";
 }
-.nw-monitored:before {
+.nw-node-health-warnings:before {
+	content: "\f06a";
+}
+.nw-eye:before {
 	content: "\f06e";
 }
-.nw-unmonitored:before {
+.nw-node-monitoring-monitored:before {
+	content: "\f06e";
+}
+.nw-eye-slash:before {
 	content: "\f070";
 }
-.nw-up:before {
+.nw-node-monitoring-unmonitored:before {
+	content: "\f070";
+}
+.nw-flask:before {
+	content: "\f0c3";
+}
+.nw-node-type-test:before {
+	content: "\f0c3";
+}
+.nw-automobile:before {
+	content: "\f1b9";
+}
+.nw-car:before {
+	content: "\f1b9";
+}
+.nw-node-type-mobile:before {
+	content: "\f1b9";
+}
+.nw-wifi:before {
 	content: "\f1eb";
+}
+.nw-node-network-up:before {
+	content: "\f1eb";
+}
+.nw-server:before {
+	content: "\f233";
+}
+.nw-node-type-server:before {
+	content: "\f233";
 }
