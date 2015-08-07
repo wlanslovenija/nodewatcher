@@ -67,6 +67,6 @@ class PublicKeyWidget(widgets.Textarea):
         widget = super(PublicKeyWidget, self).render(name, value, attrs)
 
         if valid:
-            return template_loader.render_to_string('identity/public_key/public_key.html', context) + widget
+            return template_loader.render_to_string('identity/public_key/public_key.html', context)
         else:
             return widget
