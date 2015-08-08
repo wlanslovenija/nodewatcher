@@ -7,7 +7,7 @@ amqp==1.4.6
 anyjson==0.3.3
 billiard==3.3.0.19
 celery==3.1.17
-datastream==0.4.4
+datastream==0.4.6
 defusedxml==0.4.1
 django-celery==3.1.16
 django-classy-tags==0.6.1
@@ -31,7 +31,7 @@ mongoengine==0.8.1
 phonenumbers==6.1.0
 psycopg2==2.6
 git+https://github.com/wlanslovenija/pyScss.git@026664cf390ffb6883994cbc54c5b3d3f507a48d#egg=pyScss-wlanslovenija
-pymongo==2.6.3
+pymongo==2.7.1
 python-dateutil==2.2
 python-memcached==1.53
 pytz==2015.2

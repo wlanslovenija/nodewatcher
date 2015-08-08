@@ -410,7 +410,7 @@ class ResetField(DerivedField):
         Class constructor.
         """
 
-        kwargs['value_type'] = 'numeric'
+        kwargs['value_type'] = 'nominal'
         super(ResetField, self).__init__(
             [{'name': 'reset', 'field': field}],
             'counter_reset',
@@ -551,7 +551,8 @@ class GraphField(Field):
 
 class NominalField(Field):
     """
-    A field that can contain any value.
+    A field that can contain any value but does not support any statistical
+    operators.
     """
 
     def __init__(self, **kwargs):
@@ -563,9 +564,18 @@ class NominalField(Field):
         super(NominalField, self).__init__(**kwargs)
 
 
+class IntegerNominalField(NominalField):
+    """
+    A nominal field that contains integers.
+    """
+
+    def prepare_value(self, value):
+        return int(value)
+
+
 class IntegerArrayNominalField(NominalField):
     """
-    A field that contains an array of integers.
+    A nominal field that contains an array of integers.
     """
 
     def prepare_value(self, value):
