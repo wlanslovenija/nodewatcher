@@ -184,12 +184,13 @@ class Field(object):
 
         return stream.ensure_stream(query_tags, tags, downsamplers, highest_granularity, value_type=self.value_type)
 
-    def to_stream(self, descriptor, stream):
+    def to_stream(self, descriptor, stream, timestamp=None):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
+        :param timestamp: Optional datapoint timestamp
         """
 
         attribute = self.name if self.attribute is None else self.attribute
@@ -203,7 +204,7 @@ class Field(object):
             return
 
         value = self.prepare_value(value)
-        stream.append(stream_id, value)
+        stream.append(stream_id, value, timestamp=timestamp)
 
     def fill_tags(self, **tags):
         """
@@ -389,12 +390,13 @@ class DerivedField(Field):
             value_type=self.value_type,
         )
 
-    def to_stream(self, descriptor, stream):
+    def to_stream(self, descriptor, stream, timestamp=None):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
+        :param timestamp: Optional datapoint timestamp
         """
 
         self.ensure_stream(descriptor, stream)
@@ -521,12 +523,13 @@ class DynamicSumField(Field):
                 value_type=self.value_type,
             )
 
-    def to_stream(self, descriptor, stream):
+    def to_stream(self, descriptor, stream, timestamp=None):
         """
         Creates streams and inserts datapoints to the stream via the datastream API.
 
         :param descriptor: Destination stream descriptor
         :param stream: Stream API instance
+        :param timestamp: Optional datapoint timestamp
         """
 
         self.ensure_stream(descriptor, stream)

@@ -73,7 +73,7 @@ class StreamsBase(object):
             self._local_fields[name] = field
             setattr(self, name, field)
 
-    def insert_to_stream(self, stream):
+    def insert_to_stream(self, stream, timestamp=None):
         """
         Inserts all the fields specified in this descriptor to the datastream.
 
@@ -81,7 +81,7 @@ class StreamsBase(object):
         """
 
         for field in self._local_fields.values():
-            field.to_stream(self, stream)
+            field.to_stream(self, stream, timestamp=timestamp)
 
     def get_model(self):
         """

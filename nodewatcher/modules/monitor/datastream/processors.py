@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models import signals as model_signals
 
 from django_datastream import datastream
@@ -61,6 +63,9 @@ class DatastreamBase(object):
         :param context: Current context
         """
 
+        # Use the same timestamp for all datapoints of this node.
+        now = datetime.datetime.utcnow()
+
         processed_items = set()
         for items in context.datastream.values():
             if isinstance(items, dict):
@@ -77,7 +82,7 @@ class DatastreamBase(object):
 
                 try:
                     descriptor = pool.get_descriptor(item)
-                    descriptor.insert_to_stream(datastream)
+                    descriptor.insert_to_stream(datastream, timestamp=now)
                     pool.clear_descriptor(item)
                 except exceptions.StreamDescriptorNotRegistered:
                     continue
