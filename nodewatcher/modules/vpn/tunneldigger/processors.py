@@ -134,6 +134,6 @@ if DATASTREAM_SUPPORTED:
                         continue
 
                     # Hide source field from being displayed by default
-                    src_field.set_tags(visualization={'hidden': True})
+                    src_field.set_tags(visualization={'initial_set': False})
                     # Include this field into our general summed field
                     dst_field.add_source_field(src_field, iface_streams)

@@ -184,16 +184,16 @@ class Interfaces(monitor_processors.NodeProcessor):
 if DATASTREAM_SUPPORTED:
     class DatastreamInterfaces(Interfaces):
 
-        def set_interface_hidden(self, iface, hidden):
+        def set_interface_initial_set(self, iface, initial_set):
             """
-            Toggles hidden status of interface data.
+            Toggles initial_set status of interface data.
             """
 
             descriptor = ds_pool.get_descriptor(iface)
             for field in descriptor.get_fields():
-                # We are using fill_tags instead of set_tags so that things which are hidden by
-                # default also stay hidden.
-                field.fill_tags(visualization={'hidden': hidden})
+                # We are using fill_tags instead of set_tags so that things which have
+                # initial_set set to false by default keep it to false.
+                field.fill_tags(visualization={'initial_set': initial_set})
 
         def interface_enabled(self, context, node, iface):
             """
@@ -201,7 +201,7 @@ if DATASTREAM_SUPPORTED:
             """
 
             super(DatastreamInterfaces, self).interface_enabled(context, node, iface)
-            self.set_interface_hidden(iface, False)
+            self.set_interface_initial_set(iface, False)
 
         def interface_disabled(self, context, node, iface):
             """
@@ -209,4 +209,4 @@ if DATASTREAM_SUPPORTED:
             """
 
             super(DatastreamInterfaces, self).interface_disabled(context, node, iface)
-            self.set_interface_hidden(iface, True)
+            self.set_interface_initial_set(iface, True)
