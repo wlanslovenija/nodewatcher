@@ -31,8 +31,41 @@ $.extend( DataTable.ext.classes, {
 	sWrapper:      "dataTables_wrapper form-inline dt-bootstrap",
 	sFilterInput:  "form-control input-sm",
 	sLengthSelect: "form-control input-sm"
+	//sProcessing: "dataTables_processing"
 } );
 
+DataTable.ext.renderer.header.bootstrap = function (settings, cell, column, classes) {
+	cell.prepend($('<i class="icon sort nw nw-sort">'));
+
+	$(settings.nTable).on( 'order.dt.DT', function ( e, ctx, sorting, columns ) {
+		if ( settings !== ctx ) { // need to check this this is the host
+			return;               // table, not a nested one
+		}
+
+		var colIdx = column.idx;
+
+		cell
+			.removeClass(
+				column.sSortingClass +' '+
+				classes.sSortAsc +' '+
+				classes.sSortDesc
+			)
+			.addClass( columns[ colIdx ] == 'asc' ?
+				classes.sSortAsc : columns[ colIdx ] == 'desc' ?
+					classes.sSortDesc :
+					column.sSortingClass
+			);
+
+		cell.find(".icon.sort")
+				.removeClass("nw-sort nw-sort-asc nw-sort-desc")
+				.addClass(columns[ colIdx ] == 'asc' ?
+				"nw-sort-asc" : columns[ colIdx ] == 'desc' ?
+					"nw-sort-desc" :
+					"nw-sort"
+			);
+
+	} );
+};
 
 /* Bootstrap paging button renderer */
 DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, buttons, page, pages ) {

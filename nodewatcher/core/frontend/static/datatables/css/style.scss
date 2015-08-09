@@ -105,36 +105,33 @@ table.dataTable thead .sorting_desc_disabled {
 	position: relative;
 }
 
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_desc:after {
+table.dataTable thead .sorting .sort,
+table.dataTable thead .sorting_asc .sort,
+table.dataTable thead .sorting_desc .sort {
 	position: absolute;
-	bottom: 5px;
+	bottom: 30%;
 	right: 12px;
 	display: block;
-	font-family: 'Glyphicons Halflings';
 	opacity: 0.5;
+	font-size: 110%;
 }
-table.dataTable thead .sorting:after {
+table.dataTable thead .sorting .sort {
 	opacity: 0.2;
-	content: "\e150"; /* sort */
 }
-table.dataTable thead .sorting_asc:after {
-	content: "\e155"; /* sort-by-attributes */
+table.dataTable thead .sorting_asc .sort {
     color: $brand-primary;
 }
-table.dataTable thead .sorting_desc:after {
-	content: "\e156"; /* sort-by-attributes-alt */
+table.dataTable thead .sorting_desc .sort {
     color: $brand-primary;
 }
-div.dataTables_scrollBody table.dataTable thead .sorting:after,
-div.dataTables_scrollBody table.dataTable thead .sorting_asc:after,
-div.dataTables_scrollBody table.dataTable thead .sorting_desc:after {
+div.dataTables_scrollBody table.dataTable thead .sorting .sort,
+div.dataTables_scrollBody table.dataTable thead .sorting_asc .sort,
+div.dataTables_scrollBody table.dataTable thead .sorting_desc .sort {
 	display: none;
 }
 
-table.dataTable thead .sorting_asc_disabled:after,
-table.dataTable thead .sorting_desc_disabled:after {
+table.dataTable thead .sorting_asc_disabled .sort,
+table.dataTable thead .sorting_desc_disabled .sort {
 	color: $gray-lighter;
 }
 
