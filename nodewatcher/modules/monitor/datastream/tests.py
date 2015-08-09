@@ -37,7 +37,7 @@ class TestStreams(TestBaseStreams):
         'title': "Uptime",
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         }
@@ -46,6 +46,7 @@ class TestStreams(TestBaseStreams):
         'title': "Reboots",
         'visualization': {
             'type': 'event',
+            'initial_set': True,
             'with': {'uuid': fields.TagReference('uuid')},
         }
     })
@@ -66,18 +67,18 @@ class RegistryTestCase(django_test.TestCase):
         pass
 
     def test_basic(self):
-        # Register stream
+        # Register stream.
         pool.register(DummyModel, TestStreams)
 
-        # Test invalid model without registered descriptor
+        # Test invalid model without registered descriptor.
         with self.assertRaises(exceptions.StreamDescriptorNotRegistered):
             pool.get_descriptor(UnregisteredModel)
 
-        # Test streams descriptor with invalid base
+        # Test streams descriptor with invalid base.
         with self.assertRaises(exceptions.StreamDescriptorHasInvalidBase):
             pool.register(UnregisteredModel, InvalidBaseStreams)
 
-        # Insert stuff into datastream
+        # Insert stuff into datastream.
         item = DummyModel()
         item.uuid = 1
         item.uptime = 1
@@ -97,10 +98,22 @@ class RegistryTestCase(django_test.TestCase):
         descriptor = pool.get_descriptor(item)
         self.assertIsInstance(descriptor, TestStreams)
 
+        # Test tag updates.
+        self.assertEqual(descriptor.uptime.custom_tags['visualization']['initial_set'], False)
+        descriptor.uptime.set_tags(visualization={'initial_set': True, 'foo': 1})
+        self.assertEqual(descriptor.uptime.custom_tags['visualization']['initial_set'], True)
+        self.assertEqual(descriptor.uptime.custom_tags['visualization']['foo'], 1)
+        descriptor.uptime.reset_tags_to_default(visualization={'initial_set': True})
+        self.assertEqual(descriptor.uptime.custom_tags['visualization']['initial_set'], False)
+        self.assertEqual(descriptor.uptime.custom_tags['visualization']['foo'], 1)
+        descriptor.uptime.reset_tags_to_default(visualization=True)
+        self.assertNotIn('foo', descriptor.uptime.custom_tags['visualization'])
+        self.assertEqual(descriptor.uptime.custom_tags['visualization']['initial_set'], False)
+
         descriptor.insert_to_stream(self.datastream)
         pool.clear_descriptor(item)
 
-        # Unregister stream
+        # Unregister stream.
         pool.unregister(DummyModel)
         with self.assertRaises(exceptions.StreamDescriptorNotRegistered):
             pool.unregister(DummyModel)

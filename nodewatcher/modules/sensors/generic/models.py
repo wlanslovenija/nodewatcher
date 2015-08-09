@@ -29,6 +29,7 @@ class GenericSensorMonitorStreams(ds_models.RegistryItemStreams):
         'title': ds_fields.TagReference('name', gettext_noop("%(name)s")),
         'visualization': {
             'type': 'line',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         }

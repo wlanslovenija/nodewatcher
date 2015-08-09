@@ -110,7 +110,7 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Uptime of the node's system."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -121,6 +121,7 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Node reboot events."),
         'visualization': {
             'type': 'event',
+            'initial_set': True,
             'with': {'node': fields.TagReference('node')},
         },
     })
@@ -135,7 +136,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("1 minute load average."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -148,7 +149,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("5 minute load average."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -161,7 +162,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("15 minute load average."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -174,6 +175,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Amount of free memory."),
         'visualization': {
             'type': 'stack',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -187,6 +189,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Amount of memory used for kernel buffers."),
         'visualization': {
             'type': 'stack',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -200,6 +203,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Amount of memory used for cache."),
         'visualization': {
             'type': 'stack',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -213,6 +217,8 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Total amount of memory."),
         'visualization': {
             'type': 'line',
+            # We want total memory in graphs, but we hide it by the default to emphasis visualization on used memory.
+            'initial_set': True,
             'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
@@ -226,7 +232,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Number of running processes."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -242,7 +248,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Number of routes installed in the kernel routing tables."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -253,7 +259,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Number of local TCP connections."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -264,7 +270,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Number of local UDP connections."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -276,7 +282,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Number of tracked connections."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -289,7 +295,7 @@ class NetworkResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Limit of the number of tracked connections."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -307,6 +313,7 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Packet loss in percent."),
         'visualization': {
             'type': 'line',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -322,6 +329,7 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
             'description': gettext_noop("Measured round-trip time."),
             'visualization': {
                 'type': 'line',
+                'initial_set': True,
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
@@ -387,7 +395,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of transmitted packets."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -406,7 +414,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of received packets."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -425,6 +433,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Throughput of transmitted packets."),
         'visualization': {
             'type': 'line',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -443,6 +452,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Throughput of received packets."),
         'visualization': {
             'type': 'line',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -461,7 +471,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of transmission errors."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -480,7 +490,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of receive errors."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -499,7 +509,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of transmission drops."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -518,7 +528,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Rate of receive drops."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -535,7 +545,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
         'description': gettext_noop("Interface MTU (Maximum Transmission Unit)."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -551,7 +561,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Channel the wireless radio is operating on."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -561,7 +571,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Width of the channel the wireless radio is operating on."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -572,7 +582,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Wireless radio bitrate."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -583,7 +593,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("RTS threshold."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -594,7 +604,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Fragmentation threshold."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         },
@@ -606,6 +616,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Amount of signal."),
         'visualization': {
             'type': 'line',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
@@ -622,6 +633,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Amount of noise."),
         'visualization': {
             'type': 'line',
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
@@ -638,7 +650,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Signal-to-noise ratio."),
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'with': {

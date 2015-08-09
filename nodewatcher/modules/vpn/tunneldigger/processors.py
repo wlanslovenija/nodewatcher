@@ -18,6 +18,7 @@ try:
             'description': gettext_noop("Combined throughput of transmitted packets via VPN."),
             'visualization': {
                 'type': 'line',
+                'initial_set': True,
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
@@ -31,6 +32,7 @@ try:
             'description': gettext_noop("Combined throughput of received packets via VPN."),
             'visualization': {
                 'type': 'line',
+                'initial_set': True,
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
@@ -132,6 +134,6 @@ if DATASTREAM_SUPPORTED:
                         continue
 
                     # Hide source field from being displayed by default
-                    src_field.set_tags(visualization={'hidden': True})
+                    src_field.set_tags(visualization={'initial_set': False})
                     # Include this field into our general summed field
                     dst_field.add_source_field(src_field, iface_streams)
