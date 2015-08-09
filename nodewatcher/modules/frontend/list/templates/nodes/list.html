@@ -11,8 +11,8 @@
     {% add_data "js_data" "datatables/js/jquery.dataTables.moment.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
     {% add_data "js_data" "tastypie/js/code.js" %}
-    {% add_data "js_data" "types/js/list.js" %}
-    {% add_data "js_data" "nodes/js/status.js" %}
+    {% add_data "js_data" "list/js/types.js" %}
+    {% add_data "js_data" "list/js/status.js" %}
     {% add_data "js_data" "nodes/list/js/code.js" %}
 
     {% trans "Node List" as title %}
@@ -27,8 +27,8 @@
 {% endblock altlinks %}
 
 {% block content %}
-    {% include "nodes/status/definitions.html" %}
-    {% include "nodes/types/definitions.html" %}
+    {% include "status/definitions.html" %}
+    {% include "types/definitions.html" %}
     <table class="table table-striped node-list {% block node_list_classes %}{% endblock node_list_classes %}" data-source="{% block node_list_data_source %}{% url "api:api_dispatch_list" "v1" "node" %}{% endblock node_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
         <thead>
             <tr>
