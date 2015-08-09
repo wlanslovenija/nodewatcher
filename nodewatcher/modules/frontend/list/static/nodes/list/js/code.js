@@ -5,8 +5,11 @@
 
         if (data == '')
             return "";
-        
-        return moment(data).fromNow();
+
+        var t = moment(data);
+        var output = $('<span/>').attr('title', t.format("MMMM Do YYYY, h:mm:ss a")).append(t.fromNow());
+
+        return output.wrap('<span/>').parent().html();
 
     }
 
@@ -39,9 +42,9 @@
                     {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
                     {'data': 'router_id[].router_id', 'orderByField': 'router_id__router_id'},
                     {'data': 'last_seen', 'render': renderTimeAgo},
-                    {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network') },
-                    {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored')},
-                    {'data': 'status.health', 'render': $.nodewatcher.renderStatus(table, 'Health')},
+                    {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network'), 'class': 'center', 'width': '20px'},
+                    {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored'), 'class': 'center', 'width': '20px'},
+                    {'data': 'status.health', 'render': $.nodewatcher.renderStatus(table, 'Health'), 'class': 'center', 'width': '20px'},
                     {'data': 'routing_topology.', 'render': renderRoutingTopology, 'orderByField': 'routing_topology__link_count'},
                     {'data': 'project'},
                     // So that user can search by UUID
