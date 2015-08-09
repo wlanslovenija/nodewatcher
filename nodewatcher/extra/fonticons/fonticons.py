@@ -53,8 +53,8 @@ class SVGPathGlyph(IconGlyph):
         os.unlink(svgtmp)
 
         # make the glyph rest on the baseline
-        ymin = glyph.boundingBox()[1]
-        glyph.transform([1, 0, 0, 1, 0, -ymin])
+        #ymin = glyph.boundingBox()[1]
+        glyph.transform([1, 0, 0, 1, 0, 0])
         # set glyph side bearings, can be any value or even 0
         glyph.left_side_bearing = glyph.right_side_bearing = 10
 
@@ -68,8 +68,8 @@ class SVGFileGlyph(IconGlyph):
         os.unlink(svgtmp)
 
         # make the glyph rest on the baseline
-        ymin = glyph.boundingBox()[1]
-        glyph.transform([1, 0, 0, 1, 0, -ymin])
+        #ymin = glyph.boundingBox()[1]
+        glyph.transform([1, 0, 0, 1, 0, 0])
         # set glyph side bearings, can be any value or even 0
         glyph.left_side_bearing = glyph.right_side_bearing = 10
 
@@ -83,8 +83,8 @@ class SVGDocumentGlyph(IconGlyph):
         os.close(fp)
         glyph.importOutlines(svgtmp)
         os.unlink(svgtmp)
-        ymin = glyph.boundingBox()[1]
-        glyph.transform([1, 0, 0, 1, 0, -ymin])
+        #ymin = glyph.boundingBox()[1]
+        glyph.transform([1, 0, 0, 1, 0, 0])
         glyph.left_side_bearing = glyph.right_side_bearing = 10
 
 class FontIcons(object):
