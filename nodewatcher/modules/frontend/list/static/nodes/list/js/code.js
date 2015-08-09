@@ -3,10 +3,10 @@
         if (type !== 'display') 
             return data;
 
-        if (data == '')
+        var t = moment(data);
+        if (!t.isValid())
             return "";
 
-        var t = moment(data);
         var output = $('<span/>').attr('title', t.format("MMMM Do YYYY, h:mm:ss a")).append(t.fromNow());
 
         return output.wrap('<span/>').parent().html();
