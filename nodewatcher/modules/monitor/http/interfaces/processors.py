@@ -191,9 +191,12 @@ if DATASTREAM_SUPPORTED:
 
             descriptor = ds_pool.get_descriptor(iface)
             for field in descriptor.get_fields():
-                # We are using fill_tags instead of set_tags so that things which have
-                # initial_set set to false by default keep it to false.
-                field.fill_tags(visualization={'initial_set': initial_set})
+                if not initial_set:
+                    # When the interface is disabled, set initial_set to False.
+                    field.set_tags(visualization={'initial_set': False})
+                else:
+                    # Reset the initial_set tag to its default value (may be either False or True).
+                    field.reset_tags_to_default(visualization={'initial_set': True})
 
         def interface_enabled(self, context, node, iface):
             """

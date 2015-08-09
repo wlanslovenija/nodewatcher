@@ -1,4 +1,5 @@
 import collections
+import copy
 
 from django.core import exceptions
 
@@ -76,6 +77,7 @@ class Field(object):
         self.name = None
         self.attribute = attribute
         self.custom_tags = tags or {}
+        self.default_tags = copy.deepcopy(self.custom_tags)
 
         if value_downsamplers is None:
             if value_type == 'numeric':
@@ -206,23 +208,49 @@ class Field(object):
         value = self.prepare_value(value)
         stream.append(stream_id, value, timestamp=timestamp)
 
-    def fill_tags(self, **tags):
+    def reset_tags_to_default(self, **tags):
         """
-        Only sets tags which are not already set.
+        Resets specific tags to their default values, specified at field
+        definition time. In order to specify nested tags, use dictionaries.
 
-        :param **tags: Keyword arguments describing the tags to fill
+        For example, if there are tags::
+
+            {'visualization': {'initial_set': False, 'foo': 'bar'}}
+
+        And you want to reset the ``initial_set`` tag, you may call this method
+        as follows::
+
+            field.reset_tags_to_default(visualization={'initial_set': True})
+
+        :param **tags: Keyword arguments describing the tags to reset
         """
 
-        def update(d, u):
-            for k, v in u.iteritems():
-                if isinstance(v, collections.Mapping):
-                    r = update(d.get(k, {}), v)
-                    d[k] = r
-                elif k not in d:
-                    d[k] = u[k]
-            return d
+        def reset_tags(tags, current_tags, default_tags):
+            for tag, value in tags.items():
+                if isinstance(value, collections.Mapping):
+                    # Value is a further mapping, we should descend. If there is nothing under
+                    # defaults for this tag, then act as if the default is an empty dictionary.
+                    # This is needed to remove existing values in case there is no default.
+                    default_value = default_tags.get(tag, {})
+                    if not isinstance(default_value, collections.Mapping):
+                        continue
 
-        update(self.custom_tags, tags)
+                    current_value = current_tags.setdefault(tag, {})
+                    reset_tags(value, current_value, default_value)
+                    if not current_value:
+                        # If nothing has been added, remove the empty dictionary.
+                        del current_tags[tag]
+                elif value is True:
+                    # A true value means that this tag should be reset from defaults (if any). If
+                    # there are no defaults for this tag, then the tag will be removed.
+                    if tag in default_tags:
+                        current_tags[tag] = default_tags[tag]
+                    else:
+                        del current_tags[tag]
+                else:
+                    raise ValueError("Reset tag value should be either a dictionary or a boolean True.")
+
+        reset_tags(tags, self.custom_tags, self.default_tags)
 
     def set_tags(self, **tags):
         """
