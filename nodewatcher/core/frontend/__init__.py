@@ -156,7 +156,7 @@ def render_tag(tag, attrs=None, content=None, close=True):
     )
 
 
-def render_icon(icon, title='', icons='glyphicon'):
+def render_icon(icon, title='', icons='nw'):
     """
     Render a font icon
     """
