@@ -12,10 +12,10 @@
     $.extend($.nodewatcher.theme, {
     	'iconElement': function(identifier, icons) {
     		if (_.isUndefined(icons)) icons = 'nw';
-    		return $('div').addClass('icon ' + icons + ' ' + icons + '-' + identifier).clone().wrap('<i>').parent().html();
+    		return $('i').addClass('icon ' + icons + ' ' + icons + '-' + identifier);
     	},
     	'iconHtml': function(identifier, icons) {
-    		return $.nodewatcher.theme.iconElement(identifier, icons).clone().wrap('<i>').parent().html();
+    		return $.nodewatcher.theme.iconElement(identifier, icons).clone().wrap('<div>').parent().html();
     	}
     });
 
