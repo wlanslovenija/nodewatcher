@@ -9,3 +9,5 @@ libgdal-dev
 libgdal1h
 fping
 libffi-dev
+eot-utils
+python-fontforge

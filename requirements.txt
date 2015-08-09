@@ -1,3 +1,4 @@
 -r requirements-readthedocs.txt
 gdal==1.10.0
 cryptography==0.9
+scour==0.27

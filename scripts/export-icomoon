@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+import os
+import sys
+import json
+
+
+directory = '.'
+filename = 'selection.json'
+
+if len(sys.argv) > 1:
+    filename = sys.argv[1]
+
+if len(sys.argv) > 2:
+    directory = sys.argv[2]
+
+data = json.load(open(filename))
+
+width = 1024
+height = 1024
+
+for i in xrange(0, len(data["icons"])):
+    paths = data["icons"][i]["icon"]["paths"]
+    names = [name.strip()
+             for name in data["icons"][i]["properties"]["name"].split(',')]
+    print names
+    identifier = names[0]
+    names = names[1:]
+
+    print "Exporting %s" % identifier
+
+    svg = """<?xml version="1.0" encoding="utf-8"?>
+        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">"""
+    svg = svg + \
+        """<svg version="1.1" xmlns="http://www.w3.org/2000/svg" 
+        xmlns:xlink="http://www.w3.org/1999/xlink" 
+        width="%d" height="%d" viewBox="0 0 %d %d">""" % (
+            width, height, width, height)
+    for p in paths:
+        svg = svg + '<path d="%s"></path>' % p
+    svg = svg + "</svg>"
+
+    with open(os.path.join(directory, "%s.svg" % identifier), 'w') as fp:
+        fp.write(svg)
+
+    for name in names:
+        with open(os.path.join(directory, "%s.icon" % name), 'w') as fp:
+            fp.write(identifier)

@@ -137,7 +137,7 @@ STATICFILES_FINDERS = (
     #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-STATICFILES_STORAGE = 'nodewatcher.core.frontend.staticfiles.storage.SCSSStaticFilesStorage'
+STATICFILES_STORAGE = 'nodewatcher.core.frontend.staticfiles.storage.FilesProcessorStorage'
 
 GEOIP_PATH = os.path.abspath(os.path.join(settings_dir, '..', 'libs', 'geoip'))
 DEFAULT_COUNTRY = 'SI'
