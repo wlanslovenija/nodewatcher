@@ -1,9 +1,19 @@
 {% load i18n node_status_tags %}
 <div class="row snippet node-status">
-<div class="col-md-2 key">{% trans "Status" %}</div>
+<div class="col-md-2 key">{% trans "Network" %}</div>
 <div class="col-md-10 value">
-	{% network_status_icon node_status.get_network_choice "normal" %} {% network_status_description node_status.get_network_choice %} <br/>
-    {% monitored_status_icon node_status.get_monitored_choice "normal" %} {% monitored_status_description node_status.get_monitored_choice %} <br/>
+	{% network_status_icon node_status.get_network_choice "normal" %} {% network_status_description node_status.get_network_choice %}
+</div>
+</div>
+<div class="row snippet node-status">
+<div class="col-md-2 key">{% trans "Monitored" %}</div>
+<div class="col-md-10 value">
+    {% monitored_status_icon node_status.get_monitored_choice "normal" %} {% monitored_status_description node_status.get_monitored_choice %}
+</div>
+</div>
+<div class="row snippet node-status">
+<div class="col-md-2 key">{% trans "Health" %}</div>
+<div class="col-md-10 value">
     {% health_status_icon node_status.get_health_choice "normal" %} {% health_status_description node_status.get_health_choice %} 
 </div>
 </div>
