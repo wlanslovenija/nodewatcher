@@ -279,7 +279,7 @@ class CounterField(IntegerField):
         kwargs.setdefault('value_downsamplers', [])
         tags = kwargs.setdefault('tags', {})
         visualization = tags.setdefault('visualization', {})
-        visualization['hidden'] = True
+        visualization['initial_set'] = False
 
         super(CounterField, self).__init__(**kwargs)
 

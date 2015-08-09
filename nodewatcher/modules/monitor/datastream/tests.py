@@ -37,7 +37,7 @@ class TestStreams(TestBaseStreams):
         'title': "Uptime",
         'visualization': {
             'type': 'line',
-            'hidden': True,
+            'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
         }
@@ -46,6 +46,7 @@ class TestStreams(TestBaseStreams):
         'title': "Reboots",
         'visualization': {
             'type': 'event',
+            'initial_set': True,
             'with': {'uuid': fields.TagReference('uuid')},
         }
     })

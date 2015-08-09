@@ -204,7 +204,9 @@ class Command(base.BaseCommand):
                     'registry_id': 'core.interfaces',
                     'name': 'tx_bytes',
                     'interface': item['m'],
-                    'visualization': {'hidden': True},
+                    'visualization': {
+                        'initial_set': False,
+                    },
                 },
                 'value': int(item['d']['upload']) if item['d'] is not None else None,
             },
@@ -216,7 +218,9 @@ class Command(base.BaseCommand):
                     'registry_id': 'core.interfaces',
                     'name': 'rx_bytes',
                     'interface': item['m'],
-                    'visualization': {'hidden': True},
+                    'visualization': {
+                        'initial_set': False,
+                    },
                 },
                 'value': int(item['d']['download']) if item['d'] is not None else None,
             },
