@@ -23,10 +23,15 @@
             });
         });
 
+        var cluster = new L.MarkerClusterGroup({spiderfyDistanceMultiplier: 3, maxClusterRadius: 20,
+            disableClusteringAtZoom: 13});
+
         $.each(nodes, function(index, node) {
             if (node.marker)
-                node.marker.addTo(map);
+                cluster.addLayer(node.marker);
         });
+
+        map.addLayer(cluster);
 
         $.each(linkExtenders, function(index, extender) {
             $.each(links, function(index, link) {

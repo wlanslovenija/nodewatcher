@@ -6,6 +6,9 @@
     {% addtoblock "css" %}{% leaflet_css %}{% endaddtoblock %}
     {% addtoblock "js" %}{% leaflet_js %}{% endaddtoblock %}
 
+    {% add_data "js_data_post" "leaflet/js/leaflet.markercluster.js" %}
+    {% add_data "css_data" "leaflet/css/leaflet.markercluster.css" %}
+
     {% add_data "js_data" "map/js/api.js" %}
     {% add_data "js_data" "map/js/code.js" %}
     {% add_data "css_data" "map/css/style.css" %}

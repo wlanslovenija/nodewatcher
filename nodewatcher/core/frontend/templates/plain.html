@@ -24,6 +24,9 @@
         {% end_with_data %}
         {% render_block "js" %}
         {% block js %}{% endblock js %}
+        {% with_data "js_data_post" as js_data %}
+            {% include "head/js_data.html" %}
+        {% end_with_data %}
     </head>
 
     <body class="locale-{{ LANGUAGE_CODE|default:"en-us" }} {% if LANGUAGE_BIDI %}dir-rtl{% else %}dir-ltr{% endif %} {% block body_classes %}{% endblock body_classes %}">
