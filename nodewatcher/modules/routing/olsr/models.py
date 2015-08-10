@@ -25,11 +25,22 @@ class OlsrRoutingTopologyMonitor(monitor_models.RoutingTopologyMonitor):
     OLSR routing topology.
     """
 
+    router_id = models.CharField(max_length=64, null=True)
     average_lq = models.FloatField(null=True)
     average_ilq = models.FloatField(null=True)
     average_etx = models.FloatField(null=True)
 
 registration.point('node.monitoring').register_item(OlsrRoutingTopologyMonitor)
+
+
+class LinkLocalAddress(models.Model):
+    """
+    A link-local address belonging to an OLSR router.
+    """
+
+    router = models.ForeignKey(OlsrRoutingTopologyMonitor, related_name='link_local')
+    address = registry_fields.IPAddressField(host_required=True, db_index=True)
+    interface = models.CharField(max_length=50, null=True)
 
 
 class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):

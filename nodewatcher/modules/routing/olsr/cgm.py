@@ -106,8 +106,16 @@ def olsr(node, cfg):
     firewall.output = 'ACCEPT'
     firewall.forward = 'ACCEPT'
 
-    # Ensure that "olsrd" package is installed
-    cfg.packages.update(['olsrd'])
+    # Enable jsoninfo plugin.
+    jsoninfo = cfg.olsrd.add('LoadPlugin')
+    jsoninfo.library = 'olsrd_jsoninfo.so.0.0'
+
+    # Ensure that OLSR packages are installed.
+    cfg.packages.update([
+        'olsrd',
+        'olsrd-mod-jsoninfo',
+        'nodewatcher-agent-mod-routing_olsr',
+    ])
 
 
 @cgm_base.register_platform_package('openwrt', 'olsrd-mod-txtinfo', olsr_models.OlsrdModTxtinfoPackageConfig)

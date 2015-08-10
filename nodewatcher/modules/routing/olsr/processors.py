@@ -5,11 +5,12 @@ from django.utils import timezone
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors, events as monitor_events
+from nodewatcher.utils import ipaddr
 
 from . import models as olsr_models, parser as olsr_parser
 
 
-class Topology(monitor_processors.NetworkProcessor):
+class GlobalTopology(monitor_processors.NetworkProcessor):
     """
     Processor that handles monitoring of olsrd routing daemon.
     """
@@ -51,7 +52,7 @@ class Topology(monitor_processors.NetworkProcessor):
                 core_routerid__router_id__in=visible_routers,
             ):
                 first_router_id = node.router_id.all()[0]
-                olsr_context.router_id_map[first_router_id] = node
+                olsr_context.router_id_map[first_router_id] = node.pk
                 registered_routers.add(first_router_id)
                 nodes.add(node)
 
@@ -62,7 +63,7 @@ class Topology(monitor_processors.NetworkProcessor):
                     uuid=str(uuid.uuid5(olsr_models.OLSR_UUID_NAMESPACE, router_id))
                 )
                 nodes.add(node)
-                olsr_context.router_id_map[router_id] = node
+                olsr_context.router_id_map[router_id] = node.pk
 
                 if created:
                     general_cfg = node.config.core.general(create=core_models.GeneralConfig)
@@ -78,7 +79,7 @@ class Topology(monitor_processors.NetworkProcessor):
         return context, nodes
 
 
-class NodePostprocess(monitor_processors.NodeProcessor):
+class NodeTopology(monitor_processors.NodeProcessor):
     def process(self, context, node):
         """
         Called for every processed node.
@@ -88,88 +89,156 @@ class NodePostprocess(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
+        # In case the topology processor is included multiple times, do not re-process the
+        # topology information. This may happen because this processor can be used in pull and
+        # push contexts where the data source is different.
+        if context.routing.olsr.node_topology_processed:
+            return context
+        context.routing.olsr.node_topology_processed = True
+
         try:
-            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-            topology = context.routing.olsr.topology.get(router_id, [])
-            announces = context.routing.olsr.announces.get(router_id, [])
-            aliases = context.routing.olsr.aliases.get(router_id, [])
+            rtm = node.monitoring.network.routing.topology(onlyclass=olsr_models.OlsrRoutingTopologyMonitor)[0]
+        except IndexError:
+            rtm = node.monitoring.network.routing.topology(
+                create=olsr_models.OlsrRoutingTopologyMonitor,
+                protocol=olsr_models.OLSR_PROTOCOL_NAME,
+            )
+            rtm.save()
 
-            if not topology:
-                context.node_available = False
-                return context
-            else:
-                context.node_available = True
+        rtm.router_id = None
+        rtm.average_lq = None
+        rtm.average_ilq = None
+        rtm.average_etx = None
 
-            # Update last seen timestamp as the router is at least visible
-            general = node.monitoring.core.general(create=monitor_models.GeneralMonitor)
-            general.last_seen = timezone.now()
-            general.save()
-
-            # Setup links in topology tables
+        if not context.push.source:
+            # The processor is being invoked in global context. In this case, the GlobalTopology
+            # processor has already provided information about the topology.
             try:
-                rtm = node.monitoring.network.routing.topology(onlyclass=olsr_models.OlsrRoutingTopologyMonitor)[0]
-            except IndexError:
-                rtm = node.monitoring.network.routing.topology(
-                    create=olsr_models.OlsrRoutingTopologyMonitor,
-                    protocol=olsr_models.OLSR_PROTOCOL_NAME,
-                )
-                rtm.save()
+                rtm.router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+            except core_models.RouterIdConfig.DoesNotExist:
+                # No router-id for this node can be found for IPv4. This means we can't identify the node.
+                pass
 
-            visible_links = []
-            for link in topology:
-                dst_node = context.routing.olsr.router_id_map.get(str(link['dst']), None)
-                if not dst_node:
-                    self.logger.warning("Inconsistency in topology table for router ID %s!" % link['dst'])
-                    continue
+            neighbours = context.routing.olsr.topology.get(rtm.router_id, [])
+            announces = context.routing.olsr.announces.get(rtm.router_id, [])
+            aliases = context.routing.olsr.aliases.get(rtm.router_id, [])
+            push = False
+
+            if not neighbours:
+                version = 0
+                context.node_available = False
+            else:
+                version = 1
+                context.node_available = True
+                aliases.append(rtm.router_id)
+
+                # Update last seen timestamp as the router is at least visible.
+                general = node.monitoring.core.general(create=monitor_models.GeneralMonitor)
+                general.last_seen = timezone.now()
+                general.save()
+        else:
+            # The processor is being invoked in push context. In this case, topology information
+            # comes in via the telemetry.
+            version = context.http.get_module_version('core.routing.olsr')
+            push = True
+
+            if version >= 1:
+                rtm.router_id = context.http.core.routing.olsr.router_id
+                neighbours = context.http.core.routing.olsr.neighbours
+                announces = context.http.core.routing.olsr.exported_routes
+                aliases = context.http.core.routing.olsr.link_local
+
+        visible_lladdr = []
+        visible_links = []
+        visible_announces = []
+
+        if version >= 1:
+            # A list of link-local addresses of OLSR interfaces. This is required in order to be
+            # able to generate a combined topology in case of push mode.
+            for address in aliases:
+                if isinstance(address, ipaddr.IPv4Address):
+                    interface = None
+                else:
+                    try:
+                        address, interface = address.split('%')
+                    except ValueError:
+                        interface = None
+
+                    address = ipaddr.IPv4Address(address)
+
+                lladdr, created = rtm.link_local.get_or_create(address=address)
+                lladdr.interface = interface
+                lladdr.save()
+                visible_lladdr.append(lladdr)
+
+            # Neighbours.
+            for neighbour in neighbours:
+                if not push:
+                    try:
+                        dst_node = core_models.Node.objects.get(
+                            pk=context.routing.olsr.router_id_map.get(str(neighbour['address']), None)
+                        )
+                    except core_models.Node.DoesNotExist:
+                        # Skip unknown neighbour.
+                        self.logger.warning("Inconsistency in topology table for router ID %s!" % neighbour['address'])
+                        continue
+                else:
+                    # Attempt to resolve destination node.
+                    try:
+                        lladdr = olsr_models.LinkLocalAddress.objects.get(address=neighbour['address'])
+                    except olsr_models.LinkLocalAddress.DoesNotExist:
+                        # Skip unknown neighbour.
+                        continue
+
+                    dst_node = lladdr.router.root
 
                 elink, created = olsr_models.OlsrTopologyLink.objects.get_or_create(monitor=rtm, peer=dst_node)
-                elink.lq = link['lq']
-                elink.ilq = link['ilq']
-                elink.etx = link['etx']
+                elink.lq = neighbour['lq']
+                elink.ilq = neighbour['ilq']
+                elink.etx = neighbour['cost']
+                if push:
+                    # In push mode, link cost is reported as an integer.
+                    elink.etx = float(elink.etx) / 1024
                 elink.last_seen = timezone.now()
                 elink.save()
                 visible_links.append(elink)
 
                 if created:
-                    # TODO: This will still create one event for each end of the link
+                    # TODO: This will still create one event for each end of the link.
                     monitor_events.TopologyLinkEstablished(node, dst_node, olsr_models.OLSR_PROTOCOL_NAME).post()
 
-            # Compute average values
+            # Compute average values.
             if visible_links:
                 rtm.average_lq = float(sum([link.lq for link in visible_links])) / len(visible_links)
                 rtm.average_ilq = float(sum([link.ilq for link in visible_links])) / len(visible_links)
                 rtm.average_etx = float(sum([link.etx for link in visible_links])) / len(visible_links)
-            else:
-                rtm.average_lq = None
-                rtm.average_ilq = None
-                rtm.average_etx = None
+
             rtm.link_count = len(visible_links)
             rtm.save()
 
-            # Create streams for all links
+            # Create streams for all links.
             context.datastream.olsr_links = visible_links
 
-            # Remove all links that do not exist anymore
-            rtm.links.exclude(pk__in=[x.pk for x in visible_links]).delete()
-
-            # Setup networks in announce tables
-            visible_announces = []
-            existing_announces = node.monitoring.network.routing.announces(
-                onlyclass=olsr_models.OlsrRoutingAnnounceMonitor, queryset=True
-            )
-            for announce in announces + aliases:
-                network = announce['net'] if 'net' in announce else announce['alias']
-                eannounce, created = olsr_models.OlsrRoutingAnnounceMonitor.objects.get_or_create(root=node, network=network)
-                eannounce.status = "ok" if 'net' in announce else "alias"
+            # Setup networks in announce tables.
+            for announce in announces:
+                eannounce, created = olsr_models.OlsrRoutingAnnounceMonitor.objects.get_or_create(
+                    root=node,
+                    network=announce['dst_prefix'],
+                )
+                eannounce.status = 'ok'
                 eannounce.last_seen = timezone.now()
                 eannounce.save()
                 visible_announces.append(eannounce)
 
-            # Remove all announces that do not exist anymore
-            existing_announces.exclude(pk__in=[x.pk for x in visible_announces]).delete()
-        except core_models.RouterIdConfig.DoesNotExist:
-            # No router-id for this node can be found for IPv4; this means
-            # that we have nothing to do here
-            pass
+        # Remove all link-local addresses that do not exist anymore.
+        rtm.link_local.exclude(pk__in=[x.pk for x in visible_lladdr]).delete()
+        # Remove all links that do not exist anymore.
+        rtm.links.exclude(pk__in=[x.pk for x in visible_links]).delete()
+        # Remove all announces that do not exist anymore.
+        node.monitoring.network.routing.announces(
+            onlyclass=olsr_models.OlsrRoutingAnnounceMonitor, queryset=True
+        ).exclude(pk__in=[x.pk for x in visible_announces]).delete()
+
+        rtm.save()
 
         return context

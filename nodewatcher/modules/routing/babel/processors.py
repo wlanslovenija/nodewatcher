@@ -40,12 +40,15 @@ class BabelTopology(monitor_processors.NodeProcessor):
 
         version = context.http.get_module_version('core.routing.babel')
 
+        visible_lladdr = []
+        visible_links = []
+        visible_announces = []
+
         if version >= 1:
             # Router ID.
             rtm.router_id = context.http.core.routing.babel.router_id
             # A list of link-local addresses of Babel interfaces. This is required in order to be
             # able to generate a combined topology.
-            visible_lladdr = []
             for address in context.http.core.routing.babel.link_local:
                 try:
                     address, interface = address.split('%')
@@ -57,11 +60,7 @@ class BabelTopology(monitor_processors.NodeProcessor):
                 lladdr.save()
                 visible_lladdr.append(lladdr)
 
-            # Remove all link-local addresses that do not exist anymore.
-            rtm.link_local.exclude(pk__in=[x.pk for x in visible_lladdr]).delete()
-
             # Neighbours.
-            visible_links = []
             for neighbour in context.http.core.routing.babel.neighbours:
                 # Attempt to resolve destination node.
                 try:
@@ -101,14 +100,7 @@ class BabelTopology(monitor_processors.NodeProcessor):
             # Create streams for all links.
             context.datastream.babel_links = visible_links
 
-            # Remove all links that do not exist anymore.
-            rtm.links.exclude(pk__in=[x.pk for x in visible_links]).delete()
-
             # Exported routes.
-            visible_announces = []
-            existing_announces = node.monitoring.network.routing.announces(
-                onlyclass=babel_models.BabelRoutingAnnounceMonitor, queryset=True
-            )
             for announce in context.http.core.routing.babel.exported_routes:
                 eannounce, created = babel_models.BabelRoutingAnnounceMonitor.objects.get_or_create(
                     root=node,
@@ -119,8 +111,14 @@ class BabelTopology(monitor_processors.NodeProcessor):
                 eannounce.save()
                 visible_announces.append(eannounce)
 
-            # Remove all announces that do not exist anymore.
-            existing_announces.exclude(pk__in=[x.pk for x in visible_announces]).delete()
+        # Remove all link-local addresses that do not exist anymore.
+        rtm.link_local.exclude(pk__in=[x.pk for x in visible_lladdr]).delete()
+        # Remove all links that do not exist anymore.
+        rtm.links.exclude(pk__in=[x.pk for x in visible_links]).delete()
+        # Remove all announces that do not exist anymore.
+        node.monitoring.network.routing.announces(
+            onlyclass=babel_models.BabelRoutingAnnounceMonitor, queryset=True
+        ).exclude(pk__in=[x.pk for x in visible_announces]).delete()
 
         rtm.save()
 

@@ -60,10 +60,10 @@ class OlsrInfo(object):
             dst, src, lq, ilq, etx = topo_entry[:5]
             try:
                 topology.setdefault(src, []).append({
-                    'dst': ipaddr.IPAddress(dst),
+                    'address': ipaddr.IPAddress(dst),
                     'lq': float(lq),
                     'ilq': float(ilq),
-                    'etx': float(etx),
+                    'cost': float(etx),
                 })
             except ValueError:
                 # Skip entries with INFINITE ETX value
@@ -84,7 +84,7 @@ class OlsrInfo(object):
         for hna_entry in self._tables.get('hna', []):
             net, router_id = hna_entry[:2]
             announces.setdefault(router_id, []).append({
-                'net': ipaddr.IPNetwork(net),
+                'dst_prefix': ipaddr.IPNetwork(net),
             })
 
         return announces
@@ -103,7 +103,7 @@ class OlsrInfo(object):
             router_id, alias = mid_entry[:2]
             tmp = aliases.setdefault(router_id, [])
             tmp += [
-                {'alias': ipaddr.IPAddress(x)} for x in alias.split(';')
+                ipaddr.IPAddress(x) for x in alias.split(';')
             ]
 
         return aliases
