@@ -1,6 +1,6 @@
 {% load i18n html_tags theme_tags %}
 
-<nav id="registry-navbar">
+<nav id="registry-navbar" class="hidden-print hidden-xs hidden-sm">
 <ul class="nav nav-pills nav-stacked">
 {% for descriptor in registry_forms.children %}
     <li><a href="#registry_{{ descriptor.id|anchorify }}">{{ descriptor.name }}</a></li>
