@@ -32,6 +32,8 @@ def stage_worker(args):
                     processor = p()
                     try:
                         context = processor.process(context, node)
+                        if not isinstance(context, monitor_processors.ProcessorContext):
+                            logger.warning("Processor '%s' did not return a valid context!" % processor.__class__.__name__)
                     except exceptions.NodeProcessorAbort:
                         # Do not run any further processors, but do not report this as an error and
                         # do not rollback the transaction.
