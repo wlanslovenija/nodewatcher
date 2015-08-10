@@ -44,4 +44,18 @@ def run_pipeline(self, run_id, base_context=None):
             # push updates from a single node.
             if nodes:
                 node = nodes.pop()
-                monitor_worker.stage_worker((context, node.pk, processor_list))
+
+                # Store the per-node context, so we can limit its scope only to specific nodes in
+                # order to avoid excessive context copying.
+                node_local_context = context.for_node
+                del context.for_node
+
+                monitor_worker.stage_worker((
+                    context,
+                    node_local_context.get(node.pk, monitor_processors.ProcessorContext()),
+                    node.pk,
+                    processor_list
+                ))
+
+                # Restore per-node context for further network processors.
+                context.for_node = node_local_context

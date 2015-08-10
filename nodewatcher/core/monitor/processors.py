@@ -62,7 +62,6 @@ class ProcessorContext(dict):
 
         return self
 
-    @contextlib.contextmanager
     def create(self, namespace, ctx_class=None):
         """
         Creates a new sub-context.
@@ -80,7 +79,7 @@ class ProcessorContext(dict):
         for part in parts:
             ctx = ctx.setdefault(part, ctx_class())
 
-        yield ctx
+        return ctx
 
 
 class MonitoringProcessor(object):

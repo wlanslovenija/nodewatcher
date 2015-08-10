@@ -20,8 +20,9 @@ def stage_worker(args):
     Runs a list of (node) processors on a given node.
     """
 
-    context, node_pk, processors = args
-    context = copy.copy(context)
+    context, node_context, node_pk, processors = args
+    context = copy.deepcopy(context)
+    context.merge_with(node_context)
     node = core_models.Node.objects.get(pk=node_pk)
     cleanup_queue = []
     try:
@@ -140,11 +141,27 @@ class MonitorRun(object):
                     for p in processor_list:
                         logger.info("  - %s" % p.__name__)
 
+                    # Store the per-node context, so we can limit its scope only to specific nodes in
+                    # order to avoid excessive context copying.
+                    node_local_context = context.for_node
+                    del context['for_node']
+
+                    def node_arguments(node):
+                        return (
+                            context,
+                            node_local_context.get(node.pk, monitor_processors.ProcessorContext()),
+                            node.pk,
+                            processor_list,
+                        )
+
                     if self.config['process_only_node'] is not None:
                         logger.info("Limiting only to the following node: %s" % self.config['process_only_node'])
-                        self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
+                        self.workers.map_async(stage_worker, (node_arguments(node) for node in nodes if node.pk == self.config['process_only_node'])).get(0xFFFF)
                     else:
-                        self.workers.map_async(stage_worker, ((context, node.pk, processor_list) for node in nodes)).get(0xFFFF)
+                        self.workers.map_async(stage_worker, (node_arguments(node) for node in nodes)).get(0xFFFF)
+
+                    # Restore per-node context for further network processors.
+                    context.for_node = node_local_context
                 else:
                     logger.warning("Ignoring unkown type of processor '%s'!" % lead_proc.__name__)
 
@@ -226,7 +243,7 @@ class Worker(object):
         logger.info("Starting monitoring runs...")
         runs = []
         for run in monitor_config.get_runs():
-            if filter_run is not None and run != filter_run:
+            if filter_run is not None and run['name'] != filter_run:
                 continue
 
             # Ignore runs without any scheduling information.

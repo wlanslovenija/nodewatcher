@@ -25,56 +25,78 @@ class GlobalTopology(monitor_processors.NetworkProcessor):
         :return: A (possibly) modified context and a (possibly) modified set of nodes
         """
 
-        with context.create('routing.olsr') as olsr_context:
-            self.logger.info("Parsing olsrd information...")
-            olsr_info = olsr_parser.OlsrInfo(
-                host=settings.OLSRD_MONITOR_HOST,
-                port=settings.OLSRD_MONITOR_PORT,
+        self.logger.info("Parsing olsrd information...")
+        olsr_info = olsr_parser.OlsrInfo(
+            host=settings.OLSRD_MONITOR_HOST,
+            port=settings.OLSRD_MONITOR_PORT,
+        )
+
+        try:
+            topology = olsr_info.get_topology()
+            announces = olsr_info.get_announces()
+            aliases = olsr_info.get_aliases()
+        except olsr_parser.OlsrParseFailed:
+            self.logger.warning("Failed to parse olsrd feeds!")
+            return context, nodes
+
+        # Create a mapping from router ids to nodes.
+        self.logger.info("Mapping router IDs to node instances...")
+        visible_routers = set(topology.keys())
+        registered_routers = set()
+        router_id_map = {}
+        for node in core_models.Node.objects.regpoint('config').registry_fields(
+            router_id='core.routerid#router_id'
+        ).registry_filter(
+            core_routerid__rid_family='ipv4',
+            core_routerid__router_id__in=visible_routers,
+        ):
+            first_router_id = node.router_id.all()[0]
+            router_id_map[first_router_id] = node.pk
+            registered_routers.add(first_router_id)
+            nodes.add(node)
+
+            # Store per-node routing data.
+            olsr_data = context.for_node[node.pk].routing.olsr
+            olsr_data.router_id = first_router_id
+            olsr_data.neighbours = topology.get(first_router_id, [])
+            olsr_data.announces = announces.get(first_router_id, [])
+            olsr_data.aliases = aliases.get(first_router_id, [])
+
+        self.logger.info("Creating unknown node instances...")
+        for router_id in visible_routers.difference(registered_routers):
+            # Create an invalid node for each unknown router id seen by olsrd.
+            node, created = core_models.Node.objects.get_or_create(
+                uuid=str(uuid.uuid5(olsr_models.OLSR_UUID_NAMESPACE, router_id))
             )
+            nodes.add(node)
+            router_id_map[router_id] = node.pk
 
-            try:
-                olsr_context.topology = olsr_info.get_topology()
-                olsr_context.announces = olsr_info.get_announces()
-                olsr_context.aliases = olsr_info.get_aliases()
-            except olsr_parser.OlsrParseFailed:
-                self.logger.warning("Failed to parse olsrd feeds!")
-                return context, nodes
+            # Store per-node routing data.
+            olsr_data = context.for_node[node.pk].routing.olsr
+            olsr_data.router_id = first_router_id
+            olsr_data.neighbours = topology.get(first_router_id, [])
+            olsr_data.announces = announces.get(first_router_id, [])
+            olsr_data.aliases = aliases.get(first_router_id, [])
 
-            # Create a mapping from router ids to nodes
-            self.logger.info("Mapping router IDs to node instances...")
-            visible_routers = set(olsr_context.topology.keys())
-            registered_routers = set()
-            olsr_context.router_id_map = {}
-            for node in core_models.Node.objects.regpoint('config').registry_fields(
-                router_id='core.routerid#router_id'
-            ).registry_filter(
-                core_routerid__rid_family='ipv4',
-                core_routerid__router_id__in=visible_routers,
-            ):
-                first_router_id = node.router_id.all()[0]
-                olsr_context.router_id_map[first_router_id] = node.pk
-                registered_routers.add(first_router_id)
-                nodes.add(node)
+            if created:
+                general_cfg = node.config.core.general(create=core_models.GeneralConfig)
+                # Name the nodes using their IP address by default.
+                general_cfg.name = str(router_id)
+                general_cfg.save()
 
-            self.logger.info("Creating unknown node instances...")
-            for router_id in visible_routers.difference(registered_routers):
-                # Create an invalid node for each unknown router id seen by olsrd
-                node, created = core_models.Node.objects.get_or_create(
-                    uuid=str(uuid.uuid5(olsr_models.OLSR_UUID_NAMESPACE, router_id))
-                )
-                nodes.add(node)
-                olsr_context.router_id_map[router_id] = node.pk
+                node.config.core.routerid(
+                    create=core_models.StaticIpRouterIdConfig,
+                    address='%s/32' % router_id,
+                ).save()
 
-                if created:
-                    general_cfg = node.config.core.general(create=core_models.GeneralConfig)
-                    # Name the nodes using their IP address by default
-                    general_cfg.name = str(router_id)
-                    general_cfg.save()
+        # Prepare smaller router ID maps for each node.
+        for router_id, neighbours in topology.iteritems():
+            node_id = router_id_map[router_id]
+            olsr_data = context.for_node[node_id].routing.olsr
 
-                    node.config.core.routerid(
-                        create=core_models.StaticIpRouterIdConfig,
-                        address='%s/32' % router_id,
-                    ).save()
+            for neighbour in neighbours:
+                address = str(neighbour['address'])
+                olsr_data.router_id_map[address] = router_id_map[address]
 
         return context, nodes
 
@@ -113,15 +135,9 @@ class NodeTopology(monitor_processors.NodeProcessor):
         if not context.push.source:
             # The processor is being invoked in global context. In this case, the GlobalTopology
             # processor has already provided information about the topology.
-            try:
-                rtm.router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-            except core_models.RouterIdConfig.DoesNotExist:
-                # No router-id for this node can be found for IPv4. This means we can't identify the node.
-                pass
-
-            neighbours = context.routing.olsr.topology.get(rtm.router_id, [])
-            announces = context.routing.olsr.announces.get(rtm.router_id, [])
-            aliases = context.routing.olsr.aliases.get(rtm.router_id, [])
+            neighbours = context.routing.olsr.neighbours
+            announces = context.routing.olsr.announces
+            aliases = context.routing.olsr.aliases
             push = False
 
             if not neighbours:
@@ -130,6 +146,8 @@ class NodeTopology(monitor_processors.NodeProcessor):
             else:
                 version = 1
                 context.node_available = True
+
+                rtm.router_id = context.routing.olsr.router_id
                 aliases.append(rtm.router_id)
 
                 # Update last seen timestamp as the router is at least visible.
