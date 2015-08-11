@@ -34,8 +34,7 @@
                     enabled: false
                 },
                 title: {
-                    // TODO: Translate.
-                    text: "Nodes by Status"
+                    text: ""
                 },
                 plotOptions: {
                     pie: {

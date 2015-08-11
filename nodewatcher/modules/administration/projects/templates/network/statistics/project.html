@@ -6,10 +6,11 @@
 {% add_data "js_data" "datastream/highstock/highstock.js" %}
 {% add_data "js_data" "datastream/highstock/highcharts-more.js" %}
 {% add_data "js_data" "datastream/highstock/exporting.js" %}
+{% add_data "js_data" "frontend/js/highcharts.js" %}
 {% add_data "js_data" "network/statistics/project.js" %}
 
 <div class="row snippet node-project">
-    <div class="col-md-2 key"></div>
+    <div class="col-md-2 key">{% trans "Nodes by project" %}</div>
     <div class="col-md-10 value">
         <div id="statistics-nodes-by-project" data-url="{% url "api:api_dispatch_detail" "v1" "statistics" "nodes_by_project" %}"></div>
     </div>
