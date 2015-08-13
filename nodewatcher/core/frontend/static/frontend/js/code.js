@@ -10,6 +10,7 @@
 	if (!$.nodewatcher.theme) { $.nodewatcher.theme = {}; }
 
     $.extend($.nodewatcher.theme, {
+        'hasTouch': 'ontouchstart' in document.documentElement,
     	'iconElement': function(identifier, icons) {
     		if (_.isUndefined(icons)) icons = 'nw';
     		return $('<i/>').addClass('icon ' + icons + ' ' + icons + '-' + identifier);

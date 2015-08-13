@@ -121,7 +121,11 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Node reboot events."),
         'visualization': {
             'type': 'event',
+            'label': gettext_noop("R"),
+            'message': gettext_noop("Node reboot."),
             'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['count'],
             'with': {'node': fields.TagReference('node')},
         },
     })

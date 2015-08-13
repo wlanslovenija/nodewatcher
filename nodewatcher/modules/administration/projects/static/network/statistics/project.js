@@ -28,8 +28,7 @@
                     enabled: false
                 },
                 title: {
-                    // TODO: Translate.
-                    text: "Nodes by Project"
+                    text: ""
                 },
                 plotOptions: {
                     pie: {
