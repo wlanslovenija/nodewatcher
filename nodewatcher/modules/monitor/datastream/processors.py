@@ -148,12 +148,12 @@ class MaintenanceBackprocess(monitor_processors.NetworkProcessor):
         return context, nodes
 
 
-def _maintenance_downsample_worker():
+def _maintenance_downsample_worker(worker_id, num_workers):
     """
     Helper function proxy that can be called by the worker pool.
     """
 
-    datastream.downsample_streams()
+    datastream.downsample_streams(filter_stream=lambda stream: stream.id % num_workers == worker_id)
 
 
 class MaintenanceDownsample(monitor_processors.NetworkProcessor):
@@ -173,12 +173,13 @@ class MaintenanceDownsample(monitor_processors.NetworkProcessor):
         :return: A (possibly) modified context and a (possibly) modified set of nodes
         """
 
-        # Downsample streams using multiple workers in parallel
+        # Downsample streams using multiple workers in parallel.
         results = []
         workers = self.get_worker_pool()
-        self.logger.info("Downsampling streams with %d workers..." % workers._processes)
-        for worker in xrange(workers._processes):
-            results.append(workers.apply_async(_maintenance_downsample_worker))
+        num_workers = workers._processes
+        self.logger.info("Downsampling streams with %d workers..." % num_workers)
+        for worker in xrange(num_workers):
+            results.append(workers.apply_async(_maintenance_downsample_worker, [worker, num_workers]))
 
         for result in results:
             result.get()
