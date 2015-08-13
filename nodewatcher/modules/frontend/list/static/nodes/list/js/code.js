@@ -8,7 +8,7 @@
             return "<em>never</em>";
         
         // TODO: custom date formats, refresing?
-        var output = $('<span/>').attr('title', t.format("MMMM Do YYYY, h:mm:ss a")).append(t.fromNow());
+        var output = $('<span/>').attr('title', t.format($.nodewatcher.theme.dateFormat)).append(t.fromNow());
 
         return output.wrap('<span/>').parent().html();
 

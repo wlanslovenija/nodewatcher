@@ -35,6 +35,10 @@ $.extend( DataTable.ext.classes, {
 } );
 
 DataTable.ext.renderer.header.bootstrap = function (settings, cell, column, classes) {
+
+	if (!column.bSortable)
+		return;
+
 	cell.prepend($('<i class="icon sort nw nw-sort">'));
 
 	$(settings.nTable).on( 'order.dt.DT', function ( e, ctx, sorting, columns ) {
