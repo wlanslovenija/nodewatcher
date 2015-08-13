@@ -516,7 +516,7 @@ MONITOR_RUNS = {
     },
 
     'datastream': {
-        'workers': 10,
+        'workers': 2,
         'interval': 700,
         'max_tasks_per_child': 1,
         'processors': (
