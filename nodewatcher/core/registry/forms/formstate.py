@@ -109,6 +109,11 @@ class FormState(dict):
             container = item._registry_virtual_parent_items_container
             container.remove(item)
 
+            try:
+                del self._item_map[item._id]
+            except KeyError:
+                pass
+
             # Add form actions to remove form data.
             self.add_form_action(
                 registry_id,
@@ -136,6 +141,8 @@ class FormState(dict):
             item = identifier_or_item
         else:
             item = self.lookup_item_by_id(identifier_or_item)
+            if not item:
+                return
 
         self.remove_items(item.get_registry_id(), item_id=item._id)
 

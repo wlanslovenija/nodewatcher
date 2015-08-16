@@ -140,12 +140,12 @@ class AppendFormAction(RegistryFormAction):
 
         # Set form data so that the form will not overwrite it with incorrect values.
         form_data = http_request.QueryDict(None, mutable=True)
-        data = django_forms.model_to_dict(self.item)
-        for field in self.item._meta.fields:
+        data = django_forms.model_to_dict(item)
+        for field in item._meta.fields:
             if not field.editable or field.rel is not None:
                 continue
 
-            context.data_from_field(form_prefix, self.item, field, data[field.name], form_data)
+            context.data_from_field(form_prefix, item, field, data[field.name], form_data)
 
         context.subforms.append(base.generate_form_for_class(
             context,
