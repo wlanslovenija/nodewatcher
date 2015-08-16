@@ -518,6 +518,10 @@ class Command(base.BaseCommand):
                 # Determine whether the imported node should be configured as AP/STA.
                 if 'ap_ssid' in metadata or 'sta_ssid' in metadata:
                     # Backbone node.
+                    type_config = node_mdl.config.core.type()
+                    type_config.type = 'backbone'
+                    type_config.save()
+
                     radio_wifi = node_mdl.config.core.interfaces(
                         create=cgm_models.WifiRadioDeviceConfig,
                         wifi_radio='wifi0',

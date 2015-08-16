@@ -19,6 +19,7 @@ class TypeConfig(registration.bases.NodeConfigRegistryItem):
 
 # Register possible node types
 registration.point('node.config').register_choice('core.type#type', registration.Choice('server', _("Server"), icon="node-type-server"))
+registration.point('node.config').register_choice('core.type#type', registration.Choice('backbone', _("Backbone"), icon="node-type-backbone"))
 registration.point('node.config').register_choice('core.type#type', registration.Choice('wireless', _("Wireless"), icon="node-type-wireless"))
 registration.point('node.config').register_choice('core.type#type', registration.Choice('test', _("Test"), icon="node-type-test"))
 registration.point('node.config').register_choice('core.type#type', registration.Choice('mobile', _("Mobile"), icon="node-type-mobile"))
