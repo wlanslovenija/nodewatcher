@@ -57,7 +57,7 @@ class RegistryChoiceFormField(form_fields.TypedChoiceField, RegistryChoiceFormFi
             self._rp_choices = self._choices = self.widget.choices = rp_choices
 
 
-class RegistryMultipleChoiceFormField(form_fields.MultipleChoiceField, RegistryChoiceFormFieldMixin):
+class RegistryMultipleChoiceFormField(form_fields.TypedMultipleChoiceField, RegistryChoiceFormFieldMixin):
     """
     An augmented TypedMultipleChoiceField that gets updated by client-side AJAX on every
     change and can handle dependent choices.

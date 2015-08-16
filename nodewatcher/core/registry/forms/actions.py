@@ -1,4 +1,5 @@
 from django import forms as django_forms
+from django.http import request as http_request
 
 from . import base
 
@@ -137,10 +138,19 @@ class AppendFormAction(RegistryFormAction):
                 parent=context.hierarchy_parent_current,
             )
 
+        # Set form data so that the form will not overwrite it with incorrect values.
+        form_data = http_request.QueryDict(None, mutable=True)
+        data = django_forms.model_to_dict(self.item)
+        for field in self.item._meta.fields:
+            if not field.editable or field.rel is not None:
+                continue
+
+            context.data_from_field(form_prefix, self.item, field, data[field.name], form_data)
+
         context.subforms.append(base.generate_form_for_class(
             context,
             form_prefix,
-            None,
+            form_data,
             len(context.subforms),
             instance=item,
             force_selector_widget=context.force_selector_widget,
@@ -183,11 +193,4 @@ class AssignToFormAction(RegistryFormAction):
         # Modify any overriden values.
         data = django_forms.model_to_dict(self.item)
         for field in self.fields:
-            values = data[field]
-            if not isinstance(values, (list, tuple)):
-                # We need to support updates of lists of values.
-                values = [values]
-
-            field_name = context.get_prefix(form_prefix, self.item, field)
-            for value in values:
-                context.data.update({field_name: value})
+            context.data_from_field(form_prefix, self.item, field, data[field])

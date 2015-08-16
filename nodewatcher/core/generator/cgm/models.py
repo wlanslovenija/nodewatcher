@@ -168,6 +168,9 @@ class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
             self.name = "Bridge%(id)s" % {'id': random.choice(string.uppercase)}
 
     def __unicode__(self):
+        if not self.name:
+            return "(unnamed bridge)"
+
         return self.name
 
 registration.point('node.config').register_item(BridgeInterfaceConfig)

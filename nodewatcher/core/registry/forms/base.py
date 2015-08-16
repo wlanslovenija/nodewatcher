@@ -284,10 +284,10 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
     # Populate data with default values from the registry item instance
     if selected_item != previous_item and instance is not None:
         model_data = django_forms.model_to_dict(instance)
-        for field_key, value in model_data.iteritems():
-            field_key = context.get_prefix(prefix, selected_item, field_key)
-            if data is not None and field_key not in data:
-                data[field_key] = value
+        for field_name, values in model_data.iteritems():
+            field_name_prefix = context.get_prefix(prefix, selected_item, field_name)
+            if data is not None and field_name_prefix not in data:
+                context.data_from_field(prefix, selected_item, field_name, values, data)
 
     # Now generate a form for the selected item
     form_prefix = context.get_prefix(prefix, selected_item)
@@ -479,6 +479,18 @@ class RegistryFormContext(object):
             return form_prefix
         else:
             return '%s-%s' % (form_prefix, field)
+
+    def data_from_field(self, prefix, item, field, value, data=None):
+        if data is None:
+            data = self.data
+
+        if not isinstance(value, (list, tuple)):
+            # We need to support updates of lists of values.
+            value = [value]
+
+        field_name = self.get_prefix(prefix, item, field)
+        for scalar_value in value:
+            data.update({field_name: scalar_value})
 
     @property
     def form_id(self):
