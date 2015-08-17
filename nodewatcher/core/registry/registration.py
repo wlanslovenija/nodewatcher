@@ -5,6 +5,8 @@ from django.core import exceptions as django_exceptions
 from django.db import models as django_models
 from django.utils import datastructures as django_datastructures
 
+import json_field
+
 from . import access as registry_access, lookup as registry_lookup, models as registry_models, state as registry_state
 from . import exceptions
 from ...utils import datastructures as nw_datastructures
@@ -543,6 +545,18 @@ class RegistrationPoint(object):
 
         return [p['processor'] for p in sorted(self._form_processors, key=lambda p: p['order'])]
 
+    def get_root_metadata(self, root):
+        try:
+            return root.registry_metadata.get(self.namespace, {})
+        except TypeError:
+            return {}
+
+    def set_root_metadata(self, root, metadata):
+        if not root.registry_metadata:
+            root.registry_metadata = {}
+
+        root.registry_metadata[self.namespace] = metadata
+
     def __repr__(self):
         return "<RegistrationPoint '%s'>" % self.name
 
@@ -608,15 +622,19 @@ def create_point(model, namespace, mixins=None):
         setattr(bases, base_name, item_base)
 
         def augment_root_model(model):
-            # Augment the model with a custom manager and a custom accessor
+            # Augment the model with a custom manager and a custom accessor.
             model.add_to_class(namespace, registry_access.RegistryAccessor(point))
             if not isinstance(model.objects, registry_lookup.RegistryLookupManager):
                 del model.objects
                 model.add_to_class('objects', registry_lookup.RegistryLookupManager(point))
                 model._default_manager = model.objects
 
-            # Update the model attribute in regpoint instance
+            # Update the model attribute in regpoint instance.
             point.model = model
+
+            # Add a registry metadata field to the root model.
+            if not hasattr(model, 'registry_metadata'):
+                model.add_to_class('registry_metadata', json_field.JSONField(default={}))
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation

@@ -356,7 +356,15 @@ class Command(base.BaseCommand):
         # Preprocess nodes and create instances.
         name_model_map = {}
         for node in data['nodes'].values():
-            node_mdl = core_models.Node(uuid=node['uuid'])
+            node_mdl = core_models.Node(
+                uuid=node['uuid'],
+                registry_metadata={
+                    'config': {
+                        # Since we are generating custom configuration, disable defaults.
+                        'using_defaults': False,
+                    }
+                }
+            )
             node_mdl.save()
             node['_model'] = node_mdl
 

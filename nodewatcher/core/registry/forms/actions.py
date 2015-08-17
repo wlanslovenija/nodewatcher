@@ -142,10 +142,15 @@ class AppendFormAction(RegistryFormAction):
         form_data = http_request.QueryDict(None, mutable=True)
         data = django_forms.model_to_dict(item)
         for field in item._meta.fields:
-            if not field.editable or field.rel is not None:
+            if not field.editable:
                 continue
 
-            context.data_from_field(form_prefix, item, field, data[field.name], form_data)
+            context.data_from_field(form_prefix, item, field.name, data[field.name], form_data)
+
+        # Add dummy meta fields.
+        form_data[context.get_prefix(form_prefix, field='item')] = item._meta.model_name
+        form_data[context.get_prefix(form_prefix, field='prev_item')] = item._meta.model_name
+        form_data[context.get_prefix(form_prefix, field='mid')] = 0
 
         context.subforms.append(base.generate_form_for_class(
             context,

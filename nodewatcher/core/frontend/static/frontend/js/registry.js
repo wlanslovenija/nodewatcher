@@ -25,16 +25,16 @@
 
         // Bind event handlers
         $('.registry_form_item_chooser').change(function() {
-            $.registry.evaluate_rules({});
+            $.registry.update({});
         });
         $('.registry_form_selector').change(function() {
-            $.registry.evaluate_rules({});
+            $.registry.update({});
         });
         $('input[type="checkbox"]').change(function() {
-            $.registry.evaluate_rules({});
+            $.registry.update({});
         });
         $('.registry_add_item').click(function() {
-            $.registry.evaluate_rules({
+            $.registry.update({
                 append: {
                     registry_id: $(this).data('registry-id'),
                     parent_id: $(this).data('parent')
@@ -42,9 +42,24 @@
             });
         });
         $('.registry_remove_item').click(function() {
-            $.registry.evaluate_rules({
+            $.registry.update({
                 remove: {
                     index: $(this).data('index')
+                }
+            });
+        });
+
+        $('.registry-defaults-enable').click(function() {
+            $.registry.update({
+                defaults: {
+                    value: true
+                }
+            });
+        });
+        $('.registry-defaults-disable').click(function() {
+            $.registry.update({
+                defaults: {
+                    value: false
                 }
             });
         });
@@ -79,7 +94,7 @@
      * changes as a set of Javascript instructions that manipulate the registry
      * object.
      */
-    $.registry.evaluate_rules = function(actions) {
+    $.registry.update = function(actions) {
         // Prepare form in serialized form (pun intended)
         var forms = $('#registry_forms *').serialize();
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));

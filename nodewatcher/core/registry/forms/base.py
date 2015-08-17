@@ -3,7 +3,7 @@ import hashlib
 import os
 
 from django import forms as django_forms, template
-from django.db import transaction
+from django.db import transaction, models
 from django.utils import datastructures
 
 from ....utils import loader, toposort
@@ -19,6 +19,8 @@ __all__ = (
     'FORM_DEFAULTS',
     'FORM_ONLY_DEFAULTS',
     'FORM_ROOT_CREATE',
+    'FORM_SET_DEFAULTS',
+    'FORM_DEFAULTS_ENABLED',
 )
 
 
@@ -28,6 +30,8 @@ FORM_OUTPUT = 0x02
 FORM_DEFAULTS = 0x04
 FORM_ONLY_DEFAULTS = 0x08
 FORM_ROOT_CREATE = 0x10
+FORM_SET_DEFAULTS = 0x20
+FORM_DEFAULTS_ENABLED = 0x40
 
 
 class RegistryValidationError(Exception):
@@ -148,6 +152,7 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
         self.regpoint = context.regpoint.name
         self.root = context.root.pk if context.root else None
         self.form_id = context.form_id
+        self.form_state = context.form_state
 
     def add_error(self, message):
         """
@@ -288,6 +293,10 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
             field_name_prefix = context.get_prefix(prefix, selected_item, field_name)
             if data is not None and field_name_prefix not in data:
                 context.data_from_field(prefix, selected_item, field_name, values, data)
+
+    # Ensure that the instance root is properly set.
+    if instance is not None:
+        instance.root = context.root
 
     # Now generate a form for the selected item
     form_prefix = context.get_prefix(prefix, selected_item)
@@ -735,11 +744,7 @@ def prepare_forms(context):
                             meta_modified = True
 
                     if meta_modified:
-                        # If a form has been modified we cannot simply save, so we fake a validation
-                        # error so the user will be displayed the updated forms
-                        context.validation_errors = True
-
-                        # Update the submeta form with new count
+                        # Update the submeta form with new count.
                         submeta = RegistrySetMetaForm(
                             prefix=context.get_prefix(context.base_prefix + '_sm'),
                             initial={'form_count': len(context.subforms)},
@@ -832,6 +837,17 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
     # Load initial form state when requested and available.
     if flags & FORM_INITIAL and root is not None:
         context.form_state = formstate.FormState.from_db(regpoint, root)
+        context.state = {
+            'metadata': regpoint.get_root_metadata(root)
+        }
+    elif not context.state:
+        context.state = {
+            'metadata': {},
+        }
+
+    context.form_state.set_metadata(context.state['metadata'])
+    if flags & FORM_SET_DEFAULTS:
+        context.form_state.set_using_defaults(flags & FORM_DEFAULTS_ENABLED)
 
     # Prepare form processors.
     form_processors = []
@@ -895,6 +911,10 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
                     forms.add_error(e.message)
 
         if not context.validation_errors:
+            # Persist metadata.
+            regpoint.set_root_metadata(root, context.state['metadata'])
+            root.save()
+
             transaction.savepoint_commit(sid)
             context.clear_state()
         else:

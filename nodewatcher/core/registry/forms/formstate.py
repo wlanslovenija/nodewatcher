@@ -3,6 +3,10 @@ import itertools
 
 from django.core import exceptions
 
+__all__ = (
+    'FormState',
+)
+
 
 class FormState(dict):
     def __init__(self, registration_point):
@@ -15,6 +19,16 @@ class FormState(dict):
         self.registration_point = registration_point
         self._form_actions = {}
         self._item_map = {}
+        self._metadata = {}
+
+    def set_metadata(self, metadata):
+        self._metadata = metadata
+
+    def set_using_defaults(self, value):
+        self._metadata['using_defaults'] = value
+
+    def is_using_defaults(self):
+        return self._metadata.get('using_defaults', True)
 
     def get_form_actions(self, registry_id):
         """
@@ -390,6 +404,9 @@ class FormState(dict):
         :param registration_point: Registration point instance
         :param create: True if the root is just being created
         """
+
+        if not self.is_using_defaults():
+            return
 
         for form_default in registration_point.get_form_defaults():
             form_default.set_defaults(self, create)

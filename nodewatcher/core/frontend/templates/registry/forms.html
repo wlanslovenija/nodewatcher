@@ -1,9 +1,27 @@
 {% contextblock %}
-    {% load sekizai_tags %}
+    {% load sekizai_tags i18n %}
 
     {% addtoblock "css" %}{{ registry_forms.media.css }}{% endaddtoblock %}
     {% addtoblock "js" %}{{ registry_forms.media.js }}{% endaddtoblock %}
 {% endcontextblock %}
+
+{% if registry_forms.form_state.is_using_defaults %}
+    <div class="alert alert-info">
+      <b>{% trans "This node is currently using automatically generated defaults." %}</b>
+      <button type="button" class="btn btn-xs btn-primary pull-right registry-defaults-disable">{% trans "Disable defaults" %}</button>
+      <div class="small">
+        {% trans "Whenever you change any configuration, defaults are automatically applied, which may reconfigure the node." %}
+      </div>
+    </div>
+{% else %}
+    <div class="alert alert-warning">
+      <b>{% trans "This node is using a custom configuration." %}</b>
+      <button type="button" class="btn btn-xs btn-warning pull-right registry-defaults-enable">{% trans "Reset to defaults" %}</button>
+      <div class="small">
+        {% trans "If you change any configuration, automatic defaults will not be applied, so you need to configure everything manually. " %}
+      </div>
+    </div>
+{% endif %}
 
 {{ registry_forms }}
 
