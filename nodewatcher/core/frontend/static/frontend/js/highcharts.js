@@ -7,7 +7,7 @@
         $.nodewatcher.theme = {};
     }
 
-    $.extend(Highcharts.Chart.prototype, { 
+    $.extend(Highcharts.Chart.prototype, {
         contextMenu: function (name, items, x, y, width, height) {
             var chart = this,
                 navOptions = chart.options.navigation,
@@ -75,6 +75,8 @@
 
             wrapper.addClass('open');
         },
+
+        // TODO: This function should use contextMenu so that it is extensible by plugins.
         addButton: function (options) {
             var chart = this,
                 renderer = chart.renderer,
