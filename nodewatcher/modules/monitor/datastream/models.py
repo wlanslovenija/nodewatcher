@@ -140,7 +140,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("1 minute load average."),
         'visualization': {
             'type': 'line',
-            'initial_set': False,
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -153,7 +153,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("5 minute load average."),
         'visualization': {
             'type': 'line',
-            'initial_set': False,
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -166,7 +166,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("15 minute load average."),
         'visualization': {
             'type': 'line',
-            'initial_set': False,
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -221,7 +221,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Total amount of memory."),
         'visualization': {
             'type': 'line',
-            # We want total memory in graphs, but we hide it by the default to emphasis visualization on used memory.
+            # We want total memory in graphs, but we hide it by the default to emphasise visualization on used memory.
             'initial_set': True,
             'hidden': True,
             'time_downsamplers': ['mean'],
@@ -236,7 +236,7 @@ class GeneralResourcesMonitorStreams(RegistryItemStreams):
         'description': gettext_noop("Number of running processes."),
         'visualization': {
             'type': 'line',
-            'initial_set': False,
+            'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'minimum': 0.0,
@@ -552,6 +552,7 @@ class InterfaceMonitorStreams(InterfaceStreams):
             'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         },
         'unit': 'B',
     })
@@ -578,6 +579,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         },
         'unit': 'MHz',
     })
@@ -589,6 +591,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         },
         'unit': 'Mbps',
     })
@@ -600,6 +603,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         },
         'unit': 'B',
     })
@@ -611,6 +615,7 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
             'initial_set': False,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
+            'minimum': 0.0,
         },
         'unit': 'B',
     })
@@ -654,7 +659,9 @@ class WifiInterfaceMonitorStreams(InterfaceMonitorStreams):
         'description': gettext_noop("Signal-to-noise ratio."),
         'visualization': {
             'type': 'line',
-            'initial_set': False,
+            # We want signal-to-noise in graphs, but we hide it by the default to emphasise visualization on signal and noise.
+            'initial_set': True,
+            'hidden': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['min', 'mean', 'max'],
             'with': {
