@@ -96,7 +96,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 data=request.POST,
                 save=True,
                 form_state=form_state,
-                flags=registry_forms.FORM_OUTPUT,
+                flags=registry_forms.FORM_OUTPUT | registry_forms.FORM_CLEAR_STATE,
             )
 
             if not has_errors:
@@ -175,7 +175,7 @@ class RegistryEditFormMixin(RegistryFormMixin):
             data=request.POST,
             save=True,
             form_state=form_state,
-            flags=registry_forms.FORM_OUTPUT,
+            flags=registry_forms.FORM_OUTPUT | registry_forms.FORM_CLEAR_STATE,
         )
 
         if not has_errors:

@@ -2,8 +2,8 @@ import copy
 import hashlib
 import os
 
-from django import forms as django_forms, template
-from django.db import transaction, models
+from django import forms as django_forms, template, db as django_db
+from django.db import transaction
 from django.utils import datastructures
 
 from ....utils import loader, toposort
@@ -21,6 +21,7 @@ __all__ = (
     'FORM_ROOT_CREATE',
     'FORM_SET_DEFAULTS',
     'FORM_DEFAULTS_ENABLED',
+    'FORM_CLEAR_STATE',
 )
 
 
@@ -32,6 +33,7 @@ FORM_ONLY_DEFAULTS = 0x08
 FORM_ROOT_CREATE = 0x10
 FORM_SET_DEFAULTS = 0x20
 FORM_DEFAULTS_ENABLED = 0x40
+FORM_CLEAR_STATE = 0x80
 
 
 class RegistryValidationError(Exception):
@@ -916,12 +918,15 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
             root.save()
 
             transaction.savepoint_commit(sid)
-            context.clear_state()
+            if flags & FORM_CLEAR_STATE:
+                context.clear_state()
         else:
             transaction.savepoint_rollback(sid)
     except RegistryValidationError:
         transaction.savepoint_rollback(sid)
-    except transaction.TransactionManagementError:
+    except (transaction.TransactionManagementError, django_db.DatabaseError):
+        # Do not perform a rollback in case of a database error as this will just raise another
+        # database error exception as the transaction has been aborted.
         raise
     except:
         transaction.savepoint_rollback(sid)
