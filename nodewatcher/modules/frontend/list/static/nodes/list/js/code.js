@@ -52,7 +52,7 @@
                     {'data': 'uuid', 'visible': false}
                 ],
                 // Grouping, we fix sorting by (hidden) type column
-                'orderFixed': [],
+                //'orderFixed': [],
                 // And make default sorting by name column
                 'order': [[0, 'asc'],[1, 'asc']],
                 //'drawCallback': $.tastypie.groupDrawCallback(table),
