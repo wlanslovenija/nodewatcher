@@ -2,8 +2,8 @@ import copy
 import hashlib
 import os
 
-from django import forms as django_forms, template
-from django.db import transaction, models
+from django import forms as django_forms, template, db as django_db
+from django.db import transaction
 from django.utils import datastructures
 
 from ....utils import loader, toposort
@@ -921,7 +921,9 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
             transaction.savepoint_rollback(sid)
     except RegistryValidationError:
         transaction.savepoint_rollback(sid)
-    except transaction.TransactionManagementError:
+    except (transaction.TransactionManagementError, django_db.DatabaseError):
+        # Do not perform a rollback in case of a database error as this will just raise another
+        # database error exception as the transaction has been aborted.
         raise
     except:
         transaction.savepoint_rollback(sid)
