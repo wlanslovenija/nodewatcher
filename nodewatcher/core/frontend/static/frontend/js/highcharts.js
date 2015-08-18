@@ -77,6 +77,7 @@
         },
 
         // TODO: This function should use contextMenu so that it is extensible by plugins.
+        // TODO: Menu should not pass through mouseover events because then tooltips are shown below (which makes it impossible to print a chart without a tooltip).
         addButton: function (options) {
             var chart = this,
                 renderer = chart.renderer,
