@@ -25,7 +25,7 @@ class FormState(dict):
         self._metadata = metadata
 
     def set_using_defaults(self, value):
-        self._metadata['using_defaults'] = value
+        self._metadata['using_defaults'] = bool(value)
 
     def is_using_defaults(self):
         return self._metadata.get('using_defaults', True)
