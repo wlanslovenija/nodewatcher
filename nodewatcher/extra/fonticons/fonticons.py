@@ -17,11 +17,13 @@ EOT_SUFFIX = '.eot'
 CHARACTER_ALLOCATION_START = 0xF0000
 CHARACTER_ALLOCATION_END = 0xFFFFD
 
+
 def maybe_gziped_file(filename, mode="r"):
     if os.path.splitext(filename)[1].lower() in (".svgz", ".gz"):
         import gzip
         return gzip.GzipFile(filename, mode)
     return file(filename, mode)
+
 
 class IconGlyph(object):
     def __init__(self):
@@ -29,6 +31,7 @@ class IconGlyph(object):
 
     def export(self, glyph):
         pass
+
 
 class SVGPathGlyph(IconGlyph):
     def __init__(self, paths, width=1024, height=1024):
@@ -58,6 +61,7 @@ class SVGPathGlyph(IconGlyph):
         # set glyph side bearings, can be any value or even 0
         glyph.left_side_bearing = glyph.right_side_bearing = 10
 
+
 class SVGFileGlyph(IconGlyph):
     def __init__(self, svgfile):
         self._file = svgfile
@@ -73,6 +77,7 @@ class SVGFileGlyph(IconGlyph):
         # set glyph side bearings, can be any value or even 0
         glyph.left_side_bearing = glyph.right_side_bearing = 10
 
+
 class SVGDocumentGlyph(IconGlyph):
     def __init__(self, data):
         self._data = data
@@ -87,6 +92,7 @@ class SVGDocumentGlyph(IconGlyph):
         glyph.transform([1, 0, 0, 1, 0, 0])
         glyph.left_side_bearing = glyph.right_side_bearing = 10
 
+
 class FontIcons(object):
     def __init__(self, identifier, name=None):
         self._name = name if name else identifier
@@ -94,13 +100,13 @@ class FontIcons(object):
         self._icons = {}
         self._characters = {}
 
-    def addGlyph(self, identifier, glyph, character = None):
+    def addGlyph(self, identifier, glyph, character=None):
         if identifier in self._icons:
             raise KeyError("Identifier already used")
 
         if not character:
             for c in xrange(CHARACTER_ALLOCATION_START, CHARACTER_ALLOCATION_END):
-                if not c in self._characters:
+                if c not in self._characters:
                     character = c
                     break
 
@@ -111,13 +117,12 @@ class FontIcons(object):
         self._characters[character] = identifier
 
     def addName(self, identifier, name):
-        if not identifier in self._icons:
+        if identifier not in self._icons:
             return
         self._icons[identifier]['names'].update(Set(name))
 
-
     def delName(self, identifier, name):
-        if not identifier in self._icons:
+        if identifier not in self._icons:
             return
         self._icons[identifier]['names'].difference_update(Set(name))
 
@@ -149,9 +154,8 @@ class FontIcons(object):
         #subprocess.call(['ttfautohint', '-s', '-v', ttftmp, os.path.join(directory, self._identifier + TTF_SUFFIX)])
 
         if not ttfonly:
-
             print "Exporting EOT font ..."
-            fd = os.open(os.path.join(directory, self._identifier + EOT_SUFFIX), os.O_WRONLY|os.O_CREAT)
+            fd = os.open(os.path.join(directory, self._identifier + EOT_SUFFIX), os.O_WRONLY | os.O_CREAT)
             subprocess.call(['mkeot', os.path.join(directory, self._identifier + TTF_SUFFIX)], stdout=fd)
             os.close(fd)
             files.append(os.path.join(directory, self._identifier + EOT_SUFFIX))
@@ -162,7 +166,7 @@ class FontIcons(object):
             print "Exporting SVG font ..."
             font.generate(os.path.join(directory, self._identifier + SVG_SUFFIX))
             files.append(os.path.join(directory, self._identifier + SVG_SUFFIX))
-         
+
             try:
                 import scour
 
@@ -182,7 +186,6 @@ class FontIcons(object):
         return files
 
     def exportCSS(self, directory='.', name=None, prefix=None, fonturl=''):
-
         if not name:
             name = self._identifier + '.css'
 

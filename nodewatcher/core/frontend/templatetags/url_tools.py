@@ -14,6 +14,7 @@ from django.utils.encoding import iri_to_uri
 
 register = template.Library()
 
+
 @register.simple_tag
 def url_add_params(url, **kwargs):
     r = urlparse.urlparse(url)
@@ -35,4 +36,3 @@ def url_add_params(url, **kwargs):
         )
     except:
         return ''
-

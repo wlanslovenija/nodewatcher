@@ -80,6 +80,7 @@ def text_concat(*args, **kwargs):
     values = filter(None, [text_value(v) for v in args])
     return separator.join(values)
 
+
 def parse_token_contents(parser, token):
     """
     Parse template tag contents
@@ -109,6 +110,7 @@ def parse_token_contents(parser, token):
         'kwargs': kwargs,
         'asvar': asvar,
     }
+
 
 def split_css_classes(css_classes):
     """

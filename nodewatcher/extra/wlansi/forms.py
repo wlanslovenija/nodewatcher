@@ -133,7 +133,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         # TODO: Make it so that we don't always remove everything.
         state.remove_items('core.interfaces')
 
-        ### Ethernet.
+        # Ethernet.
 
         if len(device.ports) > 1:
             # If there are multiple ethernet ports, use Wan0 for uplink.
@@ -230,7 +230,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     },
                 )
 
-        ### Wireless.
+        # Wireless.
 
         radio = device.get_radio('wifi0')
         protocol = radio.protocols[0]

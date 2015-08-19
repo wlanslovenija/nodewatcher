@@ -11,7 +11,7 @@ from django.template.loader import get_template
 
 from ..forms import (
     render_button, render_field, render_field_and_label, render_form,
-    render_form_group, render_formset, 
+    render_form_group, render_formset,
     render_label, render_form_errors, render_formset_errors
 )
 
@@ -250,6 +250,7 @@ def theme_alert(content, type='info', dismissable=True):
     """
     return render_alert(content, type, dismissable)
 
+
 @register.simple_tag
 def theme_legend(content):
     """
@@ -262,7 +263,7 @@ def theme_legend(content):
     **Parameters**:
 
         :content: HTML content
-        
+
     **usage**::
 
         {% theme_legend "my_content" %}
@@ -273,6 +274,7 @@ def theme_legend(content):
 
     """
     return "<legend>%s</legend>" % content
+
 
 @register.tag('buttons')
 def theme_buttons(parser, token):
@@ -333,6 +335,7 @@ class ButtonsNode(template.Node):
         else:
             return output
 
+
 @register.tag('alert')
 def theme_alert(parser, token):
     """
@@ -363,8 +366,8 @@ def theme_alert(parser, token):
     parser.delete_first_token()
     return AlertNode(**kwargs)
 
-class AlertNode(template.Node):
 
+class AlertNode(template.Node):
     def __init__(self, nodelist, type="info", icon=None, dismissable=False):
         self.nodelist = nodelist
         self.alert_type = type
@@ -373,6 +376,7 @@ class AlertNode(template.Node):
 
     def render(self, context):
         return render_alert(self.nodelist.render(context), alert_type=self.alert_type, dismissable=self.dismissable)
+
 
 @register.simple_tag(takes_context=True)
 def theme_messages(context, *args, **kwargs):

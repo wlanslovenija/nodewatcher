@@ -7,7 +7,7 @@ register = template.Library()
 @register.inclusion_tag(('status/network_icon.html', 'status/icon.html'))
 def network_status_icon(choice, size):
     return {
-        'category' : 'network',
+        'category': 'network',
         'choice': choice,
         'size': size,
     }
@@ -16,7 +16,7 @@ def network_status_icon(choice, size):
 @register.inclusion_tag(('status/monitored_icon.html', 'status/icon.html'))
 def monitored_status_icon(choice, size):
     return {
-        'category' : 'monitored',
+        'category': 'monitored',
         'choice': choice,
         'size': size,
     }
@@ -25,7 +25,7 @@ def monitored_status_icon(choice, size):
 @register.inclusion_tag(('status/health_icon.html', 'status/icon.html'))
 def health_status_icon(choice, size):
     return {
-        'category' : 'health',
+        'category': 'health',
         'choice': choice,
         'size': size,
     }
@@ -34,7 +34,7 @@ def health_status_icon(choice, size):
 @register.inclusion_tag(('status/network_description.html', 'status/description.html'))
 def network_status_description(choice):
     return {
-        'category' : 'network',
+        'category': 'network',
         'choice': choice,
     }
 
@@ -42,7 +42,7 @@ def network_status_description(choice):
 @register.inclusion_tag(('status/monitored_description.html', 'status/description.html'))
 def monitored_status_description(choice):
     return {
-        'category' : 'monitored',
+        'category': 'monitored',
         'choice': choice,
     }
 
@@ -50,6 +50,6 @@ def monitored_status_description(choice):
 @register.inclusion_tag(('status/health_description.html', 'status/description.html'))
 def health_status_description(choice):
     return {
-        'category' : 'health',
+        'category': 'health',
         'choice': choice,
     }
