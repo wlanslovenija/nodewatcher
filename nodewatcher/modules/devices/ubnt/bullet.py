@@ -1,23 +1,23 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class UBNTBullet(cgm_devices.DeviceBase):
+class UBNTBulletM2(cgm_devices.DeviceBase):
     """
-    UBNT Bullet device descriptor.
+    UBNT Bullet M2 device descriptor.
     """
 
-    identifier = 'ub-bullet'
-    name = "Bullet"
+    identifier = 'ub-bullet-m2'
+    name = "Bullet M2"
     manufacturer = "Ubiquity"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
-            cgm_protocols.IEEE80211AN(
-                cgm_protocols.IEEE80211AN.SHORT_GI_40,
-                cgm_protocols.IEEE80211AN.TX_STBC1,
-                cgm_protocols.IEEE80211AN.RX_STBC1,
-                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.TX_STBC1,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
             )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
@@ -61,14 +61,28 @@ class UBNTBullet(cgm_devices.DeviceBase):
     }
 
 
-class UBNTBulletM5(UBNTBullet):
+class UBNTBulletM5(UBNTBulletM2):
     """
     UBNT Bullet M5 device descriptor.
     """
 
     identifier = 'ub-bullet-m5'
     name = "Bullet M5"
+    radios = [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
+            cgm_protocols.IEEE80211AN(
+                cgm_protocols.IEEE80211AN.SHORT_GI_40,
+                cgm_protocols.IEEE80211AN.TX_STBC1,
+                cgm_protocols.IEEE80211AN.RX_STBC1,
+                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            )
+        ], [
+            cgm_devices.AntennaConnector('a1', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
+        ])
+    ]
 
 # Register the UBNT Bullet device
-cgm_base.register_device('openwrt', UBNTBullet)
+cgm_base.register_device('openwrt', UBNTBulletM2)
 cgm_base.register_device('openwrt', UBNTBulletM5)

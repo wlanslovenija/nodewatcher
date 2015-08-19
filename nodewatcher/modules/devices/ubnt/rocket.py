@@ -1,23 +1,23 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class UBNTRocketM5(cgm_devices.DeviceBase):
+class UBNTRocketM2(cgm_devices.DeviceBase):
     """
-    UBNT Rocket M5 device descriptor.
+    UBNT Rocket M2 device descriptor.
     """
 
-    identifier = 'ub-rocket-m5'
-    name = "Rocket"
+    identifier = 'ub-rocket-m2'
+    name = "Rocket M2"
     manufacturer = "Ubiquity"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
-            cgm_protocols.IEEE80211AN(
-                cgm_protocols.IEEE80211AN.SHORT_GI_40,
-                cgm_protocols.IEEE80211AN.TX_STBC1,
-                cgm_protocols.IEEE80211AN.RX_STBC1,
-                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.TX_STBC1,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
             )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
@@ -60,5 +60,29 @@ class UBNTRocketM5(cgm_devices.DeviceBase):
         }
     }
 
+
+class UBNTRocketM5(UBNTRocketM2):
+    """
+    UBNT Rocket M5 device descriptor.
+    """
+
+    identifier = 'ub-rocket-m5'
+    name = "Rocket M5"
+    radios = [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
+            cgm_protocols.IEEE80211AN(
+                cgm_protocols.IEEE80211AN.SHORT_GI_40,
+                cgm_protocols.IEEE80211AN.TX_STBC1,
+                cgm_protocols.IEEE80211AN.RX_STBC1,
+                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            )
+        ], [
+            cgm_devices.AntennaConnector('a1', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
+        ])
+    ]
+
 # Register the UBNT Rocket device
+cgm_base.register_device('openwrt', UBNTRocketM2)
 cgm_base.register_device('openwrt', UBNTRocketM5)
