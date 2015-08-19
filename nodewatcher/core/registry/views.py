@@ -34,8 +34,8 @@ def evaluate_forms(request, regpoint_id, root_id):
             root.save()
 
         # TODO: Maybe actions should be registered and each action should have something like Action.name that would then call Action.prepare(...)
-        actions = json.loads(request.POST.get('ACTIONS', '')).iteritems()
-        for action, options in actions:
+        actions = json.loads(request.POST.get('ACTIONS', ''))
+        for action, options in actions.items():
             if action == 'defaults':
                 additional_flags |= registry_forms.FORM_SET_DEFAULTS
 
@@ -55,7 +55,7 @@ def evaluate_forms(request, regpoint_id, root_id):
 
         # Merge in client actions when available.
         changed = False
-        for action, options in actions:
+        for action, options in actions.items():
             if action == 'append':
                 form_state.append_default_item(options['registry_id'], options['parent_id'])
                 changed = True
