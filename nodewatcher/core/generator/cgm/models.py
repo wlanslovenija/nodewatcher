@@ -317,11 +317,17 @@ class LeasableNetwork(models.Model):
         default='1h',
         verbose_name=_('Lease Duration'),
     )
+    nat_type = registry_fields.RegistryChoiceField(
+        'node.config', 'core.interfaces.network#nat_type',
+        blank=True, null=True, verbose_name=_("NAT Type"),
+    )
 
     class Meta:
         abstract = True
 
 registration.point('node.config').register_choice('core.interfaces.network#lease_type', registration.Choice('dhcp', _("DHCP")))
+registration.point('node.config').register_choice('core.interfaces.network#nat_type', registration.Choice('snat-primary-ip', _("SNAT (Primary IP)")))
+# TODO: Support other kinds of SNAT, for example over the uplink interface(s).
 
 
 class NetworkConfig(registration.bases.NodeConfigRegistryItem):
