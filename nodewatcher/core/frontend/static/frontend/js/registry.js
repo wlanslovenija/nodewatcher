@@ -9,6 +9,7 @@
 }(function ($) {
     var regpoint_id;
     var root_id;
+    var updating = false;
 
     // Registry methods object
     $.registry = {};
@@ -95,6 +96,12 @@
      * object.
      */
     $.registry.update = function(actions) {
+        // Ignore multiple parallel updates as they may cause transaction deadlocks.
+        if (updating) {
+            return;
+        }
+        updating = true;
+
         // Prepare form in serialized form (pun intended)
         var forms = $('#registry_forms *').serialize();
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
@@ -125,6 +132,8 @@
             }
 
             $('body').scrollspy('refresh');
+
+            updating = false;
         });
     };
 }));
