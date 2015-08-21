@@ -1,7 +1,7 @@
 {% overextends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n %}
+    {% load future i18n partial_tags %}
 
     {% setcontext as title %}{% blocktrans %}Generate Firmware for Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
     {% setcontext as heading %}{% spaceless %}
