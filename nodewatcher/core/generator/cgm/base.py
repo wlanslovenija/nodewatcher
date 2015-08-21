@@ -252,6 +252,24 @@ class PlatformConfiguration(object):
         self.crypto = self.crypto_manager_class()
         self.files = self.file_manager_class()
 
+        self._deferred_configuration = []
+
+    def defer_configuration(self, function):
+        """
+        Defers a configuration function so it will be called after all the
+        other configuration modules have already completed.
+        """
+
+        self._deferred_configuration.append(function)
+        return function
+
+    def get_deferred_configuration(self):
+        """
+        Returns a list of deferred configuration functions.
+        """
+
+        return self._deferred_configuration
+
     def get_build_config(self):
         """
         Returns a build configuration which must be JSON-serializable. This
@@ -294,17 +312,21 @@ class PlatformBase(object):
 
         cfg = self.config_class()
 
-        # Execute the module chain in order
+        # Execute the module chain in order.
         for _, module, device in sorted(self._modules):
             if device is None or device == node.config.core.general().router:
                 module(node, cfg)
 
-        # Process user-configured packages
+        # Process user-configured packages.
         for name, cfgclass, package in self._packages:
             pkgcfg = node.config.core.packages(onlyclass=cfgclass)
             if [x for x in pkgcfg if x.enabled]:
                 package(node, pkgcfg, cfg)
                 cfg.packages.add(name)
+
+        # Process any deferred configuration.
+        for function in cfg.get_deferred_configuration():
+            function()
 
         return cfg
 
