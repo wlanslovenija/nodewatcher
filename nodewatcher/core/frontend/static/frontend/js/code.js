@@ -14,6 +14,7 @@
     }
 
     $.extend($.nodewatcher.theme, {
+        'isIE': /(msie|trident)/i.test(navigator.userAgent) && !window.opera,
         'hasTouch': 'ontouchstart' in document.documentElement,
         'dateFormat' : "MMMM Do YYYY, h:mm:ss a",
         'iconElement': function(identifier, icons) {
