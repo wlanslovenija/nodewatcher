@@ -65,27 +65,7 @@
             });
         });
 
-        // Prepare side navigation
-        $('body').css('position', 'relative').scrollspy({ target: '#registry-navbar' });
-
-        $(window).on('load', function () {
-          $('body').scrollspy('refresh')
-        });
-
-        // Sidenav affixing
-        setTimeout(function () {
-          var $sideBar = $('#registry-navbar')
-
-          $sideBar.affix({
-            offset: {
-              top: function () {
-                var offsetTop = $('#registry_forms').offset().top;
-                return (this.top = offsetTop);
-              },
-              bottom: 10
-            }
-          })
-        }, 100);
+        $(window).trigger('registry:initialize');
 
     };
 
@@ -131,7 +111,7 @@
                 window.fireEvent("on" + event.eventType, event);
             }
 
-            $('body').scrollspy('refresh');
+            $(window).trigger('registry:update');
 
             updating = false;
         });
