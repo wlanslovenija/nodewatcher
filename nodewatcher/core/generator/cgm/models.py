@@ -326,7 +326,7 @@ class LeasableNetwork(models.Model):
         abstract = True
 
 registration.point('node.config').register_choice('core.interfaces.network#lease_type', registration.Choice('dhcp', _("DHCP")))
-registration.point('node.config').register_choice('core.interfaces.network#nat_type', registration.Choice('snat-primary-ip', _("SNAT (Primary IP)")))
+registration.point('node.config').register_choice('core.interfaces.network#nat_type', registration.Choice('snat-routed-networks', _("SNAT (towards routed networks)")))
 # TODO: Support other kinds of SNAT, for example over the uplink interface(s).
 
 

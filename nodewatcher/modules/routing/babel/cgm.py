@@ -10,6 +10,10 @@ ROUTING_TABLE_NAME = 'babel'
 ROUTING_TABLE_PRIORITY = 999
 
 
+class BabelProtocolManager(object):
+    routing_protocol = babel_models.BABEL_PROTOCOL_NAME
+
+
 @cgm_base.register_platform_module('openwrt', 900)
 def babel(node, cfg):
     babel_configured = False
@@ -101,7 +105,7 @@ def babel(node, cfg):
     rt.priority = ROUTING_TABLE_PRIORITY
 
     # Ensure that forwarding between all Babel interfaces is allowed.
-    firewall = cfg.firewall.add('zone')
+    firewall = cfg.firewall.add('zone', managed_by=BabelProtocolManager())
     firewall.name = 'babel'
     firewall.network = list(set(routable_ifaces + announced_ifaces))
     firewall.input = 'ACCEPT'
