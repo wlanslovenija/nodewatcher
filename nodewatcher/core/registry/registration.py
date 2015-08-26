@@ -105,6 +105,17 @@ class LazyChoiceList(collections.Sequence):
         self._dependent_choices.add((choice.limited_to, choice))
         self._list.add(choice)
 
+    def remove_choice(self, choice_name):
+        for limited_to, choice in self._dependent_choices:
+            if choice.name == choice_name:
+                self._dependent_choices.discard((limited_to, choice))
+                break
+
+        for choice in self._list:
+            if choice.name == choice_name:
+                self._list.discard(choice)
+                break
+
 
 class RegistrationPoint(object):
     """
@@ -480,6 +491,13 @@ class RegistrationPoint(object):
             raise TypeError("'choice' must be an instance of Choice!")
 
         self.get_registered_choices(choices_id).add_choice(choice)
+
+    def unregister_choice(self, choices_id, choice_name):
+        """
+        Removes an existing choice/enumeration.
+        """
+
+        self.get_registered_choices(choices_id).remove_choice(choice_name)
 
     def config_items(self):
         """
