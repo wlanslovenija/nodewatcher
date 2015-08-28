@@ -261,16 +261,16 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             },
         )
 
-        def get_project_essid(purpose, default=None):
+        def get_project_ssid(purpose, default=None, attribute='essid'):
             try:
-                essid = project_config.project.ssids.get(purpose=purpose).essid
+                ssid = getattr(project_config.project.ssids.get(purpose=purpose), attribute)
             except project_models.SSID.DoesNotExist:
                 try:
-                    essid = project_config.project.ssids.get(default=True).essid
+                    ssid = getattr(project_config.project.ssids.get(default=True), attribute)
                 except project_models.SSID.DoesNotExist:
-                    essid = default
+                    ssid = default
 
-            return essid
+            return ssid
 
         if node_type != 'backbone':
             if radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
@@ -281,7 +281,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     parent=wifi_radio,
                     configuration={
                         'mode': 'ap',
-                        'essid': get_project_essid('ap', 'open.commotionwireless.net'),
+                        'essid': get_project_ssid('ap', 'open.commotionwireless.net'),
                     },
                 )
 
@@ -302,7 +302,8 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 parent=wifi_radio,
                 configuration={
                     'mode': 'mesh',
-                    'essid': get_project_essid('mesh', 'mesh.commotionwireless.net'),
+                    'essid': get_project_ssid('mesh', 'mesh.commotionwireless.net'),
+                    'bssid': get_project_ssid('mesh', '03:CA:FF:EE:BA:BE', attribute='bssid'),
                     'routing_protocols': ['olsr'],
                 },
             )
@@ -314,7 +315,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 parent=wifi_radio,
                 configuration={
                     'mode': 'ap',
-                    'essid': get_project_essid('backbone', 'backbone.commotionwireless.net'),
+                    'essid': get_project_ssid('backbone', 'backbone.commotionwireless.net'),
                     'routing_protocols': ['olsr'],
                 },
             )
