@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_noop
 
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
-from nodewatcher.core.generator.cgm import models as cgm_models
 
 from . import models
 
@@ -22,7 +21,7 @@ try:
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
-                'with': {'group': 'tunneldigger_bytes_rate'},
+                'with': {'group': 'tunneldigger_bytes_rate', 'node': ds_fields.TagReference('node')},
             },
             'unit': 'Bps',
         })
@@ -36,7 +35,7 @@ try:
                 'time_downsamplers': ['mean'],
                 'value_downsamplers': ['min', 'mean', 'max'],
                 'minimum': 0.0,
-                'with': {'group': 'tunneldigger_bytes_rate'},
+                'with': {'group': 'tunneldigger_bytes_rate', 'node': ds_fields.TagReference('node')},
             },
             'unit': 'Bps',
         })
