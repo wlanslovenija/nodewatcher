@@ -1,7 +1,7 @@
 {% overextends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n %}
+    {% load future i18n partial_tags %}
 
     {% setcontext as title %}{% blocktrans %}Generate Firmware for Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
     {% setcontext as heading %}{% spaceless %}
@@ -11,9 +11,14 @@
 {% endcontextblock %}
 
 {% block content %}
-    {% block node_snippet_wrapper %}
-        {% include "nodes/generate_firmware_snippet.html" %}
-    {% endblock node_snippet_wrapper %}
+    <section class="node">
+    {% block node_information_wrapper %}
+        {% get_partial "node_general_partial" as node_general_partial %}
+        {% with partial=node_general_partial %}
+            {% include "base/partial.html" %}
+        {% endwith %}
+    {% endblock node_information_wrapper %}
+    </section>
 
     {% block generate_firmware_form_wrapper %}
         {% with form_submit=_("Generate") %}

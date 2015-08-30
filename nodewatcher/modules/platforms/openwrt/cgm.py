@@ -7,7 +7,7 @@ from nodewatcher.core import models as core_models
 from nodewatcher.core.allocation.ip import models as pool_models
 from nodewatcher.core.registry import exceptions as registry_exceptions
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, devices as cgm_devices
-from nodewatcher.utils import posix_tz
+from nodewatcher.utils import posix_tz, ipaddr
 
 from . import builder as openwrt_builder
 
@@ -28,13 +28,14 @@ class UCISection(object):
     Represents a configuration section in UCI.
     """
 
-    def __init__(self, key=None, typ=None):
+    def __init__(self, key=None, typ=None, managed_by=None):
         """
         Class constructor.
         """
 
         self.__dict__['_key'] = key
         self.__dict__['_typ'] = typ
+        self.__dict__['_managed_by'] = managed_by
         self.__dict__['_values'] = collections.OrderedDict()
 
     def __setattr__(self, name, value):
@@ -78,6 +79,14 @@ class UCISection(object):
         """
 
         return self._typ
+
+    def get_manager(self):
+        """
+        Returns a manager object in case one has been set when adding this
+        piece of configuration.
+        """
+
+        return self._managed_by
 
     def format_value(self, key, value, root, section, idx=None, fmt=UCIFormat.DUMP):
         """
@@ -165,13 +174,15 @@ class UCIRoot(object):
         :return: The newly created UCISection
         """
 
+        managed_by = kwargs.pop('managed_by', None)
+
         if len(args) > 1 or len(kwargs) > 1 or len(args) == len(kwargs):
             raise ValueError
 
         if kwargs:
             # Adding a named section
             section_key = kwargs.values()[0]
-            section = UCISection(key=section_key, typ=kwargs.keys()[0])
+            section = UCISection(key=section_key, typ=kwargs.keys()[0], managed_by=managed_by)
 
             # Check for duplicates to avoid screwing up existing lists and sections
             if section_key in self._named_sections:
@@ -180,7 +191,7 @@ class UCIRoot(object):
             self._named_sections[section_key] = section
         else:
             # Adding an ordered section
-            section = UCISection()
+            section = UCISection(managed_by=managed_by)
             self._ordered_sections.setdefault(args[0], []).append(section)
 
         return section
@@ -469,6 +480,11 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
 
 cgm_base.register_platform('openwrt', _("OpenWRT"), PlatformOpenWRT())
 
+# NAT routing table.
+NAT_ROUTING_TABLE_ID = 100
+NAT_ROUTING_TABLE_NAME = 'nat'
+NAT_ROUTING_TABLE_PRIORITY = 600
+
 
 @cgm_base.register_platform_module('openwrt', 10)
 def general(node, cfg):
@@ -539,11 +555,13 @@ def user_accounts(node, cfg):
         pass
 
 
-def configure_leasable_network(cfg, network, iface_name, subnet):
+def configure_leasable_network(cfg, node, interface, network, iface_name, subnet):
     """
     A helper function to configure network lease.
 
     :param cfg: Platform configuration
+    :param node: Node instance
+    :param interface: Interface configuration
     :param network: Network configuration
     :param iface_name: Name of the UCI interface
     :param subnet: Subnet to be leased
@@ -560,12 +578,85 @@ def configure_leasable_network(cfg, network, iface_name, subnet):
         dhcp.limit = len(list(subnet.iterhosts())) - 1
         dhcp.leasetime = int(network.lease_duration.total_seconds())
 
+    if network.nat_type == 'snat-routed-networks':
+        # SNAT using the primary router identifier as source address.
+        try:
+            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+        except core_models.RouterIdConfig.DoesNotExist:
+            raise cgm_base.ValidationError(
+                _("SNAT towards routed networks configured, but router ID is missing! The node must have a configured primary IP address.")
+            )
 
-def configure_network(cfg, network, section, iface_name):
+        if getattr(network, 'routing_announces', []) or getattr(interface, 'routing_protocols', []):
+            raise cgm_base.ValidationError(
+                _("NAT may not be used together with routing on the same interface.")
+            )
+
+        # Create a firewall zone for this interface so we can use it as source.
+        zone = cfg.firewall.add('zone')
+        zone.name = iface_name
+        zone.network = [iface_name]
+        zone.input = 'ACCEPT'
+        zone.output = 'ACCEPT'
+        zone.forward = 'ACCEPT'
+        zone.conntrack = True
+
+        # Add policy routing to route traffic towards the network.
+        cfg.routing_tables.set_table(NAT_ROUTING_TABLE_NAME, NAT_ROUTING_TABLE_ID)
+
+        if not cfg.network.find_ordered_section('rule', lookup=NAT_ROUTING_TABLE_ID):
+            policy = cfg.network.add('rule')
+            policy.lookup = NAT_ROUTING_TABLE_ID
+            policy.priority = NAT_ROUTING_TABLE_PRIORITY
+
+        nat_route = cfg.network.add(route='nat_%s' % iface_name)
+        nat_route.interface = iface_name
+        nat_route.target = subnet.network
+        nat_route.netmask = subnet.netmask
+        nat_route.gateway = '0.0.0.0'
+        nat_route.table = NAT_ROUTING_TABLE_ID
+
+        # Setup NAT towards routed networks. Since the routing protocol modules have probably
+        # not yet been configured, we wait until later to configure this.
+        @cfg.defer_configuration
+        def nat_routed_networks():
+            for zone in cfg.firewall.find_all_ordered_sections('zone'):
+                # Enable connection tracking on all the zones. If we don't do this, NAT may not
+                # work as the firewall will disable connection tracking on some devices even when
+                # they are part of other zones which require connection tracking.
+                # See OpenWrt ticket: https://dev.openwrt.org/ticket/20374
+                zone.conntrack = True
+
+                # Ignore zones which are not managed by routing protocols.
+                if not hasattr(zone.get_manager(), 'routing_protocol'):
+                    continue
+
+                # Create a SNAT rule.
+                redirect = cfg.firewall.add('redirect')
+                redirect.src = iface_name
+                redirect.dest = zone.name
+                redirect.src_ip = str(subnet)
+                redirect.src_dip = router_id
+                redirect.proto = 'all'
+                redirect.target = 'SNAT'
+
+                # Allow forwarding in both directions.
+                forward_in = cfg.firewall.add('forwarding')
+                forward_in.src = zone.name
+                forward_in.dest = iface_name
+
+                forward_out = cfg.firewall.add('forwarding')
+                forward_out.src = iface_name
+                forward_out.dest = zone.name
+
+
+def configure_network(cfg, node, interface, network, section, iface_name):
     """
     A helper function to configure an interface's network.
 
     :param cfg: Platform configuration
+    :param node: Node instance
+    :param interface: Interface configuration
     :param network: Network configuration
     :param section: UCI interface or alias section
     :param iface_name: Name of the UCI interface
@@ -588,7 +679,7 @@ def configure_network(cfg, network, section, iface_name):
         # When network is marked to be announced, also specify it here
         section._announce = network.routing_announces
 
-        configure_leasable_network(cfg, network, iface_name, network.address)
+        configure_leasable_network(cfg, node, interface, network, iface_name, network.address)
     elif isinstance(network, cgm_models.AllocatedNetworkConfig):
         section.proto = 'static'
 
@@ -609,7 +700,7 @@ def configure_network(cfg, network, section, iface_name):
             elif network.family == 'ipv6':
                 section.ip6addr = address
 
-            configure_leasable_network(cfg, network, iface_name, address)
+            configure_leasable_network(cfg, node, interface, network, iface_name, address)
         else:
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
     elif isinstance(network, cgm_models.DHCPNetworkConfig):
@@ -630,11 +721,12 @@ def configure_network(cfg, network, section, iface_name):
         section.proto = 'none'
 
 
-def configure_interface(cfg, interface, section, iface_name):
+def configure_interface(cfg, node, interface, section, iface_name):
     """
     A helper function to configure an interface.
 
     :param cfg: Platform configuration
+    :param node: Node instance
     :param interface: Interface configuration
     :param section: UCI interface section
     :param iface_name: Name of the UCI interface
@@ -645,13 +737,13 @@ def configure_interface(cfg, interface, section, iface_name):
     networks = [x.cast() for x in interface.networks.all()]
     if networks:
         network = networks[0]
-        configure_network(cfg, network, section, iface_name)
+        configure_network(cfg, node, interface, network, section, iface_name)
 
         # Additional network configurations are aliases
         for network in networks[1:]:
             alias = cfg.network.add('alias')
             alias.interface = iface_name
-            configure_network(cfg, network, alias, iface_name)
+            configure_network(cfg, node, interface, network, alias, iface_name)
     else:
         section.proto = 'none'
 
@@ -863,7 +955,7 @@ def network(node, cfg):
             if interface.mac_address:
                 iface.macaddr = interface.mac_address
 
-            configure_interface(cfg, interface, iface, iface_name)
+            configure_interface(cfg, node, interface, iface, iface_name)
         elif isinstance(interface, cgm_models.MobileInterfaceConfig):
             iface = cfg.network.add(interface=interface.device)
             iface._uplink = True
@@ -898,7 +990,7 @@ def network(node, cfg):
                 iface.username = interface.username
                 iface.password = interface.password
 
-            configure_interface(cfg, interface, iface, interface.device)
+            configure_interface(cfg, node, interface, iface, interface.device)
             iface.proto = '3g'
 
             # Some packages are required for using a mobile interface
@@ -945,7 +1037,7 @@ def network(node, cfg):
             if interface.mac_address:
                 iface.macaddr = interface.mac_address
 
-            configure_interface(cfg, interface, iface, interface.eth_port)
+            configure_interface(cfg, node, interface, iface, interface.eth_port)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
             # Configure virtual interfaces on top of the same radio device
             dsc_radio = device.get_radio(interface.wifi_radio)
@@ -1068,7 +1160,7 @@ def network(node, cfg):
                 else:
                     iface = cfg.network.add(interface=vif_name)
                     wif.network = vif_name
-                    configure_interface(cfg, vif, iface, vif_name)
+                    configure_interface(cfg, node, vif, iface, vif_name)
 
             # Include some wireless related packages.
             cfg.packages.update([

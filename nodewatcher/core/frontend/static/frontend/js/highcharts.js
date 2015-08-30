@@ -8,72 +8,34 @@
     }
 
     $.extend(Highcharts.Chart.prototype, {
-        contextMenu: function (name, items, x, y, width, height) {
+        contextMenu: function (name, menuItems) {
             var chart = this,
                 navOptions = chart.options.navigation,
                 chartWidth = chart.chartWidth,
                 chartHeight = chart.chartHeight,
                 cacheName = 'cache-' + name,
-                wrapper = chart[cacheName],
-                menuPadding = Math.max(width, height), // for mouse leave detection
-                boxShadow = '3px 3px 10px #888',
-                hasTouch = $.nodewatcher.theme.hasTouch,
-                hide;
+                menu = chart[cacheName],
+                hasTouch = $.nodewatcher.theme.hasTouch;
             // create the menu only the first time
-            if (!menu) {
-
-                // create a HTML element above the SVG
-                chart[cacheName] = wrapper = $('<div />')
-                    .appendTo(chart.container)
-                    .addClass('btn-group open').css({
-                        position: 'absolute',
-                        zIndex: 1000,
-                        padding: menuPadding + 'px'
-                    });
-
-                var menu = $('<ul />')
-                    .addClass('dropdown-menu dropdown-right')
-                    .appendTo(wrapper);
-
-                // hide on mouse out
-                hide = function() {
-                    wrapper.removeClass('open');
-                };
-
-                menu.on('mouseleave', hide);
-
+            if (menu.is(':empty')) {
                 // create the items
-                $.each(items, function(i, item) {
+                $.each(menuItems, function(i, item) {
                     if (item) {
-                        var entry = $('<li/>').addClass('menu-entry').append(
-                            $('<a/>').addClass('menu-entry-link').on(
-                                hasTouch ? 'touchstart' : 'click', function() {
-                                    hide();
-                                    item.onclick.apply(chart, arguments);
-                                }).html(
-                                    item.text || Highcharts.getOptions().lang[item.textKey]))
-                                .appendTo(menu);
-
+                        if (item.separator) {
+                            $('<li/>').addClass('divider').appendTo(menu);
+                        } else {
+                            $('<li/>').addClass('menu-entry').appendTo(menu).append(
+                                $('<a/>').addClass('menu-entry-link').on(
+                                    hasTouch ? 'touchstart' : 'click', function() {
+                                        item.onclick.apply(chart, arguments);
+                                    }).html(
+                                        item.text || Highcharts.getOptions().lang[item.textKey]));
+                                    
+                        }
                     }
                 });
-                chart.exportMenuWidth = wrapper.offsetWidth;
-                chart.exportMenuHeight = wrapper.offsetHeight;
             }
 
-            // if outside right, right align it
-            if (x + chart.exportMenuWidth > chartWidth) {
-                wrapper.css('right', (chartWidth - x - width - menuPadding));
-            } else {
-                wrapper.css('left', (x - menuPadding));
-            }
-            // if outside bottom, bottom align it
-            if (y + height + chart.exportMenuHeight > chartHeight) {
-                wrapper.css('bottom', (chartHeight - y - menuPadding));
-            } else {
-                wrapper.css('top', (y + height - menuPadding));
-            }
-
-            wrapper.addClass('open');
         },
 
         // TODO: This function should use contextMenu so that it is extensible by plugins.
@@ -82,45 +44,27 @@
             var chart = this,
                 renderer = chart.renderer,
                 btnOptions = Highcharts.merge(chart.options.navigation.buttonOptions, options),
-                onclick = btnOptions.onclick,
-                hasTouch = $.nodewatcher.theme.hasTouch,
-                menuItems = btnOptions.menuItems;
+                hasTouch = $.nodewatcher.theme.hasTouch;
 
             if (btnOptions.enabled === false) {
                 return;
             }
 
-            //chart.container.onclick = null;
+            $(chart.renderTo).addClass("chart");
 
-            var wrapper = $('<div/>').addClass('btn-group export').prependTo(chart.container);
+            var wrapper = $('<div/>').addClass('btn-group export').prependTo(chart.renderTo).bind('mouseenter', function(ev) { console.log("event"); ev.stopPropagation(); });
 
             var button = $('<button data-toggle="dropdown"/>').addClass('btn btn-default dropdown-toggle')
                 .append($.nodewatcher.theme.iconElement('cog')).appendTo(wrapper).dropdown();
 
-            var menu = $('<ul />')
+            chart['cache-export-menu'] = $('<ul />')
                 .addClass('dropdown-menu dropdown-right')
-                .appendTo(wrapper);
+                .appendTo(wrapper);//.bind('mouseenter', function(ev) { ev.stopPropagation(); });
 
-            // add the click event
-            if (menuItems) {
+            wrapper.on('show.bs.dropdown', function () {
+                chart.contextMenu('export-menu', btnOptions.menuItems);
+            });
 
-                $.each(menuItems, function(i, item) {
-                    if (item) {
-                        if (item.separator) {
-                            var entry = $('<li/>').addClass('divider').appendTo(menu);
-                        } else {
-
-                            var entry = $('<li/>').addClass('menu-entry').append(
-                                $('<a/>').addClass('menu-entry-link').on(
-                                    hasTouch ? 'touchstart' : 'click', function() {
-                                        item.onclick.apply(chart, arguments);
-                                    }).html(
-                                        item.text || Highcharts.getOptions().lang[item.textKey]))
-                                    .appendTo(menu);
-                        }
-                    }
-                });
-            }
         }
     });
 

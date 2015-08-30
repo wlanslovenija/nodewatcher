@@ -23,7 +23,10 @@ class SSID(models.Model):
         verbose_name = 'SSID'
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.essid, self.bssid)
+        if self.bssid:
+            return u'%s (%s)' % (self.essid, self.bssid)
+        else:
+            return self.essid
 
 
 @dispatch.receiver(django_signals.post_save, sender=SSID)

@@ -7,8 +7,8 @@ from nodewatcher.core.registry import forms as registry_forms, registration
 
 from nodewatcher.modules.administration.types import models as type_models
 from nodewatcher.modules.administration.projects import models as project_models
-from nodewatcher.modules.vpn.tunneldigger import models as td_models
 from nodewatcher.modules.services.dns import models as dns_models
+from nodewatcher.modules.monitor.sources.http import models as http_models
 
 
 class DefaultPlatform(registry_forms.FormDefaults):
@@ -49,22 +49,22 @@ class DefaultProject(registry_forms.FormDefaults):
         if not create:
             return
 
-        # Default to project 'Slovenia' in case it exists.
+        # Default to project 'Commotion' in case it exists.
         try:
-            slovenia_project = project_models.Project.objects.get(name='Slovenija')
+            commotion_project = project_models.Project.objects.get(name='Commotion')
         except project_models.Project.DoesNotExist:
             return
 
         # Choose a default project.
         project_config = state.lookup_item(project_models.ProjectConfig)
         if not project_config:
-            state.append_item(project_models.ProjectConfig, project=slovenia_project)
+            state.append_item(project_models.ProjectConfig, project=commotion_project)
         else:
             try:
                 if project_config.project:
                     return
             except project_models.Project.DoesNotExist:
-                state.update_item(project_config, project=slovenia_project)
+                state.update_item(project_config, project=commotion_project)
 
 registration.point('node.config').add_form_defaults(DefaultProject())
 
@@ -103,6 +103,17 @@ class DefaultRouterID(registry_forms.FormDefaults):
             )
 
 registration.point('node.config').add_form_defaults(DefaultRouterID())
+
+
+class DefaultTelemetrySource(registry_forms.FormDefaults):
+    def set_defaults(self, state, create):
+        telemetry_config = state.lookup_item(http_models.HttpTelemetrySourceConfig)
+        if not telemetry_config:
+            state.append_item(http_models.HttpTelemetrySourceConfig, source='push')
+        else:
+            state.update_item(telemetry_config, source='push')
+
+registration.point('node.config').add_form_defaults(DefaultTelemetrySource())
 
 
 class NetworkConfiguration(registry_forms.FormDefaults):
@@ -182,7 +193,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 cgm_models.BridgeInterfaceConfig,
                 name='clients0',
                 configuration={
-                    'routing_protocols': ['olsr', 'babel'],
+                    'routing_protocols': ['olsr'],
                 },
             )
 
@@ -192,7 +203,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 cgm_models.AllocatedNetworkConfig,
                 configuration={
                     'description': "AP-LAN Client Access",
-                    'routing_announces': ['olsr', 'babel'],
+                    'routing_announces': ['olsr'],
                     'family': 'ipv4',
                     'pool': project_config.project.default_ip_pool,
                     'prefix_length': 28,
@@ -226,7 +237,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     cgm_models.EthernetInterfaceConfig,
                     eth_port=lan_port,
                     configuration={
-                        'routing_protocols': ['olsr', 'babel'],
+                        'routing_protocols': ['olsr'],
                     },
                 )
 
@@ -270,7 +281,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     parent=wifi_radio,
                     configuration={
                         'mode': 'ap',
-                        'essid': get_project_ssid('ap', 'open.wlan-si.net'),
+                        'essid': get_project_ssid('ap', 'open.commotionwireless.net'),
                     },
                 )
 
@@ -291,9 +302,9 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 parent=wifi_radio,
                 configuration={
                     'mode': 'mesh',
-                    'essid': get_project_ssid('mesh', 'mesh.wlan-si.net'),
-                    'bssid': get_project_ssid('mesh', '02:CA:FF:EE:BA:BE', attribute='bssid'),
-                    'routing_protocols': ['olsr', 'babel'],
+                    'essid': get_project_ssid('mesh', 'mesh.commotionwireless.net'),
+                    'bssid': get_project_ssid('mesh', '03:CA:FF:EE:BA:BE', attribute='bssid'),
+                    'routing_protocols': ['olsr'],
                 },
             )
         else:
@@ -304,8 +315,8 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 parent=wifi_radio,
                 configuration={
                     'mode': 'ap',
-                    'essid': get_project_ssid('backbone', 'backbone.wlan-si.net'),
-                    'routing_protocols': ['olsr', 'babel'],
+                    'essid': get_project_ssid('backbone', 'backbone.commotionwireless.net'),
+                    'routing_protocols': ['olsr'],
                 },
             )
 
@@ -344,67 +355,6 @@ class STAChannelAutoselect(registry_forms.FormDefaults):
                 state.update_item(vif.device, channel='')
 
 registration.point('node.config').add_form_defaults(STAChannelAutoselect())
-
-
-class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
-    """
-    Automatically configures default tunneldigger servers as soon as an
-    uplink interface is configured.
-    """
-
-    def set_defaults(self, state, create):
-        # Check if there are any uplink interfaces.
-        if state.filter_items('core.interfaces', uplink=True):
-            self.update_tunneldigger(state)
-        else:
-            self.remove_tunneldigger(state)
-
-    def get_servers(self, state):
-        # Get the currently configured project.
-        try:
-            project = state.filter_items('core.project')[0]
-        except IndexError:
-            project = None
-
-        query = models.Q(PerProjectTunneldiggerServer___project=None)
-        if project:
-            query |= models.Q(PerProjectTunneldiggerServer___project=project)
-
-        return td_models.TunneldiggerServer.objects.filter(query)
-
-    def remove_tunneldigger(self, state):
-        # Remove any tunneldigger interfaces.
-        state.remove_items('core.interfaces', klass=td_models.TunneldiggerInterfaceConfig)
-
-    def update_tunneldigger(self, state):
-        # Check if there are existing tunneldigger interfaces.
-        existing_ifaces = state.filter_items('core.interfaces', klass=td_models.TunneldiggerInterfaceConfig)
-        configured = self.get_servers(state)
-
-        # Update existing interfaces.
-        for index, server in enumerate(configured):
-            if index >= len(existing_ifaces):
-                # We need to create a new interface.
-                td_iface = state.append_item(
-                    td_models.TunneldiggerInterfaceConfig,
-                    server=server,
-                    routing_protocols=['olsr', 'babel'],
-                )
-            else:
-                # Update server configuration for an existing element.
-                state.update_item(
-                    existing_ifaces[index],
-                    server=server,
-                    routing_protocols=['olsr', 'babel'],
-                )
-
-        delta = len(existing_ifaces) - len(configured)
-        if delta > 0:
-            # Remove the last few interfaces.
-            for td_iface in existing_ifaces[-delta:]:
-                state.remove_item(td_iface)
-
-registration.point('node.config').add_form_defaults(TunneldiggerServersOnUplink())
 
 
 class DnsServers(registry_forms.FormDefaults):

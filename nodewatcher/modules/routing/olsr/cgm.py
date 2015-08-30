@@ -14,6 +14,10 @@ ROUTING_TABLE_DEFAULT_NAME = 'olsr_default'
 ROUTING_TABLE_DEFAULT_PRIORITY = 1100
 
 
+class OlsrProtocolManager(object):
+    routing_protocol = olsr_models.OLSR_PROTOCOL_NAME
+
+
 @cgm_base.register_platform_module('openwrt', 900)
 def olsr(node, cfg):
     olsrd_configured = False
@@ -99,7 +103,7 @@ def olsr(node, cfg):
     rt.priority = ROUTING_TABLE_DEFAULT_PRIORITY
 
     # Ensure that forwarding between all OLSR interfaces is allowed
-    firewall = cfg.firewall.add('zone')
+    firewall = cfg.firewall.add('zone', managed_by=OlsrProtocolManager())
     firewall.name = 'olsr'
     firewall.network = list(set(routable_ifaces + announced_ifaces))
     firewall.input = 'ACCEPT'

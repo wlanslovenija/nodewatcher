@@ -3,3 +3,12 @@
     right: 0px;
     left: inherit;
 }
+
+.nav-pills > li > a.has-error {
+	color: $brand-danger;
+}
+
+.nav-pills > li.active > a.has-error {
+	background-color: $brand-danger;
+	color: white;
+}

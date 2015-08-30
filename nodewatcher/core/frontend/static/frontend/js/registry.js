@@ -9,6 +9,7 @@
 }(function ($) {
     var regpoint_id;
     var root_id;
+    var updating = false;
 
     // Registry methods object
     $.registry = {};
@@ -64,27 +65,7 @@
             });
         });
 
-        // Prepare side navigation
-        $('body').css('position', 'relative').scrollspy({ target: '#registry-navbar' });
-
-        $(window).on('load', function () {
-          $('body').scrollspy('refresh')
-        });
-
-        // Sidenav affixing
-        setTimeout(function () {
-          var $sideBar = $('#registry-navbar')
-
-          $sideBar.affix({
-            offset: {
-              top: function () {
-                var offsetTop = $('#registry_forms').offset().top;
-                return (this.top = offsetTop);
-              },
-              bottom: 10
-            }
-          })
-        }, 100);
+        $(window).trigger('registry:initialize');
 
     };
 
@@ -95,6 +76,12 @@
      * object.
      */
     $.registry.update = function(actions) {
+        // Ignore multiple parallel updates as they may cause transaction deadlocks.
+        if (updating) {
+            return;
+        }
+        updating = true;
+
         // Prepare form in serialized form (pun intended)
         var forms = $('#registry_forms *').serialize();
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
@@ -124,7 +111,9 @@
                 window.fireEvent("on" + event.eventType, event);
             }
 
-            $('body').scrollspy('refresh');
+            $(window).trigger('registry:update');
+
+            updating = false;
         });
     };
 }));
