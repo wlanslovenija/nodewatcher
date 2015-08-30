@@ -119,10 +119,10 @@ class SystemStatusMonitorStreams(RegistryItemStreams):
     reboots = fields.ResetField("#uptime", tags={
         'title': gettext_noop("Reboots"),
         'description': gettext_noop("Node reboot events."),
+        'label': gettext_noop("R"),
+        'message': gettext_noop("Node reboot."),
         'visualization': {
             'type': 'event',
-            'label': gettext_noop("R"),
-            'message': gettext_noop("Node reboot."),
             'initial_set': True,
             'time_downsamplers': ['mean'],
             'value_downsamplers': ['count'],
