@@ -1,73 +1,50 @@
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import fields as registry_fields, registration
 
 
 class RoleConfig(registration.bases.NodeConfigRegistryItem):
     """
-    Describes a single node's role.
+    Describes a single node's roles.
     """
+
+    roles = registry_fields.RegistryMultipleChoiceField(
+        'node.config', 'core.roles#roles',
+        blank=True, null=True, default=[],
+    )
 
     class RegistryMeta:
         form_weight = 20
         registry_id = 'core.roles'
         registry_section = _("Node Roles")
-        registry_name = _("Generic Role")
-        multiple = True
-        multiple_static = True
-        hidden = True
+        registry_name = _("Node Roles")
 
+registration.point("node.config").register_choice(
+    'core.roles#roles',
+    registration.Choice(
+        'system', _("System node"),
+        help_text=_("The node has an important system function, required for network operation."),
+    )
+)
+registration.point("node.config").register_choice(
+    'core.roles#roles',
+    registration.Choice(
+        'border-router', _("Border router"),
+        help_text=_("The node is a border router, enabling access to external networks."),
+    )
+)
+registration.point("node.config").register_choice(
+    'core.roles#roles',
+    registration.Choice(
+        'vpn-server', _("VPN server"),
+        help_text=_("The node provides a VPN server for other nodes."),
+    )
+)
+registration.point("node.config").register_choice(
+    'core.roles#roles',
+    registration.Choice(
+        'redundancy-required', _("Node with redundant links requirement"),
+        help_text=_("The node requires multiple redundant links."),
+    )
+)
 registration.point("node.config").register_item(RoleConfig)
-
-
-class SystemRoleConfig(RoleConfig):
-    """
-    Describes the "system" role.
-    """
-
-    system = models.BooleanField(default=False)
-
-    class RegistryMeta(RoleConfig.RegistryMeta):
-        registry_name = _("System Role")
-
-registration.point('node.config').register_item(SystemRoleConfig)
-
-
-class BorderRouterRoleConfig(RoleConfig):
-    """
-    Describes the "border router" role.
-    """
-
-    border_router = models.BooleanField(default=False)
-
-    class RegistryMeta(RoleConfig.RegistryMeta):
-        registry_name = _("Border Router Role")
-
-registration.point('node.config').register_item(BorderRouterRoleConfig)
-
-
-class VpnServerRoleConfig(RoleConfig):
-    """
-    Describes the "vpn server" role.
-    """
-
-    vpn_server = models.BooleanField(default=False)
-
-    class RegistryMeta(RoleConfig.RegistryMeta):
-        registry_name = _("VPN Server Role")
-
-registration.point('node.config').register_item(VpnServerRoleConfig)
-
-
-class RedundantNodeRoleConfig(RoleConfig):
-    """
-    Describes the "redundant node" role.
-    """
-
-    redundancy_required = models.BooleanField(default=False)
-
-    class RegistryMeta(RoleConfig.RegistryMeta):
-        registry_name = _("Redundant Node Role")
-
-registration.point('node.config').register_item(RedundantNodeRoleConfig)

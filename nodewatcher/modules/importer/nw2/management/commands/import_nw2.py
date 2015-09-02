@@ -479,11 +479,18 @@ class Command(base.BaseCommand):
                 url=node['url'] or ''
             )
 
-            # Role config
-            node_mdl.config.core.roles(create=role_models.SystemRoleConfig, system=node['system_node']).save()
-            node_mdl.config.core.roles(create=role_models.BorderRouterRoleConfig, border_router=node['border_router']).save()
-            node_mdl.config.core.roles(create=role_models.VpnServerRoleConfig, vpn_server=node['vpn_server']).save()
-            node_mdl.config.core.roles(create=role_models.RedundantNodeRoleConfig, redundancy_required=node['redundancy_req']).save()
+            # Role config.
+            role_config = node_mdl.config.core.roles(create=role_models.RoleConfig)
+            role_config.roles = []
+            if node['system_node']:
+                role_config.roles.append('system')
+            if node['border_router']:
+                role_config.roles.append('border-router')
+            if node['vpn_server']:
+                role_config.roles.append('vpn-server')
+            if node['redundancy_req']:
+                role_config.roles.append('redundancy-required')
+            role_config.save()
 
             # HTTP telemetry source config.
             node_mdl.config.core.telemetry.http(

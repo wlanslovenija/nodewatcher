@@ -255,29 +255,15 @@ a node may have. Several default roles are provided.
 
 .. autoclass:: nodewatcher.modules.administration.roles.models.RoleConfig()
 
-.. autoclass:: nodewatcher.modules.administration.roles.models.SystemRoleConfig()
-   :show-inheritance:
+   :param roles: A list of roles the node has.
+   :type roles: registered choice
 
-   :param system: The node is a system node.
-   :type system: bool
+The following roles are provided by default:
 
-.. autoclass:: nodewatcher.modules.administration.roles.models.BorderRouterRoleConfig()
-   :show-inheritance:
-
-   :param border_router: The node is a border router node.
-   :type border_router: bool
-
-.. autoclass:: nodewatcher.modules.administration.roles.models.VpnServerRoleConfig()
-   :show-inheritance:
-
-   :param vpn_server: The node is a VPN server node.
-   :type vpn_server: bool
-
-.. autoclass:: nodewatcher.modules.administration.roles.models.RedundantNodeRoleConfig()
-   :show-inheritance:
-
-   :param redundancy: The node requires redundancy in connectivity.
-   :type redundancy: bool
+  * ``system`` (the node has an important system function, required for network operation),
+  * ``border-router`` (the node is a border router, enabling access to external networks),
+  * ``vpn-server`` (the node provides a VPN server for other nodes),
+  * ``redundancy-required`` (the node requires multiple redundant links).
 
 core.interfaces
 ---------------
