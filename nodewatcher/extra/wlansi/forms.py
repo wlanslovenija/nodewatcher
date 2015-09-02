@@ -10,6 +10,7 @@ from nodewatcher.modules.administration.projects import models as project_models
 from nodewatcher.modules.vpn.tunneldigger import models as td_models
 from nodewatcher.modules.services.dns import models as dns_models
 
+from . import models as wlansi_models
 
 class DefaultPlatform(registry_forms.FormDefaults):
     def set_defaults(self, state, create):
@@ -130,6 +131,13 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         else:
             node_type = type_config.type
 
+        # Get network profile configuration.
+        network_profile_config = state.lookup_item(wlansi_models.NetworkProfileConfig)
+        if not network_profile_config or not network_profile_config.profiles:
+            network_profiles = []
+        else:
+            network_profiles = network_profile_config.profiles
+
         # TODO: Make it so that we don't always remove everything.
         state.remove_items('core.interfaces')
 
@@ -161,45 +169,80 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         if node_type != 'backbone':
             # Setup uplink interface.
             if wan_port:
-                uplink_interface = self.setup_interface(
+                if 'routing-over-wan' in network_profiles:
+                    # Instead of uplink, use WAN port for routing. This means no network configuration.
+                    self.setup_interface(
+                        state,
+                        cgm_models.EthernetInterfaceConfig,
+                        eth_port=wan_port,
+                        configuration={
+                            'routing_protocols': ['olsr', 'babel'],
+                        },
+                    )
+                else:
+                    # Configure WAN port as an uplink port which gets automatically configured via DHCP.
+                    uplink_interface = self.setup_interface(
+                        state,
+                        cgm_models.EthernetInterfaceConfig,
+                        eth_port=wan_port,
+                        configuration={
+                            'uplink': True,
+                        },
+                    )
+
+                    self.setup_network(
+                        state,
+                        uplink_interface,
+                        cgm_models.DHCPNetworkConfig,
+                    )
+
+            # Create a clients bridge.
+            if 'nat-clients' in network_profiles:
+                # Configure clients for NAT.
+                clients_interface = self.setup_interface(
                     state,
-                    cgm_models.EthernetInterfaceConfig,
-                    eth_port=wan_port,
+                    cgm_models.BridgeInterfaceConfig,
+                    name='clients0',
+                )
+
+                self.setup_network(
+                    state,
+                    clients_interface,
+                    cgm_models.StaticNetworkConfig,
                     configuration={
-                        'uplink': True,
+                        'description': "AP-LAN Client Access",
+                        'family': 'ipv4',
+                        'address': '172.21.42.1/24',
+                        'lease_type': 'dhcp',
+                        'lease_duration': '1h',
+                        'nat_type': 'snat-routed-networks',
+                    }
+                )
+            else:
+                # Configure clients with an allocated network, announced to the mesh.
+                clients_interface = self.setup_interface(
+                    state,
+                    cgm_models.BridgeInterfaceConfig,
+                    name='clients0',
+                    configuration={
+                        'routing_protocols': ['olsr', 'babel'],
                     },
                 )
 
                 self.setup_network(
                     state,
-                    uplink_interface,
-                    cgm_models.DHCPNetworkConfig,
+                    clients_interface,
+                    cgm_models.AllocatedNetworkConfig,
+                    configuration={
+                        'description': "AP-LAN Client Access",
+                        'routing_announces': ['olsr', 'babel'],
+                        'family': 'ipv4',
+                        'pool': project_config.project.default_ip_pool,
+                        'prefix_length': 28,
+                        'lease_type': 'dhcp',
+                        'lease_duration': '1h',
+                    }
                 )
-
-            # Create a clients bridge.
-            clients_interface = self.setup_interface(
-                state,
-                cgm_models.BridgeInterfaceConfig,
-                name='clients0',
-                configuration={
-                    'routing_protocols': ['olsr', 'babel'],
-                },
-            )
-
-            self.setup_network(
-                state,
-                clients_interface,
-                cgm_models.AllocatedNetworkConfig,
-                configuration={
-                    'description': "AP-LAN Client Access",
-                    'routing_announces': ['olsr', 'babel'],
-                    'family': 'ipv4',
-                    'pool': project_config.project.default_ip_pool,
-                    'prefix_length': 28,
-                    'lease_type': 'dhcp',
-                    'lease_duration': '1h',
-                }
-            )
 
             if lan_port:
                 # Setup routing/clients interface.
