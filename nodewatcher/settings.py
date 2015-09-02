@@ -573,6 +573,14 @@ USE_HTTPS = False
 HTTPS_PUBLIC_KEY = None
 
 LEAFLET_CONFIG = {
+    'TILES': [
+        # OpenStreetMap.
+        (
+            _('OSM'),
+            '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        ),
+    ],
     'DEFAULT_CENTER': (46.05, 14.507),
     'DEFAULT_ZOOM': 8,
     'RESET_VIEW': False,
