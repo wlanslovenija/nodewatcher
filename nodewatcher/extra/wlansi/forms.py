@@ -12,6 +12,7 @@ from nodewatcher.modules.services.dns import models as dns_models
 
 from . import models as wlansi_models
 
+
 class DefaultPlatform(registry_forms.FormDefaults):
     def set_defaults(self, state, create):
         # If we are not creating a new node, ignore this.

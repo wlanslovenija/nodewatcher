@@ -109,13 +109,12 @@ class FormsetRenderer(BaseRenderer):
     def render_errors(self):
         formset_errors = self.get_formset_errors()
         if formset_errors:
-            return get_template(
-                'form/form_errors.html').render(
-                    Context({
-                        'errors': formset_errors,
-                        'form': self.formset,
-                        'layout': self.layout,
-                    })
+            return get_template('form/form_errors.html').render(
+                Context({
+                    'errors': formset_errors,
+                    'form': self.formset,
+                    'layout': self.layout,
+                })
             )
         return ''
 
@@ -178,13 +177,12 @@ class FormRenderer(BaseRenderer):
             form_errors = self.form.non_field_errors()
 
         if form_errors:
-            return get_template(
-                'form/form_errors.html').render(
-                    Context({
-                        'errors': form_errors,
-                        'form': self.form,
-                        'layout': self.layout,
-                    })
+            return get_template('form/form_errors.html').render(
+                Context({
+                    'errors': form_errors,
+                    'form': self.form,
+                    'layout': self.layout,
+                })
             )
         return ''
 
