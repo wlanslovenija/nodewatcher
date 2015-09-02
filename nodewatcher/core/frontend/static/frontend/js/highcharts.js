@@ -52,7 +52,7 @@
 
             $(chart.renderTo).addClass("chart");
 
-            var wrapper = $('<div/>').addClass('btn-group export').prependTo(chart.renderTo).bind('mouseenter', function(ev) { console.log("event"); ev.stopPropagation(); });
+            var wrapper = $('<div/>').addClass('btn-group export').prependTo(chart.renderTo).bind('mouseenter', function(ev) { ev.stopPropagation(); });
 
             var button = $('<button data-toggle="dropdown"/>').addClass('btn btn-default dropdown-toggle')
                 .append($.nodewatcher.theme.iconElement('cog')).appendTo(wrapper).dropdown();
