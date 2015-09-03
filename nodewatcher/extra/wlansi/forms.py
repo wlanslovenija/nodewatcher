@@ -277,11 +277,11 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         # Wireless.
 
         radio = device.get_radio('wifi0')
-        protocol = radio.protocols[0]
 
         if not radio:
             return
 
+        protocol = radio.protocols[0]
         wifi_radio = self.setup_interface(
             state,
             cgm_models.WifiRadioDeviceConfig,
