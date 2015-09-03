@@ -8,6 +8,9 @@ from . import models as babel_models
 ROUTING_TABLE_ID = 21
 ROUTING_TABLE_NAME = 'babel'
 ROUTING_TABLE_PRIORITY = 999
+ROUTING_TABLE_DEFAULT_ID = 31
+ROUTING_TABLE_DEFAULT_NAME = 'babel_default'
+ROUTING_TABLE_DEFAULT_PRIORITY = 1099
 
 
 class BabelProtocolManager(object):
@@ -73,6 +76,7 @@ def babel(node, cfg):
 
     # Configure routing table names.
     cfg.routing_tables.set_table(ROUTING_TABLE_NAME, ROUTING_TABLE_ID)
+    cfg.routing_tables.set_table(ROUTING_TABLE_DEFAULT_NAME, ROUTING_TABLE_DEFAULT_ID)
 
     for iface in routable_ifaces:
         interface = cfg.babeld.add('interface')
@@ -93,6 +97,13 @@ def babel(node, cfg):
         rule.proto = 4
         rule.action = 'allow'
 
+    # Ensure default route is exported into a different table.
+    default_route = cfg.babeld.add('filter')
+    default_route.type = 'export'
+    default_route.ip = '0.0.0.0/0'
+    default_route.le = 0
+    default_route.table = ROUTING_TABLE_DEFAULT_ID
+
     # By default, do not redistribute any local addresses.
     rule = cfg.babeld.add('filter')
     rule.type = 'redistribute'
@@ -103,6 +114,10 @@ def babel(node, cfg):
     rt = cfg.network.add('rule')
     rt.lookup = ROUTING_TABLE_ID
     rt.priority = ROUTING_TABLE_PRIORITY
+
+    rt = cfg.network.add('rule')
+    rt.lookup = ROUTING_TABLE_DEFAULT_ID
+    rt.priority = ROUTING_TABLE_DEFAULT_PRIORITY
 
     # Ensure that forwarding between all Babel interfaces is allowed.
     firewall = cfg.firewall.add('zone', managed_by=BabelProtocolManager())
