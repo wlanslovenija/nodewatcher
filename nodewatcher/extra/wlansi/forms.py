@@ -197,71 +197,72 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         cgm_models.DHCPNetworkConfig,
                     )
 
-            # Create a clients bridge.
-            if 'nat-clients' in network_profiles:
-                # Configure clients for NAT.
-                clients_interface = self.setup_interface(
-                    state,
-                    cgm_models.BridgeInterfaceConfig,
-                    name='clients0',
-                )
+            if node_type != 'server':
+                # Create a clients bridge.
+                if 'nat-clients' in network_profiles:
+                    # Configure clients for NAT.
+                    clients_interface = self.setup_interface(
+                        state,
+                        cgm_models.BridgeInterfaceConfig,
+                        name='clients0',
+                    )
 
-                self.setup_network(
-                    state,
-                    clients_interface,
-                    cgm_models.StaticNetworkConfig,
-                    configuration={
-                        'description': "AP-LAN Client Access",
-                        'family': 'ipv4',
-                        'address': '172.21.42.1/24',
-                        'lease_type': 'dhcp',
-                        'lease_duration': '1h',
-                        'nat_type': 'snat-routed-networks',
-                    }
-                )
-            else:
-                # Configure clients with an allocated network, announced to the mesh.
-                clients_interface = self.setup_interface(
-                    state,
-                    cgm_models.BridgeInterfaceConfig,
-                    name='clients0',
-                    configuration={
-                        'routing_protocols': ['olsr', 'babel'],
-                    },
-                )
+                    self.setup_network(
+                        state,
+                        clients_interface,
+                        cgm_models.StaticNetworkConfig,
+                        configuration={
+                            'description': "AP-LAN Client Access",
+                            'family': 'ipv4',
+                            'address': '172.21.42.1/24',
+                            'lease_type': 'dhcp',
+                            'lease_duration': '1h',
+                            'nat_type': 'snat-routed-networks',
+                        }
+                    )
+                else:
+                    # Configure clients with an allocated network, announced to the mesh.
+                    clients_interface = self.setup_interface(
+                        state,
+                        cgm_models.BridgeInterfaceConfig,
+                        name='clients0',
+                        configuration={
+                            'routing_protocols': ['olsr', 'babel'],
+                        },
+                    )
 
-                self.setup_network(
-                    state,
-                    clients_interface,
-                    cgm_models.AllocatedNetworkConfig,
-                    configuration={
-                        'description': "AP-LAN Client Access",
-                        'routing_announces': ['olsr', 'babel'],
-                        'family': 'ipv4',
-                        'pool': project_config.project.default_ip_pool,
-                        'prefix_length': 28,
-                        'lease_type': 'dhcp',
-                        'lease_duration': '1h',
-                    }
-                )
+                    self.setup_network(
+                        state,
+                        clients_interface,
+                        cgm_models.AllocatedNetworkConfig,
+                        configuration={
+                            'description': "AP-LAN Client Access",
+                            'routing_announces': ['olsr', 'babel'],
+                            'family': 'ipv4',
+                            'pool': project_config.project.default_ip_pool,
+                            'prefix_length': 28,
+                            'lease_type': 'dhcp',
+                            'lease_duration': '1h',
+                        }
+                    )
 
-            if lan_port:
-                # Setup routing/clients interface.
-                lan_interface = self.setup_interface(
-                    state,
-                    cgm_models.EthernetInterfaceConfig,
-                    eth_port=lan_port,
-                )
+                if lan_port:
+                    # Setup routing/clients interface.
+                    lan_interface = self.setup_interface(
+                        state,
+                        cgm_models.EthernetInterfaceConfig,
+                        eth_port=lan_port,
+                    )
 
-                self.setup_network(
-                    state,
-                    lan_interface,
-                    cgm_models.BridgedNetworkConfig,
-                    configuration={
-                        'bridge': clients_interface,
-                        'description': '',
-                    },
-                )
+                    self.setup_network(
+                        state,
+                        lan_interface,
+                        cgm_models.BridgedNetworkConfig,
+                        configuration={
+                            'bridge': clients_interface,
+                            'description': '',
+                        },
+                    )
         else:
             # Setup routing interface for backbone nodes.
             if lan_port:
