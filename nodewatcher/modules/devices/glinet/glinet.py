@@ -8,7 +8,7 @@ class GLiNetv1(cgm_devices.DeviceBase):
 
     identifier = 'gl-inetv1'
     name = "GL.iNet (v1)"
-    manufacturer = "GL.iNet"
+    manufacturer = "GL Technologies"
     url = 'http://www.gl-inet.com/'
     architecture = 'ar71xx'
     radios = [
