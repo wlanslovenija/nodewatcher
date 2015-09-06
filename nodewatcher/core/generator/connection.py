@@ -143,6 +143,15 @@ class BuilderConnection(object):
         except paramiko.SSHException:
             raise cgm_exceptions.BuildError('Unknown error on builder.')
 
+    def list_dir(self, path):
+        """
+        Returns a directory listing.
+
+        :param path: Path relative to the builder directory
+        """
+
+        return self.sftp.listdir(os.path.join(BUILDER_PATH, path))
+
     def read_result_file(self, path):
         """
         Reads a result file.

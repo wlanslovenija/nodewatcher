@@ -27,9 +27,9 @@ def banner(node, cfg):
 
     # Get the node's local timezone using the location schema.
     try:
-        node_zone = node.config.core.location().timezone
+        node_zone = node.config.core.location().timezone or timezone.utc
     except (registry_exceptions.RegistryItemNotRegistered, AttributeError):
-        node_zone = timezone.UTC
+        node_zone = timezone.utc
 
     # Convert current timestamp to node-local time.
     now = datetime.datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(node_zone)

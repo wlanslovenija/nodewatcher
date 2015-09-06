@@ -96,14 +96,21 @@ def build_image(result, profile):
             'PACKAGES=%s' % " ".join(cfg['_packages'])
         )
 
+        # Determine the location of output files.
+        output_locations = builder.list_dir('bin')
+
         # Collect the output files and return them.
         fw_files = []
         for fw_file in profile['files']:
-            try:
-                fw_files.append(
-                    (fw_file, builder.read_result_file(os.path.join('bin', result.builder.architecture, fw_file)))
-                )
-            except IOError:
+            for output_location in output_locations:
+                try:
+                    fw_files.append(
+                        (fw_file, builder.read_result_file(os.path.join('bin', output_location, fw_file)))
+                    )
+                    break
+                except IOError:
+                    continue
+            else:
                 raise cgm_exceptions.BuildError('Output file \'%s\' not found!' % fw_file)
 
         return fw_files
