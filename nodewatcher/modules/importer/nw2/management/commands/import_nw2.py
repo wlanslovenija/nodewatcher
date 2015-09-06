@@ -628,7 +628,7 @@ class Command(base.BaseCommand):
                             prefix_length=subnet_ap.prefixlen,
                             allocation=allocation,
                             lease_type='dhcp',
-                            lease_duration='1h',
+                            lease_duration='15min',
                         ).save()
 
                         # Create the AP VIF and put it into the bridge.

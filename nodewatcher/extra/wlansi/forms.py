@@ -216,7 +216,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             'family': 'ipv4',
                             'address': '172.21.42.1/24',
                             'lease_type': 'dhcp',
-                            'lease_duration': '1h',
+                            'lease_duration': '15min',
                             'nat_type': 'snat-routed-networks',
                         }
                     )
@@ -242,7 +242,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             'pool': project_config.project.default_ip_pool,
                             'prefix_length': 28,
                             'lease_type': 'dhcp',
-                            'lease_duration': '1h',
+                            'lease_duration': '15min',
                         }
                     )
 
