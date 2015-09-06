@@ -100,7 +100,7 @@ class WirelessProtocol(object):
         for channel in cls.channels:
             if (regulatory_filter is None or channel.frequency in regulatory_filter) and \
                     (width.limit_channels is None or width.limit_channels(cls, channel)):
-                yield channel.identifier, channel.number
+                yield channel.identifier, "%d (%d MHz)" % (channel.number, channel.frequency)
 
     @classmethod
     def get_channel(cls, identifier):
