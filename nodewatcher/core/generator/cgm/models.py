@@ -1,3 +1,4 @@
+import datetime
 import random
 import string
 
@@ -317,13 +318,13 @@ class LeasableNetwork(models.Model):
         default='15min',
         verbose_name=_("Lease Duration"),
         choices=(
-            ('15min', _("15 minutes")),
-            ('30min', _("30 minutes")),
-            ('1h', _("1 hour")),
-            ('2h', _("2 hours")),
-            ('4h', _("4 hours")),
-            ('12h', _("12 hours")),
-            ('24h', _("24 hours")),
+            (datetime.timedelta(minutes=15), _("15 minutes")),
+            (datetime.timedelta(minutes=30), _("30 minutes")),
+            (datetime.timedelta(hours=1), _("1 hour")),
+            (datetime.timedelta(hours=2), _("2 hours")),
+            (datetime.timedelta(hours=4), _("4 hours")),
+            (datetime.timedelta(hours=12), _("12 hours")),
+            (datetime.timedelta(hours=24), _("24 hours")),
         )
     )
     nat_type = registry_fields.RegistryChoiceField(
