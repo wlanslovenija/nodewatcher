@@ -84,8 +84,8 @@ class BuildResultResource(api.BaseResource):
     build_channel = api_fields.ToOneField(BuildChannelResource, 'build_channel', full=True)
     builder = api_fields.ToOneField(BuilderResource, 'builder', full=True)
     files = fields.ToManyField(BuildResultFileResource, 'files', full=True, use_in='detail')
-    build_log = fields.CharField('build_log', use_in='detail')
-    config = fields.DictField('config', use_in='detail')
+    build_log = fields.CharField('build_log', use_in='detail', null=True, blank=True)
+    config = fields.DictField('config', use_in='detail', blank=True)
 
     class Meta:
         queryset = generator_models.BuildResult.objects.prefetch_related(

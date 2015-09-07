@@ -97,6 +97,9 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
         if field.name.startswith('_'):
             return True
 
+        if field.name == 'registry_metadata':
+            return True
+
         if isinstance(field, (registry_fields.RegistryRelationField, registry_fields.RegistryMultipleRelationField)):
             return False
 

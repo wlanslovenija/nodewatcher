@@ -136,8 +136,13 @@ class BuildResultResourceTest(test_runner.ResourceTestCase):
                 # We manually construct URI to make sure it is like we assume it is.
                 u'resource_uri': u'%s%s/' % (self.resource_list_uri('builder'), build_result.builder.uuid),
             },
-            u'created': feedgenerator.rfc2822_date(build_result.created),
-            u'last_modified': feedgenerator.rfc2822_date(build_result.last_modified),
+            u'build_log': None,
+            u'files': [],
+            u'config': {
+                u'index': i,
+            },
+            u'created': build_result.created.isoformat().replace('+00:00', 'Z'),
+            u'last_modified': build_result.last_modified.isoformat().replace('+00:00', 'Z'),
             u'status': build_result.status,
             # We manually construct URI to make sure it is like we assume it is.
             u'resource_uri': u'%s%s/' % (self.resource_list_uri('build_result'), build_result.uuid),

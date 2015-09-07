@@ -137,11 +137,13 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                 u'geolocation': json.loads(node.config.core.location().geolocation.geojson),
                 u'timezone': u'Europe/Ljubljana',
             },
+            u'router_id': [],
+            u'routing_topology': [],
             # We manually construct URI to make sure it is like we assume it is.
             u'resource_uri': u'%s%s/' % (self.resource_list_uri('node'), node.uuid),
             u'type': node.config.core.type().type,
             # Works correctly only if i < 60.
-            u'last_seen': u'Wed, 05 Nov 2014 01:05:%02d +0000' % i,
+            u'last_seen': u'2014-11-05T01:05:%02dZ' % i,
         }), json_node)
 
     def project(self, source, projection):

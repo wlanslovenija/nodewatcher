@@ -652,7 +652,7 @@ def create_point(model, namespace, mixins=None):
 
             # Add a registry metadata field to the root model.
             if not hasattr(model, 'registry_metadata'):
-                model.add_to_class('registry_metadata', json_field.JSONField(default={}))
+                model.add_to_class('registry_metadata', json_field.JSONField(default={}, editable=False))
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation

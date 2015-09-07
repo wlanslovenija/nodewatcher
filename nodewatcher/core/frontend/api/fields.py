@@ -56,7 +56,7 @@ class ToOneField(FieldInUsePathMixin, ApiNameMixin, tastypie_fields.ToOneField):
         }
 
 
-class ManyToManyField(FieldInUsePathMixin, tastypie_fields.ManyToManyField):
+class ManyToManyField(FieldInUsePathMixin, ApiNameMixin, tastypie_fields.ManyToManyField):
     """
     Extended tastypie ManyToManyField with support field filtering.
     """
