@@ -855,6 +855,10 @@ def check_interface_bridged(interface):
                 )
 
             bridge = network.bridge
+            if bridge is None:
+                raise cgm_base.ValidationError(
+                    _("Bridge interface cannot be empty!")
+                )
         elif bridge is not None:
             raise cgm_base.ValidationError(
                 _("Interface cannot be part of a bridge and also have network configuration!")
