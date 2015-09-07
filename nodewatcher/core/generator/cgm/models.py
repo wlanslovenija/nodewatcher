@@ -314,8 +314,17 @@ class LeasableNetwork(models.Model):
         blank=True, null=True, verbose_name=_("Lease Type"),
     )
     lease_duration = timedelta_fields.TimedeltaField(
-        default='1h',
-        verbose_name=_('Lease Duration'),
+        default='15min',
+        verbose_name=_("Lease Duration"),
+        choices=(
+            ('15min', _("15 minutes")),
+            ('30min', _("30 minutes")),
+            ('1h', _("1 hour")),
+            ('2h', _("2 hours")),
+            ('4h', _("4 hours")),
+            ('12h', _("12 hours")),
+            ('24h', _("24 hours")),
+        )
     )
     nat_type = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.network#nat_type',
