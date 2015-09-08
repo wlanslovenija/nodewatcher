@@ -22,12 +22,12 @@ urlpatterns = urls.patterns(
     urls.url(r'^activate/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/activation_complete.html')), name='registration_activation_complete'),
     urls.url(r'^activate/(?P<activation_key>[A-Za-z0-9-_:]+)/$', registration_views.ActivationView.as_view(), name='registration_activate'),
     urls.url(r'^register/$', registration_views.RegistrationView.as_view(), name='registration_register'),
-#    urls.url(r'^activate/(?P<activation_key>\w+)/$', decorators.anonymous_required(function=registration_views.activate), {
-#        'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
-#    }, name='registration_activate'),
-#    urls.url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
-#        'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
-#    }, name='registration_register'),
+    #urls.url(r'^activate/(?P<activation_key>\w+)/$', decorators.anonymous_required(function=registration_views.activate), {
+    #    'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
+    #}, name='registration_activate'),
+    #urls.url(r'^register/$', decorators.anonymous_required(function=registration_views.register), {
+    #    'backend': 'nodewatcher.extra.accounts.regbackend.ProfileBackend',
+    #}, name='registration_register'),
     urls.url(r'^register/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/registration_complete.html')), name='registration_complete'),
     urls.url(r'^register/closed/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/registration_closed.html')), name='registration_disallowed'),
     urls.url(r'^email/change/complete/$', decorators.anonymous_required(function=generic.TemplateView.as_view(template_name='registration/email_change_complete.html')), name='email_change_complete'),
