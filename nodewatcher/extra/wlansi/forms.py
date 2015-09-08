@@ -406,13 +406,13 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
     def get_servers(self, state):
         # Get the currently configured project.
         try:
-            project = state.filter_items('core.project')[0]
+            project_config = state.filter_items('core.project')[0]
         except IndexError:
-            project = None
+            project_config = None
 
         query = models.Q(PerProjectTunneldiggerServer___project=None)
-        if project:
-            query |= models.Q(PerProjectTunneldiggerServer___project=project)
+        if project_config:
+            query |= models.Q(PerProjectTunneldiggerServer___project=project_config.project)
 
         return td_models.TunneldiggerServer.objects.filter(query)
 
@@ -479,13 +479,13 @@ class DnsServers(registry_forms.FormDefaults):
     def get_servers(self, state):
         # Get the currently configured project.
         try:
-            project = state.filter_items('core.project')[0]
+            project_config = state.filter_items('core.project')[0]
         except IndexError:
-            project = None
+            project_config = None
 
         query = models.Q(PerProjectDnsServer___project=None)
-        if project:
-            query |= models.Q(PerProjectDnsServer___project=project)
+        if project_config:
+            query |= models.Q(PerProjectDnsServer___project=project_config.project)
 
         return dns_models.DnsServer.objects.filter(query)
 
