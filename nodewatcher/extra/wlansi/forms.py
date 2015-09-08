@@ -9,8 +9,7 @@ from nodewatcher.modules.administration.types import models as type_models
 from nodewatcher.modules.administration.projects import models as project_models
 from nodewatcher.modules.vpn.tunneldigger import models as td_models
 from nodewatcher.modules.services.dns import models as dns_models
-
-from . import models as wlansi_models
+from nodewatcher.modules.defaults.network_profile import models as network_profile_models
 
 
 class DefaultPlatform(registry_forms.FormDefaults):
@@ -133,7 +132,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             node_type = type_config.type
 
         # Get network profile configuration.
-        network_profile_config = state.lookup_item(wlansi_models.NetworkProfileConfig)
+        network_profile_config = state.lookup_item(network_profile_models.NetworkProfileConfig)
         if not network_profile_config or not network_profile_config.profiles:
             network_profiles = []
         else:

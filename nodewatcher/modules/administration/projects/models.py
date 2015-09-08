@@ -57,7 +57,6 @@ class Project(models.Model):
         'core.IpPool',
         related_name='projects',
         verbose_name=_("IP pools"),
-        null=True,
         blank=True,
         # Only toplevel pools should be selected.
         limit_choices_to={'parent': None},

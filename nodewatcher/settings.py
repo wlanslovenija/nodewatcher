@@ -275,8 +275,6 @@ INSTALLED_APPS = (
     'nodewatcher.modules.services.dns',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
-    'nodewatcher.modules.sensors.digitemp',
-    'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.authentication.public_key',
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.events.sinks.db_sink',
@@ -290,6 +288,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.map',
     'nodewatcher.modules.administration.banner',
     'nodewatcher.modules.sensors.generic',
+    'nodewatcher.modules.defaults.network_profile',
 
     # Defaults for wlan slovenia network.
     'nodewatcher.extra.wlansi',
@@ -325,7 +324,6 @@ INSTALLED_APPS = (
     'timezone_field',
     'overextends',
     'json_field',
-    'uuidfield',
     'leaflet',
     'django_countries',
     'timedelta',

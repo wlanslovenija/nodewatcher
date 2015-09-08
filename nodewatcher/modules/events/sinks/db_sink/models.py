@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import models as auth_models
 
-from uuidfield import fields as uuid_field
 import json_field
 
 from nodewatcher.core import models as core_models
@@ -52,7 +51,7 @@ class SerializedNodeWarning(SerializedEvent):
     A serialized version of node warnings.
     """
 
-    uuid = uuid_field.UUIDField(hyphenate=True, primary_key=True)
+    uuid = models.UUIDField(primary_key=True)
     first_seen = models.DateTimeField(auto_now_add=True)
     last_seen = models.DateTimeField(auto_now=True)
     related_nodes = models.ManyToManyField(core_models.Node, related_name='warnings')

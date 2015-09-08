@@ -243,13 +243,13 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
             cls._meta.object_class._meta.local_fields = cls._meta.object_class._meta.virtual_fields
             if hasattr(cls._meta.object_class._meta, 'fields'):
                 del cls._meta.object_class._meta.fields
-            cls._meta.object_class._meta._fill_fields_cache()
+            cls._meta.object_class._meta._expire_cache()
             final_fields.update(parent_get_fields())
         finally:
             cls._meta.object_class._meta.local_fields = meta_fields
             if hasattr(cls._meta.object_class._meta, 'fields'):
                 del cls._meta.object_class._meta.fields
-            cls._meta.object_class._meta._fill_fields_cache()
+            cls._meta.object_class._meta._expire_cache()
 
         return final_fields
 

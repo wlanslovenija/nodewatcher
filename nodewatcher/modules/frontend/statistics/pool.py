@@ -1,17 +1,16 @@
-from django.utils import datastructures
+import collections
+import copy
 
 from . import exceptions
 
 
 class StatisticsResourcePool(object):
     def __init__(self):
-        self._resources = datastructures.SortedDict()
+        self._resources = collections.OrderedDict()
         self._states = []
 
     def __enter__(self):
-        # Cannot use copy.copy here because it fails to copy datastructures.SortedDict properly
-        # See https://github.com/django/django/commit/4b11762f7d7aed2f4f36c4158326c0a4332038f9
-        self._states.append((datastructures.SortedDict(self._resources),))
+        self._states.append((copy.copy(self._resources),))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         state = self._states.pop()

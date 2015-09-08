@@ -1,7 +1,8 @@
+import collections
+
 from django import forms
 from django.db import models
 from django.forms import models as model_forms
-from django.utils import datastructures
 from django.utils.translation import ugettext_lazy as _
 
 from nodewatcher.core.registry import registration
@@ -14,7 +15,7 @@ ANTENNA_FORM_FIELD_PREFIX = 'antenna_'
 class AntennaEquipmentConfigFormMeta(model_forms.ModelFormMetaclass):
     def __new__(cls, name, bases, attrs):
         # Prepare fields for our model
-        fields = datastructures.SortedDict()
+        fields = collections.OrderedDict()
         for fname, field in model_forms.fields_for_model(antenna_models.Antenna).items():
             fields['%s%s' % (ANTENNA_FORM_FIELD_PREFIX, fname)] = field
         attrs['_antenna_fields'] = fields

@@ -7,8 +7,6 @@ from django.core import management, exceptions as django_exceptions
 from django.db.models import query
 from django.test import utils
 
-from .registry_tests import models
-
 from nodewatcher.core.registry import registration, exceptions
 
 CUSTOM_SETTINGS = {
@@ -25,14 +23,18 @@ class RegistryTestCase(django_test.TransactionTestCase):
         #registration.remove_point('thing.second')
 
     def setUp(self):
+        from .registry_tests import models
+
         apps.clear_cache()
-        management.call_command('syncdb', verbosity=0, interactive=False, load_initial_data=False)
+        management.call_command('migrate', verbosity=0, interactive=False, load_initial_data=False)
 
     def tearDown(self):
         # TODO: Reset
         pass
 
     def test_basic(self):
+        from .registry_tests import models
+
         # Create some things and some registry items for each thing
         for i in xrange(100):
             thing = models.Thing(foo='hello', bar=i)
@@ -147,6 +149,8 @@ class RegistryTestCase(django_test.TransactionTestCase):
         thing.delete()
 
     def test_choices(self):
+        from .registry_tests import models
+
         ordered_choices = ['level-x', 'level-a', 'level-m']
         ordered_pks = []
 
@@ -204,6 +208,8 @@ class RegistryTestCase(django_test.TransactionTestCase):
         self.assertEqual(ordered, ordered_pks)
 
     def test_prefetch_queryset(self):
+        from .registry_tests import models
+
         thing = models.Thing(foo='hello', bar=1)
         thing.save()
 
@@ -222,6 +228,8 @@ class RegistryTestCase(django_test.TransactionTestCase):
             self.assertEqual(thing.f1.test, 42)
 
     def test_prefetch_queryset_default(self):
+        from .registry_tests import models
+
         thing = models.Thing(foo='hello', bar=1)
         thing.save()
 

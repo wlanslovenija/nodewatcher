@@ -40,8 +40,6 @@ REQUIRED_APPS = [
     'nodewatcher.modules.equipment.antennas',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
-    'nodewatcher.modules.sensors.digitemp',
-    'nodewatcher.modules.sensors.solar',
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.identity.base',
@@ -199,18 +197,18 @@ NODE_NOTES_METADATA = {
 
 class Command(base.BaseCommand):
     help = "Imports legacy nodewatcher v2 data."
-    requires_model_validation = True
+    requires_system_checks = True
+
+    def add_arguments(self, parser):
+        parser.add_argument('filename', type=str)
 
     def handle(self, *args, **options):
-        if len(args) != 1:
-            raise base.CommandError('Missing filename argument!')
-
-        # Validate that all the required applications are registered
+        # Validate that all the required applications are registered.
         for app_name in REQUIRED_APPS:
             if not apps.is_installed(app_name):
                 raise base.CommandError('Required application \'%s\' is not installed!' % app_name)
 
-        input_filename = args[0]
+        input_filename = options['filename']
         try:
             input_file = open(input_filename, 'r')
         except IOError:
