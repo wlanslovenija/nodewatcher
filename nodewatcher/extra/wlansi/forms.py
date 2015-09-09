@@ -143,7 +143,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         # Ethernet.
 
-        if len(device.ports) > 1:
+        if len(device.ports) >= 1:
             # If there are multiple ethernet ports, use Wan0 for uplink.
             wan_port = device.get_port('wan0')
             if not wan_port:
@@ -157,10 +157,6 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 if port.identifier != wan_port:
                     lan_port = port.identifier
                     break
-        elif len(device.ports) == 1:
-            # If there is only one ethernet port, use it for routing/clients.
-            wan_port = None
-            lan_port = device.ports[0].identifier
         else:
             # Do not configure any ethernet ports.
             wan_port = None
