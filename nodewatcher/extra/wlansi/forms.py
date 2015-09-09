@@ -138,7 +138,11 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         else:
             network_profiles = network_profile_config.profiles
 
-        # TODO: Make it so that we don't always remove everything.
+        # Preserve certain network settings in order to enable a small amount of customization.
+        radio_defaults = {}
+        for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
+            radio_defaults[radio.wifi_radio] = radio
+
         state.remove_items('core.interfaces')
 
         # Ethernet.
@@ -273,11 +277,24 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         # Wireless.
 
         radio = device.get_radio('wifi0')
+        radio_defaults = radio_defaults.get('wifi0', None)
 
         if not radio:
             return
 
         protocol = radio.protocols[0]
+        channel = protocol.channels[0].identifier
+        tx_power = None
+        ack_distance = None
+
+        if radio_defaults:
+            # Transfer over some settings.
+            if protocol.has_channel(radio_defaults.channel):
+                channel = radio_defaults.channel
+
+            tx_power = radio_defaults.tx_power
+            ack_distance = radio_defaults.ack_distance
+
         wifi_radio = self.setup_interface(
             state,
             cgm_models.WifiRadioDeviceConfig,
@@ -285,8 +302,10 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             configuration={
                 'protocol': protocol.identifier,
                 'channel_width': 'ht20',
-                'channel': protocol.channels[0].identifier,
+                'channel': channel,
                 'antenna_connector': radio.connectors[0].identifier,
+                'tx_power': tx_power,
+                'ack_distance': ack_distance,
             },
         )
 

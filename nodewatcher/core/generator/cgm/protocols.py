@@ -113,6 +113,14 @@ class WirelessProtocol(object):
                 return channel
 
     @classmethod
+    def has_channel(cls, identifier):
+        """
+        Returns true if this protocol supports the given channel.
+        """
+
+        return cls.get_channel(identifier) is not None
+
+    @classmethod
     def get_channel_number(cls, number):
         """
         Returns a specific channel descriptor.
