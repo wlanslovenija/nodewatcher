@@ -379,9 +379,21 @@ div.DTFC_RightBodyWrapper table.dataTable thead .sorting_desc:after {
 /*
  * FixedHeader styles
  */
-div.FixedHeader_Cloned table {
-	margin: 0 !important
+table.dataTable.fixedHeader-floating,
+table.dataTable.fixedHeader-locked {
+	background-color: white;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 }
+
+table.dataTable.fixedHeader-floating {
+	position: fixed;
+}
+
+table.dataTable.fixedHeader-locked {
+	position: absolute;
+}
+
 
 .dataTables_processing {
   position: fixed;
