@@ -1,5 +1,6 @@
 import datetime
 
+from django import template
 from django.utils import timezone
 
 from nodewatcher.core.registry import exceptions as registry_exceptions
@@ -12,18 +13,6 @@ def banner(node, cfg):
     Configures a banner that will be displayed when logging in to
     the node.
     """
-
-    cfg.banner = """
-                   _                         _          _
-                  | |                       | |        | |
- _ __    ___    __| |  ___ __      __  __ _ | |_   ___ | |__    ___  _ __
-| '_ \  / _ \  / _` | / _ \\ \ /\ / / / _` || __| / __|| '_ \  / _ \| '__|
-| | | || (_) || (_| ||  __/ \ V  V / | (_| || |_ | (__ | | | ||  __/| |
-|_| |_| \___/  \__,_| \___|  \_/\_/   \__,_| \__| \___||_| |_| \___||_|
-
-    v3 firmware                                     nodewatcher.net
-
-"""
 
     # Get the node's local timezone using the location schema.
     try:
@@ -38,10 +27,15 @@ def banner(node, cfg):
     # the login banner by default.
     general = node.config.core.general()
     device = general.get_device()
-    cfg.banner += "        Node: %s\n" % general.name
-    cfg.banner += "        UUID: %s\n" % node.uuid
-    cfg.banner += "      Device: %s %s\n" % (device.manufacturer, device.name)
-    cfg.banner += "  Configured: %s\n" % (now.strftime('%d.%m.%Y %H:%M:%S %Z'))
-    cfg.banner += "\n"
+
+    print device, getattr(device, 'manufacturer')
+    banner_template = template.loader.get_template('banner/banner.txt')
+    cfg.banner = banner_template.render(template.Context({
+        'name': general.name,
+        'uuid': node.uuid,
+        'device_manufacturer': device.manufacturer,
+        'device_name': device.name,
+        'timestamp': now.strftime('%d.%m.%Y %H:%M:%S %Z'),
+    }))
 
     # TODO: We currently cannot include the firmware version as configuration is generated before building.
