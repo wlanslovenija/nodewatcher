@@ -1,6 +1,7 @@
+import importlib
+
 from django.conf import settings
 from django.core import exceptions
-from django.utils import importlib
 
 from . import processors as monitor_processors
 
