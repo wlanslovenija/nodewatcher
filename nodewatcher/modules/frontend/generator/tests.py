@@ -1,8 +1,7 @@
-import datetime
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.utils import encoding, timezone, feedgenerator
+from django.utils import encoding
 
 from django_datastream import test_runner
 

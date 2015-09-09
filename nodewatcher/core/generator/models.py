@@ -1,4 +1,5 @@
 import requests
+import uuid
 
 from django import dispatch
 from django.contrib.auth import models as auth_models
@@ -7,7 +8,6 @@ from django.db.models import signals as django_signals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from uuidfield import fields as uuid_field
 import json_field
 
 from .. import models as core_models
@@ -19,8 +19,8 @@ class BuildChannel(models.Model):
     Firmware build channel model, independent of any platform.
     """
 
-    uuid = uuid_field.UUIDField(
-        hyphenate=True, primary_key=True, auto=True,
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False,
         help_text=_('A unique build channel identifier.'),
     )
     name = models.CharField(
@@ -73,8 +73,8 @@ class BuildVersion(models.Model):
     Firmware build version.
     """
 
-    uuid = uuid_field.UUIDField(
-        hyphenate=True, primary_key=True, auto=True,
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False,
         help_text=_('A unique build version identifier.'),
     )
     created = models.DateTimeField(
@@ -96,8 +96,8 @@ class Builder(models.Model):
     Firmware builder host configuration.
     """
 
-    uuid = uuid_field.UUIDField(
-        hyphenate=True, primary_key=True, auto=True,
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False,
         help_text=_('A unique builder identifier.'),
     )
     platform = models.CharField(
@@ -206,8 +206,8 @@ class BuildResult(models.Model):
         (OK, _("ok")),
     )
 
-    uuid = uuid_field.UUIDField(
-        hyphenate=True, primary_key=True, auto=True,
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False,
         help_text=_('A unique build result identifier.'),
     )
     user = models.ForeignKey(
@@ -254,13 +254,21 @@ class BuildResult(models.Model):
         return '<BuildResult for node \'%s\'>' % self.node_id
 
 
+def generate_build_result_filename(result_file, filename):
+    """
+    Generates the build result file location.
+    """
+
+    return 'generator/%s/%s' % (result_file.result.uuid, filename)
+
+
 class BuildResultFile(models.Model):
     """
     A generated file belonging to a build result.
     """
 
-    uuid = uuid_field.UUIDField(
-        hyphenate=True, primary_key=True, auto=True,
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False,
         help_text=_('A unique build result file identifier.'),
     )
     result = models.ForeignKey(
@@ -268,7 +276,7 @@ class BuildResultFile(models.Model):
         related_name='files',
     )
     file = models.FileField(
-        upload_to=lambda r, filename: 'generator/%s/%s' % (r.result.uuid, filename),
+        upload_to=generate_build_result_filename,
         max_length=200,
     )
     checksum_md5 = models.CharField(max_length=32)

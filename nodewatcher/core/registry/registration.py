@@ -3,7 +3,6 @@ import collections
 from django import apps as django_apps
 from django.core import exceptions as django_exceptions
 from django.db import models as django_models
-from django.utils import datastructures as django_datastructures
 
 import json_field
 
@@ -138,7 +137,7 @@ class RegistrationPoint(object):
         self.item_registry = {}
         self.item_classes = set()
         self.item_classes_name = {}
-        self.item_object_toplevel = django_datastructures.SortedDict()
+        self.item_object_toplevel = collections.OrderedDict()
         self.choices_registry = {}
         self.flat_lookup_proxies = {}
 
@@ -148,7 +147,7 @@ class RegistrationPoint(object):
     def _register_item_to_container(self, item, container):
         item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
         item_dict[item._meta.model_name] = item
-        return django_datastructures.SortedDict(
+        return collections.OrderedDict(
             sorted(container.items(), key=lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_weight', 0))
         )
 
@@ -257,7 +256,7 @@ class RegistrationPoint(object):
                 # to parent classes where these subitems might not be registered
                 parent._registry_object_children = self._register_item_to_container(
                     child,
-                    parent.__dict__.get('_registry_object_children', django_datastructures.SortedDict()),
+                    parent.__dict__.get('_registry_object_children', collections.OrderedDict()),
                 )
 
                 # Setup the parent relation and verify that one doesn't already exist

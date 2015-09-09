@@ -1,10 +1,10 @@
+import collections
 import copy
 import hashlib
 import os
 
 from django import forms as django_forms, template, db as django_db
 from django.db import transaction
-from django.utils import datastructures
 
 from ....utils import loader, toposort
 
@@ -591,7 +591,7 @@ def prepare_forms(context):
                 continue
 
         # Fetch existing models for this item
-        context.existing_models = datastructures.SortedDict()
+        context.existing_models = collections.OrderedDict()
         if context.root is not None:
             existing_models_qs = context.regpoint.get_accessor(context.root).by_registry_id(cls_meta.registry_id, queryset=True)
 

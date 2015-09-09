@@ -1,7 +1,7 @@
+import collections
 import copy
 
 from django.core import exceptions
-from django.utils import datastructures
 
 
 class StreamsMeta(type):
@@ -16,7 +16,7 @@ class StreamsMeta(type):
         # Create the actual class
         module = attrs.pop("__module__")
         new_class = type.__new__(cls, classname, bases, {"__module__": module})
-        new_class._shared_fields = datastructures.SortedDict()
+        new_class._shared_fields = collections.OrderedDict()
 
         from . import fields
 
@@ -67,7 +67,7 @@ class StreamsBase(object):
         self._model = model
 
         # Make a local copy of all field descriptors for this model
-        self._local_fields = datastructures.SortedDict()
+        self._local_fields = collections.OrderedDict()
         for name, field in self._shared_fields.iteritems():
             field = copy.deepcopy(field)
             self._local_fields[name] = field

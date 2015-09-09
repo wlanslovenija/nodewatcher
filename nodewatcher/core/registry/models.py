@@ -1,6 +1,7 @@
 from django import forms
 
 import polymorphic
+from . import polymorphic_deletion_fix
 
 
 class RegistryItemBase(polymorphic.PolymorphicModel):

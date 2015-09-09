@@ -1,8 +1,9 @@
+import collections
+import copy
 import re
 
 from django import shortcuts
 from django.conf import settings, urls
-from django.utils import datastructures
 
 from ....utils import loader
 
@@ -13,14 +14,12 @@ VALID_NAME = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 
 class FrontendComponentsPool(object):
     def __init__(self):
-        self._components = datastructures.SortedDict()
+        self._components = collections.OrderedDict()
         self._discovered = False
         self._states = []
 
     def __enter__(self):
-        # Cannot use copy.copy here because it fails to copy datastructures.SortedDict properly
-        # See https://github.com/django/django/commit/4b11762f7d7aed2f4f36c4158326c0a4332038f9
-        self._states.append((datastructures.SortedDict(self._components), self._discovered))
+        self._states.append((copy.copy(self._components), self._discovered))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         state = self._states.pop()

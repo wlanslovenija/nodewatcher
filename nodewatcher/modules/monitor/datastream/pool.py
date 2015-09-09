@@ -1,4 +1,4 @@
-from django.utils import datastructures
+import collections
 
 from . import base, exceptions
 
@@ -9,7 +9,7 @@ class StreamDescriptorPool(object):
         Class constructor.
         """
 
-        self._descriptors = datastructures.SortedDict()
+        self._descriptors = collections.OrderedDict()
         self._cache = {}
 
     def register(self, model, descriptor):

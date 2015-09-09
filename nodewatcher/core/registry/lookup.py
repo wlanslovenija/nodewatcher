@@ -17,6 +17,25 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
     An augmented query set that enables lookups of values from the registry.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(RegistryQuerySet, self).__init__(*args, **kwargs)
+
+        # Override query_terms as it breaks Tastypie on Django 1.8 for GIS fields as they are no
+        # longer hardcoded terms, but use the new lookup API which Tastypie does not know about.
+        # TODO: Remove this hack once we get rid of Tastypie.
+        from django.db.models.sql.constants import QUERY_TERMS
+        GIS_LOOKUPS = {
+            'bbcontains', 'bboverlaps', 'contained', 'contains',
+            'contains_properly', 'coveredby', 'covers', 'crosses', 'disjoint',
+            'distance_gt', 'distance_gte', 'distance_lt', 'distance_lte',
+            'dwithin', 'equals', 'exact',
+            'intersects', 'overlaps', 'relate', 'same_as', 'touches', 'within',
+            'left', 'right', 'overlaps_left', 'overlaps_right',
+            'overlaps_above', 'overlaps_below',
+            'strictly_above', 'strictly_below'
+        }
+        self.query.query_terms = GIS_LOOKUPS | QUERY_TERMS
+
     def _clone(self, *args, **kwargs):
         """
         Clones this queryset.
@@ -196,6 +215,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     '__reduce__': pickle_reduce,
                 },
             )
+            clone.query.model = clone.model
             this_class['class'] = clone.model
 
             del apps.all_models['_registry_proxy_models_']
@@ -210,6 +230,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             # Since the field is populated by a join, it can always be null when the model doesn't exist
             field.null = True
             field.contribute_to_class(clone.model, name, virtual_only=True)
+            field.concrete = False
 
             if field.name != field.attname:
                 # Handle foreign key relations properly
@@ -274,6 +295,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 field.src_model = dst_model
                 field.src_field = dst_field_name
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
+                field.concrete = False
                 clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_field is None:
@@ -285,6 +307,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 field.src_model = dst_model
                 field.src_field = None
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)
+                field.concrete = False
                 clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_related is None:

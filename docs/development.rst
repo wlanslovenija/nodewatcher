@@ -46,9 +46,9 @@ In order to prepare the database, after running the development server execute::
 
     $ docker-compose run web scripts/docker-init-database
 
-This will recreate the `nodewatcher` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call `syncdb`::
+This will recreate the `nodewatcher` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call `migrate`::
 
-    $ docker-compose run web python manage.py syncdb
+    $ docker-compose run web python manage.py migrate
 
 This will initialize the database schema.
 

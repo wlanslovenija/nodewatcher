@@ -7,7 +7,7 @@ from ... import worker
 
 class Command(BaseCommand):
     help = "Runs the nodewatcher monitoring daemon."
-    requires_model_validation = True
+    requires_system_checks = True
     option_list = BaseCommand.option_list + (
         make_option(
             '--run',

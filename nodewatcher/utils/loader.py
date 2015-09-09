@@ -1,5 +1,7 @@
+import importlib
+
 from django.apps import apps
-from django.utils import importlib, module_loading
+from django.utils import module_loading
 
 
 def load_modules(*types):

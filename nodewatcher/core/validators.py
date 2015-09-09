@@ -1,4 +1,5 @@
 from django.core import validators, exceptions
+from django.utils import deconstruct
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -11,6 +12,7 @@ class NodeNameValidator(validators.RegexValidator):
     message = _('Node name contains invalid characters.')
 
 
+@deconstruct.deconstructible
 class PortNumberValidator(object):
     """
     Validates a port number.
