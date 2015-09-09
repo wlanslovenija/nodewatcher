@@ -61,8 +61,9 @@ def tunneldigger(node, cfg):
 
             if limit.limit_in:
                 broker.limit_bw_down = limit.limit_in
-                # Only take the first bandwidth limit into account and ignore the rest
-                break
+
+            # Only take the first bandwidth limit into account and ignore the rest.
+            break
 
         # Create routing policy entries to ensure tunneldigger connections are not
         # routed via the mesh

@@ -475,11 +475,11 @@ class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
 
     limit_out = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.limits#speeds',
-        verbose_name=_("Limit OUT"), default='', blank=True,
+        verbose_name=_("Upload limit"), default='', blank=True,
     )
     limit_in = registry_fields.RegistryChoiceField(
         'node.config', 'core.interfaces.limits#speeds',
-        verbose_name=_("Limit IN"), default='', blank=True,
+        verbose_name=_("Download limit"), default='', blank=True,
     )
 
     class RegistryMeta(InterfaceLimitConfig.RegistryMeta):
@@ -493,3 +493,17 @@ registration.point('node.config').register_choice('core.interfaces.limits#speeds
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('1024', _("1 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('2048', _("2 Mbit/s")))
 registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('4096', _("4 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('6144', _("6 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('8192', _("8 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('10240', _("10 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('15360', _("15 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('20480', _("20 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('25600', _("25 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('30720', _("30 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('40960', _("40 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('51200', _("50 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('61440', _("60 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('71680', _("70 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('81920', _("80 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('92160', _("90 Mbit/s")))
+registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('102400', _("100 Mbit/s")))
