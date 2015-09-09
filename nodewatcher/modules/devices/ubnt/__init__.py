@@ -1,2 +1,2 @@
-# UBNT device modules
-from . import nano, bullet, rocket
+# UBNT device modules.
+from . import nano, bullet, rocket, pico
