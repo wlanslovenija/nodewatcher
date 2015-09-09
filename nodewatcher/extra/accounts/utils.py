@@ -2,10 +2,10 @@ import inspect
 import random
 import string
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import exceptions
-from django.db import models
 
 
 def generate_random_password(length=8):
@@ -42,7 +42,7 @@ def get_profile_model():
     except ValueError:
         raise auth_models.SiteProfileNotAvailable('app_label and model_name should be separated by a dot in the AUTH_PROFILE_MODULE setting')
     try:
-        model = models.get_model(app_label, model_name)
+        model = apps.get_model(app_label, model_name)
         if model is None:
             raise auth_models.SiteProfileNotAvailable('Unable to load the profile model, check AUTH_PROFILE_MODULE in your project settings')
     except (ImportError, exceptions.ImproperlyConfigured):

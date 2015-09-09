@@ -1,5 +1,3 @@
-import copy
-
 from django import shortcuts
 from django import template
 from django.conf import settings
@@ -8,12 +6,57 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User
 from django.contrib.sites import models as sites_models
 from django.core import urlresolvers
+from django.forms import models as forms_models
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from registration import models as registration_models
+from registration.backends.hmac import views as registration_views
 
-from . import decorators, forms, signals
+from . import decorators, forms, signals, utils
+
+
+class RegistrationView(registration_views.RegistrationView):
+    def register(self, **kwargs):
+        """
+        Register a new user account, which will initially be inactive.
+
+        It also creates corresponding user profile.
+        """
+
+        user = super(RegistrationView, self).register(**kwargs)
+        profile, created = utils.get_profile_model().objects.get_or_create(user=user)
+
+        # lambda-object to the rescue
+        form = lambda: None
+        form.cleaned_data = kwargs
+
+        # First name, last name and e-mail address are stored in user object
+        forms_models.construct_instance(form, user)
+        user.save()
+
+        # Other fields are stored in user profile object
+        forms_models.construct_instance(form, profile)
+        profile.save()
+
+        return user
+
+    def get_form_class(self):
+        """
+        Returns the default form class used for user registration.
+
+        It returns `nodewatcher.extra.accounts.forms.AccountRegistrationForm` form which contains fields for both user and user profile objects.
+        """
+
+        return utils.initial_accepts_request(self.request, forms.AccountRegistrationForm)
+
+    def get_success_url(self, user):
+        return ('AccountsComponent:registration_complete', (), {})
+
+
+class ActivationView(registration_views.ActivationView):
+    def get_success_url(self, user):
+        return ('AccountsComponent:registration_activation_complete', (), {})
 
 
 def user(request, username):

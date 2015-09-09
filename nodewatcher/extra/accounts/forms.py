@@ -19,13 +19,14 @@ def alter_user_form_fields(form):
     to fields.
     """
 
-    # Minimal length (it is otherwise checked in a form field so we also check it just there)
-    if not filter(lambda v: isinstance(v, core_validators.MinLengthValidator), form.fields['username'].validators):
-        # We do not blindly append as field objects can be reused
-        form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
-    # We set it every time to be sure
-    form.fields['username'].min_length = 4
-    form.fields['username'].help_text = _("Letters, digits and @/./+/-/_ only. Will be public.")
+    if 'username' in form.fields:
+        # Minimal length (it is otherwise checked in a form field so we also check it just there)
+        if not filter(lambda v: isinstance(v, core_validators.MinLengthValidator), form.fields['username'].validators):
+            # We do not blindly append as field objects can be reused
+            form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
+        # We set it every time to be sure
+        form.fields['username'].min_length = 4
+        form.fields['username'].help_text = _("Letters, digits and @/./+/-/_ only. Will be public.")
 
     # E-mail domain validation (we check it in a model field)
     emailfield = filter(lambda x: x.name == 'email', form.Meta.model._meta.fields)[0]
@@ -99,7 +100,7 @@ class UserCreationForm(auth_forms.UserCreationForm):
 
     def clean_username(self):
         # Check for username existence in a case-insensitive manner
-        username = super(UserCreationForm, self).clean_username()
+        username = self.cleaned_data['username']
         try:
             auth_models.User.objects.get(username__iexact=username)
         except auth_models.User.DoesNotExist:
@@ -138,7 +139,6 @@ class UserChangeForm(AdminUserChangeForm):
         # a subclass form when field is not declared in Meta.fields or even if it is defined in Meta.exclude
         # So we remove such field (in this case username and password fields) here ourselves
         super(UserChangeForm, self).__init__(*args, **kwargs)
-        del self.fields['username']
         del self.fields['password']
 
         self.fields['email'].help_text = _("If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.")
@@ -171,7 +171,7 @@ class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncl
     fieldset = UserCreationForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
 
     def save(self, commit=True):
-        # We disable save method as registration module (through `nodewatcher.extra.accounts.regbackend.ProfileBackend` backend) takes
+        # We disable save method as registration module (through `nodewatcher.extra.accounts.views.RegistrationView`) takes
         # care of user and user profile objects creation and we do not use it for changing data
         assert False
         return None

@@ -31,7 +31,7 @@ def logout_url(menu_entry, context):
     # TODO: Is there a way for accounts_tags.authenticated_required to work with official decorators as well?
     url = urlresolvers.reverse('AccountsComponent:auth_logout')
     redirect_field_name = context.get('REDIRECT_FIELD_NAME', auth.REDIRECT_FIELD_NAME)
-    next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].REQUEST.get(redirect_field_name, None) or context['request'].get_full_path()
+    next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].GET.get(redirect_field_name, None) or context['request'].get_full_path()
     if next_url and not accounts_tags.authenticated_required(next_url):
         url = "%s?%s=%s" % (url, redirect_field_name, http.urlquote(next_url))
     return url
@@ -57,7 +57,7 @@ def login_url(menu_entry, context):
     # TODO: Is there a way for accounts_tags.anonymous_required to work with official decorators as well?
     url = urlresolvers.reverse('AccountsComponent:auth_login')
     redirect_field_name = context.get('REDIRECT_FIELD_NAME', auth.REDIRECT_FIELD_NAME)
-    next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].REQUEST.get(redirect_field_name, None) or context['request'].get_full_path()
+    next_url = context.get('next', None) or context.get('request_get_next', None) or context['request'].GET.get(redirect_field_name, None) or context['request'].get_full_path()
     if next_url and not accounts_tags.anonymous_required(next_url):
         url = "%s?%s=%s" % (url, redirect_field_name, http.urlquote(next_url))
     return url
