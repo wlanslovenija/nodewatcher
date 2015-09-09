@@ -77,7 +77,7 @@ ROUTER_MAP = {
     "tp-wr841ndv8": "tp-wr841ndv8",
     "tp-wr703n": "tp-wr703nv1",
     "ub-bullet": "ub-bullet-m5",
-    "ub-nano": "ub-nano",
+    "ub-nano": "ub-nano-m5",
     "ub-nano-m5-xw": "ub-nano-m5-xw",
     "ub-loco-m5-xw": "ub-loco-m5-xw",
     "ub-bullet-m5": "ub-bullet-m5",

@@ -1,23 +1,23 @@
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class UBNTNano(cgm_devices.DeviceBase):
+class UBNTNanoM2(cgm_devices.DeviceBase):
     """
-    UBNT Nano device descriptor.
+    UBNT Nanostation M2 device descriptor.
     """
 
-    identifier = 'ub-nano'
-    name = "Nanostation"
+    identifier = 'ub-nano-m2'
+    name = "Nanostation M2"
     manufacturer = "Ubiquity"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
-            cgm_protocols.IEEE80211AN(
-                cgm_protocols.IEEE80211AN.SHORT_GI_40,
-                cgm_protocols.IEEE80211AN.TX_STBC1,
-                cgm_protocols.IEEE80211AN.RX_STBC1,
-                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.TX_STBC1,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
             )
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
@@ -61,16 +61,30 @@ class UBNTNano(cgm_devices.DeviceBase):
     }
 
 
-class UBNTNanoM5(UBNTNano):
+class UBNTNanoM5(UBNTNanoM2):
     """
-    UBNT Nano M5 device descriptor.
+    UBNT Nanostation M5 device descriptor.
     """
 
     identifier = 'ub-nano-m5'
     name = "Nanostation M5"
+    radios = [
+        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
+            cgm_protocols.IEEE80211AN(
+                cgm_protocols.IEEE80211AN.SHORT_GI_40,
+                cgm_protocols.IEEE80211AN.TX_STBC1,
+                cgm_protocols.IEEE80211AN.RX_STBC1,
+                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            )
+        ], [
+            cgm_devices.AntennaConnector('a1', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
+        ])
+    ]
 
 
-class UBNTNanoM5XW(UBNTNano):
+class UBNTNanoM5XW(UBNTNanoM5):
     """
     UBNT Nano M5 XW device descriptor.
     """
@@ -88,36 +102,13 @@ class UBNTNanoM5XW(UBNTNano):
     }
 
 
-class UBNTLocoM2(UBNTNano):
+class UBNTLocoM2(UBNTNanoM2):
     """
     UBNT Nanostation Loco M2 device descriptor.
     """
 
     identifier = 'ub-loco-m2'
     name = "Nanostation Loco M2"
-    radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
-            cgm_protocols.IEEE80211BGN(
-                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
-                cgm_protocols.IEEE80211BGN.TX_STBC1,
-                cgm_protocols.IEEE80211BGN.RX_STBC1,
-                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
-            )
-        ], [
-            cgm_devices.AntennaConnector('a1', "Antenna0")
-        ], [
-            cgm_devices.DeviceRadio.MultipleSSID,
-        ])
-    ]
-    profiles = {
-        'openwrt': {
-            'name': 'UBNT',
-            'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
-            ]
-        }
-    }
 
 
 class UBNTLocoM5(UBNTNanoM5):
@@ -127,15 +118,6 @@ class UBNTLocoM5(UBNTNanoM5):
 
     identifier = 'ub-loco-m5'
     name = "Nanostation Loco M5"
-    profiles = {
-        'openwrt': {
-            'name': 'UBNT',
-            'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
-            ]
-        }
-    }
 
 
 class UBNTLocoM5XW(UBNTNanoM5):
@@ -155,8 +137,8 @@ class UBNTLocoM5XW(UBNTNanoM5):
         }
     }
 
-# Register the UBNT Nano device
-cgm_base.register_device('openwrt', UBNTNano)
+# Register the UBNT Nano device.
+cgm_base.register_device('openwrt', UBNTNanoM2)
 cgm_base.register_device('openwrt', UBNTNanoM5)
 cgm_base.register_device('openwrt', UBNTNanoM5XW)
 cgm_base.register_device('openwrt', UBNTLocoM2)
