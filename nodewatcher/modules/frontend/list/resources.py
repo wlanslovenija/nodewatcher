@@ -1,10 +1,11 @@
+from django.conf import urls
 from django.contrib.auth import models as auth_models
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import api
 from nodewatcher.utils import permissions
 
-from tastypie import resources
+from tastypie import resources, utils
 
 # TODO: Temporary, create a way to register fields into an API
 from ...administration.status import models as status_models
@@ -66,6 +67,14 @@ class NodeResource(api.BaseResource):
             'type',
             'project',
         )
+
+    def base_urls(self):
+        base_urls = super(NodeResource, self).base_urls()
+        # Replace last URL so that it doesn't match everything after /node but only UUIDs. This is
+        # needed so other subresources may be registered by other modules.
+        base_urls[-1] = urls.url(r"^(?P<resource_name>%s)/(?P<%s>[\w\d_.-]+)%s$" % (self._meta.resource_name, self._meta.detail_uri_name, utils.trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail")
+
+        return base_urls
 
     def _after_apply_sorting(self, obj_list, options, order_by_args):
         # We want to augment sorting so that it is always sorted at the end by "uuid" to have a defined order
