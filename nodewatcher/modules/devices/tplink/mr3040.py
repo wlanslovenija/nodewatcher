@@ -60,5 +60,23 @@ class TPLinkMR3040v1(cgm_devices.DeviceBase):
         }
     }
 
-# Register the TP-Link MR3040 device
+
+class TPLinkMR3040v2(TPLinkMR3040v1):
+    """
+    TP-Link MR3040v2 device descriptor.
+    """
+
+    identifier = 'tp-mr3040v2'
+    name = "MR3040 (v2)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLMR3040',
+            'files': [
+                'openwrt-ar71xx-generic-tl-mr3040-v2-squashfs-factory.bin'
+            ]
+        }
+    }
+
+# Register the TP-Link MR3040 device.
 cgm_base.register_device('openwrt', TPLinkMR3040v1)
+cgm_base.register_device('openwrt', TPLinkMR3040v2)
