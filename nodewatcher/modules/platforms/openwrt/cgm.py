@@ -1289,3 +1289,19 @@ def firewall(node, cfg):
     defaults.input = 'ACCEPT'
     defaults.output = 'ACCEPT'
     defaults.forward = 'REJECT'
+
+
+@cgm_base.register_platform_module('openwrt', 11)
+def time_synchronization(node, cfg):
+    """
+    Sets up defaults for time synchronization.
+    """
+
+    ntp = cfg.system.add(timeserver='ntp')
+    ntp.enable_server = False
+    ntp.server = [
+        '0.openwrt.pool.ntp.org',
+        '1.openwrt.pool.ntp.org',
+        '2.openwrt.pool.ntp.org',
+        '3.openwrt.pool.ntp.org',
+    ]
