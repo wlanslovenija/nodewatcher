@@ -28,7 +28,6 @@ def banner(node, cfg):
     general = node.config.core.general()
     device = general.get_device()
 
-    print device, getattr(device, 'manufacturer')
     banner_template = template.loader.get_template('banner/banner.txt')
     cfg.banner = banner_template.render(template.Context({
         'name': general.name,
