@@ -27,7 +27,8 @@ class UBNTNanoM2(cgm_devices.DeviceBase):
     ]
     switches = []
     ports = [
-        cgm_devices.EthernetPort('lan0', "Lan0")
+        cgm_devices.EthernetPort('wan0', "Main"),
+        cgm_devices.EthernetPort('lan0', "Secondary"),
     ]
     antennas = [
         # TODO: This information is probably not correct
@@ -42,7 +43,8 @@ class UBNTNanoM2(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'lan0': 'eth0',
+            'wan0': 'eth0',
+            'lan0': 'eth1',
         }
     }
     drivers = {
@@ -109,6 +111,15 @@ class UBNTLocoM2(UBNTNanoM2):
 
     identifier = 'ub-loco-m2'
     name = "Nanostation Loco M2"
+    ports = [
+        cgm_devices.EthernetPort('lan0', "Lan0"),
+    ]
+    port_map = {
+        'openwrt': {
+            'wifi0': 'radio0',
+            'lan0': 'eth0',
+        }
+    }
 
 
 class UBNTLocoM5(UBNTNanoM5):
@@ -118,9 +129,18 @@ class UBNTLocoM5(UBNTNanoM5):
 
     identifier = 'ub-loco-m5'
     name = "Nanostation Loco M5"
+    ports = [
+        cgm_devices.EthernetPort('lan0', "Lan0"),
+    ]
+    port_map = {
+        'openwrt': {
+            'wifi0': 'radio0',
+            'lan0': 'eth0',
+        }
+    }
 
 
-class UBNTLocoM5XW(UBNTNanoM5):
+class UBNTLocoM5XW(UBNTLocoM5):
     """
     UBNT Nanostation Loco M5 XW device descriptor.
     """
