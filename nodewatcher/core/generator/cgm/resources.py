@@ -123,8 +123,6 @@ class PhysicalPortResource(Resource):
         if port_type is not None and port_type != self.port_type:
             raise ResourceExhausted
 
-        print 'allocating port', port
-
         try:
             self.available_ports.remove(port)
         except KeyError:

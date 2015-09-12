@@ -935,16 +935,6 @@ def network(node, cfg):
             for port in interface.bridge_ports.all():
                 port = port.interface
                 if isinstance(port, cgm_models.EthernetInterfaceConfig):
-                    # Allocate the port to ensure it is only bound to this bridge.
-                    try:
-                        cfg.resources.get(cgm_resources.PhysicalPortResource, port_type='ethernet', port=port.eth_port)
-                    except cgm_resources.ResourceExhausted:
-                        raise cgm_base.ValidationError(
-                            _("Ethernet port '%(name)s' cannot be bound to multiple interfaces.") % {
-                                'name': port.eth_port,
-                            }
-                        )
-
                     raw_port = device.remap_port('openwrt', port.eth_port)
                     if isinstance(raw_port, (list, tuple)):
                         iface.ifname += raw_port
