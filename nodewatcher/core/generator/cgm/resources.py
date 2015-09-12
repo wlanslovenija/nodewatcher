@@ -96,3 +96,40 @@ class IpResource(Resource):
             return ipaddr.IPNetwork("%s/%d" % (self.allocation.next(), self.subnet.prefixlen))
         except StopIteration:
             raise ResourceExhausted
+
+
+class PhysicalPortResource(Resource):
+    """
+    A phsyical port resource.
+    """
+
+    def __init__(self, port_type, ports):
+        """
+        Class constructor.
+
+        :param ports: A list of available physical ports
+        :param port_type: Arbitrary string identifying the port type
+        """
+
+        self.port_type = port_type
+        self.available_ports = set(ports)
+        self.allocated_ports = set()
+
+    def allocate(self, port, port_type=None):
+        """
+        Allocates a specific port.
+        """
+
+        if port_type is not None and port_type != self.port_type:
+            raise ResourceExhausted
+
+        print 'allocating port', port
+
+        try:
+            self.available_ports.remove(port)
+        except KeyError:
+            raise ResourceExhausted
+
+        self.allocated_ports.add(port)
+
+        return port

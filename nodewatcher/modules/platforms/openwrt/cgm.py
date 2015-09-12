@@ -908,8 +908,17 @@ def network(node, cfg):
     cfg.sysctl.set_variable('net.ipv6.conf.default.accept_dad', 0)
     cfg.sysctl.set_variable('net.ipv6.conf.all.accept_dad', 0)
 
-    # Obtain the device descriptor for this device
+    # Obtain the device descriptor for this device and generate physical port resource so
+    # we can track binding of ports to different interface and prevent multiple definitions.
     device = node.config.core.general().get_device()
+    cfg.resources.add(cgm_resources.PhysicalPortResource(
+        'ethernet',
+        [port.identifier for port in device.ports],
+    ))
+    cfg.resources.add(cgm_resources.PhysicalPortResource(
+        'radio',
+        [radio.identifier for radio in device.radios],
+    ))
 
     # Configure all interfaces
     for interface in node.config.core.interfaces():
@@ -926,6 +935,16 @@ def network(node, cfg):
             for port in interface.bridge_ports.all():
                 port = port.interface
                 if isinstance(port, cgm_models.EthernetInterfaceConfig):
+                    # Allocate the port to ensure it is only bound to this bridge.
+                    try:
+                        cfg.resources.get(cgm_resources.PhysicalPortResource, port_type='ethernet', port=port.eth_port)
+                    except cgm_resources.ResourceExhausted:
+                        raise cgm_base.ValidationError(
+                            _("Ethernet port '%(name)s' cannot be bound to multiple interfaces.") % {
+                                'name': port.eth_port,
+                            }
+                        )
+
                     raw_port = device.remap_port('openwrt', port.eth_port)
                     if isinstance(raw_port, (list, tuple)):
                         iface.ifname += raw_port
@@ -1010,6 +1029,16 @@ def network(node, cfg):
                 'kmod-usb2',
             ])
         elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
+            # Allocate the port to ensure it is only bound to this interface.
+            try:
+                cfg.resources.get(cgm_resources.PhysicalPortResource, port_type='ethernet', port=interface.eth_port)
+            except cgm_resources.ResourceExhausted:
+                raise cgm_base.ValidationError(
+                    _("Ethernet port '%(name)s' cannot be bound to multiple interfaces.") % {
+                        'name': interface.eth_port,
+                    }
+                )
+
             # Check if we need to configure the switch.
             port = device.get_port(interface.eth_port)
             if isinstance(port, cgm_devices.SwitchedEthernetPort):
@@ -1043,6 +1072,16 @@ def network(node, cfg):
 
             configure_interface(cfg, node, interface, iface, interface.eth_port)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
+            # Allocate the port to ensure it is only bound to this bridge.
+            try:
+                cfg.resources.get(cgm_resources.PhysicalPortResource, port_type='radio', port=interface.wifi_radio)
+            except cgm_resources.ResourceExhausted:
+                raise cgm_base.ValidationError(
+                    _("Wireless radio '%(name)s' cannot be bound to multiple interfaces.") % {
+                        'name': interface.wifi_radio,
+                    }
+                )
+
             # Configure virtual interfaces on top of the same radio device
             dsc_radio = device.get_radio(interface.wifi_radio)
             interfaces = list(interface.interfaces.all())
