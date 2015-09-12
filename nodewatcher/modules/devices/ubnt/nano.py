@@ -27,8 +27,8 @@ class UBNTNanoM2(cgm_devices.DeviceBase):
     ]
     switches = []
     ports = [
-        cgm_devices.EthernetPort('wan0', "Main"),
-        cgm_devices.EthernetPort('lan0', "Secondary"),
+        cgm_devices.EthernetPort('wan0', "Secondary"),
+        cgm_devices.EthernetPort('lan0', "Primary"),
     ]
     antennas = [
         # TODO: This information is probably not correct
