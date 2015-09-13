@@ -31,7 +31,9 @@ in global_vars context processor.
 
         {% if form %}
             {% if form.non_field_errors %}
-                {{ form.non_field_errors }}
+                {% with form.non_field_errors as errors %}
+                    {% include "form/form_errors.html" %}
+                {% endwith %}
             {% endif %}
             {% for field in form.hidden_fields %}
                 <div style="display: none;">{{ field }}</div>
