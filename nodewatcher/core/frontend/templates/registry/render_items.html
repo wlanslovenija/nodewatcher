@@ -1,7 +1,7 @@
 {% load i18n html_tags theme_tags %}
 
 {% if errors %}
-    <div class="alert alert-danger">
+    <div class="alert alert-danger errors">
       <b>{% trans "Errors while performing validation" %}</b><br/>
       <br/>
       {% for error in errors %}

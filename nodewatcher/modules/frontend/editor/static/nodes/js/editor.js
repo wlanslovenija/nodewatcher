@@ -49,6 +49,24 @@
 				}
 			});
 
+			var $errorsBar = $('#registry_forms > .errors')
+
+			$errorsBar.css('width', $('#registry_forms').width());
+
+			$( window ).resize(function() {
+				$errorsBar.css('width', $('#registry_forms').width());
+			});
+
+			$errorsBar.affix({
+				offset: {
+					top: function() {
+						var offsetTop = $errorsBar.offset().top;
+						return (this.top = offsetTop);
+					},
+					bottom: 10
+				}
+			});
+
 			// Update errors a bit later as well
 			showErrors();
 		}, 100);

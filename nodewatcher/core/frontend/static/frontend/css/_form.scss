@@ -92,6 +92,17 @@ textarea.form-control {
     }
 }
 
+#registry_forms > .errors {
+    width: 100%;
+}
+
+#registry_forms > .errors.affix {
+    width: 100%;
+    top: 10px;
+    opacity: 0.9;
+    z-index: 2000;
+}
+
 #registry-navbar.affix {
     top: 10px;
 }
