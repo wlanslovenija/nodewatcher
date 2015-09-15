@@ -86,6 +86,13 @@ def background_build(self, result_uuid):
 
     # Store resulting files and generate the file manifest.
     manifest = {
+        'node': {
+            'uuid': str(result.node.uuid),
+            'name': node_name,
+        },
+        'firmware': {
+            'version': result.builder.version.name,
+        },
         'files': []
     }
 
