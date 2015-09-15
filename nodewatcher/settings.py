@@ -273,6 +273,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.validation.version',
     'nodewatcher.modules.monitor.validation.interfaces',
     'nodewatcher.modules.services.dns',
+    'nodewatcher.modules.services.nodeupgrade',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
     'nodewatcher.modules.authentication.public_key',
@@ -569,6 +570,17 @@ USE_HTTPS = False
 # Server's public key. This is used for certificate pinning when provisioning nodes. If this is not
 # set, nodes may be configured to access the server via insecure HTTP instead.
 HTTPS_PUBLIC_KEY = None
+
+# Nodeupgrade server location. Note that all this information (including the private key)
+# can be made public and does not need to be protected as it is only used to download
+# files via SCP.
+NODEUPGRADE_SERVER = ''
+NODEUPGRADE_PORT = 28932
+NODEUPGRADE_USER = 'fileserver'
+# Private key must be in Dropbear-compatible format and base64 encoded.
+NODEUPGRADE_PRIVATE_KEY = ''
+# Server public key must be in SSH-compatible format.
+NODEUPGRADE_SERVER_PUBLIC_KEY = ''
 
 LEAFLET_CONFIG = {
     'TILES': [

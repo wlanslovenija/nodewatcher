@@ -262,6 +262,11 @@ def generate_build_result_filename(result_file, filename):
     return 'generator/%s/%s' % (result_file.result.uuid, filename)
 
 
+class BuildResultFileManager(models.Manager):
+    def visible_only(self):
+        return self.filter(hidden=False)
+
+
 class BuildResultFile(models.Model):
     """
     A generated file belonging to a build result.
@@ -279,11 +284,30 @@ class BuildResultFile(models.Model):
         upload_to=generate_build_result_filename,
         max_length=200,
     )
+    hidden = models.BooleanField(default=False)
     checksum_md5 = models.CharField(max_length=32)
     checksum_sha256 = models.CharField(max_length=64)
 
+    # Override the default manager to provide some extra methods.
+    objects = BuildResultFileManager()
+
     def __repr__(self):
         return '<BuildResultFile for result \'%s\'>' % self.result_id
+
+    def to_manifest(self):
+        """
+        Returns a representation of this build result suitable for use in a manifest
+        file.
+        """
+
+        if self.hidden:
+            return None
+
+        return {
+            'filename': self.file.name,
+            'checksum_md5': self.checksum_md5,
+            'checksum_sha256': self.checksum_sha256,
+        }
 
 
 @dispatch.receiver(django_signals.post_delete, sender=BuildResultFile)

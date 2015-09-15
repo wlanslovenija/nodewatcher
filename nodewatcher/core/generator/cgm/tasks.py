@@ -1,5 +1,6 @@
 import hashlib
 import io
+import json
 import os
 
 import unidecode
@@ -83,7 +84,11 @@ def background_build(self, result_uuid):
     # Dispatch signal that can be used to modify files
     signals.post_firmware_build.send(sender=None, result=result, files=files)
 
-    # Store resulting files
+    # Store resulting files and generate the file manifest.
+    manifest = {
+        'files': []
+    }
+
     for fw_name, fw_file in files:
         r_file = generator_models.BuildResultFile(
             result=result,
@@ -98,7 +103,29 @@ def background_build(self, result_uuid):
             checksum_md5=hashlib.md5(fw_file).hexdigest(),
             checksum_sha256=hashlib.sha256(fw_file).hexdigest(),
         )
+
+        manifest_entry = r_file.to_manifest()
+        if manifest_entry is not None:
+            manifest['files'].append(manifest_entry)
+
         r_file.save()
+
+    # Store the manifest.
+    manifest = json.dumps(manifest)
+    generator_models.BuildResultFile(
+        result=result,
+        file=uploadedfile.InMemoryUploadedFile(
+            io.BytesIO(manifest),
+            None,
+            'manifest.json',
+            'text/json',
+            len(manifest),
+            None
+        ),
+        checksum_md5=hashlib.md5(manifest).hexdigest(),
+        checksum_sha256=hashlib.sha256(manifest).hexdigest(),
+        hidden=True,
+    ).save()
 
     result.status = generator_models.BuildResult.OK
     result.save()

@@ -35,9 +35,9 @@
 
         <dt>{% trans "Firmware files" %}</dt>
         <dd>
-            {% if result.files.all %}
+            {% if result.files.visible_only %}
             <ul>
-                {% for fo in result.files.all %}
+                {% for fo in result.files.visible_only %}
                 <li>
                     <a href="{{ fo.file.url }}">{{ fo.file|basename }}</a><br/>
                     MD5: {{ fo.checksum_md5 }}<br/>

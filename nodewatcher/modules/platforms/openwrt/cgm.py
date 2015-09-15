@@ -513,7 +513,6 @@ def general(node, cfg):
 
     # Setup base packages to be installed.
     cfg.packages.update([
-        'nodeupgrade',
         # TODO: This should probably not be hardcoded (or at least moved to modules).
         'nodewatcher-watchdog',
     ])

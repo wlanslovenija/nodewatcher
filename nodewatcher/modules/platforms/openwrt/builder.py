@@ -1,3 +1,4 @@
+import base64
 import io
 import os
 
@@ -67,7 +68,13 @@ def build_image(result, profile):
             if not crypto_object['path']:
                 continue
 
-            builder.write_file(os.path.join(temp_path, crypto_object['path'][1:]), crypto_object['content'].encode('ascii'))
+            content = crypto_object['content']
+            if crypto_object['decoder'] == cgm_base.PlatformCryptoManager.BASE64:
+                content = base64.b64decode(content)
+            else:
+                content = content.encode('ascii')
+
+            builder.write_file(os.path.join(temp_path, crypto_object['path'][1:]), content)
 
         builder.write_file(
             os.path.join(temp_path, 'etc', 'dropbear', 'authorized_keys'),

@@ -103,8 +103,11 @@ class PlatformCryptoManager(object):
     SYMMETRIC_KEY = 4
     SSH_AUTHORIZED_KEY = 5
 
+    # Decoders.
+    BASE64 = 'base64'
+
     class CryptoObject(object):
-        def __init__(self, object_type, content, name):
+        def __init__(self, object_type, content, name, decoder=None):
             """
             Class constructor.
             """
@@ -112,6 +115,7 @@ class PlatformCryptoManager(object):
             self.object_type = object_type
             self.content = content
             self.name = name
+            self.decoder = decoder
 
         def path(self):
             """
@@ -131,6 +135,7 @@ class PlatformCryptoManager(object):
                 'type': self.object_type,
                 'name': self.name,
                 'content': self.content,
+                'decoder': self.decoder,
             }
 
     object_class = CryptoObject
@@ -142,13 +147,14 @@ class PlatformCryptoManager(object):
 
         self._objects = {}
 
-    def add_object(self, object_type, content, name):
+    def add_object(self, object_type, content, name, decoder=None):
         """
         Adds a new crypto object.
 
         :param object_type: Type of the crypto object
         :param content: Object content
         :param name: Unique object name
+        :param decoder: Optional content decoder
         :return: Crypto object instance
         """
 
@@ -156,7 +162,7 @@ class PlatformCryptoManager(object):
 
         name = str(name)
 
-        crypto_object = self.object_class(object_type, content.strip(), name)
+        crypto_object = self.object_class(object_type, content.strip(), name, decoder=decoder)
         objects = self._objects.setdefault(object_type, {})
         objects[name] = crypto_object
 
