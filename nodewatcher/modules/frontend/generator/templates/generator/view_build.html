@@ -50,6 +50,10 @@
             {% endif %}
         </dd>
 
+        {% block view_build_partial_wrapper %}
+            {% include "generator/view_build_partial.html" %}
+        {% endblock view_build_partial_wrapper %}
+
         <dt>{% trans "Build log" %}</dt>
         <dd class="build-log">{{ result.build_log|default:_("N/A") }}</dd>
     </dl>

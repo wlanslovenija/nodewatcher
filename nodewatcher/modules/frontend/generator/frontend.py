@@ -39,3 +39,6 @@ components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     url=urlresolvers.reverse_lazy('GeneratorComponent:list_builds'),
     visible=lambda menu_entry, request, context: request.user.is_authenticated(),
 ))
+
+
+components.partials.register(components.Partial('generator_view_build_partial'))
