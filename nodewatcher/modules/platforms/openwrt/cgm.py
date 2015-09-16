@@ -1071,9 +1071,9 @@ def network(node, cfg):
                     }
                 )
 
-            # Configure virtual interfaces on top of the same radio device
+            # Configure virtual interfaces on top of the same radio device.
             dsc_radio = device.get_radio(interface.wifi_radio)
-            interfaces = list(interface.interfaces.all())
+            interfaces = list(interface.interfaces.filter(enabled=True))
             if len(interfaces) > 1 and not dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
                 raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % device.name)
 
