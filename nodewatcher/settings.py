@@ -273,6 +273,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.validation.version',
     'nodewatcher.modules.monitor.validation.interfaces',
     'nodewatcher.modules.services.dns',
+    'nodewatcher.modules.services.dhcp',
     'nodewatcher.modules.services.nodeupgrade',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
