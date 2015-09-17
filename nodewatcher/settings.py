@@ -275,6 +275,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.services.dns',
     'nodewatcher.modules.services.dhcp',
     'nodewatcher.modules.services.nodeupgrade',
+    'nodewatcher.modules.services.watchdog',
     'nodewatcher.modules.routing.olsr',
     'nodewatcher.modules.routing.babel',
     'nodewatcher.modules.authentication.public_key',

@@ -511,12 +511,6 @@ def general(node, cfg):
     # Reboot system in 3 seconds after a kernel panic.
     cfg.sysctl.set_variable('kernel.panic', 3)
 
-    # Setup base packages to be installed.
-    cfg.packages.update([
-        # TODO: This should probably not be hardcoded (or at least moved to modules).
-        'nodewatcher-watchdog',
-    ])
-
 
 @cgm_base.register_platform_module('openwrt', 1)
 def router_id(node, cfg):
