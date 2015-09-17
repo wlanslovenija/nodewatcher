@@ -1,3 +1,4 @@
+from nodewatcher.core import models as core_models
 from nodewatcher.core.generator.cgm import base as cgm_base
 
 # These must be the same as defined in package 'identity-pubkey'.
@@ -14,10 +15,15 @@ def public_key_identity(node, cfg):
     # Configure uhttpd so it will serve files via TLS.
     uhttpd = cfg.uhttpd.find_named_section('uhttpd')
     if uhttpd and uhttpd.listen_http:
-        router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-        uhttpd.listen_https = ['%s:443' % router_id]
-        uhttpd.cert = IDENTITY_CERTIFICATE_LOCATION
-        uhttpd.key = IDENTITY_KEY_LOCATION
+        try:
+            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+            uhttpd.listen_https = ['%s:443' % router_id]
+            uhttpd.cert = IDENTITY_CERTIFICATE_LOCATION
+            uhttpd.key = IDENTITY_KEY_LOCATION
+
+            cfg.packages.add('uhttpd-mod-tls')
+        except core_models.RouterIdConfig.DoesNotExist:
+            pass
 
     # Configure nodewatcher-agent so it will use the generated keys for authentication
     # when configured for push.
@@ -26,8 +32,5 @@ def public_key_identity(node, cfg):
         agent.push_client_certificate = IDENTITY_CERTIFICATE_LOCATION
         agent.push_client_key = IDENTITY_KEY_LOCATION
 
-    cfg.packages.update([
-        'uhttpd-mod-tls',
-        # Require the identity-pubkey package which will generate the node's key pair on first boot.
-        'identity-pubkey',
-    ])
+    # Require the identity-pubkey package which will generate the node's key pair on first boot.
+    cfg.packages.add('identity-pubkey')
