@@ -7,7 +7,7 @@ from nodewatcher.core import models as core_models
 from nodewatcher.core.allocation.ip import models as pool_models
 from nodewatcher.core.registry import exceptions as registry_exceptions
 from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base, resources as cgm_resources, devices as cgm_devices
-from nodewatcher.utils import posix_tz, ipaddr
+from nodewatcher.utils import posix_tz
 
 from . import builder as openwrt_builder
 
