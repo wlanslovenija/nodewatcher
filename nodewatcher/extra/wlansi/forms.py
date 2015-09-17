@@ -143,6 +143,11 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
             radio_defaults[radio.wifi_radio] = radio
 
+        clients_network = None
+        for bridge in state.filter_items('core.interfaces', klass=cgm_models.BridgeInterfaceConfig, name='clients0'):
+            for network in state.filter_items('core.interfaces.network', klass=cgm_models.AllocatedNetworkConfig, parent=bridge):
+                clients_network = network
+
         state.remove_items('core.interfaces')
 
         # Ethernet.
@@ -230,20 +235,37 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         },
                     )
 
-                    self.setup_network(
-                        state,
-                        clients_interface,
-                        cgm_models.AllocatedNetworkConfig,
-                        configuration={
-                            'description': "AP-LAN Client Access",
-                            'routing_announces': ['olsr', 'babel'],
-                            'family': 'ipv4',
-                            'pool': project_config.project.default_ip_pool,
-                            'prefix_length': 28,
-                            'lease_type': 'dhcp',
-                            'lease_duration': '15min',
-                        }
-                    )
+                    if clients_network is not None:
+                        # Reuse some configuration from the previous clients network.
+                        self.setup_network(
+                            state,
+                            clients_interface,
+                            cgm_models.AllocatedNetworkConfig,
+                            configuration={
+                                'description': "AP-LAN Client Access",
+                                'routing_announces': ['olsr', 'babel'],
+                                'family': 'ipv4',
+                                'pool': clients_network.pool,
+                                'prefix_length': clients_network.prefix_length,
+                                'lease_type': 'dhcp',
+                                'lease_duration': '15min',
+                            }
+                        )
+                    else:
+                        self.setup_network(
+                            state,
+                            clients_interface,
+                            cgm_models.AllocatedNetworkConfig,
+                            configuration={
+                                'description': "AP-LAN Client Access",
+                                'routing_announces': ['olsr', 'babel'],
+                                'family': 'ipv4',
+                                'pool': project_config.project.default_ip_pool,
+                                'prefix_length': 28,
+                                'lease_type': 'dhcp',
+                                'lease_duration': '15min',
+                            }
+                        )
 
                 if lan_port:
                     # Setup routing/clients interface.
