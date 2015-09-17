@@ -867,7 +867,7 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
         sid = transaction.savepoint()
         forms = RootRegistryRenderItem(context, prepare_forms(context))
 
-        if flags & FORM_DEFAULTS | FORM_ONLY_DEFAULTS:
+        if flags & (FORM_DEFAULTS | FORM_ONLY_DEFAULTS):
             # Set form defaults.
             context.form_state.apply_form_defaults(regpoint, flags & FORM_ROOT_CREATE)
 

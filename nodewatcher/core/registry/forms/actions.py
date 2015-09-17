@@ -15,6 +15,13 @@ class RegistryFormAction(object):
     An abstract action that can modify lists of registry forms.
     """
 
+    def __init__(self):
+        """
+        Class constructor.
+        """
+
+        self.executed = False
+
     def modify_form(self, context, index, form_prefix):
         """
         Subclasses should provide action implementation in this method. It
@@ -27,7 +34,7 @@ class RegistryFormAction(object):
         :param form_prefix: Form prefix string
         """
 
-        pass
+        self.executed = True
 
     def modify_forms_before(self, context):
         """
@@ -37,7 +44,7 @@ class RegistryFormAction(object):
         :param context: Form context
         """
 
-        pass
+        self.executed = True
 
     def modify_forms_after(self, context):
         """
@@ -47,7 +54,7 @@ class RegistryFormAction(object):
         :param context: Form context
         """
 
-        pass
+        self.executed = True
 
 
 class RemoveFormAction(RegistryFormAction):
@@ -63,6 +70,7 @@ class RemoveFormAction(RegistryFormAction):
         :param parent: Optional partial parent item
         """
 
+        super(RemoveFormAction, self).__init__()
         self.indices = sorted(indices)
         self.parent = parent
 
@@ -102,6 +110,9 @@ class RemoveFormAction(RegistryFormAction):
 
         # Reduce form count depending on how many forms have been removed
         context.user_form_count -= len(self.indices)
+
+        super(RemoveFormAction, self).modify_forms_before(context)
+
         return True
 
 
@@ -118,6 +129,7 @@ class AppendFormAction(RegistryFormAction):
         :param parent: Optional partial parent item
         """
 
+        super(AppendFormAction, self).__init__()
         self.item = item
         self.parent = parent
 
@@ -161,6 +173,7 @@ class AppendFormAction(RegistryFormAction):
             force_selector_widget=context.force_selector_widget,
         ))
 
+        super(AppendFormAction, self).modify_forms_after(context)
         return True
 
 
@@ -179,6 +192,7 @@ class AssignToFormAction(RegistryFormAction):
         :param parent: Optional partial parent item
         """
 
+        super(AssignToFormAction, self).__init__()
         self.item = item
         self.index = index
         self.fields = fields
@@ -199,3 +213,5 @@ class AssignToFormAction(RegistryFormAction):
         data = django_forms.model_to_dict(self.item)
         for field in self.fields:
             context.data_from_field(form_prefix, self.item, field, data[field])
+
+        super(AssignToFormAction, self).modify_form(context, index, form_prefix)

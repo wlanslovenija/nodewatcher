@@ -18,6 +18,7 @@ class FormState(dict):
 
         self.registration_point = registration_point
         self._form_actions = {}
+        self._form_action_dependencies = {}
         self._item_map = {}
         self._metadata = {}
 
@@ -39,15 +40,18 @@ class FormState(dict):
 
         return self._form_actions.get(registry_id, [])
 
-    def add_form_action(self, registry_id, action):
+    def add_form_action(self, registry_id, action, item=None):
         """
         Adds a new form action to the pending actions list.
 
         :param registry_id: Registry identifier this action should execute for
         :param action: Action instance
+        :param item: Depend on this item
         """
 
         self._form_actions.setdefault(registry_id, []).append(action)
+        if item is not None:
+            self._form_action_dependencies.setdefault(id(item), []).append(action)
 
     def filter_items(self, registry_id, item_id=None, klass=None, parent=None, **kwargs):
         """
@@ -128,14 +132,31 @@ class FormState(dict):
             except KeyError:
                 pass
 
-            # Add form actions to remove form data.
-            self.add_form_action(
-                registry_id,
-                actions.RemoveFormAction(
-                    [item._registry_virtual_child_index],
-                    parent=item.get_registry_parent(),
+            # Remove any form actions which were added but not yet executed. There is no need to
+            # execute them if the item they depend on has just been removed.
+            item_added = False
+            for action in self._form_action_dependencies.get(id(item), []):
+                if action.executed:
+                    continue
+
+                self._form_actions.get(registry_id, []).remove(action)
+                if isinstance(action, actions.AppendFormAction):
+                    item_added = True
+
+            try:
+                del self._form_action_dependencies[id(item)]
+            except KeyError:
+                pass
+
+            if not item_added:
+                # Add form actions to remove form data.
+                self.add_form_action(
+                    registry_id,
+                    actions.RemoveFormAction(
+                        [item._registry_virtual_child_index],
+                        parent=item.get_registry_parent(),
+                    )
                 )
-            )
 
             # Update indices and identifiers of other items in the same container.
             for sibling in container:
@@ -190,7 +211,8 @@ class FormState(dict):
                     item._registry_virtual_child_index,
                     modified,
                     parent=item.get_registry_parent(),
-                )
+                ),
+                item=item,
             )
 
     def append_item(self, cls, parent=None, **attributes):
@@ -205,7 +227,11 @@ class FormState(dict):
         from . import actions
 
         item = self.create_item(cls, attributes, parent=parent)
-        self.add_form_action(cls.get_registry_id(), actions.AppendFormAction(item, parent))
+        self.add_form_action(
+            cls.get_registry_id(),
+            actions.AppendFormAction(item, parent),
+            item=item,
+        )
 
         return item
 
