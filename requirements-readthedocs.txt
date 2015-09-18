@@ -48,3 +48,4 @@ pyinotify==0.9.5
 requests==2.5.1
 unidecode==0.04.18
 ijson==2.2
+py-radix==0.9.3

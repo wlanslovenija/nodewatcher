@@ -483,6 +483,7 @@ MONITOR_RUNS = {
         'interval': 600,
         'processors': (
             'nodewatcher.modules.routing.olsr.processors.GlobalTopology',
+            'nodewatcher.modules.routing.babel.processors.IncludeRoutableNodes',
             'nodewatcher.modules.monitor.measurements.rtt.processors.RttMeasurement',
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             'nodewatcher.modules.monitor.measurements.rtt.processors.StoreNode',
@@ -498,6 +499,7 @@ MONITOR_RUNS = {
         'processors': (
             'nodewatcher.core.monitor.processors.GetAllNodes',
             'nodewatcher.modules.routing.olsr.processors.GlobalTopology',
+            'nodewatcher.modules.routing.babel.processors.IncludeRoutableNodes',
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             'nodewatcher.modules.routing.olsr.processors.NodeTopology',
             TELEMETRY_PROCESSOR_PIPELINE,

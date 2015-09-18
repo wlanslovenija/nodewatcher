@@ -1,10 +1,59 @@
+from django.conf import settings
 from django.utils import timezone
 
+from nodewatcher.core import models as core_models
 from nodewatcher.core.monitor import processors as monitor_processors, events as monitor_events
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
 from nodewatcher.utils import ipaddr
 
-from . import models as babel_models
+from . import models as babel_models, parser as babel_parser
+
+
+class IncludeRoutableNodes(monitor_processors.NetworkProcessor):
+    """
+    Selects all nodes for which routes exist as reported by the local Babel daemon.
+    """
+
+    def process(self, context, nodes):
+        """
+        Performs network-wide processing and selects the nodes that will be processed
+        in any following processors.
+
+        :param context: Current context
+        :param nodes: A set of nodes that are to be processed
+        :return: A (possibly) modified context and a (possibly) modified set of nodes
+        """
+
+        # Fetch data from the Babel daemon.
+        self.logger.info("Parsing babeld information...")
+        babel = babel_parser.BabelParser(
+            host=getattr(settings, 'BABELD_MONITOR_HOST', '::1'),
+            port=getattr(settings, 'BABELD_MONITOR_PORT', 33123),
+        )
+
+        try:
+            routes = babel.routes
+        except babel_parser.BabelParseFailed:
+            self.logger.warning("Failed to parse babeld feeds!")
+            return context, nodes
+
+        # Determine which nodes are available.
+        for node in core_models.Node.objects.regpoint('config').registry_fields(
+            router_id='core.routerid#router_id'
+        ).registry_filter(
+            core_routerid__rid_family__in=['ipv4', 'ipv6'],
+        ):
+            for router_id in node.router_id.all():
+                # Try to find the most specific route for this router.
+                route = routes.search_best(router_id)
+                if route.prefixlen > 20:
+                    nodes.add(node)
+
+                    # A specific enough route exists for this node, count it as available.
+                    context.for_node[node.pk].node_available = True
+                    break
+
+        return context, nodes
 
 
 class BabelTopology(monitor_processors.NodeProcessor):
@@ -43,10 +92,11 @@ class BabelTopology(monitor_processors.NodeProcessor):
         visible_lladdr = []
         visible_links = []
         visible_announces = []
+        router_id = context.http.core.routing.babel.router_id
 
-        if version >= 1:
+        if version >= 1 and router_id:
             # Router ID.
-            rtm.router_id = context.http.core.routing.babel.router_id
+            rtm.router_id = router_id
             # A list of link-local addresses of Babel interfaces. This is required in order to be
             # able to generate a combined topology.
             for address in context.http.core.routing.babel.link_local:

@@ -83,7 +83,7 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
             context.node_available = True
             push = True
 
-        node_available = context.node_available
+        node_available = bool(context.node_available)
 
         http_context = context.create('http', HTTPTelemetryContext)
         try:

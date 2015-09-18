@@ -7,7 +7,7 @@ class OlsrParseFailed(Exception):
     pass
 
 
-class OlsrInfo(object):
+class OlsrParser(object):
     """
     A simple class for obtaining OLSR routing information from olsrd via
     mod-txtinfo plugin.

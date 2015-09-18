@@ -26,9 +26,9 @@ class GlobalTopology(monitor_processors.NetworkProcessor):
         """
 
         self.logger.info("Parsing olsrd information...")
-        olsr_info = olsr_parser.OlsrInfo(
-            host=settings.OLSRD_MONITOR_HOST,
-            port=settings.OLSRD_MONITOR_PORT,
+        olsr_info = olsr_parser.OlsrParser(
+            host=getattr(settings, 'OLSRD_MONITOR_HOST', '127.0.0.1'),
+            port=getattr(settings, 'OLSRD_MONITOR_PORT', 2006),
         )
 
         try:
@@ -142,7 +142,6 @@ class NodeTopology(monitor_processors.NodeProcessor):
 
             if not neighbours:
                 version = 0
-                context.node_available = False
             else:
                 version = 1
                 context.node_available = True
