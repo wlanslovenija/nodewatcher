@@ -95,6 +95,9 @@ def build_image(result, profile):
                 mode=custom_file['mode'],
             )
 
+        # Clean the build first to prevent accidentally taking build results from a previous build.
+        builder.call('make', 'clean')
+
         # Run the build system and wait for its completion.
         result.build_log = builder.call(
             'make', 'image',
