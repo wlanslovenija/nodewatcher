@@ -55,3 +55,9 @@ def commotion_network(node, cfg):
                 raise cgm_base.ValidationError(
                     _("Unsupported DHCP option '%s' for OpenWrt commotion network configuration!") % network.dhcp
                 )
+
+    # Ensure commotion packages are installed.
+    cfg.packages.update([
+        'commotion',
+        'commotion-gui',
+    ])
