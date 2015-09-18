@@ -53,7 +53,12 @@ def background_build(self, result_uuid):
         files = platform.build(result)
     except exceptions.BuildError, e:
         if len(e.args) > 0:
-            result.build_log = e.args[0]
+            error_message = 'ERROR: %s' % e.args[0]
+
+            if result.build_log:
+                result.build_log += '\n' + error_message
+            else:
+                result.build_log = error_message
 
         result.status = generator_models.BuildResult.FAILED
         result.save()
