@@ -759,8 +759,14 @@ def configure_interface(cfg, node, interface, section, iface_name):
         # Only take the first bandwidth limit into account and ignore the rest
         break
 
-    # Configure firewall policy for this interface
     if section._uplink:
+        # Ensure that uplink traffic is routed via the main table.
+        policy = cfg.network.add('rule')
+        policy['in'] = iface_name
+        policy.lookup = 'main'
+        policy.priority = 500
+
+        # Configure firewall policy for the uplink interface.
         firewall = cfg.firewall.find_ordered_section('zone', name='uplink')
         if not firewall:
             firewall = cfg.firewall.add('zone')

@@ -11,11 +11,6 @@ def tunneldigger(node, cfg):
     Configures the tunneldigger VPN solution.
     """
 
-    # Raise validation error when no uplink interface has been configured
-    uplink_interface = cfg.network.find_named_section('interface', _uplink=True)
-    if uplink_interface:
-        uplink_interface = uplink_interface.get_key()
-
     # Create tunneldigger configuration
     tunneldigger_enabled = False
     tunneldigger_ifaces = []
@@ -74,14 +69,10 @@ def tunneldigger(node, cfg):
             policy.priority = 500
 
     if tunneldigger_enabled:
+        # Raise validation error when no uplink interface has been configured.
+        uplink_interface = cfg.network.find_named_section('interface', _uplink=True)
         if not uplink_interface:
             raise cgm_base.ValidationError(_("In order to use Tunneldigger interfaces, an uplink interface must be defined!"))
-
-        # Ensure that WAN traffic is routed via the main table
-        policy = cfg.network.add('rule')
-        setattr(policy, 'in', uplink_interface)
-        policy.lookup = 'main'
-        policy.priority = 500
 
         # Setup firewall policy for tunneldigger traffic
         firewall = cfg.firewall.add('zone')
