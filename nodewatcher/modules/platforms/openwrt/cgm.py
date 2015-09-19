@@ -999,7 +999,8 @@ def network(node, cfg):
                 )
 
             iface.apn = interface.apn
-            iface.pincode = interface.pin
+            if iface.pincode:
+                iface.pincode = interface.pin
             if interface.username:
                 iface.username = interface.username
                 iface.password = interface.password

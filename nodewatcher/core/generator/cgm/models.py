@@ -280,7 +280,7 @@ class MobileInterfaceConfig(InterfaceConfig):
     service = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_service', default='umts')
     device = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_device', default='mobile0')
     apn = models.CharField(max_length=100, verbose_name=_("APN"))
-    pin = models.CharField(max_length=4, verbose_name=_("PIN"))
+    pin = models.CharField(max_length=4, blank=True, verbose_name=_("PIN"))
     username = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=50, blank=True)
     uplink = models.BooleanField(default=False)
