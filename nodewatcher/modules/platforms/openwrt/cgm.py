@@ -964,8 +964,10 @@ def network(node, cfg):
             configure_interface(cfg, node, interface, iface, iface_name)
         elif isinstance(interface, cgm_models.MobileInterfaceConfig):
             iface = cfg.network.add(interface=interface.device)
-            iface._uplink = True
-            set_dhcp_ignore(cfg, interface.device)
+
+            if interface.uplink:
+                iface._uplink = True
+                set_dhcp_ignore(cfg, interface.device)
 
             # Mapping of device identifiers to ports
             port_map = {

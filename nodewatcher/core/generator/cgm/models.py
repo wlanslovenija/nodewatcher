@@ -283,6 +283,7 @@ class MobileInterfaceConfig(InterfaceConfig):
     pin = models.CharField(max_length=4, verbose_name=_("PIN"))
     username = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=50, blank=True)
+    uplink = models.BooleanField(default=False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Mobile Interface")
