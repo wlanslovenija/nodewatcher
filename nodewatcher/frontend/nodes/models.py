@@ -635,7 +635,7 @@ class Node(models.Model):
     
     @param request: The request to get the current user from
     """
-    return not self.is_invalid() and (self.owner == request.user or request.user.is_staff)
+    return not self.is_invalid() and request.user.is_staff
   
   def save(self, **kwargs):
     """

@@ -34,6 +34,7 @@ def account(request):
   """
   
   assert request.user.is_authenticated()
+  assert request.user.is_staff
   
   if request.method == 'POST':
     stored_user = copy.copy(request.user)

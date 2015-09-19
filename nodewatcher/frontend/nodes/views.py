@@ -134,7 +134,7 @@ def node_new(request):
   """
   if request.method == 'POST':
     form = initial_accepts_request(request, RegisterNodeForm)(request.POST)
-    if form.is_valid() and form.save(request.user):
+    if form.is_valid() and request.user.is_staff and form.save(request.user):
       return HttpResponseRedirect(reverse("view_node", kwargs={ 'node': form.node.get_current_id() }))
   else:
     form = initial_accepts_request(request, RegisterNodeForm)()
@@ -419,7 +419,7 @@ def whitelisted_mac(request):
   """
   if request.method == 'POST':
     form = WhitelistMacForm(request.POST)
-    if form.is_valid():
+    if form.is_valid() and request.user.is_staff:
       form.save(request.user)
       return HttpResponseRedirect(reverse('my_whitelist'))
   else:
@@ -438,7 +438,7 @@ def unwhitelist_mac(request, item_id):
   Removes a whitelisted MAC address.
   """
   item = get_object_or_404(WhitelistItem, pk = item_id)
-  if item.owner != request.user and not request.user.is_staff:
+  if not request.user.is_staff:
     raise Http404
   
   item.delete()
@@ -533,7 +533,7 @@ def event_subscribe(request):
   """
   if request.method == 'POST':
     form = EventSubscribeForm(request.POST, request=request)
-    if form.is_valid():
+    if form.is_valid() and request.user.is_staff:
       form.save(request.user)
       return HttpResponseRedirect(reverse('my_events'))
   else:
@@ -551,7 +551,7 @@ def event_unsubscribe(request, subscription_id):
   Removes event subscription.
   """
   s = get_object_or_404(EventSubscription, pk = subscription_id)
-  if s.user != request.user and not request.user.is_staff:
+  if not request.user.is_staff:
     raise Http404
   
   s.delete()
