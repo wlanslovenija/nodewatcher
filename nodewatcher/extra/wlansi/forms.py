@@ -143,10 +143,15 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
             radio_defaults[radio.wifi_radio] = radio
 
-        clients_network = None
+        clients_network_defaults = None
         for bridge in state.filter_items('core.interfaces', klass=cgm_models.BridgeInterfaceConfig, name='clients0'):
             for network in state.filter_items('core.interfaces.network', klass=cgm_models.AllocatedNetworkConfig, parent=bridge):
-                clients_network = network
+                clients_network_defaults = network
+
+        mobile_defaults = None
+        for mobile_interface in state.filter_items('core.interfaces', klass=cgm_models.MobileInterfaceConfig):
+            mobile_defaults = mobile_interface
+            break
 
         state.remove_items('core.interfaces')
 
@@ -235,7 +240,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         },
                     )
 
-                    if clients_network is not None:
+                    if clients_network_defaults is not None:
                         # Reuse some configuration from the previous clients network.
                         self.setup_network(
                             state,
@@ -245,8 +250,8 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                                 'description': "AP-LAN Client Access",
                                 'routing_announces': ['olsr', 'babel'],
                                 'family': 'ipv4',
-                                'pool': clients_network.pool,
-                                'prefix_length': clients_network.prefix_length,
+                                'pool': clients_network_defaults.pool,
+                                'prefix_length': clients_network_defaults.prefix_length,
                                 'lease_type': 'dhcp',
                                 'lease_duration': '15min',
                             }
@@ -294,6 +299,36 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     configuration={
                         'routing_protocols': ['olsr', 'babel'],
                     },
+                )
+
+        # Mobile uplink.
+
+        if 'mobile-uplink' in network_profiles:
+            if mobile_defaults is not None:
+                # Reuse some configuration form the previous mobile interface.
+                mobile_interface = self.setup_interface(
+                    state,
+                    cgm_models.MobileInterfaceConfig,
+                    configuration={
+                        'service': mobile_defaults.service,
+                        'device': mobile_defaults.device,
+                        'apn': mobile_defaults.apn,
+                        'pin': mobile_defaults.pin,
+                        'username': mobile_defaults.username,
+                        'password': mobile_defaults.password,
+                        'uplink': True,
+                    }
+                )
+            else:
+                # Create a new mobile interface.
+                mobile_interface = self.setup_interface(
+                    state,
+                    cgm_models.MobileInterfaceConfig,
+                    configuration={
+                        'service': 'umts',
+                        'device': 'mobile0',
+                        'uplink': True,
+                    }
                 )
 
         # Wireless.

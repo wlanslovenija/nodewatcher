@@ -356,6 +356,7 @@ class NetworkConfig(registration.bases.NodeConfigRegistryItem):
         registry_section = _("Network Configuration")
         registry_name = _("Generic Network Config")
         multiple = True
+        hidden = True
 
 registration.point('node.config').register_subitem(InterfaceConfig, NetworkConfig)
 
