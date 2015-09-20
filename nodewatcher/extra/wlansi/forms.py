@@ -346,7 +346,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             return
 
         protocol = radio.protocols[0]
-        channel = protocol.channels[0].identifier
+        channel = protocol.channels[7].identifier
         tx_power = None
         ack_distance = None
 
