@@ -268,6 +268,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.modules.monitor.http.interfaces',
+    'nodewatcher.modules.monitor.http.clients',
     'nodewatcher.modules.monitor.topology',
     'nodewatcher.modules.monitor.validation.reboot',
     'nodewatcher.modules.monitor.validation.version',
