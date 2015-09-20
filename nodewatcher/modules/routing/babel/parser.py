@@ -1,4 +1,5 @@
 import radix
+import socket
 import telnetlib
 
 
@@ -32,7 +33,7 @@ class BabelParser(object):
             connection = telnetlib.Telnet(self.host, self.port)
             raw = connection.read_until('\ndone\n', 15)
             connection.close()
-        except EOFError:
+        except (socket.error, EOFError):
             raise BabelParseFailed
 
         # Parse data.
