@@ -256,14 +256,21 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     )
                 else:
                     # Configure clients with an allocated network, announced to the mesh.
-                    clients_interface = self.setup_interface(
-                        state,
-                        cgm_models.BridgeInterfaceConfig,
-                        name='clients0',
-                        configuration={
-                            'routing_protocols': ['olsr', 'babel'],
-                        },
-                    )
+                    if 'no-lan-bridge' in network_profiles:
+                        clients_interface = self.setup_interface(
+                            state,
+                            cgm_models.BridgeInterfaceConfig,
+                            name='clients0',
+                        )
+                    else:
+                        clients_interface = self.setup_interface(
+                            state,
+                            cgm_models.BridgeInterfaceConfig,
+                            name='clients0',
+                            configuration={
+                                'routing_protocols': ['olsr', 'babel'],
+                            },
+                        )
 
                     if clients_network_defaults is not None:
                         # Reuse some configuration from the previous clients network.
@@ -299,21 +306,33 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
                 if lan_port:
                     # Setup routing/clients interface.
-                    lan_interface = self.setup_interface(
-                        state,
-                        cgm_models.EthernetInterfaceConfig,
-                        eth_port=lan_port,
-                    )
+                    if 'no-lan-bridge' in network_profiles:
+                        # Use LAN port only for routing, do not bridge with clients.
+                        lan_interface = self.setup_interface(
+                            state,
+                            cgm_models.EthernetInterfaceConfig,
+                            eth_port=lan_port,
+                            configuration={
+                                'routing_protocols': ['olsr', 'babel'],
+                            },
+                        )
+                    else:
+                        # Bridge LAN port to clients.
+                        lan_interface = self.setup_interface(
+                            state,
+                            cgm_models.EthernetInterfaceConfig,
+                            eth_port=lan_port,
+                        )
 
-                    self.setup_network(
-                        state,
-                        lan_interface,
-                        cgm_models.BridgedNetworkConfig,
-                        configuration={
-                            'bridge': clients_interface,
-                            'description': '',
-                        },
-                    )
+                        self.setup_network(
+                            state,
+                            lan_interface,
+                            cgm_models.BridgedNetworkConfig,
+                            configuration={
+                                'bridge': clients_interface,
+                                'description': '',
+                            },
+                        )
         else:
             # Setup routing interface for backbone nodes.
             if lan_port:
