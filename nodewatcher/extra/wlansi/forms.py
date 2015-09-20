@@ -335,11 +335,11 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         )
         else:
             # Setup routing interface for backbone nodes.
-            if lan_port:
+            if lan_port or wan_port:
                 lan_interface = self.setup_interface(
                     state,
                     cgm_models.EthernetInterfaceConfig,
-                    eth_port=lan_port,
+                    eth_port=lan_port or wan_port,
                     configuration={
                         'routing_protocols': ['olsr', 'babel'],
                     },
