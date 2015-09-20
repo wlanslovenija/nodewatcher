@@ -1,6 +1,7 @@
 import collections
 
 from django.conf import settings
+from django.utils import crypto
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core import models as core_models
@@ -545,7 +546,9 @@ def user_accounts(node, cfg):
     except cgm_models.AuthenticationConfig.MultipleObjectsReturned:
         raise cgm_base.ValidationError(_("Multiple root passwords are not supported!"))
     except cgm_models.AuthenticationConfig.DoesNotExist:
-        pass
+        # If there is no password authentication, we still need to create a default root account
+        # as otherwise authentication will not be possible. In this case, we use a random password.
+        cfg.accounts.add_user('root', crypto.get_random_string(), 0, 0, '/tmp', '/bin/ash')
 
 
 def configure_leasable_network(cfg, node, interface, network, iface_name, subnet):
