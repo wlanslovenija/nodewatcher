@@ -24,4 +24,5 @@ class NetworkProfileConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('routing-over-wan', _("Routing over WAN port")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('nat-clients', _("Clients behind NAT")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('mobile-uplink', _("Use a mobile interface for uplink")))
+registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('wifi-uplink', _("Use a wireless interface for uplink")))
 registration.point('node.config').register_item(NetworkProfileConfig)

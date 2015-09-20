@@ -225,6 +225,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
     connect_to = models.ForeignKey(core_models.Node, blank=True, null=True, related_name='+')
     essid = models.CharField(max_length=50, verbose_name="ESSID")
     bssid = registry_fields.MACAddressField(verbose_name="BSSID", blank=True, null=True)
+    uplink = models.BooleanField(default=False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         form_weight = 51
@@ -422,6 +423,8 @@ class DHCPNetworkConfig(NetworkConfig):
         registry_name = _("DHCP")
 
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, DHCPNetworkConfig)
+registration.point('node.config').register_subitem(WifiInterfaceConfig, DHCPNetworkConfig)
+registration.point('node.config').register_subitem(BridgeInterfaceConfig, DHCPNetworkConfig)
 
 
 class AllocatedNetworkConfig(NetworkConfig, ip_models.IpAddressAllocator, AnnouncableNetwork, LeasableNetwork):

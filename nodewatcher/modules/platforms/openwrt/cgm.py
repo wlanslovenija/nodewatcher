@@ -760,6 +760,10 @@ def configure_interface(cfg, node, interface, section, iface_name):
         break
 
     if section._uplink:
+        # An uplink interface cannot be used for routing.
+        if section._routable:
+            raise cgm_base.ValidationError(_("An uplink interface cannot also be used for routing!"))
+
         # Ensure that uplink traffic is routed via the main table.
         policy = cfg.network.add('rule')
         policy['in'] = iface_name
@@ -1210,6 +1214,14 @@ def network(node, cfg):
                 else:
                     iface = cfg.network.add(interface=vif_name)
                     wif.network = vif_name
+
+                    if vif.uplink:
+                        if vif.mode != 'sta':
+                            raise cgm_base.ValidationError(_("Wireless interface may only be an uplink when in station mode!"))
+
+                        iface._uplink = True
+                        set_dhcp_ignore(cfg, vif_name)
+
                     configure_interface(cfg, node, vif, iface, vif_name)
 
             # Include some wireless related packages.

@@ -140,8 +140,14 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         # Preserve certain network settings in order to enable a small amount of customization.
         radio_defaults = {}
+        wifi_uplink_defaults = None
         for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
             radio_defaults[radio.wifi_radio] = radio
+
+            for wifi_interface in state.filter_items('core.interfaces', klass=cgm_models.WifiInterfaceConfig, parent=radio):
+                if wifi_interface.uplink:
+                    wifi_uplink_defaults = wifi_interface
+                    break
 
         clients_network_defaults = None
         for bridge in state.filter_items('core.interfaces', klass=cgm_models.BridgeInterfaceConfig, name='clients0'):
@@ -425,6 +431,41 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 },
             )
 
+        # Wireless uplink.
+
+        if 'wifi-uplink' in network_profiles:
+            if wifi_uplink_defaults is not None:
+                # Reuse some configuration form the previous wifi uplink interface.
+                wifi_uplink_interface = self.setup_interface(
+                    state,
+                    cgm_models.WifiInterfaceConfig,
+                    parent=wifi_radio,
+                    configuration={
+                        'mode': 'sta',
+                        'connect_to': wifi_uplink_defaults.connect_to,
+                        'essid': wifi_uplink_defaults.essid,
+                        'bssid': wifi_uplink_defaults.bssid,
+                        'uplink': True,
+                    }
+                )
+            else:
+                # Create a new wifi uplink interface.
+                wifi_uplink_interface = self.setup_interface(
+                    state,
+                    cgm_models.WifiInterfaceConfig,
+                    parent=wifi_radio,
+                    configuration={
+                        'mode': 'sta',
+                        'uplink': True,
+                    }
+                )
+
+            self.setup_network(
+                state,
+                wifi_uplink_interface,
+                cgm_models.DHCPNetworkConfig,
+            )
+
     def setup_item(self, state, registry_id, klass, configuration=None, **filter):
         # Create a new item.
         if configuration is None:
@@ -451,13 +492,16 @@ class STAChannelAutoselect(registry_forms.FormDefaults):
     def set_defaults(self, state, create):
         # Iterate over all configured radios and VIFs.
         for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
-            # TODO: Improve this filtering.
+            all_vifs_sta = None
             for vif in state.filter_items('core.interfaces', klass=cgm_models.WifiInterfaceConfig, parent=radio):
-                if vif.mode != 'sta':
-                    continue
+                if all_vifs_sta is None and vif.mode == 'sta':
+                    all_vifs_sta = True
+                elif vif.mode != 'sta':
+                    all_vifs_sta = False
 
+            if all_vifs_sta:
                 # Ensure that the parent radio has the channel set to auto.
-                state.update_item(vif.device, channel='')
+                state.update_item(radio, channel='')
 
 registration.point('node.config').add_form_defaults(STAChannelAutoselect())
 
