@@ -1,9 +1,50 @@
 import datetime
 import pytz
 
+from django.utils.translation import gettext_noop
+
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
 from nodewatcher.utils import ipaddr
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
+
+DATASTREAM_SUPPORTED = False
+try:
+    from django_datastream import datastream
+    from nodewatcher.modules.monitor.datastream import base as ds_base, fields as ds_fields
+    from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
+
+    class ClientStreams(ds_base.StreamsBase):
+        client_count = ds_fields.IntegerField(tags={
+            'title': gettext_noop("Client count"),
+            'description': gettext_noop("Number of clients connected to the node."),
+            'visualization': {
+                'type': 'line',
+                'initial_set': True,
+                'time_downsamplers': ['mean'],
+                'value_downsamplers': ['min', 'mean', 'max'],
+                'minimum': 0.0,
+            },
+        })
+
+        def get_stream_query_tags(self):
+            return {'node': self._model.node.uuid, 'module': 'monitor.http.clients'}
+
+        def get_stream_tags(self):
+            return {'node': self._model.node.uuid, 'module': 'monitor.http.clients'}
+
+        def get_stream_highest_granularity(self):
+            return datastream.Granularity.Minutes
+
+    class ClientStreamsData(object):
+        def __init__(self, node, client_count):
+            self.node = node
+            self.client_count = client_count
+
+    ds_pool.register(ClientStreamsData, ClientStreams)
+
+    DATASTREAM_SUPPORTED = True
+except ImportError:
+    pass
 
 
 class ClientInfo(monitor_processors.NodeProcessor):
@@ -31,6 +72,7 @@ class ClientInfo(monitor_processors.NodeProcessor):
             # Unsupported version or data fetch failed (v0)
             return context
 
+        client_count = 0
         for client_id, data in context.http.core.clients.iteritems():
             if client_id.startswith('_'):
                 continue
@@ -44,11 +86,16 @@ class ClientInfo(monitor_processors.NodeProcessor):
 
             client.save()
             self.process_client(context, node, client, data)
+            client_count += 1
 
             del existing_clients[client_id]
 
         for client in existing_clients.values():
             client.delete()
+
+        if DATASTREAM_SUPPORTED:
+            # Store client count into datastream.
+            context.datastream.monitor_http_clients = ClientStreamsData(node, client_count)
 
         return context
 
