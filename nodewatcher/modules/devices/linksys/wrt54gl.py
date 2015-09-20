@@ -12,7 +12,7 @@ class LinksysWRT54GL(cgm_devices.DeviceBase):
     url = 'http://www.linksysbycisco.com/'
     architecture = 'brcm47xx'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [cgm_protocols.IEEE80211BG], [
             cgm_devices.AntennaConnector('a1', "Antenna0"),
             cgm_devices.AntennaConnector('a2', "Antenna1"),
         ])

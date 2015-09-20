@@ -13,7 +13,7 @@ class MikrotikRB433AH(cgm_devices.DeviceBase):
     architecture = 'ar71xx'
     radios = [
         # TODO: This information is not correct, there are no integrated radios
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [cgm_protocols.IEEE80211BG], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]

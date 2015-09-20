@@ -11,8 +11,9 @@ class GLiNetv1(cgm_devices.DeviceBase):
     manufacturer = "GL Technologies"
     url = 'http://www.gl-inet.com/'
     architecture = 'ar71xx'
+    usb = True
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,

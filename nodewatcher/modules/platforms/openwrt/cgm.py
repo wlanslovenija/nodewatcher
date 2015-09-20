@@ -1102,7 +1102,35 @@ def network(node, cfg):
             if len(interfaces) > 1 and not dsc_radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
                 raise cgm_base.ValidationError(_("Router '%s' does not support multiple SSIDs!") % device.name)
 
-            wifi_radio = device.remap_port('openwrt', interface.wifi_radio)
+            if isinstance(dsc_radio, cgm_devices.IntegratedRadio):
+                # Integrated radios have specified names and drivers.
+                wifi_radio = device.remap_port('openwrt', interface.wifi_radio)
+                if not wifi_radio:
+                    raise cgm_base.ValidationError(
+                        _("Radio '%s' not defined on OpenWRT!") % interface.wifi_radio
+                    )
+
+                try:
+                    radio_type = device.drivers['openwrt'][interface.wifi_radio]
+                except KeyError:
+                    raise cgm_base.ValidationError(
+                        _("Radio driver for '%s' not defined on OpenWRT!") % interface.wifi_radio
+                    )
+            elif isinstance(dsc_radio, cgm_devices.USBRadio):
+                wifi_radio = 'radio%d' % dsc_radio.index
+                radio_type = 'mac80211'
+
+                # Add required packages.
+                # TODO: This currently assumes an ath9k radio.
+                cfg.packages.update([
+                    'kmod-ath9k-htc',
+                    'kmod-ath9k-common',
+                ])
+            else:
+                raise cgm_base.ValidationError(
+                    _("Radio type '%s' not supported on OpenWRT!") % dsc_radio.__class__.__name__
+                )
+
             try:
                 radio = cfg.wireless.add(**{'wifi-device': wifi_radio})
             except ValueError:
@@ -1110,13 +1138,7 @@ def network(node, cfg):
                     _("Duplicate radio definition for radio '%s'!") % interface.wifi_radio
                 )
 
-            try:
-                radio.type = device.drivers['openwrt'][interface.wifi_radio]
-            except KeyError:
-                raise cgm_base.ValidationError(
-                    _("Radio driver for '%s' not defined on OpenWRT!") % interface.wifi_radio
-                )
-
+            radio.type = radio_type
             dsc_protocol = dsc_radio.get_protocol(interface.protocol)
             dsc_channel = dsc_protocol.get_channel(interface.channel) if interface.channel else None
             dsc_channel_width = dsc_protocol.get_channel_width(interface.channel_width)

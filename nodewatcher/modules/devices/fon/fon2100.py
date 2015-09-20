@@ -12,7 +12,7 @@ class Fonera(cgm_devices.DeviceBase):
     url = 'http://www.fon.com'
     architecture = 'atheros'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [cgm_protocols.IEEE80211BG], [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [cgm_protocols.IEEE80211BG], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
         ])
     ]

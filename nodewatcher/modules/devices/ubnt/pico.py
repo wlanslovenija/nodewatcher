@@ -12,7 +12,7 @@ class UBNTPicoM2(cgm_devices.DeviceBase):
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,
                 cgm_protocols.IEEE80211BGN.TX_STBC1,

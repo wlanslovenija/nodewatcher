@@ -12,7 +12,7 @@ class DeliberantGeneric(cgm_devices.DeviceBase):
     url = 'https://www.deliberant.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Wifi0", [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
             cgm_protocols.IEEE80211AN(
                 cgm_protocols.IEEE80211AN.SHORT_GI_20,
                 cgm_protocols.IEEE80211AN.SHORT_GI_40,

@@ -4,6 +4,7 @@ from django.core import exceptions
 from django.utils.translation import ugettext as _
 
 from ...registry import registration
+from . import protocols as cgm_protocols
 
 
 class DevicePort(object):
@@ -145,6 +146,45 @@ class IntegratedRadio(DeviceRadio):
     pass
 
 
+class USBRadio(DeviceRadio):
+    """
+    Describes a device's USB radio.
+    """
+
+    def __init__(self, identifier, description):
+        """
+        Class constructor.
+        """
+
+        super(USBRadio, self).__init__(
+            identifier,
+            description,
+            # USB radios must always support all protocols.
+            [
+                cgm_protocols.IEEE80211BGN(
+                    cgm_protocols.IEEE80211BGN.SHORT_GI_20,
+                    cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                    cgm_protocols.IEEE80211BGN.RX_STBC1,
+                    cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
+                ),
+                cgm_protocols.IEEE80211AN(
+                    cgm_protocols.IEEE80211AN.SHORT_GI_40,
+                    cgm_protocols.IEEE80211AN.TX_STBC1,
+                    cgm_protocols.IEEE80211AN.RX_STBC1,
+                    cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+                )
+            ],
+            # Connectors.
+            [
+                AntennaConnector('%sa0' % identifier, "Antenna0"),
+            ],
+            # Features.
+            [
+                DeviceRadio.MultipleSSID,
+            ],
+        )
+
+
 class MiniPCIRadio(DeviceRadio):
     """
     Describes a device's MiniPCI slot for a radio.
@@ -234,6 +274,11 @@ class DeviceMetaclass(type):
                 if getattr(new_class, attr, None) is None:
                     raise exceptions.ImproperlyConfigured("Attribute '{0}' is required for device descriptor specification!".format(attr))
 
+            # If USB devices are supported, automatically configure a radio.
+            if getattr(new_class, 'usb', False):
+                if not new_class.get_radio('wifi-usb0'):
+                    new_class.radios.append(USBRadio('wifi-usb0', "USB wireless radio"))
+
             # Validate that list of switches only contains Switch instances
             if len([x for x in new_class.switches if not isinstance(x, Switch)]):
                 raise exceptions.ImproperlyConfigured("List of device switches may only contain Switch instances!")
@@ -282,6 +327,7 @@ class DeviceBase(object):
     ports = None
     radios = None
     switches = None
+    usb = False
 
     @classmethod
     def register(cls, platform):
