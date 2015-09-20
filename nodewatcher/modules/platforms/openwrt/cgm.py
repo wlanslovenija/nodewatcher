@@ -975,10 +975,10 @@ def network(node, cfg):
                 iface._uplink = True
                 set_dhcp_ignore(cfg, interface.device)
 
-            # Mapping of device identifiers to ports
+            # Mapping of device identifiers to ports.
             port_map = {
-                'mobile0': '/dev/ttyUSB0',
-                'mobile1': '/dev/ttyUSB1',
+                'ppp0': '/dev/ttyUSB0',
+                'qmi0': '/dev/cdc-wdm0',
             }
 
             iface.device = port_map.get(interface.device, None)
@@ -1006,9 +1006,24 @@ def network(node, cfg):
                 iface.password = interface.password
 
             configure_interface(cfg, node, interface, iface, interface.device)
-            iface.proto = '3g'
+            if interface.device.startswith('ppp'):
+                iface.proto = '3g'
+            elif interface.device.startswith('qmi'):
+                iface.proto = 'qmi'
 
-            # Some packages are required for using a mobile interface
+                cfg.packages.update([
+                    'kmod-mii',
+                    'kmod-usb-net',
+                    'kmod-usb-wdm',
+                    'kmod-usb-net-qmi-wwan',
+                    'uqmi',
+                ])
+            else:
+                raise cgm_base.ValidationError(
+                    _("Unsupported mobile interface type '%(port)s'!") % {'port': interface.device}
+                )
+
+            # Some packages are required for using a mobile interface.
             cfg.packages.update([
                 'comgt',
                 'usb-modeswitch',

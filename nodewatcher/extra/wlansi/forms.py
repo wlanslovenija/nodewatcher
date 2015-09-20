@@ -326,7 +326,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     cgm_models.MobileInterfaceConfig,
                     configuration={
                         'service': 'umts',
-                        'device': 'mobile0',
+                        'device': 'ppp0',
                         'uplink': True,
                     }
                 )
