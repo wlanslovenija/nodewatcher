@@ -160,13 +160,16 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         # Preserve certain network settings in order to enable a small amount of customization.
         radio_defaults = {}
         wifi_uplink_defaults = None
+        wifi_backbone_defaults = None
         for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
             radio_defaults[radio.wifi_radio] = radio
 
             for wifi_interface in state.filter_items('core.interfaces', klass=cgm_models.WifiInterfaceConfig, parent=radio):
                 if wifi_interface.uplink:
                     wifi_uplink_defaults = wifi_interface
-                    break
+                elif node_type == 'backbone' and wifi_interface.annotations.get('wlansi.backbone', False):
+                    # Copy over configuration from existing automatically generated backbone configuration.
+                    wifi_backbone_defaults = wifi_interface
 
         clients_network_defaults = None
         for bridge in state.filter_items('core.interfaces', klass=cgm_models.BridgeInterfaceConfig, name='clients0'):
@@ -457,17 +460,38 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 },
             )
         else:
-            # If the device is of type "Backbone", create one in AP mode.
-            backbone_wifi = self.setup_interface(
-                state,
-                cgm_models.WifiInterfaceConfig,
-                parent=wifi_radio,
-                configuration={
-                    'mode': 'ap',
-                    'essid': get_project_ssid('backbone', 'backbone.wlan-si.net'),
-                    'routing_protocols': ['olsr', 'babel'],
-                },
-            )
+            # If the device is of type "Backbone", create one AP/STA.
+            if wifi_backbone_defaults is not None:
+                mode = wifi_backbone_defaults.mode
+                if mode not in ('ap', 'sta'):
+                    mode = 'ap'
+
+                backbone_wifi = self.setup_interface(
+                    state,
+                    cgm_models.WifiInterfaceConfig,
+                    parent=wifi_radio,
+                    configuration={
+                        'mode': mode,
+                        'connect_to': wifi_backbone_defaults.connect_to,
+                        'essid': wifi_backbone_defaults.essid,
+                        'bssid': wifi_backbone_defaults.bssid,
+                        'routing_protocols': ['olsr', 'babel'],
+                    },
+                )
+            else:
+                backbone_wifi = self.setup_interface(
+                    state,
+                    cgm_models.WifiInterfaceConfig,
+                    parent=wifi_radio,
+                    configuration={
+                        'mode': 'ap',
+                        'essid': get_project_ssid('backbone', 'backbone.wlan-si.net'),
+                        'routing_protocols': ['olsr', 'babel'],
+                    },
+                    annotations={
+                        'wlansi.backbone': True,
+                    },
+                )
 
         # Wireless uplink.
 
@@ -504,19 +528,19 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 cgm_models.DHCPNetworkConfig,
             )
 
-    def setup_item(self, state, registry_id, klass, configuration=None, **filter):
+    def setup_item(self, state, registry_id, klass, configuration=None, annotations=None, **filter):
         # Create a new item.
         if configuration is None:
             configuration = {}
 
         filter.update(configuration)
-        return state.append_item(klass, **filter)
+        return state.append_item(klass, annotations=annotations, **filter)
 
-    def setup_interface(self, state, klass, configuration=None, **filter):
-        return self.setup_item(state, 'core.interfaces', klass, configuration, **filter)
+    def setup_interface(self, state, klass, configuration=None, annotations=None, **filter):
+        return self.setup_item(state, 'core.interfaces', klass, configuration, annotations, **filter)
 
-    def setup_network(self, state, interface, klass, configuration=None, **filter):
-        return self.setup_item(state, 'core.interfaces.network', klass, configuration, parent=interface, **filter)
+    def setup_network(self, state, interface, klass, configuration=None, annotations=None, **filter):
+        return self.setup_item(state, 'core.interfaces.network', klass, configuration, annotations, parent=interface, **filter)
 
 registration.point('node.config').add_form_defaults(NetworkConfiguration())
 
