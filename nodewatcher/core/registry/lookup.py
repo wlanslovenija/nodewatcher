@@ -97,7 +97,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     dst_model, dst_field, m2m = self._regpoint.get_model_with_field(registry_id, dst_field)
                     dst_field = dst_field.name
 
-            new_selector = dst_model.get_registry_lookup_chain() + constants.LOOKUP_SEP + dst_field
+            new_selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field
             if selector is not None:
                 new_selector += constants.LOOKUP_SEP + selector
 
@@ -135,11 +135,11 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             if field.src_field is None and len(alias) > 1:
                 # We need to perform model resolution again as the destination model
                 # is not known as a field name is required to resolve the proper model subclass.
-                src_model = src_model.get_registry_regpoint().get_model_with_field(
-                    src_model.get_registry_id(), alias[1]
+                src_model = src_model._registry.registration_point.get_model_with_field(
+                    src_model._registry.registry_id, alias[1]
                 )[0]
 
-            selector = [src_model.get_registry_lookup_chain()]
+            selector = [src_model._registry.get_lookup_chain()]
             if field.src_field is not None:
                 selector.append(field.src_field)
             if alias[1:]:
@@ -250,11 +250,11 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if not self._regpoint.is_item(dst):
                     raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
 
-                dst_registry_id = dst.get_registry_id()
+                dst_registry_id = dst._registry.registry_id
                 dst_model = dst
             elif isinstance(dst, django_models.QuerySet):
                 dst_model = dst.model
-                dst_registry_id = dst_model.get_registry_id()
+                dst_registry_id = dst_model._registry.registry_id
                 dst_queryset = dst
 
                 if not self._regpoint.is_item(dst_model):
@@ -282,7 +282,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             if m2m:
                 raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
-            if dst_model.has_registry_multiple():
+            if dst_model._registry.multiple:
                 # The destination model can contain multiple items; in this case we need to
                 # provide the proxy model with a descriptor that returns a queryset to the models
                 if dst_related is not None:

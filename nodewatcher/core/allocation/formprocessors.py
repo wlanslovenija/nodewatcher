@@ -32,7 +32,7 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
         ]
 
         for src in allocation_sources:
-            for allocation in node.config.by_registry_id(src.get_registry_id()):
+            for allocation in node.config.by_registry_id(src._registry.registry_id):
                 if isinstance(allocation, src):
                     self.allocations.add(allocation)
 
@@ -48,7 +48,7 @@ class AutoPoolAllocator(formprocessors.RegistryFormProcessor):
 
         unsatisfied_requests = []
         for src in allocation_sources:
-            for request in node.config.by_registry_id(src.get_registry_id()):
+            for request in node.config.by_registry_id(src._registry.registry_id):
                 if isinstance(request, src):
                     if not request.is_satisfied():
                         unsatisfied_requests.append(request)

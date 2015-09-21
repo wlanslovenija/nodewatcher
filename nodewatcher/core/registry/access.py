@@ -36,7 +36,7 @@ class RegistryResolver(object):
         if queryset:
             return cfg.all()
 
-        if getattr(top_level.RegistryMeta, 'multiple', False):
+        if top_level._registry.multiple:
             # Model supports multiple configuration options of this type
             if create is not None:
                 return create(root=self._root, **kwargs)

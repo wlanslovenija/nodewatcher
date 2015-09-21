@@ -460,7 +460,7 @@ class ReferenceChoiceField(models.ForeignKey):
                 'ReferenceChoiceField requires a relation with a registry item!'
             )
 
-        if cls.get_registry_regpoint() != self.rel.to.get_registry_regpoint():
+        if cls._registry.registration_point != self.rel.to._registry.registration_point:
             raise exceptions.ImproperlyConfigured(
                 'ReferenceChoiceField can only reference items registered under the same registration point!'
             )
@@ -578,7 +578,7 @@ class RegistryProxyMultipleDescriptor(object):
         self.cache_name = field_with_rel.get_cache_name()
 
         # Generate a chain that can be used to generate the filter query.
-        toplevel = self.related_model.get_registry_toplevel()
+        toplevel = self.related_model._registry.get_toplevel_class()
         self.chain = ['%s_ptr' % x._meta.model_name for x in self.related_model._meta.get_base_chain(toplevel) or []]
         self.chain.append('root')
 

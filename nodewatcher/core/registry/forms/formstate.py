@@ -117,9 +117,9 @@ class FormState(dict):
 
         # Chack that the specified registry item can be removed.
         item_class = self.registration_point.get_top_level_class(registry_id)
-        if not item_class.has_registry_multiple():
+        if not item_class._registry.multiple:
             raise ValueError("Attempted to remove a singular registry item '%s'!" % registry_id)
-        if item_class.is_registry_multiple_static():
+        if item_class._registry.multiple_static:
             raise ValueError("Attempted to remove a static registry item '%s'!" % registry_id)
 
         # Run a filter to get the items.
@@ -179,7 +179,7 @@ class FormState(dict):
             if not item:
                 return
 
-        self.remove_items(item.get_registry_id(), item_id=item._id)
+        self.remove_items(item._registry.registry_id, item_id=item._id)
 
     def update_item(self, identifier_or_item, **attributes):
         """
@@ -205,7 +205,7 @@ class FormState(dict):
         if modified:
             # Add form action to modify data.
             self.add_form_action(
-                item.get_registry_id(),
+                item._registry.registry_id,
                 actions.AssignToFormAction(
                     item,
                     item._registry_virtual_child_index,
@@ -228,7 +228,7 @@ class FormState(dict):
 
         item = self.create_item(cls, attributes, parent=parent)
         self.add_form_action(
-            cls.get_registry_id(),
+            cls._registry.registry_id,
             actions.AppendFormAction(item, parent),
             item=item,
         )
@@ -259,11 +259,11 @@ class FormState(dict):
         """
 
         identifier = []
-        if item.has_registry_parent():
+        if item._registry.has_parent():
             identifier.append(self.get_identifier(item.get_registry_parent()))
 
         identifier += [
-            item.get_registry_id(),
+            item._registry.registry_id,
             item.__class__.__name__,
             item._registry_virtual_child_index
         ]
@@ -285,11 +285,11 @@ class FormState(dict):
         item._registry_virtual_model = True
         items_container = None
         if parent is not None:
-            setattr(item, cls._registry_object_parent_link.name, parent)
+            setattr(item, cls._registry.item_parent_field.name, parent)
 
             # Create a virtual reverse relation in the parent object.
             virtual_relation = getattr(parent, '_registry_virtual_relation', {})
-            desc = getattr(parent.__class__, cls._registry_object_parent_link.rel.related_name)
+            desc = getattr(parent.__class__, cls._registry.item_parent_field.rel.related_name)
             items_container = virtual_relation.setdefault(desc, [])
             parent._registry_virtual_relation = virtual_relation
 
@@ -306,14 +306,14 @@ class FormState(dict):
                 index = len(items_container)
                 items_container.append(item)
         elif index is not None:
-            items_container = self.setdefault(cls.get_registry_id(), [])
+            items_container = self.setdefault(cls._registry.registry_id, [])
             try:
                 items_container[index] = item
             except IndexError:
                 assert index == len(items_container)
                 items_container.append(item)
         else:
-            items_container = self.setdefault(cls.get_registry_id(), [])
+            items_container = self.setdefault(cls._registry.registry_id, [])
             index = len(items_container)
             items_container.append(item)
 
@@ -341,9 +341,9 @@ class FormState(dict):
 
         try:
             if parent is not None:
-                return getattr(parent, cls._registry_object_parent_link.rel.related_name)[index]
+                return getattr(parent, cls._registry.item_parent_field.rel.related_name)[index]
             else:
-                return self[cls.get_registry_id()][index]
+                return self[cls._registry.registry_id][index]
         except (KeyError, IndexError):
             return None
 
@@ -376,7 +376,7 @@ class FormState(dict):
                 return
 
             # Obtain the real parent (as set in the database).
-            real_parent = getattr(item, item._registry_object_parent_link.name)
+            real_parent = getattr(item, item._registry.item_parent_field.name)
             # Check if there is already a mapping from real parent to converted parent.
             try:
                 mapped_parent = item_map[(real_parent.__class__, real_parent.pk)]
@@ -391,7 +391,7 @@ class FormState(dict):
             for cls in registration_point.get_children(parent):
                 toplevel_cls = cls.values()[0]
 
-                for item in registration_point.get_accessor(root).by_registry_id(toplevel_cls.get_registry_id(), queryset=True):
+                for item in registration_point.get_accessor(root).by_registry_id(toplevel_cls._registry.registry_id, queryset=True):
                     # Skip already converted items.
                     if (item.__class__, item.pk) in item_map:
                         return
@@ -404,14 +404,14 @@ class FormState(dict):
 
                         attributes[field.name] = getattr(item, field.name, None)
 
-                    if item.has_registry_parent():
+                    if item._registry.has_parent():
                         convert_child_item(item, attributes)
                     else:
                         item_map[(item.__class__, item.pk)] = form_state.create_item(item.__class__, attributes)
 
                 # Convert also all subitems.
                 for cls in cls.values():
-                    if cls.has_registry_children():
+                    if cls._registry.has_children():
                         convert_items(cls)
 
         # Start the conversion process with top-level registry items.

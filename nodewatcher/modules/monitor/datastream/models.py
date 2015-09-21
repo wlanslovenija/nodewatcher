@@ -27,7 +27,7 @@ class RegistryItemStreams(base.StreamsBase):
 
         return {
             'node': self._model.root.uuid,
-            'registry_id': self._model.get_registry_id(),
+            'registry_id': self._model._registry.registry_id,
         }
 
     def get_stream_tags(self):
@@ -40,7 +40,7 @@ class RegistryItemStreams(base.StreamsBase):
 
         return {
             'node': self._model.root.uuid,
-            'registry_id': self._model.get_registry_id(),
+            'registry_id': self._model._registry.registry_id,
         }
 
     def get_stream_highest_granularity(self):
@@ -61,7 +61,7 @@ class RegistryItemStreams(base.StreamsBase):
         :return: Resolved model class
         """
 
-        regpoint = self._model.get_registry_regpoint()
+        regpoint = self._model._registry.registration_point
         return getattr(self._model.root, regpoint.namespace).by_registry_id(model_reference)
 
 

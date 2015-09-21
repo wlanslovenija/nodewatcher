@@ -130,7 +130,7 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
         :param choices_model: Choices model class
         """
 
-        self.choices_rid = choices_model.get_registry_id()
+        self.choices_rid = choices_model._registry.registry_id
         self.filter_model = choices_model
         self.partially_validated_tree = None
         kwargs['empty_value'] = None

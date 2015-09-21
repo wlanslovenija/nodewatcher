@@ -201,7 +201,7 @@ class RegistryMetaForm(django_forms.Form):
             item_widget = django_forms.HiddenInput
 
         # Generate list of item choices
-        item_choices = [(name, item.RegistryMeta.registry_name) for name, item in context.items.iteritems()]
+        item_choices = [(name, item._registry.registry_name) for name, item in context.items.iteritems()]
 
         self.fields['item'] = django_forms.TypedChoiceField(
             choices=item_choices,
@@ -264,7 +264,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
     # Items have changed between submissions, we should copy some field values from the
     # previous form to the new one
     if previous_item is not None and selected_item != previous_item and not static:
-        pform = previous_item.get_form()(
+        pform = previous_item._registry.get_form_class()(
             data,
             prefix=context.get_prefix(prefix, previous_item),
         )
@@ -302,7 +302,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
 
     # Now generate a form for the selected item
     form_prefix = context.get_prefix(prefix, selected_item)
-    form = selected_item.get_form()(
+    form = selected_item._registry.get_form_class()(
         data,
         instance=instance,
         prefix=form_prefix,
@@ -338,7 +338,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
         if context.flags & FORM_OUTPUT:
             # Perform a full validation and save the form
             if form.is_valid():
-                form_id = (instance.get_registry_id(), id(context.hierarchy_parent_obj), index)
+                form_id = (instance._registry.registry_id, id(context.hierarchy_parent_obj), index)
                 assert form_id not in context.pending_save_forms
 
                 # Setup dependencies among forms
@@ -350,18 +350,18 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
                 # If we have a parent, we depend on it
                 if context.hierarchy_parent_obj is not None:
                     parent_id = (
-                        context.hierarchy_parent_obj.get_registry_id(),
+                        context.hierarchy_parent_obj._registry.registry_id,
                         id(context.hierarchy_grandparent_obj),
                         context.hierarchy_parent_index,
                     )
                     dependencies.add(parent_id)
                     context.pending_save_foreign_keys.setdefault(parent_id, []).append(
-                        (form_id, selected_item._registry_object_parent_link.name)
+                        (form_id, selected_item._registry.item_parent_field.name)
                     )
 
                 # Add form to list of forms pending save together with dependencies
                 context.pending_save_forms[form_id] = {
-                    'registry_id': instance.get_registry_id(),
+                    'registry_id': instance._registry.registry_id,
                     'index': index,
                     'form': form,
                     'form_id': form_id,
@@ -401,8 +401,8 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
         static=static, instance_mid=existing_mid,
     )
 
-    # Pack forms into a proper abstract representation
-    if selected_item.has_registry_children():
+    # Pack forms into a proper abstract representation.
+    if selected_item._registry.has_children():
         sub_context = RegistryFormContext(
             regpoint=context.regpoint,
             request=context.request,
@@ -567,10 +567,10 @@ def prepare_forms(context):
                 if all([issubclass(x, item_cls) for x in context.items.values()]):
                     break
             else:
-                item_cls = context.items.values()[0].get_registry_toplevel()
+                item_cls = context.items.values()[0]._registry.get_toplevel_class()
         else:
-            item_cls = context.items.values()[0].get_registry_toplevel()
-        cls_meta = item_cls.RegistryMeta
+            item_cls = context.items.values()[0]._registry.get_toplevel_class()
+        cls_meta = item_cls._registry
 
         if context.hierarchy_prefix is not None:
             context.base_prefix = context.hierarchy_prefix + '_' + cls_meta.registry_id.replace('.', '_')
@@ -580,7 +580,7 @@ def prepare_forms(context):
         context.subforms = []
         context.force_selector_widget = False
 
-        if getattr(cls_meta, 'hidden', False) and item_cls._meta.model_name in context.items:
+        if cls_meta.hidden and item_cls._meta.model_name in context.items:
             # The top-level item should be hidden
             del context.items[item_cls._meta.model_name]
             context.force_selector_widget = True
@@ -596,8 +596,8 @@ def prepare_forms(context):
             existing_models_qs = context.regpoint.get_accessor(context.root).by_registry_id(cls_meta.registry_id, queryset=True)
 
             if context.hierarchy_parent_cls is not None:
-                rel_field_name = item_cls._registry_object_parent_link.name
-                if item_cls != item_cls.get_registry_toplevel():
+                rel_field_name = item_cls._registry.item_parent_field.name
+                if item_cls != item_cls._registry.get_toplevel_class():
                     rel_field_name = "%s__%s" % (item_cls._meta.model_name, rel_field_name)
                     # We have to filter out completely unrelated items because if the parent object
                     # is set to None, the basic filter would also match those that aren't linked
@@ -614,10 +614,9 @@ def prepare_forms(context):
                 mdl = mdl.cast()
 
                 # When we are looking for existing top-level objects in object hierarchy, we should
-                # skip those that have the parent link set to a non-NULL value
-                if context.hierarchy_parent_cls is None and \
-                   getattr(mdl, '_registry_object_parent', None) is not None:
-                    if getattr(mdl, mdl._registry_object_parent_link.name) is not None:
+                # skip those that have the parent link set to a non-NULL value.
+                if context.hierarchy_parent_cls is None and mdl._registry.has_parent():
+                    if getattr(mdl, mdl._registry.item_parent_field.name) is not None:
                         continue
 
                 # Skip items that should not be here
@@ -629,7 +628,7 @@ def prepare_forms(context):
 
         # Remove all items that should not be visible
         for key, value in context.items.items():
-            if value._registry_hide_requests > 0:
+            if value._registry.hide_requests > 0:
                 del context.items[key]
                 continue
 
@@ -640,10 +639,10 @@ def prepare_forms(context):
 
         context.default_item_cls = context.items.values()[0]
 
-        if getattr(cls_meta, 'multiple', False):
-            # This is an item class that supports multiple objects of the same class
-            if getattr(cls_meta, 'multiple_static', False):
-                # All multiple objects that are registered should always be displayed
+        if cls_meta.multiple:
+            # This is an item class that supports multiple objects of the same class.
+            if cls_meta.multiple_static:
+                # All multiple objects that are registered should always be displayed.
                 for index, item in enumerate(context.items.values()):
                     mdl = None
                     for emdl in context.existing_models.values():
@@ -791,8 +790,8 @@ def prepare_forms(context):
         forms.append({
             'name': cls_meta.registry_section,
             'id': cls_meta.registry_id,
-            'multiple': getattr(cls_meta, 'multiple', False),
-            'hide_multiple_controls': getattr(cls_meta, 'multiple_static', False),
+            'multiple': cls_meta.multiple,
+            'hide_multiple_controls': cls_meta.multiple_static,
             'subforms': context.subforms,
             'submeta': submeta,
             'prefix': context.base_prefix,

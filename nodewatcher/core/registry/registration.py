@@ -145,10 +145,10 @@ class RegistrationPoint(object):
         self._form_processors = []
 
     def _register_item_to_container(self, item, container):
-        item_dict = container.setdefault(item.RegistryMeta.registry_id, {})
+        item_dict = container.setdefault(item._registry.registry_id, {})
         item_dict[item._meta.model_name] = item
         return collections.OrderedDict(
-            sorted(container.items(), key=lambda x: getattr(x[1].values()[0].RegistryMeta, 'form_weight', 0))
+            sorted(container.items(), key=lambda x: x[1].values()[0]._registry.form_weight)
         )
 
     def _register_item(self, item, object_toplevel=True):
@@ -177,7 +177,7 @@ class RegistrationPoint(object):
             self.item_object_toplevel = self._register_item_to_container(item, self.item_object_toplevel)
 
         # Record the class with its registry identifier
-        registry_id = item.RegistryMeta.registry_id
+        registry_id = item._registry.registry_id
         if item.__base__ == self.item_base:
             if registry_id in self.item_registry:
                 raise exceptions.RegistryItemAlreadyRegistered(
@@ -190,16 +190,15 @@ class RegistrationPoint(object):
             raise exceptions.RegistryItemNotRegistered(
                 "Top-level registry class for '%s' not yet registered!" % registry_id
             )
-        elif getattr(item.RegistryMeta, 'hides_parent', False):
+        elif item._registry.hides_parent:
             parent = item.__base__
-            parent._registry_hide_requests += 1
+            parent._registry.hide_requests += 1
 
         # The first item in the list is the top-level class for this registry id
         self.item_registry.setdefault(registry_id, []).append(item)
 
-        # Include registration point in item class
-        item._registry_regpoint = self
-        item._registry_hide_requests = 0
+        # Include registration point in item class.
+        item._registry.registration_point = self
 
         return True
 
@@ -211,24 +210,22 @@ class RegistrationPoint(object):
         if not self._register_item(item):
             return
 
-        # Register proxy fields for performing registry lookups
-        lookup_proxies = getattr(item.RegistryMeta, 'lookup_proxies', None)
-        if lookup_proxies is not None:
-            for field in lookup_proxies:
-                if isinstance(field, (tuple, list)):
-                    src_field, dst_fields = field
-                else:
-                    src_field = dst_fields = field
+        # Register proxy fields for performing registry lookups.
+        for field in item._registry.lookup_proxies:
+            if isinstance(field, (tuple, list)):
+                src_field, dst_fields = field
+            else:
+                src_field = dst_fields = field
 
-                if not isinstance(dst_fields, (tuple, list)):
-                    dst_fields = (dst_fields,)
+            if not isinstance(dst_fields, (tuple, list)):
+                dst_fields = (dst_fields,)
 
-                for dst_field in dst_fields:
-                    # Ignore registrations of existing proxies
-                    if dst_field in self.flat_lookup_proxies:
-                        continue
+            for dst_field in dst_fields:
+                # Ignore registrations of existing proxies.
+                if dst_field in self.flat_lookup_proxies:
+                    continue
 
-                    self.flat_lookup_proxies[dst_field] = item, src_field
+                self.flat_lookup_proxies[dst_field] = item, src_field
 
     def register_subitem(self, parent, child):
         """
@@ -252,21 +249,7 @@ class RegistrationPoint(object):
                     # Foreign key is required for this subitem, so it can't be a top-level item
                     top_level = False
 
-                # We have to use __dict__.get instead of getattr to prevent propagation of attribute access
-                # to parent classes where these subitems might not be registered
-                parent._registry_object_children = self._register_item_to_container(
-                    child,
-                    parent.__dict__.get('_registry_object_children', collections.OrderedDict()),
-                )
-
-                # Setup the parent relation and verify that one doesn't already exist
-                existing_parent = child.__dict__.get('_registry_object_parent', None)
-                if existing_parent is not None and existing_parent.get_registry_id() != parent.get_registry_id():
-                    raise django_exceptions.ImproperlyConfigured("Registry item cannot have two object parents without a common ancestor!")
-                child._registry_object_parent = parent
-                child._registry_object_parent_link = field
-
-                parent._registry_has_children = True
+                parent._registry.add_child_item(child, field)
                 break
         else:
             raise django_exceptions.ImproperlyConfigured("Missing IntraRegistryForeignKey linkage for parent-child relationship!")
@@ -282,10 +265,9 @@ class RegistrationPoint(object):
         """
 
         parent = item_cls.__base__
-        if getattr(item_cls.RegistryMeta, 'hides_parent', False) and parent != self.item_base:
-            parent._registry_hide_requests -= 1
+        if item_cls._registry.hides_parent and parent != self.item_base:
+            parent._registry.hide_requests -= 1
 
-        item_cls._registry_endpoint = None
         self.item_classes.remove(item_cls)
 
     def unregister_item_by_name(self, cls_name):
@@ -316,7 +298,7 @@ class RegistrationPoint(object):
         if item_cls not in self.item_classes:
             raise exceptions.RegistryItemNotRegistered("Registry item '%s' is not registered!" % item_cls._meta.object_name)
 
-        registry_id = item_cls.RegistryMeta.registry_id
+        registry_id = item_cls._registry.registry_id
         # TODO: Properly handle removal with new item list
 
         if item_cls.__base__ == self.item_base:
@@ -359,7 +341,7 @@ class RegistrationPoint(object):
         if parent is None:
             return self.item_object_toplevel.values()
         else:
-            return parent._registry_object_children.values()
+            return parent._registry.item_children.values()
 
     def get_top_level_queryset(self, root, registry_id):
         """
@@ -690,7 +672,4 @@ def register_form_for_item(item, form_class):
     :param form_class: Form class
     """
 
-    if not hasattr(item, '_forms'):
-        item._forms = {}
-
-    item._forms[item] = form_class
+    item._registry.set_form_class(form_class)
