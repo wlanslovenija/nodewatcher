@@ -126,7 +126,7 @@ class NewNode(mixins.PermissionRequiredMixin,
               RegistryCreateFormMixin,
               generic.TemplateView):
     template_name = 'nodes/new.html'
-    permission_required = 'add_node'
+    permission_required = 'core.add_node'
 
     def form_valid(self):
         return http.HttpResponseRedirect(self.get_success_url())
@@ -191,7 +191,7 @@ class EditNode(mixins.PermissionRequiredMixin,
                generic.DetailView):
     template_name = 'nodes/edit.html'
     model = core_models.Node
-    permission_required = 'change_node'
+    permission_required = 'core.change_node'
     context_object_name = 'node'
 
     def get_cancel_url(self):
@@ -223,7 +223,7 @@ class ResetNode(mixins.PermissionRequiredMixin,
                 generic.DetailView):
     template_name = 'nodes/reset.html'
     model = core_models.Node
-    permission_required = 'reset_node'
+    permission_required = 'core.reset_node'
     context_object_name = 'node'
 
     def get_success_url(self):
@@ -241,7 +241,7 @@ class RemoveNode(mixins.PermissionRequiredMixin,
                  generic.DeleteView):
     template_name = 'nodes/remove.html'
     model = core_models.Node
-    permission_required = 'delete_node'
+    permission_required = 'core.delete_node'
     context_object_name = 'node'
 
     def delete(self, request, *args, **kwargs):

@@ -47,7 +47,7 @@ class GenerateFirmware(mixins.PermissionRequiredMixin,
                        generic.DetailView):
     template_name = 'nodes/generate_firmware.html'
     model = core_models.Node
-    permission_required = 'generate_firmware'
+    permission_required = 'core.generate_firmware'
     context_object_name = 'node'
 
     def get_success_url(self):
