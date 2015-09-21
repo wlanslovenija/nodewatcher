@@ -9,21 +9,17 @@ __all__ = (
 
 
 class FormState(dict):
-    def __init__(self, registration_point):
+    def __init__(self, context):
         """
         Class constructor.
-
-        :param registration_point: Registration point instance
         """
 
-        self.registration_point = registration_point
+        self.registration_point = context.regpoint
         self._form_actions = {}
         self._form_action_dependencies = {}
         self._item_map = {}
-        self._metadata = {}
-
-    def set_metadata(self, metadata):
-        self._metadata = metadata
+        self._metadata = context.state['metadata']
+        self._annotations = context.state['annotations']
 
     def set_using_defaults(self, value):
         self._metadata['using_defaults'] = bool(value)
@@ -215,7 +211,7 @@ class FormState(dict):
                 item=item,
             )
 
-    def append_item(self, cls, parent=None, **attributes):
+    def append_item(self, cls, parent=None, annotations=None, **attributes):
         """
         Appends a new item to a specified part of form state.
 
@@ -226,7 +222,7 @@ class FormState(dict):
 
         from . import actions
 
-        item = self.create_item(cls, attributes, parent=parent)
+        item = self.create_item(cls, attributes, parent=parent, annotations=annotations)
         self.add_form_action(
             cls._registry.registry_id,
             actions.AppendFormAction(item, parent),
@@ -270,7 +266,7 @@ class FormState(dict):
 
         return hashlib.sha1(".".join([str(atom) for atom in identifier])).hexdigest()
 
-    def create_item(self, cls, attributes, parent=None, index=None):
+    def create_item(self, cls, attributes, parent=None, index=None, annotations=None):
         """
         Creates a new form state item.
 
@@ -278,6 +274,7 @@ class FormState(dict):
         :param attributes: Attributes dictionary to set for the new item
         :param parent: Optional parent item
         :param index: Optional index to overwrite an existing item
+        :param annotations: Optional annotations dictionary
         :return: Created form state item
         """
 
@@ -328,6 +325,15 @@ class FormState(dict):
             except (exceptions.ValidationError, ValueError):
                 pass
 
+        if annotations is None:
+            # Load existing annotations for this item.
+            annotations = self._annotations.get(item._id, {})
+        else:
+            # Store annotations.
+            self._annotations[item._id] = annotations
+
+        item.annotations = annotations
+
         return item
 
     def lookup_item(self, cls, index=0, parent=None):
@@ -357,16 +363,17 @@ class FormState(dict):
         return self._item_map.get(identifier, None)
 
     @classmethod
-    def from_db(cls, registration_point, root):
+    def from_db(cls, context):
         """
         Generates form state from current registry items stored in the database.
 
-        :param registration_point: Registration point instance
-        :param root: Root model instance
+        :param context: Registry form context
         :return: Instance of FormState populated from the database
         """
 
-        form_state = FormState(registration_point)
+        form_state = FormState(context)
+        registration_point = form_state.registration_point
+        root = context.root
         item_map = {}
         pending_children = []
 
@@ -385,7 +392,12 @@ class FormState(dict):
                 pending_children.append((item, attributes))
                 return
 
-            item_map[(item.__class__, item.pk)] = form_state.create_item(item.__class__, attributes, mapped_parent)
+            item_map[(item.__class__, item.pk)] = form_state.create_item(
+                item.__class__,
+                attributes,
+                parent=mapped_parent,
+                annotations=item.annotations,
+            )
 
         def convert_items(parent=None):
             for cls in registration_point.get_children(parent):
@@ -407,7 +419,11 @@ class FormState(dict):
                     if item._registry.has_parent():
                         convert_child_item(item, attributes)
                     else:
-                        item_map[(item.__class__, item.pk)] = form_state.create_item(item.__class__, attributes)
+                        item_map[(item.__class__, item.pk)] = form_state.create_item(
+                            item.__class__,
+                            attributes,
+                            annotations=item.annotations,
+                        )
 
                 # Convert also all subitems.
                 for cls in cls.values():

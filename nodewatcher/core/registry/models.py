@@ -1,3 +1,4 @@
+import json_field
 import polymorphic
 from polymorphic import base as polymorphic_base
 from . import polymorphic_deletion_fix, options
@@ -20,7 +21,10 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
 
     __metaclass__ = RegistryItemModelBase
 
+    # Upon registration, this attribute is replaced with an actual ForeignKey.
     root = None
+    # Custom item annotations.
+    annotations = json_field.JSONField(default={}, editable=False)
 
     class RegistryMeta:
         registry_id = None

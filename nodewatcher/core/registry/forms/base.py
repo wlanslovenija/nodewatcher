@@ -474,7 +474,13 @@ class RegistryFormContext(object):
         self._form_id = None
 
         if self.form_id not in self.request.session:
-            self.state = {}
+            self.state = {
+                'metadata': {},
+                'annotations': {},
+            }
+
+        if self.form_state is None:
+            self.form_state = formstate.FormState(self)
 
     def get_prefix(self, prefix, item=None, field=None):
         """
@@ -836,22 +842,15 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
         validation_errors=False,
         pending_save_forms={},
         pending_save_foreign_keys={},
-        form_state=form_state if form_state is not None else formstate.FormState(regpoint),
+        form_state=form_state,
         flags=flags,
     )
 
     # Load initial form state when requested and available.
     if flags & FORM_INITIAL and root is not None:
-        context.form_state = formstate.FormState.from_db(regpoint, root)
-        context.state = {
-            'metadata': regpoint.get_root_metadata(root)
-        }
-    elif not context.state:
-        context.state = {
-            'metadata': {},
-        }
+        context.state['metadata'] = regpoint.get_root_metadata(root)
+        context.form_state = formstate.FormState.from_db(context)
 
-    context.form_state.set_metadata(context.state['metadata'])
     if flags & FORM_SET_DEFAULTS:
         context.form_state.set_using_defaults(flags & FORM_DEFAULTS_ENABLED)
 
