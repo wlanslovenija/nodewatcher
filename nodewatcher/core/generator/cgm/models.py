@@ -292,6 +292,7 @@ class MobileInterfaceConfig(InterfaceConfig):
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp0', _("PPP over USB0")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp1', _("PPP over USB1")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp2', _("PPP over USB2")))
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp3', _("PPP over USB3")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi0', _("QMI over USB0")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi1', _("QMI over USB1")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi2', _("QMI over USB2")))

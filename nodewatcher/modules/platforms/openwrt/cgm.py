@@ -987,6 +987,7 @@ def network(node, cfg):
                 'ppp0': '/dev/ttyUSB0',
                 'ppp1': '/dev/ttyUSB1',
                 'ppp2': '/dev/ttyUSB2',
+                'ppp3': '/dev/ttyUSB3',
                 'qmi0': '/dev/cdc-wdm0',
                 'qmi1': '/dev/cdc-wdm1',
                 'qmi2': '/dev/cdc-wdm2',
