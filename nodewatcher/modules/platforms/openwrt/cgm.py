@@ -985,7 +985,11 @@ def network(node, cfg):
             # Mapping of device identifiers to ports.
             port_map = {
                 'ppp0': '/dev/ttyUSB0',
+                'ppp1': '/dev/ttyUSB1',
+                'ppp2': '/dev/ttyUSB2',
                 'qmi0': '/dev/cdc-wdm0',
+                'qmi1': '/dev/cdc-wdm1',
+                'qmi2': '/dev/cdc-wdm2',
             }
 
             iface.device = port_map.get(interface.device, None)
