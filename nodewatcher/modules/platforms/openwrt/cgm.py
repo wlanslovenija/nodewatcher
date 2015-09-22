@@ -1041,10 +1041,7 @@ def network(node, cfg):
                 'kmod-usb-serial',
                 'kmod-usb-serial-option',
                 'kmod-usb-serial-wwan',
-                'kmod-usb-ohci',
-                'kmod-usb-uhci',
                 'kmod-usb-acm',
-                'kmod-usb2',
             ])
         elif isinstance(interface, cgm_models.EthernetInterfaceConfig):
             # Allocate the port to ensure it is only bound to this interface.
