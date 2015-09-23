@@ -108,7 +108,25 @@ class TPLinkWR740NDv4(TPLinkWR740NDv1):
         }
     }
 
-# Register the TP-Link WR740ND device
+
+class TPLinkWR740NDv5(TPLinkWR740NDv1):
+    """
+    TP-Link WR740NDv5 device descriptor.
+    """
+
+    identifier = 'tp-wr740ndv5'
+    name = "WR740ND (v5)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR740',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr740n-v5-squashfs-factory.bin'
+            ]
+        }
+    }
+
+# Register the TP-Link WR740ND device.
 cgm_base.register_device('openwrt', TPLinkWR740NDv1)
 cgm_base.register_device('openwrt', TPLinkWR740NDv3)
 cgm_base.register_device('openwrt', TPLinkWR740NDv4)
+cgm_base.register_device('openwrt', TPLinkWR740NDv5)
