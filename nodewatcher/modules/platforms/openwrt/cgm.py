@@ -989,10 +989,29 @@ def network(node, cfg):
                 set_dhcp_ignore(cfg, interface.device)
 
             if interface.device.startswith('eth'):
-                # Mobile modem presents itself as a USB ethernet device.
+                # Mobile modem presents itself as a USB ethernet device. Determine the port based on
+                # the existing device port map to see which interfaces are already there by default.
+                used_ports = set()
+                for port in device.port_map['openwrt'].values():
+                    if not port.startswith('eth'):
+                        continue
+
+                    port = port.split('.')[0]
+                    used_ports.add(int(port[3:]))
+
+                for port_base in xrange(10):
+                    if port_base not in used_ports:
+                        break
+                else:
+                    raise cgm_base.ValidationError(
+                        _("Unable to determine free ethernet port for mobile interface '%(port)s'!") % {'port': interface.device}
+                    )
+
+                # TODO: Handle these as resources.
                 port_map = {
-                    # TODO: This should probably be determined in a device-specific way.
-                    'eth-cdc0': 'eth2',
+                    'eth-cdc0': 'eth%d' % (port_base + 0),
+                    'eth-cdc1': 'eth%d' % (port_base + 1),
+                    'eth-cdc2': 'eth%d' % (port_base + 2),
                 }
 
                 iface.ifname = port_map.get(interface.device, None)
@@ -1009,6 +1028,7 @@ def network(node, cfg):
                 ])
             else:
                 # Mapping of device identifiers to ports.
+                # TODO: Handle these as resources.
                 port_map = {
                     'ppp0': '/dev/ttyUSB0',
                     'ppp1': '/dev/ttyUSB1',

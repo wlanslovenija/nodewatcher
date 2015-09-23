@@ -297,6 +297,8 @@ registration.point('node.config').register_choice('core.interfaces#mobile_device
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi1', _("QMI over USB1")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi2', _("QMI over USB2")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('eth-cdc0', _("Ethernet over CDC-USB0")))
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('eth-cdc1', _("Ethernet over CDC-USB1")))
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('eth-cdc2', _("Ethernet over CDC-USB2")))
 registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('umts', _("UMTS")))
 registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('gprs', _("GPRS")))
 registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('cdma', _("CDMA")))
