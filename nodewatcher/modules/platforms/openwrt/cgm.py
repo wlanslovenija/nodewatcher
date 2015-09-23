@@ -976,64 +976,90 @@ def network(node, cfg):
 
             configure_interface(cfg, node, interface, iface, iface_name)
         elif isinstance(interface, cgm_models.MobileInterfaceConfig):
+            # Check if the device actually supports USB.
+            if not device.usb:
+                raise cgm_base.ValidationError(
+                    _("The target device does not support USB, so mobile interface cannot be configured!")
+                )
+
             iface = cfg.network.add(interface=interface.device)
 
             if interface.uplink:
                 iface._uplink = True
                 set_dhcp_ignore(cfg, interface.device)
 
-            # Mapping of device identifiers to ports.
-            port_map = {
-                'ppp0': '/dev/ttyUSB0',
-                'ppp1': '/dev/ttyUSB1',
-                'ppp2': '/dev/ttyUSB2',
-                'ppp3': '/dev/ttyUSB3',
-                'qmi0': '/dev/cdc-wdm0',
-                'qmi1': '/dev/cdc-wdm1',
-                'qmi2': '/dev/cdc-wdm2',
-            }
+            if interface.device.startswith('eth'):
+                # Mobile modem presents itself as a USB ethernet device.
+                port_map = {
+                    # TODO: This should probably be determined in a device-specific way.
+                    'eth-cdc0': 'eth2',
+                }
 
-            iface.device = port_map.get(interface.device, None)
-            if not iface.device:
-                raise cgm_base.ValidationError(
-                    _("Unsupported mobile interface port '%(port)s'!") % {'port': interface.device}
-                )
+                iface.ifname = port_map.get(interface.device, None)
+                if not iface.ifname:
+                    raise cgm_base.ValidationError(
+                        _("Unsupported mobile interface port '%(port)s'!") % {'port': interface.device}
+                    )
 
-            if interface.service == 'umts':
-                iface.service = 'umts'
-            elif interface.service == 'gprs':
-                iface.service = 'gprs'
-            elif interface.service == 'cdma':
-                iface.service = 'cdma'
-            else:
-                raise cgm_base.ValidationError(
-                    _("Unsupported mobile service type '%(service)s'!") % {'service': interface.service}
-                )
-
-            iface.apn = interface.apn
-            if iface.pincode:
-                iface.pincode = interface.pin
-            if interface.username:
-                iface.username = interface.username
-                iface.password = interface.password
-
-            configure_interface(cfg, node, interface, iface, interface.device)
-            if interface.device.startswith('ppp'):
-                iface.proto = '3g'
-            elif interface.device.startswith('qmi'):
-                iface.proto = 'qmi'
+                configure_interface(cfg, node, interface, iface, interface.device)
+                iface.proto = 'dhcp'
 
                 cfg.packages.update([
-                    'kmod-mii',
-                    'kmod-usb-net',
-                    'kmod-usb-wdm',
-                    'kmod-usb-net-qmi-wwan',
-                    'uqmi',
+                    'kmod-usb-net-cdc-ether',
                 ])
             else:
-                raise cgm_base.ValidationError(
-                    _("Unsupported mobile interface type '%(port)s'!") % {'port': interface.device}
-                )
+                # Mapping of device identifiers to ports.
+                port_map = {
+                    'ppp0': '/dev/ttyUSB0',
+                    'ppp1': '/dev/ttyUSB1',
+                    'ppp2': '/dev/ttyUSB2',
+                    'ppp3': '/dev/ttyUSB3',
+                    'qmi0': '/dev/cdc-wdm0',
+                    'qmi1': '/dev/cdc-wdm1',
+                    'qmi2': '/dev/cdc-wdm2',
+                }
+
+                iface.device = port_map.get(interface.device, None)
+                if not iface.device:
+                    raise cgm_base.ValidationError(
+                        _("Unsupported mobile interface port '%(port)s'!") % {'port': interface.device}
+                    )
+
+                if interface.service == 'umts':
+                    iface.service = 'umts'
+                elif interface.service == 'gprs':
+                    iface.service = 'gprs'
+                elif interface.service == 'cdma':
+                    iface.service = 'cdma'
+                else:
+                    raise cgm_base.ValidationError(
+                        _("Unsupported mobile service type '%(service)s'!") % {'service': interface.service}
+                    )
+
+                iface.apn = interface.apn
+                if iface.pincode:
+                    iface.pincode = interface.pin
+                if interface.username:
+                    iface.username = interface.username
+                    iface.password = interface.password
+
+                configure_interface(cfg, node, interface, iface, interface.device)
+                if interface.device.startswith('ppp'):
+                    iface.proto = '3g'
+                elif interface.device.startswith('qmi'):
+                    iface.proto = 'qmi'
+
+                    cfg.packages.update([
+                        'kmod-mii',
+                        'kmod-usb-net',
+                        'kmod-usb-wdm',
+                        'kmod-usb-net-qmi-wwan',
+                        'uqmi',
+                    ])
+                else:
+                    raise cgm_base.ValidationError(
+                        _("Unsupported mobile interface type '%(port)s'!") % {'port': interface.device}
+                    )
 
             # Some packages are required for using a mobile interface.
             cfg.packages.update([

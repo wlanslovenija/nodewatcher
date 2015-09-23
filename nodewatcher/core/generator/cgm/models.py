@@ -278,8 +278,8 @@ class MobileInterfaceConfig(InterfaceConfig):
     A mobile (3G/UMTS/GPRS) interface.
     """
 
-    service = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_service', default='umts')
     device = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_device', default='ppp0')
+    service = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#mobile_service', default='umts')
     apn = models.CharField(max_length=100, verbose_name=_("APN"))
     pin = models.CharField(max_length=4, blank=True, verbose_name=_("PIN"))
     username = models.CharField(max_length=50, blank=True)
@@ -296,6 +296,7 @@ registration.point('node.config').register_choice('core.interfaces#mobile_device
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi0', _("QMI over USB0")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi1', _("QMI over USB1")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('qmi2', _("QMI over USB2")))
+registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('eth-cdc0', _("Ethernet over CDC-USB0")))
 registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('umts', _("UMTS")))
 registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('gprs', _("GPRS")))
 registration.point('node.config').register_choice('core.interfaces#mobile_service', registration.Choice('cdma', _("CDMA")))
