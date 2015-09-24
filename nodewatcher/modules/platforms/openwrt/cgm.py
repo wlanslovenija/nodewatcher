@@ -874,6 +874,23 @@ def check_interface_bridged(interface):
 
 
 @cgm_base.register_platform_module('openwrt', 15)
+def usb(node, cfg):
+    """
+    Install USB modules for devices which support it.
+    """
+
+    device = node.config.core.general().get_device()
+    if device.usb:
+        # Include base USB packages for devices supporting USB.
+        # TODO: Perhaps this should be made device-specific so only the needed packages are installed.
+        cfg.packages.update([
+            'kmod-usb2',
+            'kmod-usb-ohci',
+            'kmod-usb-uhci',
+        ])
+
+
+@cgm_base.register_platform_module('openwrt', 15)
 def network(node, cfg):
     """
     Basic network configuration.
