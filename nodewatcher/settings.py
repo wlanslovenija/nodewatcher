@@ -56,7 +56,6 @@ LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = (
     ('en', _('English')),
-    ('sl', _('Slovenian')),
 )
 
 LOCALE_PATHS = (
