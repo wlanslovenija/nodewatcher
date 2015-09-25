@@ -76,3 +76,19 @@
 .icon.nw-node-network-visible {
 	color: $brand-warning;
 }
+
+.icon.nw-generator-ok {
+	color: $brand-success;
+}
+
+.icon.nw-generator-pending {
+	color: $gray-light;
+}
+
+.icon.nw-generator-building {
+	color: $brand-warning;
+}
+
+.icon.nw-generator-failed {
+	color: $brand-danger;
+}
