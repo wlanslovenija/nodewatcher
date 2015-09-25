@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from registration import models as registration_models
-from registration.backends.hmac import views as registration_views
+from registration.backends.model_activation import views as registration_views
 
 from . import decorators, forms, signals, utils
 
