@@ -29,6 +29,14 @@ class NoSuitableBuildersFound(BuilderConfigurationError):
     pass
 
 
+class NoDeviceConfigured(BuilderConfigurationError):
+    """
+    Exception that gets raised when no device is configured.
+    """
+
+    pass
+
+
 class BuildError(Exception):
     """
     Exception that gets raised when a build error occurrs.

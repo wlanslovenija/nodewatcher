@@ -880,6 +880,9 @@ def usb(node, cfg):
     """
 
     device = node.config.core.general().get_device()
+    if not device:
+        return
+
     if device.usb:
         # Include base USB packages for devices supporting USB.
         # TODO: Perhaps this should be made device-specific so only the needed packages are installed.
@@ -934,6 +937,9 @@ def network(node, cfg):
     # Obtain the device descriptor for this device and generate physical port resource so
     # we can track binding of ports to different interface and prevent multiple definitions.
     device = node.config.core.general().get_device()
+    if not device:
+        return
+
     cfg.resources.add(cgm_resources.PhysicalPortResource(
         'ethernet',
         [port.identifier for port in device.ports],
