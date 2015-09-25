@@ -1,4 +1,19 @@
 (function ($) {
+    function renderTimeAgo(data, type, row, meta) {
+        if (type !== 'display') 
+            return data;
+
+        var t = moment(data);
+        if (!t.isValid())
+            return "<em>never</em>";
+        
+        // TODO: custom date formats, refresing?
+        var output = $('<span/>').attr('title', t.format($.nodewatcher.theme.dateFormat)).addClass('time').append(t.fromNow());
+
+        return output.wrap('<span/>').parent().html();
+
+    }
+
     function renderBuilderUuid(table) {
         return function (data, type, row, meta) {
             if (type === 'display') {
@@ -22,8 +37,8 @@
                     {'data': 'node.name', 'render': $.tastypie.nodeSubdocumentName(table, 'node'), 'orderByField': 'node__config_core_generalconfig__name'},
                     {'data': 'build_channel.name'},
                     {'data': 'builder.version.name'},
-                    {'data': 'status'},
-                    {'data': 'created'},
+                    {'data': 'status', 'render': $.nodewatcher.renderGeneratorResultStatus(table), 'class': 'center', 'width': '20px'},
+                    {'data': 'created', 'render': renderTimeAgo},
                     // We need extra data to render the node column
                     {'data': 'node.uuid', 'visible': false}
                 ],

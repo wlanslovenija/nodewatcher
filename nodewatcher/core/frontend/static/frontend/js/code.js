@@ -17,12 +17,14 @@
         'isIE': /(msie|trident)/i.test(navigator.userAgent) && !window.opera,
         'hasTouch': 'ontouchstart' in document.documentElement,
         'dateFormat' : "MMMM Do YYYY, h:mm:ss a",
-        'iconElement': function(identifier, icons) {
+        'iconElement': function(identifier, tooltip, icons) {
             if (_.isUndefined(icons)) icons = 'nw';
-            return $('<i/>').addClass('icon ' + icons + ' ' + icons + '-' + identifier);
+            var e = $('<i/>').addClass('icon ' + icons + ' ' + icons + '-' + identifier);
+            if (!_.isUndefined(tooltip)) e.attr('title', tooltip);
+            return e;
         },
-        'iconHtml': function(identifier, icons) {
-            return $.nodewatcher.theme.iconElement(identifier, icons).wrap('<div/>').parent().html();
+        'iconHtml': function(identifier, tooltip, icons) {
+            return $.nodewatcher.theme.iconElement(identifier, tooltip, icons).wrap('<div/>').parent().html();
         }
     });
 
