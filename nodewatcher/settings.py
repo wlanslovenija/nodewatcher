@@ -663,5 +663,18 @@ PARTIALS = {
     #],
 }
 
+# Configure which registry items should be displayed in the editor when the simple mode
+# is enabled. Items should be specified for each registration point.
+REGISTRY_SIMPLE_MODE = {
+    'node.config': {
+        'default': True,
+        'items': [
+            'core.general',
+            'core.location',
+            'core.authentication',
+        ],
+    },
+}
+
 # Allowed hosts (required for production use)
 ALLOWED_HOSTS = []

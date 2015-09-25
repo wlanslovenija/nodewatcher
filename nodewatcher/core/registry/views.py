@@ -43,6 +43,10 @@ def evaluate_forms(request, regpoint_id, root_id):
                     additional_flags |= registry_forms.FORM_DEFAULTS_ENABLED
                 else:
                     additional_flags &= ~registry_forms.FORM_DEFAULTS_ENABLED
+            elif action == 'simple_mode':
+                # Simple mode should also automatically enable defaults.
+                if options['value']:
+                    additional_flags |= registry_forms.FORM_SET_DEFAULTS | registry_forms.FORM_DEFAULTS_ENABLED
 
         # First perform partial validation and generate defaults.
         form_state = registry_forms.prepare_root_forms(
@@ -62,6 +66,8 @@ def evaluate_forms(request, regpoint_id, root_id):
             elif action == 'remove':
                 form_state.remove_item(options['index'])
                 changed = True
+            elif action == 'simple_mode':
+                form_state.set_using_simple_mode(options['value'])
 
         # Re-apply form defaults in case client actions have changed something.
         if changed:

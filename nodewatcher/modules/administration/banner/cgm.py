@@ -27,6 +27,8 @@ def banner(node, cfg):
     # the login banner by default.
     general = node.config.core.general()
     device = general.get_device()
+    if not device:
+        return
 
     banner_template = template.loader.get_template('banner/banner.txt')
     cfg.banner = banner_template.render(template.Context({

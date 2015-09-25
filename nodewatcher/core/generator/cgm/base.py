@@ -399,6 +399,8 @@ class PlatformBase(object):
         build_channel = node.config.core.general().build_channel
         version = node.config.core.general().version
         device = node.config.core.general().get_device()
+        if not device:
+            raise exceptions.NoDeviceConfigured
 
         if build_channel is None:
             # Default build channel specified, use it if one is selected

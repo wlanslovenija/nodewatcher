@@ -3,27 +3,60 @@
 
     {% addtoblock "css" %}{{ registry_forms.media.css }}{% endaddtoblock %}
     {% addtoblock "js" %}{{ registry_forms.media.js }}{% endaddtoblock %}
+
+    {% add_data "css_data" "bootstrap-switch/css/bootstrap-switch.min.css" %}
+    {% add_data "js_data" "bootstrap-switch/js/bootstrap-switch.min.js" %}
 {% endcontextblock %}
 
-{% if registry_forms.form_state.is_using_defaults %}
-    <div class="alert alert-info">
-      <b>{% trans "This node is currently using automatically generated defaults." %}</b>
-      <button type="button" class="btn btn-xs btn-primary pull-right registry-defaults-disable">{% trans "Disable defaults" %}</button>
-      <div class="small">
-        {% trans "Whenever you change any configuration, defaults are automatically applied, which may reconfigure the node." %}
-      </div>
-    </div>
-{% else %}
-    <div class="alert alert-warning">
-      <b>{% trans "This node is using a custom configuration." %}</b>
-      <button type="button" class="btn btn-xs btn-warning pull-right registry-defaults-enable">{% trans "Reset to defaults" %}</button>
-      <div class="small">
-        {% trans "If you change any configuration, automatic defaults will not be applied, so you need to configure everything manually. " %}
-      </div>
-    </div>
-{% endif %}
+<div class="row">
+    <div class="col-md-9" role="main">
+        {% if not registry_forms.form_state.is_using_simple_mode %}
+            {% if registry_forms.form_state.is_using_defaults %}
+                <div class="alert alert-info">
+                    <b>{% trans "This node is currently using automatically generated defaults." %}</b>
+                    <button type="button" class="btn btn-xs btn-primary pull-right registry-defaults-disable">{% trans "Disable defaults" %}</button>
+                    <div class="small">
+                        {% trans "Whenever you change any configuration, defaults are automatically applied, which may reconfigure the node." %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <b>{% trans "This node is using a custom configuration." %}</b>
+                    <button type="button" class="btn btn-xs btn-warning pull-right registry-defaults-enable">{% trans "Reset to defaults" %}</button>
+                    <div class="small">
+                        {% trans "If you change any configuration, automatic defaults will not be applied, so you need to configure everything manually. " %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
 
-{{ registry_forms }}
+        {{ registry_forms }}
+
+        <p class="btn-row">
+            <button class="btn btn-default btn-lg" type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>&nbsp;
+            <button class="btn btn-primary btn-lg" type="submit">{% if registry_forms.root %}{% trans "Update" %}{% else %}{% trans "Register" %}{% endif %}</button>
+        </p>
+    </div>
+
+    <div class="col-md-3" role="complementary">
+        <div class="row registry-simple-mode-toggle">
+            <div class="col-md-6 vertical-align toggle-label">
+                {% trans "Advanced mode" %}
+            </div><!--
+            --><div class="col-md-6 vertical-align">
+                {% if registry_forms.form_state.is_using_simple_mode %}
+                    <input type="checkbox" class="registry-simple-mode" />
+                {% else %}
+                    <input type="checkbox" class="registry-simple-mode" checked />
+                {% endif %}
+            </div>
+        </div>
+
+        <br/>
+
+        {% include "registry/menu.html" %}
+    </div>
+</div>
 
 <input type="hidden" name="registry_form_id" value="{{ registry_forms.form_id }}" />
 <script type="text/javascript">

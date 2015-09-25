@@ -1,9 +1,8 @@
 import collections
 import copy
-import hashlib
-import os
 
 from django import forms as django_forms, template, db as django_db
+from django.conf import settings
 from django.db import transaction
 
 from ....utils import loader, toposort
@@ -153,7 +152,7 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
         self.errors = []
         self.regpoint = context.regpoint.name
         self.root = context.root.pk if context.root else None
-        self.form_id = context.form_id
+        self.form_id = context.form_state.form_id
         self.form_state = context.form_state
 
     def add_error(self, message):
@@ -471,16 +470,15 @@ class RegistryFormContext(object):
         Class constructor.
         """
         self.__dict__.update(kwargs)
-        self._form_id = None
-
-        if self.form_id not in self.request.session:
-            self.state = {
-                'metadata': {},
-                'annotations': {},
-            }
 
         if self.form_state is None:
-            self.form_state = formstate.FormState(self)
+            if self.flags & FORM_INITIAL and self.root is not None:
+                # Load initial form state when requested and available.
+                self.form_state = formstate.FormState.from_db(self)
+                self.form_state.set_metadata(self.regpoint.get_root_metadata(self.root))
+            else:
+                # Create empty form state.
+                self.form_state = formstate.FormState(self)
 
     def get_prefix(self, prefix, item=None, field=None):
         """
@@ -513,47 +511,6 @@ class RegistryFormContext(object):
                 scalar_value = scalar_value._registry_virtual_child_index
 
             data.update({field_name: scalar_value})
-
-    @property
-    def form_id(self):
-        """
-        Returns the unique form identifier. If one is not yet configured,
-        a new one is generated.
-        """
-
-        if not self._form_id:
-            if not self.data or 'registry_form_id' not in self.data:
-                self._form_id = hashlib.sha1('registry-form-%s' % os.urandom(32)).hexdigest()
-            else:
-                self._form_id = self.data['registry_form_id']
-
-        return self._form_id
-
-    def _get_state(self):
-        """
-        Rule evaluation state getter.
-        """
-
-        self.request.session.modified = True
-        return self.request.session[self.form_id]
-
-    def _set_state(self, value):
-        """
-        Rule evaluation state setter.
-        """
-
-        self.request.session[self.form_id] = value
-        self.request.session.modified = True
-
-    state = property(_get_state, _set_state)
-
-    def clear_state(self):
-        """
-        Clears rule evaluation state.
-        """
-
-        del self.request.session[self.form_id]
-        self.request.session.modified = True
 
 
 def prepare_forms(context):
@@ -793,6 +750,14 @@ def prepare_forms(context):
 
             submeta = None
 
+        # Determine whether the form for this registry item should be displayed.
+        displayed = True
+        if context.form_state.is_using_simple_mode():
+            item_filter = getattr(settings, 'REGISTRY_SIMPLE_MODE', {}).get(context.regpoint.name, {}).get('items', [])
+            if item_filter is not None:
+                if context.default_item_cls._registry.registry_id not in item_filter:
+                    displayed = False
+
         forms.append({
             'name': cls_meta.registry_section,
             'id': cls_meta.registry_id,
@@ -802,6 +767,7 @@ def prepare_forms(context):
             'submeta': submeta,
             'prefix': context.base_prefix,
             'parent_id': context.hierarchy_parent_current._id if context.hierarchy_parent_current else '',
+            'displayed': displayed,
         })
 
     return forms
@@ -846,13 +812,14 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
         flags=flags,
     )
 
-    # Load initial form state when requested and available.
-    if flags & FORM_INITIAL and root is not None:
-        context.state['metadata'] = regpoint.get_root_metadata(root)
-        context.form_state = formstate.FormState.from_db(context)
-
     if flags & FORM_SET_DEFAULTS:
         context.form_state.set_using_defaults(flags & FORM_DEFAULTS_ENABLED)
+
+    if flags & FORM_INITIAL and flags & FORM_ROOT_CREATE:
+        # Set simple mode to its configured default value.
+        context.form_state.set_using_simple_mode(
+            getattr(settings, 'REGISTRY_SIMPLE_MODE', {}).get(regpoint.name, {}).get('default', False)
+        )
 
     # Prepare form processors.
     form_processors = []
@@ -917,12 +884,12 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
 
         if not context.validation_errors:
             # Persist metadata.
-            regpoint.set_root_metadata(root, context.state['metadata'])
+            regpoint.set_root_metadata(root, context.form_state.get_metadata())
             root.save()
 
             transaction.savepoint_commit(sid)
             if flags & FORM_CLEAR_STATE:
-                context.clear_state()
+                context.form_state.clear_session()
         else:
             transaction.savepoint_rollback(sid)
     except RegistryValidationError:

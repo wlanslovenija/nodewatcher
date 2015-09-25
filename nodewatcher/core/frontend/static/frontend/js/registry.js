@@ -65,6 +65,17 @@
             });
         });
 
+        $('.registry-simple-mode').bootstrapSwitch({
+            size: 'small',
+            onSwitchChange: function(event, state) {
+                $.registry.update({
+                    simple_mode: {
+                        value: !state
+                    }
+                });
+            }
+        });
+
         $(window).trigger('registry:initialize');
 
     };
@@ -116,4 +127,83 @@
             updating = false;
         });
     };
+
+    function showErrors() {
+        // Check if any of the secions in the registry form contains errors and
+        // update the class of the menu entry.
+        errorsFound = {}
+        $('.registry-item-container > legend').each(function(i, section) {
+            section = $(section);
+            var id = section.attr('id');
+            var errors = section.nextUntil('legend').find('.form-group.has-error');
+            if (!_.has(errorsFound, id)) {
+                errorsFound[id] = 0;
+            }
+            errorsFound[id] += errors.length;
+            errorCount = errorsFound[id]
+
+            if (errorCount > 0) {
+                // TODO: Localization.
+                var tooltip = errorCount + (errorCount > 1 ? " errors" : " error");
+
+                $('#registry-navbar a[href="#' + id + '"]').addClass('has-error').attr('title', tooltip);
+            } else {
+                $('#registry-navbar a[href="#' + id + '"]').removeClass('has-error').attr('title', '');
+            }
+
+        });
+    }
+
+    // Side navigation handling.
+    $(window).on('registry:initialize', function(event) {
+        // Prepare side navigation.
+        $('body').css('position', 'relative').scrollspy({
+            target: '#registry-navbar'
+        });
+
+        $(window).on('load', function() {
+            $('body').scrollspy('refresh')
+        });
+
+        // Sidenav affixing.
+        setTimeout(function() {
+            var $sideBar = $('#registry-navbar')
+
+            $sideBar.affix({
+                offset: {
+                    top: function() {
+                        var offsetTop = $('#registry_forms').offset().top;
+                        return (this.top = offsetTop);
+                    },
+                    bottom: 10
+                }
+            });
+
+            var $errorsBar = $('.registry-validation-errors');
+            $errorsBar.css('width', $('#registry_forms').width());
+            $(window).resize(function() {
+                $errorsBar.css('width', $('#registry_forms').width());
+            });
+
+            $errorsBar.affix({
+                offset: {
+                    top: function() {
+                        var offsetTop = $errorsBar.offset().top;
+                        return (this.top = offsetTop);
+                    },
+                    bottom: 10
+                }
+            });
+
+            // Update errors a bit later as well.
+            showErrors();
+        }, 100);
+    });
+
+    $(window).on('registry:update', function(event) {
+        $('body').scrollspy('refresh');
+
+        // Update errors.
+        showErrors();
+    });
 }));

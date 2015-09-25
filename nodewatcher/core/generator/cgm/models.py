@@ -65,6 +65,9 @@ class CgmGeneralConfig(core_models.GeneralConfig):
         Returns the device descriptor for the configured router.
         """
 
+        if not self.router:
+            return None
+
         return cgm_base.get_platform(self.platform).get_device(self.router)
 
 registration.point('node.config').register_item(CgmGeneralConfig)
