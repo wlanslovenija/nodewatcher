@@ -2,6 +2,7 @@ import hashlib
 import itertools
 
 from django.core import exceptions
+from django.utils import crypto
 
 __all__ = (
     'FormState',
@@ -18,8 +19,49 @@ class FormState(dict):
         self._form_actions = {}
         self._form_action_dependencies = {}
         self._item_map = {}
-        self._metadata = context.state['metadata']
-        self._annotations = context.state['annotations']
+
+        # Initialize the session.
+        self._session = context.request.session
+        if not context.data or 'registry_form_id' not in context.data:
+            self.form_id = hashlib.sha1('registry-form-%s' % crypto.get_random_string()).hexdigest()
+        else:
+            self.form_id = context.data['registry_form_id']
+
+        if self.form_id not in self._session:
+            self.session = {
+                'metadata': {},
+                'annotations': {},
+            }
+
+        self._metadata = self.session['metadata']
+        self._annotations = self.session['annotations']
+
+    def _get_session(self):
+        self._session.modified = True
+        return self._session[self.form_id]
+
+    def _set_session(self, value):
+        self._session[self.form_id] = value
+        self._session.modified = True
+
+    session = property(_get_session, _set_session)
+
+    def clear_session(self):
+        del self._session[self.form_id]
+        self._session.modified = True
+
+    def set_metadata(self, metadata):
+        self.session['metadata'] = metadata
+        self._metadata = self.session['metadata']
+
+    def get_metadata(self):
+        return self._metadata
+
+    def set_using_simple_mode(self, value):
+        self._metadata['using_simple_mode'] = bool(value)
+
+    def is_using_simple_mode(self):
+        return self._metadata.get('using_simple_mode', False)
 
     def set_using_defaults(self, value):
         self._metadata['using_defaults'] = bool(value)

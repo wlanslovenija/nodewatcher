@@ -1,7 +1,7 @@
 {% load i18n html_tags theme_tags %}
 
 {% if errors %}
-    <div class="alert alert-danger errors">
+    <div class="alert alert-danger errors registry-validation-errors">
       <b>{% trans "Errors while performing validation" %}</b><br/>
       <br/>
       {% for error in errors %}
@@ -11,39 +11,41 @@
 {% endif %}
 
 {% for descriptor in registry_forms %}
-    <legend id="registry_{{ descriptor.id|anchorify }}"><a name="registry_{{ descriptor.id|anchorify }}"></a>{{ descriptor.name }}</legend>
-    {% if descriptor.multiple %}
-        {{ descriptor.submeta }}
-        <div id="{{ descriptor.prefix }}_mu_container">
-    {% endif %}
+    <div class="registry-item-container" {% if not descriptor.displayed %} style="display: none;"{% endif %}>
+        <legend id="registry_{{ descriptor.id|anchorify }}"><a name="registry_{{ descriptor.id|anchorify }}"></a>{{ descriptor.name }}</legend>
+        {% if descriptor.multiple %}
+            {{ descriptor.submeta }}
+            <div id="{{ descriptor.prefix }}_mu_container">
+        {% endif %}
 
-    {% for subform in descriptor.subforms %}
-       {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
-        <div class="registry-item panel panel-default">
-            <div class="panel-heading">{% theme_field subform.meta_form.item %}{{ subform.meta_form.prev_item }}{{ subform.meta_form.mid }} &nbsp;
-                <button type="button" class="close registry_remove_item" data-index="{{ subform.args.index }}" aria-label="Remove"><span aria-hidden="true">&times;</span></button>
+        {% for subform in descriptor.subforms %}
+           {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
+            <div class="registry-item panel panel-default">
+                <div class="panel-heading">{% theme_field subform.meta_form.item %}{{ subform.meta_form.prev_item }}{{ subform.meta_form.mid }} &nbsp;
+                    <button type="button" class="close registry_remove_item" data-index="{{ subform.args.index }}" aria-label="Remove"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="panel-body">
+            {% else %}
+                <div class="registry-item">{% theme_field subform.meta_form.item %}{{ subform.meta_form.prev_item }}{{ subform.meta_form.mid }}
+            {% endif %}
+                {{ subform }}
+           {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
+                </div>
+            {% endif %}
             </div>
-            <div class="panel-body">
-        {% else %}
-            <div class="registry-item">{% theme_field subform.meta_form.item %}{{ subform.meta_form.prev_item }}{{ subform.meta_form.mid }}
-        {% endif %}
-            {{ subform }}
-       {% if descriptor.multiple and not descriptor.hide_multiple_controls %}
+        {% empty %}
+            <div class="alert alert-info">
+                <div class="registry_nested_empty ui-state-highlight ui-corner-all">{% trans 'This category is currently empty.' %}</div>
             </div>
-        {% endif %}
-        </div>
-    {% empty %}
-        <div class="alert alert-info">
-            <div class="registry_nested_empty ui-state-highlight ui-corner-all">{% trans 'This category is currently empty.' %}</div>
-        </div>
-    {% endfor %}
+        {% endfor %}
 
-    {% if descriptor.multiple %}
-        {% if not descriptor.hide_multiple_controls %}
-        <p class="btn-row">
-            <button type="button" class="registry_add_item btn btn-default" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}" title="{% blocktrans with name=descriptor.name %}Add '{{name}}'{% endblocktrans %}">{% theme_icon icon='plus' %}</button>
-        </p>
+        {% if descriptor.multiple %}
+            {% if not descriptor.hide_multiple_controls %}
+            <p class="btn-row">
+                <button type="button" class="registry_add_item btn btn-default" data-parent="{{ descriptor.parent_id }}" data-registry-id="{{ descriptor.id }}" title="{% blocktrans with name=descriptor.name %}Add '{{name}}'{% endblocktrans %}">{% theme_icon icon='plus' %}</button>
+            </p>
+            {% endif %}
+            </div>
         {% endif %}
-        </div>
-    {% endif %}
+    </div>
 {% endfor %}

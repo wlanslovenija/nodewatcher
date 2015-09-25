@@ -64,7 +64,7 @@ textarea.form-control {
 
 
     .panel-heading {
-        
+
         button.close {
             font-size: 200%;
         }
@@ -92,11 +92,11 @@ textarea.form-control {
     }
 }
 
-#registry_forms > .errors {
+.registry-validation-errors {
     width: 100%;
 }
 
-#registry_forms > .errors.affix {
+.registry-validation-errors.affix {
     width: 100%;
     top: 10px;
     opacity: 0.9;
@@ -105,4 +105,18 @@ textarea.form-control {
 
 #registry-navbar.affix {
     top: 10px;
+}
+
+.registry-simple-mode-toggle {
+    padding-left: 15px;
+
+    .toggle-label {
+        font-weight: bold;
+    }
+
+    .vertical-align {
+        vertical-align: middle;
+        display: inline-block;
+        float: none;
+    }
 }
