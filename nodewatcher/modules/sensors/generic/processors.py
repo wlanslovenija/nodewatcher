@@ -22,6 +22,9 @@ class GenericSensors(monitor_processors.NodeProcessor):
 
         if version >= 1:
             for sensor_id, data in context.http.sensors.generic.items():
+                if sensor_id.startswith('_'):
+                    continue
+
                 node.monitoring.sensors.generic(queryset=True).update_or_create(
                     sensor_id=sensor_id,
                     defaults={
