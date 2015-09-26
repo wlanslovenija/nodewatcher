@@ -670,6 +670,7 @@ REGISTRY_SIMPLE_MODE = {
         'items': [
             'core.general',
             'core.location',
+            'core.description',
             'core.authentication',
         ],
     },
