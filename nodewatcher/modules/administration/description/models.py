@@ -9,7 +9,11 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
     Textual description of a node.
     """
 
-    notes = models.TextField(blank=True, default='')
+    notes = models.TextField(
+        blank=True,
+        default='',
+        help_text=_("The notes field is private and is shown only to node maintainers."),
+    )
     url = models.URLField(blank=True, default='', verbose_name=_("URL"))
 
     class RegistryMeta:
