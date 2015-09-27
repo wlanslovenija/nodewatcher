@@ -37,7 +37,7 @@ class PublicKeyWidget(widgets.Textarea):
             'name': name,
             'raw': value,
         }
-        print value
+
         try:
             public_key = models.PublicKeyIdentityConfig._extract_public_key(value.encode('ascii'))
             valid = True
@@ -64,9 +64,11 @@ class PublicKeyWidget(widgets.Textarea):
                 context['key_algorithm'] = _("Unknown")
                 context['key_size'] = _("unknown")
 
+        if valid:
+            attrs['style'] = 'display: none'
         widget = super(PublicKeyWidget, self).render(name, value, attrs)
 
         if valid:
-            return template_loader.render_to_string('identity/public_key/public_key.html', context)
+            return template_loader.render_to_string('identity/public_key/public_key.html', context) + widget
         else:
             return widget
