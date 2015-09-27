@@ -28,14 +28,39 @@ class RegistryFormMixin(object):
             raise exceptions.ImproperlyConfigured("No URL to redirect to. Provide a success_url.")
         return url
 
-    def form_valid(self):
+    def form_valid(self, **kwargs):
         return http.HttpResponseRedirect(self.get_success_url())
 
-    def form_invalid(self):
-        return self.render_to_response(self.get_context_data(object=self.object))
+    def form_invalid(self, **kwargs):
+        kwargs['object'] = self.object
+        return self.render_to_response(self.get_context_data(**kwargs))
 
 
 class RegistryCreateFormMixin(RegistryFormMixin):
+    def get_node_uuid(self, **kwargs):
+        """
+        May return an UUID for the newly created node. The default implementation
+        will return None and cause the UUID to be generated automatically.
+        """
+
+        return None
+
+    def get_initial_flags(self, flags, **kwargs):
+        """
+        This method may provide initial form generation flags.
+
+        :param flags: Existing form generation flags
+        """
+
+        return flags
+
+    def initial_configuration(self, request, form_state, **kwargs):
+        """
+        This method may provide additional initial node configuration.
+        """
+
+        pass
+
     @transaction.atomic
     def get(self, request, *args, **kwargs):
         self.object = None
@@ -49,8 +74,15 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 'node.config',
                 request,
                 self.object,
-                flags=registry_forms.FORM_INITIAL | registry_forms.FORM_ONLY_DEFAULTS | registry_forms.FORM_ROOT_CREATE,
+                flags=self.get_initial_flags(
+                    registry_forms.FORM_INITIAL |
+                    registry_forms.FORM_ONLY_DEFAULTS |
+                    registry_forms.FORM_ROOT_CREATE
+                ),
             )
+
+            # Run the initial configuration hook.
+            self.initial_configuration(request, form_state, **kwargs)
 
             has_errors, self.dynamic_forms = registry_forms.prepare_root_forms(
                 'node.config',
@@ -70,7 +102,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 # transaction is aborted anyway.
                 pass
 
-        return self.render_to_response(self.get_context_data())
+        return self.render_to_response(self.get_context_data(**kwargs))
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -78,7 +110,7 @@ class RegistryCreateFormMixin(RegistryFormMixin):
 
         sid = transaction.savepoint()
         try:
-            self.object = core_models.Node()
+            self.object = core_models.Node(uuid=self.get_node_uuid(**kwargs))
             self.object.save()
 
             form_state = registry_forms.prepare_root_forms(
@@ -104,12 +136,13 @@ class RegistryCreateFormMixin(RegistryFormMixin):
                 shortcuts.assign_perm('delete_node', request.user, self.object)
                 shortcuts.assign_perm('reset_node', request.user, self.object)
                 signals.post_create_node.send(sender=self, request=request, node=self.object)
+                response = self.form_valid(**kwargs)
                 transaction.savepoint_commit(sid)
-                return self.form_valid()
+                return response
             else:
                 transaction.savepoint_rollback(sid)
                 self.dynamic_forms.root = None
-                return self.form_invalid()
+                return self.form_invalid(**kwargs)
         except:
             try:
                 transaction.savepoint_rollback(sid)
@@ -128,11 +161,11 @@ class NewNode(mixins.PermissionRequiredMixin,
     template_name = 'nodes/new.html'
     permission_required = 'core.add_node'
 
-    def form_valid(self):
+    def form_valid(self, **kwargs):
         return http.HttpResponseRedirect(self.get_success_url())
 
-    def form_invalid(self):
-        return self.render_to_response(self.get_context_data())
+    def form_invalid(self, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_cancel_url(self):
         # TODO: Where should we redirect here? What if mynodes component is not enabled?
@@ -154,7 +187,8 @@ class RegistryEditFormMixin(RegistryFormMixin):
             flags=registry_forms.FORM_INITIAL | registry_forms.FORM_OUTPUT | registry_forms.FORM_DEFAULTS,
         )
 
-        return self.render_to_response(self.get_context_data(object=self.object))
+        kwargs['object'] = self.object
+        return self.render_to_response(self.get_context_data(**kwargs))
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -179,9 +213,9 @@ class RegistryEditFormMixin(RegistryFormMixin):
         )
 
         if not has_errors:
-            return self.form_valid()
+            return self.form_valid(**kwargs)
         else:
-            return self.form_invalid()
+            return self.form_invalid(**kwargs)
 
 
 class EditNode(mixins.PermissionRequiredMixin,

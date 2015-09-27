@@ -1,0 +1,38 @@
+{% overextends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n sekizai_tags html_tags url_tags %}
+
+    {% add_data "css_data" "datatables/css/style.css" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
+    {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
+    {% add_data "js_data" "datastream/moment/moment.js" %}
+    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "unknown_nodes/js/list.js" %}
+
+    {% trans "List of My Unknown Nodes" as title %}
+{% endcontextblock %}
+
+{% block altlinks %}
+    {% url "api:api_dispatch_list" "v1" "unknown_node" as api_url %}
+    {% with api_url as url %}
+    {% include "formats.html" %}
+    {% endwith %}
+{% endblock altlinks %}
+
+{% block content %}
+    <table class="table table-striped unknown-node-list {% block unknown_node_list_classes %}{% endblock unknown_node_list_classes %}" data-source="{% block unknown_node_list_data_source %}{% url "api:api_dispatch_list" "v1" "unknown_node" %}{% endblock unknown_node_list_data_source %}" data-register-url-template="{% urltemplate "UnknownNodesComponent:register" %}" width="100%">
+        <thead>
+            <tr>
+                <th>{% trans "UUID" %}</th>
+                <th>{% trans "First Seen" %}</th>
+                <th>{% trans "Last Seen" %}</th>
+                <th>{% trans "IP Address" %}</th>
+                <th>{% trans "Certificate" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+{% endblock %}

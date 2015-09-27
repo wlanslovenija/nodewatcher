@@ -269,6 +269,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.http.interfaces',
     'nodewatcher.modules.monitor.http.clients',
     'nodewatcher.modules.monitor.topology',
+    'nodewatcher.modules.monitor.unknown_nodes',
     'nodewatcher.modules.monitor.validation.reboot',
     'nodewatcher.modules.monitor.validation.version',
     'nodewatcher.modules.monitor.validation.interfaces',
@@ -511,6 +512,7 @@ MONITOR_RUNS = {
         # This run does not define any scheduling or worker information, so it will only be
         # executed on demand.
         'processors': (
+            'nodewatcher.modules.monitor.unknown_nodes.processors.DiscoverUnknownNodes',
             'nodewatcher.modules.monitor.sources.http.processors.HTTPGetPushedNode',
             'nodewatcher.modules.identity.public_key.processors.VerifyNodePublicKey',
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',

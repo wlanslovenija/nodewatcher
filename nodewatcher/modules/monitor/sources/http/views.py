@@ -17,6 +17,13 @@ class HttpPushEndpoint(generic.View):
         Handles HTTP push requests from nodewatcher-agent.
         """
 
+        # Determine the remote IP address.
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            remote_ip = x_forwarded_for.split(',')[0]
+        else:
+            remote_ip = request.META.get('REMOTE_ADDR')
+
         # Schedule a new push task.
         monitor_tasks.run_pipeline.delay(
             run_id=settings.MONITOR_HTTP_PUSH_RUN,
@@ -26,6 +33,7 @@ class HttpPushEndpoint(generic.View):
                     'data': request.body,
                 },
                 'identity': {
+                    'ip_address': remote_ip,
                     # We assume that the HTTP server is configured so that it populates
                     # the X-SSL-Certificate header with the PEM-encoded certificate.
                     'certificate': request.META.get('HTTP_X_SSL_CERTIFICATE', None),

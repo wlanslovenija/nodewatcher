@@ -815,7 +815,7 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
     if flags & FORM_SET_DEFAULTS:
         context.form_state.set_using_defaults(flags & FORM_DEFAULTS_ENABLED)
 
-    if flags & FORM_INITIAL and flags & FORM_ROOT_CREATE:
+    if flags & FORM_INITIAL and flags & FORM_ROOT_CREATE and context.form_state.is_using_defaults():
         # Set simple mode to its configured default value.
         context.form_state.set_using_simple_mode(
             getattr(settings, 'REGISTRY_SIMPLE_MODE', {}).get(regpoint.name, {}).get('default', False)
