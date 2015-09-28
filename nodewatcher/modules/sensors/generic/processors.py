@@ -20,12 +20,18 @@ class GenericSensors(monitor_processors.NodeProcessor):
 
         version = context.http.get_module_version('sensors.generic')
 
+        existing_sensors = {}
+        for sensor in node.monitoring.sensors.generic():
+            sensor.value = None
+            existing_sensors[sensor.sensor_id] = sensor
+
         if version >= 1:
             for sensor_id, data in context.http.sensors.generic.items():
                 if sensor_id.startswith('_'):
                     continue
 
                 node.monitoring.sensors.generic(queryset=True).update_or_create(
+                    root=node,
                     sensor_id=sensor_id,
                     defaults={
                         'name': str(data.name or ''),
@@ -33,5 +39,11 @@ class GenericSensors(monitor_processors.NodeProcessor):
                         'value': float(data.value),
                     }
                 )
+
+                if sensor_id in existing_sensors:
+                    del existing_sensors[sensor_id]
+
+        for sensor in existing_sensors.values():
+            sensor.save()
 
         return context

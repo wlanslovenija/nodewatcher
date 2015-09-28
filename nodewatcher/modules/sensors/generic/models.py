@@ -15,7 +15,7 @@ class GenericSensorMonitor(registration.bases.NodeMonitoringRegistryItem):
     last_updated = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200)
     unit = models.CharField(max_length=50)
-    value = models.FloatField()
+    value = models.FloatField(null=True)
 
     class RegistryMeta:
         registry_id = 'sensors.generic'
