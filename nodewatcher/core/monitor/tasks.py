@@ -48,7 +48,7 @@ def run_pipeline(self, run_id, base_context=None):
                 # Store the per-node context, so we can limit its scope only to specific nodes in
                 # order to avoid excessive context copying.
                 node_local_context = context.for_node
-                del context.for_node
+                del context['for_node']
 
                 monitor_worker.stage_worker((
                     context,
