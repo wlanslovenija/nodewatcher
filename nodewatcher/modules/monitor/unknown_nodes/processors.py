@@ -33,7 +33,7 @@ class DiscoverUnknownNodes(monitor_processors.NetworkProcessor):
                     uuid=str(uuid.UUID(context.push.source)),
                     defaults={
                         'ip_address': context.identity.ip_address or None,
-                        'certificate': dict(context.identity.certificate) or None,
+                        'certificate': dict(context.identity.certificate or {}) or None,
                         'origin': models.UnknownNode.PUSH,
                     },
                 )

@@ -59,7 +59,7 @@ class RegisterUnknownNode(mixins.PermissionRequiredMixin,
             )
 
         # Configure trusted certificate if available.
-        if unknown_node.certificate.get('public_key', None):
+        if unknown_node.certificate:
             identity_config = form_state.append_item(
                 identity_models.IdentityConfig,
                 trust_policy='first',
