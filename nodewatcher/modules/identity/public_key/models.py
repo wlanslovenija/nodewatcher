@@ -41,6 +41,11 @@ class PublicKeyIdentityConfig(base_models.IdentityMechanismConfig):
         if data is None:
             raise ValueError("Invalid null public key.")
 
+        if isinstance(data, x509.Certificate):
+            return data.public_key()
+        elif isinstance(data, dict):
+            data = data['public_key']
+
         backend = backends.default_backend()
 
         # First assume this is a public key.
