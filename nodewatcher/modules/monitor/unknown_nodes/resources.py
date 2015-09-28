@@ -24,8 +24,8 @@ class UnknownNodeResource(api.BaseResource):
     uuid = fields.CharField('uuid')
     first_seen = fields.DateTimeField('first_seen')
     last_seen = fields.DateTimeField('last_seen')
-    ip_address = fields.CharField('ip_address')
-    certificate = fields.DictField('certificate')
+    ip_address = fields.CharField('ip_address', null=True)
+    certificate = fields.DictField('certificate', null=True)
     origin = fields.CharField('origin')
 
     class Meta:
