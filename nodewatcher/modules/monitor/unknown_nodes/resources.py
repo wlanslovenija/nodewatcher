@@ -26,13 +26,14 @@ class UnknownNodeResource(api.BaseResource):
     last_seen = fields.DateTimeField('last_seen')
     ip_address = fields.CharField('ip_address')
     certificate = fields.DictField('certificate')
+    origin = fields.CharField('origin')
 
     class Meta:
         resource_name = 'unknown_node'
         queryset = models.UnknownNode.objects.all()
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
-        fields = ('uuid', 'first_seen', 'last_seen', 'ip_address', 'certificate')
+        fields = ('uuid', 'first_seen', 'last_seen', 'ip_address', 'certificate', 'origin')
         ordering = ('uuid', 'first_seen', 'last_seen', 'ip_address')
         authentication = api_authentication.SessionAuthentication()
         authorization = UnknownNodeAuthorization()

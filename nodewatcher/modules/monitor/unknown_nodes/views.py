@@ -9,6 +9,7 @@ from nodewatcher.core.registry import forms as registry_forms
 from nodewatcher.modules.frontend.editor import views as editor_views
 from nodewatcher.modules.identity.base import models as identity_models
 from nodewatcher.modules.identity.public_key import models as public_key_models
+from nodewatcher.modules.monitor.sources.http import models as http_models
 
 from . import models
 
@@ -49,6 +50,13 @@ class RegisterUnknownNode(mixins.PermissionRequiredMixin,
         # Get the unknown node instance.
         unknown_node = shortcuts.get_object_or_404(models.UnknownNode, uuid=kwargs['uuid'])
         self.unknown_node = unknown_node
+
+        # Configure telemetry source.
+        if unknown_node.origin == models.UnknownNode.PUSH:
+            form_state.append_item(
+                http_models.HttpTelemetrySourceConfig,
+                source='push',
+            )
 
         # Configure trusted certificate if available.
         if unknown_node.certificate.get('raw', None):

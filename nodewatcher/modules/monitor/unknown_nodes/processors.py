@@ -66,6 +66,7 @@ class DiscoverUnknownNodes(monitor_processors.NetworkProcessor):
                     defaults={
                         'ip_address': context.identity.ip_address or None,
                         'certificate': certificate,
+                        'origin': models.UnknownNode.PUSH,
                     },
                 )
             except ValueError:
