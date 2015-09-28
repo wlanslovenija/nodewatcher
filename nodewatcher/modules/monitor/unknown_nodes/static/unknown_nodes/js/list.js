@@ -17,6 +17,9 @@
         if (type !== 'display')
             return data;
 
+        if (!data)
+            return '<em>not provided</em>';
+
         var output = '';
         if (data.country)
             output += '<span>C=' + data.country + '</span><br/>';
