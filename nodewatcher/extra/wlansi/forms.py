@@ -380,8 +380,8 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         # Wireless.
 
-        radio = device.get_radio('wifi0')
-        radio_defaults = radio_defaults.get('wifi0', None)
+        radio = device.radios[0]
+        radio_defaults = radio_defaults.get(radio.identifier, None)
 
         if not radio:
             return
