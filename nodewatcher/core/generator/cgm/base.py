@@ -403,22 +403,24 @@ class PlatformBase(object):
             raise exceptions.NoDeviceConfigured
 
         if build_channel is None:
-            # Default build channel specified, use it if one is selected
+            # Default build channel specified, use it if one is selected.
             try:
                 build_channel = generator_models.BuildChannel.objects.get(default=True)
             except generator_models.BuildChannel.DoesNotExist:
                 raise exceptions.NoBuildChannelsConfigured
 
         if version is None:
-            # Build channel specified, use the latest version
+            # Build channel specified, use the latest version.
             try:
                 version = generator_models.BuildVersion.objects.filter(
-                    builders__channels=build_channel
+                    builders__channels=build_channel,
+                    builders__platform=self.name,
+                    builders__architecture=device.architecture,
                 ).latest('created')
             except generator_models.BuildVersion.DoesNotExist:
                 raise exceptions.NoBuildersConfigured
 
-        # Select a proper builder
+        # Select a proper builder.
         try:
             builder = generator_models.Builder.objects.get(
                 platform=self.name,
