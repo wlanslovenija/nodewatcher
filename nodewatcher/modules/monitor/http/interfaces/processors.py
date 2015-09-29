@@ -204,7 +204,7 @@ if DATASTREAM_SUPPORTED:
             """
 
             super(DatastreamInterfaces, self).interface_enabled(context, node, iface)
-            self.set_interface_initial_set(iface, False)
+            self.set_interface_initial_set(iface, True)
 
         def interface_disabled(self, context, node, iface):
             """
@@ -212,4 +212,4 @@ if DATASTREAM_SUPPORTED:
             """
 
             super(DatastreamInterfaces, self).interface_disabled(context, node, iface)
-            self.set_interface_initial_set(iface, True)
+            self.set_interface_initial_set(iface, False)
