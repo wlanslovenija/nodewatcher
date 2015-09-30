@@ -88,12 +88,12 @@ def commotion_network(node, cfg):
     uhttpd.listen_https = ['0.0.0.0:443']
     uhttpd.home = '/www'
     uhttpd.rfc1918_filter = False
-    uhttpd.max_requests = '2'
+    uhttpd.max_requests = 2
     uhttpd.cert = '/etc/uhttpd.crt'
     uhttpd.key = '/etc/uhttpd.key'
     uhttpd.cgi_prefix = '/cgi-bin'
-    uhttpd.script_timeout = '300'
-    uhttpd.network_timeout = '30'
+    uhttpd.script_timeout = 300
+    uhttpd.network_timeout = 30
     uhttpd.tcp_keepalive = True
 
     cert = cfg.uhttpd.add(cert='px5g')
@@ -103,6 +103,52 @@ def commotion_network(node, cfg):
     cert.state = 'DC'
     cert.location = 'Washington'
     cert.commonname = 'Commotion'
+
+    # Configure olsrd defaults.
+    olsrd = cfg.olsrd.add('olsrd')
+    olsrd.IpVersion = 4
+    olsrd.LinkQualityLevel = 2
+    olsrd.LinkQualityAlgorithm = 'etx_ffeth'
+    olsrd.SmartGateway = 'yes'
+    cfg.packages.add('olsrd')
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_arprefresh.so.0.1'
+    cfg.packages.add('olsrd-mod-arprefresh')
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_dyn_gw_plain.so.0.4'
+    cfg.packages.add('olsrd-mod-dyn-gw-plain')
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_nameservice.so.0.3'
+    plugin.sighup_pid_file = '/var/run/dnsmasq.pid'
+    plugin.hosts_file = '/var/run/hosts_olsr'
+    plugin.suffix = '.mesh.local'
+    cfg.packages.add('olsrd-mod-nameservice')
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_dnssd.so.0.1.3'
+    plugin.P2pdTtl = 5
+    plugin.UdpDestPort = '224.0.0.251 5353'
+    plugin.ServiceFileDir = '/etc/avahi/services'
+    plugin.Domain = 'mesh.local'
+    plugin.ServiceUpdateInterval = 300
+    cfg.packages.add('olsrd-mod-dnssd')
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_txtinfo.so.0.1'
+    plugin.accept = '127.0.0.1'
+    plugin.listen = '127.0.0.1'
+    cfg.packages.add('olsrd-mod-txtinfo')
+
+    plugin = cfg.olsrd.add('LoadPlugin')
+    plugin.library = 'olsrd_jsoninfo.so.0.0'
+    plugin.accept = '127.0.0.1'
+    plugin.listen = '127.0.0.1'
+    plugin.port = 9090
+    plugin.UUIDFile = '/etc/olsrd.d/olsrd.uuid'
+    cfg.packages.add('olsrd-mod-jsoninfo')
 
     # Ensure commotion packages are installed.
     cfg.packages.update([
