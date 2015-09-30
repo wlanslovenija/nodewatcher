@@ -64,6 +64,24 @@ def commotion_network(node, cfg):
                     _("Unsupported DHCP option '%s' for OpenWrt commotion network configuration!") % network.dhcp
                 )
 
+    # Configure DHCP defaults.
+    dnsmasq = cfg.dhcp.add('dnsmasq')
+    dnsmasq.domainneeded = True
+    dnsmasq.boguspriv = True
+    dnsmasq.filterwin2k = False
+    dnsmasq.localise_queries = True
+    dnsmasq.rebind_protection = True
+    dnsmasq.rebind_localhost = True
+    dnsmasq.local = '/mesh.local/'
+    dnsmasq.domain = 'mesh.local'
+    dnsmasq.expandhosts = True
+    dnsmasq.nonegcache = False
+    dnsmasq.authoritative = True
+    dnsmasq.readethers = True
+    dnsmasq.leasefile = '/tmp/dhcp.leases'
+    dnsmasq.resolvfile = '/tmp/resolv.conf.auto'
+    dnsmasq.addnhosts = ['/var/run/hosts_olsr']
+
     # Ensure commotion packages are installed.
     cfg.packages.update([
         'commotion',
