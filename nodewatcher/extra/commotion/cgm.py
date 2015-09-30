@@ -65,7 +65,7 @@ def commotion_network(node, cfg):
                 )
 
     # Configure DHCP defaults.
-    dnsmasq = cfg.dhcp.add('dnsmasq')
+    dnsmasq = cfg.dhcp.find_ordered_section('dnsmasq')
     dnsmasq.domainneeded = True
     dnsmasq.boguspriv = True
     dnsmasq.filterwin2k = False
