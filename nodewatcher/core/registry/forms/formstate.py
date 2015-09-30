@@ -452,6 +452,7 @@ class FormState(dict):
 
                     # Copy attributes from item.
                     attributes = {}
+                    attributes['_original_pk'] = item.pk
                     for field in item._meta.fields:
                         if not field.editable or field.primary_key:
                             continue

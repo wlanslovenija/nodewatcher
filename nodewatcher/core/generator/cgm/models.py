@@ -173,9 +173,9 @@ class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     def __unicode__(self):
         if not self.name:
-            return "(unnamed bridge)"
+            return _("Bridge interface (unnamed)")
 
-        return self.name
+        return _("Bridge interface (%(name)s)") % {'name': self.name}
 
 registration.point('node.config').register_item(BridgeInterfaceConfig)
 
@@ -191,6 +191,12 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Ethernet Interface")
+
+    def __unicode__(self):
+        if not self.eth_port:
+            return _("Ethernet interface (unbound)")
+
+        return _("Ethernet interface (%(eth_port)s)") % {'eth_port': self.get_eth_port_display()}
 
 registration.point('node.config').register_item(EthernetInterfaceConfig)
 
@@ -291,6 +297,12 @@ class MobileInterfaceConfig(InterfaceConfig):
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Mobile Interface")
+
+    def __unicode__(self):
+        if not self.device:
+            return _("Mobile interface (unbound)")
+
+        return _("Mobile interface (%(device)s)") % {'device': self.get_device_display()}
 
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp0', _("PPP over USB0")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp1', _("PPP over USB1")))

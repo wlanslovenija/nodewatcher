@@ -443,6 +443,8 @@ class ReferenceChoiceField(models.ForeignKey):
 
         kwargs['null'] = True
         kwargs['blank'] = True
+        # We have our own limit_choices_to implementation.
+        self._limit_choices_to = kwargs.pop('limit_choices_to', None)
         super(ReferenceChoiceField, self).__init__(*args, **kwargs)
 
     def _validate_relation(self, field, model, cls):
@@ -491,6 +493,7 @@ class ReferenceChoiceField(models.ForeignKey):
             'label': text.capfirst(self.verbose_name),
             'help_text': self.help_text,
             'choices_model': self.rel.to,
+            'limit_choices_to': self._limit_choices_to,
         }
 
         return form_fields.ReferenceChoiceFormField(**defaults)

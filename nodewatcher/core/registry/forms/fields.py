@@ -133,6 +133,8 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
         self.choices_rid = choices_model._registry.registry_id
         self.filter_model = choices_model
         self.partially_validated_tree = None
+        self.limit_choices_to = kwargs.pop('limit_choices_to', None) or (lambda model: True)
+        kwargs['widget'] = widgets.Select(attrs={'class': 'registry_form_selector'})
         kwargs['empty_value'] = None
         super(ReferenceChoiceFormField, self).__init__(*args, **kwargs)
 
@@ -156,10 +158,15 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
         Limits the valid choices to items from the partially validated configuration.
         """
 
-        self.choices = [
+        self.choices = []
+
+        if not self.required:
+            self.choices += fields.BLANK_CHOICE_DASH
+
+        self.choices += [
             (index, model)
             for index, model in enumerate(cfg.get(self.choices_rid, []))
-            if isinstance(model, self.filter_model)
+            if isinstance(model, self.filter_model) and self.limit_choices_to(model)
         ]
 
         # Store the partially validated tree on which the choices are based
@@ -168,7 +175,10 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
     def prepare_value(self, value):
         if isinstance(value, self.filter_model):
             for index, model in self.choices:
-                if value.pk == model.pk:
+                if index == '':
+                    continue
+
+                if value.pk == model.pk or value.pk == getattr(model, '_original_pk', ''):
                     return index
 
         return super(ReferenceChoiceFormField, self).prepare_value(value)
@@ -183,7 +193,7 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
                 return None
 
             return model
-        except (KeyError, IndexError, TypeError):
+        except (KeyError, IndexError, TypeError, ValueError):
             return None
 
     def valid_value(self, value):
@@ -191,6 +201,9 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
             return True
 
         for index, model in self.choices:
+            if index == '':
+                continue
+
             if isinstance(model, models.Model):
                 try:
                     if value == self.partially_validated_tree[self.choices_rid][index]:

@@ -39,6 +39,14 @@ def tunneldigger(node, cfg):
         broker.uuid = node.uuid
         broker.interface = ifname
 
+        # Bind to specific interface when configured.
+        if interface.uplink_interface:
+            section = cfg.network.find_named_section('interface', _managed_by=interface.uplink_interface)
+            if not section:
+                raise cgm_base.ValidationError(_("Configured Tunneldigger uplink interface not found."))
+
+            broker.bind_interface = section.get_key()
+
         # Configure downstream limits if any are defined for this interface
         for limit in interface.limits.filter(enabled=True):
             limit = limit.cast()

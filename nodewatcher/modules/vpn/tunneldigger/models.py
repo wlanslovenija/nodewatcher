@@ -48,6 +48,13 @@ class TunneldiggerInterfaceConfig(cgm_models.InterfaceConfig, cgm_models.Routabl
 
     mac = registry_fields.MACAddressField(auto_add=True)
     server = registry_fields.ModelRegistryChoiceField(TunneldiggerServer, limit_choices_to={'enabled': True})
+    uplink_interface = registry_fields.ReferenceChoiceField(
+        cgm_models.InterfaceConfig,
+        # Limit choices to interfaces selected as uplinks.
+        limit_choices_to=lambda model: getattr(model, 'uplink', False),
+        related_name='+',
+        help_text=_("Select this if you want to bind the tunnel only to a specific interface."),
+    )
 
     class RegistryMeta(cgm_models.InterfaceConfig.RegistryMeta):
         registry_name = _("Tunneldigger Interface")

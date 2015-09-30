@@ -956,7 +956,7 @@ def network(node, cfg):
 
         if isinstance(interface, cgm_models.BridgeInterfaceConfig):
             iface_name = device.get_bridge_mapping('openwrt', interface)
-            iface = cfg.network.add(interface=iface_name)
+            iface = cfg.network.add(interface=iface_name, managed_by=interface)
             iface.type = 'bridge'
 
             # Configure bridge interfaces
@@ -1005,7 +1005,7 @@ def network(node, cfg):
                     _("The target device does not support USB, so mobile interface cannot be configured!")
                 )
 
-            iface = cfg.network.add(interface=interface.device)
+            iface = cfg.network.add(interface=interface.device, managed_by=interface)
 
             if interface.uplink:
                 iface._uplink = True
@@ -1133,7 +1133,7 @@ def network(node, cfg):
                 continue
 
             try:
-                iface = cfg.network.add(interface=interface.eth_port)
+                iface = cfg.network.add(interface=interface.eth_port, managed_by=interface)
             except ValueError:
                 raise cgm_base.ValidationError(
                     _("Duplicate interface definition for port '%s'!") % interface.eth_port
@@ -1308,7 +1308,7 @@ def network(node, cfg):
                     # Wireless interfaces are reverse-configured to be part of a bridge
                     wif.network = bridge.name
                 else:
-                    iface = cfg.network.add(interface=vif_name)
+                    iface = cfg.network.add(interface=vif_name, managed_by=vif)
                     wif.network = vif_name
 
                     if vif.uplink:
