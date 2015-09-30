@@ -36,6 +36,14 @@ def commotion_network(node, cfg):
             iface['class'] = 'mesh'
         elif network.network_class == 'client':
             iface['class'] = 'client'
+
+            # Configure DHCP for client network class.
+            dhcp = cfg.dhcp.add(dhcp=name)
+            dhcp.interface = name
+            dhcp.start = 2
+            dhcp.limit = 150
+            dhcp.leasetime = 900
+            dhcp.ignore = False
         elif network.network_class == 'wired':
             iface['class'] = 'wired'
         else:
