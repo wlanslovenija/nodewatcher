@@ -13,7 +13,7 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
     architecture = 'ar71xx'
     usb = True
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio (2.4 GHz)", [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,
@@ -25,7 +25,7 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
         ], [
             cgm_devices.DeviceRadio.MultipleSSID,
         ]),
-        cgm_devices.IntegratedRadio('wifi1', "Wifi1", [
+        cgm_devices.IntegratedRadio('wifi1', "Integrated wireless radio (5 GHz)", [
             cgm_protocols.IEEE80211AN(
                 cgm_protocols.IEEE80211AN.SHORT_GI_20,
                 cgm_protocols.IEEE80211AN.SHORT_GI_40,
