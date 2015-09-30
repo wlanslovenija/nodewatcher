@@ -1,5 +1,6 @@
+from django.utils import crypto
+
 from nodewatcher.core.generator.cgm import models as cgm_models
-from nodewatcher.core.generator.cgm import devices as cgm_devices
 from nodewatcher.core.registry import forms as registry_forms, registration
 
 from nodewatcher.modules.administration.types import models as type_models
@@ -76,6 +77,24 @@ class DefaultTelemetrySource(registry_forms.FormDefaults):
             state.update_item(telemetry_config, source='push')
 
 registration.point('node.config').add_form_defaults(DefaultTelemetrySource())
+
+
+class DefaultPassword(registry_forms.FormDefaults):
+    def set_defaults(self, state, create):
+        # If we are not creating a new node, ignore this.
+        if not create:
+            return
+
+        # Generate a default random password in case no authentication is configured.
+        try:
+            state.filter_items('core.authentication')[0]
+        except IndexError:
+            state.append_item(
+                cgm_models.PasswordAuthenticationConfig,
+                password=crypto.get_random_string(),
+            )
+
+registration.point('node.config').add_form_defaults(DefaultPassword())
 
 
 class NetworkConfiguration(registry_forms.FormDefaults):
