@@ -11,6 +11,7 @@ class DeliberantGeneric(cgm_devices.DeviceBase):
     manufacturer = "Deliberant"
     url = 'https://www.deliberant.com/'
     architecture = 'ar71xx'
+    usb = True
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
             cgm_protocols.IEEE80211AN(
