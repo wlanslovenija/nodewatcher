@@ -82,6 +82,28 @@ def commotion_network(node, cfg):
     dnsmasq.resolvfile = '/tmp/resolv.conf.auto'
     dnsmasq.addnhosts = ['/var/run/hosts_olsr']
 
+    # Configure uhttpd defaults.
+    uhttpd = cfg.uhttpd.add(uhttpd='main')
+    uhttpd.listen_http = ['0.0.0.0:80']
+    uhttpd.listen_https = ['0.0.0.0:443']
+    uhttpd.home = '/www'
+    uhttpd.rfc1918_filter = False
+    uhttpd.max_requests = '2'
+    uhttpd.cert = '/etc/uhttpd.crt'
+    uhttpd.key = '/etc/uhttpd.key'
+    uhttpd.cgi_prefix = '/cgi-bin'
+    uhttpd.script_timeout = '300'
+    uhttpd.network_timeout = '30'
+    uhttpd.tcp_keepalive = True
+
+    cert = cfg.uhttpd.add(cert='px5g')
+    cert.days = '730'
+    cert.bits = '2048'
+    cert.country = 'US'
+    cert.state = 'DC'
+    cert.location = 'Washington'
+    cert.commonname = 'Commotion'
+
     # Ensure commotion packages are installed.
     cfg.packages.update([
         'commotion',
