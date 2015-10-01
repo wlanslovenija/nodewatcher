@@ -574,8 +574,6 @@ def prepare_forms(context):
                 )
 
             for mdl in existing_models_qs:
-                mdl = mdl.cast()
-
                 # When we are looking for existing top-level objects in object hierarchy, we should
                 # skip those that have the parent link set to a non-NULL value.
                 if context.hierarchy_parent_cls is None and mdl._registry.has_parent():
