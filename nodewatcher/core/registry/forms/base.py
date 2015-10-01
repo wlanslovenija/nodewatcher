@@ -1,5 +1,6 @@
 import collections
 import copy
+import json
 
 from django import forms as django_forms, template, db as django_db
 from django.conf import settings
@@ -811,6 +812,20 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
         flags=flags,
     )
 
+    # Parse form actions.
+    if data:
+        form_actions = json.loads(data.get('ACTIONS', '{}'))
+    else:
+        form_actions = {}
+
+    for action, options in form_actions.items():
+        if action == 'defaults':
+            context.form_state.set_using_defaults(options['value'])
+        elif action == 'simple_mode':
+            # Simple mode should also automatically enable defaults.
+            if options['value']:
+                context.form_state.set_using_defaults(True)
+
     if flags & FORM_SET_DEFAULTS:
         context.form_state.set_using_defaults(flags & FORM_DEFAULTS_ENABLED)
 
@@ -832,7 +847,16 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
         forms = RootRegistryRenderItem(context, prepare_forms(context))
 
         if flags & (FORM_DEFAULTS | FORM_ONLY_DEFAULTS):
-            # Set form defaults.
+            # Apply form actions before applying defaults.
+            for action, options in form_actions.items():
+                if action == 'append':
+                    context.form_state.append_default_item(options['registry_id'], options['parent_id'])
+                elif action == 'remove':
+                    context.form_state.remove_item(options['index'])
+                elif action == 'simple_mode':
+                    context.form_state.set_using_simple_mode(options['value'])
+
+            # Apply form defaults.
             context.form_state.apply_form_defaults(regpoint, flags & FORM_ROOT_CREATE)
 
             if flags & FORM_ONLY_DEFAULTS:
