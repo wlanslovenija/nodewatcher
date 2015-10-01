@@ -82,7 +82,7 @@ class RemoveFormAction(RegistryFormAction):
         if self.parent != context.hierarchy_parent_current or len(self.indices) < 1:
             return False
 
-        # Move form data as forms might be renumbered
+        # Move form data as forms might be renumbered.
         form_prefix = context.base_prefix + '_mu_'
         reduce_by = 0
         for i in xrange(context.user_form_count):
@@ -105,7 +105,7 @@ class RemoveFormAction(RegistryFormAction):
 
                 if postfix is not None:
                     new_key = key.replace(form_prefix + str(i) + postfix, form_prefix + str(i - reduce_by) + postfix)
-                    context.data[new_key] = context.data[key]
+                    context.data.setlist(new_key, context.data.getlist(key))
                     del context.data[key]
 
         # Reduce form count depending on how many forms have been removed
@@ -182,19 +182,17 @@ class AssignToFormAction(RegistryFormAction):
     An action that assigns to an existing form.
     """
 
-    def __init__(self, item, index, fields, parent=None):
+    def __init__(self, item, fields, parent=None):
         """
         Class constructor.
 
         :param item: Configuration item
-        :param index: Subform index
         :param fields: A list of fields to assign
         :param parent: Optional partial parent item
         """
 
         super(AssignToFormAction, self).__init__()
         self.item = item
-        self.index = index
         self.fields = fields
         self.parent = parent
 
@@ -206,7 +204,7 @@ class AssignToFormAction(RegistryFormAction):
         if self.parent != context.hierarchy_parent_current:
             return
 
-        if self.index != index:
+        if self.item._registry_virtual_child_index != index:
             return
 
         # Modify any overriden values.

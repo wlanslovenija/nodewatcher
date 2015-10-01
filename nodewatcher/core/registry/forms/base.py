@@ -504,13 +504,14 @@ class RegistryFormContext(object):
             value = [value]
 
         field_name = self.get_prefix(prefix, item, field)
+        data.setlist(field_name, [])
         for scalar_value in value:
             # References to virtual registry models should be replaced with their indices in
             # the virtual form state tree to be handled correctly (as they are not actual models).
             if hasattr(scalar_value, '_registry_virtual_model'):
                 scalar_value = scalar_value._registry_virtual_child_index
 
-            data.update({field_name: scalar_value})
+            data.appendlist(field_name, scalar_value)
 
 
 def prepare_forms(context):

@@ -246,7 +246,6 @@ class FormState(dict):
                 item._registry.registry_id,
                 actions.AssignToFormAction(
                     item,
-                    item._registry_virtual_child_index,
                     modified,
                     parent=item.get_registry_parent(),
                 ),
