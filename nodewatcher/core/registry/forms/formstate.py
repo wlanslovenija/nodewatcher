@@ -197,11 +197,18 @@ class FormState(dict):
                 )
 
             # Update indices and identifiers of other items in the same container.
-            for sibling in container:
-                sibling._registry_virtual_child_index = container.index(sibling)
-                del self._item_map[sibling._id]
-                sibling._id = self.get_identifier(sibling)
-                self._item_map[sibling._id] = sibling
+            def update_item_ids(container):
+                for item in container:
+                    item._registry_virtual_child_index = container.index(item)
+                    del self._item_map[item._id]
+                    item._id = self.get_identifier(item)
+                    self._item_map[item._id] = item
+
+                    # Recompute all child indices.
+                    for children in getattr(item, '_registry_virtual_relation', {}).values():
+                        update_item_ids(children)
+
+            update_item_ids(container)
 
     def remove_item(self, identifier_or_item):
         """
