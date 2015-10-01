@@ -273,6 +273,28 @@ class FormState(dict):
 
         return item
 
+    def get_default_item_class(self, registry_id, parent_class=None):
+        """
+        Returns the default registry item class for a specific registry id
+        and parent class.
+
+        :param registry_id: Registry identifier
+        :param parent_class: Optional parent class
+        :return: Item class that may be used as default
+        """
+
+        items = self.registration_point.get_children(parent=parent_class, registry_id=registry_id)
+
+        # Remove all items that should not be visible.
+        for key, item_class in items.items():
+            if item_class._registry.is_hidden():
+                del items[key]
+
+        if not items:
+            return None
+
+        return items.values()[0]
+
     def append_default_item(self, registry_id, parent_identifier=None):
         """
         Appends a default item to a specified part of form state.
@@ -281,13 +303,10 @@ class FormState(dict):
         :param parent_identifier: Optional identifier of the parent object
         """
 
-        from . import actions
-
-        # Validate that the specified registry identifier is actually correct.
-        self.registration_point.get_top_level_class(registry_id)
-
         parent = self.lookup_item_by_id(parent_identifier) if parent_identifier else None
-        self.add_form_action(registry_id, actions.AppendFormAction(None, parent))
+        item_class = self.get_default_item_class(registry_id, parent.__class__ if parent else None)
+        if item_class is not None:
+            self.append_item(item_class, parent)
 
     def get_identifier(self, item):
         """

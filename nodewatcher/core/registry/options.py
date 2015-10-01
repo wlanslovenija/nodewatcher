@@ -107,13 +107,20 @@ class Options(object):
 
         return self.registration_point.get_top_level_class(self.registry_id)
 
+    def is_toplevel_class(self):
+        """
+        Returns True if this is the toplevel class for this registry id.
+        """
+
+        return self.model_class.__base__ == self.registration_point.item_base
+
     def get_lookup_chain(self):
         """
         Returns a query filter "chain" that can be used for performing root lookups with
         fields that are part of some registry object.
         """
 
-        if self.model_class.__base__ == self.registration_point.item_base:
+        if self.is_toplevel_class():
             return '%(namespace)s_%(app_label)s_%(model_name)s' % {
                 'namespace': self.registration_point.namespace,
                 'app_label': self.model_class._meta.app_label,
@@ -126,3 +133,10 @@ class Options(object):
                         'base_chain': base._registry.get_lookup_chain(),
                         'model_name': self.model_class._meta.model_name,
                     }
+
+    def is_hidden(self):
+        """
+        Returns True if this registry item class should be hidden.
+        """
+
+        return (self.hidden and self.is_toplevel_class()) or self.hide_requests > 0

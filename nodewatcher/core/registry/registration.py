@@ -328,7 +328,7 @@ class RegistrationPoint(object):
 
         return issubclass(model, self.item_base)
 
-    def get_children(self, parent=None):
+    def get_children(self, parent=None, registry_id=None):
         """
         Returns the child registry item classes that are available under the given
         parent registry item (via internal foreign key relationships). If None is
@@ -339,9 +339,14 @@ class RegistrationPoint(object):
         """
 
         if parent is None:
-            return self.item_object_toplevel.values()
+            container = self.item_object_toplevel
         else:
-            return parent._registry.item_children.values()
+            container = parent._registry.item_children
+
+        if registry_id is None:
+            return container.values()
+
+        return container.get(registry_id, {}).copy()
 
     def get_top_level_queryset(self, root, registry_id):
         """

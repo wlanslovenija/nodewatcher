@@ -168,7 +168,7 @@ class AppendFormAction(RegistryFormAction):
             context,
             form_prefix,
             form_data,
-            len(context.subforms),
+            item._registry_virtual_child_index,
             instance=item,
             force_selector_widget=context.force_selector_widget,
         ))
