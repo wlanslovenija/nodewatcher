@@ -5,7 +5,7 @@ import string
 from django import dispatch
 from django.core import exceptions
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from guardian import shortcuts
 from timedelta import fields as timedelta_fields
@@ -173,9 +173,9 @@ class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     def __unicode__(self):
         if not self.name:
-            return _("Bridge interface (unnamed)")
+            return ugettext("Bridge interface (unnamed)")
 
-        return _("Bridge interface (%(name)s)") % {'name': self.name}
+        return ugettext("Bridge interface (%(name)s)") % {'name': self.name}
 
 registration.point('node.config').register_item(BridgeInterfaceConfig)
 
@@ -194,9 +194,9 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
 
     def __unicode__(self):
         if not self.eth_port:
-            return _("Ethernet interface (unbound)")
+            return ugettext("Ethernet interface (unbound)")
 
-        return _("Ethernet interface (%(eth_port)s)") % {'eth_port': self.get_eth_port_display()}
+        return ugettext("Ethernet interface (%(eth_port)s)") % {'eth_port': self.get_eth_port_display()}
 
 registration.point('node.config').register_item(EthernetInterfaceConfig)
 
@@ -300,9 +300,9 @@ class MobileInterfaceConfig(InterfaceConfig):
 
     def __unicode__(self):
         if not self.device:
-            return _("Mobile interface (unbound)")
+            return ugettext("Mobile interface (unbound)")
 
-        return _("Mobile interface (%(device)s)") % {'device': self.get_device_display()}
+        return ugettext("Mobile interface (%(device)s)") % {'device': self.get_device_display()}
 
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp0', _("PPP over USB0")))
 registration.point('node.config').register_choice('core.interfaces#mobile_device', registration.Choice('ppp1', _("PPP over USB1")))
