@@ -91,7 +91,7 @@ class FormState(dict):
         if item is not None:
             self._form_action_dependencies.setdefault(id(item), []).append(action)
 
-    def filter_items(self, registry_id, item_id=None, klass=None, parent=None, **kwargs):
+    def filter_items(self, registry_id, item_id=None, klass=None, parent=None, filter=None, **kwargs):
         """
         Filters form state items based on specified criteria.
 
@@ -99,6 +99,7 @@ class FormState(dict):
         :param item_id: Optional item identifier filter
         :param klass: Optional item class filter
         :param parent: Optional parent instance filter
+        :param filter: Optional filter callable
         :return: A list of form state items
         """
 
@@ -128,6 +129,10 @@ class FormState(dict):
             for item in items_container:
                 # Filter based on specified class.
                 if klass is not None and item.__class__ != klass:
+                    continue
+
+                # Filter based on custom callable.
+                if filter is not None and not filter(item):
                     continue
 
                 # Filter based on partial values.

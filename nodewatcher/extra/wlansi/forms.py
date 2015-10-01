@@ -181,7 +181,15 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             mobile_defaults = mobile_interface
             break
 
-        state.remove_items('core.interfaces')
+        def filter_remove_item(item):
+            # Do not remove tunneldigger interfaces as they are already handled by other
+            # defaults handlers.
+            if isinstance(item, td_models.TunneldiggerInterfaceConfig):
+                return False
+
+            # Remove everything else.
+            return True
+        state.remove_items('core.interfaces', filter=filter_remove_item)
 
         # Ethernet.
 
