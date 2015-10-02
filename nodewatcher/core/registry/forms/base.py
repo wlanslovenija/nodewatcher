@@ -880,7 +880,10 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
 
                     if form.is_valid():
                         # Save the form and store the instance into partial configuration so
-                        # dependent objects can reference the new instance
+                        # dependent objects can reference the new instance. Before we save,
+                        # we also store the form's index into the display_order attribute of
+                        # the instances, so that we preserve order when loading back from db.
+                        form.instance.display_order = info['index']
                         instance = form.save()
                         # Only overwrite instances at the top layer (forms which have no dependencies
                         # on anything else). Models with dependencies will already be updated when

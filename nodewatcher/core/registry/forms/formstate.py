@@ -508,7 +508,7 @@ class FormState(dict):
 
         # Register all parent links as virtual relations.
         while pending_children:
-            convert_child_item(*pending_children.pop())
+            convert_child_item(*pending_children.pop(0))
 
         return form_state
 

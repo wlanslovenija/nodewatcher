@@ -1,3 +1,5 @@
+from django.db import models
+
 import json_field
 import polymorphic
 from polymorphic import base as polymorphic_base
@@ -23,6 +25,9 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
 
     # Upon registration, this attribute is replaced with an actual ForeignKey.
     root = None
+    # Item display order so that we can load items back from the database in the same
+    # order that they were shown on any edit forms.
+    display_order = models.IntegerField(null=True, editable=False)
     # Custom item annotations.
     annotations = json_field.JSONField(default={}, editable=False)
 
@@ -31,7 +36,7 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
 
     class Meta:
         abstract = True
-        ordering = ['id']
+        ordering = ['display_order', 'id']
 
     def get_registry_parent(self):
         """
