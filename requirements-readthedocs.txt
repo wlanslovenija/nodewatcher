@@ -49,3 +49,4 @@ requests==2.5.1
 unidecode==0.04.18
 ijson==2.2
 py-radix==0.9.3
+django-oauth-toolkit==0.9.0

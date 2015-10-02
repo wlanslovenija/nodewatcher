@@ -294,6 +294,10 @@ INSTALLED_APPS = (
     'nodewatcher.modules.sensors.generic',
     'nodewatcher.modules.defaults.network_profile',
 
+    # OAuth2 authentication.
+    'nodewatcher.modules.authentication.oauth.apps.OAuthAuthenticationConfig',
+    'nodewatcher.modules.authentication.oauth.apps.OAuth2ProviderConfig',
+
     # Defaults for wlan slovenia network.
     'nodewatcher.extra.wlansi',
 
