@@ -157,6 +157,24 @@ class UBNTLocoM5XW(UBNTLocoM5):
         }
     }
 
+
+class UBNTNanobridgeM5(UBNTLocoM5):
+    """
+    UBNT Nanobridge M5 device descriptor.
+    """
+
+    identifier = 'ub-nanobridge-m5'
+    name = "Nanobridge M5"
+
+
+class UBNTNanobridgeM2(UBNTLocoM2):
+    """
+    UBNT Nanobridge M2 device descriptor.
+    """
+
+    identifier = 'ub-nanobridge-m2'
+    name = "Nanobridge M2"
+
 # Register the UBNT Nano device.
 cgm_base.register_device('openwrt', UBNTNanoM2)
 cgm_base.register_device('openwrt', UBNTNanoM5)
@@ -164,3 +182,5 @@ cgm_base.register_device('openwrt', UBNTNanoM5XW)
 cgm_base.register_device('openwrt', UBNTLocoM2)
 cgm_base.register_device('openwrt', UBNTLocoM5)
 cgm_base.register_device('openwrt', UBNTLocoM5XW)
+cgm_base.register_device('openwrt', UBNTNanobridgeM5)
+cgm_base.register_device('openwrt', UBNTNanobridgeM2)
