@@ -242,6 +242,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         cgm_models.DHCPNetworkConfig,
                     )
 
+            clients_interface = None
             if node_type != 'server':
                 # Create a clients bridge.
                 if 'nat-clients' in network_profiles:
@@ -317,7 +318,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
                 if lan_port:
                     # Setup routing/clients interface.
-                    if 'no-lan-bridge' in network_profiles:
+                    if ('no-lan-bridge' in network_profiles or not clients_interface):
                         # Use LAN port only for routing, do not bridge with clients.
                         lan_interface = self.setup_interface(
                             state,
