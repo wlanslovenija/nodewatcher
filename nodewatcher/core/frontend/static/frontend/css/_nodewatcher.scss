@@ -125,3 +125,17 @@ footer {
 .icon {
     cursor: pointer;
 }
+
+.logtext {
+    font-family: $font-family-monospace;
+    display: block;
+    max-height: 400px;
+    font-size: 80%;
+    overflow: auto;
+    background-color: $gray-lighter;
+    border-style: solid;
+    border-width: 1px;
+    border-color: $gray-light;
+    border-radius: $border-radius-base;
+    padding: 10px;
+}

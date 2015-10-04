@@ -40,5 +40,58 @@ components.menus.get_menu('accounts_menu').add(components.MenuEntry(
     visible=lambda menu_entry, request, context: request.user.is_authenticated(),
 ))
 
-
 components.partials.register(components.Partial('generator_view_build_partial'))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='node',
+    template='nodes/general/name.html',
+    extra_context=lambda context: {} if 'node' in context else {
+        'node': context['build'].node
+    },
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='created',
+    template='generator/build/created.html',
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='updated',
+    template='generator/build/updated.html',
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='status',
+    template='generator/build/status.html',
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='channel',
+    template='generator/build/channel.html',
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='channel',
+    template='generator/builder/name.html',
+    extra_context=lambda context: {} if 'builder' in context else {
+        'builder': context['build'].builder
+    },
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='channel',
+    template='generator/builder/version.html',
+    extra_context=lambda context: {} if 'builder' in context else {
+        'builder': context['build'].builder
+    },
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='files',
+    template='generator/build/files.html',
+))
+
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='log',
+    template='generator/build/log.html',
+))

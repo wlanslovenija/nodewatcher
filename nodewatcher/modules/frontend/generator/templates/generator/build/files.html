@@ -1,0 +1,19 @@
+{% load i18n path_tags %}
+<div class="row snippet build-files">
+<div class="col-md-2 key">{% trans "Firmware files" %}</div>
+<div class="col-md-10 value">
+	{% if build.files.visible_only %}
+    <ul>
+        {% for fo in build.files.visible_only %}
+        <li>
+            <a href="{{ fo.file.url }}">{{ fo.file|basename }}</a><br/>
+            MD5: {{ fo.checksum_md5 }}<br/>
+            SHA256: {{ fo.checksum_sha256 }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    {% trans "N/A" %}
+    {% endif %}
+</div>
+</div>

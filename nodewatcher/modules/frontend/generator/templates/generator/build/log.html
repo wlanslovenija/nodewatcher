@@ -1,0 +1,7 @@
+{% load i18n %}
+<div class="row snippet build-log">
+<div class="col-md-2 key">{% trans "Build log" %}</div>
+<div class="col-md-10 value">
+	<tt class="logtext">{{ build.build_log|default:_("N/A") }}</tt>
+</div>
+</div>

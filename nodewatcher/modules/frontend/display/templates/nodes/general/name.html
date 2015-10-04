@@ -1,5 +1,6 @@
-{% load i18n %}
+{% load i18n registry %}
+{% url "DisplayComponent:node" result.node.pk as node_url %}
 <div class="row snippet node-name">
 <div class="col-md-2 key">{% trans "Node name" %}</div>
-<div class="col-md-10 value">{{ node_name }}</div>
+<div class="col-md-10 value"><a href="{{ node_url }}">{% registry_get node "config" "core.general" "name" %}</a></div>
 </div>
