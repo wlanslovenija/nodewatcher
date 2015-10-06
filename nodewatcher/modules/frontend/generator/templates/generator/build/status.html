@@ -1,5 +1,5 @@
 {% load i18n generator_tags %}
 <div class="row snippet build-status">
-<div class="col-md-2 key">{% trans "Status" %}</div>
-<div class="col-md-10 value">{% generator_status_icon build.status "normal" %} {{ build.get_status_display }}</div>
+    <div class="col-md-2 key">{% trans "Status" %}</div>
+    <div class="col-md-10 value">{% generator_status_icon build.status "normal" %} {{ build.get_status_display }}</div>
 </div>
