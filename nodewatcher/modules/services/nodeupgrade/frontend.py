@@ -11,11 +11,11 @@ def filter_platform(platform):
             return False
 
         # Only display instructions when build has successfully completed.
-        if context['result'].status != generator_models.BuildResult.OK:
+        if context['build'].status != generator_models.BuildResult.OK:
             return False
 
         # Only display instructions for the correct platform.
-        if context['result'].builder.platform != platform:
+        if context['build'].builder.platform != platform:
             return False
 
         return True
