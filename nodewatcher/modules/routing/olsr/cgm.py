@@ -83,6 +83,10 @@ def olsr(node, cfg):
     try:
         router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
         olsrd.MainIp = router_id
+    except core_models.RouterIdConfig.MultipleObjectsReturned:
+        raise cgm_base.ValidationError(
+            _("OLSR routing configured with multiple router IDs. Only one address should be configured.")
+        )
     except core_models.RouterIdConfig.DoesNotExist:
         raise cgm_base.ValidationError(
             _("OLSR routing configured, but router ID is missing! In order to use OLSR, the node must have a configured primary IP address.")

@@ -86,43 +86,43 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
         node_available = bool(context.node_available)
 
         http_context = context.create('http', HTTPTelemetryContext)
-        try:
-            http_context.successfully_parsed = False
+        http_context.successfully_parsed = False
 
-            # If the node is not marked as available, we should skip telemetry parsing
-            if not node_available:
-                return context
+        # If the node is not marked as available, we should skip telemetry parsing
+        if not node_available:
+            return context
 
-            if not push:
-                router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-                parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
-            else:
-                parser = telemetry_parser.HttpTelemetryParser(data=context.push.data)
-
-            # Fetch information from the router and merge it into local context
+        if not push:
             try:
-                parser.parse_into(http_context)
-                if http_context._meta.version == 2:
-                    # TODO: Add a warning that the node is using a legacy feed
-                    pass
-                http_context.successfully_parsed = True
+                router_id = node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
+            except IndexError:
+                # No router-id for this node can be found for IPv4.
+                pass
+
+            parser = telemetry_parser.HttpTelemetryParser(router_id, 80)
+        else:
+            parser = telemetry_parser.HttpTelemetryParser(data=context.push.data)
+
+        # Fetch information from the router and merge it into local context
+        try:
+            parser.parse_into(http_context)
+            if http_context._meta.version == 2:
+                # TODO: Add a warning that the node is using a legacy feed
+                pass
+            http_context.successfully_parsed = True
+            context.node_responds = True
+
+            # Remove the warning if it is present.
+            if hasattr(node.config.core.general(), 'router'):
+                monitor_events.TelemetryProcessingFailed(node, method='http').absent()
+        except telemetry_parser.HttpTelemetryParseFailed:
+            # If the node responded in some way, set the appropriate flag.
+            if parser.node_responds:
                 context.node_responds = True
 
-                # Remove the warning if it is present.
-                if hasattr(node.config.core.general(), 'router'):
-                    monitor_events.TelemetryProcessingFailed(node, method='http').absent()
-            except telemetry_parser.HttpTelemetryParseFailed:
-                # If the node responded in some way, set the appropriate flag.
-                if parser.node_responds:
-                    context.node_responds = True
-
-                # Create a warning in case the router has an associated firmware configuration.
-                if hasattr(node.config.core.general(), 'router') and context.node_responds:
-                    monitor_events.TelemetryProcessingFailed(node, method='http').post()
-        except core_models.RouterIdConfig.DoesNotExist:
-            # No router-id for this node can be found for IPv4; this means
-            # that we have nothing to do here
-            pass
+            # Create a warning in case the router has an associated firmware configuration.
+            if hasattr(node.config.core.general(), 'router') and context.node_responds:
+                monitor_events.TelemetryProcessingFailed(node, method='http').post()
 
         return context
 

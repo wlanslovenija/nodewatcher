@@ -1,4 +1,3 @@
-from nodewatcher.core import models as core_models
 from nodewatcher.core.generator.cgm import base as cgm_base
 
 # These must be the same as defined in package 'identity-pubkey'.
@@ -16,13 +15,13 @@ def public_key_identity(node, cfg):
     uhttpd = cfg.uhttpd.find_named_section('uhttpd')
     if uhttpd and uhttpd.listen_http:
         try:
-            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+            router_id = node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
             uhttpd.listen_https = ['%s:443' % router_id]
             uhttpd.cert = IDENTITY_CERTIFICATE_LOCATION
             uhttpd.key = IDENTITY_KEY_LOCATION
 
             cfg.packages.add('uhttpd-mod-tls')
-        except core_models.RouterIdConfig.DoesNotExist:
+        except IndexError:
             pass
 
     # Configure nodewatcher-agent so it will use the generated keys for authentication

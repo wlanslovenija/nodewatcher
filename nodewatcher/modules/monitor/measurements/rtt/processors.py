@@ -44,10 +44,12 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
             return context, nodes
 
         # Prepare a list of node IPv4 addresses
-        node_ips = [
-            str(node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id)
-            for node in nodes
-        ]
+        node_ips = []
+        for node in nodes:
+            try:
+                node_ips.append(str(node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id))
+            except IndexError:
+                continue
 
         # If there are no node IPs skip the measurement procedure
         if not node_ips:
@@ -161,40 +163,40 @@ class StoreNode(monitor_processors.NodeProcessor):
         """
 
         try:
-            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-            results = context.rtt.results.get(router_id, None)
-            context.node_available = False
-            context.node_responds = False
-            if not results:
-                return context
-            else:
-                context.node_available = True
+            router_id = node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
+        except IndexError:
+            # No router-id for this node can be found for IPv4; this means that we have nothing to do here.
+            return context
 
-            # Store results into monitoring schema
-            for size, result in results.iteritems():
-                rm, _ = monitor_models.RttMeasurementMonitor.objects.get_or_create(
-                    root=node,
-                    packet_size=size,
-                    source=context.rtt.source_node,
-                )
-                rm.start = context.rtt.meta[size]['start']
-                rm.end = context.rtt.meta[size]['end']
-                rm.all_packets = result['sent']
-                rm.successful_packets = result['successful']
-                rm.failed_packets = result['failed']
-                rm.rtt_minimum = result['rtt_min']
-                rm.rtt_average = result['rtt_avg']
-                rm.rtt_maximum = result['rtt_max']
-                rm.rtt_std = result['rtt_std']
-                rm.packet_loss = 100 * rm.failed_packets / rm.all_packets
-                rm.save()
+        results = context.rtt.results.get(router_id, None)
+        context.node_available = False
+        context.node_responds = False
+        if not results:
+            return context
+        else:
+            context.node_available = True
 
-                # Mark the node as responding if at least one packet was delivered
-                if rm.successful_packets > 0:
-                    context.node_responds = True
-        except core_models.RouterIdConfig.DoesNotExist:
-            # No router-id for this node can be found for IPv4; this means
-            # that we have nothing to do here
-            pass
+        # Store results into monitoring schema
+        for size, result in results.iteritems():
+            rm, _ = monitor_models.RttMeasurementMonitor.objects.get_or_create(
+                root=node,
+                packet_size=size,
+                source=context.rtt.source_node,
+            )
+            rm.start = context.rtt.meta[size]['start']
+            rm.end = context.rtt.meta[size]['end']
+            rm.all_packets = result['sent']
+            rm.successful_packets = result['successful']
+            rm.failed_packets = result['failed']
+            rm.rtt_minimum = result['rtt_min']
+            rm.rtt_average = result['rtt_avg']
+            rm.rtt_maximum = result['rtt_max']
+            rm.rtt_std = result['rtt_std']
+            rm.packet_loss = 100 * rm.failed_packets / rm.all_packets
+            rm.save()
+
+            # Mark the node as responding if at least one packet was delivered
+            if rm.successful_packets > 0:
+                context.node_responds = True
 
         return context

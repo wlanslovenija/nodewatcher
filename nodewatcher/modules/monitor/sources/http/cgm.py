@@ -18,7 +18,7 @@ def general(node, cfg):
     agent = cfg.nodewatcher.add('agent')
 
     try:
-        router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+        router_id = node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
 
         # Configure the uhttpd server.
         uhttpd = cfg.uhttpd.add(uhttpd='main')
@@ -36,7 +36,7 @@ def general(node, cfg):
         agent.output_json = '/www/nodewatcher/feed'
 
         cfg.packages.add('uhttpd')
-    except core_models.RouterIdConfig.DoesNotExist:
+    except IndexError:
         # In case no router id is configured, do not configure uhttpd as the node will probably
         # only use push for monitoring.
         pass

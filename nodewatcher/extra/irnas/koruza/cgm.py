@@ -21,10 +21,10 @@ def koruza(node, pkgcfg, cfg):
     peer_ip = None
     try:
         # Use the first IPv4 Router ID.
-        peer_ip = pkgcfg.peer_controller.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
+        peer_ip = pkgcfg.peer_controller.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
     except (core_models.Node.DoesNotExist, AttributeError):
         pass
-    except core_models.RouterIdConfig.DoesNotExist:
+    except IndexError:
         raise cgm_base.ValidationError(_("Specified KORUZA controller peer does not have a router ID."))
 
     # Convert serial port.

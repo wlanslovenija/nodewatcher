@@ -577,8 +577,8 @@ def configure_leasable_network(cfg, node, interface, network, iface_name, subnet
     if network.nat_type == 'snat-routed-networks':
         # SNAT using the primary router identifier as source address.
         try:
-            router_id = node.config.core.routerid(queryset=True).get(rid_family='ipv4').router_id
-        except core_models.RouterIdConfig.DoesNotExist:
+            router_id = node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
+        except IndexError:
             raise cgm_base.ValidationError(
                 _("SNAT towards routed networks configured, but router ID is missing! The node must have a configured primary IP address.")
             )
