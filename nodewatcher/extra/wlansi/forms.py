@@ -389,7 +389,11 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         # Wireless.
 
-        radio = device.radios[0]
+        try:
+            radio = device.radios[0]
+        except IndexError:
+            return
+
         radio_defaults = radio_defaults.get(radio.identifier, None)
 
         if not radio:
