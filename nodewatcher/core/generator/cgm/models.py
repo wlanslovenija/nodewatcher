@@ -4,6 +4,7 @@ import string
 
 from django import dispatch
 from django.core import exceptions
+from django.contrib.postgres import fields as postgres_fields
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -234,6 +235,18 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
     connect_to = models.ForeignKey(core_models.Node, blank=True, null=True, related_name='+')
     essid = models.CharField(max_length=50, null=True, verbose_name="ESSID")
     bssid = registry_fields.MACAddressField(verbose_name="BSSID", blank=True, null=True)
+    bitrates_preset = registry_fields.RegistryChoiceField(
+        'node.config',
+        'core.interfaces#wifi_bitrates_preset',
+        null=True,
+        blank=True,
+    )
+    bitrates = postgres_fields.ArrayField(
+        models.CharField(max_length=50),
+        blank=True,
+        null=True,
+        default=[],
+    )
     uplink = models.BooleanField(default=False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
@@ -279,6 +292,10 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('sta', _("STA")))
+registration.point('node.config').register_choice('core.interfaces#wifi_bitrates_preset', registration.Choice(None, _("Allow all supported bitrates")))
+registration.point('node.config').register_choice('core.interfaces#wifi_bitrates_preset', registration.Choice('exclude-80211b', _("Exclude legacy 802.11b bitrates")))
+registration.point('node.config').register_choice('core.interfaces#wifi_bitrates_preset', registration.Choice('exclude-80211bg', _("Exclude legacy 802.11b/g bitrates")))
+registration.point('node.config').register_choice('core.interfaces#wifi_bitrates_preset', registration.Choice('custom', _("Custom bitrate configuration")))
 registration.point('node.config').register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
 
 

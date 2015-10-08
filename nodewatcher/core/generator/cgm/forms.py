@@ -81,9 +81,10 @@ class WifiInterfaceConfigForm(forms.ModelForm):
 
     def modify_to_context(self, item, cfg, request):
         """
-        Handles "connect to existing AP" functionality for STA VIFs.
+        Dynamically configures the wireless interface configuration form.
         """
 
+        # Handle "connect to existing access point" functionality for STA VIFs.
         if item.mode == 'sta':
             self.fields['connect_to'] = AccessPointSelectionField(
                 protocol=item.device.protocol,
@@ -99,6 +100,34 @@ class WifiInterfaceConfigForm(forms.ModelForm):
         else:
             # If mode is not set to STA, hide the connect to field.
             del self.fields['connect_to']
+
+        # Handle bitrate selection.
+        if item.bitrates_preset == 'custom':
+            protocol = None
+            try:
+                protocol = cgm_base.get_platform(
+                    cfg['core.general'][0].platform
+                ).get_device(
+                    cfg['core.general'][0].router
+                ).get_radio(
+                    item.device.wifi_radio
+                ).get_protocol(
+                    item.device.protocol
+                )
+
+                self.fields['bitrates'] = registry_forms.RegistryMultipleChoiceFormField(
+                    label=_("Bitrates"),
+                    choices=list(protocol.get_bitrate_choices()),
+                    required=False,
+                )
+            except (KeyError, IndexError, AttributeError):
+                self.fields['bitrates'] = registry_forms.RegistryMultipleChoiceFormField(
+                    label=_("Bitrates"),
+                    choices=[],
+                )
+        else:
+            # If a preset is selected, hide the manual bitrates configuration field.
+            del self.fields['bitrates']
 
 registration.register_form_for_item(models.WifiInterfaceConfig, WifiInterfaceConfigForm)
 

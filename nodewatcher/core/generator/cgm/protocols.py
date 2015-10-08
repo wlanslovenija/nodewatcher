@@ -43,6 +43,22 @@ class Capability(object):
         self.identifier = identifier
 
 
+class Bitrate(object):
+    """
+    A wireless protocol bitrate.
+    """
+
+    def __init__(self, identifier, description, rate, rate_set):
+        """
+        Class constructor.
+        """
+
+        self.identifier = identifier
+        self.description = description
+        self.rate = rate
+        self.rate_set = rate_set
+
+
 class WirelessProtocolMetaclass(type):
     def __new__(cls, name, bases, attrs):
         new_class = type.__new__(cls, name, bases, attrs)
@@ -53,21 +69,25 @@ class WirelessProtocolMetaclass(type):
         new_class.widths = ()
         new_class.capabilities = set()
         new_class.available_capabilities = set()
+        new_class.bitrates = ()
 
         for base in bases:
             if not hasattr(base, 'identifier'):
                 continue
 
-            # Merge channels from base classes
+            # Merge channels from base classes.
             new_class.channels += base.channels
-            # Merge channel widths from base classes
+            # Merge channel widths from base classes.
             new_class.widths += base.widths
-            # Merge capabilities from base classes
+            # Merge bitrates from base classes.
+            new_class.bitrates += base.bitrates
+            # Merge capabilities from base classes.
             new_class.capabilities.update(base.capabilities)
 
         new_class.channels += attrs.get('channels', ())
         new_class.widths += attrs.get('widths', ())
         new_class.capabilities.update(attrs.get('capabilities', set()))
+        new_class.bitrates += attrs.get('bitrates', ())
 
         for capability in new_class.capabilities:
             setattr(new_class, capability.identifier.replace('-', '_').upper(), capability)
@@ -86,6 +106,7 @@ class WirelessProtocol(object):
     widths = ()
     capabilities = ()
     available_capabilities = ()
+    bitrates = ()
 
     @classmethod
     def get_channel_choices(cls, width, regulatory_filter=None):
@@ -149,6 +170,43 @@ class WirelessProtocol(object):
             if width.identifier == identifier:
                 return width
 
+    @classmethod
+    def get_rate_set(cls, include=None, exclude=None):
+        """
+        Returns all bitrates belonging to a specific rate set.
+        """
+
+        result = []
+        for bitrate in cls.bitrates:
+            if include is not None and bitrate.rate_set not in include:
+                continue
+
+            if exclude is not None and bitrate.rate_set in exclude:
+                continue
+
+            result.append(bitrate)
+
+        return result
+
+    @classmethod
+    def get_bitrate(cls, identifier):
+        """
+        Returns a specific bitrate descriptor.
+        """
+
+        for bitrate in cls.bitrates:
+            if bitrate.identifier == identifier:
+                return bitrate
+
+    @classmethod
+    def get_bitrate_choices(cls):
+        """
+        Returns a list of bitrate choices.
+        """
+
+        for bitrate in cls.bitrates:
+            yield bitrate.identifier, bitrate.description
+
     def __init__(self, *capabilities):
         """
         Sets up available capabilities for this protocol.
@@ -187,6 +245,20 @@ class IEEE80211BG(WirelessProtocol):
         ChannelWidth("nw10", _("10 MHz"), 10),
         ChannelWidth("ht20", _("20 MHz"), 20),
     )
+    bitrates = (
+        Bitrate('legacy-1', _("1 Mbps"), 1, rate_set='802.11b'),
+        Bitrate('legacy-2', _("2 Mbps"), 2, rate_set='802.11b'),
+        Bitrate('legacy-5', _("5.5 Mbps"), 5.5, rate_set='802.11b'),
+        Bitrate('legacy-6', _("6 Mbps"), 6, rate_set='802.11g'),
+        Bitrate('legacy-9', _("9 Mbps"), 9, rate_set='802.11g'),
+        Bitrate('legacy-11', _("11 Mbps"), 11, rate_set='802.11b'),
+        Bitrate('legacy-12', _("12 Mbps"), 12, rate_set='802.11g'),
+        Bitrate('legacy-18', _("18 Mbps"), 18, rate_set='802.11g'),
+        Bitrate('legacy-24', _("24 Mbps"), 24, rate_set='802.11g'),
+        Bitrate('legacy-36', _("36 Mbps"), 36, rate_set='802.11g'),
+        Bitrate('legacy-48', _("48 Mbps"), 48, rate_set='802.11g'),
+        Bitrate('legacy-54', _("54 Mbps"), 54, rate_set='802.11g'),
+    )
 
 
 class IEEE80211BGN(IEEE80211BG):
@@ -223,6 +295,10 @@ class IEEE80211BGN(IEEE80211BG):
             limit_channels=lambda proto, channel: proto.get_channel_number(channel.number + 4) is not None,
         )
     )
+    bitrates = tuple([
+        Bitrate('ht-mcs-%d' % index, _("HT MCS %d") % index, index, rate_set='802.11n')
+        for index in xrange(0, 32)
+    ])
 
 
 class IEEE80211A(WirelessProtocol):
@@ -290,3 +366,7 @@ class IEEE80211AN(IEEE80211A):
             40,
         )
     )
+    bitrates = tuple([
+        Bitrate('ht-mcs-%d' % index, _("HT MCS %d") % index, index, rate_set='802.11n')
+        for index in xrange(0, 32)
+    ])

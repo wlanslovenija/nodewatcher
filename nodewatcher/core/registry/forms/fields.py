@@ -31,10 +31,11 @@ class RegistryChoiceFormFieldMixin(object):
             except (KeyError, IndexError, AttributeError):
                 return None
 
+        current_choices = self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
         prepend_choices = []
-        if not self.accepts_multiple_choices:
+        if not self.accepts_multiple_choices and self.empty_value not in [choice[0] for choice in current_choices]:
             prepend_choices = fields.BLANK_CHOICE_DASH
-        self.choices = prepend_choices + self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
+        self.choices = prepend_choices + current_choices
 
 
 class RegistryChoiceFormField(form_fields.TypedChoiceField, RegistryChoiceFormFieldMixin):

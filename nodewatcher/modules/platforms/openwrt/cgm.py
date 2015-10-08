@@ -1299,6 +1299,30 @@ def network(node, cfg):
                 if not wif.ssid:
                     raise cgm_base.ValidationError(_("ESSID of a wireless interface must not be empty!"))
 
+                # Configure allowed bitrates.
+                bitrates = []
+                if vif.bitrates_preset is None:
+                    # Allow all bitrates, no need to configure anything.
+                    pass
+                elif vif.bitrates_preset == 'exclude-80211b':
+                    bitrates = dsc_protocol.get_rate_set(exclude=['802.11b'])
+                elif vif.bitrates_preset == 'exclude-80211bg':
+                    bitrates = dsc_protocol.get_rate_set(exclude=['802.11b', '802.11g'])
+                elif vif.bitrates_preset == 'custom':
+                    bitrates = [dsc_protocol.get_bitrate(x) for x in vif.bitrates]
+                else:
+                    raise cgm_base.ValidationError(_("Unsupported OpenWrt bitrate preset '%s'!") % vif.bitrates_preset)
+
+                wif.basic_rate = []
+                for bitrate in bitrates:
+                    if bitrate.rate_set in ('802.11b', '802.11g'):
+                        wif.basic_rate.append(int(bitrate.rate * 1000))
+                    elif bitrate.rate_set in ('802.11n',):
+                        # TODO: Configuring HT MCS rates is currently not supported.
+                        pass
+                    else:
+                        raise cgm_base.ValidationError(_("Unsupported OpenWrt bitrate set '%s'!") % bitrate.rate_set)
+
                 # Configure network interface for each vif, first being the primary network
                 vif_name = device.get_vif_mapping('openwrt', interface.wifi_radio, vif)
                 wif.ifname = vif_name
