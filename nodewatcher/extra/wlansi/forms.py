@@ -346,16 +346,34 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             },
                         )
         else:
-            # Setup routing interface for backbone nodes.
+            # Backbone node.
             if lan_port or wan_port:
-                lan_interface = self.setup_interface(
-                    state,
-                    cgm_models.EthernetInterfaceConfig,
-                    eth_port=lan_port or wan_port,
-                    configuration={
-                        'routing_protocols': ['olsr', 'babel'],
-                    },
-                )
+                if 'backbone-with-uplink' in network_profiles:
+                    # Configure WAN port as an uplink port which gets automatically configured via DHCP.
+                    uplink_interface = self.setup_interface(
+                        state,
+                        cgm_models.EthernetInterfaceConfig,
+                        eth_port=lan_port or wan_port,
+                        configuration={
+                            'uplink': True,
+                        },
+                    )
+
+                    self.setup_network(
+                        state,
+                        uplink_interface,
+                        cgm_models.DHCPNetworkConfig,
+                    )
+                else:
+                    # Setup routing interface.
+                    lan_interface = self.setup_interface(
+                        state,
+                        cgm_models.EthernetInterfaceConfig,
+                        eth_port=lan_port or wan_port,
+                        configuration={
+                            'routing_protocols': ['olsr', 'babel'],
+                        },
+                    )
 
         # Mobile uplink.
 
