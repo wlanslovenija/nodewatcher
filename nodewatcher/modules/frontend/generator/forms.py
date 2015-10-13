@@ -20,13 +20,13 @@ class GenerateFirmwareForm(forms.Form):
         except cgm_base.ValidationError, e:
             raise forms.ValidationError(e.args[0])
         except exceptions.NoBuildChannelsConfigured:
-            raise forms.ValidationError(_('No build channels have been configured!'), code='no_build_channels')
+            raise forms.ValidationError(_("No build channels have been configured!"), code='no_build_channels')
         except exceptions.NoBuildersConfigured:
-            raise forms.ValidationError(_('No builders have been configured!'), code='no_builders')
+            raise forms.ValidationError(_("No builders have been configured!"), code='no_builders')
         except exceptions.NoSuitableBuildersFound:
-            raise forms.ValidationError(_('No suitable builder could be found!'), code='no_builder')
+            raise forms.ValidationError(_("No suitable builder could be found!"), code='no_builder')
         except exceptions.NoDeviceConfigured:
-            raise forms.ValidationError(_('No device has been configured!'), code='no_device')
+            raise forms.ValidationError(_("No device has been configured!"), code='no_device')
 
         return cleaned_data
 
