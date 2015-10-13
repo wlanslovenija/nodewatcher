@@ -13,9 +13,10 @@ class GenerateFirmwareForm(forms.Form):
     def clean(self):
         cleaned_data = super(GenerateFirmwareForm, self).clean()
 
-        # Validate that node build will work
+        # Validate that node build will work.
         try:
-            cgm_base.generate_firmware(self.node, only_validate=True)
+            if not cgm_base.generate_firmware(self.node, only_validate=True):
+                raise forms.ValidationError(_("No build platform is configured for this node!"), code='no_platform')
         except cgm_base.ValidationError, e:
             raise forms.ValidationError(e.args[0])
         except exceptions.NoBuildChannelsConfigured:
