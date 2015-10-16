@@ -14,12 +14,13 @@ bases = registry_state.bases
 
 
 class Choice(object):
-    def __init__(self, name, verbose_name, help_text=None, limited_to=None, icon=None):
+    def __init__(self, name, verbose_name, help_text=None, limited_to=None, icon=None, **kwargs):
         self.name = name
         self.verbose_name = verbose_name
         self.help_text = help_text
         self.limited_to = limited_to
         self.icon = icon
+        self.metadata = kwargs
 
     def get_field_tuple(self):
         return (self.name, self.verbose_name)
@@ -29,12 +30,14 @@ class Choice(object):
         Returns the choice suitable for JSON serialization.
         """
 
-        return {
+        output = self.metadata.copy()
+        output.update({
             'name': self.name,
             'verbose_name': self.verbose_name,
             'help_text': self.help_text,
             'icon': self.icon,
-        }
+        })
+        return output
 
     def __repr__(self):
         return "<Choice '%s'>" % self.name

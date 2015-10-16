@@ -344,6 +344,9 @@ class DeviceBase(object):
                 cls.identifier,
                 _("%(manufacturer)s - %(name)s") % {'manufacturer': cls.manufacturer, 'name': cls.name},
                 limited_to=('core.general#platform', platform.name),
+                # Include some more device metadata.
+                manufacturer=cls.manufacturer,
+                model=cls.name,
             )
         )
 

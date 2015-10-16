@@ -1,0 +1,17 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load i18n sekizai_tags %}
+
+{% add_data "js_data" "datastream/underscore/underscore.js" %}
+{% add_data "js_data" "datastream/highstock/highstock.js" %}
+{% add_data "js_data" "datastream/highstock/highcharts-more.js" %}
+{% add_data "js_data" "datastream/highstock/exporting.js" %}
+{% add_data "js_data" "frontend/js/highcharts.js" %}
+{% add_data "js_data" "network/statistics/cgm.js" %}
+
+<div class="row snippet node-device">
+    <div class="col-md-2 key">{% trans "Nodes by device" %}</div>
+    <div class="col-md-10 value">
+        <div id="statistics-nodes-by-device" data-url="{% url "api:api_dispatch_detail" "v1" "statistics" "nodes_by_device" %}"></div>
+    </div>
+</div>
