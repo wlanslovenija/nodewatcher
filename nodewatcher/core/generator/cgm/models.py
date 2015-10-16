@@ -69,7 +69,10 @@ class CgmGeneralConfig(core_models.GeneralConfig):
         if not self.router:
             return None
 
-        return cgm_base.get_platform(self.platform).get_device(self.router)
+        try:
+            return cgm_base.get_platform(self.platform).get_device(self.router)
+        except KeyError:
+            return None
 
 registration.point('node.config').register_item(CgmGeneralConfig)
 

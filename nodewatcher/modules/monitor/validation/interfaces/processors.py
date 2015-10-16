@@ -24,9 +24,9 @@ class InterfaceValidator(monitor_processors.NodeProcessor):
             loader.load_modules('cgm')
 
             platform = node.config.core.general().platform
-            if not platform:
-                raise AttributeError
             device = node.config.core.general().get_device()
+            if not platform or not device:
+                raise AttributeError
 
             for interface in node.config.core.interfaces():
                 if not interface.enabled:
