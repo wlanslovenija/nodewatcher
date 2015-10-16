@@ -71,6 +71,11 @@ class IpPoolTestCase(unittest.TestCase):
         self.assertEqual(b.status, models.IpPoolStatus.Full)
         self.assertEqual(c.status, models.IpPoolStatus.Full)
 
+        # Test that top-level has been properly set
+        self.assertEqual(a.top_level, self.pool)
+        self.assertEqual(b.top_level, self.pool)
+        self.assertEqual(c.top_level, self.pool)
+
     def test_allocation_failure(self):
         # Test that we can't allocate more than we have
         a = self.small_pool.allocate_subnet(prefix_len=24)

@@ -80,6 +80,7 @@ class PoolBase(models.Model):
         abstract = True
 
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    top_level = models.ForeignKey('self', null=True, blank=True, related_name='+')
 
     @classmethod
     def modifies_pool(cls, f):
@@ -91,15 +92,17 @@ class PoolBase(models.Model):
 
         return decorator
 
-    def top_level(self):
+    def save(self, **kwargs):
         """
-        Returns the root of this pool tree.
+        Saves the model.
         """
 
-        if self.parent:
-            return self.parent.top_level()
+        super(PoolBase, self).save(**kwargs)
 
-        return self
+        # Become the top-level pool if we have no parent.
+        if not self.parent:
+            self.top_level = self
+            super(PoolBase, self).save()
 
     def free(self):
         """

@@ -3,6 +3,7 @@ from nodewatcher.core.frontend import api, components
 from . import resources
 
 
+api.v1_api.register(resources.IpPoolResource())
 api.v1_api.register(resources.NodeIpAllocationResource())
 
 

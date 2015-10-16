@@ -73,8 +73,8 @@ class IpPool(allocation_models.PoolBase):
         net = ipaddr.IPNetwork('%s/%d' % (self.network, self.prefix_length))
         net0, net1 = net.subnet()
 
-        left = IpPool(parent=self, family=self.family, network=str(net0.network), prefix_length=net0.prefixlen)
-        right = IpPool(parent=self, family=self.family, network=str(net1.network), prefix_length=net1.prefixlen)
+        left = IpPool(parent=self, family=self.family, network=str(net0.network), prefix_length=net0.prefixlen, top_level=self.top_level)
+        right = IpPool(parent=self, family=self.family, network=str(net1.network), prefix_length=net1.prefixlen, top_level=self.top_level)
         left.save()
         right.save()
 
@@ -409,7 +409,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         if self.subnet_hint is not None and self.allocation.network != str(self.subnet_hint.network):
             return False
 
-        if self.allocation.top_level() != self.pool:
+        if self.allocation.top_level != self.pool:
             return False
 
         return True

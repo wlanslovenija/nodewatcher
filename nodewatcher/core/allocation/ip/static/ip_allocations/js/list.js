@@ -3,7 +3,7 @@
         $('.ip-allocation-list').each(function (i, table) {
             $.tastypie.newDataTable(table, $(table).data('source'), {
                 'columns': [
-                    {'data': 'pool.description', 'orderable': false},
+                    {'data': 'pool.description'},
                     {'data': 'family'},
                     {'data': 'network'},
                     {'data': 'prefix_length'}

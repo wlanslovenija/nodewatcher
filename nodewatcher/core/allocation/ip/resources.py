@@ -1,8 +1,7 @@
-from tastypie import fields
-
 from nodewatcher.core import resources as core_resources
 from nodewatcher.core.registry import registration
 from nodewatcher.core.frontend import api
+from nodewatcher.core.frontend.api import fields as api_fields
 # TODO: Remove this dependency after we have https://dev.wlan-si.net/ticket/1268.
 from nodewatcher.modules.frontend.list import resources
 
@@ -21,19 +20,34 @@ class NodeResource(resources.NodeResource):
         return super(NodeResource, self)._build_reverse_url(name, args=args, kwargs=kwargs)
 
 
+class IpPoolResource(api.BaseResource):
+
+    class Meta:
+        queryset = ip_models.IpPool.objects.all().order_by('pk')
+        resource_name = 'ip_pool'
+        list_allowed_methods = ('get',)
+        detail_allowed_methods = ('get',)
+        max_limit = 5000
+        ordering = ('pk', 'family', 'network', 'status')
+
+
 class NodeIpAllocationResource(core_resources.NodeSubresourceMixin, api.BaseResource):
 
-    pool = fields.DictField(readonly=True)
+    pool = api_fields.ToOneField(IpPoolResource, 'top_level', full=True)
 
     class Meta:
         resource_name = 'ip_allocations'
         queryset = ip_models.IpPool.objects.all().order_by('id')
         list_allowed_methods = ('get',)
         detail_allowed_methods = ('get',)
-        ordering = ('id', 'family', 'network', 'status')
+        ordering = ('id', 'family', 'network', 'status', 'pool')
         include_resource_uri = False
 
     def get_object_list(self, request):
+        """
+        Generate a list of all IP allocations for the current node.
+        """
+
         if hasattr(request, '_filter_node'):
             node = request._filter_node
             del request._filter_node
@@ -48,12 +62,3 @@ class NodeIpAllocationResource(core_resources.NodeSubresourceMixin, api.BaseReso
 
         objects = super(NodeIpAllocationResource, self).get_object_list(request)
         return objects.filter(pk__in=allocations)
-
-    def dehydrate_pool(self, bundle):
-        # TODO: This is suboptimal as it performs many useless queries. We could include the top-level field in the db.
-        pool = bundle.obj.top_level()
-
-        return {
-            'id': pool.id,
-            'description': pool.description,
-        }
