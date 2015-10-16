@@ -187,13 +187,19 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         clone = self._clone()
 
-        # Construct a temporary fake model for this query
+        # Construct a temporary fake model for this query.
         if not hasattr(clone.model, '_registry_proxy'):
+            # Clear any existing proxy models to prevent duplicate class warnings.
+            try:
+                del apps.all_models['_registry_proxy_models_']
+            except KeyError:
+                pass
+
             class Meta:
                 proxy = True
                 app_label = '_registry_proxy_models_'
 
-            # Use a dictionary to transfer data to closure by reference
+            # Use a dictionary to transfer data to closure by reference.
             this_class = {'parent': clone.model}
 
             def pickle_reduce(self):
@@ -217,8 +223,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             )
             clone.query.model = clone.model
             this_class['class'] = clone.model
-
-            del apps.all_models['_registry_proxy_models_']
 
         def install_proxy_field(model, field, name, src_model=None, src_field=None):
             field = copy.deepcopy(field)
