@@ -71,6 +71,8 @@ class BabelParser(object):
             elif update_type == 'xroute':
                 # Exported routes.
                 data['exported_routes'].append(arguments)
+                node = data['routes'].add(arguments['prefix'])
+                node.data.update(arguments)
             elif update_type == 'route':
                 # Imported routes.
                 node = data['routes'].add(arguments['prefix'])
