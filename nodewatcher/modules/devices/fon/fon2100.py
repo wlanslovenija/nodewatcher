@@ -8,7 +8,7 @@ class Fonera(cgm_devices.DeviceBase):
 
     identifier = 'fon-2100'
     name = "Fonera"
-    manufacturer = "Fon Wireless Ltd."
+    manufacturer = "Fon Wireless"
     url = 'http://www.fon.com'
     architecture = 'atheros'
     radios = [
