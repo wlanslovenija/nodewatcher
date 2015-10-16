@@ -308,6 +308,25 @@ class DeviceMetaclass(type):
             if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):
                 raise exceptions.ImproperlyConfigured("List of device antennas may only contain InternalAntenna instances!")
 
+            def merge_platform_dict(source, destination):
+                for platform in source:
+                    destination.setdefault(platform, {}).update(source[platform])
+
+            new_class.port_map = {}
+            new_class.drivers = {}
+
+            for base in bases:
+                if not issubclass(base, DeviceBase):
+                    continue
+
+                # Merge port maps from base classes.
+                merge_platform_dict(base.port_map, new_class.port_map)
+                # Merge drivers from base classes.
+                merge_platform_dict(base.drivers, new_class.drivers)
+
+            merge_platform_dict(attrs.get('port_map', {}), new_class.port_map)
+            merge_platform_dict(attrs.get('drivers', {}), new_class.drivers)
+
         return new_class
 
 

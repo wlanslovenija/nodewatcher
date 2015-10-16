@@ -1,2 +1,2 @@
-# Mikrotik device modules
-from . import rb433ah
+# Mikrotik device modules.
+from . import rb2011
