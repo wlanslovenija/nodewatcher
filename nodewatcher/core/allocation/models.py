@@ -79,8 +79,8 @@ class PoolBase(models.Model):
     class Meta:
         abstract = True
 
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
-    top_level = models.ForeignKey('self', null=True, blank=True, related_name='+')
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', editable=False)
+    top_level = models.ForeignKey('self', null=True, blank=True, related_name='+', editable=False)
 
     @classmethod
     def modifies_pool(cls, f):
