@@ -443,6 +443,7 @@ class ReferenceChoiceField(models.ForeignKey):
 
         kwargs['null'] = True
         kwargs['blank'] = True
+        kwargs['on_delete'] = models.SET_NULL
         # We have our own limit_choices_to implementation.
         self._limit_choices_to = kwargs.pop('limit_choices_to', None)
         super(ReferenceChoiceField, self).__init__(*args, **kwargs)
