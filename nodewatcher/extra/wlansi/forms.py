@@ -455,7 +455,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
             return ssid
 
-        if node_type != 'backbone':
+        if node_type not in ('backbone', 'server'):
             if radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
                 # If the device supports multiple SSIDs, use one in AP mode, the other in mesh mode.
                 clients_wifi = self.setup_interface(
@@ -490,7 +490,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     'routing_protocols': ['olsr', 'babel'],
                 },
             )
-        else:
+        elif node_type == 'backbone':
             # If the device is of type "Backbone", create one AP/STA.
             if wifi_backbone_defaults is not None:
                 mode = wifi_backbone_defaults.mode
