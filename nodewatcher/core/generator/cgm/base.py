@@ -1,3 +1,5 @@
+import copy
+
 from django.template import loader as template_loader
 
 from ....utils import loader
@@ -318,17 +320,27 @@ class PlatformBase(object):
 
         cfg = self.config_class()
 
-        # Execute the module chain in order.
-        for _, module, device in sorted(self._modules):
-            if device is None or device == node.config.core.general().router:
-                module(node, cfg)
+        modules = copy.copy(self._modules)
 
         # Process user-configured packages.
-        for name, cfgclass, package in self._packages:
+        for name, cfgclass, package, weight in self._packages:
             pkgcfg = node.config.core.packages(onlyclass=cfgclass)
             if [x for x in pkgcfg if x.enabled]:
-                package(node, pkgcfg, cfg)
+                # Copy the variables to avoid them being overwritten in the for loop.
+                _package = package
+                _pkgcfg = pkgcfg
+
+                modules.append((
+                    weight,
+                    lambda node, cfg: _package(node, _pkgcfg, cfg),
+                    None
+                ))
                 cfg.packages.add(name)
+
+        # Execute the module chain in order.
+        for weight, module, device in sorted(modules):
+            if device is None or device == node.config.core.general().router:
+                module(node, cfg)
 
         # Process any deferred configuration.
         for function in cfg.get_deferred_configuration():
@@ -447,19 +459,20 @@ class PlatformBase(object):
 
         self._modules.append((weight, module, device))
 
-    def register_package(self, name, config, package):
+    def register_package(self, name, config, package, weight=300):
         """
         Registers a new platform package.
 
         :param name: Platform-dependent package name
         :param config: Configuration class
         :param package: Package implementation function
+        :param weight: Optional call order weight (defaults to 300)
         """
 
         if [x for x in self._packages if x[2] == package]:
             return
 
-        self._packages.append((name, config, package))
+        self._packages.append((name, config, package, weight))
 
     def register_device(self, device):
         """
