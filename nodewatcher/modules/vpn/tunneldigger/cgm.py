@@ -21,7 +21,7 @@ def tunneldigger(node, cfg):
 
         # Create interface configurations; note that addressing configuration is routing
         # daemon dependent and as such should not be filled in here
-        iface = cfg.network.add(interface=ifname)
+        iface = cfg.network.add(interface=ifname, managed_by=interface)
         iface.ifname = ifname
         iface.macaddr = interface.mac
         iface.proto = 'none'
@@ -93,3 +93,51 @@ def tunneldigger(node, cfg):
 
         # Ensure that "tunneldigger" package is installed
         cfg.packages.update(['tunneldigger'])
+
+
+@cgm_base.register_platform_package('openwrt', 'tunneldigger-broker', models.TunneldiggerBrokerConfig)
+def tunneldigger_broker(node, pkgcfg, cfg):
+    """
+    Configures a tunneldigger broker.
+    """
+
+    try:
+        pkgcfg = pkgcfg.get()
+    except models.TunneldiggerBrokerConfig.MultipleObjectsReturned:
+        raise cgm_base.ValidationError(_("Only one tunneldigger broker may be defined."))
+
+    # Configure the broker.
+    broker = cfg['tunneldigger-broker'].add('broker')
+    broker.port = pkgcfg.ports
+
+    # Configure uplink interface.
+    if not pkgcfg.uplink_interface:
+        raise cgm_base.ValidationError(_("Tunneldigger broker must have an uplink interface configured."))
+
+    section = cfg.network.find_named_section('interface', _managed_by=pkgcfg.uplink_interface)
+    if not section:
+        raise cgm_base.ValidationError(_("Configured tunneldigger broker uplink interface not found."))
+
+    broker.interface = section.get_key()
+    broker.max_cookies = pkgcfg.max_cookies
+    broker.max_tunnels = pkgcfg.max_tunnels
+    broker.port_base = 20000
+    broker.tunnel_id_base = 100
+    broker.tunnel_timeout = int(pkgcfg.tunnel_timeout.total_seconds())
+    broker.pmtu_discovery = pkgcfg.pmtu_discovery
+    broker.namespace = 'broker0'
+
+    log = cfg['tunneldigger-broker'].add('log')
+    log.filename = '/dev/null'
+    log.verbosity = 'INFO'
+    log.log_ip_addresses = False
+
+    # Create routable digger interfaces.
+    for mtu in (1280, 1346, 1396, 1422, 1438, 1446):
+        ifname = models.get_tunneldigger_broker_interface_name(mtu)
+        iface = cfg.network.add(interface=ifname, managed_by=pkgcfg)
+        iface.ifname = ifname
+        iface.type = 'bridge'
+        iface.bridge_empty = True
+        iface.proto = 'none'
+        iface._routable = pkgcfg.routing_protocols
