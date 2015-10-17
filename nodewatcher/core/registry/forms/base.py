@@ -345,7 +345,7 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
                 dependencies = set()
                 for name, field in form.fields.iteritems():
                     if hasattr(field, 'get_dependencies'):
-                        dependencies.update(field.get_dependencies(form.cleaned_data.get(name, None)))
+                        dependencies.update(field.get_dependencies(form._raw_value(name)))
 
                 # If we have a parent, we depend on it
                 if context.hierarchy_parent_obj is not None:

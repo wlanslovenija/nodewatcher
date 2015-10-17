@@ -145,11 +145,15 @@ class ReferenceChoiceFormField(form_fields.TypedChoiceField):
         only be called when form validation succeeds and the form is scheduled
         to be saved.
 
-        :param value: Cleaned value
+        :param value: Raw value
         :return: A list of dependency tuples (cfg_location, id(cfg_parent), cfg_index)
         """
 
-        if value is None:
+        # Check if the value is valid.
+        try:
+            value = int(value)
+            self.partially_validated_tree[self.choices_rid][value]
+        except (ValueError, TypeError, KeyError, IndexError):
             return []
 
         return [(self.choices_rid, id(None), value)]
