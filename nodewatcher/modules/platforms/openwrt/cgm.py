@@ -436,6 +436,8 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
 
         return self._roots.setdefault(root, UCIRoot(root))
 
+    __getitem__ = __getattr__
+
     def format(self, fmt=UCIFormat.DUMP):
         """
         Formats the configuration tree so it is suitable for loading into UCI.
