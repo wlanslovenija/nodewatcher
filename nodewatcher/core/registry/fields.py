@@ -2,6 +2,7 @@ import operator
 import os
 
 from django import db as django_db
+from django.contrib.postgres import fields as postgres_fields
 from django.core import exceptions
 from django.db import models
 from django.db.models import constants
@@ -9,9 +10,6 @@ from django.db.models.fields import related as related_fields
 from django.forms import fields as widgets
 from django.utils import text, functional
 from django.utils.translation import ugettext_lazy as _
-
-# TODO: This import will not be needed once we upgrade to Django 1.8.
-from postgres import fields as postgres_fields
 
 from ...utils import ipaddr
 
@@ -136,10 +134,8 @@ class RegistryMultipleChoiceField(postgres_fields.ArrayField):
         self.regpoint = regpoint
         self.enum_id = enum_id
         self._rp_choices = self.get_registered_choices().field_tuples()
-        super(RegistryMultipleChoiceField, self).__init__(
-            models.CharField(max_length=50, choices=self._rp_choices),
-            **kwargs
-        )
+        kwargs['base_field'] = models.CharField(max_length=50, choices=self._rp_choices)
+        super(RegistryMultipleChoiceField, self).__init__(**kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(RegistryMultipleChoiceField, self).deconstruct()
