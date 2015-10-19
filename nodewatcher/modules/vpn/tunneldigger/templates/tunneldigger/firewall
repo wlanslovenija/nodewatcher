@@ -1,0 +1,7 @@
+# Setup firewall policy for tunneldigger broker ports to prevent forwarding
+# between clients on the same bridge.
+
+{% for interface in interfaces %}
+ebtables -D FORWARD --logical-in {{interface}} -j DROP 2>/dev/null
+ebtables -A FORWARD --logical-in {{interface}} -j DROP
+{% endfor %}

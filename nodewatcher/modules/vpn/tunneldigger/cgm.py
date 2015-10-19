@@ -133,6 +133,7 @@ def tunneldigger_broker(node, pkgcfg, cfg):
     log.log_ip_addresses = False
 
     # Create routable digger interfaces.
+    interfaces = []
     for mtu in (1280, 1346, 1396, 1422, 1438, 1446):
         ifname = models.get_tunneldigger_broker_interface_name(mtu)
         iface = cfg.network.add(interface=ifname, managed_by=pkgcfg)
@@ -141,3 +142,20 @@ def tunneldigger_broker(node, pkgcfg, cfg):
         iface.bridge_empty = True
         iface.proto = 'none'
         iface._routable = pkgcfg.routing_protocols
+        interfaces.append(ifname)
+
+    # Enable bridge iptables.
+    cfg.sysctl.set_variable('net.bridge.bridge-nf-call-iptables', 1)
+    cfg.packages.add('ebtables')
+
+    # Configure firewall policy to prevent forwarding within the bridge.
+    include = cfg.firewall.add('include')
+    include.path = '/etc/firewall.tunneldigger'
+
+    cfg.files.install(
+        include.path,
+        'tunneldigger/firewall',
+        context={
+            'interfaces': interfaces,
+        }
+    )
