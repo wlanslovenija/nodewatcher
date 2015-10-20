@@ -142,6 +142,11 @@ def tunneldigger_broker(node, pkgcfg, cfg):
         iface.bridge_empty = True
         iface.proto = 'none'
         iface._routable = pkgcfg.routing_protocols
+
+        bridge = cfg['tunneldigger-broker'].add('bridge')
+        bridge.mtu = mtu
+        bridge.interface = ifname
+
         interfaces.append(ifname)
 
     # Enable bridge iptables.
