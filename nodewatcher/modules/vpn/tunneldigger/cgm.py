@@ -164,3 +164,7 @@ def tunneldigger_broker(node, pkgcfg, cfg):
             'interfaces': interfaces,
         }
     )
+
+    # Ensure connection tracking is enabled on the uplink zone.
+    firewall = cfg.firewall.find_ordered_section('zone', name='uplink')
+    firewall.conntrack = True
