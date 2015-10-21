@@ -80,6 +80,41 @@
 
     };
 
+    var loadingDialog = (function () {
+        var pleaseWaitDiv = $(
+            '<div class="modal fade bs-example-modal-sm" id="registryLoadingDialog" tabindex="-1" ' +
+                'role="dialog" aria-hidden="true" data-backdrop="static">' +
+                '<div class="modal-dialog modal-sm">' +
+                    '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                            '<h4 class="modal-title">' +
+                                '<span class="glyphicon glyphicon-time">' +
+                                '</span>Updating configuration' +
+                             '</h4>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                            '<div class="progress">' +
+                                '<div class="progress-bar progress-bar-info ' +
+                                'progress-bar-striped active" ' +
+                                'style="width: 100%">' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        );
+        return {
+            show: function() {
+                pleaseWaitDiv.modal();
+            },
+            hide: function () {
+                pleaseWaitDiv.modal('hide');
+            },
+
+        };
+    })();
+
     /**
      * Performs server-side rule evaluation based on current values of all
      * entered registry items and executes any sent changes. Server returns
@@ -92,6 +127,7 @@
             return;
         }
         updating = true;
+        loadingDialog.show();
 
         // Prepare form in serialized form (pun intended)
         var forms = $('#registry_forms *').serialize();
@@ -125,6 +161,7 @@
             $(window).trigger('registry:update');
 
             updating = false;
+            loadingDialog.hide();
         });
     };
 
