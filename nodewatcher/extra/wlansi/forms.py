@@ -365,15 +365,17 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         cgm_models.DHCPNetworkConfig,
                     )
                 else:
-                    # Setup routing interface.
-                    lan_interface = self.setup_interface(
-                        state,
-                        cgm_models.EthernetInterfaceConfig,
-                        eth_port=lan_port or wan_port,
-                        configuration={
-                            'routing_protocols': ['olsr', 'babel'],
-                        },
-                    )
+                    # Setup routing interface on all defined ports.
+                    for eth_port in (lan_port, wan_port):
+                        if eth_port:
+                            self.setup_interface(
+                                state,
+                                cgm_models.EthernetInterfaceConfig,
+                                eth_port=eth_port,
+                                configuration={
+                                    'routing_protocols': ['olsr', 'babel'],
+                                },
+                            )
 
         # Mobile uplink.
 
