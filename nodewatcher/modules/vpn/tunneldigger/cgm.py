@@ -168,3 +168,10 @@ def tunneldigger_broker(node, pkgcfg, cfg):
     # Ensure connection tracking is enabled on the uplink zone.
     firewall = cfg.firewall.find_ordered_section('zone', name='uplink')
     firewall.conntrack = True
+
+    # Ensure all configured ports are allowed.
+    rule = cfg.firewall.add('rule')
+    rule.src = 'uplink'
+    rule.proto = 'udp'
+    rule.dest_port = pkgcfg.ports
+    rule.target = 'ACCEPT'
