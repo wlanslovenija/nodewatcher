@@ -523,14 +523,14 @@ def router_id(node, cfg):
 
     for rid in node.config.core.routerid():
         if isinstance(rid, core_models.StaticIpRouterIdConfig):
-            res = cgm_resources.IpResource(rid.rid_family, rid.address, rid)
+            res = cgm_resources.IpResource(rid.rid_family, rid.address, rid, allow_broadcast=True)
             cfg.resources.add(res)
         elif isinstance(rid, pool_models.AllocatedIpRouterIdConfig):
             # Check that the network has actually been allocated and fail validation if not so
             if not rid.allocation:
                 raise cgm_base.ValidationError(_("Missing network allocation in router ID configuration."))
 
-            res = cgm_resources.IpResource(rid.family, rid.allocation.ip_subnet, rid)
+            res = cgm_resources.IpResource(rid.family, rid.allocation.ip_subnet, rid, allow_broadcast=True)
             cfg.resources.add(res)
 
 

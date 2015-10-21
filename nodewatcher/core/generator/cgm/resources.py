@@ -63,7 +63,7 @@ class IpResource(Resource):
     An IP subnet resource.
     """
 
-    def __init__(self, family, subnet, config):
+    def __init__(self, family, subnet, config, allow_broadcast=False):
         """
         Class constructor.
 
@@ -71,18 +71,25 @@ class IpResource(Resource):
         :param subnet: Subnet to allocate from
         :param config: Configuration object this resource has been
           created from
+        :param allow_broadcast: Should allocation of the broadcast
+          address be allowed
         """
 
         self.family = family
         self.subnet = subnet
         self.config = config
+        self.allocation = []
 
         # Special handling for single-address subnets where we can only allocate
-        # that one address (in this case network/broadcast is ignored)
+        # that one address (in this case network/broadcast is ignored).
         if self.subnet.numhosts == 1:
-            self.allocation = iter([self.subnet.network])
+            self.allocation = [self.subnet.network]
         else:
-            self.allocation = self.subnet.iterhosts()
+            self.allocation = list(self.subnet.iterhosts())
+            if allow_broadcast:
+                self.allocation.append(self.subnet.broadcast)
+
+        self.allocation = iter(self.allocation)
 
     def allocate(self, family=None):
         """
