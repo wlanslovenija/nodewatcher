@@ -81,16 +81,18 @@
     };
 
     var loadingDialog = (function () {
-        var pleaseWaitDiv = $(
-            '<div class="modal fade bs-example-modal-sm" id="registryLoadingDialog" tabindex="-1" ' +
+        var div = $(
+            '<div class="modal fade nw-dialog" id="registryLoadingDialog" tabindex="-1" ' +
                 'role="dialog" aria-hidden="true" data-backdrop="static">' +
                 '<div class="modal-dialog modal-sm">' +
                     '<div class="modal-content">' +
                         '<div class="modal-header">' +
                             '<h4 class="modal-title">' +
-                                '<span class="glyphicon glyphicon-time">' +
-                                '</span>Updating configuration' +
-                             '</h4>' +
+                                'Updating configuration' +
+                            '</h4>' +
+                            '<span class="small">' +
+                                'Your changes are being applied, please wait.' +
+                            '</span>' +
                         '</div>' +
                         '<div class="modal-body">' +
                             '<div class="progress">' +
@@ -106,10 +108,45 @@
         );
         return {
             show: function() {
-                pleaseWaitDiv.modal();
+                div.modal();
             },
             hide: function () {
-                pleaseWaitDiv.modal('hide');
+                div.modal('hide');
+            },
+
+        };
+    })();
+
+    var errorDialog = (function () {
+        var div = $(
+            '<div class="modal fade nw-dialog type-danger" id="registryErrorDialog" tabindex="-1" ' +
+                'role="dialog" aria-hidden="true" data-backdrop="static">' +
+                '<div class="modal-dialog modal-lg">' +
+                    '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                            '<h4 class="modal-title">' +
+                                'Configuration failed' +
+                            '</h4>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                            '<p>' +
+                                'There was an error while applying configuration, which usually ' +
+                                'indicates a problem in one of the configuration modules.' +
+                            '</p>' +
+                            '<p>' +
+                                'Please contact the site administrator.' +
+                            '</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        );
+        return {
+            show: function() {
+                div.modal();
+            },
+            hide: function () {
+                div.modal('hide');
             },
 
         };
@@ -162,6 +199,10 @@
 
             updating = false;
             loadingDialog.hide();
+        }).fail(function() {
+            updating = false;
+            loadingDialog.hide();
+            errorDialog.show();
         });
     };
 
