@@ -467,6 +467,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     configuration={
                         'mode': 'ap',
                         'essid': get_project_ssid('ap', 'open.wlan-si.net'),
+                        'isolate_clients': False,
                     },
                 )
 
@@ -508,6 +509,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         'connect_to': wifi_backbone_defaults.connect_to,
                         'essid': wifi_backbone_defaults.essid,
                         'bssid': wifi_backbone_defaults.bssid,
+                        'isolate_clients': wifi_backbone_defaults.isolate_clients,
                         'routing_protocols': ['olsr', 'babel'],
                     },
                 )
@@ -519,6 +521,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     configuration={
                         'mode': 'ap',
                         'essid': get_project_ssid('backbone', 'backbone.wlan-si.net'),
+                        'isolate_clients': True,
                         'routing_protocols': ['olsr', 'babel'],
                     },
                     annotations={

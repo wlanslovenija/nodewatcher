@@ -101,6 +101,10 @@ class WifiInterfaceConfigForm(forms.ModelForm):
             # If mode is not set to STA, hide the connect to field.
             del self.fields['connect_to']
 
+        # Handle client isolation configuration.
+        if item.mode != 'ap':
+            del self.fields['isolate_clients']
+
         # Handle bitrate selection.
         if item.bitrates_preset == 'custom':
             protocol = None

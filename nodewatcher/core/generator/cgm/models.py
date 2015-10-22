@@ -250,6 +250,10 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         null=True,
         default=[],
     )
+    isolate_clients = models.BooleanField(
+        default=True,
+        help_text=_("Enable to isolate clients connected to the same AP from each other."),
+    )
     uplink = models.BooleanField(default=False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):

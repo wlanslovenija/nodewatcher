@@ -1275,6 +1275,9 @@ def network(node, cfg):
 
                 if vif.mode == 'ap':
                     wif.mode = 'ap'
+
+                    if vif.isolate_clients:
+                        wif.isolate = True
                 elif vif.mode == 'mesh':
                     wif.mode = 'adhoc'
                     wif.bssid = vif.bssid
