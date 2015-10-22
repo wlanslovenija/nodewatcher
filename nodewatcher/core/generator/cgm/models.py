@@ -263,6 +263,18 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         multiple = True
         hidden = False
 
+    def save(self, **kwargs):
+        """
+        Save handler.
+        """
+
+        # The value of isolate_clients cannot be null, but the field is removed from the
+        # form for non-AP configurations, which would cause the field to be NULL.
+        if not self.isolate_clients:
+            self.isolate_clients = False
+
+        super(WifiInterfaceConfig, self).save(**kwargs)
+
     def get_target_interface(self):
         """
         Retrieve target (AP) node's interface configuration (for STA interfaces).
