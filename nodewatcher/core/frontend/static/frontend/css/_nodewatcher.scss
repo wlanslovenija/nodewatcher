@@ -139,3 +139,13 @@ footer {
     border-radius: $border-radius-base;
     padding: 10px;
 }
+
+.nw-dialog.type-danger {
+    .modal-header {
+        background-color: #d9534f;
+
+        .modal-title {
+            color: #ffffff;
+        }
+    }
+}
