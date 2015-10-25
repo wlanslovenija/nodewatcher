@@ -150,6 +150,22 @@ class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
         multiple = True
         hidden = True
 
+    def has_child_interfaces(self):
+        """
+        Interface implementations may return True if this interface can have
+        any child interfaces.
+        """
+
+        return False
+
+    def get_child_interfaces(self):
+        """
+        Interface implementations may return a queryset that accesses any child
+        interfaces.
+        """
+
+        return InterfaceConfig.objects.none()
+
 registration.point('node.config').register_item(InterfaceConfig)
 
 
@@ -220,6 +236,12 @@ class WifiRadioDeviceConfig(InterfaceConfig):
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Wireless Radio")
+
+    def has_child_interfaces(self):
+        return True
+
+    def get_child_interfaces(self):
+        return self.interfaces.all()
 
 registration.point('node.config').register_item(WifiRadioDeviceConfig)
 
@@ -511,63 +533,3 @@ class PPPoENetworkConfig(NetworkConfig):
         registry_name = _("PPPoE")
 
 registration.point('node.config').register_subitem(EthernetInterfaceConfig, PPPoENetworkConfig)
-
-
-class InterfaceLimitConfig(registration.bases.NodeConfigRegistryItem):
-    """
-    Configuration of per-interface traffic limits.
-    """
-
-    interface = registry_fields.IntraRegistryForeignKey(InterfaceConfig, editable=False, null=False, related_name='limits')
-    enabled = models.BooleanField(default=True)
-
-    class RegistryMeta:
-        form_weight = 50
-        registry_id = 'core.interfaces.limits'
-        registry_section = _("Traffic Limits Configuration")
-        registry_name = _("Generic Limits")
-        multiple = True
-        hidden = True
-
-registration.point('node.config').register_subitem(InterfaceConfig, InterfaceLimitConfig)
-
-
-class ThroughputInterfaceLimitConfig(InterfaceLimitConfig):
-    """
-    Throughput limit configuration.
-    """
-
-    limit_out = registry_fields.RegistryChoiceField(
-        'node.config', 'core.interfaces.limits#speeds',
-        verbose_name=_("Upload limit"), default='', blank=True,
-    )
-    limit_in = registry_fields.RegistryChoiceField(
-        'node.config', 'core.interfaces.limits#speeds',
-        verbose_name=_("Download limit"), default='', blank=True,
-    )
-
-    class RegistryMeta(InterfaceLimitConfig.RegistryMeta):
-        registry_name = _("Throughput Limit")
-        hidden = False
-
-# TODO: This probably shouldn't be hardcoded, it should be moved to modules.administration?
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('128', _("128 Kbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('256', _("256 Kbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('512', _("512 Kbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('1024', _("1 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('2048', _("2 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('4096', _("4 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('6144', _("6 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('8192', _("8 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('10240', _("10 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('15360', _("15 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('20480', _("20 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('25600', _("25 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('30720', _("30 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('40960', _("40 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('51200', _("50 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('61440', _("60 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('71680', _("70 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('81920', _("80 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('92160', _("90 Mbit/s")))
-registration.point('node.config').register_choice('core.interfaces.limits#speeds', registration.Choice('102400', _("100 Mbit/s")))

@@ -263,6 +263,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.devices',
     'nodewatcher.modules.identity.base',
     'nodewatcher.modules.identity.public_key',
+    'nodewatcher.modules.qos.base',
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
     'nodewatcher.modules.monitor.http.resources',

@@ -3,7 +3,7 @@ import datetime
 from django.apps import apps
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 import polymorphic
 from timedelta import fields as timedelta_fields
@@ -60,8 +60,22 @@ class TunneldiggerInterfaceConfig(cgm_models.InterfaceConfig, cgm_models.Routabl
     class RegistryMeta(cgm_models.InterfaceConfig.RegistryMeta):
         registry_name = _("Tunneldigger Interface")
 
+    def __unicode__(self):
+        if not self.server:
+            return ugettext("Tunneldigger interface (no server)")
+
+        return ugettext("Tunneldigger interface (%(server)s)") % {'server': self.server}
+
 registration.point('node.config').register_item(TunneldiggerInterfaceConfig)
-registration.point('node.config').register_subitem(TunneldiggerInterfaceConfig, cgm_models.ThroughputInterfaceLimitConfig)
+
+# Support QoS on tunneldigger interfaces.
+if apps.is_installed('nodewatcher.modules.qos.base'):
+    from nodewatcher.modules.qos.base import models as qos_models
+
+    registration.point('node.config').register_subitem(
+        TunneldiggerInterfaceConfig,
+        qos_models.InterfaceQoSConfig,
+    )
 
 
 def get_tunneldigger_interface_name(index):

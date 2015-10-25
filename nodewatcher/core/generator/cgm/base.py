@@ -247,11 +247,16 @@ class PlatformConfiguration(object):
     crypto_manager_class = PlatformCryptoManager
     file_manager_class = PlatformFileManager
 
-    def __init__(self):
+    def __init__(self, platform, node):
         """
         Class constructor.
+
+        :param platform: Platform instance
+        :param node: Node instance this configuration is for
         """
 
+        self.platform = platform
+        self.node = node
         self.resources = self.resources_class()
         self.packages = self.packages_class()
         self.accounts = self.accounts_class()
@@ -318,7 +323,7 @@ class PlatformBase(object):
         Generates a concrete configuration for this platform.
         """
 
-        cfg = self.config_class()
+        cfg = self.config_class(self, node)
 
         modules = copy.copy(self._modules)
 

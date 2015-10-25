@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_base
+from nodewatcher.core.generator.cgm import base as cgm_base
 
 from . import models
 
@@ -47,26 +47,17 @@ def tunneldigger(node, cfg):
 
             broker.bind_interface = section.get_key()
 
-        # Configure downstream limits if any are defined for this interface
-        for limit in interface.limits.filter(enabled=True):
-            limit = limit.cast()
-            if not isinstance(limit, cgm_models.ThroughputInterfaceLimitConfig):
-                # We currently only support bandwidth limits, others are ignored as
-                # far as tunneldigger is concerned
-                continue
+        # Configure downstream limits if any are defined for this interface.
+        try:
+            for qos in interface.qos.filter(enabled=True):
+                if qos.download:
+                    broker.limit_bw_down = qos.download
 
-            if limit.limit_out:
-                # Configure upload limit via local QoS
-                qos = cfg.qos.add(interface=ifname)
-                qos.enabled = True
-                qos.classgroup = 'Default'
-                qos.upload = limit.limit_out
-
-            if limit.limit_in:
-                broker.limit_bw_down = limit.limit_in
-
-            # Only take the first bandwidth limit into account and ignore the rest.
-            break
+                # Only take the first bandwidth limit into account and ignore the rest.
+                break
+        except AttributeError:
+            # Support for QoS is not installed, skip any bandwidth limit configuration.
+            pass
 
         # Create routing policy entries to ensure tunneldigger connections are not
         # routed via the mesh

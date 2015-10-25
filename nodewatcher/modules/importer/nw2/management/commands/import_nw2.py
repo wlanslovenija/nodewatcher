@@ -24,6 +24,7 @@ from nodewatcher.modules.vpn.tunneldigger import models as tunneldigger_models
 from nodewatcher.modules.monitor.sources.http import models as telemetry_http_models
 from nodewatcher.modules.identity.base import models as identity_base_models
 from nodewatcher.modules.services.dns import models as dns_models
+from nodewatcher.modules.qos.base import models as qos_models
 from nodewatcher.utils import ipaddr
 
 # Applications that this import process requires to be installed
@@ -44,6 +45,7 @@ REQUIRED_APPS = [
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.identity.base',
     'nodewatcher.modules.services.dns',
+    'nodewatcher.modules.qos.base',
 ]
 
 # Mapping of nodewatcher v2 node types to v3 node types
@@ -66,7 +68,7 @@ ROUTER_MAP = {
     "wl-500gp": "wl500gpv1",
     "wl-500gp-v1": "wl500gpv1",
     "wl-500gd": "wl500gpv1",
-    "rb433ah": "rb433ah",
+    "rb433ah": "mt-rb2011uias-2hnd-in",
     "tp-wr741nd": "tp-wr741ndv4",
     "tp-wr740nd": "tp-wr740ndv4",
     "tp-wr743nd": "tp-wr743ndv1",
@@ -747,11 +749,11 @@ class Command(base.BaseCommand):
 
                         # Throughput limits
                         if node['profile']['vpn_egress_limit'] or node['profile']['vpn_ingress_limit']:
-                            node_mdl.config.core.interfaces.limits(
-                                create=cgm_models.ThroughputInterfaceLimitConfig,
+                            node_mdl.config.core.interfaces.qos(
+                                create=qos_models.InterfaceQoSConfig,
                                 interface=iface_vpn,
-                                limit_in=str(node['profile']['vpn_ingress_limit'] or ''),
-                                limit_out=str(node['profile']['vpn_egress_limit'] or ''),
+                                download=node['profile']['vpn_ingress_limit'] or 0,
+                                upload=node['profile']['vpn_egress_limit'] or 0,
                             ).save()
 
                 # DNS servers.

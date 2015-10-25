@@ -403,11 +403,12 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
     crypto_manager_class = OpenWrtCryptoManager
     sysctl_manager_class = OpenWrtSysctlManager
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Class constructor.
         """
-        super(UCIConfiguration, self).__init__()
+
+        super(UCIConfiguration, self).__init__(*args, **kwargs)
         self.sysctl = self.sysctl_manager_class()
         self._roots = {}
 
@@ -744,25 +745,6 @@ def configure_interface(cfg, node, interface, section, iface_name):
             configure_network(cfg, node, interface, network, alias, iface_name)
     else:
         section.proto = 'none'
-
-    # Configure QoS for this interface when specified
-    for limit in interface.limits.filter(enabled=True):
-        limit = limit.cast()
-        if not isinstance(limit, cgm_models.ThroughputInterfaceLimitConfig):
-            # We currently only support bandwidth limits
-            continue
-
-        qos = cfg.qos.add(interface=iface_name)
-        qos.enabled = True
-        qos.classgroup = 'Default'
-
-        if limit.limit_in:
-            qos.download = limit.limit_in
-        if limit.limit_out:
-            qos.upload = limit.limit_out
-
-        # Only take the first bandwidth limit into account and ignore the rest
-        break
 
     if section._uplink:
         # An uplink interface cannot be used for routing.
@@ -1353,80 +1335,6 @@ def network(node, cfg):
             cfg.packages.update([
                 'wireless-tools'
             ])
-
-
-@cgm_base.register_platform_module('openwrt', 15)
-def qos_base(node, cfg):
-    """
-    Configures basic QoS rules (independent of interfaces).
-    """
-
-    def add_classify(target, ports, proto=None):
-        c = cfg.qos.add('classify')
-        c.target = target
-        c.ports = ','.join([str(x) for x in ports])
-        if proto is not None:
-            c.proto = proto
-
-    def add_default(target, proto=None, portrange=None, pktsize=None):
-        d = cfg.qos.add('default')
-        d.target = target
-        if proto is not None:
-            d.proto = proto
-        if portrange is not None:
-            d.portrange = '%d-%d' % portrange
-        if pktsize is not None:
-            d.pktsize = pktsize
-
-    def add_reclassify(target, proto=None, pktsize=None, mark=None, tcpflags=None):
-        r = cfg.qos.add('reclassify')
-        r.target = target
-        if proto is not None:
-            r.proto = proto
-        if pktsize is not None:
-            r.pktsize = pktsize
-        if mark is not None:
-            r.mark = mark
-        if tcpflags is not None:
-            r.tcpflags = tcpflags
-
-    def add_classgroup(name, classes, default):
-        g = cfg.qos.add(classgroup=name)
-        g.classes = ' '.join(classes)
-        g.default = default
-
-    def add_class(name, packetsize=None, packetdelay=None, maxsize=None, avgrate=None, priority=None):
-        c = cfg.qos.add(**{'class': name})
-        if packetsize is not None:
-            c.packetsize = packetsize
-        if packetdelay is not None:
-            c.packetdelay = packetdelay
-        if maxsize is not None:
-            c.maxsize = maxsize
-        if avgrate is not None:
-            c.avgrate = avgrate
-        if priority is not None:
-            c.priority = priority
-
-    # Configure default OpenWrt QoS rules
-    add_classify(target='Priority', ports=[22, 53])
-    add_classify(target='Normal', proto='tcp', ports=[20, 21, 25, 80, 110, 443, 993, 995])
-    add_classify(target='Express', ports=[5190])
-    add_default(target='Express', proto='udp', pktsize=-500)
-    add_reclassify(target='Priority', proto='icmp')
-    add_default(target='Bulk', portrange=(1024, 65535))
-    add_reclassify(target='Priority', proto='tcp', pktsize=-128, mark='!Bulk', tcpflags='SYN')
-    add_reclassify(target='Priority', proto='tcp', pktsize=-128, mark='!Bulk', tcpflags='ACK')
-    add_classgroup(name='Default', classes=['Priority', 'Express', 'Normal', 'Bulk'], default='Normal')
-    add_class(name='Priority', packetsize=400, maxsize=400, avgrate=10, priority=20)
-    add_class(name='Priority_down', packetsize=1000, avgrate=10)
-    add_class(name='Express', packetsize=1000, maxsize=800, avgrate=50, priority=10)
-    add_class(name='Normal', packetsize=1500, packetdelay=100, avgrate=10, priority=5)
-    add_class(name='Normal_down', avgrate=20)
-    add_class(name='Bulk', avgrate=1, packetdelay=200)
-
-    # Ensure that we have qos-scripts installed
-    cfg.packages.update(['qos-scripts'])
 
 
 @cgm_base.register_platform_module('openwrt', 15)
