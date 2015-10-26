@@ -1,0 +1,51 @@
+#!/bin/sh
+#DEBUG="echo"
+
+. /lib/functions.sh
+. /lib/functions/commotion.sh
+. /lib/config/uci.sh
+
+if [ "$ACTION" == "ifup" -a "$INTERFACE" == "{{ client_interface.get_key }}" ]; then
+
+    ALIAS="thisnode"
+    localip="$(commotion_gen_ip 169.254.0.0 255.255.0.0)"
+
+        logger -t commotion.hotplug.thisnode -s "Checking for $ALIAS entry in /etc/config/dhcp"
+
+        if grep -Fq $ALIAS /etc/config/dhcp; then
+        logger -t commotion.hotplug.thisnode -s "Found $ALIAS in /etc/config/dhcp"
+        else
+uci batch <<EOF
+    set dhcp.$ALIAS=domain
+    set dhcp.$ALIAS.name=$ALIAS
+    set dhcp.$ALIAS.ip=$localip
+    commit dhcp
+EOF
+        /etc/init.d/dnsmasq restart
+                logger -t commotion.hotplug.thisnode -s "Adding $ALIAS to /etc/config/dhcp"
+    fi
+
+
+    logger -t commotion.hotplug.thisnode -s "Checking for UCI entry for $ALIAS alias"
+
+    if grep -Fq $ALIAS /etc/config/network; then
+          logger -t commotion.hotplug.thisnode -s "$ALIAS alias exists with ip address $localip"
+
+    else
+        logger -t commotion.hotplug.thisnode -s "No entry found. Creating UCI entry for '$ALIAS' alias"
+
+uci batch <<EOF
+    set network.$ALIAS=interface
+    set network.$ALIAS.ifname=br-{{ client_interface.get_key }}
+    set network.$ALIAS.proto=static
+    set network.$ALIAS.ipaddr=$localip
+    set network.$ALIAS.netmask=255.255.0.0
+    commit network
+EOF
+
+        logger -t commotion.hotplug.thisnode -s "Setting '$ALIAS' ip address to $localip"
+            /etc/init.d/network reload
+    fi
+        #NOTE: this method of configuring aliases is only supported on barrier breaker, not attitude adjustment
+
+fi

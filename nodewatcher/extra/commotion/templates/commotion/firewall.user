@@ -1,0 +1,4 @@
+{% if client_interface %}
+iptables -I INPUT -i br-{{ client_interface.get_key }} -p tcp --dport 22 -m state --state NEW -m recent --set
+iptables -I INPUT -i br-{{ client_interface.get_key }} -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 -j DROP
+{% endif %}

@@ -1,3 +1,5 @@
+import os
+
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.generator.cgm import base as cgm_base, models as cgm_models
@@ -64,6 +66,9 @@ def commotion_network(node, cfg):
                     _("Unsupported DHCP option '%s' for OpenWrt commotion network configuration!") % network.dhcp
                 )
 
+    # Enable bridge iptables.
+    cfg.sysctl.set_variable('net.bridge.bridge-nf-call-iptables', 1)
+
     # Configure DHCP defaults.
     dnsmasq = cfg.dhcp.find_ordered_section('dnsmasq')
     dnsmasq.domainneeded = True
@@ -103,6 +108,14 @@ def commotion_network(node, cfg):
     cert.state = 'DC'
     cert.location = 'Washington'
     cert.commonname = 'Commotion'
+
+    splash = cfg.uhttpd.add(uhttpd='splash')
+    splash.home = '/www/cgi-bin/splash/'
+    splash.interpreter = '.sh=/bin/ash'
+    splash.listen_http = 8082
+    splash.index_page = 'splash.sh'
+    splash.error_page = '/splash.sh'
+    splash.http_keepalive = 0
 
     # Configure olsrd defaults.
     olsrd = cfg.olsrd.add('olsrd')
@@ -150,8 +163,44 @@ def commotion_network(node, cfg):
     plugin.UUIDFile = '/etc/olsrd.d/olsrd.uuid'
     cfg.packages.add('olsrd-mod-jsoninfo')
 
+    # Applications.
+    apps = cfg.applications.add(settings='settings')
+    apps.category = ['Community', 'Collaboration', 'Fun']
+    apps.autoapprove = True
+    apps.lifetime = 86400
+    apps.allowpermanent = True
+    apps.disabled = False
+
     # Ensure commotion packages are installed.
     cfg.packages.update([
         'commotion',
         'commotion-gui',
     ])
+
+
+@cgm_base.register_platform_module('openwrt', 510)
+def commotion_files(node, cfg):
+    """
+    Installs any additional files required by commotion firmware.
+    """
+
+    # Determine the client interface.
+    client_interface = cfg.network.find_named_section('interface', **{'class': 'client'})
+
+    files = [
+        ('sysupgrade.conf', '/etc', {}),
+        ('rc.local', '/etc', {}),
+        ('firewall.user', '/etc', {'client_interface': client_interface}),
+        ('nodogsplash.conf', '/etc/nodogsplash', {'client_interface': client_interface}),
+
+        # TODO: These really belong into commotion packages.
+        ('40-olsrd', '/etc/hotplug.d/iface', {}),
+        ('90-thisnode', '/etc/hotplug.d/iface', {}),
+    ]
+
+    for filename, path, context in files:
+        cfg.files.install(
+            os.path.join(path, filename),
+            os.path.join('commotion', filename),
+            context=context,
+        )
