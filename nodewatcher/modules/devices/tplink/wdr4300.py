@@ -43,6 +43,7 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
             'sw0', "Switch0",
             ports=6,
             cpu_port=0,
+            cpu_tagged=True,
             vlans=16,
         )
     ]
