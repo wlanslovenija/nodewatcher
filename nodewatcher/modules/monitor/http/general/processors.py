@@ -23,24 +23,30 @@ class GeneralInfo(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        version = context.http.get_module_version("core.general")
-        if version == 0:
-            # Unsupported version or data fetch failed (v0).
+        if not context.http.get_version():
             return context
 
-        # Create models when they don't yet exist.
+        # Create general model when they don't yet exist.
         general = node.monitoring.core.general()
         if general is None:
             general = node.monitoring.core.general(create=monitor_models.GeneralMonitor)
-
-        status = node.monitoring.system.status()
-        if status is None:
-            status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
 
         if not general.first_seen:
             general.first_seen = timezone.now()
 
         general.last_seen = timezone.now()
+
+        version = context.http.get_module_version("core.general")
+        if not version:
+            # Unsupported version or data fetch failed.
+            general.save()
+            return context
+
+        # Create status model when they don't yet exist.
+        status = node.monitoring.system.status()
+        if status is None:
+            status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
+
         if version >= 4:
             general.uuid = context.http.core.general.uuid
             general.firmware = context.http.core.general.version
