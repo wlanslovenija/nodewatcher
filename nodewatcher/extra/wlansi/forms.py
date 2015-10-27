@@ -97,6 +97,8 @@ class DefaultRouterID(registry_forms.FormDefaults):
 
         # Ensure there is one router ID allocated from the default pool.
         router_ids = state.filter_items('core.routerid')
+        if router_ids:
+            return
 
         # Check if we have a project selected.
         project_config = state.lookup_item(project_models.ProjectConfig)
@@ -107,20 +109,12 @@ class DefaultRouterID(registry_forms.FormDefaults):
             return
 
         # Create a new allocated router identifier from the default IP pool.
-        if router_ids:
-            state.update_item(
-                router_ids[0],
-                family='ipv4',
-                pool=project_config.project.default_ip_pool,
-                prefix_length=29,
-            )
-        else:
-            state.append_item(
-                ip_models.AllocatedIpRouterIdConfig,
-                family='ipv4',
-                pool=project_config.project.default_ip_pool,
-                prefix_length=29,
-            )
+        state.append_item(
+            ip_models.AllocatedIpRouterIdConfig,
+            family='ipv4',
+            pool=project_config.project.default_ip_pool,
+            prefix_length=29,
+        )
 
 registration.point('node.config').add_form_defaults(DefaultRouterID())
 
