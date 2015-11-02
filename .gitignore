@@ -12,3 +12,4 @@
 .idea
 *.sublime-*
 dump.sql
+celerybeat-schedule

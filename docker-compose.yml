@@ -71,7 +71,7 @@ generator:
         - builderlantiq
 monitorq:
     build: .
-    command: "scripts/docker-cleanup; celery worker -A nodewatcher -l info -Q monitor --autoreload"
+    command: "scripts/docker-cleanup; celery worker -A nodewatcher -l info -Q monitor -B --autoreload"
     entrypoint: scripts/docker-run
     environment:
         # Allow celery to run under the root user in order for it to have access
