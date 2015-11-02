@@ -1,5 +1,7 @@
 import datetime
 
+from django.utils import timezone
+
 from nodewatcher import celery
 
 from . import models
@@ -18,5 +20,5 @@ def cleanup(self):
     """
 
     models.UnknownNode.objects.filter(
-        last_seen__lt=datetime.datetime.now() - datetime.timedelta(minutes=30)
+        last_seen__lt=timezone.now() - datetime.timedelta(minutes=30)
     ).delete()
