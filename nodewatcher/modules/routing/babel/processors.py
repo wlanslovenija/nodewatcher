@@ -86,6 +86,7 @@ class BabelTopology(monitor_processors.NodeProcessor):
         rtm.average_txcost = None
         rtm.average_rttcost = None
         rtm.average_cost = None
+        rtm.link_count = 0
 
         version = context.http.get_module_version('core.routing.babel')
 

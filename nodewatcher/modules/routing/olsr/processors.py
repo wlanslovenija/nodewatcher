@@ -131,6 +131,7 @@ class NodeTopology(monitor_processors.NodeProcessor):
         rtm.average_lq = None
         rtm.average_ilq = None
         rtm.average_etx = None
+        rtm.link_count = 0
 
         if not context.push.source:
             # The processor is being invoked in global context. In this case, the GlobalTopology
