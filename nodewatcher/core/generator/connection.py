@@ -3,6 +3,7 @@ import io
 import os
 import paramiko
 import pipes
+import socket
 
 from . import exceptions
 from .cgm import exceptions as cgm_exceptions
@@ -51,7 +52,7 @@ class BuilderConnection(object):
             transport = self.client.get_transport()
             transport.set_keepalive(60)
             self.sftp = transport.open_sftp_client()
-        except (paramiko.SSHException, paramiko.SFTPError):
+        except (paramiko.SSHException, paramiko.SFTPError, socket.error):
             raise exceptions.BuilderConnectionFailed
 
         return self
