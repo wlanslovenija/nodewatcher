@@ -2,6 +2,7 @@ import hashlib
 import io
 import json
 import os
+import traceback
 
 import unidecode
 
@@ -69,7 +70,8 @@ def background_build(self, result_uuid):
         generator_events.BuildResultFailed(result).post()
         return
     except:
-        result.build_log = 'Internal build error.'
+        result.build_log = 'An internal build error has occurred.\n\n'
+        result.build_log += traceback.format_exc()
         result.status = generator_models.BuildResult.FAILED
         result.save()
 
