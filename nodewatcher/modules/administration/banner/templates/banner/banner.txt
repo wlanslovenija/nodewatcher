@@ -11,4 +11,5 @@
         UUID: {{uuid}}
       Device: {{device_manufacturer}} {{device_name}}
   Configured: {{timestamp}}
+     Version: {{version}}
 

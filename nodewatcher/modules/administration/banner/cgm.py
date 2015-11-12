@@ -27,7 +27,7 @@ def banner(node, cfg):
     # the login banner by default.
     general = node.config.core.general()
     device = general.get_device()
-    if not device:
+    if not device or not cfg.builder:
         return
 
     banner_template = template.loader.get_template('banner/banner.txt')
@@ -37,6 +37,5 @@ def banner(node, cfg):
         'device_manufacturer': device.manufacturer,
         'device_name': device.name,
         'timestamp': now.strftime('%d.%m.%Y %H:%M:%S %Z'),
+        'version': cfg.builder.version.name,
     }))
-
-    # TODO: We currently cannot include the firmware version as configuration is generated before building.
