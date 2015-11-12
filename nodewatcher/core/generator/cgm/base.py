@@ -257,6 +257,7 @@ class PlatformConfiguration(object):
 
         self.platform = platform
         self.node = node
+        self.builder = None
         self.resources = self.resources_class()
         self.packages = self.packages_class()
         self.accounts = self.accounts_class()
@@ -282,6 +283,37 @@ class PlatformConfiguration(object):
         """
 
         return self._deferred_configuration
+
+    def has_package_version(self, package, version):
+        """
+        Returns True if the target builder has at least the specified version
+        of the package. In case builder metadata is not available, this method
+        will return False.
+
+        :param package: Package identifier
+        :param version: Package version string
+        """
+
+        if not self.builder:
+            return False
+
+        installed = self.builder.metadata['packages'].get(package, None)
+        if not installed:
+            return False
+
+        return self.package_version_compare(package['version'], version) >= 0
+
+    def package_version_compare(self, version_a, version_b):
+        """
+        Platform-specific version check. Should return an integer, which is
+        less than, equal to or greater than zero, based on the result of the
+        comparison.
+
+        :param version_a: First version
+        :param version_b: Second version
+        """
+
+        return False
 
     def get_build_config(self):
         """
@@ -324,6 +356,11 @@ class PlatformBase(object):
         """
 
         cfg = self.config_class(self, node)
+
+        try:
+            cfg.builder = self.get_builder(node)[1]
+        except exceptions.BuilderConfigurationError:
+            cfg.builder = None
 
         modules = copy.copy(self._modules)
 
@@ -447,6 +484,12 @@ class PlatformBase(object):
             )
         except generator_models.Builder.DoesNotExist:
             raise exceptions.NoSuitableBuildersFound
+
+        # Ensure that current builder metadata is consistent with what has been stored
+        # in the database. Otherwise, the actual builder may be replaced and we will be
+        # operating on incorrect data.
+        if not builder.is_consistent():
+            raise exceptions.BuilderInconsistent
 
         return build_channel, builder
 

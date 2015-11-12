@@ -118,6 +118,10 @@ class Builder(models.Model):
         blank=True,
         editable=False,
     )
+    metadata = json_field.JSONField(
+        blank=True,
+        editable=False,
+    )
     host = models.CharField(
         max_length=50,
         help_text=_('Builder host, reachable over SSH and HTTP.'),
@@ -126,7 +130,7 @@ class Builder(models.Model):
         help_text=_('Private key for SSH authentication.'),
     )
 
-    def get_metadata(self):
+    def _get_metadata(self):
         """
         Establishes a connection with the builder and fetches metadata.
 
@@ -141,18 +145,21 @@ class Builder(models.Model):
         when one does not yet exist.
         """
 
-        # Fetch metadata via HTTP
+        # Fetch metadata via HTTP.
         try:
-            metadata = self.get_metadata()
+            metadata = self._get_metadata()
             self.platform = str(metadata['platform'])
             self.architecture = str(metadata['architecture'])
             self.version, created = BuildVersion.objects.get_or_create(name=str(metadata['version']))
+            self.metadata = {
+                'packages': metadata.get('packages', {}),
+            }
         except ValueError:
             raise django_exceptions.ValidationError(_('Failed to obtain metadata from builder!'))
         except requests.ConnectionError:
             raise django_exceptions.ValidationError(_('Failed to establish connection with builder!'))
 
-        # Verify that the builder is also reachable over SSH
+        # Verify that the builder is also reachable over SSH.
         try:
             with self.connect():
                 pass
@@ -160,6 +167,25 @@ class Builder(models.Model):
             raise django_exceptions.ValidationError(_('Failed to establish SSH connection with builder!'))
         except exceptions.MalformedPrivateKey:
             raise django_exceptions.ValidationError(_('Specified private key is malformed!'))
+
+    def is_consistent(self):
+        """
+        Verifies that the remote builder still has the same metadata as when it
+        was registered.
+        """
+
+        metadata = self._get_metadata()
+
+        if self.platform != str(metadata['platform']):
+            return False
+
+        if self.architecture != str(metadata['architecture']):
+            return False
+
+        if self.version.name != str(metadata['version']):
+            return False
+
+        return True
 
     def connect(self):
         """

@@ -1,5 +1,7 @@
 import collections
 
+import apt_pkg
+
 from django.conf import settings
 from django.utils import crypto
 from django.utils.translation import ugettext as _
@@ -11,6 +13,9 @@ from nodewatcher.core.generator.cgm import models as cgm_models, base as cgm_bas
 from nodewatcher.utils import posix_tz
 
 from . import builder as openwrt_builder
+
+# Make sure APT is initialized.
+apt_pkg.init()
 
 
 class UCIFormat:
@@ -411,6 +416,18 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         super(UCIConfiguration, self).__init__(*args, **kwargs)
         self.sysctl = self.sysctl_manager_class()
         self._roots = {}
+
+    def package_version_compare(self, version_a, version_b):
+        """
+        Platform-specific version check. Should return an integer, which is
+        less than, equal to or greater than zero, based on the result of the
+        comparison.
+
+        :param version_a: First version
+        :param version_b: Second version
+        """
+
+        return apt_pkg.version_compare(version_a, version_b)
 
     def get_build_config(self):
         """

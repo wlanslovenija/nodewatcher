@@ -11,3 +11,4 @@ fping
 libffi-dev
 eot-utils
 python-fontforge
+python-apt

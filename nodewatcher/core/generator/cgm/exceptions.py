@@ -29,6 +29,15 @@ class NoSuitableBuildersFound(BuilderConfigurationError):
     pass
 
 
+class BuilderInconsistent(BuilderConfigurationError):
+    """
+    Exception that gets raised when builder metadata is inconsistent with data
+    stored in the local database.
+    """
+
+    pass
+
+
 class NoDeviceConfigured(BuilderConfigurationError):
     """
     Exception that gets raised when no device is configured.
