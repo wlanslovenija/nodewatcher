@@ -294,7 +294,7 @@ class PlatformConfiguration(object):
         :param version: Package version string
         """
 
-        if not self.builder:
+        if not self.builder or not self.builder.metadata:
             return False
 
         installed = self.builder.metadata['packages'].get(package, None)
