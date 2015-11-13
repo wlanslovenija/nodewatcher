@@ -99,7 +99,10 @@ def babel(node, cfg):
 
     # Ensure default route is exported into a different table.
     default_route = cfg.babeld.add('filter')
-    default_route.type = 'export'
+    if cfg.has_package_version('babeld', '1.7.0'):
+        default_route.type = 'install'
+    else:
+        default_route.type = 'export'
     default_route.ip = '0.0.0.0/0'
     default_route.le = 0
     default_route.table = ROUTING_TABLE_DEFAULT_ID

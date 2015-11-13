@@ -301,7 +301,7 @@ class PlatformConfiguration(object):
         if not installed:
             return False
 
-        return self.package_version_compare(package['version'], version) >= 0
+        return self.package_version_compare(installed['version'], version) >= 0
 
     def package_version_compare(self, version_a, version_b):
         """
