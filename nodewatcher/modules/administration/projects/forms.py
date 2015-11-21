@@ -1,11 +1,11 @@
-from django.dispatch import receiver
+from django import dispatch
 
 from nodewatcher.core.allocation.ip import signals
 
 from . import models
 
 
-@receiver(signals.filter_pools)
+@dispatch.receiver(signals.filter_pools)
 def filter_pools(sender, pool, cfg, **kwargs):
     """
     Project-based pool selection.
