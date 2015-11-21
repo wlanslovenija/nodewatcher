@@ -4,7 +4,7 @@ from django.contrib.auth import models as auth_models
 from django.db import transaction
 from django.db.models import signals as models_signals
 
-from ... import utils
+from ... import models
 
 
 class Command(management_base.NoArgsCommand):
@@ -20,16 +20,15 @@ class Command(management_base.NoArgsCommand):
         """
 
         verbosity = int(options.get('verbosity', 1))
-        model = utils.get_profile_model()
         for user in auth_models.User.objects.all():
-            profile, created = model.objects.get_or_create(user=user)
+            profile, created = models.UserProfileAndSettings.objects.get_or_create(user=user)
             if verbosity == 2 and created:
                 self.stdout.write('Created %s.\n' % profile)
         transaction.commit_unless_managed()
 
 
 def command_signal(sender, app, created_models, **kwargs):
-    if utils.get_profile_model() in created_models:
+    if models.UserProfileAndSettings in created_models:
         management.call_command('createprofiles', **kwargs)
 
-models_signals.post_syncdb.connect(command_signal, sender=utils.get_profile_model().__module__)
+models_signals.post_syncdb.connect(command_signal, sender=models)

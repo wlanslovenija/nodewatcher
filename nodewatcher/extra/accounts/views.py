@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from registration import models as registration_models
 from registration.backends.model_activation import views as registration_views
 
-from . import decorators, forms, signals, utils
+from . import decorators, forms, models, signals, utils
 
 
 class RegistrationView(registration_views.RegistrationView):
@@ -25,7 +25,7 @@ class RegistrationView(registration_views.RegistrationView):
         """
 
         user = super(RegistrationView, self).register(**kwargs)
-        profile, created = utils.get_profile_model().objects.get_or_create(user=user)
+        profile, created = models.UserProfileAndSettings.objects.get_or_create(user=user)
 
         # lambda-object to the rescue
         form = lambda: None

@@ -28,28 +28,6 @@ def generate_random_password(length=8):
     return x
 
 
-def get_profile_model():
-    """
-    Gets user profile model based on AUTH_PROFILE_MODULE setting.
-
-    Code based on `django.contrib.auth.models.User.get_profile`.
-    """
-
-    if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
-        raise auth_models.SiteProfileNotAvailable('You need to set AUTH_PROFILE_MODULE in your project settings')
-    try:
-        app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
-    except ValueError:
-        raise auth_models.SiteProfileNotAvailable('app_label and model_name should be separated by a dot in the AUTH_PROFILE_MODULE setting')
-    try:
-        model = apps.get_model(app_label, model_name)
-        if model is None:
-            raise auth_models.SiteProfileNotAvailable('Unable to load the profile model, check AUTH_PROFILE_MODULE in your project settings')
-    except (ImportError, exceptions.ImproperlyConfigured):
-        raise auth_models.SiteProfileNotAvailable
-    return model
-
-
 def intersect(a, b):
     """
     Finds the intersection of two dictionaries.
