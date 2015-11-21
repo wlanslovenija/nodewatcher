@@ -20,11 +20,11 @@ class Command(management_base.NoArgsCommand):
         """
 
         verbosity = int(options.get('verbosity', 1))
-        for user in auth_models.User.objects.all():
-            profile, created = models.UserProfileAndSettings.objects.get_or_create(user=user)
-            if verbosity == 2 and created:
-                self.stdout.write('Created %s.\n' % profile)
-        transaction.commit_unless_managed()
+        with transaction.atomic():
+            for user in auth_models.User.objects.all():
+                profile, created = models.UserProfileAndSettings.objects.get_or_create(user=user)
+                if verbosity == 2 and created:
+                    self.stdout.write('Created %s.\n' % profile)
 
 
 def command_signal(sender, app, created_models, **kwargs):
