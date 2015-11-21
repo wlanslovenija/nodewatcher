@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 # Argument is user which has logged in
 user_login = dispatch.Signal(providing_args=["request", "user"])
 
-# Arugment is user which has logged out if any
+# Argument is user which has logged out if any
 user_logout = dispatch.Signal(providing_args=["request", "user"])
 
 
