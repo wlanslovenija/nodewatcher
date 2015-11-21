@@ -77,7 +77,7 @@ class UserCreationForm(auth_forms.UserCreationForm):
 
     error_css_class = 'error'
     required_css_class = 'required'
-    fieldset = user_add_fieldsets
+    fieldsets = user_add_fieldsets
 
     class Meta(auth_forms.UserCreationForm.Meta):
         # By default first name, last name and e-mail address are not created at user creation, but we want them
@@ -132,7 +132,7 @@ class UserChangeForm(AdminUserChangeForm):
 
     error_css_class = 'error'
     required_css_class = 'required'
-    fieldset = user_change_fieldsets
+    fieldsets = user_change_fieldsets
 
     def __init__(self, *args, **kwargs):
         # This is here just because of the bug in Django which does not remove explicitly declared fields in parent class from
@@ -160,7 +160,7 @@ class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
         fields = '__all__'
 
 
-class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
+class AccountRegistrationForm(metaforms.FieldsetsFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
     """
     This class defines combined form for `django.contrib.auth.models.User` and `nodewatcher.extra.accounts.models.UserProfileAndSettings` objects.
     It is used for user registration.
@@ -168,7 +168,7 @@ class AccountRegistrationForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncl
 
     error_css_class = 'error'
     required_css_class = 'required'
-    fieldset = UserCreationForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
+    fieldsets = UserCreationForm.fieldsets + list(UserProfileAndSettingsChangeForm.Meta.model.fieldsets)
 
     def save(self, commit=True):
         # We disable save method as registration module (through `nodewatcher.extra.accounts.views.RegistrationView`) takes
@@ -236,13 +236,13 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
         check_password_length(self)
 
 
-class AccountChangeForm(metaforms.FieldsetFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
+class AccountChangeForm(metaforms.FieldsetsFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
     """
     This class defines combined change form for `django.contrib.auth.models.User` and `nodewatcher.extra.accounts.models.UserProfileAndSettings` objects.
     """
 
     error_css_class = 'error'
     required_css_class = 'required'
-    fieldset = UserChangeForm.fieldset + list(UserProfileAndSettingsChangeForm.Meta.model.fieldset)
+    fieldsets = UserChangeForm.fieldsets + list(UserProfileAndSettingsChangeForm.Meta.model.fieldsets)
 
     __metaclass__ = metaforms.ParentsIncludedModelFormMetaclass

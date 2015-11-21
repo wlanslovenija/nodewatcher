@@ -141,13 +141,13 @@ class FieldsetBoundField(forms.BoundField):
         self.fieldset = fieldset
 
 
-class FieldsetFormMixin(object):
+class FieldsetsFormMixin(object):
     """
     This mixin class defines methods to use with other form classes to extend them to return `FieldsetBoundField` when accessing
-    forms' fields. If such form class has `fieldset` attribute defined it is used to attach fieldset to all fields, which
+    forms' fields. If such form class has `fieldsets` attribute defined it is used to attach fieldset to all fields, which
     are returned as `FieldsetBoundField`.
 
-    `fieldset` attribute should have the same structure as that for `django.contrib.admin.ModelAdmin`. The attached fieldset is
+    `fieldsets` attribute should have the same structure as that for `django.contrib.admin.ModelAdmin`. The attached fieldset is
     the given fieldset dictionary with `name` set to the name of the fieldset.
 
     It should be listed as the parent class before `django.forms.models.ModelForm` based classes so that methods here take
@@ -156,29 +156,29 @@ class FieldsetFormMixin(object):
 
     def __iter__(self):
         """
-        If `fieldset` attribute is not defined we iterate normally. Otherwise we iterate in the order in which fields
-        are defined in `fieldset` attribute. In the later case we return fields as `FieldsetBoundField`.
+        If `fieldsets` attribute is not defined we iterate normally. Otherwise we iterate in the order in which fields
+        are defined in `fieldsets` attribute. In the later case we return fields as `FieldsetBoundField`.
         """
 
-        if not hasattr(self, 'fieldset'):
-            for field in super(FieldsetFormMixin, self).__iter__():
+        if not hasattr(self, 'fieldsets'):
+            for field in super(FieldsetsFormMixin, self).__iter__():
                 yield field
         else:
-            for field in admin_util.flatten_fieldsets(self.fieldset):
+            for field in admin_util.flatten_fieldsets(self.fieldsets):
                 yield self[field]
 
     def __getitem__(self, name):
         """
-        If `fieldset` attribute is not defined we return the field normally. Otherwise we return the field as `FieldsetBoundField`
-        with fieldset attached to it. It the later case the field has to be defined in `fieldset` attribute.
+        If `fieldsets` attribute is not defined we return the field normally. Otherwise we return the field as `FieldsetBoundField`
+        with fieldsets attached to it. It the later case the field has to be defined in `fieldsets` attribute.
         """
 
-        field = super(FieldsetFormMixin, self).__getitem__(name)
-        if not hasattr(self, 'fieldset'):
+        field = super(FieldsetsFormMixin, self).__getitem__(name)
+        if not hasattr(self, 'fieldsets'):
             return field
         else:
             fieldset = None
-            for fname, fset in self.fieldset:
+            for fname, fset in self.fieldsets:
                 if name in fset['fields']:
                     # We copy dictionary here so that we do not dirty it with later changes
                     fieldset = fset.copy()

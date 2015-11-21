@@ -36,7 +36,7 @@ class UserProfileAndSettings(django_models.Model):
     attribution = django_models.CharField(_('attribution'), max_length=8, choices=ATTRIBUTION_CHOICES, default=ATTRIBUTION_CHOICES[0][0], help_text=_('What to use when we want to give you public attribution for your participation and contribution?'))
 
     # AccountRegistrationForm and AccountChangeForm uses this
-    fieldset = (
+    fieldsets = (
         (_('Additional personal info'), {
             'fields': ('phone_number', 'country'),
         }),
