@@ -12,7 +12,7 @@ defusedxml==0.4.1
 django-classy-tags==0.6.1
 git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb84e273a#egg=ujson-wlanslovenija
 git+https://github.com/wlanslovenija/django-tastypie.git@fc6467c1bdbae634dc58f885b6ef543d0b09174c#egg=django_tastypie-wlanslovenija
---allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@fe61aace1b8c8131ae914b067f9f2a200fedbeec#egg=django_datastream-master
+--allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@b2ab84f27790c23a9f879d3efb251012e53c757d#egg=django_datastream-master
 django-guardian==1.3
 git+https://github.com/wlanslovenija/django-missing.git@028bb5a94e82a0f290cbd6fb85edf7163fcdf05c#egg=django_missing-master
 git+https://github.com/wlanslovenija/django-overextends.git@03a127e0759373a6c1e6f2c7859cdc516dd8e305#egg=django_overextends-wlanslovenija

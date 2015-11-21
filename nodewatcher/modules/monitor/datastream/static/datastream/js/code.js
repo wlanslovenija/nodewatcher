@@ -8,7 +8,8 @@
                 'tags__node': $nodeGraphs.data('node'),
                 // More streams per page.
                 'limit': 500
-            }
+            },
+            'timezoneOffset': parseInt($nodeGraphs.data('timezone'))
         });
     });
 })(jQuery);

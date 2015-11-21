@@ -16,6 +16,7 @@ def banner(node, cfg):
 
     # Get the node's local timezone using the location schema.
     try:
+        # TODO: Should this go to some method on the node class?
         node_zone = node.config.core.location().timezone or timezone.utc
     except (registry_exceptions.RegistryItemNotRegistered, AttributeError):
         node_zone = timezone.utc

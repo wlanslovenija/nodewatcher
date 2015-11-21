@@ -17,7 +17,7 @@
 {% block included_graphs %}
     {% theme_legend _("Graphs") %}
 
-    <div class="node-graphs {% block node_graphs_classes %}{% endblock node_graphs_classes %}" data-source="{% block node_graphs_data_source %}{% url "api:api_dispatch_list" "v1" "stream" %}{% endblock node_graphs_data_source %}" data-node="{% block node_graphs_data_node %}{{ node.pk }}{% endblock node_graphs_data_node %}">
+    <div class="node-graphs {% block node_graphs_classes %}{% endblock node_graphs_classes %}" data-source="{% block node_graphs_data_source %}{% url "api:api_dispatch_list" "v1" "stream" %}{% endblock node_graphs_data_source %}" data-node="{% block node_graphs_data_node %}{{ node.pk }}{% endblock node_graphs_data_node %}" data-timezone="{% block node_graphs_data_timezone %}{{ timezone_offset }}{% endblock node_graphs_data_timezone %}">
         <p class="loading">{% trans "Loading..." %}</p>
     </div>
 {% endblock included_graphs %}
