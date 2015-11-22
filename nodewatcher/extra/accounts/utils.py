@@ -1,31 +1,4 @@
 import inspect
-import random
-import string
-
-from django.apps import apps
-from django.conf import settings
-from django.contrib.auth import models as auth_models
-from django.core import exceptions
-
-
-def generate_random_password(length=8):
-    """
-    Generates a random password.
-    """
-
-    # Re-seed random number generator
-    # This can make random values even more predictable if for seed
-    # a time-dependent value is used as time of password generation
-    # is easier to deduce than time of the first seed initialization
-    # But Python uses os.urandom source if available so we are probably
-    # better off
-    random.seed()
-
-    x = ''
-    for i in xrange(0, length):
-        x += random.choice(string.ascii_letters + string.digits)
-
-    return x
 
 
 def intersect(a, b):
@@ -51,7 +24,7 @@ def initial_accepts_request(request, form_class):
         if callable(field.initial):
             try:
                 if len(inspect.getargspec(field.initial)[0]) == 1:
-                    # We fight Python aliasing in for loops here
+                    # We fight Python aliasing in for loops here.
                     initial[name] = (lambda fi: lambda: fi(request))(field.initial)
             except:
                 pass
