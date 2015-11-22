@@ -158,7 +158,7 @@ class UserProfileAndSettingsChangeForm(forms_models.ModelForm):
 
     class Meta:
         model = models.UserProfileAndSettings
-        fields = '__all__'
+        fields = forms_models.ALL_FIELDS
 
 
 class AccountRegistrationForm(metaforms.FieldsetsFormMixin, metaforms.ParentsIncludedModelFormMixin, UserCreationForm, UserProfileAndSettingsChangeForm):
