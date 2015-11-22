@@ -1,8 +1,9 @@
 import crypt
-import md5crypt
 
 from django.contrib import auth
 from django.contrib.auth import backends as auth_backends, models as auth_models
+
+from . import md5crypt
 
 try:
     # pylint: disable=import-error
