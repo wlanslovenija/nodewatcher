@@ -1,5 +1,3 @@
-import copy
-
 from django import shortcuts, template
 from django.conf import settings
 from django.contrib import auth, messages
@@ -46,6 +44,17 @@ def user(request, username):
     }, context_instance=template.RequestContext(request))
 
 
+def get_user_copy(user):
+    if isinstance(user, auth_models.AnonymousUser):
+        return auth_models.AnonymousUser()
+
+    for backend in auth.get_backends():
+        user_copy = backend.get_user(user.pk)
+        if user_copy is not None:
+            return user_copy
+
+    assert False
+
 @decorators.authenticated_required
 def account(request):
     """
@@ -57,7 +66,7 @@ def account(request):
     assert request.user.is_authenticated()
 
     if request.method == 'POST':
-        stored_user = copy.copy(request.user)
+        stored_user = get_user_copy(request.user)
 
         form = forms.AccountChangeForm(request.POST, instance=[request.user, request.user.profile])
 
