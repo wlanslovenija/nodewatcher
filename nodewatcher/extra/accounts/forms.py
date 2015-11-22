@@ -2,15 +2,20 @@ from django.conf import settings
 from django.core import validators as core_validators
 from django.forms import forms, models as forms_models
 from django.contrib.admin import util as admin_util
+from django.contrib import auth
 from django.contrib.auth import admin as auth_admin, forms as auth_forms, models as auth_models
 from django.utils.translation import ugettext_lazy as _
 
 from . import metaforms, models, validators
 
+# Fieldsets of fields we use both in admin and registration for the user object creation.
 user_add_fieldsets = list(auth_admin.UserAdmin.add_fieldsets)
-user_add_fieldsets.append(auth_admin.UserAdmin.fieldsets[1]) # UserAdmin.fieldsets[1] contains first name, last name and e-mail address
+# UserAdmin.fieldsets[1] contains first name, last name and e-mail address.
+user_add_fieldsets.append(auth_admin.UserAdmin.fieldsets[1])
 
-user_change_fieldsets = [auth_admin.UserAdmin.fieldsets[1]] # UserAdmin.fieldsets[1] contains first name, last name and e-mail address
+# Fieldsets of fields we use in registration for the user object modification.
+# UserAdmin.fieldsets[1] contains first name, last name and e-mail address.
+user_change_fieldsets = [auth_admin.UserAdmin.fieldsets[1]]
 
 
 def alter_user_form_fields(form):
@@ -21,31 +26,31 @@ def alter_user_form_fields(form):
     """
 
     if 'username' in form.fields:
-        # Minimal length (it is otherwise checked in a form field so we also check it just there)
+        # Minimal length (it is otherwise checked in a form field so we also check it just there).
         if not filter(lambda v: isinstance(v, core_validators.MinLengthValidator), form.fields['username'].validators):
-            # We do not blindly append as field objects can be reused
+            # We do not blindly append as field objects can be reused.
             form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
-        # We set it every time to be sure
+        # We set it every time to be sure.
         form.fields['username'].min_length = 4
         form.fields['username'].help_text = _("Letters, digits and @/./+/-/_ only. Will be public.")
 
-    # E-mail domain validation (we check it in a model field)
+    # E-mail domain validation (we check it in a model field).
     emailfield = filter(lambda x: x.name == 'email', form.Meta.model._meta.fields)[0]
-    # We replace core validator with our own extended version which also checks hostname existence
+    # We replace core validator with our own extended version which also checks hostname existence.
     emailfield.validators = filter(lambda x: not isinstance(x, core_validators.EmailValidator), emailfield.validators)
+    # We do not blindly append as field objects can be reused.
     if validators.validate_email_with_hostname not in emailfield.validators:
-        # We do not blindly append as field objects can be reused
         emailfield.validators.append(validators.validate_email_with_hostname)
 
-    # We add in a form field as it is too late to add in model field
+    # We add in a form field as it is too late to add in model field.
     form.fields['email'].help_text = _("Carefully enter your e-mail address as it will be used for account activation. It will be visible to other registered users.")
     form.fields['first_name'].help_text = _("By default used for attribution. You can hide it to be visible only to network administrators in privacy section bellow.")
     form.fields['last_name'].help_text = form.fields['first_name'].help_text
 
-    # We want those fields to be required (UserCreationForm.Meta.fields is made from user_add_fieldsets)
-    # user_add_fieldsets defines which fields we want at user creation
-    for field in UserCreationForm.Meta.fields:
-        # We check so that function works also on the user change form
+    # We want those fields to be required (`UserCreationForm.Meta.fields` is made from `user_add_fieldsets`).
+    # `user_add_fieldsets` defines which fields we want at user creation.
+    for field in AdminUserCreationForm.Meta.fields:
+        # We check so that function works also on the user change form.
         if field in form.fields:
             form.fields[field].required = True
 
@@ -58,55 +63,58 @@ def check_password_length(form):
     fieldname1 = 'new_password1' if 'new_password1' in form.fields else 'password1'
     fieldname2 = 'new_password2' if 'new_password2' in form.fields else 'password2'
 
-    # Minimal length (it can be checked only in a form field)
+    # Minimal length (it can be checked only in a form field).
     if not filter(lambda v: isinstance(v, core_validators.MinLengthValidator), form.fields[fieldname1].validators):
-        # We do not blindly append as field objects can be reused
+        # We do not blindly append as field objects can be reused.
         form.fields[fieldname1].validators.append(core_validators.MinLengthValidator(6))
-    # We set it every time to be sure
+    # We set it every time to be sure.
     form.fields[fieldname1].min_length = 6
     form.fields[fieldname1].help_text = _("Minimal password length is 6.")
     form.fields[fieldname2].help_text = _("Enter the same password as above, for verification.")
 
 
-class UserCreationForm(auth_forms.UserCreationForm):
+class AdminUserCreationForm(auth_forms.UserCreationForm):
+    """
+    This class defines creation form for `django.contrib.auth.models.User` objects for admin interface.
+
+    It adds first name, last name and e-mail address fields and marks them as required. It validates hostname part
+    of the e-mail address and sets minimal length on username and password fields.
+    """
+
+    # Admin interface does not use our form-level `fieldsets`.
+
+    class Meta(auth_forms.UserCreationForm.Meta):
+        # Both admin and registration user object creation forms share the same fields.
+        fields = admin_util.flatten_fieldsets(user_add_fieldsets)
+
+    def __init__(self, *args, **kwargs):
+        super(AdminUserCreationForm, self).__init__(*args, **kwargs)
+
+        alter_user_form_fields(self)
+        check_password_length(self)
+
+    def clean_username(self):
+        # Check for username existence in a case-insensitive manner.
+
+        UserModel = auth.get_user_model()
+        username = self.cleaned_data.get('username', None)
+        if username is None:
+            username = self.cleaned_data.get(UserModel.USERNAME_FIELD)
+        try:
+            UserModel._default_manager.get(**{('%s__iexact' % UserModel.USERNAME_FIELD): username})
+        except UserModel.DoesNotExist:
+            return username
+        raise forms.ValidationError(_("A user with that username already exists."))
+
+
+class UserCreationForm(AdminUserCreationForm):
     """
     This class defines creation form for `django.contrib.auth.models.User` objects.
-
-    It adds first name, last name and e-mail address fields and marks them as required. It validates hostname part of the e-mail
-    address and sets minimal length on username and password fields.
     """
 
     error_css_class = 'error'
     required_css_class = 'required'
     fieldsets = user_add_fieldsets
-
-    class Meta(auth_forms.UserCreationForm.Meta):
-        # By default first name, last name and e-mail address are not created at user creation, but we want them
-        # user_add_fieldsets defines which fields we want at user creation
-        fields = list(auth_forms.UserCreationForm.Meta.fields)
-        for fieldset in user_add_fieldsets:
-            fields.extend(fieldset[1]['fields'])
-
-    def __init__(self, *args, **kwargs):
-        super(UserCreationForm, self).__init__(*args, **kwargs)
-        alter_user_form_fields(self)
-        check_password_length(self)
-
-    def clean_password2(self):
-        # If password1 is invalid (and thus missing) we do not check password2 and let user first correct password1 error
-        # There is a ticket about this: http://code.djangoproject.com/ticket/7833#comment:6
-        if not self.cleaned_data.get('password1'):
-            return self.cleaned_data.get('password2')
-        return super(UserCreationForm, self).clean_password2()
-
-    def clean_username(self):
-        # Check for username existence in a case-insensitive manner
-        username = self.cleaned_data['username']
-        try:
-            auth_models.User.objects.get(username__iexact=username)
-        except auth_models.User.DoesNotExist:
-            return username
-        raise forms.ValidationError(_("A user with that username already exists."))
 
 
 class AdminUserChangeForm(auth_forms.UserChangeForm):
@@ -117,11 +125,12 @@ class AdminUserChangeForm(auth_forms.UserChangeForm):
     address and sets minimal length on the username field.
     """
 
-    error_css_class = 'error'
-    required_css_class = 'required'
+    # For user object modification we leave things as they are for admin.
 
     def __init__(self, *args, **kwargs):
         super(AdminUserChangeForm, self).__init__(*args, **kwargs)
+
+        # Making sure we use the same validation on all forms.
         alter_user_form_fields(self)
 
 
@@ -144,6 +153,7 @@ class UserChangeForm(AdminUserChangeForm):
         self.fields['email'].help_text = _("If you change your e-mail address you will have to activate your account again so carefully enter it. It will be visible to other registered users.")
 
     class Meta(AdminUserChangeForm.Meta):
+        # For registration user modification we use our set of fields.
         fields = admin_util.flatten_fieldsets(user_change_fieldsets)
 
 
@@ -190,17 +200,7 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
 
     error_css_class = 'error'
     required_css_class = 'required'
-
-    def clean(self):
-        msg = _("Please enter a correct username and password. Note that both fields are case-sensitive.")
-        try:
-            super(AuthenticationForm, self).clean()
-        except forms.ValidationError, e:
-            if (hasattr(e, 'args') and msg in e.args) or (hasattr(e, 'message') and e.message == msg) or (hasattr(e, 'messages') and msg in e.messages):
-                raise forms.ValidationError(_("Please enter a correct username and password. Note that password is case-sensitive."))
-            else:
-                raise
-        return self.cleaned_data
+    error_messages = dict(auth_forms.AuthenticationForm.error_messages, invalid_login=_("Please enter a correct username and password. Note that password is case-sensitive."))
 
 
 class PasswordResetForm(auth_forms.PasswordResetForm):
@@ -220,8 +220,8 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
 class SetPasswordForm(auth_forms.SetPasswordForm):
     """
-    This class adds CSS classes to `django.contrib.auth.forms.SetPasswordForm` form. It sets minimal length and help text
-    on password field.
+    This class adds CSS classes to `django.contrib.auth.forms.SetPasswordForm` form.
+    It sets minimal length and help text on password field.
     """
 
     error_css_class = 'error'
@@ -229,13 +229,14 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
 
     def __init__(self, *args, **kwargs):
         super(SetPasswordForm, self).__init__(*args, **kwargs)
+
         check_password_length(self)
 
 
 class PasswordChangeForm(auth_forms.PasswordChangeForm):
     """
-    This class adds CSS classes to `django.contrib.auth.forms.PasswordChangeForm` form. It sets minimal length and help text
-    on password field.
+    This class adds CSS classes to `django.contrib.auth.forms.PasswordChangeForm` form.
+    It sets minimal length and help text on password field.
     """
 
     error_css_class = 'error'
@@ -243,6 +244,7 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
 
     def __init__(self, *args, **kwargs):
         super(PasswordChangeForm, self).__init__(*args, **kwargs)
+
         check_password_length(self)
 
 # TODO: Probably not needed anymore in Django 1.9.
