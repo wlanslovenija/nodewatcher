@@ -4,7 +4,8 @@ from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 
-languages_choices = map(lambda (code, name): (code, _(name)), settings.LANGUAGES) # We have to translate names
+# We have to translate names.
+languages_choices = map(lambda (code, name): (code, _(name)), settings.LANGUAGES)
 
 
 def get_initial_language(request=None):
@@ -26,4 +27,4 @@ class LanguageField(fields.CharField):
         super(LanguageField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
-        return "CharField"
+        return 'CharField'
