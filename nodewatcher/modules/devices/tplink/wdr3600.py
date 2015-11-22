@@ -102,5 +102,5 @@ class TPLinkWDR3600v1(cgm_devices.DeviceBase):
         }
     }
 
-# Register the TP-Link WDR3600 device
+# Register the TP-Link WDR3600 device.
 cgm_base.register_device('openwrt', TPLinkWDR3600v1)
