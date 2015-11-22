@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from registration import models as registration_models
 from registration.backends.model_activation import views as registration_views
 
-from . import decorators, forms, models, signals, utils
+from . import decorators, forms, models, utils
 
 
 class RegistrationView(registration_views.RegistrationView):
@@ -123,19 +123,17 @@ def account(request):
 
 def logout_redirect(request, *args, **kwargs):
     """
-    Logs out the user and redirects her to the log-in page or elsewhere, as specified.
+    Logs out the user and redirects them to the log-in page or elsewhere, as specified.
 
-    A wrapper (which prefers redirects) around `django.contrib.auth.views.logout` view which sends a `nodewatcher.extra.accounts.signals.user_logout` signal on logout.
+    A wrapper around `django.contrib.auth.views.logout` view which prefers redirect to
+    the `LOGIN_URL` instead of rendering the template.
     """
 
     kwargs.setdefault('redirect_field_name', auth.REDIRECT_FIELD_NAME)
-    # We prefer redirect but explicit None for next_page makes it behave as the official logout view
+    # We prefer redirect but explicit None for next_page makes it behave as the official logout view.
     kwargs.setdefault('next_page', request.REQUEST.get(kwargs.get('redirect_field_name')) or settings.LOGIN_URL)
 
-    user = request.user
-    res = auth_views.logout(request, *args, **kwargs)
-    signals.user_logout.send(sender=logout_redirect, request=request, user=user)
-    return res
+    return auth_views.logout(request, *args, **kwargs)
 
 
 @decorators.anonymous_required
@@ -143,13 +141,10 @@ def login(request, *args, **kwargs):
     """
     Displays the login form and handles the login action.
 
-    A wrapper around `django.contrib.auth.views.login` view which sends a `nodewatcher.extra.accounts.signals.user_login` signal on successful login.
+    A wrapper around `django.contrib.auth.views.login` view which uses our authentication form.
     """
 
     assert request.user.is_anonymous()
 
     kwargs.setdefault('authentication_form', forms.AuthenticationForm)
-    res = auth_views.login(request, *args, **kwargs)
-    if request.user.is_authenticated():
-        signals.user_login.send(sender=login, request=request, user=request.user)
-    return res
+    return auth_views.login(request, *args, **kwargs)

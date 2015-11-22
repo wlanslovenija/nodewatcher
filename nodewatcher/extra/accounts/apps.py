@@ -15,3 +15,6 @@ class AccountsConfig(apps.AppConfig):
         super(AccountsConfig, self).ready()
 
         models_signals.post_migrate.connect(command_signal, sender=self)
+
+        # Register module signals.
+        from . import signals

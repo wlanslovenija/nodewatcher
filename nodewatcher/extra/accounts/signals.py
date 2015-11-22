@@ -1,14 +1,9 @@
 from django import dispatch
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.utils.translation import ugettext_lazy as _
 
-# Argument is user which has logged in
-user_login = dispatch.Signal(providing_args=["request", "user"])
 
-# Argument is user which has logged out if any
-user_logout = dispatch.Signal(providing_args=["request", "user"])
-
-
+@dispatch.receiver(auth.user_logged_in, dispatch_uid='user_login_message')
 def user_login_message(sender, request, user, **kwargs):
     """
     Gives a success login message to the user.
@@ -16,9 +11,8 @@ def user_login_message(sender, request, user, **kwargs):
 
     messages.success(request, _("You have been successfully logged in."), fail_silently=True)
 
-user_login.connect(user_login_message, dispatch_uid=__name__ + '.user_login_message')
 
-
+@dispatch.receiver(auth.user_logged_in, dispatch_uid='set_language')
 def set_language(sender, request, user, **kwargs):
     """
     Sets Django language preference based on user profile.
@@ -26,14 +20,11 @@ def set_language(sender, request, user, **kwargs):
 
     request.session['django_language'] = user.profile.language
 
-user_login.connect(set_language, dispatch_uid=__name__ + '.set_language')
 
-
+@dispatch.receiver(auth.user_logged_out, dispatch_uid='user_logout_message')
 def user_logout_message(sender, request, user, **kwargs):
     """
     Gives a success logout message to the user.
     """
 
     messages.success(request, _("You have been successfully logged out."), fail_silently=True)
-
-user_logout.connect(user_logout_message, dispatch_uid=__name__ + '.user_logout_message')

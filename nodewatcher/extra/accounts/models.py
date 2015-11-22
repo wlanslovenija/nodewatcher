@@ -115,10 +115,3 @@ def activation_key_expired(instance):
     return orig_activation_key_expired(instance)
 activation_key_expired.boolean = True
 registration_models.RegistrationProfile.activation_key_expired = activation_key_expired
-
-try:
-    # So that signals are registered early on
-    from . import signals
-except ImportError:
-    # Probably circular imports
-    pass
