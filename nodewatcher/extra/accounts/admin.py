@@ -16,6 +16,7 @@ class UserProfileAndSettingsInline(admin.StackedInline):
 # Define a new User admin.
 class UserAdmin(auth_admin.UserAdmin):
     inlines = (UserProfileAndSettingsInline,)
+    add_fieldsets = auth_admin.UserAdmin.add_fieldsets + (auth_admin.UserAdmin.fieldsets[1],)
 
 
 # Re-register UserAdmin.
