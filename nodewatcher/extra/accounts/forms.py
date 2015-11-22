@@ -246,6 +246,10 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
         super(PasswordChangeForm, self).__init__(*args, **kwargs)
         check_password_length(self)
 
+# TODO: Probably not needed anymore in Django 1.9.
+#       See: https://github.com/django/django/commit/28986da4ca167ae257abcaf7caea230eca2bcd80
+PasswordChangeForm.base_fields = auth_forms.PasswordChangeForm.base_fields
+
 
 class AccountChangeForm(metaforms.FieldsetsFormMixin, metaforms.ParentsIncludedModelFormMixin, UserChangeForm, UserProfileAndSettingsChangeForm):
     """
