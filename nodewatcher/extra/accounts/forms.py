@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core import validators as core_validators
 from django.forms import forms, models as forms_models
 from django.contrib.admin import util as admin_util
@@ -206,6 +207,12 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
     error_css_class = 'error'
     required_css_class = 'required'
+
+    def save(self, **kwargs):
+        # We are trying to use setting everywhere and not `request.is_secure()`.
+        kwargs.use_https = getattr(settings, 'USE_HTTPS', False)
+
+        return super(PasswordResetForm, self).save(**kwargs)
 
 
 class SetPasswordForm(auth_forms.SetPasswordForm):

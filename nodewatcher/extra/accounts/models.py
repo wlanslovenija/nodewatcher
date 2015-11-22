@@ -15,6 +15,7 @@ from nodewatcher.modules.administration.projects import models as projects_model
 
 from . import fields as account_fields
 
+
 ATTRIBUTION_CHOICES = (
     ('name', _("Use my full name")),
     ('username', _("Use my username")),
@@ -72,24 +73,25 @@ def create_profile_and_settings(sender, instance, created, **kwargs):
         pass
 
 
-# Monkey-patch registration_models.RegistrationProfile
+# Monkey-patch registration_models.RegistrationProfile.
 def send_activation_email(instance, site, email_change=False):
     """
-    Based on `registration.models.RegistrationProfile.send_activation_email` to extend activation e-mail template context with
-    `email_change` boolean and other values.
+    Based on `registration.models.RegistrationProfile.send_activation_email` to extend activation
+    e-mail template context with `email_change` boolean and other values.
     """
 
     protocol = 'https' if getattr(settings, 'USE_HTTPS', False) else 'http'
 
     ctx_dict = {
-        'email': instance.user.email,
-        'domain': site.domain,
-        'site_name': site.name,
-        'user': instance.user,
-        'protocol': protocol,
         'activation_key': instance.activation_key,
         'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-        'NETWORK': getattr(settings, 'NETWORK', {}),
+        # We pass "site_name" and not "site" because "site_name" is used in the password reset e-mail template.
+        'site_name': site.name,
+        # The following are our extra values, matching values available in the password reset e-mail template.
+        'email': instance.user.email,
+        'domain': site.domain,
+        'user': instance.user,
+        'protocol': protocol,
         'email_change': email_change,
     }
     subject = loader.render_to_string('registration/activation_email_subject.txt', ctx_dict)
@@ -98,7 +100,9 @@ def send_activation_email(instance, site, email_change=False):
     message = loader.render_to_string('registration/activation_email.txt', ctx_dict)
 
     instance.user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+
 registration_models.RegistrationProfile.send_activation_email = send_activation_email
+
 
 orig_activation_key_expired = registration_models.RegistrationProfile.activation_key_expired
 
@@ -114,5 +118,6 @@ def activation_key_expired(instance):
     if instance.user.last_login != instance.user.date_joined:
         return False
     return orig_activation_key_expired(instance)
+
 activation_key_expired.boolean = True
 registration_models.RegistrationProfile.activation_key_expired = activation_key_expired
