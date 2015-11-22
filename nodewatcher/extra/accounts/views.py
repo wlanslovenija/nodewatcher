@@ -1,20 +1,17 @@
 import copy
 
-from django import shortcuts
-from django import template
+from django import shortcuts, template
 from django.conf import settings
 from django.contrib import auth, messages
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.models import User
+from django.contrib.auth import models as auth_models, views as auth_views
 from django.contrib.sites import shortcuts as sites_shortcuts
 from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404
 
 from registration import models as registration_models
 from registration.backends.model_activation import views as registration_views
 
-from . import decorators, forms, models, utils
+from . import decorators, forms, utils
 
 
 class RegistrationView(registration_views.RegistrationView):
@@ -42,7 +39,7 @@ def user(request, username):
     This view displays a public page for a given user.
     """
 
-    user = get_object_or_404(User, username=username)
+    user = shortcuts.get_object_or_404(auth_models.User, username=username)
 
     return shortcuts.render_to_response("users/user.html", {
         'profileuser': user,
