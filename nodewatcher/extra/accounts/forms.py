@@ -172,10 +172,14 @@ class AccountRegistrationForm(metaforms.FieldsetsFormMixin, metaforms.ParentsInc
     fieldsets = UserCreationForm.fieldsets + list(UserProfileAndSettingsChangeForm.Meta.model.fieldsets)
 
     def save(self, commit=True):
-        # We disable save method as registration module (through `nodewatcher.extra.accounts.views.RegistrationView`) takes
-        # care of user and user profile objects creation and we do not use it for changing data
-        assert False
-        return None
+        user, profile = super(AccountRegistrationForm, self).save(False)
+
+        # We ignore `commit` argument because we have to save `user` to be able to set `profile`'s reference.
+        user.save()
+        profile.user = user
+        profile.save()
+
+        return user
 
     __metaclass__ = metaforms.ParentsIncludedModelFormMetaclass
 

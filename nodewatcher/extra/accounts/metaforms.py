@@ -58,11 +58,17 @@ class ParentsIncludedModelFormMixin(object):
         """
 
         self.metas = []
+        self.classes = []
         if 'Meta' in self.__class__.__dict__:
-            # We add meta of the current class
+            # We add meta of the current class.
             self.metas.append(forms_models.ModelFormOptions(self.Meta))
-        # We add metas from parent classes
-        self.metas += [forms_models.ModelFormOptions(getattr(cls, 'Meta', None)) for cls in self.__class__.__bases__ if issubclass(cls, forms_models.ModelForm)]
+            self.classes.append(self.__class__)
+        # We add metas from parent classes.
+        for cls in self.__class__.__bases__:
+            if not issubclass(cls, forms_models.ModelForm):
+                continue
+            self.metas.append(forms_models.ModelFormOptions(getattr(cls, 'Meta', None)))
+            self.classes.append(cls)
 
         instances = kwargs.pop('instance', None)
         if instances is None:
@@ -98,32 +104,33 @@ class ParentsIncludedModelFormMixin(object):
         into the list and returns it. At the end it restores `self.instance` and `self._meta` to initial values.
         """
 
-        # Save original values
+        # Save original values.
         original_instance = self.instance
         original_meta = self._meta
 
         results = []
 
-        for instance, meta in zip(self.instances, self.metas):
-            # Temporary set values
+        for instance, meta, cls in zip(self.instances, self.metas, self.classes):
+            # Temporary set values.
             self.instance = instance
             self._meta = meta
-            results.append(getattr(super(ParentsIncludedModelFormMixin, self), method_name)(*args, **kwargs))
+            results.append(getattr(cls, method_name)(self, *args, **kwargs))
 
-        # Restore original values
+        # Restore original values.
         self.instance = original_instance
         self._meta = original_meta
 
         return results
 
     def clean(self):
-        # We traverse in reverse order to keep in sync with get_declared_fields
+        # We traverse in reverse order to keep in sync with `get_declared_fields`.
         return reduce(utils.intersect, reversed(self._iterate_over_instances('clean')))
 
     def _post_clean(self):
         self._iterate_over_instances('_post_clean')
 
-    # We do not change validate_unique on purpose as it is called from _post_clean and we will probably do not use it otherwise
+    # We do not change validate_unique on purpose as it is called from
+    # `_post_clean` and we will probably do not use it otherwise.
 
     def save(self, commit=True):
         return self._iterate_over_instances('save', commit)

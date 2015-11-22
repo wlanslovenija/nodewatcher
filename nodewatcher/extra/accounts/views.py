@@ -1,12 +1,13 @@
+import copy
+
 from django import shortcuts
 from django import template
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User
-from django.contrib.sites import models as sites_models
+from django.contrib.sites import shortcuts as sites_shortcuts
 from django.core import urlresolvers
-from django.forms import models as forms_models
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
@@ -17,35 +18,12 @@ from . import decorators, forms, models, utils
 
 
 class RegistrationView(registration_views.RegistrationView):
-    def register(self, **kwargs):
-        """
-        Register a new user account, which will initially be inactive.
-
-        It also creates corresponding user profile.
-        """
-
-        user = super(RegistrationView, self).register(**kwargs)
-        profile, created = models.UserProfileAndSettings.objects.get_or_create(user=user)
-
-        # lambda-object to the rescue
-        form = lambda: None
-        form.cleaned_data = kwargs
-
-        # First name, last name and e-mail address are stored in user object
-        forms_models.construct_instance(form, user)
-        user.save()
-
-        # Other fields are stored in user profile object
-        forms_models.construct_instance(form, profile)
-        profile.save()
-
-        return user
-
     def get_form_class(self):
         """
         Returns the default form class used for user registration.
 
-        It returns `nodewatcher.extra.accounts.forms.AccountRegistrationForm` form which contains fields for both user and user profile objects.
+        It returns `nodewatcher.extra.accounts.forms.AccountRegistrationForm` form
+        which contains fields for both user and user profile objects.
         """
 
         return utils.initial_accepts_request(self.request, forms.AccountRegistrationForm)
@@ -76,14 +54,16 @@ def account(request):
     """
     View which displays `nodewatcher.extra.accounts.forms.AccountChangeForm` form for users to change their account.
 
-    If the user changes her e-mail address her account is inactivated and she gets an activation e-mail.
+    If the user changes their e-mail address her account is inactivated and they gets an activation e-mail.
     """
 
     assert request.user.is_authenticated()
 
     if request.method == 'POST':
-        stored_user = User.objects.get(pk=request.user.pk)
+        stored_user = copy.copy(request.user)
+
         form = forms.AccountChangeForm(request.POST, instance=[request.user, request.user.profile])
+
         if form.is_valid():
             objs = form.save()
             messages.success(request, _("Your account has been successfully updated."), fail_silently=True)
@@ -92,14 +72,15 @@ def account(request):
             new_email = request.user.email
 
             if old_email == new_email:
-                return shortcuts.redirect(objs[-1]) # The last element is user profile object
+                # The last element is user profile object.
+                return shortcuts.redirect(objs[-1])
             else:
-                site = sites_models.Site.objects.get_current() if sites_models.Site._meta.installed else sites_models.RequestSite(request)
+                site = sites_shortcuts.get_current_site(request)
 
                 request.user.is_active = False
                 request.user.save()
 
-                # Creates a new activation key
+                # Creates a new activation key.
                 registration_models.RegistrationProfile.objects.filter(user=request.user).delete()
                 registration_profile = registration_models.RegistrationProfile.objects.create_profile(request.user)
                 registration_profile.send_activation_email(site, email_change=True)
@@ -108,10 +89,10 @@ def account(request):
 
                 return logout_redirect(request, next_page=url)
         else:
-            # Restore user request object as it is changed by form.is_valid
+            # Restore user request object as it is changed by form.is_valid.
             request.user = stored_user
             if hasattr(request.user, '_profile_cache'):
-                # Invalidates profile cache
+                # Invalidates profile cache.
                 delattr(request.user, '_profile_cache')
     else:
         form = forms.AccountChangeForm(instance=[request.user, request.user.profile])
