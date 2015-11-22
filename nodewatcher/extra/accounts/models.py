@@ -28,7 +28,7 @@ class UserProfileAndSettings(django_models.Model):
     This class represents an user profile and settings.
     """
 
-    user = django_models.OneToOneField(auth.get_user_model(), editable=False, primary_key=True, related_name='profile')
+    user = django_models.OneToOneField(settings.AUTH_USER_MODEL, editable=False, primary_key=True, related_name='profile')
 
     phone_number = phonenumber_fields.PhoneNumberField(_('phone number'), help_text=_('Please enter your phone number in international format (e.g. +38651654321) for use in emergency. It will be visible only to network administrators.'), null=True)
     country = country_fields.CountryField(blank=True, help_text=_('Where are you from? It will be public.'))
@@ -61,7 +61,7 @@ class UserProfileAndSettings(django_models.Model):
         return ('AccountsComponent:user_account',)
 
 
-@dispatch.receiver(models_signals.post_save, sender=auth.get_user_model(), dispatch_uid='create_profile_and_settings')
+@dispatch.receiver(models_signals.post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid='create_profile_and_settings')
 def create_profile_and_settings(sender, instance, created, **kwargs):
     if not created:
         return
