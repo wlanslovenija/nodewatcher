@@ -18,7 +18,7 @@ git+https://github.com/wlanslovenija/django-missing.git@028bb5a94e82a0f290cbd6fb
 git+https://github.com/wlanslovenija/django-overextends.git@03a127e0759373a6c1e6f2c7859cdc516dd8e305#egg=django_overextends-wlanslovenija
 django-phonenumber-field==0.5
 django_polymorphic==0.7.1
-git+https://github.com/ubernostrum/django-registration.git@6a953b0044a7e82fca0f9ce3b7146a0dffec3a51#egg=django_registration-master
+git+https://github.com/ubernostrum/django-registration.git@958056f59cb17467ddd26eb7a4c44280c2aba196#egg=django_registration-master
 django-sekizai==0.8.2
 dnspython==1.12.0
 docutils==0.12
