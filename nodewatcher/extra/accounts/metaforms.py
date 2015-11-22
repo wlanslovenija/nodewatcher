@@ -86,9 +86,12 @@ class ParentsIncludedModelFormMixin(object):
             object_data = {}
             if len(instances) != len(self.metas):
                 raise ValueError('Number of instances does not match number of metas.')
-            # We traverse in reverse order to keep in sync with get_declared_fields
+            # We traverse in reverse order to keep in sync with get_declared_fields.
             for instance, meta in reversed(zip(self.instances, self.metas)):
-                object_data.update(forms_models.model_to_dict(instance, meta.fields, meta.exclude))
+                fields = meta.fields
+                if fields == forms_models.ALL_FIELDS:
+                    fields = None
+                object_data.update(forms_models.model_to_dict(instance, fields, meta.exclude))
 
         initial = kwargs.pop('initial', None)
         if initial is not None:
