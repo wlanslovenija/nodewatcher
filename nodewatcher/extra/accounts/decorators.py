@@ -1,14 +1,11 @@
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps # Python 2.4 fallback.
+import functools
 
-from django import http
+from django import shortcuts
 from django.conf import settings
-from django.contrib import auth
-from django.contrib import messages
+from django.contrib import auth, messages
+from django.core import exceptions
 from django.utils import decorators
-from django.utils import http as utils_http
+from django.utils.six.moves.urllib import parse
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -27,22 +24,32 @@ def user_test_required(test_func, message_func=None, message_level_func=lambda u
         decorator_id = id(user_test_required)
 
     def decorator(view_func):
+        @functools.wraps(view_func, assigned=decorators.available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
-            path = utils_http.urlquote(request.get_full_path())
-            tup = (redirect_url_func(request.user) or settings.LOGIN_REDIRECT_URL), redirect_field_name, path
+
+            path = request.build_absolute_uri()
+            resolved_login_url = shortcuts.resolve_url(redirect_url_func(request.user) or settings.LOGIN_REDIRECT_URL)
+            # If the login url is the same scheme and net location then just
+            # use the path as the "next" url.
+            login_scheme, login_netloc = parse.urlparse(resolved_login_url)[:2]
+            current_scheme, current_netloc = parse.urlparse(path)[:2]
+            if ((not login_scheme or login_scheme == current_scheme) and (not login_netloc or login_netloc == current_netloc)):
+                path = request.get_full_path()
+
             if message_func:
                 messages.add_message(request, message_level_func(request.user), message_func(request.user), fail_silently=True)
-            return http.HttpResponseRedirect('%s?%s=%s' % tup)
 
-        wrapped_view_func = wraps(view_func, assigned=decorators.available_attrs(view_func))(_wrapped_view)
-        wrapped_view_func.decorators = []
+            from django.contrib.auth.views import redirect_to_login
+            return redirect_to_login(path, resolved_login_url, redirect_field_name)
+
+        _wrapped_view.decorators = []
         if hasattr(view_func, 'decorators'):
-            wrapped_view_func.decorators += view_func.decorators
-        wrapped_view_func.decorators.append(decorator_id)
+            _wrapped_view.decorators += view_func.decorators
+        _wrapped_view.decorators.append(decorator_id)
 
-        return wrapped_view_func
+        return _wrapped_view
 
     return decorator
 
@@ -95,7 +102,7 @@ def anonymous_required(function=None, message_func=lambda u: _("You should not b
     return actual_decorator
 
 
-def permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
+def permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME, raise_exception=False):
     """
     Decorator for views that checks whether the user has a particular permission enabled, redirecting if necessary (by default
     to the profile page).
@@ -106,10 +113,24 @@ def permission_required(perm, message_func=lambda u: _("You do not have necessar
     one used.
     """
 
-    return user_test_required(lambda u: u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(permission_required))
+    def check_perms(user):
+        if not isinstance(perm, (list, tuple)):
+            perms = (perm, )
+        else:
+            perms = perm
+        # First check if the user has the permission (even anonymous users).
+        if user.has_perms(perms):
+            return True
+        # In case the 403 handler should be called raise the exception.
+        if raise_exception:
+            raise exceptions.PermissionDenied
+        # As the last resort, show the login form.
+        return False
+
+    return user_test_required(check_perms, message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(permission_required))
 
 
-def authenticated_permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page.") if u.is_authenticated() else _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL if u.is_authenticated() else settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME):
+def authenticated_permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page.") if u.is_authenticated() else _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL if u.is_authenticated() else settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME, raise_exception=False):
     """
     Decorator for views that checks whether the user has authenticated and has a particular permission enabled, redirecting as
     necessary: if not authenticated to the log-in page, otherwise to the profile page.
@@ -120,4 +141,18 @@ def authenticated_permission_required(perm, message_func=lambda u: _("You do not
     one used.
     """
 
-    return user_test_required(lambda u: u.is_authenticated() and u.has_perm(perm), message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(authenticated_permission_required))
+    def check_perms(user):
+        if not isinstance(perm, (list, tuple)):
+            perms = (perm, )
+        else:
+            perms = perm
+        # First check if the user has the permission (even anonymous users).
+        if user.is_authenticated() and user.has_perms(perms):
+            return True
+        # In case the 403 handler should be called raise the exception.
+        if raise_exception:
+            raise exceptions.PermissionDenied
+        # As the last resort, show the login form,
+        return False
+
+    return user_test_required(check_perms, message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(authenticated_permission_required))
