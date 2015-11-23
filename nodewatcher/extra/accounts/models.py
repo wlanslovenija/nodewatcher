@@ -2,7 +2,7 @@ from django import db, dispatch
 from django.conf import settings
 from django.db import models as django_models
 from django.db.models import signals as models_signals
-from django.contrib import auth
+from django.contrib.auth import models as auth_models
 from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
@@ -73,6 +73,15 @@ def create_profile_and_settings(sender, instance, created, **kwargs):
         UserProfileAndSettings.objects.create(user=instance)
     except db.IntegrityError:
         pass
+
+
+@dispatch.receiver(models_signals.post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid='assign_node_maintainers_group')
+def assign_node_maintainers_group(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    group = auth_models.Group.objects.get_by_natural_key(name="Node maintainers")
+    instance.groups.add(group)
 
 
 # Monkey-patch registration_models.RegistrationProfile.
