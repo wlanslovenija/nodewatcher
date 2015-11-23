@@ -82,6 +82,11 @@ class ValidateUsernameMixin(object):
         if username is None:
             username = self.cleaned_data.get(UserModel.USERNAME_FIELD)
 
+        # There was no change to the usernaem made.
+        if self.instance and self.instance.username == username:
+            return username
+
+        # Username was changed, check if it maybe already exists.
         if UserModel._default_manager.filter(**{('%s__iexact' % UserModel.USERNAME_FIELD): username}).exists():
             raise forms.ValidationError(_("A user with that username already exists."))
 
