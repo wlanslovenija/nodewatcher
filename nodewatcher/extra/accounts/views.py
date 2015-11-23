@@ -55,6 +55,7 @@ def get_user_copy(user):
 
     assert False
 
+
 @decorators.authenticated_required
 def account(request):
     """

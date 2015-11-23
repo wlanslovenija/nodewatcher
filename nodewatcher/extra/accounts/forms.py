@@ -140,6 +140,7 @@ class AdminUserChangeForm(ValidateUsernameMixin, auth_forms.UserChangeForm):
         # Making sure we use the same validation on all forms.
         alter_user_form_fields(self)
 
+
 class UserChangeForm(AdminUserChangeForm):
     """
     This class defines change form for `django.contrib.auth.models.User` objects with fields limited only to first name,

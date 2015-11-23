@@ -200,6 +200,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/account/login/'
 LOGOUT_URL = '/account/logout/'
 
+
 def user_url(user):
     from django.core import urlresolvers
     return urlresolvers.reverse('AccountsComponent:user_page', kwargs={'username': user.username})
