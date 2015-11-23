@@ -113,15 +113,16 @@ class ParentsIncludedModelFormMixin(object):
 
         results = []
 
-        for instance, meta, cls in zip(self.instances, self.metas, self.classes):
-            # Temporary set values.
-            self.instance = instance
-            self._meta = meta
-            results.append(getattr(cls, method_name)(self, *args, **kwargs))
-
-        # Restore original values.
-        self.instance = original_instance
-        self._meta = original_meta
+        try:
+            for instance, meta, cls in zip(self.instances, self.metas, self.classes):
+                # Temporary set values.
+                self.instance = instance
+                self._meta = meta
+                results.append(getattr(cls, method_name)(self, *args, **kwargs))
+        finally:
+            # Restore original values.
+            self.instance = original_instance
+            self._meta = original_meta
 
         return results
 
