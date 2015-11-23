@@ -73,7 +73,22 @@ def check_password_length(form):
     form.fields[fieldname2].help_text = _("Enter the same password as above, for verification.")
 
 
-class AdminUserCreationForm(auth_forms.UserCreationForm):
+class ValidateUsernameMixin(object):
+    def clean_username(self):
+        # Check for username existence in a case-insensitive manner.
+
+        UserModel = auth.get_user_model()
+        username = self.cleaned_data.get('username', None)
+        if username is None:
+            username = self.cleaned_data.get(UserModel.USERNAME_FIELD)
+
+        if UserModel._default_manager.filter(**{('%s__iexact' % UserModel.USERNAME_FIELD): username}).exists():
+            raise forms.ValidationError(_("A user with that username already exists."))
+
+        return username
+
+
+class AdminUserCreationForm(ValidateUsernameMixin, auth_forms.UserCreationForm):
     """
     This class defines creation form for `django.contrib.auth.models.User` objects for admin interface.
 
@@ -93,19 +108,6 @@ class AdminUserCreationForm(auth_forms.UserCreationForm):
         alter_user_form_fields(self)
         check_password_length(self)
 
-    def clean_username(self):
-        # Check for username existence in a case-insensitive manner.
-
-        UserModel = auth.get_user_model()
-        username = self.cleaned_data.get('username', None)
-        if username is None:
-            username = self.cleaned_data.get(UserModel.USERNAME_FIELD)
-        try:
-            UserModel._default_manager.get(**{('%s__iexact' % UserModel.USERNAME_FIELD): username})
-        except UserModel.DoesNotExist:
-            return username
-        raise forms.ValidationError(_("A user with that username already exists."))
-
 
 class UserCreationForm(AdminUserCreationForm):
     """
@@ -117,7 +119,7 @@ class UserCreationForm(AdminUserCreationForm):
     fieldsets = user_add_fieldsets
 
 
-class AdminUserChangeForm(auth_forms.UserChangeForm):
+class AdminUserChangeForm(ValidateUsernameMixin, auth_forms.UserChangeForm):
     """
     This class defines change form for `django.contrib.auth.models.User` objects for admin interface.
 
@@ -132,7 +134,6 @@ class AdminUserChangeForm(auth_forms.UserChangeForm):
 
         # Making sure we use the same validation on all forms.
         alter_user_form_fields(self)
-
 
 class UserChangeForm(AdminUserChangeForm):
     """
