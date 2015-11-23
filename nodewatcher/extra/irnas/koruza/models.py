@@ -20,3 +20,16 @@ class KoruzaConfig(cgm_models.PackageConfig):
 registration.point('node.config').register_choice('irnas.koruza#serial_port', registration.Choice('usb0', _("USB0")))
 registration.point('node.config').register_choice('irnas.koruza#serial_port', registration.Choice('usb1', _("USB1")))
 registration.point('node.config').register_item(KoruzaConfig)
+
+
+class KoruzaVpnMonitor(registration.bases.NodeMonitoringRegistryItem):
+    """
+    KORUZA VPN information.
+    """
+
+    ip_address = registry_fields.IPAddressField(null=True)
+
+    class RegistryMeta:
+        registry_id = 'koruza.vpn'
+
+registration.point('node.monitoring').register_item(KoruzaVpnMonitor)
