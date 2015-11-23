@@ -50,4 +50,3 @@ unidecode==0.04.18
 ijson==2.2
 py-radix==0.9.3
 django-oauth-toolkit==0.9.0
-git+https://github.com/herzbube/python-aprmd5.git@ddbdab1e36291677984f26756fd9856e05994a61#egg=aprmd5-master
