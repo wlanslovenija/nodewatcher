@@ -59,15 +59,18 @@ class ParentsIncludedModelFormMixin(object):
 
         self.metas = []
         self.classes = []
+
         if 'Meta' in self.__class__.__dict__:
             # We add meta of the current class.
-            self.metas.append(forms_models.ModelFormOptions(self.Meta))
+            self.metas.append(self._meta)
             self.classes.append(self.__class__)
+
         # We add metas from parent classes.
         for cls in self.__class__.__bases__:
             if not issubclass(cls, forms_models.ModelForm):
                 continue
-            self.metas.append(forms_models.ModelFormOptions(getattr(cls, 'Meta', None)))
+
+            self.metas.append(cls._meta)
             self.classes.append(cls)
 
         instances = kwargs.pop('instance', None)
@@ -88,10 +91,7 @@ class ParentsIncludedModelFormMixin(object):
                 raise ValueError('Number of instances does not match number of metas.')
             # We traverse in reverse order to keep in sync with get_declared_fields.
             for instance, meta in reversed(zip(self.instances, self.metas)):
-                fields = meta.fields
-                if fields == forms_models.ALL_FIELDS:
-                    fields = None
-                object_data.update(forms_models.model_to_dict(instance, fields, meta.exclude))
+                object_data.update(forms_models.model_to_dict(instance, meta.fields, meta.exclude))
 
         initial = kwargs.pop('initial', None)
         if initial is not None:
