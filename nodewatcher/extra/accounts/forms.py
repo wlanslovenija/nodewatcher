@@ -213,7 +213,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
     def save(self, **kwargs):
         # We are trying to use setting everywhere and not `request.is_secure()`.
-        kwargs.use_https = getattr(settings, 'USE_HTTPS', False)
+        kwargs['use_https'] = getattr(settings, 'USE_HTTPS', False)
 
         return super(PasswordResetForm, self).save(**kwargs)
 
