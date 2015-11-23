@@ -24,6 +24,9 @@ class AccountsConfig(apps.AppConfig):
         except auth_models.Permission.DoesNotExist:
             pass
 
+    def assign_node_maintainers_group(self, **kwargs):
+        management.call_command('assignnodemaintainersgroup', **kwargs)
+
     def ready(self):
         super(AccountsConfig, self).ready()
 
@@ -31,5 +34,7 @@ class AccountsConfig(apps.AppConfig):
 
         models_signals.post_migrate.connect(self.create_node_maintainers_group, sender=self)
 
-        # Register module signals.
+        models_signals.post_migrate.connect(self.assign_node_maintainers_group, sender=self)
+
+        # Register other module signals.
         from . import signals

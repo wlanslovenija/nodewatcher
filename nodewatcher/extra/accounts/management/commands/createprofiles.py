@@ -21,5 +21,5 @@ class Command(management_base.NoArgsCommand):
         with transaction.atomic(using=options.get('using', None)):
             for user in auth_models.User.objects.all():
                 profile, created = models.UserProfileAndSettings.objects.get_or_create(user=user)
-                if verbosity == 2 and created:
-                    self.stdout.write('Created %s.\n' % profile)
+                if verbosity >= 2 and created:
+                    self.stdout.write("Created '%s'.\n" % profile)
