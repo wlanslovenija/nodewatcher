@@ -1,7 +1,5 @@
 import collections
 
-import apt_pkg
-
 from django.conf import settings
 from django.utils import crypto
 from django.utils.translation import ugettext as _
@@ -14,8 +12,17 @@ from nodewatcher.utils import posix_tz
 
 from . import builder as openwrt_builder
 
-# Make sure APT is initialized.
-apt_pkg.init()
+# Support different versions of libapt bindings.
+try:
+    import apt_pkg
+    apt_pkg.init()
+    apt_version_compare = apt_pkg.version_compare
+except ImportError:
+    try:
+        import apt
+        apt_version_compare = apt.VersionCompare
+    except (ImportError, AttributeError):
+        apt_version_compare = None
 
 
 class UCIFormat:
@@ -427,7 +434,10 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         :param version_b: Second version
         """
 
-        return apt_pkg.version_compare(version_a, version_b)
+        if apt_version_compare is not None:
+            return apt_version_compare(version_a, version_b)
+        else:
+            raise NotImplementedError('Version comparison functions are not available.')
 
     def get_build_config(self):
         """
