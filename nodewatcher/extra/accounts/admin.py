@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin, models as auth_models
 
-from . import models
+from . import forms, models
 
 
 class UserProfileAndSettingsInline(admin.StackedInline):
@@ -16,7 +16,9 @@ class UserProfileAndSettingsInline(admin.StackedInline):
 # Define a new User admin.
 class UserAdmin(auth_admin.UserAdmin):
     inlines = (UserProfileAndSettingsInline,)
-    add_fieldsets = auth_admin.UserAdmin.add_fieldsets + (auth_admin.UserAdmin.fieldsets[1],)
+    form = forms.AdminUserChangeForm
+    add_form = forms.AdminUserCreationForm
+    add_fieldsets = forms.user_add_fieldsets
 
 
 # Re-register UserAdmin.
