@@ -14,7 +14,7 @@ git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb
 git+https://github.com/wlanslovenija/django-tastypie.git@fc6467c1bdbae634dc58f885b6ef543d0b09174c#egg=django_tastypie-wlanslovenija
 --allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@adfbb91ca4798e8c993f1b5c305ecbedb9e6cfe7#egg=django_datastream-master
 django-guardian==1.3
-django-missing==0.1.14
+django-missing==0.1.15
 git+https://github.com/wlanslovenija/django-overextends.git@03a127e0759373a6c1e6f2c7859cdc516dd8e305#egg=django_overextends-wlanslovenija
 django-phonenumber-field==0.5
 django_polymorphic==0.7.1
