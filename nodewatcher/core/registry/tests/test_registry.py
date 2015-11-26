@@ -126,6 +126,15 @@ class RegistryTestCase(django_test.TransactionTestCase):
         qs = qs.filter(f1__related__name__icontains='Test')
         self.assertEqual(len(qs), 100)
 
+        # Test proxy field filter with Q expressions.
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name')
+        qs = qs.filter(query.Q(f1__icontains='Test'))
+        self.assertEqual(len(qs), 100)
+
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple')
+        qs = qs.filter(query.Q(f1__related__name__icontains='Test'))
+        self.assertEqual(len(qs), 100)
+
         # Test that fallthrough fields also work
         qs = qs.filter(id=1)
         self.assertEqual(len(qs), 1)

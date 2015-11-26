@@ -7,6 +7,7 @@ from django.apps import apps
 from django.db import models as django_models
 from django.db.models import constants
 from django.db.models.sql import query
+from django.utils import tree
 
 # Quote name
 qn = django_db.connection.ops.quote_name
@@ -157,11 +158,32 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         clone = self._clone()
 
+        def process_q(node):
+            for index, child in enumerate(node.children):
+                if isinstance(child, tree.Node):
+                    process_q(child)
+                else:
+                    try:
+                        selector, value = child
+                    except ValueError:
+                        continue
+
+                    node.children[index] = (
+                        self.registry_expand_proxy_field(selector),
+                        value
+                    )
+
+        q_selectors = []
+        for q_selector in args:
+            if isinstance(q_selector, django_models.Q):
+                process_q(q_selector)
+            q_selectors.append(q_selector)
+
         filter_selectors = {}
         for selector, value in kwargs.items():
             filter_selectors[self.registry_expand_proxy_field(selector)] = value
 
-        return super(RegistryQuerySet, clone).filter(*args, **filter_selectors)
+        return super(RegistryQuerySet, clone).filter(*q_selectors, **filter_selectors)
 
     def exclude(self, *args, **kwargs):
         """
