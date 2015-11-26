@@ -1,4 +1,4 @@
-Django==1.8.4
+Django==1.8.7
 Jinja2==2.7.3
 MarkupSafe==0.23
 Pygments==1.6
