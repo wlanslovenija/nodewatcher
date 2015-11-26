@@ -1,3 +1,4 @@
+from django.db import models
 from django.utils.translation import gettext_noop
 
 from django_datastream import datastream
@@ -82,7 +83,9 @@ class Topology(monitor_processors.NetworkProcessor):
         # Fetch per-node attributes
         node_attributes = tp_pool.get_attributes(tp_base.NodeAttribute)
 
-        qs = core_models.Node.objects.filter(pk__in=vertices.keys())
+        qs = core_models.Node.objects.all()
+        qs = qs.regpoint('monitoring').registry_fields(status='core.status#network')
+        qs = qs.filter(models.Q(pk__in=vertices.keys()) | models.Q(status='up'))
         qs = qs.regpoint('config')
         for attr in node_attributes:
             try:
