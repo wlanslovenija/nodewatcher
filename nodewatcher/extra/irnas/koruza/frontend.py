@@ -6,5 +6,6 @@ components.partials.get_partial('node_general_partial').add(components.PartialEn
     template='nodes/snippet/irnas_koruza.html',
     extra_context=lambda context: {
         'vpn_ip': getattr(context['node'].monitoring.koruza.vpn(), 'ip_address', None),
-    }
+    },
+    visible=lambda partial, request, context: request.user.has_perm('core.change_node', context['node']),
 ))
