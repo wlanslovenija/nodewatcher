@@ -1,7 +1,7 @@
 {% load i18n %}
 {% if vpn_ip %}
-<div class="row snippet koruza-vpn-ip">
-    <div class="col-md-2 key">{% trans "KORUZA VPN IP" %}</div>
-    <div class="col-md-10 value"><a href="http://{{ vpn_ip.ip }}">{{ vpn_ip.ip }}</a></div>
-</div>
+    <div class="row snippet koruza-vpn-ip">
+        <div class="col-md-2 key">{% trans "KORUZA VPN IP" %}</div>
+        <div class="col-md-10 value"><a href="http://{{ vpn_ip.ip }}">{{ vpn_ip.ip }}</a></div>
+    </div>
 {% endif %}
