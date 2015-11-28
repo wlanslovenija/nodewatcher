@@ -48,6 +48,7 @@ class NodeIpAllocationResource(core_resources.NodeSubresourceMixin, api.BaseReso
         Generate a list of all IP allocations for the current node.
         """
 
+        allocations = None
         if hasattr(request, '_filter_node'):
             node = request._filter_node
             del request._filter_node
@@ -61,4 +62,7 @@ class NodeIpAllocationResource(core_resources.NodeSubresourceMixin, api.BaseReso
                 allocations += src.objects.filter(root=node).values_list('allocation__pk', flat=True)
 
         objects = super(NodeIpAllocationResource, self).get_object_list(request)
-        return objects.filter(pk__in=allocations)
+        if allocations is not None:
+            return objects.filter(pk__in=allocations)
+        else:
+            return objects
