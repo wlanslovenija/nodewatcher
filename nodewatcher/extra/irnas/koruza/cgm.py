@@ -1,63 +1,65 @@
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core import models as core_models
 from nodewatcher.core.generator.cgm import base as cgm_base
 
 from . import models
 
 
-@cgm_base.register_platform_package('openwrt', 'koruza-controller', models.KoruzaConfig)
-def koruza(node, pkgcfg, cfg):
+@cgm_base.register_platform_package('openwrt', 'netmeasured', models.KoruzaNetworkMeasurementConfig)
+def koruza_network_measurement(node, pkgcfg, cfg):
     """
-    Configures the KORUZA controller unit.
+    Configures the KORUZA network measurement unit.
     """
 
     try:
         pkgcfg = pkgcfg.get()
     except models.KoruzaConfig.MultipleObjectsReturned:
-        raise cgm_base.ValidationError(_("Only one KORUZA controller may be defined."))
+        raise cgm_base.ValidationError(_("Only one KORUZA network measurement unit may be defined."))
 
-    # Get the peer's IP address.
-    peer_ip = None
-    try:
-        # Use the first IPv4 Router ID.
-        peer_ip = pkgcfg.peer_controller.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
-    except (core_models.Node.DoesNotExist, AttributeError):
-        pass
-    except IndexError:
-        raise cgm_base.ValidationError(_("Specified KORUZA controller peer does not have a router ID."))
+    # Ensure that the network measurement unit is a WDR4300.
+    device = node.config.core.general().get_device()
+    if not device or device.identifier != 'tp-wdr4300v1':
+        raise cgm_base.ValidationError(_("Only TP-Link WDR4300v1 may be used as KORUZA network measurement unit."))
 
-    # Convert serial port.
-    SERIAL_PORT_MAP = {
-        'usb0': '/dev/ttyACM0',
-        'usb1': '/dev/ttyACM1',
-    }
-    # TODO: Should we validate that the target device has USB support?
+    # Reconfigure network, so that the first port of Lan0 is used for measurements.
+    # XXX: This is currently hardcoded for TP-Link WDR4300 v1.
+    # TODO: Port this to custom VLAN configuration when supported.
+    vlan_lan0 = cfg.network.find_ordered_section('switch_vlan', vlan=1)
+    if not vlan_lan0:
+        raise cgm_base.ValidationError(_("Unable to find Lan0 port group to reconfigure for KORUZA network measurement unit."))
+    vlan_lan0.ports = '0t 3 4 5'
 
-    try:
-        serial_port = SERIAL_PORT_MAP[pkgcfg.serial_port]
-    except KeyError:
-        raise cgm_base.ValidationError(_("Unsupported serial port '%s' for KORUZA on OpenWrt.") % serial_port)
+    # Ensure that VLAN 3 is free.
+    if cfg.network.find_ordered_section('switch_vlan', vlan=3) is not None:
+        raise cgm_base.ValidationError(_("VLAN assignment conflicts with KORUZA network measurement unit."))
 
-    # Install the KORUZA controller configuration file.
-    cfg.files.install(
-        '/etc/koruza.cfg',
-        'irnas/koruza/koruza.cfg',
-        context={
-            'serial_port': serial_port,
-            'peer_ip': peer_ip,
-        },
-    )
+    vlan_measurement = cfg.network.add('switch_vlan')
+    vlan_measurement.device = vlan_lan0.device
+    vlan_measurement.vlan = 3
+    vlan_measurement.ports = '0t 2'
 
-    # Install the KORUZA device reset script.
-    cfg.files.install(
-        '/etc/koruza/device_reset',
-        'irnas/koruza/device_reset',
-        mode=0755
-    )
+    measurement_iface = cfg.network.add(interface='measure')
+    measurement_iface.ifname = 'eth0.3'
+    measurement_iface.proto = 'static'
+    measurement_iface.netmask = '255.255.255.0'
 
-    cfg.packages.update([
-        'koruza-controller',
-        'lm4flash',
-        'kmod-usb-acm'
-    ])
+    # Configure netmeasured.
+    listener = cfg.netmeasured.add('listener')
+    listener.interface = 'measure'
+    listener.port = 9000
+
+    probe = cfg.netmeasured.add(probe='ping0')
+    probe.interface = 'measure'
+    probe.port = 9000
+    probe.interval = 500
+
+    if pkgcfg.role == 'primary':
+        measurement_iface.ipaddr = '172.16.88.1'
+        listener.address = '172.16.88.1'
+        probe.address = '172.16.88.2'
+    elif pkgcfg.role == 'secondary':
+        measurement_iface.ipaddr = '172.16.88.2'
+        listener.address = '172.16.88.2'
+        probe.address = '172.16.88.1'
+    else:
+        raise cgm_base.ValidationError(_("Unsupported KORUZA network measurement unit role '%s'.") % pkgcfg.role)
