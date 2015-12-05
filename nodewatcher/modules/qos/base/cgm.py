@@ -105,13 +105,14 @@ def qos_apply_interface(cfg, interface):
         break
 
 
-def qos_apply_interfaces(cfg, interfaces):
+def qos_apply_interfaces(cfg, interfaces, visited_interfaces):
     for interface in interfaces:
-        if not interface.enabled:
+        if not interface.enabled or interface in visited_interfaces:
             continue
 
+        visited_interfaces.add(interface)
         if interface.has_child_interfaces():
-            qos_apply_interfaces(cfg, interface.get_child_interfaces())
+            qos_apply_interfaces(cfg, interface.get_child_interfaces(), visited_interfaces)
         else:
             qos_apply_interface(cfg, interface)
 
@@ -123,7 +124,8 @@ def qos_interfaces(node, cfg):
     """
 
     # Configure QoS on all interfaces.
-    qos_apply_interfaces(cfg, node.config.core.interfaces())
+    visited_interfaces = set()
+    qos_apply_interfaces(cfg, node.config.core.interfaces(), visited_interfaces)
 
 
 @dispatch.receiver(signals.cgm_apply_interface, sender=models.InterfaceQoSConfig, platform='openwrt')
