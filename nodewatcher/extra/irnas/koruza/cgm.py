@@ -43,6 +43,11 @@ def koruza_network_measurement(node, pkgcfg, cfg):
     measurement_iface.proto = 'static'
     measurement_iface.netmask = '255.255.255.0'
 
+    policy = cfg.network.add('rule')
+    policy.dest = '172.16.88.0/24'
+    policy.lookup = 'main'
+    policy.priority = 500
+
     # Configure netmeasured.
     listener = cfg.netmeasured.add('listener')
     listener.interface = 'measure'
