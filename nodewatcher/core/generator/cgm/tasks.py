@@ -34,7 +34,7 @@ def background_build(self, result_uuid):
 
     # Try to lock the builder for building
     try:
-        generator_models.Builder.objects.select_for_update(nowait=True).filter(pk=result.builder.pk)
+        list(generator_models.Builder.objects.select_for_update(nowait=True).filter(pk=result.builder.pk))
     except db.DatabaseError:
         # Retry the build task again in 15 seconds
         raise self.retry(countdown=15)
