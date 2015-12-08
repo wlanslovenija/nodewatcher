@@ -53,10 +53,10 @@ def koruza_network_measurement(node, pkgcfg, cfg):
     listener.interface = 'measure'
     listener.port = 9000
 
-    probe = cfg.netmeasured.add(probe='ping0')
+    probe = cfg.netmeasured.add(probe='koruza')
     probe.interface = 'measure'
     probe.port = 9000
-    probe.interval = 500
+    probe.interval = 1
 
     if pkgcfg.role == 'primary':
         measurement_iface.ipaddr = '172.16.88.1'
@@ -68,3 +68,16 @@ def koruza_network_measurement(node, pkgcfg, cfg):
         probe.address = '172.16.88.1'
     else:
         raise cgm_base.ValidationError(_("Unsupported KORUZA network measurement unit role '%s'.") % pkgcfg.role)
+
+    # Install HTTP reporting scripts.
+    cfg.files.install(
+        '/www/cgi-bin/koruza/netmeasured_get',
+        'irnas/koruza/netmeasured_get',
+        mode=0755
+    )
+
+    cfg.files.install(
+        '/www/cgi-bin/koruza/netmeasured_reset',
+        'irnas/koruza/netmeasured_reset',
+        mode=0755
+    )

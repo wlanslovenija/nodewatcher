@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "Content-type: application/json"
+echo ""
+
+ubus call netmeasured get_probe '{ "probe": "koruza" }' 2>/dev/null || echo "{}"
