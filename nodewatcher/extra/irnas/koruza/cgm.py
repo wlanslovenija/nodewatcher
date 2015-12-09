@@ -56,7 +56,7 @@ def koruza_network_measurement(node, pkgcfg, cfg):
     probe = cfg.netmeasured.add(probe='koruza')
     probe.interface = 'measure'
     probe.port = 9000
-    probe.interval = 1
+    probe.interval = 100
 
     if pkgcfg.role == 'primary':
         measurement_iface.ipaddr = '172.16.88.1'
