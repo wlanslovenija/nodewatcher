@@ -1031,11 +1031,12 @@ def network(node, cfg):
                     _("The target device does not support USB, so mobile interface cannot be configured!")
                 )
 
-            iface = cfg.network.add(interface=interface.device, managed_by=interface)
+            iface_name = interface.device.replace('-', '')
+            iface = cfg.network.add(interface=iface_name, managed_by=interface)
 
             if interface.uplink:
                 iface._uplink = True
-                set_dhcp_ignore(cfg, interface.device)
+                set_dhcp_ignore(cfg, iface_name)
 
             if interface.device.startswith('eth'):
                 # Mobile modem presents itself as a USB ethernet device. Determine the port based on
@@ -1069,7 +1070,7 @@ def network(node, cfg):
                         _("Unsupported mobile interface port '%(port)s'!") % {'port': interface.device}
                     )
 
-                configure_interface(cfg, node, interface, iface, interface.device)
+                configure_interface(cfg, node, interface, iface, iface_name)
                 iface.proto = 'dhcp'
 
                 cfg.packages.update([
@@ -1112,7 +1113,7 @@ def network(node, cfg):
                     iface.username = interface.username
                     iface.password = interface.password
 
-                configure_interface(cfg, node, interface, iface, interface.device)
+                configure_interface(cfg, node, interface, iface, iface_name)
                 if interface.device.startswith('ppp'):
                     iface.proto = '3g'
                 elif interface.device.startswith('qmi'):
