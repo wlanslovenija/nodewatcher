@@ -1,4 +1,5 @@
 import collections
+import re
 
 from django.conf import settings
 from django.utils import crypto
@@ -23,6 +24,10 @@ except ImportError:
         apt_version_compare = apt.VersionCompare
     except (ImportError, AttributeError):
         apt_version_compare = None
+
+
+# Allowed characters for UCI identifiers.
+UCI_IDENTIFIER = re.compile(r'^[a-zA-Z0-9_]+$')
 
 
 class UCIFormat:
@@ -55,6 +60,9 @@ class UCISection(object):
         """
         Sets a configuration attribute.
         """
+
+        if not name.startswith('_') and not UCI_IDENTIFIER.match(name):
+            raise ValueError("Invalid UCI identifier '%s'." % name)
 
         self._values[name] = value
 
@@ -175,6 +183,9 @@ class UCIRoot(object):
         :param root: Root name
         """
 
+        if not UCI_IDENTIFIER.match(root):
+            raise ValueError("Invalid UCI root name '%s'." % root)
+
         self._root = root
         self._named_sections = collections.OrderedDict()
         self._ordered_sections = collections.OrderedDict()
@@ -193,17 +204,21 @@ class UCIRoot(object):
             raise ValueError
 
         if kwargs:
-            # Adding a named section
+            # Adding a named section.
             section_key = kwargs.values()[0]
-            section = UCISection(key=section_key, typ=kwargs.keys()[0], managed_by=managed_by)
+            section_type = kwargs.keys()[0]
+            if not UCI_IDENTIFIER.match(section_key):
+                raise ValueError("Invalid named UCI section name '%s'." % section_key)
+
+            section = UCISection(key=section_key, typ=section_type, managed_by=managed_by)
 
             # Check for duplicates to avoid screwing up existing lists and sections
             if section_key in self._named_sections:
-                raise ValueError("UCI section '{0}' is already defined!".format(section_key))
+                raise ValueError("UCI section '%s' is already defined!" % section_key)
 
             self._named_sections[section_key] = section
         else:
-            # Adding an ordered section
+            # Adding an ordered section.
             section = UCISection(managed_by=managed_by)
             self._ordered_sections.setdefault(args[0], []).append(section)
 
