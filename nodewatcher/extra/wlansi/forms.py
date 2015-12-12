@@ -452,7 +452,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             return ssid
 
         if node_type not in ('backbone', 'server'):
-            if radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID):
+            if radio.has_feature(cgm_devices.DeviceRadio.MultipleSSID) and 'no-wifi-ap' not in network_profiles:
                 # If the device supports multiple SSIDs, use one in AP mode, the other in mesh mode.
                 clients_wifi = self.setup_interface(
                     state,
@@ -465,7 +465,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     },
                 )
 
-                clients_wifi_network = self.setup_network(
+                self.setup_network(
                     state,
                     clients_wifi,
                     cgm_models.BridgedNetworkConfig,
@@ -476,17 +476,18 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 )
 
             # Create mesh interface.
-            mesh_wifi = self.setup_interface(
-                state,
-                cgm_models.WifiInterfaceConfig,
-                parent=wifi_radio,
-                configuration={
-                    'mode': 'mesh',
-                    'essid': get_project_ssid('mesh', 'mesh.wlan-si.net'),
-                    'bssid': get_project_ssid('mesh', '02:CA:FF:EE:BA:BE', attribute='bssid'),
-                    'routing_protocols': ['olsr', 'babel'],
-                },
-            )
+            if 'no-wifi-mesh' not in network_profiles:
+                self.setup_interface(
+                    state,
+                    cgm_models.WifiInterfaceConfig,
+                    parent=wifi_radio,
+                    configuration={
+                        'mode': 'mesh',
+                        'essid': get_project_ssid('mesh', 'mesh.wlan-si.net'),
+                        'bssid': get_project_ssid('mesh', '02:CA:FF:EE:BA:BE', attribute='bssid'),
+                        'routing_protocols': ['olsr', 'babel'],
+                    },
+                )
         elif node_type == 'backbone':
             # If the device is of type "Backbone", create one AP/STA.
             if wifi_backbone_defaults is not None:
