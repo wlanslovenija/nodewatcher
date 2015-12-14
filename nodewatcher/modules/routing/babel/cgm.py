@@ -81,6 +81,7 @@ def babel(node, cfg):
     for iface in routable_ifaces:
         interface = cfg.babeld.add('interface')
         interface.ifname = iface
+        interface.link_quality = 'true'
 
         rule = cfg.babeld.add('filter')
         rule.type = 'redistribute'
