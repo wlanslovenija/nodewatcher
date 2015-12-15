@@ -28,6 +28,7 @@ except ImportError:
 
 # Allowed characters for UCI identifiers.
 UCI_IDENTIFIER = re.compile(r'^[a-zA-Z0-9_]+$')
+UCI_PACKAGE_IDENTIFIER = re.compile(r'^[a-zA-Z0-9_-]+$')
 
 
 class UCIFormat:
@@ -210,8 +211,8 @@ class UCIRoot(object):
         :param root: Root name
         """
 
-        if not UCI_IDENTIFIER.match(root):
-            raise ValueError("Invalid UCI root name '%s'." % root)
+        if not UCI_PACKAGE_IDENTIFIER.match(root):
+            raise ValueError("Invalid UCI package name '%s'." % root)
 
         self._root = root
         self._named_sections = collections.OrderedDict()
