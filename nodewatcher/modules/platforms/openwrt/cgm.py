@@ -51,6 +51,9 @@ class UCISection(object):
         Class constructor.
         """
 
+        if not isinstance(managed_by, list):
+            managed_by = [managed_by]
+
         self.__dict__['_key'] = key
         self.__dict__['_typ'] = typ
         self.__dict__['_managed_by'] = managed_by
@@ -101,13 +104,37 @@ class UCISection(object):
 
         return self._typ
 
-    def get_manager(self):
+    def get_manager(self, klass=None):
         """
         Returns a manager object in case one has been set when adding this
         piece of configuration.
         """
 
-        return self._managed_by
+        if not self._managed_by:
+            return None
+
+        for manager in self._managed_by:
+            if klass is None or isinstance(manager, klass):
+                return manager
+
+        return None
+
+    def add_manager(self, manager):
+        """
+        Adds a new manager.
+        """
+
+        self._managed_by.append(manager)
+
+    def matches(self, attribute, value):
+        """
+        Returns true if this section's attribute matches a specific value.
+        """
+
+        if attribute == '_managed_by':
+            return value in self._managed_by
+
+        return getattr(self, attribute, None) == value
 
     def format_value(self, key, value, root, section, idx=None, fmt=UCIFormat.DUMP):
         """
@@ -269,7 +296,7 @@ class UCIRoot(object):
             if section.get_type() != section_type:
                 continue
 
-            if all((getattr(section, a, None) == v for a, v in query.items())):
+            if all((section.matches(a, v) for a, v in query.items())):
                 sections.append(section)
 
         return sections
@@ -302,7 +329,7 @@ class UCIRoot(object):
 
         sections = []
         for section in self._ordered_sections.get(section_type, []):
-            if all((getattr(section, a, None) == v for a, v in query.items())):
+            if all((section.matches(a, v) for a, v in query.items())):
                 sections.append(section)
 
         return sections
@@ -703,6 +730,8 @@ def configure_network(cfg, node, interface, network, section, iface_name):
     :param iface_name: Name of the UCI interface
     """
 
+    section.add_manager(network)
+
     if isinstance(network, cgm_models.StaticNetworkConfig):
         section.proto = 'static'
         if network.family == 'ipv4':
@@ -717,15 +746,9 @@ def configure_network(cfg, node, interface, network, section, iface_name):
         else:
             raise cgm_base.ValidationError(_("Unsupported address family '%s'!") % network.family)
 
-        # When network is marked to be announced, also specify it here
-        section._announce = network.routing_announces
-
         configure_leasable_network(cfg, node, interface, network, iface_name, network.address)
     elif isinstance(network, cgm_models.AllocatedNetworkConfig):
         section.proto = 'static'
-
-        # When network is marked to be announced, also specify it here
-        section._announce = network.routing_announces
 
         # Check that the network has actually been allocated and fail validation if not so
         if not network.allocation:
@@ -773,8 +796,6 @@ def configure_interface(cfg, node, interface, section, iface_name):
     :param iface_name: Name of the UCI interface
     """
 
-    section._routable = getattr(interface, 'routing_protocols', [])
-
     networks = [x.cast() for x in interface.networks.all()]
     if networks:
         network = networks[0]
@@ -790,7 +811,7 @@ def configure_interface(cfg, node, interface, section, iface_name):
 
     if section._uplink:
         # An uplink interface cannot be used for routing.
-        if section._routable:
+        if getattr(interface, 'routing_protocols', []):
             raise cgm_base.ValidationError(_("An uplink interface cannot also be used for routing!"))
 
         # Ensure that uplink traffic is routed via the main table.

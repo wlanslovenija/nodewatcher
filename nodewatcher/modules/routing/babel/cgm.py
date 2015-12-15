@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core.generator.cgm import base as cgm_base, resources as cgm_resources
+from nodewatcher.core.generator.cgm import base as cgm_base, resources as cgm_resources, models as cgm_models
 from nodewatcher.utils import ipaddr
 
 from . import models as babel_models, signals
@@ -21,8 +21,8 @@ class BabelProtocolManager(object):
 def babel(node, cfg):
     babel_configured = False
 
-    # Iterate through interfaces and decide which ones should be included in the routing table. Other
-    # modules must have previously set its "_routable" attribute to BABEL_PROTOCOL_NAME.
+    # Iterate through interfaces and decide which ones should be included in the routing table, based
+    # on the presence of BABEL_PROTOCOL_NAME in the interface manager's "routing_protocols".
     routable_ifaces = []
     announced_ifaces = []
     announced_networks = []
@@ -30,8 +30,11 @@ def babel(node, cfg):
         if iface.get_type() != 'interface':
             continue
 
-        # All interfaces that are marked in _announce for this routing protocol should be redistributed.
-        if babel_models.BABEL_PROTOCOL_NAME in (iface._announce or []):
+        manager = iface.get_manager()
+        network_manager = iface.get_manager(cgm_models.NetworkConfig)
+
+        # All interfaces that are marked for this routing protocol should be redistributed.
+        if babel_models.BABEL_PROTOCOL_NAME in getattr(network_manager, 'routing_announces', []):
             net = ipaddr.IPNetwork('%s/%s' % (iface.ipaddr, iface.netmask))
             announced_networks.append(net)
 
@@ -46,7 +49,7 @@ def babel(node, cfg):
             announced_ifaces.append(iface)
             babel_configured = True
 
-        if babel_models.BABEL_PROTOCOL_NAME not in (iface._routable or []):
+        if babel_models.BABEL_PROTOCOL_NAME not in getattr(manager, 'routing_protocols', []):
             continue
 
         if iface.proto == 'none':

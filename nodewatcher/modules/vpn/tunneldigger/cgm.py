@@ -27,7 +27,6 @@ def tunneldigger(node, cfg):
         iface.ifname = ifname
         iface.macaddr = interface.mac
         iface.proto = 'none'
-        iface._routable = interface.routing_protocols
 
         # Add a broker for each configured interface
         broker = cfg.tunneldigger.add('broker')
@@ -134,7 +133,6 @@ def tunneldigger_broker(node, pkgcfg, cfg):
         iface.type = 'bridge'
         iface.bridge_empty = True
         iface.proto = 'none'
-        iface._routable = pkgcfg.routing_protocols
 
         bridge = cfg['tunneldigger-broker'].add('bridge')
         bridge.mtu = mtu

@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.generator.cgm import base as cgm_base, resources as cgm_resources
+from nodewatcher.core.generator.cgm import base as cgm_base, resources as cgm_resources, models as cgm_models
 from nodewatcher.utils import ipaddr
 
 from . import models as olsr_models
@@ -22,17 +22,19 @@ class OlsrProtocolManager(object):
 def olsr(node, cfg):
     olsrd_configured = False
 
-    # Iterate through interfaces and decide which ones should be included
-    # in the routing table; other modules must have previously set its
-    # "_routable" attribute to OLSR_PROTOCOL_NAME
+    # Iterate through interfaces and decide which ones should be included in the routing table, based
+    # on the presence of OLSR_PROTOCOL_NAME in the interface manager's "routing_protocols".
     routable_ifaces = []
     announced_ifaces = []
     for name, iface in list(cfg.network):
         if iface.get_type() != 'interface':
             continue
 
-        # All interfaces that are marked in _announce for this routing protocol should be added to HNA
-        if olsr_models.OLSR_PROTOCOL_NAME in (iface._announce or []):
+        manager = iface.get_manager()
+        network_manager = iface.get_manager(cgm_models.NetworkConfig)
+
+        # All interfaces that are marked for this routing protocol should be redistributed.
+        if olsr_models.OLSR_PROTOCOL_NAME in getattr(network_manager, 'routing_announces', []):
             hna = cfg.olsrd.add('Hna4')
             hna.netaddr = ipaddr.IPNetwork('%s/%s' % (iface.ipaddr, iface.netmask)).network
             hna.netmask = iface.netmask
@@ -48,7 +50,7 @@ def olsr(node, cfg):
             announced_ifaces.append(name)
             olsrd_configured = True
 
-        if olsr_models.OLSR_PROTOCOL_NAME not in (iface._routable or []):
+        if olsr_models.OLSR_PROTOCOL_NAME not in getattr(manager, 'routing_protocols', []):
             continue
 
         if iface.proto == 'none':
