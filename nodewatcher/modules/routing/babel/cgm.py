@@ -3,7 +3,7 @@ from django.utils.translation import ugettext as _
 from nodewatcher.core.generator.cgm import base as cgm_base, resources as cgm_resources
 from nodewatcher.utils import ipaddr
 
-from . import models as babel_models
+from . import models as babel_models, signals
 
 ROUTING_TABLE_ID = 21
 ROUTING_TABLE_NAME = 'babel'
@@ -43,7 +43,7 @@ def babel(node, cfg):
             hna_route.gateway = '0.0.0.0'
             hna_route.table = ROUTING_TABLE_ID
 
-            announced_ifaces.append(name)
+            announced_ifaces.append(iface)
             babel_configured = True
 
         if babel_models.BABEL_PROTOCOL_NAME not in (iface._routable or []):
@@ -59,7 +59,7 @@ def babel(node, cfg):
             except cgm_resources.ResourceExhausted:
                 raise cgm_base.ValidationError(_("Not enough IP space to allocate an address for Babel interface!"))
 
-        routable_ifaces.append(name)
+        routable_ifaces.append(iface)
         babel_configured = True
 
     if not babel_configured:
@@ -80,13 +80,23 @@ def babel(node, cfg):
 
     for iface in routable_ifaces:
         interface = cfg.babeld.add('interface')
-        interface.ifname = iface
+        interface.ifname = iface.get_key()
         interface.link_quality = 'true'
+
+        # Allow interface-specific routing protocol configuration.
+        manager = iface.get_manager()
+        if manager is not None:
+            signals.cgm_setup_interface.send(
+                manager.__class__,
+                cfg=cfg,
+                manager=manager,
+                interface=interface,
+            )
 
         rule = cfg.babeld.add('filter')
         rule.type = 'redistribute'
         rule.local = 'true'
-        rule['if'] = iface
+        rule['if'] = iface.get_key()
         rule.action = 'allow'
 
     for net in announced_networks:
@@ -126,7 +136,7 @@ def babel(node, cfg):
     # Ensure that forwarding between all Babel interfaces is allowed.
     firewall = cfg.firewall.add('zone', managed_by=BabelProtocolManager())
     firewall.name = 'babel'
-    firewall.network = list(set(routable_ifaces + announced_ifaces))
+    firewall.network = [iface.get_key() for iface in set(routable_ifaces + announced_ifaces)]
     firewall.input = 'ACCEPT'
     firewall.output = 'ACCEPT'
     firewall.forward = 'ACCEPT'
