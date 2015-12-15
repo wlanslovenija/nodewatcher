@@ -1,5 +1,6 @@
 import requests
 import uuid
+import json
 
 from django import dispatch
 from django.contrib.auth import models as auth_models
@@ -121,6 +122,8 @@ class Builder(models.Model):
     metadata = json_field.JSONField(
         blank=True,
         editable=False,
+        encoder=json.JSONEncoder,
+        decoder=json.JSONDecoder,
     )
     host = models.CharField(
         max_length=50,
@@ -145,15 +148,9 @@ class Builder(models.Model):
         when one does not yet exist.
         """
 
-        # Fetch metadata via HTTP.
+        # Refresh metadata.
         try:
-            metadata = self._get_metadata()
-            self.platform = str(metadata['platform'])
-            self.architecture = str(metadata['architecture'])
-            self.version, created = BuildVersion.objects.get_or_create(name=str(metadata['version']))
-            self.metadata = {
-                'packages': metadata.get('packages', {}),
-            }
+            self.refresh_metadata()
         except ValueError:
             raise django_exceptions.ValidationError(_('Failed to obtain metadata from builder!'))
         except requests.ConnectionError:
@@ -167,6 +164,26 @@ class Builder(models.Model):
             raise django_exceptions.ValidationError(_('Failed to establish SSH connection with builder!'))
         except exceptions.MalformedPrivateKey:
             raise django_exceptions.ValidationError(_('Specified private key is malformed!'))
+
+    def refresh_metadata(self):
+        """
+        Refreshes builder metadata.
+        """
+
+        metadata = self._get_metadata()
+
+        if not self.platform or not self.architecture:
+            self.platform = str(metadata['platform'])
+            self.architecture = str(metadata['architecture'])
+            self.version, created = BuildVersion.objects.get_or_create(name=str(metadata['version']))
+
+        new_metadata = {
+            'packages': metadata.get('packages', {}),
+        }
+
+        if self.metadata != new_metadata:
+            self.metadata = new_metadata
+            return True
 
     def is_consistent(self):
         """

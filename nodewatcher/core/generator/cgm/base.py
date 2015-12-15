@@ -491,6 +491,10 @@ class PlatformBase(object):
         if not builder.is_consistent():
             raise exceptions.BuilderInconsistent
 
+        # Update metadata.
+        if builder.refresh_metadata():
+            builder.save()
+
         return build_channel, builder
 
     def register_module(self, weight, module, device=None):
