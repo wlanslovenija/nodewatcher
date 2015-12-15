@@ -137,7 +137,7 @@ class UCISection(object):
 
         return getattr(self, attribute, None) == value
 
-    def format_value(self, key, value, root, section, idx=None, fmt=UCIFormat.DUMP):
+    def format_value(self, key, value, package, section, idx=None, fmt=UCIFormat.DUMP):
         """
         Formats a value so it is suitable for insertion into UCI.
         """
@@ -151,9 +151,9 @@ class UCISection(object):
                 value = str(value).strip().replace('\n', ' ')
 
             if self._typ is not None:
-                return ['{0}.{1}.{2}={3}'.format(root, section, key, value)]
+                return ['{0}.{1}.{2}={3}'.format(package, section, key, value)]
             else:
-                return ['{0}.@{1}[{2}].{3}={4}'.format(root, section, idx, key, value)]
+                return ['{0}.@{1}[{2}].{3}={4}'.format(package, section, idx, key, value)]
         elif fmt == UCIFormat.FILES:
             if isinstance(value, (list, tuple)):
                 return ['\tlist %s \'%s\'' % (key, item) for item in value]
@@ -164,7 +164,7 @@ class UCISection(object):
 
         return str(value)
 
-    def format(self, root, section, idx=None, fmt=UCIFormat.DUMP):
+    def format(self, package, section, idx=None, fmt=UCIFormat.DUMP):
         """
         Formats the configuration tree so it is suitable for loading into UCI.
         """
@@ -175,13 +175,13 @@ class UCISection(object):
         if self._typ is not None:
             # Named sections
             if fmt == UCIFormat.DUMP:
-                output.append('{0}.{1}={2}'.format(root, section, self._typ))
+                output.append('{0}.{1}={2}'.format(package, section, self._typ))
             elif fmt == UCIFormat.FILES:
                 output.append('config %s \'%s\'' % (self._typ, section))
         else:
             # Ordered sections
             if fmt == UCIFormat.DUMP:
-                output.append('{0}.@{1}[{2}]={1}'.format(root, section, idx))
+                output.append('{0}.@{1}[{2}]={1}'.format(package, section, idx))
             elif fmt == UCIFormat.FILES:
                 output.append('config %s' % section)
 
@@ -189,7 +189,7 @@ class UCISection(object):
         for key, value in self._values.iteritems():
             if key.startswith('_'):
                 continue
-            output += self.format_value(key, value, root, section, idx, fmt)
+            output += self.format_value(key, value, package, section, idx, fmt)
 
         # Output section footer
         if fmt == UCIFormat.FILES:
@@ -198,23 +198,23 @@ class UCISection(object):
         return output
 
 
-class UCIRoot(object):
+class UCIPackage(object):
     """
     Represents an UCI configuration file with multiple named and ordered
     sections.
     """
 
-    def __init__(self, root):
+    def __init__(self, package):
         """
         Class constructor.
 
-        :param root: Root name
+        :param package: Package name
         """
 
-        if not UCI_PACKAGE_IDENTIFIER.match(root):
-            raise ValueError("Invalid UCI package name '%s'." % root)
+        if not UCI_PACKAGE_IDENTIFIER.match(package):
+            raise ValueError("Invalid UCI package name '%s'." % package)
 
-        self._root = root
+        self._package = package
         self._named_sections = collections.OrderedDict()
         self._ordered_sections = collections.OrderedDict()
 
@@ -372,11 +372,11 @@ class UCIRoot(object):
 
         output = []
         for name, section in self._named_sections.iteritems():
-            output += section.format(self._root, name, fmt=fmt)
+            output += section.format(self._package, name, fmt=fmt)
 
         for name, sections in self._ordered_sections.iteritems():
             for idx, section in enumerate(sections):
-                output += section.format(self._root, name, idx, fmt=fmt)
+                output += section.format(self._package, name, idx, fmt=fmt)
 
         return output
 
@@ -465,7 +465,7 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
 
         super(UCIConfiguration, self).__init__(*args, **kwargs)
         self.sysctl = self.sysctl_manager_class()
-        self._roots = {}
+        self._packages = {}
 
     def package_version_compare(self, version_a, version_b):
         """
@@ -497,15 +497,15 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         })
         return result
 
-    def __getattr__(self, root):
+    def __getattr__(self, package):
         """
-        Returns the desired UCI root (config file).
+        Returns the desired UCI package (config file).
         """
 
-        if root.startswith('__') and root.endswith('__'):
-            raise AttributeError(root)
+        if package.startswith('__') and package.endswith('__'):
+            raise AttributeError(package)
 
-        return self._roots.setdefault(root, UCIRoot(root))
+        return self._packages.setdefault(package, UCIPackage(package))
 
     __getitem__ = __getattr__
 
@@ -519,13 +519,13 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         if fmt == UCIFormat.DUMP:
             # UCI dump format
             output = []
-            for name, root in self._roots.iteritems():
-                output += root.format(fmt=fmt)
+            for name, package in self._packages.iteritems():
+                output += package.format(fmt=fmt)
         elif fmt == UCIFormat.FILES:
             # UCI split into multiple files
             output = {}
-            for name, root in self._roots.iteritems():
-                output[name] = '\n'.join(root.format(fmt=fmt))
+            for name, package in self._packages.iteritems():
+                output[name] = '\n'.join(package.format(fmt=fmt))
 
         return output
 
