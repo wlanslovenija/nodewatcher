@@ -801,9 +801,9 @@ def configure_interface(cfg, node, interface, section, iface_name):
         network = networks[0]
         configure_network(cfg, node, interface, network, section, iface_name)
 
-        # Additional network configurations are aliases
+        # Additional network configurations are aliases.
         for network in networks[1:]:
-            alias = cfg.network.add('alias')
+            alias = cfg.network.add('alias', managed_by=interface)
             alias.interface = iface_name
             configure_network(cfg, node, interface, network, alias, iface_name)
     else:
