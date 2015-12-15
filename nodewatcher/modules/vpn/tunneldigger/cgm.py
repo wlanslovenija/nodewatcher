@@ -1,3 +1,5 @@
+from django import dispatch
+from django.apps import apps
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.generator.cgm import base as cgm_base
@@ -166,3 +168,27 @@ def tunneldigger_broker(node, pkgcfg, cfg):
     rule.proto = 'udp'
     rule.dest_port = pkgcfg.ports
     rule.target = 'ACCEPT'
+
+
+# Babel routing configuration.
+if apps.is_installed('nodewatcher.modules.routing.babel'):
+    from nodewatcher.modules.routing.babel import signals
+
+    @dispatch.receiver(signals.cgm_setup_interface, sender=models.TunneldiggerInterfaceConfig, platform='openwrt')
+    def babel_tunneldigger_client(sender, cfg, manager, interface, **kwargs):
+        """
+        Configures a tunneldigger client interface for Babel routing.
+        """
+
+        interface.wired = 'true'
+        interface.link_quality = 'true'
+
+    @dispatch.receiver(signals.cgm_setup_interface, sender=models.TunneldiggerBrokerConfig, platform='openwrt')
+    def babel_tunneldigger_broker(sender, cfg, manager, interface, **kwargs):
+        """
+        Configures a tunneldigger broker interface for Babel routing.
+        """
+
+        interface.wired = 'true'
+        interface.link_quality = 'true'
+        interface.split_horizon = 'false'
