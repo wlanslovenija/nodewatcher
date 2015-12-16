@@ -58,11 +58,17 @@ class GenerateFirmware(mixins.PermissionRequiredMixin,
         return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.get_object().pk})
 
 
-class ViewBuild(generic.DetailView):
+class ViewBuild(mixins.PermissionRequiredMixin,
+                generic.DetailView):
     template_name = 'generator/view_build.html'
     model = generator_models.BuildResult
+    permission_required = 'core.generate_firmware'
     context_object_name = 'build'
 
+    def get_permission_object(self):
+        return self.get_object().node
 
-class ListBuilds(generic.TemplateView):
+
+class ListBuilds(mixins.LoginRequiredMixin,
+                 generic.TemplateView):
     template_name = 'generator/list_builds.html'
