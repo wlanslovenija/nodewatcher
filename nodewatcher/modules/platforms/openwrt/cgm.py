@@ -997,7 +997,10 @@ def network(node, cfg):
         [radio.identifier for radio in device.radios],
     ))
 
-    # Configure all interfaces
+    # Include iproute package.
+    cfg.packages.add('ip')
+
+    # Configure all interfaces.
     for interface in node.config.core.interfaces():
         if not interface.enabled:
             continue
@@ -1396,10 +1399,8 @@ def network(node, cfg):
 
                     configure_interface(cfg, node, vif, iface, vif_name)
 
-            # Include some wireless related packages.
-            cfg.packages.update([
-                'wireless-tools'
-            ])
+            # Include wireless tools package.
+            cfg.packages.add('wireless-tools')
 
 
 @cgm_base.register_platform_module('openwrt', 15)
