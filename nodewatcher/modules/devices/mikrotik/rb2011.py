@@ -70,9 +70,9 @@ class MikrotikRB2011UiAS_IN(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'DefaultNoWifi',
             'files': [
+                'openwrt-ar71xx-mikrotik-DefaultNoWifi-sysupgrade.tar.gz',
                 'openwrt-ar71xx-mikrotik-DefaultNoWifi-rootfs.tar.gz',
                 'openwrt-ar71xx-mikrotik-vmlinux-lzma.elf',
-                'openwrt-ar71xx-mikrotik-vmlinux-initramfs-lzma.elf',
             ]
         }
     }
