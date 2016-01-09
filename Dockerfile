@@ -1,4 +1,4 @@
-FROM wlanslovenija/runit
+FROM tozd/runit
 
 MAINTAINER Jernej Kos <jernej@kos.mx>
 
