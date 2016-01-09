@@ -67,6 +67,22 @@ class DatastreamBase(object):
         now = datetime.datetime.utcnow()
 
         processed_items = set()
+        datapoints = []
+
+        class DatastreamBulkProxy(object):
+            def __getattr__(self, key):
+                return getattr(datastream, key)
+
+            def append(self, stream_id, value, timestamp=None):
+                # Change append to cache datapoints for bulk insertion.
+                datapoints.append({
+                    'stream_id': stream_id,
+                    'value': value,
+                    'timestamp': timestamp,
+                })
+
+        datastream_bulk_proxy = DatastreamBulkProxy()
+
         for items in context.datastream.values():
             if isinstance(items, dict):
                 items = items.values()
@@ -82,10 +98,13 @@ class DatastreamBase(object):
 
                 try:
                     descriptor = pool.get_descriptor(item)
-                    descriptor.insert_to_stream(datastream, timestamp=now)
+                    descriptor.insert_to_stream(datastream_bulk_proxy, timestamp=now)
                     pool.clear_descriptor(item)
                 except exceptions.StreamDescriptorNotRegistered:
                     continue
+
+        # Insert datapoints in bulk.
+        datastream.append_multiple(datapoints)
 
 
 class NodeDatastream(DatastreamBase, monitor_processors.NodeProcessor):
