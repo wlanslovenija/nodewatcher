@@ -341,7 +341,7 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
             },
             'unit': 'ms',
         },
-        value_downsamplers=['mean', 'sum', 'min', 'max', 'sum_squares', 'std_dev', 'count'],
+        value_downsamplers=['mean', 'sum', 'min', 'max', 'std_dev', 'count'],
         attribute=lambda model: {
             'c': model.successful_packets,
             'm': model.rtt_average,

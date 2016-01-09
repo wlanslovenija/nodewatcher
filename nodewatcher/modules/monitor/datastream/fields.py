@@ -4,7 +4,6 @@ import copy
 from django.core import exceptions
 
 from datastream import exceptions as ds_exceptions
-from django_datastream import datastream
 
 from .pool import pool
 
@@ -86,7 +85,6 @@ class Field(object):
                     'sum',
                     'min',
                     'max',
-                    'sum_squares',
                     'std_dev',
                     'count',
                 ]
