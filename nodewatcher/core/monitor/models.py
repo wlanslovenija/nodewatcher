@@ -135,6 +135,7 @@ class InterfaceMonitor(registration.bases.NodeMonitoringRegistryItem):
     """
 
     name = models.CharField(max_length=50, null=True)
+    up = models.BooleanField(default=False)
     hw_address = registry_fields.MACAddressField(null=True)
     tx_packets = models.DecimalField(max_digits=100, decimal_places=0, null=True)
     rx_packets = models.DecimalField(max_digits=100, decimal_places=0, null=True)

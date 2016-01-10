@@ -28,6 +28,7 @@ class Interfaces(monitor_processors.NodeProcessor):
         # Fetch models for all existing interfaces and reset measured variables
         existing_interfaces = {}
         for iface in node.monitoring.core.interfaces():
+            iface.up = False
             iface.tx_packets = None
             iface.rx_packets = None
             iface.tx_bytes = None
@@ -37,6 +38,7 @@ class Interfaces(monitor_processors.NodeProcessor):
             iface.tx_drops = None
             iface.rx_drops = None
             iface.mtu = None
+            iface.hw_address = None
             if isinstance(iface, monitor_models.WifiInterfaceMonitor):
                 iface.mode = None
                 iface.essid = None
@@ -95,6 +97,7 @@ class Interfaces(monitor_processors.NodeProcessor):
 
         # TODO: We currently assume that interfaces will not change types between wifi/non-wifi
 
+        iface.up = True
         iface.hw_address = str(data.mac)
         iface.tx_packets = int(data.statistics.tx_packets)
         iface.rx_packets = int(data.statistics.rx_packets)

@@ -79,10 +79,10 @@ class Tunneldigger(monitor_processors.NodeProcessor):
             # TODO: Should we identify VPN interfaces based on configured MAC address?
             ifname = models.get_tunneldigger_interface_name(idx)
             try:
-                iface = node.monitoring.core.interfaces(queryset=True).get(name=ifname).cast()
+                iface = node.monitoring.core.interfaces(queryset=True).get(name=ifname, up=True).cast()
                 self.process_interface(context, iface)
             except monitor_models.InterfaceMonitor.DoesNotExist:
-                # TODO: Generate an event that digger interface does not exist
+                # TODO: Generate an event that digger interface does not exist or is down.
                 continue
 
         return context
