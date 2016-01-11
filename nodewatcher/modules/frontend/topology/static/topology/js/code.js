@@ -8,7 +8,7 @@
             var streamId = data.objects[0].id;
             var latestTimestamp = moment(data.objects[0].latest_datapoint).unix();
             $.ajax({
-                'url': "/api/v1/stream/" + streamId + "/?format=json&reverse=true&limit=1&start_exclusive=" + latestTimestamp,
+                'url': "/api/v1/stream/" + streamId + "/?format=json&reverse=true&limit=1&start=" + latestTimestamp,
             }).done(function(data) {
                 var graph = data.datapoints[0].v;
                 var nodes = [];
