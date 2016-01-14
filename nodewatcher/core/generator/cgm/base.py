@@ -284,6 +284,18 @@ class PlatformConfiguration(object):
 
         return self._deferred_configuration
 
+    def has_package(self, package):
+        """
+        Returns True if the target build supports the specified package.
+
+        :param package: Package identifier
+        """
+
+        if not self.builder or not self.builder.metadata:
+            return False
+
+        return package in self.builder.metadata['packages']
+
     def has_package_version(self, package, version):
         """
         Returns True if the target builder has at least the specified version
