@@ -81,3 +81,20 @@ def koruza_network_measurement(node, pkgcfg, cfg):
         'irnas/koruza/netmeasured_reset',
         mode=0755
     )
+
+    # Configure webcam support if available.
+    if cfg.has_package('mjpg-streamer'):
+        streamer = cfg['mjpg-streamer'].add(**{'mjpg-streamer': 'core'})
+        streamer.enabled = True
+        streamer.input = 'uvc'
+        streamer.output = 'http'
+        streamer.device = '/dev/video0'
+        streamer.resolution = '640x480'
+        streamer.yuv = 0
+        streamer.quality = 80
+        streamer.fps = 5
+        streamer.led = 'auto'
+        streamer.www = '/www/webcam'
+        streamer.port = 8080
+
+        cfg.packages.add('mjpg-streamer')
