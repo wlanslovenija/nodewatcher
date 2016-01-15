@@ -89,10 +89,10 @@ def koruza_network_measurement(node, pkgcfg, cfg):
         streamer.input = 'uvc'
         streamer.output = 'http'
         streamer.device = '/dev/video0'
-        streamer.resolution = '640x480'
+        streamer.resolution = '1280x720'
         streamer.yuv = 0
         streamer.quality = 80
-        streamer.fps = 5
+        streamer.fps = 1
         streamer.led = 'auto'
         streamer.www = '/www/webcam'
         streamer.port = 8080
