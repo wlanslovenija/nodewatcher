@@ -1,4 +1,5 @@
 from django import dispatch
+from django.core import exceptions
 from django.db.models import signals as django_signals
 from django.utils.translation import gettext_noop
 
@@ -30,19 +31,6 @@ class RegistryItemStreams(base.StreamsBase):
             'registry_id': self._model._registry.registry_id,
         }
 
-    def get_stream_tags(self):
-        """
-        Returns the stream tags that should be included in every stream
-        derived from this object.
-
-        :return: A dictionary of tags to include
-        """
-
-        return {
-            'node': self._model.root.uuid,
-            'registry_id': self._model._registry.registry_id,
-        }
-
     def get_stream_highest_granularity(self):
         """
         Returns the highest granularity that should be used by default for
@@ -63,6 +51,74 @@ class RegistryItemStreams(base.StreamsBase):
 
         regpoint = self._model._registry.registration_point
         return getattr(self._model.root, regpoint.namespace).by_registry_id(model_reference)
+
+
+class RegistryRootStreams(base.StreamsBase):
+    """
+    Base class for registry root stream attributes.
+    """
+
+    def get_stream_query_tags(self):
+        """
+        Returns a set of tags that uniquely identify this object.
+
+        :return: A dictionary of tags that uniquely identify this object
+        """
+
+        return {
+            'node': self.get_root().uuid,
+            'module': self.get_module_name(),
+        }
+
+    def get_stream_highest_granularity(self):
+        """
+        Returns the highest granularity that should be used by default for
+        all streams derived from this object.
+        """
+
+        return datastream.Granularity.Minutes
+
+    def resolve_model_reference(self, model_reference):
+        """
+        Some fields support referencing other fields. In order to resolve
+        model references, this method must be overriden. It should return
+        the resolved model class.
+
+        :param model_reference: A string representing the model reference
+        :return: Resolved model class
+        """
+
+        return getattr(
+            self.get_root(),
+            self.get_regpoint_namespace(model_reference)
+        ).by_registry_id(model_reference)
+
+    def get_regpoint_namespace(self, model_reference):
+        """
+        Returns the registration point namespace, which should be used to resolve
+        the given model reference.
+
+        :param model_reference: A string representing the model reference
+        :return: Registration point namespace under the root model
+        """
+
+        return 'monitoring'
+
+    def get_root(self):
+        """
+        Returns the root model that this proxy should operate on.
+
+        :return: Root model instance
+        """
+
+        return self._model.node
+
+    def get_module_name(self):
+        """
+        Returns the module name that should be used as part of the query tags.
+        """
+
+        raise NotImplementedError
 
 
 class ProxyRegistryItemStreams(RegistryItemStreams):
@@ -358,11 +414,6 @@ class RttMeasurementMonitorStreams(RegistryItemStreams):
         tags.update({'packet_size': self._model.packet_size})
         return tags
 
-    def get_stream_tags(self):
-        tags = super(RttMeasurementMonitorStreams, self).get_stream_query_tags()
-        tags.update({'packet_size': self._model.packet_size})
-        return tags
-
 pool.register(models.RttMeasurementMonitor, RttMeasurementMonitorStreams)
 
 
@@ -375,18 +426,6 @@ class InterfaceStreams(RegistryItemStreams):
         """
 
         tags = super(InterfaceStreams, self).get_stream_query_tags()
-        tags.update({'interface': self._model.name})
-        return tags
-
-    def get_stream_tags(self):
-        """
-        Returns the stream tags that should be included in every stream
-        derived from this object.
-
-        :return: A dictionary of tags to include
-        """
-
-        tags = super(InterfaceStreams, self).get_stream_tags()
         tags.update({'interface': self._model.name})
         return tags
 

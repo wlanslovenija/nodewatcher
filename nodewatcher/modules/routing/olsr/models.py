@@ -102,11 +102,6 @@ class OlsrRoutingTopologyMonitorStreams(ds_models.RegistryItemStreams):
         tags.update({'link': None, 'protocol': OLSR_PROTOCOL_NAME})
         return tags
 
-    def get_stream_tags(self):
-        tags = super(OlsrRoutingTopologyMonitorStreams, self).get_stream_query_tags()
-        tags.update({'link': None, 'protocol': OLSR_PROTOCOL_NAME})
-        return tags
-
 ds_pool.register(OlsrRoutingTopologyMonitor, OlsrRoutingTopologyMonitorStreams)
 
 

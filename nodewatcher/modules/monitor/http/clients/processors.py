@@ -9,11 +9,10 @@ from nodewatcher.modules.monitor.sources.http import processors as http_processo
 
 DATASTREAM_SUPPORTED = False
 try:
-    from django_datastream import datastream
-    from nodewatcher.modules.monitor.datastream import base as ds_base, fields as ds_fields
+    from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
     from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
-    class ClientStreams(ds_base.StreamsBase):
+    class ClientStreams(ds_models.RegistryRootStreams):
         client_count = ds_fields.IntegerField(tags={
             'title': gettext_noop("Client count"),
             'description': gettext_noop("Number of clients connected to the node."),
@@ -26,14 +25,8 @@ try:
             },
         })
 
-        def get_stream_query_tags(self):
-            return {'node': self._model.node.uuid, 'module': 'monitor.http.clients'}
-
-        def get_stream_tags(self):
-            return {'node': self._model.node.uuid, 'module': 'monitor.http.clients'}
-
-        def get_stream_highest_granularity(self):
-            return datastream.Granularity.Minutes
+        def get_module_name(self):
+            return 'monitor.http.clients'
 
     class ClientStreamsData(object):
         def __init__(self, node, client_count):

@@ -227,11 +227,6 @@ class BabelTopologyLinkStreams(ds_models.ProxyRegistryItemStreams):
         tags.update({'link': self._model.peer.uuid, 'protocol': BABEL_PROTOCOL_NAME})
         return tags
 
-    def get_stream_tags(self):
-        tags = super(BabelTopologyLinkStreams, self).get_stream_query_tags()
-        tags.update({'link': self._model.peer.uuid, 'protocol': BABEL_PROTOCOL_NAME})
-        return tags
-
 ds_pool.register(BabelTopologyLink, BabelTopologyLinkStreams)
 
 

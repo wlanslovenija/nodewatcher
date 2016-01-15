@@ -124,7 +124,7 @@ class StreamsBase(object):
         :return: A dictionary of tags to include
         """
 
-        raise NotImplementedError
+        return self.get_stream_query_tags()
 
     def get_stream_highest_granularity(self):
         """
