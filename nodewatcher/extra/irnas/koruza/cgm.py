@@ -97,4 +97,7 @@ def koruza_network_measurement(node, pkgcfg, cfg):
         streamer.www = '/www/webcam'
         streamer.port = 8080
 
-        cfg.packages.add('mjpg-streamer')
+        cfg.packages.update([
+            'mjpg-streamer',
+            'kmod-video-uvc',
+        ])
