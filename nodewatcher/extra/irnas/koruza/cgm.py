@@ -13,7 +13,7 @@ def koruza_network_measurement(node, pkgcfg, cfg):
 
     try:
         pkgcfg = pkgcfg.get()
-    except models.KoruzaConfig.MultipleObjectsReturned:
+    except models.KoruzaNetworkMeasurementConfig.MultipleObjectsReturned:
         raise cgm_base.ValidationError(_("Only one KORUZA network measurement unit may be defined."))
 
     # Ensure that the network measurement unit is a WDR4300.
