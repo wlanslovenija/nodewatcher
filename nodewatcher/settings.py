@@ -402,25 +402,11 @@ LOGGING = {
     }
 }
 
-MONGO_DATABASE_NAME = 'nodewatcher'
-MONGO_DATABASE_OPTIONS = {
-    'tz_aware': USE_TZ,
+BROKER_URL = 'redis://%(host)s:%(port)s/0' % {
+    'host': os.environ.get('REDIS_1_PORT_6379_TCP_ADDR', '127.0.0.1'),
+    'port': os.environ.get('REDIS_1_PORT_6379_TCP_PORT', '6379'),
 }
-
-CELERY_RESULT_BACKEND = 'mongodb'
-CELERY_MONGODB_BACKEND_SETTINGS = {
-    'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
-    'port': int(os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017')),
-    'database': MONGO_DATABASE_NAME,
-    'taskmeta_collection': 'celery_taskmeta',
-    'options': MONGO_DATABASE_OPTIONS,
-}
-
-BROKER_URL = 'mongodb://%(host)s:%(port)s/%(db)s' % {
-    'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
-    'port': os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017'),
-    'db': MONGO_DATABASE_NAME,
-}
+CELERY_RESULT_BACKEND = BROKER_URL
 
 CELERY_ENABLE_UTC = USE_TZ
 CELERY_TIMEZONE = TIME_ZONE
@@ -554,7 +540,7 @@ MONITOR_HTTP_PUSH_HOST = '127.0.0.1'
 DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
 # Each backend can have backend-specific settings that can be specified here.
 DATASTREAM_BACKEND_SETTINGS = {
-    'database_name': MONGO_DATABASE_NAME,
+    'database_name': 'nodewatcher',
     'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
     'port': int(os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017')),
     'tz_aware': USE_TZ,

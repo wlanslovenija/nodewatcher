@@ -27,6 +27,7 @@ The following containers will be created and started when you run the above comm
 
 * ``db`` contains the PostgreSQL 9.3 database server with installed extension PostGIS 2.1.
 * ``tokumx`` contains the TokuMX database server (an improved version of MongoDB).
+* ``redis`` contains the Redis server.
 * ``builder{ar71xx,lantiq}`` contain firmware builders that you can use for development (see :ref:`development-run-builder`).
 * ``generator`` contains the Celery workers for the firmware image generator. These workers connect to the ``builder`` via SSH in order to build firmware images.
 * ``monitorq`` contains the Celery workers for handling monitoring push requests.
