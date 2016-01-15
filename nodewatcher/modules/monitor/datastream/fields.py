@@ -510,7 +510,7 @@ class DynamicSumField(Field):
         :return: Stream identifier
         """
 
-        # Generate a list of input streams
+        # Generate a list of input streams.
         streams = []
         for src_field, src_descriptor in self._fields:
             streams.append(
@@ -536,7 +536,7 @@ class DynamicSumField(Field):
                 value_type=self.value_type,
             )
         except ds_exceptions.InconsistentStreamConfiguration:
-            # Drop the existing stream and re-create it
+            # Drop the existing stream and re-create it.
             stream.delete_streams(query_tags)
             return stream.ensure_stream(
                 query_tags,
@@ -546,6 +546,9 @@ class DynamicSumField(Field):
                 derive_from=streams,
                 derive_op='sum',
                 derive_args={},
+                # Do not backprocess data as this could cause a lot of data to require processing,
+                # which could greatly stall the monitoring process.
+                derive_backprocess=False,
                 value_type=self.value_type,
             )
 

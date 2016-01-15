@@ -7,7 +7,7 @@ amqp==1.4.6
 anyjson==0.3.3
 billiard==3.3.0.19
 celery==3.1.18
-datastream==0.5.0
+datastream==0.5.1
 defusedxml==0.4.1
 django-classy-tags==0.6.1
 git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb84e273a#egg=ujson-wlanslovenija
