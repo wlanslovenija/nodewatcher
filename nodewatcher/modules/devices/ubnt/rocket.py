@@ -83,6 +83,25 @@ class UBNTRocketM5(UBNTRocketM2):
         ])
     ]
 
-# Register the UBNT Rocket device
+
+class UBNTRocketM5XW(UBNTRocketM5):
+    """
+    UBNT Rocket M5 XW device descriptor.
+    """
+
+    identifier = 'ub-rocket-m5-xw'
+    name = "Rocket M5 XW"
+    profiles = {
+        'openwrt': {
+            'name': 'UBNT',
+            'files': [
+                'openwrt-ar71xx-generic-ubnt-rocket-m-xw-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-ubnt-rocket-m-xw-squashfs-sysupgrade.bin',
+            ]
+        }
+    }
+
+# Register the UBNT Rocket devices.
 cgm_base.register_device('openwrt', UBNTRocketM2)
 cgm_base.register_device('openwrt', UBNTRocketM5)
+cgm_base.register_device('openwrt', UBNTRocketM5XW)
