@@ -64,7 +64,12 @@ class DatastreamBase(object):
         """
 
         # Use the same timestamp for all datapoints of this node.
-        now = datetime.datetime.utcnow()
+        if context.push.timestamp:
+            # When in a push context, use the timestamp of original arrival as the events may
+            # be queued and processed later.
+            now = context.push.timestamp
+        else:
+            now = datetime.datetime.utcnow()
 
         processed_items = set()
         datapoints = []

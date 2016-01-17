@@ -4,7 +4,7 @@ from django import http
 from django.conf import settings
 from django.views import generic
 from django.views.decorators import csrf
-from django.utils import decorators
+from django.utils import decorators, timezone
 
 from cryptography import x509
 from cryptography.hazmat import backends
@@ -84,6 +84,7 @@ class HttpPushEndpoint(generic.View):
                 'push': {
                     'source': uuid,
                     'data': request.body,
+                    'timestamp': timezone.now(),
                 },
                 'identity': {
                     'ip_address': remote_ip,
