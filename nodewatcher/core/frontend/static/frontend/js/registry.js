@@ -24,14 +24,11 @@
         regpoint_id = rpid;
         root_id = rid;
 
-        // Bind event handlers
-        $('.registry_form_item_chooser').change(function() {
-            $.registry.update({});
-        });
-        $('.registry_form_selector').change(function() {
-            $.registry.update({});
-        });
+        // Bind event handlers.
         $('input[type="checkbox"]').change(function() {
+            $.registry.update({});
+        });
+        $('select').change(function() {
             $.registry.update({});
         });
         $('.registry_add_item').click(function() {
