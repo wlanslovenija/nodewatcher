@@ -247,18 +247,25 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         name='clients0',
                     )
 
+                    network_configuration = {
+                        'description': "AP-LAN Client Access",
+                        'family': 'ipv4',
+                        'address': '172.21.42.1/24',
+                        'lease_type': 'dhcp',
+                        'lease_duration': '15min',
+                        'nat_type': 'snat-routed-networks',
+                    }
+
+                    if clients_network_defaults is not None:
+                        network_configuration.update({
+                            'lease_duration': clients_network_defaults.lease_duration,
+                        })
+
                     self.setup_network(
                         state,
                         clients_interface,
                         cgm_models.StaticNetworkConfig,
-                        configuration={
-                            'description': "AP-LAN Client Access",
-                            'family': 'ipv4',
-                            'address': '172.21.42.1/24',
-                            'lease_type': 'dhcp',
-                            'lease_duration': '15min',
-                            'nat_type': 'snat-routed-networks',
-                        }
+                        configuration=network_configuration,
                     )
                 else:
                     # Configure clients with an allocated network, announced to the mesh.
@@ -291,7 +298,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                                 'pool': clients_network_defaults.pool,
                                 'prefix_length': clients_network_defaults.prefix_length,
                                 'lease_type': 'dhcp',
-                                'lease_duration': '15min',
+                                'lease_duration': clients_network_defaults.lease_duration,
                             }
                         )
                     else:
