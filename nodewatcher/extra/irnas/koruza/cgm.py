@@ -16,18 +16,17 @@ def koruza_network_measurement(node, pkgcfg, cfg):
     except models.KoruzaNetworkMeasurementConfig.MultipleObjectsReturned:
         raise cgm_base.ValidationError(_("Only one KORUZA network measurement unit may be defined."))
 
-    # Ensure that the network measurement unit is a WDR4300.
+    # Ensure that the network measurement unit is a supported one.
     device = node.config.core.general().get_device()
-    if not device or device.identifier != 'tp-wdr4300v1':
-        raise cgm_base.ValidationError(_("Only TP-Link WDR4300v1 may be used as KORUZA network measurement unit."))
+    if not device or device.identifier not in ('tp-wdr4300v1', 'tp-wr1043ndv2'):
+        raise cgm_base.ValidationError(_("Only TP-Link WDR4300v1/WR1043NDv2 may be used as KORUZA network measurement unit."))
 
     # Reconfigure network, so that the first port of Lan0 is used for measurements.
-    # XXX: This is currently hardcoded for TP-Link WDR4300 v1.
+    # XXX: This is currently hardcoded for TP-Link WDR4300 v1/WR1043NDv2.
     # TODO: Port this to custom VLAN configuration when supported.
     vlan_lan0 = cfg.network.find_ordered_section('switch_vlan', vlan=1)
     if not vlan_lan0:
         raise cgm_base.ValidationError(_("Unable to find Lan0 port group to reconfigure for KORUZA network measurement unit."))
-    vlan_lan0.ports = '0t 3 4 5'
 
     # Ensure that VLAN 3 is free.
     if cfg.network.find_ordered_section('switch_vlan', vlan=3) is not None:
@@ -36,7 +35,13 @@ def koruza_network_measurement(node, pkgcfg, cfg):
     vlan_measurement = cfg.network.add('switch_vlan')
     vlan_measurement.device = vlan_lan0.device
     vlan_measurement.vlan = 3
-    vlan_measurement.ports = '0t 2'
+
+    if device.identifier == 'tp-wdr4300v1':
+        vlan_lan0.ports = '0t 3 4 5'
+        vlan_measurement.ports = '0t 2'
+    elif device.identifier == 'tp-wr1043ndv2':
+        vlan_lan0.ports = '0t 2 3 4'
+        vlan_measurement.ports = '0t 1'
 
     measurement_iface = cfg.network.add(interface='measure')
     measurement_iface.ifname = 'eth0.3'
