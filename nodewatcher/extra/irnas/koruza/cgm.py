@@ -36,17 +36,18 @@ def koruza_network_measurement(node, pkgcfg, cfg):
     vlan_measurement.device = vlan_lan0.device
     vlan_measurement.vlan = 3
 
+    measurement_iface = cfg.network.add(interface='measure')
+    measurement_iface.proto = 'static'
+    measurement_iface.netmask = '255.255.255.0'
+
     if device.identifier == 'tp-wdr4300v1':
         vlan_lan0.ports = '0t 3 4 5'
         vlan_measurement.ports = '0t 2'
+        measurement_iface.ifname = 'eth0.3'
     elif device.identifier == 'tp-wr1043ndv2':
         vlan_lan0.ports = '0t 2 3 4'
         vlan_measurement.ports = '0t 1'
-
-    measurement_iface = cfg.network.add(interface='measure')
-    measurement_iface.ifname = 'eth0.3'
-    measurement_iface.proto = 'static'
-    measurement_iface.netmask = '255.255.255.0'
+        measurement_iface.ifname = 'eth1.3'
 
     policy = cfg.network.add('rule')
     policy.dest = '172.16.88.0/24'
