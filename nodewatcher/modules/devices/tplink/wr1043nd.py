@@ -109,6 +109,7 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
             switch='sw0',
             vlan=1,
             ports=[0, 1, 2, 3, 4],
+            tagged_ports=[0],
         )
     ]
     port_map = {
@@ -116,7 +117,7 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
             'wifi0': 'radio0',
             'sw0': 'switch0',
             'wan0': 'eth0',
-            'lan0': 'eth1',
+            'lan0': 'eth1.1',
         }
     }
     profiles = {
