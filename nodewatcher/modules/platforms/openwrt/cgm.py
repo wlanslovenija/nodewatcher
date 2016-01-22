@@ -868,7 +868,7 @@ def configure_switch(cfg, device, port):
     vlan.vlan = port.vlan
     ports = []
     for p in port.ports:
-        if p in switch.cpu_ports and switch.cpu_tagged:
+        if port.is_tagged(p) or (p in switch.cpu_ports and switch.cpu_tagged):
             p = '%st' % p
         ports.append(str(p))
     vlan.ports = ' '.join(ports)

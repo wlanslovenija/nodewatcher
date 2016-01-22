@@ -34,7 +34,7 @@ class SwitchedEthernetPort(EthernetPort):
     switch.
     """
 
-    def __init__(self, identifier, description, switch, vlan, ports):
+    def __init__(self, identifier, description, switch, vlan, ports, tagged_ports=None):
         """
         Class constructor.
         """
@@ -43,6 +43,16 @@ class SwitchedEthernetPort(EthernetPort):
         self.switch = switch
         self.vlan = vlan
         self.ports = ports
+        self.tagged_ports = tagged_ports or []
+
+    def is_tagged(self, port):
+        """
+        Returns true if a port is marked as tagged.
+
+        :param port: Switch port identifier
+        """
+
+        return port in self.tagged_ports
 
     def validate(self, device):
         """
