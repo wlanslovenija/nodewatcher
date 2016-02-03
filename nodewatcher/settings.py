@@ -495,6 +495,7 @@ MONITOR_RUNS = {
             'nodewatcher.modules.routing.olsr.processors.NodeTopology',
             TELEMETRY_PROCESSOR_PIPELINE,
             'nodewatcher.modules.monitor.datastream.processors.MaintenanceBackprocess',
+            'nodewatcher.modules.administration.status.processors.PushNodeStatus',
         ),
     },
 
