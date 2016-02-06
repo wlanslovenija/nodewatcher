@@ -199,10 +199,29 @@ class TPLinkWR841NDv9(TPLinkWR841NDv7):
         }
     }
 
-# Register the TP-Link WR841ND device
+
+class TPLinkWR841NDv10(TPLinkWR841NDv7):
+    """
+    TP-Link WR841NDv10 device descriptor.
+    """
+
+    identifier = 'tp-wr841ndv10'
+    name = "WR841ND (v10)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR841',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr841n-v10-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841n-v10-squashfs-sysupgrade.bin',
+            ]
+        }
+    }
+
+# Register the TP-Link WR841ND device.
 cgm_base.register_device('openwrt', TPLinkWR841NDv1)
 cgm_base.register_device('openwrt', TPLinkWR841NDv3)
 cgm_base.register_device('openwrt', TPLinkWR841NDv5)
 cgm_base.register_device('openwrt', TPLinkWR841NDv7)
 cgm_base.register_device('openwrt', TPLinkWR841NDv8)
 cgm_base.register_device('openwrt', TPLinkWR841NDv9)
+cgm_base.register_device('openwrt', TPLinkWR841NDv10)
