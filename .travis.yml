@@ -8,6 +8,7 @@ services:
 addons:
   postgresql: "9.3"
 before_install:
+ - sudo add-apt-repository --yes ppa:fontforge/fontforge
  - sudo apt-get update
  - cat packages.txt | sudo DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
  - cat /etc/apt/sources.list.d/pgdg-source.list
@@ -20,6 +21,7 @@ before_install:
  - sudo DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -y --force-yes install postgresql-9.3-postgis-2.1 libgeos-c1
  - sudo rm -rf /dev/shm
  - sudo ln -s /run/shm /dev/shm
+ - cp /usr/lib/python2.7/dist-packages/fontforge.* /home/travis/virtualenv/python2.7/lib/python2.7/site-packages
 install:
  - pip install pep8
  - pip install https://github.com/lamby/django-lint/archive/master.zip pylint
