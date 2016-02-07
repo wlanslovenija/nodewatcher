@@ -13,9 +13,7 @@ from . import decorators, forms, views
 # purpose. We use login and logout signals to give messages to the user explaining what has happened with login
 # and logout. We do not assume the user understands what is happening behind the scenes.
 
-urlpatterns = urls.patterns(
-    '',
-
+urlpatterns = [
     # Based on "registration.backends.model_activation.urls".
     urls.url(
         r'^activate/complete/$',
@@ -46,12 +44,12 @@ urlpatterns = urls.patterns(
     # Based on "registration.auth_urls".
     urls.url(
         r'^login/$',
-        'nodewatcher.extra.accounts.views.login',
+        views.login,
         name='auth_login',
     ),
     urls.url(
         r'^logout/$',
-        'nodewatcher.extra.accounts.views.logout_redirect',
+        views.logout_redirect,
         name='auth_logout',
     ),
     urls.url(
@@ -105,7 +103,7 @@ urlpatterns = urls.patterns(
     ),
     urls.url(
         r'^$',
-        'nodewatcher.extra.accounts.views.account',
+        views.account,
         name='user_account',
     ),
-)
+]

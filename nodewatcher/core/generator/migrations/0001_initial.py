@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import nodewatcher.core.generator.models
 from django.conf import settings
-import json_field.fields
+import jsonfield
 import uuid
 
 
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
             name='BuildResult',
             fields=[
                 ('uuid', models.UUIDField(primary_key=True, default=uuid.uuid4, serialize=False, editable=False, help_text='A unique build result identifier.')),
-                ('config', json_field.fields.JSONField(default='null', help_text='Configuration used to build this firmware.', blank=True)),
+                ('config', jsonfield.JSONField(default='null', help_text='Configuration used to build this firmware.', blank=True)),
                 ('build_log', models.TextField(help_text='Last lines of the build log.', null=True, blank=True)),
                 ('created', models.DateTimeField(help_text='Timestamp when build result was created.', auto_now_add=True)),
                 ('last_modified', models.DateTimeField(help_text='Timestamp when build result was last modified.', auto_now=True)),

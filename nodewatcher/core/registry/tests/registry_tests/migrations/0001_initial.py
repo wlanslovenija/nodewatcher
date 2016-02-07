@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import nodewatcher.core.registry.fields
-import json_field.fields
+import jsonfield
 
 
 class Migration(migrations.Migration):
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('foo', models.CharField(max_length=30, null=True)),
                 ('bar', models.IntegerField(null=True)),
-                ('registry_metadata', json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False)),
+                ('registry_metadata', jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False)),
             ],
         ),
         migrations.CreateModel(

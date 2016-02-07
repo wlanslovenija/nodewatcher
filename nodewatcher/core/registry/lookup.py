@@ -95,7 +95,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                         dst_field = selector
                         selector = None
 
-                    dst_model, dst_field, m2m = self._regpoint.get_model_with_field(registry_id, dst_field)
+                    dst_model, dst_field = self._regpoint.get_model_with_field(registry_id, dst_field)
                     dst_field = dst_field.name
 
             new_selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field
@@ -300,7 +300,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                         dst_related = None
 
                     # Discover which model provides the destination field
-                    dst_model, dst_field, m2m = self._regpoint.get_model_with_field(dst_registry_id, dst_field)
+                    dst_model, dst_field = self._regpoint.get_model_with_field(dst_registry_id, dst_field)
+                    m2m = dst_field.many_to_many
                 else:
                     dst_registry_id = dst
                     dst_model = self._regpoint.get_top_level_class(dst_registry_id)
@@ -350,11 +351,11 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             else:
                 # Traverse the relation and copy the destination field descriptor
                 dst_field_model = dst_field.rel.to
-                dst_related_field, _, _, m2m = dst_field_model._meta.get_field_by_name(dst_related)
+                dst_related_field = dst_field_model._meta.get_field(dst_related)
 
                 # TODO: Support arbitrary chain of relations
 
-                if m2m:
+                if dst_related_field.many_to_many:
                     raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
                 src_column = '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))
@@ -440,7 +441,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         where_opts = []
         for key, value in kwargs.iteritems():
             field, op = key.split(constants.LOOKUP_SEP)
-            field_obj = self.model._meta.get_field_by_name(field)[0]
+            field_obj = self.model._meta.get_field(field)
             value = field_obj.get_db_prep_lookup('exact', value, connection=connection)[0]
             field = '%s.%s' % (self.model._meta.db_table, field)
 

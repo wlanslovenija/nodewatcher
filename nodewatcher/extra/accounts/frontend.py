@@ -5,18 +5,17 @@ from django.utils import http
 
 from nodewatcher.core.frontend import components
 
+from . import views
 from .templatetags import accounts_tags
 
 
 class AccountsComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
-        return super(AccountsComponent, cls).get_urls() + urls.patterns(
-            '',
-
+        return super(AccountsComponent, cls).get_urls() + [
             urls.url(r'account/', urls.include('nodewatcher.extra.accounts.urls')),
-            urls.url(r'^user/(?P<username>[\w.@+-]+)/$', 'nodewatcher.extra.accounts.views.user', name='user_page'),
-        )
+            urls.url(r'^user/(?P<username>[\w.@+-]+)/$', views.user, name='user_page'),
+        ]
 
 components.pool.register(AccountsComponent)
 

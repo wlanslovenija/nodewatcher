@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import re
-
-from math import floor
-
 from django import template
-from django.template import Context
 from django.template.loader import get_template
+from django.utils import safestring
 
 from ..forms import (
     render_button, render_field, render_field_and_label, render_form,
@@ -46,7 +42,7 @@ def theme_formset(*args, **kwargs):
         {% theme_formset formset layout='horizontal' %}
 
     """
-    return render_formset(*args, **kwargs)
+    return safestring.mark_safe(render_formset(*args, **kwargs))
 
 
 @register.simple_tag
@@ -71,7 +67,7 @@ def theme_formset_errors(*args, **kwargs):
 
         {% theme_formset_errors formset layout='inline' %}
     """
-    return render_formset_errors(*args, **kwargs)
+    return safestring.mark_safe(render_formset_errors(*args, **kwargs))
 
 
 @register.simple_tag
@@ -96,7 +92,7 @@ def theme_form(*args, **kwargs):
 
         {% theme_form form layout='inline' %}
     """
-    return render_form(*args, **kwargs)
+    return safestring.mark_safe(render_form(*args, **kwargs))
 
 
 @register.simple_tag
@@ -121,7 +117,7 @@ def theme_form_errors(*args, **kwargs):
 
         {% theme_form_errors form layout='inline' %}
     """
-    return render_form_errors(*args, **kwargs)
+    return safestring.mark_safe(render_form_errors(*args, **kwargs))
 
 
 @register.simple_tag
@@ -146,7 +142,7 @@ def theme_field(*args, **kwargs):
 
         {% theme_field form_field %}
     """
-    return render_field(*args, **kwargs)
+    return safestring.mark_safe(render_field(*args, **kwargs))
 
 
 @register.simple_tag()
@@ -171,7 +167,7 @@ def theme_label(*args, **kwargs):
 
         {% theme_label FIXTHIS %}
     """
-    return render_label(*args, **kwargs)
+    return safestring.mark_safe(render_label(*args, **kwargs))
 
 
 @register.simple_tag
@@ -196,7 +192,7 @@ def theme_button(*args, **kwargs):
 
         {% theme_button FIXTHIS %}
     """
-    return render_button(*args, **kwargs)
+    return safestring.mark_safe(render_button(*args, **kwargs))
 
 
 @register.simple_tag
@@ -221,7 +217,7 @@ def theme_icon(icon, **kwargs):
         {% theme_icon "star" %}
 
     """
-    return render_icon(icon, **kwargs)
+    return safestring.mark_safe(render_icon(icon, **kwargs))
 
 
 @register.simple_tag
@@ -248,7 +244,7 @@ def theme_alert(content, type='info', dismissable=True):
         {% theme_alert "Something went wrong" type='error' %}
 
     """
-    return render_alert(content, type, dismissable)
+    return safestring.mark_safe(render_alert(content, type, dismissable))
 
 
 @register.simple_tag
@@ -273,7 +269,7 @@ def theme_legend(content):
         {% theme_legend "Title" %}
 
     """
-    return "<legend>%s</legend>" % content
+    return safestring.mark_safe("<legend>%s</legend>" % content)
 
 
 @register.tag('buttons')

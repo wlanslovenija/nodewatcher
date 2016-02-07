@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import nodewatcher.core.registry.fields
-import json_field.fields
+import jsonfield
 
 
 class Migration(migrations.Migration):
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('display_order', models.IntegerField(null=True, editable=False)),
-                ('annotations', json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False)),
+                ('annotations', jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False)),
                 ('ip_address', nodewatcher.core.registry.fields.IPAddressField(null=True)),
                 ('polymorphic_ctype', models.ForeignKey(related_name='polymorphic_irnas_koruza.koruzavpnmonitor_set+', editable=False, to='contenttypes.ContentType', null=True)),
                 ('root', models.ForeignKey(related_name='monitoring_irnas_koruza_koruzavpnmonitor', editable=False, to='core.Node')),

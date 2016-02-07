@@ -1,6 +1,5 @@
 import requests
 import uuid
-import json
 
 from django import dispatch
 from django.contrib.auth import models as auth_models
@@ -9,7 +8,7 @@ from django.db.models import signals as django_signals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-import json_field
+import jsonfield
 
 from .. import models as core_models
 from . import connection, exceptions
@@ -119,11 +118,10 @@ class Builder(models.Model):
         blank=True,
         editable=False,
     )
-    metadata = json_field.JSONField(
+    metadata = jsonfield.JSONField(
+        default={},
         blank=True,
         editable=False,
-        encoder=json.JSONEncoder,
-        decoder=json.JSONDecoder,
     )
     host = models.CharField(
         max_length=50,
@@ -261,7 +259,8 @@ class BuildResult(models.Model):
         core_models.Node,
         help_text=_('Node this firmware build is for.'),
     )
-    config = json_field.JSONField(
+    config = jsonfield.JSONField(
+        default={},
         blank=True,
         help_text=_('Configuration used to build this firmware.'),
     )

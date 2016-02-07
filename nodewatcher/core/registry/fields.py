@@ -207,7 +207,7 @@ class ModelRegistryChoiceField(models.ForeignKey):
         return super(ModelRegistryChoiceField, self).formfield(**defaults)
 
 
-class IntraRegistryRelatedObjectDescriptor(models.fields.related.ForeignRelatedObjectsDescriptor):
+class IntraRegistryRelatedObjectDescriptor(models.fields.related.ReverseManyToOneDescriptor):
     """
     Descriptor for accessing related objects of a intra-registry foreign key that
     adds support for virtual relations in case of partially validated models.

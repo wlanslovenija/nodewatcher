@@ -1,6 +1,5 @@
 from django import apps, db
 from django.core import management
-from django.contrib.auth import models as auth_models
 from django.db.models import signals as models_signals
 
 
@@ -12,6 +11,8 @@ class AccountsConfig(apps.AppConfig):
         management.call_command('createprofiles', **kwargs)
 
     def create_node_maintainers_group(self, **kwargs):
+        from django.contrib.auth import models as auth_models
+
         try:
             # We try to create group object so that it always exist.
             group = auth_models.Group.objects.create(name="Node maintainers")

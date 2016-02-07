@@ -1,4 +1,4 @@
-import polymorphic
+from polymorphic import models as polymorphic_models
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -46,7 +46,7 @@ class RoutingTopologyMonitor(registration.bases.NodeMonitoringRegistryItem):
 registration.point('node.monitoring').register_item(RoutingTopologyMonitor)
 
 
-class TopologyLink(polymorphic.PolymorphicModel):
+class TopologyLink(polymorphic_models.PolymorphicModel):
     """
     Generic topology link not associated with any specific routing protocol.
     """

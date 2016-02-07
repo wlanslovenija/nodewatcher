@@ -87,7 +87,7 @@ class BasicRegistryRenderItem(object):
             'meta': self.meta_form,
         }
         args.update(self.args)
-        return t.render(template.Context(args))
+        return t.render(args)
 
 
 class NestedRegistryRenderItem(BasicRegistryRenderItem):
@@ -175,7 +175,7 @@ class RootRegistryRenderItem(NestedRegistryRenderItem):
             'registry_forms': self.children,
             'errors': self.errors,
         }
-        return t.render(template.Context(args))
+        return t.render(args)
 
 
 class RegistryMetaForm(django_forms.Form):
@@ -345,7 +345,8 @@ def generate_form_for_class(context, prefix, data, index, instance=None,
                 dependencies = set()
                 for name, field in form.fields.iteritems():
                     if hasattr(field, 'get_dependencies'):
-                        dependencies.update(field.get_dependencies(form._raw_value(name)))
+                        value = field.widget.value_from_datadict(form.data, form.files, form.add_prefix(name))
+                        dependencies.update(field.get_dependencies(value))
 
                 # If we have a parent, we depend on it
                 if context.hierarchy_parent_obj is not None:

@@ -32,11 +32,11 @@ def banner(node, cfg):
         return
 
     banner_template = template.loader.get_template('banner/banner.txt')
-    cfg.banner = banner_template.render(template.Context({
+    cfg.banner = banner_template.render({
         'name': general.name,
         'uuid': node.uuid,
         'device_manufacturer': device.manufacturer,
         'device_name': device.name,
         'timestamp': now.strftime('%d.%m.%Y %H:%M:%S %Z'),
         'version': cfg.builder.version.name,
-    }))
+    })

@@ -10,7 +10,6 @@ from django.forms.extras import SelectDateWidget
 from django.forms.forms import BaseForm, BoundField
 from django.forms.formsets import BaseFormSet
 from django.utils.html import conditional_escape, strip_tags
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
@@ -110,11 +109,11 @@ class FormsetRenderer(BaseRenderer):
         formset_errors = self.get_formset_errors()
         if formset_errors:
             return get_template('form/form_errors.html').render(
-                Context({
+                {
                     'errors': formset_errors,
                     'form': self.formset,
                     'layout': self.layout,
-                })
+                }
             )
         return ''
 
@@ -178,11 +177,11 @@ class FormRenderer(BaseRenderer):
 
         if form_errors:
             return get_template('form/form_errors.html').render(
-                Context({
+                {
                     'errors': form_errors,
                     'form': self.form,
                     'layout': self.layout,
-                })
+                }
             )
         return ''
 
@@ -378,11 +377,11 @@ class FieldRenderer(BaseRenderer):
         if help_text_and_errors:
             help_html = get_template(
                 'form/help_and_errors.html'
-            ).render(Context({
+            ).render({
                 'field': self.field,
                 'help_text_and_errors': help_text_and_errors,
                 'layout': self.layout,
-            }))
+            })
             html += '<span class="help-block">{help}</span>'.format(
                 help=help_html)
         return html

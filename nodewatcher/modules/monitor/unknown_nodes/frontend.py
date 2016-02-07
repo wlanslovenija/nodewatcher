@@ -9,12 +9,10 @@ from . import resources, views
 class UnknownNodesComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
-        return super(UnknownNodesComponent, cls).get_urls() + urls.patterns(
-            '',
-
+        return super(UnknownNodesComponent, cls).get_urls() + [
             urls.url(r'^my/unknown_nodes$', views.ListUnknownNodes.as_view(), name='list'),
             urls.url(r'^my/unknown_nodes/register/(?P<uuid>[^/]+)$', views.RegisterUnknownNode.as_view(), name='register'),
-        )
+        ]
 
 components.pool.register(UnknownNodesComponent)
 

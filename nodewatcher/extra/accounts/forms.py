@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core import validators as core_validators
 from django.forms import forms, models as forms_models
-from django.contrib.admin import util as admin_util
+from django.contrib.admin import utils as admin_utils
 from django.contrib import auth
 from django.contrib.auth import admin as auth_admin, forms as auth_forms, models as auth_models
 from django.utils.translation import ugettext_lazy as _
@@ -105,7 +105,7 @@ class AdminUserCreationForm(ValidateUsernameMixin, auth_forms.UserCreationForm):
 
     class Meta(auth_forms.UserCreationForm.Meta):
         # Both admin and registration user object creation forms share the same fields.
-        fields = admin_util.flatten_fieldsets(user_add_fieldsets)
+        fields = admin_utils.flatten_fieldsets(user_add_fieldsets)
 
     def __init__(self, *args, **kwargs):
         super(AdminUserCreationForm, self).__init__(*args, **kwargs)
@@ -161,7 +161,7 @@ class UserChangeForm(AdminUserChangeForm):
 
     class Meta(AdminUserChangeForm.Meta):
         # For registration user modification we use our set of fields.
-        fields = admin_util.flatten_fieldsets(user_change_fieldsets)
+        fields = admin_utils.flatten_fieldsets(user_change_fieldsets)
 
 
 class UserProfileAndSettingsChangeForm(forms_models.ModelForm):

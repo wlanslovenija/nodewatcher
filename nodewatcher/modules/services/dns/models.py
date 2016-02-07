@@ -2,12 +2,12 @@ from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-import polymorphic
+from polymorphic import models as polymorphic_models
 
 from nodewatcher.core.registry import fields as registry_fields, registration
 
 
-class DnsServer(polymorphic.PolymorphicModel):
+class DnsServer(polymorphic_models.PolymorphicModel):
     """
     DNS server configuration.
     """

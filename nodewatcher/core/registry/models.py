@@ -1,8 +1,7 @@
 from django.db import models
 
-import json_field
-import polymorphic
-from polymorphic import base as polymorphic_base
+import jsonfield
+from polymorphic import base as polymorphic_base, models as polymorphic_models
 from . import polymorphic_deletion_fix, options
 
 
@@ -16,7 +15,7 @@ class RegistryItemModelBase(polymorphic_base.PolymorphicModelBase):
         return new_class
 
 
-class RegistryItemBase(polymorphic.PolymorphicModel):
+class RegistryItemBase(polymorphic_models.PolymorphicModel):
     """
     An abstract registry configuration item.
     """
@@ -29,7 +28,7 @@ class RegistryItemBase(polymorphic.PolymorphicModel):
     # order that they were shown on any edit forms.
     display_order = models.IntegerField(null=True, editable=False)
     # Custom item annotations.
-    annotations = json_field.JSONField(default={}, editable=False)
+    annotations = jsonfield.JSONField(default={}, editable=False)
 
     class RegistryMeta:
         registry_id = None

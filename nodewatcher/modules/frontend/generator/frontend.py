@@ -9,14 +9,12 @@ from . import resources, views
 class GeneratorComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
-        return super(GeneratorComponent, cls).get_urls() + urls.patterns(
-            '',
-
+        return super(GeneratorComponent, cls).get_urls() + [
             urls.url(r'^node/(?P<pk>[^/]+)/generate_firmware/$', views.GenerateFirmware.as_view(), name='generate_firmware'),
 
             urls.url(r'^my/builds$', views.ListBuilds.as_view(), name='list_builds'),
             urls.url(r'^my/builds/(?P<pk>[^/]+)$', views.ViewBuild.as_view(), name='view_build'),
-        )
+        ]
 
 components.pool.register(GeneratorComponent)
 

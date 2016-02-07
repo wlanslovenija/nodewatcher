@@ -277,7 +277,7 @@ class IpPool(allocation_models.PoolBase):
         Returns this pool's address family as a string.
         """
 
-        for enum, desc in self._meta.get_field_by_name('family')[0].choices:
+        for enum, desc in self._meta.get_field('family').choices:
             if enum == self.family:
                 return desc
 

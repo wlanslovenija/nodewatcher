@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import json_field.fields
+import jsonfield
 
 
 class Migration(migrations.Migration):
@@ -15,51 +15,51 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='clientmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='generalmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='generalresourcesmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='interfacemonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='networkaddressmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='networkresourcesmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='routingannouncemonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='routingtopologymonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='rttmeasurementmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='systemstatusmonitor',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
     ]

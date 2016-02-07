@@ -69,7 +69,7 @@ class RegistryRelationField(ToOneField):
 
     dehydrated_type = 'registry'
 
-    def __init__(self, to, attribute, default=tastypie_fields.NOT_PROVIDED, null=False, blank=False, readonly=False, unique=False, help_text=None):
+    def __init__(self, to, attribute, default=tastypie_fields.NOT_PROVIDED, null=False, blank=False, readonly=False, unique=False, help_text=None, verbose_name=None):
         """
         The ``to`` argument should point to a ``Resource`` class, not to a ``document``. Required.
         """
@@ -82,6 +82,7 @@ class RegistryRelationField(ToOneField):
             blank=blank,
             readonly=readonly,
             unique=unique,
+            verbose_name=verbose_name,
             full=True,
         )
 
@@ -101,7 +102,7 @@ class RegistryMultipleRelationField(ManyToManyField):
 
     dehydrated_type = 'registry'
 
-    def __init__(self, to, attribute, default=tastypie_fields.NOT_PROVIDED, null=False, blank=False, readonly=False, unique=False, help_text=None):
+    def __init__(self, to, attribute, default=tastypie_fields.NOT_PROVIDED, null=False, blank=False, readonly=False, unique=False, help_text=None, verbose_name=None):
         """
         The ``to`` argument should point to a ``Resource`` class, not to a ``document``. Required.
         """
@@ -114,6 +115,7 @@ class RegistryMultipleRelationField(ManyToManyField):
             blank=blank,
             readonly=readonly,
             unique=unique,
+            verbose_name=verbose_name,
             full=True,
         )
 

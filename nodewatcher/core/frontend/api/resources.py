@@ -9,7 +9,7 @@ from tastypie.contrib.gis import resources as gis_resources
 
 from django_datastream import resources as datastream_resources, serializers
 
-import json_field
+import jsonfield
 
 from ...registry import fields as registry_fields
 
@@ -135,7 +135,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
 
             return create_field
         else:
-            if isinstance(field, json_field.JSONField):
+            if isinstance(field, jsonfield.JSONField):
                 # TODO: Optimize this so that double conversion is not performed and that we pass raw JSON.
                 field_class = tastypie_fields.DictField
             elif isinstance(field, gis_models.GeometryField):

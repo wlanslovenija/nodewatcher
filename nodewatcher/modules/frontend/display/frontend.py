@@ -11,11 +11,9 @@ from . import views
 class DisplayComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
-        return super(DisplayComponent, cls).get_urls() + urls.patterns(
-            '',
-
+        return super(DisplayComponent, cls).get_urls() + [
             urls.url(r'^node/(?P<pk>[^/]+)/$', views.DisplayNode.as_view(), name='node'),
-        )
+        ]
 
 components.pool.register(DisplayComponent)
 

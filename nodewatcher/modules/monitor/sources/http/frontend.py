@@ -8,11 +8,9 @@ from . import views
 class HttpPushComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
-        return super(HttpPushComponent, cls).get_urls() + urls.patterns(
-            '',
-
+        return super(HttpPushComponent, cls).get_urls() + [
             # Push endpoint.
             urls.url(r'^push/http/(?P<uuid>.+)$', views.HttpPushEndpoint.as_view(), name='endpoint'),
-        )
+        ]
 
 components.pool.register(HttpPushComponent)

@@ -9,13 +9,11 @@ from . import resources, views
 class PublicKeyComponent(components.FrontendComponent):
     @classmethod
     def get_urls(cls):
-        return super(PublicKeyComponent, cls).get_urls() + urls.patterns(
-            '',
-
+        return super(PublicKeyComponent, cls).get_urls() + [
             urls.url(r'^my/public_keys$', views.ListPublicKeys.as_view(), name='list'),
             urls.url(r'^my/public_keys/add$', views.AddPublicKey.as_view(), name='add'),
             urls.url(r'^my/public_keys/(?P<pk>[^/]+)/remove$', views.RemovePublicKey.as_view(), name='remove'),
-        )
+        ]
 
 components.pool.register(PublicKeyComponent)
 

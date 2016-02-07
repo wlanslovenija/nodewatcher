@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-import json_field
+import jsonfield
 
 
 class UnknownNode(models.Model):
@@ -22,5 +22,5 @@ class UnknownNode(models.Model):
     first_seen = models.DateTimeField(auto_now_add=True)
     last_seen = models.DateTimeField(auto_now=True)
     ip_address = models.GenericIPAddressField(null=True, unpack_ipv4=True)
-    certificate = json_field.JSONField(null=True)
+    certificate = jsonfield.JSONField(null=True)
     origin = models.CharField(max_length=20, choices=ORIGIN_CHOICES, default=UNKNOWN)

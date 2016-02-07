@@ -11,7 +11,6 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 _ = lambda s: s
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 TEMPLATE_URL_RESOLVERS_DEBUG = True # Active only when TEMPLATE_DEBUG is True.
 
 # A tuple that lists people who get code error notifications. When
@@ -151,24 +150,28 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    #'django.template.loaders.eggs.Loader',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-    'sekizai.context_processors.sekizai',
-    'nodewatcher.core.frontend.context_processors.global_vars',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.core.context_processors.debug',
+                'django.core.context_processors.i18n',
+                'django.core.context_processors.media',
+                'django.core.context_processors.static',
+                'django.core.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
+                'sekizai.context_processors.sekizai',
+                'nodewatcher.core.frontend.context_processors.global_vars',
+            ],
+            'builtins': [
+                'missing.templatetags.context_tags',
+            ],
+        }
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -185,13 +188,6 @@ ATOMIC_REQUESTS = True
 ROOT_URLCONF = 'nodewatcher.urls'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    #os.path.join(settings_dir, 'templates'),
-)
 
 # See handler403 in urls.py as well.
 CSRF_FAILURE_VIEW = 'missing.views.forbidden_view'
@@ -329,8 +325,7 @@ INSTALLED_APPS = (
     'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
     'missing',
     'timezone_field',
-    'overextends',
-    'json_field',
+    'jsonfield',
     'leaflet',
     'django_countries',
     'timedelta',
@@ -364,9 +359,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
-        'null': {
-            'class': 'django.utils.log.NullHandler',
-        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -375,17 +367,8 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
+            'handlers': ['console', 'mail_admins'],
+            'level': 'INFO',
         },
         'py.warnings': {
             'handlers': ['console'],

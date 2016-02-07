@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import json_field.fields
+import jsonfield
 
 
 class Migration(migrations.Migration):
@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='identityconfig',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='identitymechanismconfig',
             name='annotations',
-            field=json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
         ),
     ]

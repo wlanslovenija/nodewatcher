@@ -4,7 +4,7 @@ from django import apps as django_apps
 from django.core import exceptions as django_exceptions
 from django.db import models as django_models
 
-import json_field
+import jsonfield
 
 from . import access as registry_access, lookup as registry_lookup, models as registry_models, state as registry_state
 from . import exceptions
@@ -456,16 +456,16 @@ class RegistrationPoint(object):
 
         :param registry_id: Registry identifier
         :param field: Field name
-        :return: A tuple (model, field, m2m)
+        :return: A tuple (model, field)
         """
 
-        # Discover which model provides the destination field
+        # Discover which model provides the destination field.
         for model in self.get_classes(registry_id):
-            # Attempt to fetch the field from this model
+            # Attempt to fetch the field from this model.
             try:
-                dst_field, _, _, m2m = model._meta.get_field_by_name(field)
-                # If the field exists we have found our model
-                return (model, dst_field, m2m)
+                dst_field = model._meta.get_field(field)
+                # If the field exists we have found our model.
+                return (model, dst_field)
             except django_models.FieldDoesNotExist:
                 continue
         else:
@@ -640,8 +640,10 @@ def create_point(model, namespace, mixins=None):
             point.model = model
 
             # Add a registry metadata field to the root model.
-            if not hasattr(model, 'registry_metadata'):
-                model.add_to_class('registry_metadata', json_field.JSONField(default={}, editable=False))
+            try:
+                model._meta.get_field('registry_metadata')
+            except django_exceptions.FieldDoesNotExist:
+                model.add_to_class('registry_metadata', jsonfield.JSONField(default={}, editable=False))
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation

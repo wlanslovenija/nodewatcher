@@ -5,7 +5,7 @@ from django.contrib.postgres import fields as postgres_fields
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-import polymorphic
+from polymorphic import models as polymorphic_models
 from timedelta import fields as timedelta_fields
 
 from nodewatcher.core import validators as core_validators
@@ -13,7 +13,7 @@ from nodewatcher.core.registry import fields as registry_fields, registration
 from nodewatcher.core.generator.cgm import models as cgm_models
 
 
-class TunneldiggerServer(polymorphic.PolymorphicModel):
+class TunneldiggerServer(polymorphic_models.PolymorphicModel):
     """
     Tunneldigger server configuration.
     """
