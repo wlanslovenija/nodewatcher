@@ -19,13 +19,14 @@
             $.tastypie.newDataTable(table, $(table).data('source'), {
                 'columns': [
                     // TODO: How can we generate string from registry, without hardcoding registry relations?
-                    {'data': 'peer.name', 'render': $.tastypie.nodeSubdocumentName(table, 'peer'), 'orderByField': 'peer__config_core_generalconfig__name'},
+                    {'data': 'peer.name', 'render': $.tastypie.nodeSubdocumentName(table, 'peer', true), 'orderByField': 'peer__config_core_generalconfig__name'},
                     {'data': 'last_seen', 'render': renderTimeAgo},
                     {'data': 'lq'},
                     {'data': 'ilq'},
                     {'data': 'etx'},
                     // We need extra data to render the node column.
-                    {'data': 'peer.uuid', 'visible': false}
+                    {'data': 'peer.uuid', 'visible': false},
+                    {'data': 'peer.router_id[].', 'visible': false},
                 ],
                 'order': [[0, 'asc']],
                 'language': {

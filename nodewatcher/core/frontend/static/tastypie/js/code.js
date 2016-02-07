@@ -71,7 +71,7 @@
 
         // Uses subdocument uuid for a link (or links). If nodeField is specified, it will use that row
         // field instead of current data.
-        'nodeSubdocumentName': function (table, nodeField) {
+        'nodeSubdocumentName': function (table, nodeField, routerId) {
             return function (data, type, row, meta) {
                 if (nodeField) {
                     data = row[nodeField];
@@ -81,11 +81,18 @@
                 }
                 if (type === 'display') {
                     return $.map(data, function (node, i) {
-                        return $('<a/>').attr(
+                        var name = $('<a/>').attr(
                             'href', $(table).data('node-url-template').replace('{pk}', node.uuid)
                         // TODO: Make "unknown" string translatable
                         // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
                         ).text(node.name || "unknown").wrap('<span/>').parent().html();
+                        if (routerId && node.router_id) {
+                            var router_ids = $.map(node.router_id, function (item) { return item.router_id; });
+                            if (router_ids.length > 0) {
+                                name += ' <span class="small">(' + router_ids.join(', ') + ')</a>';
+                            }
+                        }
+                        return name;
                     }).join(", ");
                 }
                 else {

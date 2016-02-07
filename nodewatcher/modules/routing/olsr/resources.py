@@ -12,7 +12,7 @@ from . import models as olsr_models
 # TODO: This is an ugly hack. There should be only one Node resource. See https://dev.wlan-si.net/ticket/1268.
 class NodeResource(resources.NodeResource):
     class Meta(resources.NodeResource.Meta):
-        fields = ('uuid', 'name')
+        fields = ('uuid', 'name', 'router_id')
 
     def _build_reverse_url(self, name, args=None, kwargs=None):
         # We fake it here and set it to the same as registered resource.
@@ -33,6 +33,7 @@ class OlsrTopologyLinkResource(core_resources.NodeSubresourceMixin, api.BaseReso
                 'peer',
                 queryset=core_models.Node.objects.regpoint('config').registry_fields(
                     name='core.general#name',
+                    router_id='core.routerid',
                 )
             ),
         ).order_by('id')
