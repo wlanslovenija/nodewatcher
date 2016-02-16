@@ -1,5 +1,7 @@
+from django.db import models
 from django.utils.translation import ugettext as _
 
+from nodewatcher.core import models as core_models
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.registry import registration, fields as registry_fields
 
@@ -30,3 +32,13 @@ class KoruzaVpnMonitor(registration.bases.NodeMonitoringRegistryItem):
         registry_id = 'koruza.vpn'
 
 registration.point('node.monitoring').register_item(KoruzaVpnMonitor)
+
+
+class KoruzaLinkMonitor(registration.bases.NodeMonitoringRegistryItem):
+    """
+    KORUZA link information.
+    """
+
+    neighbour = models.ForeignKey(core_models.Node, related_name='+', null=True)
+
+registration.point('node.monitoring').register_item(KoruzaLinkMonitor)
