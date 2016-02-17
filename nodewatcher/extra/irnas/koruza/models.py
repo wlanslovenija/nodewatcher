@@ -41,4 +41,7 @@ class KoruzaLinkMonitor(registration.bases.NodeMonitoringRegistryItem):
 
     neighbour = models.ForeignKey(core_models.Node, related_name='+', null=True)
 
+    class RegistryMeta:
+        registry_id = 'koruza.link'
+
 registration.point('node.monitoring').register_item(KoruzaLinkMonitor)
