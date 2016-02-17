@@ -37,7 +37,7 @@ six==1.10.0
 sphinx-me==0.3
 wsgiref==0.1.2
 django-timezone-field==1.3
-jsonfield==1.0.3
+django-jsonfield==0.9.15
 paramiko==1.16.0
 django-leaflet==0.18.0
 django-countries==3.4.1

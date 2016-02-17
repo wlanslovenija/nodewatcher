@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='builder',
             name='metadata',
-            field=jsonfield.JSONField(default='null', help_text='Enter a valid JSON object', editable=False, blank=True),
+            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False, blank=True),
         ),
     ]

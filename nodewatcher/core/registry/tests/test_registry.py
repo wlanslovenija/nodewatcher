@@ -46,11 +46,15 @@ class RegistryTestCase(django_test.TransactionTestCase):
 
             simple = thing.first.foo.simple(create=models.DoubleChildRegistryItem)
             self.assertNotEquals(simple.pk, None)
+            simple.annotations = {'annotation': 'bar'}
             simple.interesting = 'bla'
             simple.additional = 42
             simple.another = 69
             simple.level = 'level-x'
             simple.save()
+
+            simple = thing.first.foo.simple()
+            self.assertEquals(simple.annotations, {'annotation': 'bar'})
 
             item = thing.second.foo.multiple(create=models.FirstSubRegistryItem)
             item.foo = 3
