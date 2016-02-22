@@ -1,9 +1,11 @@
 from django.contrib import admin
 
+from guardian import admin as guardian_admin
+
 from . import models
 
 
-class IpPoolAdmin(admin.ModelAdmin):
+class IpPoolAdmin(guardian_admin.GuardedModelAdmin):
     ordering = ('description',)
 
     def get_queryset(self, request):
