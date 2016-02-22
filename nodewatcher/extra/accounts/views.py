@@ -119,7 +119,8 @@ def logout_redirect(request, *args, **kwargs):
 
     kwargs.setdefault('redirect_field_name', auth.REDIRECT_FIELD_NAME)
     # We prefer redirect but explicit None for next_page makes it behave as the official logout view.
-    kwargs.setdefault('next_page', request.REQUEST.get(kwargs.get('redirect_field_name')) or settings.LOGIN_URL)
+    redirect_field_name = kwargs.get('redirect_field_name')
+    kwargs.setdefault('next_page', request.POST.get(redirect_field_name) or request.GET.get(redirect_field_name) or settings.LOGIN_URL)
 
     return auth_views.logout(request, *args, **kwargs)
 
