@@ -35,6 +35,11 @@ class Node(models.Model):
         #       Is this already breaking the abstraction? Should even general config use an extension point?
         return getattr(self.config.core.general(), 'name', None) or self.uuid
 
+    def get_absolute_url(self):
+        # TODO: Should we make this extensible?
+        from django.core.urlresolvers import reverse
+        return reverse('DisplayComponent:node', kwargs={'pk': self.pk})
+
 # Create registration point
 registration.create_point(Node, 'config')
 
