@@ -4,7 +4,7 @@ from django.contrib.auth import admin as auth_admin, models as auth_models
 from django.utils import html
 from django.utils.translation import ugettext_lazy as _
 
-from guardian import core as guardian_core, shortcuts, utils as guardian_utils
+from guardian import shortcuts
 
 from nodewatcher.core import models as core_models
 from nodewatcher.utils import permissions
