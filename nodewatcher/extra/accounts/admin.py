@@ -1,7 +1,9 @@
+from django import forms as django_forms
 from django.core import urlresolvers
 from django.contrib import admin
+from django.contrib.admin import widgets
 from django.contrib.auth import admin as auth_admin, models as auth_models
-from django.utils import html
+from django.utils import html, translation
 from django.utils.translation import ugettext_lazy as _
 
 from guardian import shortcuts
@@ -86,6 +88,57 @@ class UserAdmin(auth_admin.UserAdmin):
 
         return super(UserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-# Re-register UserAdmin.
+
+class GroupAdminForm(django_forms.ModelForm):
+    users = django_forms.ModelMultipleChoiceField(
+        queryset=auth_admin.User.objects.all(),
+        required=False,
+        widget=widgets.FilteredSelectMultiple(
+            verbose_name=_("users"),
+            is_stacked=False,
+        ),
+        help_text=translation.string_concat(
+            _("Members of this group."),
+            " ",
+            _("Hold down \"Control\", or \"Command\" on a Mac, to select more than one."),
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(GroupAdminForm, self).__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            self.fields['users'].initial = self.instance.user_set.all()
+
+    def save(self, commit=True):
+        group = super(GroupAdminForm, self).save(commit=commit)
+
+        if commit:
+            # This immediately changes the database and there is no need to call save again.
+            group.user_set = self.cleaned_data['users']
+        else:
+            old_save_m2m = self.save_m2m
+            def new_save_m2m():
+                old_save_m2m()
+                # This immediately changes the database and there is no need to call save again.
+                group.user_set = self.cleaned_data['users']
+            self.save_m2m = new_save_m2m
+
+        return group
+
+
+# Define a new Group admin.
+class GroupAdmin(auth_admin.GroupAdmin):
+    form = GroupAdminForm
+
+    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        if db_field.name == 'permissions':
+            db_field.help_text = _("Global permissions for this group. All users in the group will get permissions over all instances of a permission's model.")
+
+        return super(GroupAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+# Re-register UserAdmin and GroupAdmin.
 admin.site.unregister(auth_models.User)
 admin.site.register(auth_models.User, UserAdmin)
+admin.site.unregister(auth_models.Group)
+admin.site.register(auth_models.Group, GroupAdmin)
