@@ -1,0 +1,37 @@
+{% extends "admin/change_form.html" %}
+
+{% load i18n admin_urls %}
+
+{% block after_related_objects %}
+    <div class="js-inline-admin-formset inline-group" id="nodes-group">
+        <div class="tabular inline-related">
+            <fieldset class="module">
+                 <h2>{% trans "Nodes" %}</h2>
+                 <table>
+                     <thead>
+                         <tr>
+                             <th>{% trans "Node" %}</th>
+                             <th title="{% trans "User-based node-level permissions for the user on the node." %}">{% trans "User permissions" %}</th>
+                             <th title="{% trans "Group-based node-level permissions for the user on the node. The user might have additional global permissions." %}">{% trans "Group permissions" %}</th>
+                             <th title="{% trans "Groups contributing to the user's permissions on the node. The user might have additional global permissions." %}">{% trans "Groups" %}</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         {% for entry in nodes %}
+                             <tr>
+                                <td><a href="{% url 'admin:core_node_change' entry.node.pk %}">{{ entry.node }}</a></td>
+                                <td>{{ entry.user_permissions|join:", " }}</td>
+                                <td>{{ entry.group_permissions|join:", " }}</td>
+                                <td>{{ entry.groups }}</td>
+                             </tr>
+                         {% empty %}
+                             <tr>
+                                <td colspan="3" class="center">{% trans "The user maintains no nodes." %}</td>
+                             </tr>
+                         {% endfor %}
+                     </tbody>
+                 </table>
+            </fieldset>
+        </div>
+    </div>
+{% endblock %}
