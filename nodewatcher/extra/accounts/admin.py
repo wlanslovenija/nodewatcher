@@ -80,6 +80,12 @@ class UserAdmin(auth_admin.UserAdmin):
         extra_context['nodes'] = self.get_nodes(object_id)
         return super(UserAdmin, self).change_view(request, object_id, form_url, extra_context)
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == 'user_permissions':
+            db_field.help_text = _("Specific global permissions for this user. A user will get permissions over all instances of a permission's model.")
+
+        return super(UserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
 # Re-register UserAdmin.
 admin.site.unregister(auth_models.User)
 admin.site.register(auth_models.User, UserAdmin)
