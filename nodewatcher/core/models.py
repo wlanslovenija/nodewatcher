@@ -29,7 +29,11 @@ class Node(models.Model):
         Returns a string representation of this node.
         """
 
-        return self.uuid
+        # TODO: Should we make this extensible?
+        #       So that other modules and change (for example, project module could add project to the string).
+        # TODO: Can we assume that config and general module is always available?
+        #       Is this already breaking the abstraction? Should even general config use an extension point?
+        return getattr(self.config.core.general(), 'name', None) or self.uuid
 
 # Create registration point
 registration.create_point(Node, 'config')
