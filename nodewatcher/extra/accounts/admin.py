@@ -23,9 +23,8 @@ class UserAdmin(auth_admin.UserAdmin):
     add_form = forms.AdminUserCreationForm
     add_fieldsets = forms.user_add_fieldsets
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'staff', 'superuser', 'groups_column')
-    # TODO: Filtering by groups is only shown when there are strictly more than one group available.
-    #       See: https://code.djangoproject.com/ticket/25799
     list_filter = ('is_active', 'is_staff', 'is_superuser', 'groups')
+    empty_value_display = _("None")
 
     # Making column label shorter.
     def superuser(self, user):
@@ -42,12 +41,10 @@ class UserAdmin(auth_admin.UserAdmin):
     staff.admin_order_field = 'is_staff'
 
     def groups_column(self, user):
-        groups = []
-        for group in user.groups.all().only('name'):
-            groups.append(html.format_html('<a href="{}">{}</a>', urlresolvers.reverse('admin:auth_group_change', args=(group.pk,)), group.name))
-        return ', '.join(groups)
+        return html.format_html_join(', ', '<a href="{}">{}</a>', (
+            (urlresolvers.reverse('admin:auth_group_change', args=(group.pk,)), group.name) for group in user.groups.all().only('name')
+        ))
     groups_column.short_description = _("Groups")
-    groups_column.allow_tags = True
 
     def get_queryset(self, request):
         # Optimization to prefetch all groups because we are displaying them for all users.
