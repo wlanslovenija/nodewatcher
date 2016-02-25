@@ -58,9 +58,9 @@ class UserProfileAndSettings(django_models.Model):
     def __unicode__(self):
         return u"profile and settings for %s" % (self.user)
 
-    @django_models.permalink
     def get_absolute_url(self):
-        return ('AccountsComponent:user_account',)
+        from django.core.urlresolvers import reverse
+        return reverse('AccountsComponent:user_account',)
 
 
 @dispatch.receiver(models_signals.post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid='create_profile_and_settings')
