@@ -573,6 +573,8 @@ LEAFLET_CONFIG = {
     ],
     'DEFAULT_CENTER': (46.05, 14.507),
     'DEFAULT_ZOOM': 8,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
     'RESET_VIEW': False,
 }
 
