@@ -21,6 +21,24 @@ Contents
    node_monitoring
    translation
 
+Paper
+-----
+
+The `paper presenting the project`_ was published in
+journal `Computer Networks`_, in the `special issue on community networks`_,
+`DOI 10.1016/j.comnet.2015.09.021`_.
+
+.. _paper presenting the project: https://github.com/wlanslovenija/nodewatcher-paper
+.. _Computer Networks: http://www.journals.elsevier.com/computer-networks
+.. _special issue on community networks: http://www.sciencedirect.com/science/journal/13891286/93/supp/P2
+.. _DOI 10.1016/j.comnet.2015.09.021: http://dx.doi.org/10.1016/j.comnet.2015.09.021
+
+Available at:
+
+* http://www.sciencedirect.com/science/article/pii/S1389128615003400
+* https://www.sharelatex.com/github/repos/wlanslovenija/nodewatcher-paper/builds/latest/output.pdf
+* http://arxiv.org/abs/1601.02372
+
 Source Code, Issue Tracker and Mailing List
 -------------------------------------------
 
