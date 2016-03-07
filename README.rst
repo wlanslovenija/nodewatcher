@@ -17,6 +17,10 @@ Documentation is found at:
 
 http://docs.nodewatcher.net
 
+Paper presenting the project can be found at:
+
+https://github.com/wlanslovenija/nodewatcher-paper
+
 For development *wlan slovenija* open wireless network `development Trac`_ is
 used, so you can see `existing open tickets`_ or `open a new one`_ there. Source
 code is available on GitHub_. If you have any questions or if you want to
