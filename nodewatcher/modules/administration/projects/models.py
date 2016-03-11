@@ -1,6 +1,5 @@
 from django import dispatch
-from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import signals as django_signals
 from django.contrib.gis.db import models as gis_models
 from django.utils.translation import ugettext_lazy as _
@@ -50,6 +49,7 @@ class Project(models.Model):
 
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
+    is_default = models.BooleanField(default=False)
     location = gis_models.PointField(null=True)
 
     # Pools linked to this project.
@@ -79,19 +79,26 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            # Make sure other projects are not default.
+            self.__class__.objects.filter(is_default=True).update(is_default=False)
+        return super(Project, self).save(*args, **kwargs)
+
 
 def project_default(request=None):
     if request and hasattr(request.user, 'profile'):
         return request.user.profile.default_project
     else:
-        projects = Project.objects.all()
-        if projects.exists():
-            try:
-                return projects.get(name__iexact=(settings.NETWORK.get('DEFAULT_PROJECT', None) or ''))
-            except Project.DoesNotExist:
+        try:
+            return Project.objects.get(is_default=True)
+        except Project.DoesNotExist:
+            projects = Project.objects.all()
+            if projects.exists():
                 return projects[0]
-        else:
-            return None
+            else:
+                return None
 
 
 class ProjectConfig(registration.bases.NodeConfigRegistryItem):

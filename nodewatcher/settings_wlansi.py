@@ -13,7 +13,6 @@ NETWORK.update({
     'DESCRIPTION': 'open wireless network of Slovenia',
     'FAVICON_FILE': 'wlansi/images/favicon.ico',
     'LOGO_FILE': 'wlansi/images/logo.png',
-    'DEFAULT_PROJECT': 'Test',
 })
 
 EMAIL_SUBJECT_PREFIX = '[' + NETWORK['NAME'] + '] '

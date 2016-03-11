@@ -586,7 +586,6 @@ NETWORK = {
     'DESCRIPTION': 'open wireless network in your neighborhood',
     'FAVICON_FILE': None,
     'LOGO_FILE': None,
-    'DEFAULT_PROJECT': None,
 }
 
 EVENTS_EMAIL = DEFAULT_FROM_EMAIL

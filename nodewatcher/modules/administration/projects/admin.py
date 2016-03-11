@@ -10,7 +10,7 @@ class SSIDAdmin(admin.ModelAdmin):
 
 
 class ProjectAdmin(leaflet_admin.LeafletGeoAdmin):
-    pass
+    list_display = ('name', 'is_default')
 
 admin.site.register(models.SSID, SSIDAdmin)
 admin.site.register(models.Project, ProjectAdmin)
