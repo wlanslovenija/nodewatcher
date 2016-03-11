@@ -13,7 +13,7 @@ django-classy-tags==0.7.1
 git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb84e273a#egg=ujson-wlanslovenija
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
 --allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@adfbb91ca4798e8c993f1b5c305ecbedb9e6cfe7#egg=django_datastream-master
-django-guardian==1.4.1
+django-guardian==1.4.2
 django-missing==0.1.18
 django-phonenumber-field==1.0.0
 django_polymorphic==0.8.1

@@ -75,7 +75,7 @@ class UserAdmin(auth_admin.UserAdmin):
 
     def get_nodes(self, object_id):
         user = auth_models.User.objects.get(pk=object_id)
-        return (self.get_nodes_entry(user, node) for node in permissions.get_objects_for_user(user, [], core_models.Node, use_superusers=False))
+        return (self.get_nodes_entry(user, node) for node in shortcuts.get_objects_for_user(user, [], core_models.Node, with_superuser=False, accept_global_perms=False))
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}

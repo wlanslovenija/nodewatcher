@@ -3,7 +3,8 @@ from django.contrib.auth import models as auth_models
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import api
-from nodewatcher.utils import permissions
+
+from guardian import shortcuts
 
 from tastypie import resources, utils
 
@@ -90,7 +91,7 @@ class NodeResource(api.BaseResource):
         if maintainer:
             try:
                 maintainer_user = auth_models.User.objects.get(username=maintainer)
-                queryset = permissions.get_objects_for_user(maintainer_user, [], queryset, use_superusers=False)
+                queryset = shortcuts.get_objects_for_user(maintainer_user, [], queryset, with_superuser=False, accept_global_perms=False)
             except auth_models.User.DoesNotExist:
                 queryset = queryset.none()
 
