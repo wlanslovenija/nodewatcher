@@ -75,13 +75,13 @@ def create_profile_and_settings(sender, instance, created, **kwargs):
         pass
 
 
-@dispatch.receiver(models_signals.post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid='assign_node_maintainers_group')
-def assign_node_maintainers_group(sender, instance, created, **kwargs):
+@dispatch.receiver(models_signals.post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid='assign_default_permissions')
+def assign_default_permissions(sender, instance, created, **kwargs):
     if not created:
         return
 
-    group = auth_models.Group.objects.get_by_natural_key(name="Node maintainers")
-    instance.groups.add(group)
+    add_node_permission = auth_models.Permission.objects.get_by_natural_key(codename='add_node', app_label='core', model='node')
+    instance.user_permissions.add(add_node_permission)
 
 
 # Monkey-patch registration_models.RegistrationProfile.

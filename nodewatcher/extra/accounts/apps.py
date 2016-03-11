@@ -10,32 +10,15 @@ class AccountsConfig(apps.AppConfig):
     def create_profiles(self, **kwargs):
         management.call_command('createprofiles', **kwargs)
 
-    def create_node_maintainers_group(self, **kwargs):
-        from django.contrib.auth import models as auth_models
-
-        try:
-            # We try to create group object so that it always exist.
-            group = auth_models.Group.objects.create(name="Node maintainers")
-
-            # And assign the group "add_node" permission.
-            permission = auth_models.Permission.objects.get_by_natural_key(codename='add_node', app_label='core', model='node')
-            group.permissions.add(permission)
-        except db.IntegrityError:
-            pass
-        except auth_models.Permission.DoesNotExist:
-            pass
-
-    def assign_node_maintainers_group(self, **kwargs):
-        management.call_command('assignnodemaintainersgroup', **kwargs)
+    def assign_default_permissions(self, **kwargs):
+        management.call_command('assigndefaultpermissions', **kwargs)
 
     def ready(self):
         super(AccountsConfig, self).ready()
 
         models_signals.post_migrate.connect(self.create_profiles, sender=self)
 
-        models_signals.post_migrate.connect(self.create_node_maintainers_group, sender=self)
-
-        models_signals.post_migrate.connect(self.assign_node_maintainers_group, sender=self)
+        models_signals.post_migrate.connect(self.assign_default_permissions, sender=self)
 
         # Register other module signals.
         from . import signals
