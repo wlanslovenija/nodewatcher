@@ -73,6 +73,9 @@ class Project(models.Model):
         limit_choices_to={'parent': None},
     )
 
+    class Meta:
+        ordering = ('name',)
+
     def __unicode__(self):
         return self.name
 
