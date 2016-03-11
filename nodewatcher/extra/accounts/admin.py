@@ -9,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from guardian import shortcuts
 
 from nodewatcher.core import models as core_models
-from nodewatcher.utils import permissions
 
 from . import forms, models
 
@@ -35,7 +34,7 @@ class UserAdmin(auth_admin.UserAdmin):
 
     class Media:
         css = {
-            'all': ('admin/auth/user/change_form.css',),
+            'all': ('admin/auth/change_form.css',),
         }
 
     # Making column label shorter.
@@ -130,6 +129,26 @@ class GroupAdminForm(django_forms.ModelForm):
 # Define a new Group admin.
 class GroupAdmin(auth_admin.GroupAdmin):
     form = GroupAdminForm
+
+    class Media:
+        css = {
+            'all': ('admin/auth/change_form.css',),
+        }
+
+    def get_nodes_entry(self, group, node):
+        return {
+            'node': node,
+            'permissions': shortcuts.get_group_perms(group, node),
+        }
+
+    def get_nodes(self, object_id):
+        group = auth_models.Group.objects.get(pk=object_id)
+        return (self.get_nodes_entry(group, node) for node in shortcuts.get_objects_for_group(group, [], core_models.Node, accept_global_perms=False))
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['nodes'] = self.get_nodes(object_id)
+        return super(GroupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         if db_field.name == 'permissions':
