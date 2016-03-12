@@ -34,4 +34,4 @@ for model in top_level_models:
     )
 
     # Register the viewset with the API router.
-    api.router.register(r'registry/%s' % model._meta.object_name.lower(), viewset)
+    api.router.register(model._meta.object_name.lower(), viewset)

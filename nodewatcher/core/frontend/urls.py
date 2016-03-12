@@ -14,6 +14,4 @@ with components.menus:
     # Frontend components auto-discovery
     components.pool.discover_components()
 
-    urlpatterns = components.pool.get_urls() + [
-        urls.url(r'^api/v2/', urls.include(api.router.urls)),
-    ]
+    urlpatterns = components.pool.get_urls()
