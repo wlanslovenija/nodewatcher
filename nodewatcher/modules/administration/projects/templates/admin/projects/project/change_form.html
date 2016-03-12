@@ -1,0 +1,33 @@
+{% extends "admin/change_form.html" %}
+
+{% load i18n admin_urls %}
+
+{% block after_related_objects %}
+    {% if change %}
+        <div class="js-inline-admin-formset inline-group" id="nodes-group">
+            <div class="tabular inline-related">
+                <fieldset class="module">
+                     <h2>{% trans "Nodes" %}</h2>
+                     <table>
+                         <thead>
+                             <tr>
+                                 <th>{% trans "Node" %}</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                             {% for entry in nodes %}
+                                 <tr>
+                                    <td><a href="{% url 'admin:core_node_change' entry.node.pk %}">{{ entry.node }}</a></td>
+                                 </tr>
+                             {% empty %}
+                                 <tr>
+                                    <td class="center">{% trans "The project has no nodes." %}</td>
+                                 </tr>
+                             {% endfor %}
+                         </tbody>
+                     </table>
+                </fieldset>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
