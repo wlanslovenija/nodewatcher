@@ -3,31 +3,33 @@
 {% load i18n admin_urls %}
 
 {% block after_related_objects %}
-    <div class="js-inline-admin-formset inline-group" id="nodes-group">
-        <div class="tabular inline-related">
-            <fieldset class="module">
-                 <h2>{% trans "Nodes" %}</h2>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>{% trans "Node" %}</th>
-                             <th title="{% trans "Node-level permissions for the group on the node. The group might have additional global permissions." %}">{% trans "Permissions" %}</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         {% for entry in nodes %}
+    {% if change %}
+        <div class="js-inline-admin-formset inline-group" id="nodes-group">
+            <div class="tabular inline-related">
+                <fieldset class="module">
+                     <h2>{% trans "Nodes" %}</h2>
+                     <table>
+                         <thead>
                              <tr>
-                                <td><a href="{% url 'admin:core_node_change' entry.node.pk %}">{{ entry.node }}</a></td>
-                                <td>{{ entry.permissions|join:", " }}</td>
+                                 <th>{% trans "Node" %}</th>
+                                 <th title="{% trans "Node-level permissions for the group on the node. The group might have additional global permissions." %}">{% trans "Permissions" %}</th>
                              </tr>
-                         {% empty %}
-                             <tr>
-                                <td colspan="2" class="center">{% trans "The group maintains no nodes." %}</td>
-                             </tr>
-                         {% endfor %}
-                     </tbody>
-                 </table>
-            </fieldset>
+                         </thead>
+                         <tbody>
+                             {% for entry in nodes %}
+                                 <tr>
+                                    <td><a href="{% url 'admin:core_node_change' entry.node.pk %}">{{ entry.node }}</a></td>
+                                    <td>{{ entry.permissions|join:", " }}</td>
+                                 </tr>
+                             {% empty %}
+                                 <tr>
+                                    <td colspan="2" class="center">{% trans "The group maintains no nodes." %}</td>
+                                 </tr>
+                             {% endfor %}
+                         </tbody>
+                     </table>
+                </fieldset>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
