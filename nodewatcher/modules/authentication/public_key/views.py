@@ -1,21 +1,18 @@
 from django.core import urlresolvers
-from django.contrib.auth import decorators as auth_decorators
 from django.views import generic
-from django.utils import decorators as django_decorators
+from django.utils import decorators
 
 from nodewatcher.core.frontend import views
+from nodewatcher.extra.accounts import decorators as accounts_decorators
 
 from . import models
 
 
+@decorators.method_decorator(accounts_decorators.authenticated_required, name='dispatch')
 class AddPublicKey(views.CancelableFormMixin, generic.CreateView):
     template_name = 'public_key/new.html'
     model = models.UserAuthenticationKey
     fields = ['name', 'public_key']
-
-    @django_decorators.method_decorator(auth_decorators.login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(AddPublicKey, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -28,13 +25,10 @@ class AddPublicKey(views.CancelableFormMixin, generic.CreateView):
         return urlresolvers.reverse('PublicKeyComponent:list')
 
 
+@decorators.method_decorator(accounts_decorators.authenticated_required, name='dispatch')
 class RemovePublicKey(views.CancelableFormMixin, generic.DeleteView):
     template_name = 'public_key/remove.html'
     model = models.UserAuthenticationKey
-
-    @django_decorators.method_decorator(auth_decorators.login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(RemovePublicKey, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
         return super(RemovePublicKey, self).get_queryset().filter(user=self.request.user)
@@ -46,5 +40,6 @@ class RemovePublicKey(views.CancelableFormMixin, generic.DeleteView):
         return urlresolvers.reverse('PublicKeyComponent:list')
 
 
+@decorators.method_decorator(accounts_decorators.authenticated_required, name='dispatch')
 class ListPublicKeys(generic.TemplateView):
     template_name = 'public_key/list_public_keys.html'

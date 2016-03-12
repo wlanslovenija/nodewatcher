@@ -1,11 +1,13 @@
 from django import http, shortcuts
 from django.core import urlresolvers, exceptions
 from django.views import generic
+from django.utils import decorators
 
 from guardian import mixins
 
 from nodewatcher.core.frontend import views
 from nodewatcher.core.registry import forms as registry_forms
+from nodewatcher.extra.accounts import decorators as accounts_decorators
 from nodewatcher.modules.frontend.editor import views as editor_views
 from nodewatcher.modules.identity.base import models as identity_models
 from nodewatcher.modules.identity.public_key import models as public_key_models
@@ -22,6 +24,7 @@ class SuperuserRequiredMixin(object):
         return super(SuperuserRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 
+@decorators.method_decorator(accounts_decorators.authenticated_required, name='dispatch')
 class ListUnknownNodes(generic.TemplateView):
     template_name = 'unknown_nodes/list.html'
 
