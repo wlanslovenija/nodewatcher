@@ -168,7 +168,7 @@
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
 
         $.postCsrf(
-            "/registry/evaluate_forms/" + regpoint_id + "/" + root_id,
+            "/registry/evaluate_forms/" + regpoint_id + "/" + root_id + "/",
             forms
         ).done(function(data) {
             $('#registry_forms').html(data);
