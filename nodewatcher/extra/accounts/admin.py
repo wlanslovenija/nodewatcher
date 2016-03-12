@@ -3,6 +3,7 @@ from django.core import urlresolvers
 from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.auth import admin as auth_admin, models as auth_models
+from django.db.models.fields import reverse_related
 from django.utils import html, translation
 from django.utils.translation import ugettext_lazy as _
 
@@ -88,6 +89,7 @@ class UserAdmin(auth_admin.UserAdmin):
         return super(UserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 
+# TODO: Needed until this ticket is resolved; https://code.djangoproject.com/ticket/897
 class GroupAdminForm(django_forms.ModelForm):
     users = django_forms.ModelMultipleChoiceField(
         queryset=auth_admin.User.objects.all(),
@@ -155,6 +157,29 @@ class GroupAdmin(auth_admin.GroupAdmin):
             db_field.help_text = _("Global permissions for this group. All users in the group will get permissions over all instances of a permission's model.")
 
         return super(GroupAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(GroupAdmin, self).get_form(request, obj, **kwargs)
+
+        # Invert the user_set.rel ManyToManyRel.
+        remote_field = reverse_related.ManyToManyRel(
+            self.model.user_set.rel.get_related_field(), self.model.user_set.rel.related_model,
+            symmetrical=self.model.user_set.rel.symmetrical,
+            through=self.model.user_set.rel.through,
+            db_constraint=self.model.user_set.rel.db_constraint,
+        )
+
+        # We have to wrap it only because otherwise the field help text is moved
+        # by JavaScript above the field and is not kept below.
+        form.base_fields['users'].widget = widgets.RelatedFieldWidgetWrapper(
+            form.base_fields['users'].widget, remote_field, self.admin_site,
+            # To simplify the interface, we do not allow adding users from this view.
+            can_add_related=False,
+            can_change_related=False,
+            can_delete_related=False,
+        )
+
+        return form
 
 # Re-register UserAdmin and GroupAdmin.
 admin.site.unregister(auth_models.User)
