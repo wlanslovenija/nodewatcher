@@ -20,7 +20,11 @@ class RegistryRootViewSetMixin(object):
             if argument in ('fields', 'limit', 'offset'):
                 continue
 
-            queryset = apply_registry_filter(argument, value, queryset)
+            try:
+                queryset = apply_registry_filter(argument, value, queryset)
+            except ValueError:
+                # Ignore invalid filters as they may be some other query arguments.
+                pass
 
         return queryset
 
