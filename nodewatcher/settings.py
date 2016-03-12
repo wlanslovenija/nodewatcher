@@ -330,6 +330,8 @@ INSTALLED_APPS = (
     'django_countries',
     'timedelta',
     'registration',
+    'rest_framework',
+    'rest_framework_gis',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -651,6 +653,11 @@ REGISTRY_SIMPLE_MODE = {
             'core.authentication',
         ],
     },
+}
+
+# REST framework.
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
 
 # Allowed hosts (required for production use)

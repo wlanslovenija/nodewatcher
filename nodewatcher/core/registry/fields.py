@@ -616,8 +616,6 @@ class RegistryProxyMultipleDescriptor(object):
                     db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
                     empty_strings_as_null = django_db.connections[db].features.interprets_empty_strings_as_nulls
                     qs = super(RelatedManager, self).get_queryset()
-                    # Disable polymorphic queries as they can be very expensive in this case.
-                    qs = qs.non_polymorphic()
 
                     qs._add_hints(instance=self.instance)
                     if self._db:
@@ -641,8 +639,6 @@ class RegistryProxyMultipleDescriptor(object):
 
                 queryset._add_hints(instance=instances[0])
                 queryset = queryset.using(queryset._db or self._db)
-                # Disable polymorphic queries as they can be very expensive in this case.
-                queryset = queryset.non_polymorphic()
 
                 rel_obj_attr = operator.attrgetter(rel_field.attname)
                 instance_attr = lambda obj: obj._get_pk_val()

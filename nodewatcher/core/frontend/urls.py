@@ -1,4 +1,6 @@
-from . import components
+from django.conf import urls
+
+from . import components, api
 
 # We are using context manager here because this is a special case
 # "menus.register" is not near the end of the module as usual and
@@ -12,4 +14,6 @@ with components.menus:
     # Frontend components auto-discovery
     components.pool.discover_components()
 
-    urlpatterns = components.pool.get_urls()
+    urlpatterns = components.pool.get_urls() + [
+        urls.url(r'^api/v2/', urls.include(api.router.urls)),
+    ]

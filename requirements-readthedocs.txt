@@ -1,4 +1,4 @@
-Django==1.9.2
+Django==1.9.4
 Jinja2==2.7.3
 MarkupSafe==0.23
 Pygments==1.6
@@ -50,3 +50,5 @@ ijson==2.3
 py-radix==0.9.3
 django-oauth-toolkit==0.10.0
 redis==2.10.5
+djangorestframework==3.3.2
+djangorestframework-gis==0.10.1

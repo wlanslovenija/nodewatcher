@@ -11,14 +11,14 @@ urlpatterns = [
     # Registry.
     urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace='registry', app_name='registry')),
 
-    # API.
-    urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
-
     # Django admin interface.
     urls.url(r'^admin/', urls.include(admin.site.urls)),
 
     # Frontend.
     urls.url(r'^', urls.include(frontend_urls)),
+
+    # Legacy API.
+    urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
 ]
 
 if settings.DEBUG:

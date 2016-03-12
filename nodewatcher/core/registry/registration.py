@@ -683,3 +683,14 @@ def register_form_for_item(item, form_class):
     """
 
     item._registry.set_form_class(form_class)
+
+
+def register_serializer_for_item(item, serializer_class):
+    """
+    Registers a serializer for use with the specified registry item.
+
+    :param item: Registry item class
+    :param serializer_class: Serializer class
+    """
+
+    item._registry.serializer_class = serializer_class

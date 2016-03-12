@@ -1,11 +1,14 @@
+import pytz
+
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 import timezone_field
 from django_countries import fields as country_field
+from rest_framework import serializers
 
-from nodewatcher.core.registry import registration
+from nodewatcher.core.registry import registration, api
 
 
 class LocationConfig(registration.bases.NodeConfigRegistryItem):
@@ -29,3 +32,20 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
         registry_name = _("Basic Location")
 
 registration.point('node.config').register_item(LocationConfig)
+
+
+class TimeZoneField(serializers.Field):
+    def to_representation(self, value):
+        return value.zone
+
+    def to_internal_value(self, value):
+        return pytz.timezone(value)
+
+
+class LocationConfigSerializer(api.RegistryItemSerializerMixin, serializers.ModelSerializer):
+    timezone = TimeZoneField()
+
+    class Meta:
+        model = LocationConfig
+
+registration.register_serializer_for_item(LocationConfig, LocationConfigSerializer)

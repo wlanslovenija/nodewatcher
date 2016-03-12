@@ -3,6 +3,10 @@ import collections
 from django import forms
 from django.core import exceptions as django_exceptions
 
+from rest_framework import serializers as drf_serializers
+
+from .api import serializers
+
 
 class Options(object):
     """
@@ -34,6 +38,18 @@ class Options(object):
         self.item_children = collections.OrderedDict()
         self.item_parent = None
         self.item_parent_field = None
+
+        # Create a default serializer.
+        class meta_cls:
+            model = model_class
+
+        self.serializer_class = type(
+            '%sRegistryItemSerializer' % (model_class.__name__),
+            (serializers.RegistryItemSerializerMixin, drf_serializers.ModelSerializer),
+            {
+                'Meta': meta_cls,
+            }
+        )
 
     def set_form_class(self, form_class):
         """
