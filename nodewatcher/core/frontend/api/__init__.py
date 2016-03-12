@@ -1,6 +1,5 @@
 from tastypie import api
 
-from .router import *
 from .resources import *
 
 

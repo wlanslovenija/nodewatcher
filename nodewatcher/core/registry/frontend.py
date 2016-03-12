@@ -1,6 +1,6 @@
 from rest_framework import serializers as drf_serializers, viewsets as drf_viewsets
 
-from nodewatcher.core.frontend import api
+from nodewatcher.core import api
 
 from . import registration
 from .api import views, serializers
