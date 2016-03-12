@@ -102,35 +102,7 @@ def anonymous_required(function=None, message_func=lambda u: _("You should not b
     return actual_decorator
 
 
-def permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME, raise_exception=False):
-    """
-    Decorator for views that checks whether the user has a particular permission enabled, redirecting if necessary (by default
-    to the profile page).
-
-    It gives the user a message with a reason for redirect.
-
-    It maintains `decorators` attribute on wrapped function with list of all ids of used decorators, where the first one is the first
-    one used.
-    """
-
-    def check_perms(user):
-        if not isinstance(perm, (list, tuple)):
-            perms = (perm, )
-        else:
-            perms = perm
-        # First check if the user has the permission (even anonymous users).
-        if user.has_perms(perms):
-            return True
-        # In case the 403 handler should be called raise the exception.
-        if raise_exception:
-            raise exceptions.PermissionDenied
-        # As the last resort, show the login form.
-        return False
-
-    return user_test_required(check_perms, message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(permission_required))
-
-
-def authenticated_permission_required(perm, message_func=lambda u: _("You do not have necessary permission to access the previous page.") if u.is_authenticated() else _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL if u.is_authenticated() else settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME, raise_exception=False):
+def permission_required(perm, function=None, message_func=lambda u: _("You do not have necessary permission to access the previous page.") if u.is_authenticated() else _("You have to be logged in while accessing the previous page. Please login to continue."), message_level_func=lambda u: messages.ERROR, redirect_url_func=lambda u: settings.LOGIN_REDIRECT_URL if u.is_authenticated() else settings.LOGIN_URL, redirect_field_name=auth.REDIRECT_FIELD_NAME, raise_exception=False, obj_func=lambda: None, accept_global_perms=False):
     """
     Decorator for views that checks whether the user has authenticated and has a particular permission enabled, redirecting as
     necessary: if not authenticated to the log-in page, otherwise to the profile page.
@@ -142,17 +114,40 @@ def authenticated_permission_required(perm, message_func=lambda u: _("You do not
     """
 
     def check_perms(user):
+        obj = None
+        if obj_func:
+            obj = obj_func()
+
         if not isinstance(perm, (list, tuple)):
             perms = (perm, )
         else:
             perms = perm
-        # First check if the user has the permission (even anonymous users).
-        if user.is_authenticated() and user.has_perms(perms):
-            return True
+
+        # First check if the user is authenticated and has the permissions.
+        if user.is_authenticated():
+            # First check global permissions.
+            if accept_global_perms and user.has_perms(perms):
+                return True
+            # Then object permissions.
+            if user.has_perms(perms, obj):
+                return True
+
         # In case the 403 handler should be called raise the exception.
         if raise_exception:
             raise exceptions.PermissionDenied
-        # As the last resort, show the login form,
+
+        # As the last resort, show the login form.
         return False
 
-    return user_test_required(check_perms, message_func=message_func, message_level_func=message_level_func, redirect_url_func=redirect_url_func, redirect_field_name=redirect_field_name, decorator_id=id(authenticated_permission_required))
+    actual_decorator = user_test_required(
+        check_perms,
+        message_func=message_func,
+        message_level_func=message_level_func,
+        redirect_url_func=redirect_url_func,
+        redirect_field_name=redirect_field_name,
+        decorator_id=id(permission_required),
+    )
+
+    if function:
+        return actual_decorator(function)
+    return actual_decorator

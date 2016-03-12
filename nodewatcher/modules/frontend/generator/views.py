@@ -2,11 +2,10 @@ from django import http
 from django.core import urlresolvers
 from django.views import generic
 
-from guardian import mixins
-
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import views
 from nodewatcher.core.generator import models as generator_models
+from nodewatcher.extra.accounts import mixins
 
 from . import forms
 
@@ -69,6 +68,6 @@ class ViewBuild(mixins.PermissionRequiredMixin,
         return self.get_object().node
 
 
-class ListBuilds(mixins.LoginRequiredMixin,
+class ListBuilds(mixins.AuthenticatedRequiredMixin,
                  generic.TemplateView):
     template_name = 'generator/list_builds.html'

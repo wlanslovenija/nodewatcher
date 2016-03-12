@@ -39,4 +39,4 @@ def authenticated_required(value):
         return False
     if not hasattr(view, 'decorators'):
         return False
-    return id(decorators.authenticated_required) in view.decorators or id(decorators.authenticated_permission_required) in view.decorators
+    return id(decorators.authenticated_required) in view.decorators or id(decorators.permission_required) in view.decorators

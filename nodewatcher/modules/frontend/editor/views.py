@@ -3,11 +3,12 @@ from django.core import exceptions, urlresolvers
 from django.db import transaction
 from django.views import generic
 
-from guardian import mixins, shortcuts
+from guardian import shortcuts
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import views
 from nodewatcher.core.registry import forms as registry_forms
+from nodewatcher.extra.accounts import mixins
 
 from . import signals
 
