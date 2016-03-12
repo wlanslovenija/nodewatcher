@@ -1,8 +1,7 @@
 from django.conf import urls
 from django.contrib.auth import models as auth_models
 
-from nodewatcher.core import models as core_models
-from nodewatcher.core.frontend import api
+from nodewatcher.core import api, models as core_models
 
 from guardian import shortcuts
 

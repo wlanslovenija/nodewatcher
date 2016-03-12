@@ -6,7 +6,8 @@ from tastypie import resources
 
 from django_datastream import urls
 
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core import api
+from nodewatcher.core.frontend import components
 from nodewatcher.core.registry import exceptions as registry_exceptions
 
 

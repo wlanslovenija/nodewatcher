@@ -1,4 +1,5 @@
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core import api
+from nodewatcher.core.frontend import components
 
 from . import resources
 

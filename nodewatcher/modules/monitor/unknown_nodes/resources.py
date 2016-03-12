@@ -1,7 +1,7 @@
 from tastypie import fields
 from tastypie import authorization as api_authorization, authentication as api_authentication
 
-from nodewatcher.core.frontend import api
+from nodewatcher.core import api
 
 from . import models
 

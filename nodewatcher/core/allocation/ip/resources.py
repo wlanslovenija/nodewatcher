@@ -1,7 +1,7 @@
 from nodewatcher.core import resources as core_resources
 from nodewatcher.core.registry import registration
-from nodewatcher.core.frontend import api
-from nodewatcher.core.frontend.api import fields as api_fields
+from nodewatcher.core import api
+from nodewatcher.core.api import fields as api_fields
 # TODO: Remove this dependency after we have https://dev.wlan-si.net/ticket/1268.
 from nodewatcher.modules.frontend.list import resources
 

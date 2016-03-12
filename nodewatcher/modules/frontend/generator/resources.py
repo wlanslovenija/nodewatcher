@@ -4,8 +4,8 @@ from tastypie import fields
 from tastypie import authorization as api_authorization, authentication as api_authentication
 
 from nodewatcher.core import models as core_models
-from nodewatcher.core.frontend import api
-from nodewatcher.core.frontend.api import fields as api_fields
+from nodewatcher.core import api
+from nodewatcher.core.api import fields as api_fields
 from nodewatcher.core.generator import models as generator_models
 from nodewatcher.modules.frontend.list import resources
 

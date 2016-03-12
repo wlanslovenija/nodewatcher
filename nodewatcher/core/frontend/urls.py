@@ -1,6 +1,4 @@
-from django.conf import urls
-
-from . import components, api
+from . import components
 
 # We are using context manager here because this is a special case
 # "menus.register" is not near the end of the module as usual and

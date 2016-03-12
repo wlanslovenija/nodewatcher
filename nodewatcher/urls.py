@@ -4,7 +4,7 @@ from django.contrib import admin
 
 # Importing nodewatcher.core.frontend.urls auto-discovers frontend components.
 from nodewatcher.core import api
-from nodewatcher.core.frontend import api as legacy_api, urls as frontend_urls
+from nodewatcher.core.frontend import urls as frontend_urls
 
 admin.autodiscover()
 
@@ -14,7 +14,7 @@ urlpatterns = [
 
     # API.
     urls.url(r'^api/v2/', urls.include(api.router.urls)),
-    urls.url(r'^api/', urls.include(legacy_api.v1_api.urls, namespace='api', app_name='api')),
+    urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
 
     # Django admin interface.
     urls.url(r'^admin/', urls.include(admin.site.urls)),

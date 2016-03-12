@@ -1,7 +1,7 @@
 from django.core import urlresolvers
 
-from nodewatcher.core import models as core_models
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core import api, models as core_models
+from nodewatcher.core.frontend import components
 
 from . import views, resources
 
