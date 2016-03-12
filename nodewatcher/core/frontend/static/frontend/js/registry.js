@@ -168,6 +168,7 @@
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
 
         $.postCsrf(
+            // TODO: Dynamically resolve the URL and do not have it hard-coded.
             "/registry/evaluate_forms/" + regpoint_id + "/" + root_id + "/",
             forms
         ).done(function(data) {
