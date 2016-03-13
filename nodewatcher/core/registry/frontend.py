@@ -25,7 +25,7 @@ for model in top_level_models:
     )
 
     viewset = type(
-        '%sRegistryRootViewSet' % (model.__name__),
+        '%sViewSet' % (model.__name__),
         (views.RegistryRootViewSetMixin, drf_viewsets.ReadOnlyModelViewSet),
         {
             'queryset': model.objects.all(),
