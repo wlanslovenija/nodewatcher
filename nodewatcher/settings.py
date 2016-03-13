@@ -174,6 +174,7 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -333,6 +334,7 @@ INSTALLED_APPS = (
     'registration',
     'rest_framework',
     'rest_framework_gis',
+    'corsheaders',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -668,3 +670,13 @@ REST_FRAMEWORK = {
 
 # Allowed hosts (required for production use)
 ALLOWED_HOSTS = []
+
+CORS_ORIGIN_ALLOW_ALL = True
+# Currently only v2 API needs this. Tastypie API provides headers by itself.
+CORS_URLS_REGEX = r'^/api/v2/'
+# API is read-only for now.
+CORS_ALLOW_METHODS = (
+    'GET',
+    'HEAD',
+    'OPTIONS',
+)

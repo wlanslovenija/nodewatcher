@@ -9,6 +9,7 @@ billiard==3.3.0.22
 celery==3.1.20
 datastream==0.5.2
 defusedxml==0.4.1
+git+https://github.com/zestedesavoir/django-cors-middleware@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
 django-classy-tags==0.7.1
 git+https://github.com/wlanslovenija/ultrajson@a8f0f0f1010956b27bf0c2cb5e52d85bb84e273a#egg=ujson-wlanslovenija
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
