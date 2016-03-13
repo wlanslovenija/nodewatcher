@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import constants
 
 from rest_framework import serializers
 
@@ -27,10 +28,14 @@ class RegistryRootSerializerMixin(object):
             value = getattr(instance, field.name)
             namespace = data.setdefault(meta.registration_point.namespace, {})
             if field.src_field:
+                container = namespace.setdefault(meta.registry_id, {})
+                atoms = field.src_field.split(constants.LOOKUP_SEP)
+                container = reduce(lambda a, b: a.setdefault(b, {}), atoms[:-1], container)
+
                 if isinstance(value, models.Manager):
-                    namespace.setdefault(meta.registry_id, {})[field.src_field] = value.all()
+                    container[atoms[-1]] = value.all()
                 else:
-                    namespace.setdefault(meta.registry_id, {})[field.src_field] = value
+                    container[atoms[-1]] = value
             elif isinstance(value, models.Manager):
                 values = []
                 for item in value.all():
