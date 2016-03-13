@@ -1,4 +1,6 @@
 from django.db.models import constants
+from django.contrib.gis.db import models as geo_models
+from django.contrib.gis.db.models import functions as geo_functions
 
 from rest_framework import viewsets
 
@@ -84,5 +86,19 @@ def apply_registry_field(field_specifier, queryset):
 
             field_name = '%s%s%s' % (registry_point, registry_id.replace('.', '_'), field_path.replace('.', '_'))
             queryset = queryset.registry_fields(**{field_name: '%s%s' % (registry_id, ('#%s' % field_path) if field_path else '')})
+            for field in queryset.model._meta.virtual_fields:
+                if field.name != field_name:
+                    continue
+
+                # Check if the model has any Geometry fields and perform GeoJSON annotations.
+                for dst_field in field.src_model._meta.get_fields():
+                    if isinstance(dst_field, geo_models.GeometryField):
+                        field_path = '%s__%s' % (queryset.registry_expand_proxy_field(field_name), dst_field.name)
+                        annotation_name = '%s_annotations_%s' % (field_name, field_path)
+                        queryset = queryset.annotate(**{annotation_name: geo_functions.AsGeoJSON(field_path)})
+
+                        container = getattr(field, '_registry_annotations', {})
+                        container['%s_geojson' % dst_field.name] = annotation_name
+                        field._registry_annotations = container
 
     return field_name, queryset

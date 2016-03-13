@@ -24,6 +24,13 @@ class RegistryRootSerializerMixin(object):
             if not hasattr(field, 'src_model'):
                 continue
 
+            def serialize_instance(item):
+                if hasattr(field, '_registry_annotations'):
+                    for target_attribute, source_attribute in field._registry_annotations.items():
+                        setattr(item, target_attribute, getattr(instance, source_attribute))
+
+                return item._registry.serializer_class(item).data
+
             meta = field.src_model._registry
             value = getattr(instance, field.name)
             namespace = data.setdefault(meta.registration_point.namespace, {})
@@ -37,13 +44,9 @@ class RegistryRootSerializerMixin(object):
                 else:
                     container[atoms[-1]] = value
             elif isinstance(value, models.Manager):
-                values = []
-                for item in value.all():
-                    values.append(item._registry.serializer_class(item).data)
-
-                namespace[meta.registry_id] = values
+                namespace[meta.registry_id] = map(serialize_instance, value.all())
             else:
-                namespace[meta.registry_id] = value._registry.serializer_class(value).data
+                namespace[meta.registry_id] = serialize_instance(value)
 
         return data
 
