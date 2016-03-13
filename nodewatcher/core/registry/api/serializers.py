@@ -60,6 +60,6 @@ class RegistryItemSerializerMixin(object):
         # Include type information as registry items are polymorphic.
         # TODO: Registry items should somehow declare what should go here instad of using the class name.
         # TODO: We might use JSON-LD way of storing the type information.
-        data['_type'] = instance.__class__.__name__.replace(instance._registry.registration_point.namespace.capitalize(), '')
+        data['@type'] = instance.__class__.__name__.replace(instance._registry.registration_point.namespace.capitalize(), '')
 
         return data
