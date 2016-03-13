@@ -239,6 +239,7 @@ INSTALLED_APPS = (
     'nodewatcher.core',
     'nodewatcher.core.allocation',
     'nodewatcher.core.allocation.ip',
+    'nodewatcher.core.api',
     'nodewatcher.core.events',
     'nodewatcher.core.frontend',
     'nodewatcher.core.generator.cgm',

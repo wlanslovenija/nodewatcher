@@ -6,7 +6,7 @@ from django.db import models as django_models
 
 import jsonfield
 
-from . import access as registry_access, lookup as registry_lookup, models as registry_models, state as registry_state
+from . import access as registry_access, lookup as registry_lookup, state as registry_state
 from . import exceptions
 from ...utils import datastructures as nw_datastructures
 
@@ -605,6 +605,10 @@ def create_point(model, namespace, mixins=None):
     if point_id not in registry_state.points:
         point = RegistrationPoint(model, namespace, point_id)
         registry_state.points[point_id] = point
+
+        # We import it here so that we can import this file
+        # without an AppRegistryNotReady exception.
+        from . import models as registry_models
 
         # Create a new top-level class
         class Meta(registry_models.RegistryItemBase.Meta):

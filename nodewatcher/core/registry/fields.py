@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from ...utils import ipaddr
 
-from . import registration, models as registry_models
+from . import registration
 from .forms import fields as form_fields
 
 
@@ -448,6 +448,10 @@ class ReferenceChoiceField(models.ForeignKey):
         """
         Performs relation validation after the destination model is fully resolved.
         """
+
+        # We import it here so that we can import this file
+        # without an AppRegistryNotReady exception.
+        from . import models as registry_models
 
         if not issubclass(cls, registry_models.RegistryItemBase):
             raise exceptions.ImproperlyConfigured(

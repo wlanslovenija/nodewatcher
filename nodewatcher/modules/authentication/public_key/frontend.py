@@ -1,7 +1,7 @@
 from django.conf import urls
 from django.core import urlresolvers
 
-from nodewatcher.core import api
+from nodewatcher.core.api import urls as api_urls
 from nodewatcher.core.frontend import components
 
 from . import resources, views
@@ -19,7 +19,7 @@ class PublicKeyComponent(components.FrontendComponent):
 components.pool.register(PublicKeyComponent)
 
 
-api.v1_api.register(resources.UserAuthenticationKeyResource())
+api_urls.v1_api.register(resources.UserAuthenticationKeyResource())
 
 
 components.menus.register(components.Menu('public_key_menu'))

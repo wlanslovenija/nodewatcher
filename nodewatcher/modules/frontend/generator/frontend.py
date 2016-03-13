@@ -1,7 +1,7 @@
 from django.conf import urls
 from django.core import urlresolvers
 
-from nodewatcher.core import api
+from nodewatcher.core.api import urls as api_urls
 from nodewatcher.core.frontend import components
 
 from . import resources, views
@@ -20,11 +20,11 @@ class GeneratorComponent(components.FrontendComponent):
 components.pool.register(GeneratorComponent)
 
 
-api.v1_api.register(resources.BuildResultResource())
-api.v1_api.register(resources.BuildResultFileResource())
-api.v1_api.register(resources.BuilderResource())
-api.v1_api.register(resources.BuildChannelResource())
-api.v1_api.register(resources.BuildVersionResource())
+api_urls.v1_api.register(resources.BuildResultResource())
+api_urls.v1_api.register(resources.BuildResultFileResource())
+api_urls.v1_api.register(resources.BuilderResource())
+api_urls.v1_api.register(resources.BuildChannelResource())
+api_urls.v1_api.register(resources.BuildVersionResource())
 
 
 components.menus.get_menu('node_menu').add(components.MenuEntry(

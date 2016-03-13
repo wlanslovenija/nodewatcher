@@ -1,10 +1,10 @@
-from nodewatcher.core import api
+from nodewatcher.core.api import urls
 from nodewatcher.core.frontend import components
 
 from . import resources
 
 
-api.v1_api.register(resources.OlsrTopologyLinkResource())
+urls.v1_api.register(resources.OlsrTopologyLinkResource())
 
 
 components.partials.get_partial('network_topology_partial').add(components.PartialEntry(

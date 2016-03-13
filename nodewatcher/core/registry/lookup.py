@@ -9,9 +9,6 @@ from django.db.models import constants
 from django.db.models.sql import query
 from django.utils import tree
 
-# Quote name
-qn = django_db.connection.ops.quote_name
-
 
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
     """
@@ -36,6 +33,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             'strictly_above', 'strictly_below'
         }
         self.query.query_terms = GIS_LOOKUPS | QUERY_TERMS
+
+        # Quote name. We import it here so that we can import this file
+        # without an AppRegistryNotReady exception.
+        self._quote_name = django_db.connection.ops.quote_name
 
     def _clone(self, *args, **kwargs):
         """
@@ -339,7 +340,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 continue
             elif dst_related is None:
                 # Select destination field and install proxy field descriptor
-                src_column = '%s.%s' % (qn(dst_model._meta.db_table), qn(dst_field.column))
+                src_column = '%s.%s' % (self._quote_name(dst_model._meta.db_table), self._quote_name(dst_field.column))
                 select_name = install_proxy_field(
                     clone.model,
                     dst_field,
@@ -358,7 +359,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if dst_related_field.many_to_many:
                     raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
-                src_column = '%s.%s' % (qn(dst_field_model._meta.db_table), qn(dst_related_field.column))
+                src_column = '%s.%s' % (self._quote_name(dst_field_model._meta.db_table), self._quote_name(dst_related_field.column))
                 select_name = install_proxy_field(
                     clone.model,
                     dst_related_field,
@@ -410,7 +411,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             if isinstance(field, (registry_fields.RegistryChoiceField, registry_fields.NullBooleanChoiceField)):
                 # Ordering by RegistryChoiceField should generate a specific query that will
                 # sort by the order that the choices were registered.
-                order_query = ['CASE', '%s.%s' % (qn(field.model()._meta.db_table), qn(field.column))]
+                order_query = ['CASE', '%s.%s' % (self._quote_name(field.model()._meta.db_table), self._quote_name(field.column))]
                 order_params = []
                 for order, choice in enumerate(field.get_registered_choices()):
                     order_query.append('WHEN %%s THEN %d' % order)

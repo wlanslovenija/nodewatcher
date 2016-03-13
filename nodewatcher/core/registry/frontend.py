@@ -1,6 +1,6 @@
 from rest_framework import serializers as drf_serializers, viewsets as drf_viewsets
 
-from nodewatcher.core import api
+from nodewatcher.core.api import urls as api_urls
 
 from . import registration
 from .api import views, serializers
@@ -34,4 +34,4 @@ for model in top_level_models:
     )
 
     # Register the viewset with the API router.
-    api.router.register(model._meta.object_name.lower(), viewset)
+    api_urls.v2_api.register(model._meta.object_name.lower(), viewset)

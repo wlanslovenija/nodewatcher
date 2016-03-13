@@ -1,6 +1,7 @@
 from django.core import urlresolvers
 
-from nodewatcher.core import api, models as core_models
+from nodewatcher.core import models as core_models
+from nodewatcher.core.api import urls
 from nodewatcher.core.frontend import components
 
 from . import views, resources
@@ -18,7 +19,7 @@ class NetworkStatisticsComponent(components.FrontendComponent):
 components.pool.register(NetworkStatisticsComponent)
 
 
-api.v1_api.register(resources.StatisticsPoolResource())
+urls.v1_api.register(resources.StatisticsPoolResource())
 
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(

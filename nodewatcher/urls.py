@@ -3,7 +3,7 @@ from django.conf.urls import static
 from django.contrib import admin
 
 # Importing nodewatcher.core.frontend.urls auto-discovers frontend components.
-from nodewatcher.core import api
+from nodewatcher.core.api import urls as api_urls
 from nodewatcher.core.frontend import urls as frontend_urls
 
 admin.autodiscover()
@@ -13,8 +13,8 @@ urlpatterns = [
     urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace='registry', app_name='registry')),
 
     # API.
-    urls.url(r'^api/v2/', urls.include(api.router.urls, namespace='apiv2', app_name='apiv2')),
-    urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
+    urls.url(r'^api/v2/', urls.include(api_urls.v2_api.urls, namespace='apiv2', app_name='apiv2')),
+    urls.url(r'^api/', urls.include(api_urls.v1_api.urls, namespace='api', app_name='api')),
 
     # Django admin interface.
     urls.url(r'^admin/', urls.include(admin.site.urls)),
