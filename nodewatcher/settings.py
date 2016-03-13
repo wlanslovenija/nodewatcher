@@ -667,6 +667,17 @@ REGISTRY_SIMPLE_MODE = {
 # REST framework.
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        #'rest_framework.renderers.JSONRenderer',
+        'nodewatcher.core.api.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        #'rest_framework.parsers.JSONParser',
+        'nodewatcher.core.api.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ),
 }
 
 # Allowed hosts (required for production use)
