@@ -17,8 +17,7 @@ class RegistryRootSerializerMixin(object):
     def to_representation(self, instance):
         data = super(RegistryRootSerializerMixin, self).to_representation(instance)
 
-        # Rename 'registry_metadata' to just '_metadata'.
-        data['_metadata'] = data.pop('registry_metadata')
+        del data['registry_metadata']
 
         for field in instance._meta.virtual_fields:
             if not hasattr(field, 'src_model'):
@@ -56,10 +55,11 @@ class RegistryItemSerializerMixin(object):
         del data['polymorphic_ctype']
         del data['root']
         del data['display_order']
+        del data['annotations']
 
         # Include type information as registry items are polymorphic.
         # TODO: Registry items should somehow declare what should go here instad of using the class name.
         # TODO: We might use JSON-LD way of storing the type information.
-        data['_type'] = instance.__class__.__name__.replace(instance._registry.registration_point.namespace.capitalize(), '')
+        data['@type'] = instance.__class__.__name__.replace(instance._registry.registration_point.namespace.capitalize(), '')
 
         return data
