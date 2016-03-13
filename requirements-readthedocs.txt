@@ -9,7 +9,7 @@ billiard==3.3.0.22
 celery==3.1.20
 datastream==0.5.2
 defusedxml==0.4.1
-git+https://github.com/zestedesavoir/django-cors-middleware@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
+git+https://github.com/zestedesavoir/django-cors-middleware.git@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
 django-classy-tags==0.7.1
 ujson==1.35
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
@@ -51,5 +51,5 @@ ijson==2.3
 py-radix==0.9.3
 django-oauth-toolkit==0.10.0
 redis==2.10.5
-git+https://github.com/wlanslovenija/django-rest-framework@4ce5ae7e3fdaac262b6356204f9c25da6ce71d61#egg=djangorestframework-wlanslovenija
+git+https://github.com/wlanslovenija/django-rest-framework.git@4ce5ae7e3fdaac262b6356204f9c25da6ce71d61#egg=djangorestframework-wlanslovenija
 djangorestframework-gis==0.10.1
