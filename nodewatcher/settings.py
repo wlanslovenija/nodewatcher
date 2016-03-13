@@ -277,6 +277,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.authentication.public_key',
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.events.sinks.db_sink',
+    'nodewatcher.modules.frontend.api',
     'nodewatcher.modules.frontend.display',
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
@@ -620,6 +621,11 @@ MENUS = {
         {
             'name': 'Map',
             'weight': 50,
+            'visible': True,
+        },
+        {
+            'name': 'API',
+            'weight': 60,
             'visible': True,
         },
     ],

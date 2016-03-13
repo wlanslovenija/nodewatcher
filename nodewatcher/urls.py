@@ -13,7 +13,7 @@ urlpatterns = [
     urls.url(r'^registry/', urls.include('nodewatcher.core.registry.urls', namespace='registry', app_name='registry')),
 
     # API.
-    urls.url(r'^api/v2/', urls.include(api.router.urls)),
+    urls.url(r'^api/v2/', urls.include(api.router.urls, namespace='apiv2', app_name='apiv2')),
     urls.url(r'^api/', urls.include(api.v1_api.urls, namespace='api', app_name='api')),
 
     # Django admin interface.

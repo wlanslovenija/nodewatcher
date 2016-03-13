@@ -50,5 +50,5 @@ ijson==2.3
 py-radix==0.9.3
 django-oauth-toolkit==0.10.0
 redis==2.10.5
-djangorestframework==3.3.2
+git+https://github.com/wlanslovenija/django-rest-framework@85abb9f29b8c01f3adab972cefe2a172abeac72b#egg=djangorestframework-wlanslovenija
 djangorestframework-gis==0.10.1
