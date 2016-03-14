@@ -18,6 +18,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# Allowed hosts (required for production use).
+ALLOWED_HOSTS = ['nodes.wlan-si.net']
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # SECRET_KEY is in secrets.
