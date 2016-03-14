@@ -156,3 +156,10 @@ class Options(object):
         """
 
         return (self.hidden and self.is_toplevel_class()) or self.hide_requests > 0
+
+    def get_api_type(self):
+        """
+        Returns this registry item's type name that is used by the API.
+        """
+
+        return self.model_class.__name__.replace(self.registration_point.namespace.capitalize(), '')

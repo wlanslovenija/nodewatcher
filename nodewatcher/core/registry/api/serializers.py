@@ -38,6 +38,7 @@ class RegistryRootSerializerMixin(object):
                 container = namespace.setdefault(meta.registry_id, {})
                 atoms = field.src_field.split(constants.LOOKUP_SEP)
                 container = reduce(lambda a, b: a.setdefault(b, {}), atoms[:-1], container)
+                container['@type'] = meta.get_api_type()
 
                 if isinstance(value, models.Manager):
                     container[atoms[-1]] = value.all()
@@ -66,8 +67,7 @@ class RegistryItemSerializerMixin(object):
         del data['annotations']
 
         # Include type information as registry items are polymorphic.
-        # TODO: Registry items should somehow declare what should go here instad of using the class name.
         # TODO: We might use JSON-LD way of storing the type information.
-        data['@type'] = instance.__class__.__name__.replace(instance._registry.registration_point.namespace.capitalize(), '')
+        data['@type'] = instance._registry.get_api_type()
 
         return data
