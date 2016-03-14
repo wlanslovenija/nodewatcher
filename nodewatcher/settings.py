@@ -666,7 +666,7 @@ REGISTRY_SIMPLE_MODE = {
 
 # REST framework.
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 50,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_RENDERER_CLASSES': (
         #'rest_framework.renderers.JSONRenderer',
