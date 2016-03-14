@@ -681,7 +681,7 @@ REST_FRAMEWORK = {
 }
 
 # Allowed hosts (required for production use)
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 # Currently only v2 API needs this. Tastypie API provides headers by itself.
