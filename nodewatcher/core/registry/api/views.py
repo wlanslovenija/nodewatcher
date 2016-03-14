@@ -52,7 +52,8 @@ def apply_registry_filter(path, value, queryset):
         if atoms:
             registry_id = atoms.pop(0)
             registry_id = registry_id.replace('.', '_')
-            condition = '%s__%s' % (registry_id, constants.LOOKUP_SEP.join(atoms))
+            condition_path = constants.LOOKUP_SEP.join(atoms).replace('.', constants.LOOKUP_SEP)
+            condition = '%s%s%s' % (registry_id, constants.LOOKUP_SEP, condition_path)
             queryset = queryset.registry_filter(**{condition: value})
 
     return queryset
@@ -93,7 +94,7 @@ def apply_registry_field(field_specifier, queryset):
                 # Check if the model has any Geometry fields and perform GeoJSON annotations.
                 for dst_field in field.src_model._meta.get_fields():
                     if isinstance(dst_field, geo_models.GeometryField):
-                        field_path = '%s__%s' % (queryset.registry_expand_proxy_field(field_name), dst_field.name)
+                        field_path = '%s%s%s' % (queryset.registry_expand_proxy_field(field_name), constants.LOOKUP_SEP, dst_field.name)
                         annotation_name = '%s_annotations_%s' % (field_name, field_path)
                         queryset = queryset.annotate(**{annotation_name: geo_functions.AsGeoJSON(field_path)})
 
