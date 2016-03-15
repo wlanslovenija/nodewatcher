@@ -129,6 +129,24 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
         }
     }
 
+
+class TPLinkWR1043NDv3(TPLinkWR1043NDv2):
+    """
+    TP-Link WR1043NDv3 device descriptor.
+    """
+
+    identifier = 'tp-wr1043ndv3'
+    name = "WR1043ND (v3)"
+    profiles = {
+        'openwrt': {
+            'name': 'TLWR1043',
+            'files': [
+                'openwrt-ar71xx-generic-tl-wr1043nd-v3-squashfs-factory.bin'
+            ]
+        }
+    }
+
 # Register the TP-Link WR1043ND device
 cgm_base.register_device('openwrt', TPLinkWR1043NDv1)
 cgm_base.register_device('openwrt', TPLinkWR1043NDv2)
+cgm_base.register_device('openwrt', TPLinkWR1043NDv3)
