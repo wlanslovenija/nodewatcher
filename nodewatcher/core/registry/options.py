@@ -157,9 +157,25 @@ class Options(object):
 
         return (self.hidden and self.is_toplevel_class()) or self.hide_requests > 0
 
+    def get_api_id(self, value):
+        """
+        Returns this registry item's unique identifier that is used by the API.
+
+        :param value: Value of the instance's primary key
+        """
+
+        return '%s/%s/%s' % (
+            self.registration_point.namespace,
+            self.registry_id,
+            value
+        )
+
     def get_api_type(self):
         """
         Returns this registry item's type name that is used by the API.
         """
 
-        return self.model_class.__name__.replace(self.registration_point.namespace.capitalize(), '')
+        return '%s/%s' % (
+            self.registration_point.namespace,
+            self.model_class.__name__.replace(self.registration_point.namespace.capitalize(), ''),
+        )
