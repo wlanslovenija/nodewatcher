@@ -123,7 +123,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
     def set_defaults(self, state, create):
         # Get device descriptor.
         general_config = state.lookup_item(cgm_models.CgmGeneralConfig)
-        if not general_config or not general_config.router:
+        if not general_config or not hasattr(general_config, 'router') or not general_config.router:
             # Return if no device is selected.
             return
 
