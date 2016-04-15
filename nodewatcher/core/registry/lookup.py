@@ -1,5 +1,6 @@
 import copy
 import inspect
+import re
 
 from django.contrib.gis.db import models as gis_models
 from django import db as django_db
@@ -8,6 +9,8 @@ from django.db import models as django_models
 from django.db.models import constants
 from django.db.models.sql import query
 from django.utils import tree
+
+from . import expression
 
 
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
@@ -267,7 +270,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             model._registry_attrs.append(select_name)
             return select_name
 
+        parser = expression.LookupExpressionParser()
         for field_name, dst in kwargs.iteritems():
+            info = None
             dst_queryset = None
             dst_field = None
             dst_related = None
@@ -287,25 +292,23 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if not self._regpoint.is_item(dst_model):
                     raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
             else:
-                if '#' in dst:
-                    try:
-                        dst_registry_id, dst_field = dst.split('#')
-                    except ValueError:
-                        raise ValueError("Expecting 'registry.id#field' specifier instead of '%s'!" % dst)
+                info = parser.parse(dst)
 
-                    # Dots in field specify relation traversal
-                    if '.' in dst_field:
-                        # TODO: Support arbitrary chain of relations
-                        dst_field, dst_related = dst_field.split('.')
-                    else:
-                        dst_related = None
-
-                    # Discover which model provides the destination field
-                    dst_model, dst_field = self._regpoint.get_model_with_field(dst_registry_id, dst_field)
+                dst_registry_id = info.registry_id
+                if info.field:
+                    # Discover, which model provides the destination field.
+                    dst_model, dst_field = self._regpoint.get_model_with_field(info.registry_id, info.field[0])
                     m2m = dst_field.many_to_many
+
+                    # TODO: Support arbitrary chains of relations.
+                    if len(info.field) > 1:
+                        dst_related = info.field[1]
                 else:
-                    dst_registry_id = dst
-                    dst_model = self._regpoint.get_top_level_class(dst_registry_id)
+                    dst_model = self._regpoint.get_top_level_class(info.registry_id)
+
+                # If there are constraints, we need to specify a queryset and apply the constraints.
+                if info.constraints:
+                    dst_queryset = info.apply_constraints(dst_model.objects.all())
 
             if m2m:
                 raise ValueError("Many-to-many fields not supported in registry_fields query!")

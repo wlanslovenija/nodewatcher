@@ -1,0 +1,27 @@
+lookup = registry_id:fields [constraints:constraint_specifier] [field:field_specifier] $ ;
+
+field_specifier = '#' @:fields ;
+
+fields = ( FIELD_SEPARATOR ).{ FIELD } ;
+
+FIELD = /[A-Za-z0-9_]+/ ;
+
+FIELD_SEPARATOR = '.' ;
+
+constraint_specifier = '[' @:constraints ']' ;
+
+constraints = ( CONSTRAINT_SEPARATOR ).{ constraint } ;
+
+constraint = field:fields operator:operator value:CONSTANT ;
+
+operator = '=' ;
+
+CONSTRAINT_SEPARATOR = ',' ;
+
+CONSTANT = INTEGER | STRING ;
+
+INTEGER = /[0-9]+/ ;
+
+STRING = '"' @:{/[^"\n\\]/ | ESC} '"' ;
+
+ESC = ?/\\["\\]/? ;

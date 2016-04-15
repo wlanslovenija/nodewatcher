@@ -57,7 +57,7 @@ class RegistryTestCase(django_test.TransactionTestCase):
             self.assertEquals(simple.annotations, {'annotation': 'bar'})
 
             item = thing.second.foo.multiple(create=models.FirstSubRegistryItem)
-            item.foo = 3
+            item.foo = 4
             item.bar = 88
             item.save()
 
@@ -146,6 +146,17 @@ class RegistryTestCase(django_test.TransactionTestCase):
         # Test that passing Q objects work.
         qs = qs.filter(query.Q(id=2))
         self.assertEqual(len(qs), 0)
+
+        # Test constraints.
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=2]')
+        self.assertEqual(len(qs), 100)
+        for item in qs:
+            self.assertEqual(len(item.f1.all()), 0)
+
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=4]')
+        self.assertEqual(len(qs), 100)
+        for item in qs:
+            self.assertEqual(len(item.f1.all()), 1)
 
         # Test filter exceptions
         with self.assertRaises(django_exceptions.FieldError):

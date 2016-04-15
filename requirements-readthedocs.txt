@@ -54,3 +54,4 @@ redis==2.10.5
 git+https://github.com/wlanslovenija/django-rest-framework.git@4ce5ae7e3fdaac262b6356204f9c25da6ce71d61#egg=djangorestframework-wlanslovenija
 git+https://github.com/wlanslovenija/django-rest-framework-gis.git@d6e9678c1bc109fd9db886aacd5d0925147c61d5#egg=djangorestframework_gis-wlanslovenija
 git+https://github.com/wlanslovenija/drf-ujson-renderer.git@96cee399260daf469b7e4b004fa245edf9dd253c#egg=drf_ujson-wlanslovenija
+grako==3.8.1
