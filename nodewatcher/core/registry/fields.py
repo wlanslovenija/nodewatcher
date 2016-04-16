@@ -5,7 +5,7 @@ from django import db as django_db
 from django.contrib.postgres import fields as postgres_fields
 from django.core import exceptions
 from django.db import models
-from django.db.models import constants
+from django.db.models import constants, query as django_query
 from django.db.models.fields import related as related_fields
 from django.forms import fields as widgets
 from django.utils import text, functional
@@ -605,6 +605,11 @@ class RegistryProxyMultipleDescriptor(object):
         chain = constants.LOOKUP_SEP.join(self.chain)
         cache_name = self.cache_name
 
+        class RelatedSubfieldIterable(django_query.ModelIterable):
+            def __iter__(self):
+                for row in super(RelatedSubfieldIterable, self).__iter__():
+                    yield getattr(row, rel_subfield)
+
         class RelatedManager(superclass):
             def __init__(self, instance):
                 super(RelatedManager, self).__init__()
@@ -619,13 +624,27 @@ class RegistryProxyMultipleDescriptor(object):
                 if rel_queryset is not None:
                     # If a queryset is available, use it instead of the default queryset as it may have
                     # some additional constraints applied.
-                    return rel_queryset.all()
+                    queryset = rel_queryset.all()
                 else:
-                    return super(RelatedManager, self).get_queryset()
+                    queryset = super(RelatedManager, self).get_queryset()
+
+                if rel_subfield is not None:
+                    # If the target subfield is known, then we skip polymorphic queries (as the proper model,
+                    # which has the target subfield has already been selected) and we only select a subset
+                    # of columns, as others will not be needed.
+                    queryset = queryset.non_polymorphic().only(rel_field.name, rel_subfield)
+
+                return queryset
 
             def get_queryset(self):
                 try:
                     qs = self.instance._prefetched_objects_cache[cache_name]
+
+                    if rel_subfield is not None and not getattr(qs, '_result_cache_fixed', False):
+                        # Fix the result cache as it is otherwise impossible to change the transformation
+                        # applied by the QuerySet iterator.
+                        qs._result_cache = map(lambda instance: getattr(instance, rel_subfield), qs._result_cache)
+                        qs._result_cache_fixed = True
                 except (AttributeError, KeyError):
                     db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
                     empty_strings_as_null = django_db.connections[db].features.interprets_empty_strings_as_nulls
@@ -642,8 +661,8 @@ class RegistryProxyMultipleDescriptor(object):
                             return qs.none()
                     qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
 
-                if rel_subfield is not None:
-                    return qs.values_list(rel_subfield, flat=True)
+                    if rel_subfield is not None:
+                        qs._iterable_class = RelatedSubfieldIterable
 
                 return qs
 
