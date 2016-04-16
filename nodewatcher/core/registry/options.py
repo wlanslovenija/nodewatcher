@@ -38,6 +38,7 @@ class Options(object):
         self.item_children = collections.OrderedDict()
         self.item_parent = None
         self.item_parent_field = None
+        self.sensitive_fields = getattr(meta, 'sensitive_fields', [])
 
         # Create a default serializer.
         class meta_cls:

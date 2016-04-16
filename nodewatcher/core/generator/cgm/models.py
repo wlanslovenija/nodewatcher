@@ -102,6 +102,7 @@ class PasswordAuthenticationConfig(AuthenticationConfig):
 
     class RegistryMeta(AuthenticationConfig.RegistryMeta):
         registry_name = _("Password")
+        sensitive_fields = ['password']
 
 registration.point('node.config').register_item(PasswordAuthenticationConfig)
 
@@ -355,6 +356,7 @@ class MobileInterfaceConfig(InterfaceConfig):
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Mobile Interface")
+        sensitive_fields = ['pin', 'username', 'password']
 
     def __unicode__(self):
         if not self.device:

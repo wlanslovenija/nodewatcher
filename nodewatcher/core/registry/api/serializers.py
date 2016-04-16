@@ -46,6 +46,8 @@ class RegistryRootSerializerMixin(object):
             namespace = data.setdefault(meta.registration_point.namespace, {})
             if field.src_field:
                 atoms = field.src_field.split(constants.LOOKUP_SEP)
+                if atoms[0] in meta.sensitive_fields:
+                    continue
 
                 if isinstance(value, models.Manager):
                     base_container = namespace.setdefault(meta.registry_id, [])
@@ -91,6 +93,10 @@ class RegistryItemSerializerMixin(object):
         del data['root']
         del data['display_order']
         del data['annotations']
+
+        # Remove all sensitive fields.
+        for field_name in instance._registry.sensitive_fields:
+            del data[field_name]
 
         # Add JSON-LD annotations.
         annotate_instance(instance._registry, data, self)
