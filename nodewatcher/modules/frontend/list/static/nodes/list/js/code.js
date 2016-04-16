@@ -1,12 +1,12 @@
 (function ($) {
     function renderTimeAgo(data, type, row, meta) {
-        if (type !== 'display') 
+        if (type !== 'display')
             return data;
 
         var t = moment(data);
         if (!t.isValid())
             return "<em>never</em>";
-        
+
         // TODO: custom date formats, refresing?
         var output = $('<span/>').attr('title', t.format($.nodewatcher.theme.dateFormat)).addClass('time').append(t.fromNow());
 
@@ -37,34 +37,45 @@
 
     $(document).ready(function () {
         $('.node-list').each(function (i, table) {
-            $.tastypie.newDataTable(table, $(table).data('source'), {
-                'columns': [
-                    {'data': 'type', 'width': 0, 'render': $.nodewatcher.renderNodeType(table)},
-                    {'data': 'name', 'render': $.tastypie.nodeNameRender(table)},
-                    {'data': 'router_id[].router_id', 'orderByField': 'router_id__router_id'},
-                    {'data': 'last_seen', 'render': renderTimeAgo},
-                    {'data': 'status.network', 'render': $.nodewatcher.renderStatus(table, 'Network'), 'class': 'center', 'width': '20px'},
-                    {'data': 'status.monitored', 'render': $.nodewatcher.renderStatus(table, 'Monitored'), 'class': 'center', 'width': '20px'},
-                    {'data': 'status.health', 'render': $.nodewatcher.renderStatus(table, 'Health'), 'class': 'center', 'width': '20px'},
-                    {'data': 'routing_topology.', 'render': renderRoutingTopology, 'orderByField': 'routing_topology__link_count'},
-                    {'data': 'project'},
-                    // So that user can search by UUID
-                    {'data': 'uuid', 'visible': false}
+            $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
+                registryFields: {
+                    'config': [
+                        ['core.general', 'name'],
+                        ['core.type', 'type'],
+                        ['core.routerid', 'router_id'],
+                        ['core.project', 'project.name']
+                    ],
+                    'monitoring': [
+                        'core.general',
+                        'core.status',
+                        'network.routing.topology'
+                    ]
+                },
+                registrySearchField: ['config', 'core.general', 'name__icontains'],
+                columns: [
+                    {data: 'config.core__type.type', width: 0, render: $.nodewatcher.renderNodeType(table)},
+                    {data: 'config.core__general.name', render: $.nodewatcher.api.nodeNameRender(table)},
+                    {data: 'config.core__routerid[].router_id'},
+                    {data: 'monitoring.core__general.last_seen', render: renderTimeAgo},
+                    {data: 'monitoring.core__status.network', render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
+                    {data: 'monitoring.core__status.monitored', render: $.nodewatcher.renderStatus(table, 'Monitored'), class: 'center', width: '20px'},
+                    {data: 'monitoring.core__status.health', render: $.nodewatcher.renderStatus(table, 'Health'), class: 'center', width: '20px'},
+                    {data: 'monitoring.network__routing__topology[].', render: renderRoutingTopology},
+                    {data: 'config.core__project.project.name'},
+                    // So that user can search by UUID.
+                    {data: 'uuid', 'visible': false}
                 ],
-                // Grouping, we fix sorting by (hidden) type column
-                //'orderFixed': [],
-                // And make default sorting by name column
-                'order': [[0, 'asc'],[1, 'asc']],
-                //'drawCallback': $.tastypie.groupDrawCallback(table),
-                'language': {
+                // And make default sorting by type and name columns.
+                order: [[0, 'asc'],[1, 'asc']],
+                language: {
                     // TODO: Make strings translatable
-                    'zeroRecords': "No matching nodes found.",
-                    'emptyTable ': "There are currently no nodes recorded/connected.",
-                    'info': "_START_ to _END_ of _TOTAL_ nodes shown",
-                    'infoEmpty': "0 nodes shown",
-                    'infoFiltered': "(from _MAX_ all nodes)",
-                    'infoPostFix': "",
-                    'search': "Filter:"
+                    zeroRecords: "No matching nodes found.",
+                    emptyTable : "There are currently no nodes recorded/connected.",
+                    info: "_START_ to _END_ of _TOTAL_ nodes shown",
+                    infoEmpty: "0 nodes shown",
+                    infoFiltered: "(from _MAX_ all nodes)",
+                    infoPostFix: "",
+                    search: "Filter:"
                 }
             });
         });

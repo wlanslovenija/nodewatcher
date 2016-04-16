@@ -10,7 +10,8 @@
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.moment.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
-    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "api/js/base.js" %}
+    {% add_data "js_data" "api/js/registry.js" %}
     {% add_data "js_data" "list/js/types.js" %}
     {% add_data "js_data" "list/js/status.js" %}
     {% add_data "js_data" "nodes/list/js/code.js" %}
@@ -20,7 +21,7 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% url "api:api_dispatch_list" "v1" "node" as api_url %}
+    {% url "apiv2:node-list" as api_url %}
     {% with api_url as url %}
     {% include "formats.html" %}
     {% endwith %}
@@ -29,7 +30,7 @@
 {% block content %}
     {% include "status/definitions.html" %}
     {% include "types/definitions.html" %}
-    <table class="table table-striped node-list {% block node_list_classes %}{% endblock node_list_classes %}" data-source="{% block node_list_data_source %}{% url "api:api_dispatch_list" "v1" "node" %}{% endblock node_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
+    <table class="table table-striped node-list {% block node_list_classes %}{% endblock node_list_classes %}" data-source="{% block node_list_data_source %}{% url "apiv2:node-list" %}{% endblock node_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
         <thead>
             <tr>
                 <th title="{% trans "The type of the node." %}"></th>

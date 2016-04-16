@@ -1,8 +1,10 @@
 from django.db.models import constants
+from django.contrib.auth import models as auth_models
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.db.models import functions as geo_functions
 
 from rest_framework import viewsets
+from guardian import shortcuts
 
 FIELD_SEPARATOR = '|'
 
@@ -23,7 +25,7 @@ class RegistryRootViewSetMixin(object):
 
         # Apply filters.
         for argument, value in self.request.query_params.items():
-            if argument in ('fields', 'limit', 'offset'):
+            if argument in ('fields', 'limit', 'offset', 'ordering'):
                 continue
 
             try:
@@ -31,6 +33,20 @@ class RegistryRootViewSetMixin(object):
             except ValueError:
                 # Ignore invalid filters as they may be some other query arguments.
                 pass
+
+        # Apply ordering.
+        ordering = self.request.query_params.get('ordering', None)
+        if ordering:
+            queryset = queryset.order_by(*ordering.split(','))
+
+        # Apply permission-based maintainer filter.
+        maintainer = self.request.query_params.get('maintainer', None)
+        if maintainer:
+            try:
+                maintainer_user = auth_models.User.objects.get(username=maintainer)
+                queryset = shortcuts.get_objects_for_user(maintainer_user, [], queryset, with_superuser=False, accept_global_perms=False)
+            except auth_models.User.DoesNotExist:
+                queryset = queryset.none()
 
         return queryset
 
