@@ -28,7 +28,7 @@
                 'serverSide': true,
                 'ajax': {
                     'url': ajaxUrl,
-                    'data': $.nodewatcher.api.ajaxData(table),
+                    'data': $.nodewatcher.api._createDataTablesApiRequest(table),
                     'dataSrc': 'results',
                     'cache': true,
                     'traditional': true
@@ -40,65 +40,17 @@
                     'regex': true,
                     'smart': false
                 }
-            }, options)).on('xhr.dt', $.nodewatcher.api.xhrCallback(table));
+            }, options)).on('xhr.dt', $.nodewatcher.api._processDataTablesApiResponse(table));
             var api = $table.api();
             // TODO: Link processing pop-up position to be linked with header's position.
             var fixedHeader = new $.fn.dataTable.FixedHeader(api);
             return $table;
         },
 
-        // Uses top-level object's uuid for a link.
-        nodeNameRender: function (table) {
-            return function (data, type, row, meta) {
-                if (type === 'display') {
-                    return $('<a/>').attr(
-                        'href', $(table).data('node-url-template').replace('{pk}', row.uuid)
-                    // TODO: Make "unknown" string translatable
-                    // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-                    ).text(data || "unknown").wrap('<span/>').parent().html();
-                } else {
-                    // TODO: Make "unknown" string translatable
-                    return data || "unknown";
-                }
-            };
-        },
-
-        // Uses subdocument uuid for a link (or links). If nodeField is specified, it will use that row
-        // field instead of current data.
-        nodeSubdocumentName: function (table, nodeField, routerId) {
-            return function (data, type, row, meta) {
-                if (nodeField) {
-                    data = row[nodeField];
-                }
-                if (!$.isArray(data)) {
-                    data = [data];
-                }
-                if (type === 'display') {
-                    return $.map(data, function (node, i) {
-                        var name = $('<a/>').attr(
-                            'href', $(table).data('node-url-template').replace('{pk}', node.uuid)
-                        // TODO: Make "unknown" string translatable
-                        // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML)
-                        ).text(node.name || "unknown").wrap('<span/>').parent().html();
-                        if (routerId && node.router_id) {
-                            var router_ids = $.map(node.router_id, function (item) { return item.router_id; });
-                            if (router_ids.length > 0) {
-                                name += ' <span class="small">(' + router_ids.join(', ') + ')</a>';
-                            }
-                        }
-                        return name;
-                    }).join(", ");
-                } else {
-                    return $.map(data, function (node, i) {
-                        // TODO: Make "unknown" string translatable
-                        return node.name || "unknown";
-                    }).join(" ");
-                }
-            };
-        },
-
-        // Converts dataTables server-side parameters to Tastypie parameters
-        ajaxData: function (table) {
+        /**
+         * Converts dataTables server-side parameters to API parameters.
+         */
+        _createDataTablesApiRequest: function (table) {
             return function (data, settings) {
                 var params = {};
 
@@ -124,8 +76,11 @@
             };
         },
 
-        // Processes data returned from the server before dataTables processes it
-        xhrCallback: function (table) {
+        /**
+         * Processes API response from the server and transforms it for
+         * consumption by DataTables.
+         */
+        _processDataTablesApiResponse: function (table) {
             return function (event, settings, data, jqXHR, context) {
                 if (data) {
                     data.recordsTotal = data.count;
@@ -133,28 +88,6 @@
                 }
 
                 data = $.nodewatcher.api.transformApiResponse(data);
-            };
-        },
-
-        // Groups rows based on the first column (you have to use 'orderFixed': [[0, 'asc']]
-        // to fix ordering primarily to the first column). Based on
-        // https://datatables.net/examples/advanced_init/row_grouping.html
-        groupDrawCallback: function (table) {
-            return function (settings) {
-                var api = this.api();
-                var rows = api.rows({page: 'current'}).nodes();
-                var $rows = $(rows);
-                var lastGroup = null;
-                var colspan = $rows.eq(0).find('td').length;
-
-                api.column(0, {page: 'current'}).data().each(function (group, i) {
-                    if (lastGroup !== group) {
-                        $('<tr />').addClass('group').append(
-                            $('<td />').attr('colspan', colspan).html(group)
-                        ).insertBefore($rows.eq(i));
-                        lastGroup = group;
-                    }
-                });
             };
         },
 
@@ -213,6 +146,60 @@
          */
         registerModule: function (module) {
             apiModules.push(module);
-        }
+        },
+
+        /**
+         * Uses top-level object's uuid for a link.
+         */
+        renderNodeName: function (table) {
+            return function (data, type, row, meta) {
+                if (type === 'display') {
+                    return $('<a/>').attr(
+                        'href', $(table).data('node-url-template').replace('{pk}', row.uuid)
+                    // TODO: Make "unknown" string translatable.
+                    // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML).
+                    ).text(data || "unknown").wrap('<span/>').parent().html();
+                } else {
+                    // TODO: Make "unknown" string translatable.
+                    return data || "unknown";
+                }
+            };
+        },
+
+        /**
+         * Uses subdocument uuid for a link (or links). If nodeField is specified, it
+         * will use that row field instead of current data.
+         */
+        renderNodeNameSubdocument: function (table, nodeField, routerId) {
+            return function (data, type, row, meta) {
+                if (nodeField) {
+                    data = row[nodeField];
+                }
+                if (!$.isArray(data)) {
+                    data = [data];
+                }
+                if (type === 'display') {
+                    return $.map(data, function (node, i) {
+                        var name = $('<a/>').attr(
+                            'href', $(table).data('node-url-template').replace('{pk}', node.uuid)
+                        // TODO: Make "unknown" string translatable.
+                        // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML).
+                        ).text(node.name || "unknown").wrap('<span/>').parent().html();
+                        if (routerId && node.router_id) {
+                            var router_ids = $.map(node.router_id, function (item) { return item.router_id; });
+                            if (router_ids.length > 0) {
+                                name += ' <span class="small">(' + router_ids.join(', ') + ')</a>';
+                            }
+                        }
+                        return name;
+                    }).join(", ");
+                } else {
+                    return $.map(data, function (node, i) {
+                        // TODO: Make "unknown" string translatable.
+                        return node.name || "unknown";
+                    }).join(" ");
+                }
+            };
+        },
     });
 })(jQuery);

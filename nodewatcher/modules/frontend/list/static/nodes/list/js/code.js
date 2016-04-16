@@ -54,7 +54,7 @@
                 registrySearchField: ['config', 'core.general', 'name__icontains'],
                 columns: [
                     {data: 'config.core__type.type', width: 0, render: $.nodewatcher.renderNodeType(table)},
-                    {data: 'config.core__general.name', render: $.nodewatcher.api.nodeNameRender(table)},
+                    {data: 'config.core__general.name', render: $.nodewatcher.api.renderNodeName(table)},
                     {data: 'config.core__routerid[].router_id'},
                     {data: 'monitoring.core__general.last_seen', render: renderTimeAgo},
                     {data: 'monitoring.core__status.network', render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
