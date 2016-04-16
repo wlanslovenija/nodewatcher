@@ -43,7 +43,7 @@
                         ['core.general', 'name'],
                         ['core.type', 'type'],
                         ['core.routerid', 'router_id'],
-                        ['core.project', 'project.name']
+                        ['core.project', 'project__name']
                     ],
                     'monitoring': [
                         'core.general',
@@ -51,7 +51,7 @@
                         'network.routing.topology'
                     ]
                 },
-                registrySearchField: ['config', 'core.general', 'name__icontains'],
+                registrySearchField: 'config:core.general__name__icontains',
                 columns: [
                     {data: 'config.core__type.type', width: 0, render: $.nodewatcher.renderNodeType(table)},
                     {data: 'config.core__general.name', render: $.nodewatcher.api.renderNodeName(table)},

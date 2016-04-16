@@ -16,17 +16,17 @@ class NodeResource(api.BaseResource):
     class Meta:
         # TODO: Temporary, create a way to register fields into an API
         queryset = core_models.Node.objects.regpoint('config').registry_fields(
-            name='core.general#name',
-            type='core.type#type',
+            name='core.general__name',
+            type='core.type__type',
             router_id='core.routerid',
-            project='core.project#project.name',
+            project='core.project__project__name',
             location=location_models.LocationConfig.geo_objects.geojson(
                 # Request GeoJSON versions of the location.
                 field_name='geolocation',
                 model_att='geolocation_geojson',
             ),
         ).regpoint('monitoring').registry_fields(
-            last_seen='core.general#last_seen',
+            last_seen='core.general__last_seen',
             status=status_models.StatusMonitor,
             routing_topology='network.routing.topology',
             # TODO: Add current clients count?

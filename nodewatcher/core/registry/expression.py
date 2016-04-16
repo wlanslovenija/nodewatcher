@@ -12,23 +12,46 @@ class LookupExpression(object):
     Describes a registry lookup expression.
     """
 
+    registration_point = None
     registry_id = None
     constraints = None
     field = None
 
-    def __init__(self, ast):
-        self.registry_id = '.'.join(ast.registry_id)
-        self.field = ast.field
-        self.constraints = ast.constraints
+    def __init__(self, registration_point=None, registry_id=None, field=None, constraints=None):
+        self.registration_point = registration_point
+        self.registry_id = registry_id
+        self.field = field
+        self.constraints = constraints
 
     def apply_constraints(self, queryset):
+        """
+        Applies all constraints contained in the lookup expression.
+
+        :param queryset: Queryset to apply the constraints to
+        :return: Queryset with all constraints applied
+        """
+
         for constraint in self.constraints:
             queryset = constraint.apply(queryset)
 
         return queryset
 
+    @property
+    def name(self):
+        """
+        Returns an identifier suitable for representing this lookup expression
+        in an attribute.
+        """
+
+        return '%s%s%s' % (
+            self.registration_point.replace('.', '_') if self.registration_point else '',
+            self.registry_id.replace('.', '_') if self.registry_id else '',
+            '_'.join(self.field or []),
+        )
+
     def __repr__(self):
-        return '<LookupExpression registry_id=\'%s\' constraints=\'%s\' field=\'%s\'>' % (
+        return '<LookupExpression registration_point=\'%s\' registry_id=\'%s\' constraints=\'%s\' field=\'%s\'>' % (
+            self.registration_point,
             self.registry_id,
             self.constraints,
             '.'.join(self.field) if self.field else ''
@@ -74,4 +97,10 @@ class LookupExpressionParser(object):
         except exceptions.FailedParse:
             raise ValueError('Invalid registry lookup expression: %s' % expression)
 
-        return LookupExpression(ast)
+        # Construct a lookup expression from the AST.
+        return LookupExpression(
+            registration_point=ast.registration_point,
+            registry_id='.'.join(ast.registry_id),
+            field=ast.field,
+            constraints=ast.constraints,
+        )

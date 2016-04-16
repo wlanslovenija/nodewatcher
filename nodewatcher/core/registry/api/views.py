@@ -6,7 +6,7 @@ from django.contrib.gis.db.models import functions as geo_functions
 from rest_framework import viewsets
 from guardian import shortcuts
 
-FIELD_SEPARATOR = '|'
+from .. import expression
 
 
 class RegistryRootViewSetMixin(object):
@@ -61,20 +61,12 @@ def apply_registry_filter(path, value, queryset):
     :return: An updated queryset
     """
 
-    atoms = path.split(FIELD_SEPARATOR)
+    parser = expression.LookupExpressionParser()
+    info = parser.parse(path)
 
-    # Parse registry point.
-    if atoms:
-        registry_point = atoms.pop(0)
-        queryset = queryset.regpoint(registry_point)
-
-        # Parse registry item identifier.
-        if atoms:
-            registry_id = atoms.pop(0)
-            registry_id = registry_id.replace('.', '_')
-            condition_path = constants.LOOKUP_SEP.join(atoms).replace('.', constants.LOOKUP_SEP)
-            condition = '%s%s%s' % (registry_id, constants.LOOKUP_SEP, condition_path)
-            queryset = queryset.registry_filter(**{condition: value})
+    queryset = queryset.regpoint(info.registration_point)
+    condition = '%s%s%s' % (info.registry_id.replace('.', '_'), constants.LOOKUP_SEP, constants.LOOKUP_SEP.join(info.field or []))
+    queryset = queryset.registry_filter(**{condition: value})
 
     return queryset
 
@@ -88,38 +80,24 @@ def apply_registry_field(field_specifier, queryset):
     :return: An updated queryset
     """
 
-    atoms = field_specifier.split(FIELD_SEPARATOR)
-    field_name = None
+    parser = expression.LookupExpressionParser()
+    info = parser.parse(field_specifier)
+    field_name = info.name
 
-    # Parse registry point.
-    if atoms:
-        registry_point = atoms.pop(0)
-        queryset = queryset.regpoint(registry_point)
+    queryset = queryset.regpoint(info.registration_point).registry_fields(**{field_name: info})
+    for field in queryset.model._meta.virtual_fields:
+        if field.name != field_name:
+            continue
 
-        # Parse registry item identifier.
-        if atoms:
-            registry_id = atoms.pop(0)
+        # Check if the model has any Geometry fields and perform GeoJSON annotations.
+        for dst_field in field.src_model._meta.get_fields():
+            if isinstance(dst_field, geo_models.GeometryField):
+                field_path = '%s%s%s' % (queryset.registry_expand_proxy_field(field_name), constants.LOOKUP_SEP, dst_field.name)
+                annotation_name = '%s_annotations_%s' % (field_name, field_path)
+                queryset = queryset.annotate(**{annotation_name: geo_functions.AsGeoJSON(field_path)})
 
-            # Parse optional field path specifier.
-            field_path = ''
-            if atoms:
-                field_path = atoms.pop(0)
-
-            field_name = '%s%s%s' % (registry_point, registry_id.replace('.', '_'), field_path.replace('.', '_'))
-            queryset = queryset.registry_fields(**{field_name: '%s%s' % (registry_id, ('#%s' % field_path) if field_path else '')})
-            for field in queryset.model._meta.virtual_fields:
-                if field.name != field_name:
-                    continue
-
-                # Check if the model has any Geometry fields and perform GeoJSON annotations.
-                for dst_field in field.src_model._meta.get_fields():
-                    if isinstance(dst_field, geo_models.GeometryField):
-                        field_path = '%s%s%s' % (queryset.registry_expand_proxy_field(field_name), constants.LOOKUP_SEP, dst_field.name)
-                        annotation_name = '%s_annotations_%s' % (field_name, field_path)
-                        queryset = queryset.annotate(**{annotation_name: geo_functions.AsGeoJSON(field_path)})
-
-                        container = getattr(field, '_registry_annotations', {})
-                        container['%s_geojson' % dst_field.name] = annotation_name
-                        field._registry_annotations = container
+                container = getattr(field, '_registry_annotations', {})
+                container['%s_geojson' % dst_field.name] = annotation_name
+                field._registry_annotations = container
 
     return field_name, queryset

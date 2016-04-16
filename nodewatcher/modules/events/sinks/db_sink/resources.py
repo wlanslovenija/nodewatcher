@@ -28,7 +28,7 @@ class RelatedNodes(str):
     def __call__(self, bundle):
         # Add name to related nodes
         return bundle.obj.related_nodes.regpoint('config').registry_fields(
-            name='core.general#name',
+            name='core.general__name',
         )
 
 

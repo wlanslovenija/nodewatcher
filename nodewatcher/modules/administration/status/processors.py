@@ -71,10 +71,10 @@ class PushNodeStatus(monitor_processors.NetworkProcessor):
 
         # Get all push nodes which should be down.
         down_nodes = core_models.Node.objects.regpoint('config').registry_fields(
-            source='core.telemetry.http#source'
+            source='core.telemetry.http__source'
         ).regpoint('monitoring').registry_fields(
-            last_seen='core.general#last_seen',
-            network_status='core.status#network',
+            last_seen='core.general__last_seen',
+            network_status='core.status__network',
         ).filter(
             source='push',
             last_seen__lt=timezone.now() - datetime.timedelta(minutes=30),

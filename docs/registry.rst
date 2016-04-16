@@ -41,12 +41,12 @@ Registration points extend the object manager of the class their are attached to
 Since instances of ``Node`` themselves don't have any fields besides the UUID you have to join them with registry models in order to obtain the required data. In order to make this easier, a ``registry_fields`` method is provided on the query set::
 
     Node.objects.regpoint('config').registry_fields(
-        name='core.general#name',
-        type='core.type#type',
-        router_id='core.routerid#router_id',
-        project='core.project#project.name',
+        name='core.general__name',
+        type='core.type__type',
+        router_id='core.routerid__router_id',
+        project='core.project__project__name',
     ).regpoint('monitoring').registry_fields(
-        last_seen='core.general#last_seen',
+        last_seen='core.general__last_seen',
     )
 
 The resulting ``Node`` (actually the results will be instances of a special proxy class called ``NodeRegistryProxy``, because we cannot modify fields in the existing model class) instances will have additional fields called ``name``, ``type``, ``router_id``, ``project`` and ``last_seen`` that will have the values of their respective registry models. Values for these fields will be obtained by performing joins with tables of the registry item models that provide these fields. Note that multiple models may be registered under the same registry identifier (for example ``core.general`` in the above case actually has ``GeneralConfig`` and ``CgmGeneralConfig`` registered). In such cases all models will be traversed and the one providing field ``name`` will be selected for joining (again, in the above case this would correspond to ``GeneralConfig``).

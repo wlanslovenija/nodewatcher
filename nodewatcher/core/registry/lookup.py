@@ -10,7 +10,7 @@ from django.db.models import constants
 from django.db.models.sql import query
 from django.utils import tree
 
-from . import expression
+from . import expression, exceptions
 
 
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
@@ -292,8 +292,13 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if not self._regpoint.is_item(dst_model):
                     raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
             else:
-                info = parser.parse(dst)
+                if isinstance(dst, expression.LookupExpression):
+                    # We can use an already parsed lookup expression directly.
+                    info = dst
+                else:
+                    info = parser.parse(dst)
 
+                # TODO: Support inline registration point specification.
                 dst_registry_id = info.registry_id
                 if info.field:
                     # Discover, which model provides the destination field.
@@ -389,6 +394,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         clone = self._clone()
         clone.query.clear_ordering(force_empty=False)
 
+        parser = expression.LookupExpressionParser()
         final_fields = []
         for raw_field_name in fields:
             field_name, field_order = query.get_order_dir(raw_field_name)
@@ -396,17 +402,19 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             # Support for direct specification of registry fields. In this case, the
             # field is first fetched into an internal field and then used for sorting.
-            if '#' in field_name:
-                if ':' in field_name:
+            try:
+                info = parser.parse(field_name)
+                if info.registration_point:
                     # Switch to proper registration point when requested.
-                    regpoint, field_name = field_name.split(':')
-                    clone = clone.regpoint(regpoint)
+                    clone = clone.regpoint(info.registration_point)
 
-                internal_field_name = '_order_field_%s' % field_name.replace('#', '_').replace('.', '_').replace(':', '_')
-                clone = clone.registry_fields(
-                    **{internal_field_name: field_name}
-                )
-                field_name = internal_field_name
+                if info.field:
+                    # If a field has been specified, use it to order by the field.
+                    internal_field_name = '_order_field_%s' % info.name
+                    clone = clone.registry_fields(**{internal_field_name: info})
+                    field_name = internal_field_name
+            except (ValueError, exceptions.RegistryItemNotRegistered):
+                pass
 
             field_names = clone.registry_expand_proxy_field(field_name).split(constants.LOOKUP_SEP)
             field = clone.query.setup_joins(field_names, clone.model._meta, clone.query.get_initial_alias())[0]

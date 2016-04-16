@@ -1,12 +1,16 @@
-lookup = registry_id:fields [constraints:constraint_specifier] [field:field_specifier] $ ;
+lookup = [registration_point:registration_point] registry_id:registry_id [constraints:constraint_specifier] [field:field_specifier] $ ;
 
-field_specifier = '#' @:fields ;
+registration_point = @:FIELD ':' ;
 
-fields = ( FIELD_SEPARATOR ).{ FIELD } ;
+registry_id = '.'.{ REGISTRY_ID_ATOM } ;
 
-FIELD = /[A-Za-z0-9_]+/ ;
+REGISTRY_ID_ATOM = /[a-zA-Z0-9]+/ ;
 
-FIELD_SEPARATOR = '.' ;
+field_specifier = '__' @:fields ;
+
+fields = '__'.{ FIELD } ;
+
+FIELD = /([a-zA-Z0-9]|_(?!_))+/ ;
 
 constraint_specifier = '[' @:constraints ']' ;
 

@@ -77,25 +77,25 @@ class RegistryTestCase(django_test.TransactionTestCase):
             item.save()
 
         # Test basic queries
-        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#additional'):
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__additional'):
             self.assertEquals(thing.f1, 42)
-        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#another'):
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__another'):
             self.assertEquals(thing.f1, 69)
 
         with self.assertRaises(ValueError):
-            models.Thing.objects.regpoint('first').registry_fields(f1='this.is.an.invalid.specifier###')
+            models.Thing.objects.regpoint('first').registry_fields(f1='this.is.an.invalid.specifier______')
         with self.assertRaises(exceptions.RegistryItemNotRegistered):
-            models.Thing.objects.regpoint('first').registry_fields(f1='foo.invalid#additional')
+            models.Thing.objects.regpoint('first').registry_fields(f1='foo.invalid__additional')
 
         # Test foreign key traversal
-        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name'):
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related__name'):
             self.assertEquals(thing.f1, None)
 
         related = models.RelatedModel(name='test')
         related.save()
         models.DoubleChildRegistryItem.objects.update(related=related)
 
-        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name'):
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related__name'):
             self.assertEquals(thing.f1, 'test')
 
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple'):
@@ -127,7 +127,7 @@ class RegistryTestCase(django_test.TransactionTestCase):
         self.assertEquals(len(items), 1)
 
         # Test proxy field filter
-        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name')
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related__name')
         qs = qs.filter(f1__icontains='Test')
         self.assertEqual(len(qs), 100)
 
@@ -136,7 +136,7 @@ class RegistryTestCase(django_test.TransactionTestCase):
         self.assertEqual(len(qs), 100)
 
         # Test proxy field filter with Q expressions.
-        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#related.name')
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related__name')
         qs = qs.filter(query.Q(f1__icontains='Test'))
         self.assertEqual(len(qs), 100)
 
@@ -168,12 +168,12 @@ class RegistryTestCase(django_test.TransactionTestCase):
         for item in qs:
             self.assertEqual(len(item.f1.all()), 1)
 
-        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=4]#bar')
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=4]__bar')
         self.assertEqual(len(qs), 100)
         for item in qs:
             self.assertEqual(len(item.f1.all()), 1)
 
-        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple#bar')
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple__bar')
         self.assertEqual(len(qs), 100)
         for item in qs:
             self.assertEqual(len(item.f1.all()), 2)
@@ -219,7 +219,7 @@ class RegistryTestCase(django_test.TransactionTestCase):
 
         ordered_pks = [x[1] for x in sorted(ordered_pks)]
 
-        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple#level')
+        qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__level')
 
         # Ensure that field descriptors are available
         for item in qs:
@@ -241,14 +241,14 @@ class RegistryTestCase(django_test.TransactionTestCase):
 
         # Test ordering by registry id without fetching the field explicitly
         qs = models.Thing.objects.regpoint('first')
-        ordered = [item.pk for item in qs.order_by('foo.simple#level', 'id')]
+        ordered = [item.pk for item in qs.order_by('foo.simple__level', 'id')]
         self.assertEqual(ordered, ordered_pks)
-        ordered = [item.pk for item in qs.order_by('foo.simple#related.level', 'id')]
+        ordered = [item.pk for item in qs.order_by('foo.simple__related__level', 'id')]
         self.assertEqual(ordered, ordered_pks)
 
         # Test regpoint specifier syntax.
         qs = models.Thing.objects.all()
-        ordered = [item.pk for item in qs.order_by('first:foo.simple#level', 'id')]
+        ordered = [item.pk for item in qs.order_by('first:foo.simple__level', 'id')]
         self.assertEqual(ordered, ordered_pks)
 
     def test_prefetch_queryset(self):

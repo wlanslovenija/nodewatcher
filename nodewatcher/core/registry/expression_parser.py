@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 15, 18, 1, 34, 4)
+__version__ = (2016, 4, 16, 20, 9, 18, 5)
 
 __all__ = [
     'LookupExpressionParser',
@@ -51,7 +51,10 @@ class LookupExpressionParser(Parser):
 
     @graken()
     def _lookup_(self):
-        self._fields_()
+        with self._optional():
+            self._registration_point_()
+            self.name_last_node('registration_point')
+        self._registry_id_()
         self.name_last_node('registry_id')
         with self._optional():
             self._constraint_specifier_()
@@ -62,13 +65,33 @@ class LookupExpressionParser(Parser):
         self._check_eof()
 
         self.ast._define(
-            ['registry_id', 'constraints', 'field'],
+            ['registration_point', 'registry_id', 'constraints', 'field'],
             []
         )
 
     @graken()
+    def _registration_point_(self):
+        self._FIELD_()
+        self.name_last_node('@')
+        self._token(':')
+
+    @graken()
+    def _registry_id_(self):
+
+        def sep0():
+            self._token('.')
+
+        def block0():
+            self._REGISTRY_ID_ATOM_()
+        self._positive_closure(block0, prefix=sep0)
+
+    @graken()
+    def _REGISTRY_ID_ATOM_(self):
+        self._pattern(r'[a-zA-Z0-9]+')
+
+    @graken()
     def _field_specifier_(self):
-        self._token('#')
+        self._token('__')
         self._fields_()
         self.name_last_node('@')
 
@@ -76,8 +99,7 @@ class LookupExpressionParser(Parser):
     def _fields_(self):
 
         def sep0():
-            with self._group():
-                self._FIELD_SEPARATOR_()
+            self._token('__')
 
         def block0():
             self._FIELD_()
@@ -85,11 +107,7 @@ class LookupExpressionParser(Parser):
 
     @graken()
     def _FIELD_(self):
-        self._pattern(r'[A-Za-z0-9_]+')
-
-    @graken()
-    def _FIELD_SEPARATOR_(self):
-        self._token('.')
+        self._pattern(r'([a-zA-Z0-9]|_(?!_))+')
 
     @graken()
     def _constraint_specifier_(self):
@@ -168,6 +186,15 @@ class LookupExpressionSemantics(object):
     def lookup(self, ast):
         return ast
 
+    def registration_point(self, ast):
+        return ast
+
+    def registry_id(self, ast):
+        return ast
+
+    def REGISTRY_ID_ATOM(self, ast):
+        return ast
+
     def field_specifier(self, ast):
         return ast
 
@@ -175,9 +202,6 @@ class LookupExpressionSemantics(object):
         return ast
 
     def FIELD(self, ast):
-        return ast
-
-    def FIELD_SEPARATOR(self, ast):
         return ast
 
     def constraint_specifier(self, ast):

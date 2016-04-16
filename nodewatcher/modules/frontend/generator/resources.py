@@ -92,7 +92,7 @@ class BuildResultResource(api.BaseResource):
             django_models.Prefetch(
                 'node',
                 queryset=core_models.Node.objects.regpoint('config').registry_fields(
-                    name='core.general#name',
+                    name='core.general__name',
                 )
             ),
             'build_channel',

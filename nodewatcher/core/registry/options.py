@@ -1,4 +1,5 @@
 import collections
+import re
 
 from django import forms
 from django.core import exceptions as django_exceptions
@@ -6,6 +7,9 @@ from django.core import exceptions as django_exceptions
 from rest_framework import serializers as drf_serializers
 
 from .api import serializers
+
+# Valid registry identifiers.
+REGISTRY_ID = re.compile('^([a-zA-Z0-9]|\.(?!(\.|$)))+$')
 
 
 class Options(object):
@@ -21,6 +25,13 @@ class Options(object):
         """
 
         meta = model_class.RegistryMeta
+
+        if not model_class._meta.abstract:
+            # Validate that the registry identifier is properly formatted.
+            if not meta.registry_id:
+                raise django_exceptions.ImproperlyConfigured("Non-abstract registry item '%s' is missing a registy identifier." % model_class.__name__)
+            if not REGISTRY_ID.match(meta.registry_id):
+                raise django_exceptions.ImproperlyConfigured("Registry identifier '%s' is not a valid identifier." % meta.registry_id)
 
         self.registration_point = None
         self.model_class = model_class

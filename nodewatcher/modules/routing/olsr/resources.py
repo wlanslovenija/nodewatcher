@@ -32,7 +32,7 @@ class OlsrTopologyLinkResource(core_resources.NodeSubresourceMixin, api.BaseReso
             django_models.Prefetch(
                 'peer',
                 queryset=core_models.Node.objects.regpoint('config').registry_fields(
-                    name='core.general#name',
+                    name='core.general__name',
                     router_id='core.routerid',
                 )
             ),

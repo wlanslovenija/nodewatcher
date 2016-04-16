@@ -26,7 +26,7 @@
             if (settings.registryFields) {
                 $.each(settings.registryFields, function (registrationPoint, fields) {
                     $.each(fields, function (index, field) {
-                        var fieldSpecification = [registrationPoint];
+                        var fieldSpecification = [];
                         if ($.isArray(field)) {
                             // Registry identifier and field path.
                             fieldSpecification.push.apply(fieldSpecification, field);
@@ -35,14 +35,14 @@
                             fieldSpecification.push(field);
                         }
 
-                        params.fields.push(fieldSpecification.join('|'));
+                        params.fields.push(registrationPoint + ':' + fieldSpecification.join('__'));
                     });
                 });
             }
 
             // Setup filters.
             if (settings.registrySearchField && data.search && data.search.value && data.search.value.length) {
-                params[settings.registrySearchField.join('|')] = data.search.value;
+                params[settings.registrySearchField] = data.search.value;
             }
 
             // Setup ordering.
@@ -55,7 +55,7 @@
                 // Skip sort by items, which do not specify fields.
                 if (!lookup[2].length) return;
 
-                ordering.push(direction + lookup[0] + ':' + lookup[1] + '#' + lookup[2]);
+                ordering.push(direction + lookup[0] + ':' + lookup[1] + '__' + lookup[2]);
             });
             if (ordering.length) {
                 params.ordering = ordering.join(',');
