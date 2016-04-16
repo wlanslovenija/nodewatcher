@@ -15,7 +15,11 @@ class RegistryRootViewSetMixin(object):
     def get_registry_queryset(self, queryset):
         # Apply projection.
         for field in self.request.query_params.getlist('fields'):
-            field_name, queryset = apply_registry_field(field, queryset)
+            try:
+                field_name, queryset = apply_registry_field(field, queryset)
+            except ValueError:
+                # Ignore invalid field projections.
+                pass
 
         # Apply filters.
         for argument, value in self.request.query_params.items():

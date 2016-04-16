@@ -322,7 +322,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 from . import fields
 
                 dst_field_name = dst_field.name if dst_field else None
-                field = fields.RegistryMultipleRelationField(dst_model, related_field=dst_field_name)
+                field = fields.RegistryMultipleRelationField(dst_model, related_field=dst_field_name, queryset=dst_queryset)
                 field.src_model = dst_model
                 field.src_field = dst_field_name
                 field.contribute_to_class(clone.model, field_name, virtual_only=True)

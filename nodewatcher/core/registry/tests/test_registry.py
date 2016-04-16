@@ -61,6 +61,11 @@ class RegistryTestCase(django_test.TransactionTestCase):
             item.bar = 88
             item.save()
 
+            item = thing.second.foo.multiple(create=models.FirstSubRegistryItem)
+            item.foo = 3
+            item.bar = 88
+            item.save()
+
             item = thing.second.foo.multiple(create=models.SecondSubRegistryItem)
             item.foo = 3
             item.moo = 77
@@ -153,10 +158,25 @@ class RegistryTestCase(django_test.TransactionTestCase):
         for item in qs:
             self.assertEqual(len(item.f1.all()), 0)
 
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=3]')
+        self.assertEqual(len(qs), 100)
+        for item in qs:
+            self.assertEqual(len(item.f1.all()), 3)
+
         qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=4]')
         self.assertEqual(len(qs), 100)
         for item in qs:
             self.assertEqual(len(item.f1.all()), 1)
+
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple[foo=4]#bar')
+        self.assertEqual(len(qs), 100)
+        for item in qs:
+            self.assertEqual(len(item.f1.all()), 1)
+
+        qs = models.Thing.objects.regpoint('second').registry_fields(f1='foo.multiple#bar')
+        self.assertEqual(len(qs), 100)
+        for item in qs:
+            self.assertEqual(len(item.f1.all()), 2)
 
         # Test filter exceptions
         with self.assertRaises(django_exceptions.FieldError):

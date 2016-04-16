@@ -580,6 +580,7 @@ class RegistryProxyMultipleDescriptor(object):
         self.related_model = field_with_rel.rel.to
         self.related_field = field_with_rel.related_field
         self.cache_name = field_with_rel.get_cache_name()
+        self.queryset = field_with_rel.queryset
 
         # Generate a chain that can be used to generate the filter query.
         toplevel = self.related_model._registry.get_toplevel_class()
@@ -600,6 +601,7 @@ class RegistryProxyMultipleDescriptor(object):
         rel_model = self.related_model
         rel_field = rel_model._meta.get_field('root')
         rel_subfield = self.related_field
+        rel_queryset = self.queryset
         chain = constants.LOOKUP_SEP.join(self.chain)
         cache_name = self.cache_name
 
@@ -613,13 +615,21 @@ class RegistryProxyMultipleDescriptor(object):
             def __call__(self, **kwargs):
                 raise Exception
 
+            def _get_queryset(self):
+                if rel_queryset is not None:
+                    # If a queryset is available, use it instead of the default queryset as it may have
+                    # some additional constraints applied.
+                    return rel_queryset.all()
+                else:
+                    return super(RelatedManager, self).get_queryset()
+
             def get_queryset(self):
                 try:
                     qs = self.instance._prefetched_objects_cache[cache_name]
                 except (AttributeError, KeyError):
                     db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
                     empty_strings_as_null = django_db.connections[db].features.interprets_empty_strings_as_nulls
-                    qs = super(RelatedManager, self).get_queryset()
+                    qs = self._get_queryset()
 
                     qs._add_hints(instance=self.instance)
                     if self._db:
@@ -639,7 +649,7 @@ class RegistryProxyMultipleDescriptor(object):
 
             def get_prefetch_queryset(self, instances, queryset=None):
                 if queryset is None:
-                    queryset = super(RelatedManager, self).get_queryset().all()
+                    queryset = self._get_queryset()
 
                 queryset._add_hints(instance=instances[0])
                 queryset = queryset.using(queryset._db or self._db)
@@ -663,6 +673,7 @@ class RegistryProxyMultipleDescriptor(object):
 class RegistryMultipleRelationField(models.Field):
     def __init__(self, to, *args, **kwargs):
         self.related_field = kwargs.pop('related_field', None)
+        self.queryset = kwargs.pop('queryset', None)
         kwargs['rel'] = related_fields.ForeignObjectRel(self, to)
         super(RegistryMultipleRelationField, self).__init__(*args, **kwargs)
 
