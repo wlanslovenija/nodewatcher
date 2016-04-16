@@ -119,12 +119,25 @@ class RegistryTestCase(django_test.TransactionTestCase):
         thing = models.Thing.objects.all()[0]
         mdl = thing.first.foo.simple()
         mdl.another = 42
+        mdl.interesting = 'boo'
         mdl.save()
 
         items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__another=69)
         self.assertEquals(len(items), 99)
         items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__another=42)
         self.assertEquals(len(items), 1)
+
+        # Test disallow filtering by sensitive fields.
+        items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__interesting='boo')
+        self.assertEquals(len(items), 1)
+        items = models.Thing.objects.regpoint('first').registry_filter(foo_simple__interesting='boo', disallow_sensitive=True)
+        self.assertEquals(len(items), 100)
+
+        # Test disallow ordering by sensitive fields.
+        items = models.Thing.objects.regpoint('first').order_by('-foo.simple__interesting', '-foo.simple__another')
+        self.assertEquals(items[0].pk, thing.pk)
+        items = models.Thing.objects.regpoint('first').order_by('-foo.simple__interesting', '-foo.simple__another', disallow_sensitive=True)
+        self.assertNotEquals(items[0].pk, thing.pk)
 
         # Test proxy field filter
         qs = models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related__name')

@@ -71,6 +71,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         registry fields via joins.
         """
 
+        disallow_sensitive = kwargs.pop('disallow_sensitive', False)
+
         if getattr(self, '_regpoint', None) is None:
             raise ValueError("Calling 'registry_filter' first requires a selected registration point!")
 
@@ -101,6 +103,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
                     dst_model, dst_field = self._regpoint.get_model_with_field(registry_id, dst_field)
                     dst_field = dst_field.name
+
+            # Disallow filter by sensitive fields if requested.
+            if dst_field in dst_model._registry.sensitive_fields and disallow_sensitive:
+                continue
 
             new_selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field
             if selector is not None:
@@ -383,10 +389,12 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         return clone
 
-    def order_by(self, *fields):
+    def order_by(self, *fields, **kwargs):
         """
         Order by with special handling for RegistryChoiceFields.
         """
+
+        disallow_sensitive = kwargs.pop('disallow_sensitive', False)
 
         assert self.query.can_filter(), "Cannot reorder a query once a slice has been taken."
 
@@ -409,6 +417,11 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                     clone = clone.regpoint(info.registration_point)
 
                 if info.field:
+                    # Check if the field is sensitive and if ordering by sensitive fields is disallowed.
+                    dst_model, dst_field = clone._regpoint.get_model_with_field(info.registry_id, info.field[0])
+                    if dst_field.name in dst_model._registry.sensitive_fields and disallow_sensitive:
+                        continue
+
                     # If a field has been specified, use it to order by the field.
                     internal_field_name = '_order_field_%s' % info.name
                     clone = clone.registry_fields(**{internal_field_name: info})

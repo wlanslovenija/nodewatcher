@@ -26,6 +26,7 @@ class SimpleRegistryItem(registration.bases.ThingFirstRegistryItem):
 
     class RegistryMeta:
         registry_id = 'foo.simple'
+        sensitive_fields = ['interesting']
 
 registration.point('thing.first').register_choice('foo.simple#level', registration.Choice('level-x', "Level 0"))
 registration.point('thing.first').register_choice('foo.simple#level', registration.Choice('level-a', "Level 1"))

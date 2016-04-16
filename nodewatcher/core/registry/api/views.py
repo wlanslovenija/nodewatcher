@@ -37,7 +37,7 @@ class RegistryRootViewSetMixin(object):
         # Apply ordering.
         ordering = self.request.query_params.get('ordering', None)
         if ordering:
-            queryset = queryset.order_by(*ordering.split(','))
+            queryset = queryset.order_by(*ordering.split(','), disallow_sensitive=True)
 
         # Apply permission-based maintainer filter.
         maintainer = self.request.query_params.get('maintainer', None)
@@ -66,7 +66,7 @@ def apply_registry_filter(path, value, queryset):
 
     queryset = queryset.regpoint(info.registration_point)
     condition = '%s%s%s' % (info.registry_id.replace('.', '_'), constants.LOOKUP_SEP, constants.LOOKUP_SEP.join(info.field or []))
-    queryset = queryset.registry_filter(**{condition: value})
+    queryset = queryset.registry_filter(**{condition: value, 'disallow_sensitive': True})
 
     return queryset
 
