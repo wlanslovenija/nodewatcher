@@ -12,7 +12,7 @@
             });
 
             registrationPoint = bits.shift();
-            registryId = bits.shift().replace('__', '.');
+            registryId = bits.shift().replace(/__/g, '.');
             return [registrationPoint, registryId, bits.join('.')];
         },
 
@@ -52,6 +52,9 @@
                 var column = data.columns[orderSpecification.column];
                 var lookup = self._pathToLookup(column.data);
                 var direction = orderSpecification.dir == 'asc' ? '' : '-';
+                // Skip sort by items, which do not specify fields.
+                if (!lookup[2].length) return;
+
                 ordering.push(direction + lookup[0] + ':' + lookup[1] + '#' + lookup[2]);
             });
             if (ordering.length) {
