@@ -34,6 +34,10 @@ class RegistryRootSerializerMixin(object):
             if not hasattr(field, 'src_model'):
                 continue
 
+            # Skip internal fields, which are added when ordering.
+            if field.name.startswith('_order_field_'):
+                continue
+
             def serialize_instance(item):
                 if hasattr(field, '_registry_annotations'):
                     for target_attribute, source_attribute in field._registry_annotations.items():

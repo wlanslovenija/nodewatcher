@@ -80,6 +80,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         # Resolve fields from kwargs that are virtual aliases for registry fields
         filter_selectors = {}
+        ensure_distinct = False
         for selector, value in kwargs.items():
             if constants.LOOKUP_SEP in selector:
                 field, selector = selector.split(constants.LOOKUP_SEP, 1)
@@ -108,14 +109,20 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             if dst_field in dst_model._registry.sensitive_fields and disallow_sensitive:
                 continue
 
+            if dst_model._registry.multiple:
+                ensure_distinct = True
+
             new_selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field
             if selector is not None:
                 new_selector += constants.LOOKUP_SEP + selector
 
             filter_selectors[new_selector] = value
 
-        # Pass transformed query into the standard filter routine
-        return super(RegistryQuerySet, clone).filter(**filter_selectors)
+        # Pass transformed query into the standard filter routine.
+        clone = super(RegistryQuerySet, clone).filter(**filter_selectors)
+        if ensure_distinct:
+            clone = clone.distinct()
+        return clone
 
     def registry_expand_proxy_field(self, alias):
         """

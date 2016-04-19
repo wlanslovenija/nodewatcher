@@ -2,11 +2,12 @@ from django.db.models import constants
 from django.contrib.auth import models as auth_models
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.db.models import functions as geo_functions
+from django.core import exceptions as django_exceptions
 
 from rest_framework import viewsets
 from guardian import shortcuts
 
-from .. import expression
+from .. import expression, exceptions
 
 
 class RegistryRootViewSetMixin(object):
@@ -19,7 +20,7 @@ class RegistryRootViewSetMixin(object):
         for field in self.request.query_params.getlist('fields'):
             try:
                 field_name, queryset = apply_registry_field(field, queryset)
-            except ValueError:
+            except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
                 # Ignore invalid field projections.
                 pass
 
@@ -30,14 +31,17 @@ class RegistryRootViewSetMixin(object):
 
             try:
                 queryset = apply_registry_filter(argument, value, queryset)
-            except ValueError:
+            except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
                 # Ignore invalid filters as they may be some other query arguments.
                 pass
 
         # Apply ordering.
         ordering = self.request.query_params.get('ordering', None)
         if ordering:
-            queryset = queryset.order_by(*ordering.split(','), disallow_sensitive=True)
+            try:
+                queryset = queryset.order_by(*ordering.split(','), disallow_sensitive=True)
+            except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
+                pass
 
         # Apply permission-based maintainer filter.
         maintainer = self.request.query_params.get('maintainer', None)
