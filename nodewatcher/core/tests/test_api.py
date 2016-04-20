@@ -98,23 +98,23 @@ class CoreAPITest(test.RegistryAPITestCase):
         # Project config:core.general__name.
         response = self.get_node_list({'fields': 'config:core.general__name'})
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.general'])
             self.assertDataKeysEqual(item['config']['core.general'], ['name'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertEquals(item['config']['core.general']['name'], node.config.core.general().name)
 
         # Project config:core.general.
         response = self.get_node_list({'fields': 'config:core.general'})
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.general'])
             self.assertDataKeysEqual(item['config']['core.general'], ['name', 'platform', 'router', 'build_channel', 'version'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertEquals(item['config']['core.general']['name'], node.config.core.general().name)
 
         # Project an invalid registry point.
@@ -133,11 +133,11 @@ class CoreAPITest(test.RegistryAPITestCase):
         response = self.get_node_list({'fields': 'config:core.routerid'})
         self.assertEquals(response.data['count'], len(self.nodes))
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.routerid'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertIsInstance(item['config']['core.routerid'], list)
             self.assertEquals(len(item['config']['core.routerid']), 3)
             for router_id in item['config']['core.routerid']:
@@ -152,11 +152,11 @@ class CoreAPITest(test.RegistryAPITestCase):
         response = self.get_node_list({'fields': 'config:core.routerid[router_id="127.0.0.1"]'})
         self.assertEquals(response.data['count'], len(self.nodes))
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.routerid'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertIsInstance(item['config']['core.routerid'], list)
             if node.config.core.general().name == 'Node 0':
                 # Only the first node should have matching router IDs.
@@ -170,11 +170,11 @@ class CoreAPITest(test.RegistryAPITestCase):
         response = self.get_node_list({'fields': 'config:core.routerid[router_id="127.0.0.1"]__router_id'})
         self.assertEquals(response.data['count'], len(self.nodes))
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.routerid'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertIsInstance(item['config']['core.routerid'], list)
             if node.config.core.general().name == 'Node 0':
                 # Only the first node should have matching router IDs.
@@ -188,12 +188,12 @@ class CoreAPITest(test.RegistryAPITestCase):
         response = self.get_node_list({'fields': ['config:core.general', 'config:core.routerid', 'monitoring:core.general']})
         self.assertEquals(response.data['count'], len(self.nodes))
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config', 'monitoring'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config', 'monitoring'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.general', 'core.routerid'])
             self.assertItemsEqual(item['monitoring'].keys(), ['core.general'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertEquals(item['config']['core.general']['name'], node.config.core.general().name)
             self.assertIsInstance(item['config']['core.routerid'], list)
             self.assertEquals(len(item['config']['core.routerid']), 3)
@@ -211,12 +211,12 @@ class CoreAPITest(test.RegistryAPITestCase):
         response = self.get_node_list({'fields': 'config:core.general', 'config:core.general__name': 'Node 0'})
         self.assertEquals(response.data['count'], 1)
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.general'])
             self.assertDataKeysEqual(item['config']['core.general'], ['name', 'platform', 'router', 'build_channel', 'version'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertEquals(node.config.core.general().name, 'Node 0')
             self.assertEquals(item['config']['core.general']['name'], 'Node 0')
 
@@ -249,11 +249,11 @@ class CoreAPITest(test.RegistryAPITestCase):
         })
         self.assertEquals(response.data['count'], len(self.nodes))
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid', 'config'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
             self.assertItemsEqual(item['config'].keys(), ['core.routerid'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertIsInstance(item['config']['core.routerid'], list)
             self.assertEquals(len(item['config']['core.routerid']), 3)
             for router_id in item['config']['core.routerid']:
@@ -298,15 +298,15 @@ class CoreAPITest(test.RegistryAPITestCase):
 
                 response = self.get_node_list({'fields': 'config:core.general', 'ordering': ordering})
                 for base_item, item in zip(nodes_by_order_key, response.data['results']):
-                    self.assertDataKeysEqual(item, ['uuid', 'config'])
-                    self.assertEquals(item['uuid'], str(base_item.uuid))
+                    self.assertDataKeysEqual(item, ['config'])
+                    self.assertEquals(item['@id'], str(base_item.uuid))
                     self.assertItemsEqual(item['config'].keys(), ['core.general'])
 
     def test_sensitive_data(self):
         def check_authentication_results(response, has_subfield=True):
             for item in response.data['results']:
-                self.assertDataKeysEqual(item, ['uuid', 'config'])
-                self.assertIn(item['uuid'], self.nodes)
+                self.assertDataKeysEqual(item, ['config'])
+                self.assertIn(item['@id'], self.nodes)
 
                 if has_subfield:
                     self.assertItemsEqual(item['config'].keys(), ['core.authentication'])
@@ -341,8 +341,8 @@ class CoreAPITest(test.RegistryAPITestCase):
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
         for base_item, item in zip(sorted(self.nodes.values(), key=lambda node: node.config.core.general().name, reverse=True), response.data['results']):
-            self.assertDataKeysEqual(item, ['uuid'])
-            self.assertEquals(item['uuid'], str(base_item.uuid))
+            self.assertDataKeysEqual(item, [])
+            self.assertEquals(item['@id'], str(base_item.uuid))
 
     def test_json_ld(self):
         pass

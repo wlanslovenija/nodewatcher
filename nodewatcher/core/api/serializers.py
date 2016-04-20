@@ -4,10 +4,37 @@ import re
 
 from django import shortcuts
 from django.conf import settings, urls
+from django.core import urlresolvers
 
 from nodewatcher.utils import loader
 
 from . import exceptions
+
+# Exports.
+__all__ = [
+    'JSONLDSerializerMixin',
+    'pool'
+]
+
+
+class JSONLDSerializerMixin(object):
+    def to_representation(self, instance):
+        data = super(JSONLDSerializerMixin, self).to_representation(instance)
+
+        # Fix primary key field.
+        if instance._meta.pk.name in data:
+            del data[instance._meta.pk.name]
+            data['@id'] = str(instance.pk)
+
+        # Include metadata.
+        base_view = getattr(self.Meta, 'base_view', None)
+        if base_view is not None:
+            data['@context'] = {
+                '@base': urlresolvers.reverse(base_view),
+                # TODO: Also include @vocab.
+            }
+
+        return data
 
 
 class SerializersPool(object):

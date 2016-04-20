@@ -1,6 +1,6 @@
 from rest_framework import serializers as drf_serializers, viewsets as drf_viewsets
 
-from nodewatcher.core.api import urls as api_urls
+from nodewatcher.core.api import urls as api_urls, serializers as api_serializers
 
 from . import registration
 from .api import views, serializers
@@ -15,10 +15,15 @@ for registration_point in registration.all_points():
 for model in top_level_models:
     class meta_cls:
         model = model
+        base_view = 'apiv2:%s-list' % model._meta.object_name.lower()
 
     serializer = type(
         '%sRegistryRootSerializer' % (model.__name__),
-        (serializers.RegistryRootSerializerMixin, drf_serializers.ModelSerializer),
+        (
+            api_serializers.JSONLDSerializerMixin,
+            serializers.RegistryRootSerializerMixin,
+            drf_serializers.ModelSerializer
+        ),
         {
             'Meta': meta_cls,
         }

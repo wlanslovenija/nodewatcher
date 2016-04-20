@@ -34,7 +34,7 @@ class ProjectAPITest(test.RegistryAPITestCase):
             self.assertRegistryItemHasProjection(item, 'config', 'core.project')
             self.assertDataKeysEqual(item['config']['core.project'], ['project'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertEquals(item['config']['core.project']['project'], node.config.core.project().project.pk)
 
         # Project instance projection.
@@ -44,7 +44,7 @@ class ProjectAPITest(test.RegistryAPITestCase):
             self.assertRegistryItemHasProjection(item, 'config', 'core.project')
             self.assertDataKeysEqual(item['config']['core.project'], ['project'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             project = node.config.core.project().project
             item_project = item['config']['core.project']['project']
             self.assertEquals(item_project['name'], project.name)
@@ -62,5 +62,5 @@ class ProjectAPITest(test.RegistryAPITestCase):
             self.assertDataKeysEqual(item['config']['core.project'], ['project'])
             self.assertDataKeysEqual(item['config']['core.project']['project'], ['name'])
 
-            node = self.nodes[item['uuid']]
+            node = self.nodes[item['@id']]
             self.assertEquals(item['config']['core.project']['project']['name'], node.config.core.project().project.name)

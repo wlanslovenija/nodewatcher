@@ -24,12 +24,6 @@ class RegistryRootSerializerMixin(object):
     def to_representation(self, instance):
         data = super(RegistryRootSerializerMixin, self).to_representation(instance)
 
-        data['@context'] = {
-            '@base': urlresolvers.reverse('apiv2:api-root'),
-            # TODO: Replace with actual schema API endpoint.
-            '@vocab': 'http://schema.nodewatcher.net/v2/#',
-        }
-
         del data['registry_metadata']
 
         for field in instance._meta.virtual_fields:
@@ -101,6 +95,8 @@ class RegistryItemSerializerMixin(object):
     def build_relational_field(self, field_name, relation_info):
         if isinstance(relation_info.model_field, model_fields.IntraRegistryForeignKey):
             return (api_fields.IntraRegistryForeignKeyField, {'related_model': relation_info.related_model})
+        elif isinstance(relation_info.model_field, models.ForeignKey):
+            return (api_fields.ForeignKeyField, {'related_model': relation_info.related_model})
 
         return super(RegistryItemSerializerMixin, self).build_relational_field(field_name, relation_info)
 
@@ -124,8 +120,13 @@ class RegistryItemSerializerMixin(object):
 
 
 def annotate_instance(meta, data, serializer=None):
+    data['@context'] = {
+        '@base': '_:%s' % meta.get_api_id(),
+        # TODO: Also include @vocab.
+    }
+
     if 'id' in data:
-        data['@id'] = '_:%s' % meta.get_api_id(data['id'])
+        data['@id'] = str(data['id'])
         del data['id']
 
     data['@type'] = meta.get_api_type()

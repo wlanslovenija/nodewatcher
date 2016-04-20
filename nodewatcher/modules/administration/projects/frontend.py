@@ -2,8 +2,8 @@ from django.apps import apps
 
 from nodewatcher.core.frontend import components
 
-# Register API serializers.
-from . import serializers
+# Register API serializers and views.
+from . import serializers, views
 
 components.partials.get_partial('node_general_partial').add(components.PartialEntry(
     name='project',

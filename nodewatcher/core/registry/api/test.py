@@ -51,14 +51,14 @@ class RegistryAPITestCase(test.APITestCase):
         self.assertItemsEqual(keys, b)
 
     def assertRegistryItemHasProjection(self, item, registration_point, registry_id):
-        self.assertDataKeysEqual(item, ['uuid', registration_point])
-        self.assertIn(item['uuid'], self.nodes)
-        self.assertItemsEqual(item['config'].keys(), [registry_id])
+        self.assertDataKeysEqual(item, [registration_point])
+        self.assertIn(item['@id'], self.nodes)
+        self.assertItemsEqual(item[registration_point].keys(), [registry_id])
 
     def assertResponseWithoutProjections(self, response):
         for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid'])
-            self.assertIn(item['uuid'], self.nodes)
+            self.assertDataKeysEqual(item, [])
+            self.assertIn(item['@id'], self.nodes)
 
     def get_node_list(self, *args, **kwargs):
         response = self.client.get(urlresolvers.reverse('apiv2:node-list'), *args, **kwargs)
