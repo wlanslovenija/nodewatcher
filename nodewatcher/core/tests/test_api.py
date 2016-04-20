@@ -8,75 +8,50 @@ from django.core import urlresolvers
 from django.utils import timezone
 
 from guardian import shortcuts
-from rest_framework import test
 
 from nodewatcher.core import models as core_models
+from nodewatcher.core.registry.api import test
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.monitor import models as monitor_models
 
 
-class CoreApiTest(test.APITestCase):
+class CoreAPITest(test.RegistryAPITestCase):
     """
     Tests API functionality of all core models. The test assumes that all core
     applications are included.
     """
 
     def setUp(self):
-        super(CoreApiTest, self).setUp()
-
-        # Create some users.
-        self.users = []
-        for i in range(3):
-            user = auth_models.User.objects.create_user(
-                username='username%s' % i,
-            )
-            user.save()
-            self.users.append(user)
-
         self.initial_time = datetime.datetime(2014, 11, 5, 1, 5, 0, tzinfo=timezone.utc)
 
-        # Create some nodes.
-        self.nodes = {}
-        for i in range(45):
-            # We generate UUIDs so that they are nicely in sequence so that
-            # default REST API ordering does not really change the order.
-            node = core_models.Node(uuid=str(uuid.UUID(int=i, version=1)))
-            node.save()
+        super(CoreAPITest, self).setUp()
 
-            # Assign maintainer permissions.
-            maintainer = self.users[i % len(self.users)]
-            shortcuts.assign_perm('change_node', maintainer, node)
-            shortcuts.assign_perm('delete_node', maintainer, node)
-            shortcuts.assign_perm('reset_node', maintainer, node)
-            shortcuts.assign_perm('generate_firmware', maintainer, node)
+    def setUpNode(self, index, node):
+        # General node information.
+        node.config.core.general(
+            create=cgm_models.CgmGeneralConfig,
+            name='Node %s' % index,
+        )
 
-            # General node information.
-            node.config.core.general(
-                create=cgm_models.CgmGeneralConfig,
-                name='Node %s' % i,
-            )
+        # Password.
+        node.config.core.authentication(
+            create=cgm_models.PasswordAuthenticationConfig,
+            password='my password %s' % index
+        ).save()
 
-            # Password.
-            node.config.core.authentication(
-                create=cgm_models.PasswordAuthenticationConfig,
-                password='my password %s' % i
+        # Router IDs.
+        for j in [1, 2, 3]:
+            node.config.core.routerid(
+                create=core_models.StaticIpRouterIdConfig,
+                address='127.0.%d.%d' % (index, j),
             ).save()
 
-            # Router IDs.
-            for j in [1, 2, 3]:
-                node.config.core.routerid(
-                    create=core_models.StaticIpRouterIdConfig,
-                    address='127.0.%d.%d' % (i, j),
-                ).save()
-
-            # Last seen / first seen.
-            node.monitoring.core.general(
-                create=monitor_models.GeneralMonitor,
-                first_seen=self.initial_time,
-                last_seen=self.initial_time + datetime.timedelta(seconds=i),
-            )
-
-            self.nodes[str(node.uuid)] = node
+        # Last seen / first seen.
+        node.monitoring.core.general(
+            create=monitor_models.GeneralMonitor,
+            first_seen=self.initial_time,
+            last_seen=self.initial_time + datetime.timedelta(seconds=index),
+        )
 
     def test_api_urls(self):
         self.assertEquals(urlresolvers.reverse('apiv2:node-list'), '/api/v2/node/')
@@ -98,35 +73,23 @@ class CoreApiTest(test.APITestCase):
         self.assertEquals(response.status_code, 405)
 
     def test_limit(self):
-        response = self.client.get(urlresolvers.reverse('apiv2:node-list'), {'offset': 0, 'limit': 0})
+        response = self.get_node_list({'offset': 0, 'limit': 0})
         self.assertEquals(len(response.data['results']), len(self.nodes))
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertEquals(response.data['next'], None)
         self.assertEquals(response.data['previous'], None)
 
-        response = self.client.get(urlresolvers.reverse('apiv2:node-list'), {'offset': 0, 'limit': 10})
+        response = self.get_node_list({'offset': 0, 'limit': 10})
         self.assertEquals(len(response.data['results']), 10)
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertEquals(response.data['next'], 'http://testserver/api/v2/node/?limit=10&offset=10')
         self.assertEquals(response.data['previous'], None)
 
-        response = self.client.get(urlresolvers.reverse('apiv2:node-list'), {'offset': 10, 'limit': 10})
+        response = self.get_node_list({'offset': 10, 'limit': 10})
         self.assertEquals(len(response.data['results']), 10)
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertEquals(response.data['next'], 'http://testserver/api/v2/node/?limit=10&offset=20')
         self.assertEquals(response.data['previous'], 'http://testserver/api/v2/node/?limit=10')
-
-    def assertDataKeysEqual(self, a, b):
-        keys = [key for key in a.keys() if key[0] != '@']
-        self.assertItemsEqual(keys, b)
-
-    def assertResponseWithoutProjections(self, response):
-        for item in response.data['results']:
-            self.assertDataKeysEqual(item, ['uuid'])
-            self.assertIn(item['uuid'], self.nodes)
-
-    def get_node_list(self, *args, **kwargs):
-        return self.client.get(urlresolvers.reverse('apiv2:node-list'), *args, **kwargs)
 
     def test_projection(self):
         # Request without any projections should just return node uuids.

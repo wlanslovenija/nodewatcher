@@ -4,6 +4,8 @@ from django.core import urlresolvers
 
 from rest_framework import serializers
 
+from nodewatcher.core.api import serializers as api_serializers, exceptions as api_exceptions
+
 from . import fields as api_fields
 from .. import fields as model_fields
 
@@ -68,6 +70,19 @@ class RegistryRootSerializerMixin(object):
                 else:
                     base_container = namespace.setdefault(meta.registry_id, {})
                     container = reduce(lambda a, b: a.setdefault(b, {}), atoms[:-1], base_container)
+
+                    if isinstance(value, models.Model):
+                        try:
+                            serializer = api_serializers.pool.get_serializer(value.__class__)
+                        except api_exceptions.SerializerNotRegistered:
+                            # Don't know how to serialize the model, construct a default serializer.
+                            class meta_cls:
+                                model = value.__class__
+
+                            serializer = type('DefaultModelSerializer', (serializers.ModelSerializer,), {'Meta': meta_cls})
+
+                        value = serializer(value).data
+
                     container[atoms[-1]] = value
                     annotate_instance(meta, base_container)
             elif isinstance(value, models.Manager):
