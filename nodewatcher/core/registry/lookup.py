@@ -275,10 +275,14 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             field.contribute_to_class(clone.model, name, virtual_only=True)
             field.concrete = False
 
-            if field.name != field.attname:
-                # Handle foreign key relations properly
+            if field.is_relation:
+                # Handle foreign key relations properly.
                 select_name = '%s_att' % name
                 field.attname = select_name
+
+                # Clear field cache to ensure the correct field is used to determine attname.
+                if hasattr(field, '_related_fields'):
+                    del field._related_fields
 
             model._registry_attrs.append(select_name)
             return select_name
@@ -333,7 +337,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
             if dst_model._registry.multiple:
                 # The destination model can contain multiple items; in this case we need to
-                # provide the proxy model with a descriptor that returns a queryset to the models
+                # provide the proxy model with a descriptor that returns a queryset to the models.
                 if dst_related is not None:
                     raise ValueError("Related fields on registry items with multiple models not supported!")
 
@@ -348,7 +352,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_field is None:
-                # If there can only be one item and no field is requested, create a descriptor
+                # If there can only be one item and no field is requested, create a descriptor.
                 from . import fields
 
                 field = fields.RegistryRelationField(dst_model)
@@ -360,7 +364,8 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 clone = clone.prefetch_related(django_models.Prefetch(field_name, queryset=dst_queryset))
                 continue
             elif dst_related is None:
-                # Select destination field and install proxy field descriptor
+                # Select destination field and install proxy field descriptor.
+                # TODO: Support prefetching if dst_field.is_relation is True.
                 src_column = '%s.%s' % (self._quote_name(dst_model._meta.db_table), self._quote_name(dst_field.column))
                 select_name = install_proxy_field(
                     clone.model,
@@ -371,7 +376,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 )
                 clone = clone.extra(select={select_name: src_column})
             else:
-                # Traverse the relation and copy the destination field descriptor
+                # Traverse the relation and copy the destination field descriptor.
                 dst_field_model = dst_field.rel.to
                 dst_related_field = dst_field_model._meta.get_field(dst_related)
 
@@ -390,7 +395,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 )
                 clone = clone.extra(select={select_name: src_column})
 
-            # Setup required joins
+            # Setup required joins.
             field_names = clone.registry_expand_proxy_field(field_name).split(constants.LOOKUP_SEP)
             clone.query.setup_joins(field_names, clone.model._meta, clone.query.get_initial_alias())
 

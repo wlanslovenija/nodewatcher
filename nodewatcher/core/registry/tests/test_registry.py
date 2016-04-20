@@ -98,6 +98,12 @@ class RegistryTestCase(django_test.TransactionTestCase):
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related__name'):
             self.assertEquals(thing.f1, 'test')
 
+        # Run the same query twice as there could be issues due to caching.
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related'):
+            self.assertEquals(thing.f1.name, 'test')
+        for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple__related'):
+            self.assertEquals(thing.f1.name, 'test')
+
         for thing in models.Thing.objects.regpoint('first').registry_fields(f1='foo.simple'):
             self.assertEquals(thing._meta.virtual_fields[0].rel.to, models.SimpleRegistryItem)
             self.assertEquals(thing.f1.interesting, 'bla')
