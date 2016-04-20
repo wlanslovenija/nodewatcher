@@ -35,7 +35,7 @@ class ProjectAPITest(test.RegistryAPITestCase):
             self.assertDataKeysEqual(item['config']['core.project'], ['project'])
 
             node = self.nodes[item['@id']]
-            self.assertEquals(item['config']['core.project']['project'], node.config.core.project().project.pk)
+            self.assertEquals(item['config']['core.project']['project']['@id'], '/api/v2/project/%s' % node.config.core.project().project.pk)
 
         # Project instance projection.
         response = self.get_node_list({'fields': 'config:core.project__project'})
