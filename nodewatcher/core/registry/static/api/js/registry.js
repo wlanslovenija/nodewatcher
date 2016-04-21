@@ -41,8 +41,8 @@
             }
 
             // Setup filters.
-            if (settings.registrySearchField && data.search && data.search.value && data.search.value.length) {
-                params[settings.registrySearchField] = data.search.value;
+            if (settings.registrySearchFilters && data.search && data.search.value && data.search.value.length) {
+                params.filters = settings.registrySearchFilters.replace(/%s/g, data.search.value);
             }
 
             // Setup ordering.

@@ -24,15 +24,14 @@ class RegistryRootViewSetMixin(object):
                 # Ignore invalid field projections.
                 pass
 
-        # Apply filters.
-        for argument, value in self.request.query_params.items():
-            if argument in ('fields', 'limit', 'offset', 'ordering'):
-                continue
-
+        # Apply filter expression.
+        filters = self.request.query_params.get('filters', None)
+        if filters:
             try:
-                queryset = apply_registry_filter(argument, value, queryset)
-            except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
-                # Ignore invalid filters as they may be some other query arguments.
+                parser = expression.FilterExpressionParser(queryset.model, disallow_sensitive=True)
+                queryset = parser.parse(filters).apply(queryset)
+            except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError, KeyError):
+                # Ignore invalid filters.
                 pass
 
         # Apply ordering.
@@ -43,12 +42,12 @@ class RegistryRootViewSetMixin(object):
             except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
                 pass
 
-        # Apply permission-based maintainer filter.
-        maintainer = self.request.query_params.get('maintainer', None)
-        if maintainer:
+        # Apply permission-based filter.
+        has_permissions = self.request.query_params.get('has_permissions', None)
+        if has_permissions:
             try:
-                maintainer_user = auth_models.User.objects.get(username=maintainer)
-                queryset = shortcuts.get_objects_for_user(maintainer_user, [], queryset, with_superuser=False, accept_global_perms=False)
+                has_permissions_user = auth_models.User.objects.get(username=has_permissions)
+                queryset = shortcuts.get_objects_for_user(has_permissions_user, [], queryset, with_superuser=False, accept_global_perms=False)
             except auth_models.User.DoesNotExist:
                 queryset = queryset.none()
 

@@ -149,13 +149,13 @@
         },
 
         /**
-         * Uses top-level object's uuid for a link.
+         * Uses top-level object's @id for a link.
          */
         renderNodeName: function (table) {
             return function (data, type, row, meta) {
                 if (type === 'display') {
                     return $('<a/>').attr(
-                        'href', $(table).data('node-url-template').replace('{pk}', row.uuid)
+                        'href', $(table).data('node-url-template').replace('{pk}', row['@id'])
                     // TODO: Make "unknown" string translatable.
                     // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML).
                     ).text(data || "unknown").wrap('<span/>').parent().html();
@@ -167,7 +167,7 @@
         },
 
         /**
-         * Uses subdocument uuid for a link (or links). If nodeField is specified, it
+         * Uses subdocument @id for a link (or links). If nodeField is specified, it
          * will use that row field instead of current data.
          */
         renderNodeNameSubdocument: function (table, nodeField, routerId) {
@@ -181,7 +181,7 @@
                 if (type === 'display') {
                     return $.map(data, function (node, i) {
                         var name = $('<a/>').attr(
-                            'href', $(table).data('node-url-template').replace('{pk}', node.uuid)
+                            'href', $(table).data('node-url-template').replace('{pk}', node['@id'])
                         // TODO: Make "unknown" string translatable.
                         // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML).
                         ).text(node.name || "unknown").wrap('<span/>').parent().html();

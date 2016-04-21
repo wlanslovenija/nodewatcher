@@ -17,18 +17,18 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 16, 20, 9, 18, 5)
+__version__ = (2016, 4, 21, 12, 4, 1, 3)
 
 __all__ = [
-    'LookupExpressionParser',
-    'LookupExpressionSemantics',
+    'ExpressionParser',
+    'ExpressionSemantics',
     'main'
 ]
 
 KEYWORDS = set([])
 
 
-class LookupExpressionParser(Parser):
+class ExpressionParser(Parser):
     def __init__(self,
                  whitespace=None,
                  nameguard=None,
@@ -38,7 +38,7 @@ class LookupExpressionParser(Parser):
                  left_recursion=True,
                  keywords=KEYWORDS,
                  **kwargs):
-        super(LookupExpressionParser, self).__init__(
+        super(ExpressionParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
             comments_re=comments_re,
@@ -47,6 +47,94 @@ class LookupExpressionParser(Parser):
             left_recursion=left_recursion,
             keywords=keywords,
             **kwargs
+        )
+
+    @graken()
+    def _filter_(self):
+        self._filter_expression_prec1_()
+        self._check_eof()
+
+    @graken()
+    def _filter_expression_prec1_(self):
+
+        def block0():
+            self._filter_expression_prec2_()
+            self.name_last_node('lhs')
+            with self._group():
+                with self._choice():
+                    with self._option():
+                        self._token(',')
+                    with self._option():
+                        self._token('|')
+                    self._error('expecting one of: , |')
+            self.name_last_node('op')
+        self._closure(block0)
+        self._filter_expression_prec2_()
+        self.name_last_node('rhs')
+
+        self.ast._define(
+            ['lhs', 'op', 'rhs'],
+            []
+        )
+
+    @graken()
+    def _filter_expression_prec2_(self):
+
+        def block0():
+            with self._group():
+                self._token('!')
+            self.name_last_node('op')
+        self._closure(block0)
+        self._filter_expression_prec3_()
+        self.name_last_node('expression')
+
+        self.ast._define(
+            ['op', 'expression'],
+            []
+        )
+
+    @graken()
+    def _filter_expression_prec3_(self):
+        self._atom_()
+
+    @graken()
+    def _atom_(self):
+        with self._choice():
+            with self._option():
+                self._equality_lookup_()
+            with self._option():
+                with self._group():
+                    self._token('(')
+                    self._filter_expression_prec1_()
+                    self.name_last_node('@')
+                    self._token(')')
+            self._error('no available options')
+
+    @graken()
+    def _equality_lookup_(self):
+        self._lookup_filter_()
+        self.name_last_node('field')
+        self._token('=')
+        self._CONSTANT_()
+        self.name_last_node('value')
+
+        self.ast._define(
+            ['field', 'value'],
+            []
+        )
+
+    @graken()
+    def _lookup_filter_(self):
+        self._registration_point_()
+        self.name_last_node('registration_point')
+        self._registry_id_()
+        self.name_last_node('registry_id')
+        self._field_specifier_()
+        self.name_last_node('field')
+
+        self.ast._define(
+            ['registration_point', 'registry_id', 'field'],
+            []
         )
 
     @graken()
@@ -142,12 +230,12 @@ class LookupExpressionParser(Parser):
         )
 
     @graken()
-    def _operator_(self):
-        self._token('=')
-
-    @graken()
     def _CONSTRAINT_SEPARATOR_(self):
         self._token(',')
+
+    @graken()
+    def _operator_(self):
+        self._token('=')
 
     @graken()
     def _CONSTANT_(self):
@@ -182,7 +270,28 @@ class LookupExpressionParser(Parser):
         self._pattern(r'\\["\\]')
 
 
-class LookupExpressionSemantics(object):
+class ExpressionSemantics(object):
+    def filter(self, ast):
+        return ast
+
+    def filter_expression_prec1(self, ast):
+        return ast
+
+    def filter_expression_prec2(self, ast):
+        return ast
+
+    def filter_expression_prec3(self, ast):
+        return ast
+
+    def atom(self, ast):
+        return ast
+
+    def equality_lookup(self, ast):
+        return ast
+
+    def lookup_filter(self, ast):
+        return ast
+
     def lookup(self, ast):
         return ast
 
@@ -213,10 +322,10 @@ class LookupExpressionSemantics(object):
     def constraint(self, ast):
         return ast
 
-    def operator(self, ast):
+    def CONSTRAINT_SEPARATOR(self, ast):
         return ast
 
-    def CONSTRAINT_SEPARATOR(self, ast):
+    def operator(self, ast):
         return ast
 
     def CONSTANT(self, ast):
@@ -246,7 +355,7 @@ def main(
 
     with open(filename) as f:
         text = f.read()
-    parser = LookupExpressionParser(parseinfo=False)
+    parser = ExpressionParser(parseinfo=False)
     ast = parser.parse(
         text,
         startrule,
@@ -260,7 +369,7 @@ def main(
 
 if __name__ == '__main__':
     import json
-    ast = generic_main(main, LookupExpressionParser, name='LookupExpression')
+    ast = generic_main(main, ExpressionParser, name='Expression')
     print('AST:')
     print(ast)
     print()

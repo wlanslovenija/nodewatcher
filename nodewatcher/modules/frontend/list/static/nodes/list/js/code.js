@@ -51,7 +51,7 @@
                         'network.routing.topology'
                     ]
                 },
-                registrySearchField: 'config:core.general__name__icontains',
+                registrySearchFilters: 'config:core.general__name__icontains="%s"',
                 columns: [
                     {data: 'config.core__type.type', width: 0, render: $.nodewatcher.renderNodeType(table)},
                     {data: 'config.core__general.name', render: $.nodewatcher.api.renderNodeName(table)},
@@ -62,8 +62,7 @@
                     {data: 'monitoring.core__status.health', render: $.nodewatcher.renderStatus(table, 'Health'), class: 'center', width: '20px'},
                     {data: 'monitoring.network__routing__topology[].', render: renderRoutingTopology},
                     {data: 'config.core__project.project.name'},
-                    // So that user can search by UUID.
-                    {data: 'uuid', 'visible': false}
+                    {data: '@id', 'visible': false}
                 ],
                 // And make default sorting by type and name columns.
                 order: [[0, 'asc'],[1, 'asc']],

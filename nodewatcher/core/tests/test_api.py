@@ -204,11 +204,11 @@ class CoreAPITest(test.RegistryAPITestCase):
 
     def test_filter(self):
         # Filter equality.
-        response = self.get_node_list({'config:core.general__name': 'Node 0'})
+        response = self.get_node_list({'filters': 'config:core.general__name="Node 0"'})
         self.assertEquals(response.data['count'], 1)
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'fields': 'config:core.general', 'config:core.general__name': 'Node 0'})
+        response = self.get_node_list({'fields': 'config:core.general', 'filters': 'config:core.general__name="Node 0"'})
         self.assertEquals(response.data['count'], 1)
         for item in response.data['results']:
             self.assertDataKeysEqual(item, ['config'])
@@ -221,30 +221,29 @@ class CoreAPITest(test.RegistryAPITestCase):
             self.assertEquals(item['config']['core.general']['name'], 'Node 0')
 
         # Filter with __contains.
-        response = self.get_node_list({'config:core.general__name__contains': 'Node'})
+        response = self.get_node_list({'filters': 'config:core.general__name__contains="Node"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:core.general__name__contains': 'node'})
+        response = self.get_node_list({'filters': 'config:core.general__name__contains="node"'})
         self.assertEquals(response.data['count'], 0)
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:core.general__name__icontains': 'node'})
+        response = self.get_node_list({'filters': 'config:core.general__name__icontains="node"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
         # Filter multiple fields at once.
-        response = self.get_node_list({'config:core.general__name__contains': 'Node', 'config:core.routerid__router_id__contains': '127'})
+        response = self.get_node_list({'filters': 'config:core.general__name__contains="Node",config:core.routerid__router_id__contains="127"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:core.general__name__contains': 'Node', 'config:core.routerid__router_id__contains': '555'})
+        response = self.get_node_list({'filters': 'config:core.general__name__contains="Node",config:core.routerid__router_id__contains="555"'})
         self.assertEquals(response.data['count'], 0)
         self.assertResponseWithoutProjections(response)
 
         response = self.get_node_list({
-            'config:core.general__name__contains': 'Node',
-            'config:core.routerid__router_id__contains': '127',
+            'filters': 'config:core.general__name__contains="Node",config:core.routerid__router_id__contains="127"',
             'fields': 'config:core.routerid__router_id'
         })
         self.assertEquals(response.data['count'], len(self.nodes))
@@ -264,20 +263,32 @@ class CoreAPITest(test.RegistryAPITestCase):
                 [rid.router_id for rid in node.config.core.routerid()]
             )
 
+        # Filter with complex expressions.
+        response = self.get_node_list({
+            'filters': 'config:core.general__name__contains="Node",(config:core.general__name="Node 0"|config:core.general__name="Node 1")',
+            'fields': 'config:core.general__name'
+        })
+        self.assertEquals(response.data['count'], 2)
+        for item in response.data['results']:
+            self.assertDataKeysEqual(item, ['config'])
+            self.assertIn(item['@id'], self.nodes)
+            self.assertItemsEqual(item['config'].keys(), ['core.general'])
+            self.assertIn(item['config']['core.general']['name'], ['Node 0', 'Node 1'])
+
         # Filter by invalid fields.
-        response = self.get_node_list({'invalidregpoint:core.general__name__contains': 'Node 0'})
+        response = self.get_node_list({'filters': 'invalidregpoint:core.general__name__contains="Node 0"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:strange.registry.id__name__contains': 'Node 0'})
+        response = self.get_node_list({'filters': 'config:strange.registry.id__name__contains="Node 0"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:core.general__invalidfield': 'Node 0'})
+        response = self.get_node_list({'filters': 'config:core.general__invalidfield="Node 0"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:core.general__invalidfield__contains': 'Node 0'})
+        response = self.get_node_list({'filters': 'config:core.general__invalidfield__contains="Node 0"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
@@ -327,11 +338,11 @@ class CoreAPITest(test.RegistryAPITestCase):
         check_authentication_results(response, False)
 
         # Check filter by sensitive fields.
-        response = self.get_node_list({'config:core.authentication__password': 'my password 0'})
+        response = self.get_node_list({'filters': 'config:core.authentication__password="my password 0"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 
-        response = self.get_node_list({'config:core.authentication__password__contains': 'my password 0'})
+        response = self.get_node_list({'filters': 'config:core.authentication__password__contains="my password 0"'})
         self.assertEquals(response.data['count'], len(self.nodes))
         self.assertResponseWithoutProjections(response)
 

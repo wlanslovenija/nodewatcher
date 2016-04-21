@@ -167,6 +167,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         return raw_alias
 
+    def raw_filter(self, *args, **kwargs):
+        return super(RegistryQuerySet, self).filter(*args, **kwargs)
+
     def filter(self, *args, **kwargs):
         """
         An augmented filter method to support querying by virtual fields created
@@ -520,3 +523,31 @@ class RegistryLookupManager(gis_models.GeoManager):
 
     def registry_fields(self, **kwargs):
         return self.get_queryset().registry_fields(**kwargs)
+
+
+def selector_for_lookup(root_cls, lookup, disallow_sensitive=False):
+    """
+    Generates a Django ORM selector for performing a specific registry field lookup.
+
+    :param root_cls: Registry root model class
+    :param lookup: A LookupExpression for the destination field
+    :param disallow_sensitive: Should sensitive fields be disallowed
+    :return A tuple (selector, ensure_distinct) or None in case a field is disallowed
+    """
+
+    from . import registration
+
+    registration_point = registration.point('%s.%s' % (root_cls._meta.concrete_model._meta.model_name, lookup.registration_point))
+    dst_model, dst_field = registration_point.get_model_with_field(lookup.registry_id, lookup.field[0])
+    dst_field = dst_field.name
+
+    # Disallow filter by sensitive fields if requested.
+    if dst_field in dst_model._registry.sensitive_fields and disallow_sensitive:
+        return None
+
+    selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field
+    if len(lookup.field) > 1:
+        selector += constants.LOOKUP_SEP + constants.LOOKUP_SEP.join(lookup.field[1:])
+
+    ensure_distinct = dst_model._registry.multiple
+    return (selector, ensure_distinct)
