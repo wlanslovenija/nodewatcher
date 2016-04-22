@@ -344,6 +344,9 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 if dst_related is not None:
                     raise ValueError("Related fields on registry items with multiple models not supported!")
 
+                if dst_field is not None and not dst_field.concrete:
+                    raise ValueError("Cannot project non-concrete field on registry items with multiple models.")
+
                 from . import fields
 
                 dst_field_name = dst_field.name if dst_field else None
