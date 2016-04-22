@@ -108,7 +108,9 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                 country='SI',
                 timezone='Europe/Ljubljana',
                 altitude=0,
-                geolocation='POINT(%f %f)' % (10 + (i / 100.0), 40 + (i / 100.0)),
+                defaults={
+                    'geolocation': 'POINT(%f %f)' % (10 + (i / 100.0), 40 + (i / 100.0)),
+                }
             )
 
             cls.nodes.append(node)

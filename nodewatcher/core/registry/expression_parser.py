@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 21, 12, 4, 1, 3)
+__version__ = (2016, 4, 22, 12, 30, 42, 4)
 
 __all__ = [
     'ExpressionParser',
@@ -241,10 +241,22 @@ class ExpressionParser(Parser):
     def _CONSTANT_(self):
         with self._choice():
             with self._option():
+                self._FLOAT_()
+            with self._option():
                 self._INTEGER_()
             with self._option():
                 self._STRING_()
+            with self._option():
+                self._distance_()
+            with self._option():
+                self._area_()
+            with self._option():
+                self._tuple_()
             self._error('no available options')
+
+    @graken()
+    def _FLOAT_(self):
+        self._pattern(r'[0-9+]\.[0-9+]')
 
     @graken()
     def _INTEGER_(self):
@@ -268,6 +280,47 @@ class ExpressionParser(Parser):
     @graken()
     def _ESC_(self):
         self._pattern(r'\\["\\]')
+
+    @graken()
+    def _tuple_(self):
+        self._token('{')
+        self._tuple_values_()
+        self.name_last_node('@')
+        self._token('}')
+
+    @graken()
+    def _tuple_values_(self):
+
+        def sep0():
+            self._token(',')
+
+        def block0():
+            self._CONSTANT_()
+        self._positive_closure(block0, prefix=sep0)
+
+    @graken()
+    def _distance_(self):
+        self._token('distance::')
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._FLOAT_()
+                with self._option():
+                    self._INTEGER_()
+                self._error('no available options')
+        self.name_last_node('@')
+
+    @graken()
+    def _area_(self):
+        self._token('area::')
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._FLOAT_()
+                with self._option():
+                    self._INTEGER_()
+                self._error('no available options')
+        self.name_last_node('@')
 
 
 class ExpressionSemantics(object):
@@ -331,6 +384,9 @@ class ExpressionSemantics(object):
     def CONSTANT(self, ast):
         return ast
 
+    def FLOAT(self, ast):
+        return ast
+
     def INTEGER(self, ast):
         return ast
 
@@ -338,6 +394,18 @@ class ExpressionSemantics(object):
         return ast
 
     def ESC(self, ast):
+        return ast
+
+    def tuple(self, ast):
+        return ast
+
+    def tuple_values(self, ast):
+        return ast
+
+    def distance(self, ast):
+        return ast
+
+    def area(self, ast):
         return ast
 
 

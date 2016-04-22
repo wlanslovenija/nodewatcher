@@ -17,12 +17,13 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     """
 
     address = models.CharField(max_length=100, blank=True)
-    city = models.CharField(max_length=100, blank=True) # TODO: Autocomplete city field?
+    city = models.CharField(max_length=100, blank=True)  # TODO: Autocomplete city field?
     country = country_field.CountryField(null=True, blank=True)
     timezone = timezone_field.TimeZoneField(null=True, blank=True)
-    geolocation = gis_models.PointField(null=True, blank=True)
+    geolocation = gis_models.PointField(geography=True, null=True, blank=True)
     altitude = models.FloatField(default=0)
 
+    # TODO: This manager should be removed when we drop support for Tastypie-based API.
     geo_objects = gis_models.GeoManager()
 
     class RegistryMeta:

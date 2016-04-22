@@ -3,6 +3,7 @@ import re
 from grako import exceptions
 
 from django.db.models import constants, query
+from django.contrib.gis import measure
 
 from . import expression_parser
 
@@ -87,8 +88,20 @@ class LookupExpressionSemantics(expression_parser.ExpressionSemantics):
     def INTEGER(self, ast):
         return int(ast)
 
+    def FLOAT(self, ast):
+        return float(ast)
+
     def STRING(self, ast):
         return ''.join(ast)
+
+    def TUPLE(self, ast):
+        return tuple(ast)
+
+    def distance(self, ast):
+        return measure.Distance(m=ast)
+
+    def area(self, ast):
+        return measure.Area(sq_m=ast)
 
 
 class LookupExpressionParser(object):
