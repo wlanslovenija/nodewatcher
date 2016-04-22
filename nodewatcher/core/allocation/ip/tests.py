@@ -2,7 +2,10 @@ import datetime
 import multiprocessing
 import unittest
 
+from django.core import urlresolvers
 from django.db import transaction, connection
+
+from nodewatcher.core.registry.api import test as api_test
 
 from . import models
 
@@ -19,7 +22,7 @@ def _concurrent_allocation_worker(pool):
     return (alloc.network, alloc.prefix_length)
 
 
-class IpPoolTestCase(unittest.TestCase):
+class IpPoolTest(unittest.TestCase):
     def setUp(self):
         """
         Prepare the IP pool test environment by creating some dummy IP
@@ -126,3 +129,44 @@ class IpPoolTestCase(unittest.TestCase):
         finally:
             workers.close()
             workers.join()
+
+
+class IpPoolAPITest(api_test.RegistryAPITestCase):
+    def setUp(self):
+        # Create an allocation pool.
+        self.pool = models.IpPool.objects.create(
+            description="Top level pool",
+            family='ipv4',
+            network='10.10.0.0',
+            prefix_length=16,
+        )
+
+        super(IpPoolAPITest, self).setUp()
+
+    def setUpNode(self, index, node):
+        node.config.core.routerid(
+            create=models.AllocatedIpRouterIdConfig,
+            family='ipv4',
+            pool=self.pool,
+            prefix_length=27,
+            allocation=self.pool.allocate_subnet(prefix_len=27)
+        ).save()
+
+    def get_ip_allocation_list(self, *args, **kwargs):
+        return self.client.get(urlresolvers.reverse('apiv2:ippool-list'), *args, **kwargs)
+
+    def test_list(self):
+        response = self.get_ip_allocation_list()
+        self.assertEquals(response.data['count'], 105)
+        for item in response.data['results']:
+            self.assertDataKeysEqual(item, ['family', 'network', 'prefix_length', 'status', 'description', 'prefix_length_default',
+                                            'prefix_length_minimum', 'prefix_length_maximum', 'held_from', 'top_level'])
+
+            self.assertDataKeysEqual(item['top_level'], ['description'])
+            self.assertEquals(item['top_level']['description'], "Top level pool")
+
+    def test_allocated_to_filter(self):
+        # Check that the allocated_to filter can filter by nodes.
+        for node_id, node in self.nodes.items():
+            response = self.get_ip_allocation_list({'allocated_to': 'node,%s' % node_id})
+            self.assertEquals(response.data['count'], 1)
