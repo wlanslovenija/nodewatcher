@@ -29,6 +29,9 @@ for model in top_level_models:
         }
     )
 
+    # Register the serializer with the API serializer pool.
+    api_serializers.pool.register(serializer)
+
     viewset = type(
         '%sViewSet' % (model.__name__),
         (views.RegistryRootViewSetMixin, drf_viewsets.ReadOnlyModelViewSet),
