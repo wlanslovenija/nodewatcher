@@ -18,12 +18,22 @@ __all__ = [
 
 
 class JSONLDSerializerMixin(object):
+    """
+    Mixin, which adds JSON-LD metadata to a serializer.
+    """
+
     def to_representation(self, instance):
         data = super(JSONLDSerializerMixin, self).to_representation(instance)
 
         # Fix primary key field.
+        id_field = None
         if instance._meta.pk.name in data:
-            del data[instance._meta.pk.name]
+            id_field = instance._meta.pk.name
+        elif 'id' in data:
+            id_field = 'id'
+
+        if id_field:
+            del data[id_field]
             data['@id'] = str(instance.pk)
 
         # Include metadata.
