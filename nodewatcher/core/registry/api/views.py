@@ -54,26 +54,6 @@ class RegistryRootViewSetMixin(object):
         return queryset
 
 
-def apply_registry_filter(path, value, queryset):
-    """
-    Applies a given registry filter to the given queryset.
-
-    :param path: Field path
-    :param value: Filtered value
-    :param queryset: Queryset to apply the filter to
-    :return: An updated queryset
-    """
-
-    parser = expression.LookupExpressionParser()
-    info = parser.parse(path)
-
-    queryset = queryset.regpoint(info.registration_point)
-    condition = '%s%s%s' % (info.registry_id.replace('.', '_'), constants.LOOKUP_SEP, constants.LOOKUP_SEP.join(info.field or []))
-    queryset = queryset.registry_filter(**{condition: value, 'disallow_sensitive': True})
-
-    return queryset
-
-
 def apply_registry_field(field_specifier, queryset):
     """
     Applies a given registry field specifier to the given queryset.
