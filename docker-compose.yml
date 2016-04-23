@@ -63,7 +63,7 @@ generator:
     entrypoint: scripts/docker-run
     environment:
         # Allow celery to run under the root user in order for it to have access
-        C_FORCE_ROOT: true
+        C_FORCE_ROOT: "true"
     volumes:
         - .:/code
     links:
@@ -78,7 +78,7 @@ monitorq:
     entrypoint: scripts/docker-run
     environment:
         # Allow celery to run under the root user in order for it to have access
-        C_FORCE_ROOT: true
+        C_FORCE_ROOT: "true"
     volumes:
         - .:/code
     links:
