@@ -41,13 +41,13 @@ The following containers will be created and started when you run the above comm
 Initializing the database
 -------------------------
 
-.. note:: This and all further sections assume that the development environment has been started via `docker-compose up` and is running (in the background or in another terminal). If the environment is not running, some of the following commands will fail.
+.. note:: This and all further sections assume that the development environment has been started via ``docker-compose up`` and is running (in the background or in another terminal). If the environment is not running, some of the following commands will fail.
 
 In order to prepare the database, after running the development server execute::
 
     $ docker-compose run web scripts/docker-init-database
 
-This will recreate the `nodewatcher` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call `migrate`::
+This will recreate the ``nodewatcher`` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call ``migrate``::
 
     $ docker-compose run web python manage.py migrate
 
@@ -70,21 +70,37 @@ To compile SCSS files into CSS files run::
 .. _Compass: http://compass-style.org/
 .. _Sass: http://sass-lang.com/
 
-Importing the JSON database dump from version 2
------------------------------------------------
+Running management commands
+---------------------------
 
-If you have a JSON data export from nodewatcher version 2 available and would like to migrate to version 3, the procedure is as follows (after you have already performed the database initialization above). Let us assume that the dump is stored in a file called `dump.json` (note that the dump file must be located inside the toplevel directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher directory). The dump can be imported by running::
+When running any Django management command, do not forget to run it via the container as otherwise the settings
+will be wrong. You can do it by prefixing commands with ``docker-compose run web`` like this::
+
+    $ docker-compose run web python manage.py <command...>
+
+Populating the database
+-----------------------
+
+If you are installing the nodewatcher from scratch, you should probably now create a Django admin user::
+
+    $ docker-compose run web python manage.py createsuperuser
+
+Now you can login with this user into the nodewatcher at http://localhost:8000/account/login/ or into
+the nodewatcher's admin interface at http://localhost:8000/admin/.
+
+.. note::
+    Depending on your Docker installation the web interface might not be available at ``localhost``
+    but at some other address.
+
+If you have a JSON data export from nodewatcher version 2 available and would like to migrate to version 3,
+the procedure is as follows (after you have already performed the database initialization above). Let us assume
+that the dump is stored in a file called ``dump.json`` (note that the dump file must be located inside the top-level
+directory as commands are executed inside the container which only sees what is under the toplevel nodewatcher
+directory). The dump can be imported by running::
 
     $ docker-compose run web python manage.py import_nw2 dump.json
 
 Now the database is ready for use with nodewatcher 3.
-
-Running management commands
----------------------------
-
-Don't forget to run any management command via the container as otherwise the settings will be wrong. You can do it by prefixing commands with `docker-compose run web` like this::
-
-    $ docker-compose run web python manage.py <command...>
 
 .. _development-run-builder:
 
@@ -153,7 +169,7 @@ In order to enable data collection from nodes, the monitoring system needs to be
 
 Then, there are two configuration options that need to be set in ``settings.py``:
 
-* ``OLSRD_MONITOR_HOST`` should point to an IP address where an `olsrd` instance is responding to HTTP requests about the routing state using the `txtinfo` plugin. In the default configuration, this will be used by the ``modules.routing.olsr`` module to enumerate visible nodes and obtain topology information.
+* ``OLSRD_MONITOR_HOST`` should point to an IP address where an ``olsrd`` instance is responding to HTTP requests about the routing state using the ``txtinfo`` plugin. In the default configuration, this will be used by the ``modules.routing.olsr`` module to enumerate visible nodes and obtain topology information.
 * ``MEASUREMENT_SOURCE_NODE`` should be set to an UUID of a node that is performing the RTT measurements (this means that such a node must first be created using nodewatcher). This option is planned to be removed from ``settings.py`` and moved into the administration interface.
 
 After the above settings are configured, one may run the monitoring system by issuing::
