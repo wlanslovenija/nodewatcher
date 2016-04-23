@@ -620,10 +620,12 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
             self.remove_tunneldigger(state)
 
     def get_servers(self, state):
-        # Get the currently configured project.
+        # Get configured project.
+        project_config = state.lookup_item(project_models.ProjectConfig)
         try:
-            project_config = state.filter_items('core.project')[0]
-        except IndexError:
+            if project_config and not project_config.project:
+                project_config = None
+        except project_models.Project.DoesNotExist:
             project_config = None
 
         query = models.Q(PerProjectTunneldiggerServer___project=None)
@@ -693,10 +695,12 @@ class DnsServers(registry_forms.FormDefaults):
                 state.remove_item(server)
 
     def get_servers(self, state):
-        # Get the currently configured project.
+        # Get configured project.
+        project_config = state.lookup_item(project_models.ProjectConfig)
         try:
-            project_config = state.filter_items('core.project')[0]
-        except IndexError:
+            if project_config and not project_config.project:
+                project_config = None
+        except project_models.Project.DoesNotExist:
             project_config = None
 
         query = models.Q(PerProjectDnsServer___project=None)
