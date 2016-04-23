@@ -51,22 +51,18 @@ class DefaultProject(registry_forms.FormDefaults):
         if not create:
             return
 
-        # Default to project 'Slovenia' in case it exists.
-        try:
-            slovenia_project = project_models.Project.objects.get(name='Slovenija')
-        except project_models.Project.DoesNotExist:
-            return
-
         # Choose a default project.
+        default_project = project_models.project_default(state.get_request())
+
         project_config = state.lookup_item(project_models.ProjectConfig)
         if not project_config:
-            state.append_item(project_models.ProjectConfig, project=slovenia_project)
+            state.append_item(project_models.ProjectConfig, project=default_project)
         else:
             try:
                 if project_config.project:
                     return
             except project_models.Project.DoesNotExist:
-                state.update_item(project_config, project=slovenia_project)
+                state.update_item(project_config, project=default_project)
 
 registration.point('node.config').add_form_defaults(DefaultProject())
 

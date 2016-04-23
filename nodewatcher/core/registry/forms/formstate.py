@@ -20,6 +20,8 @@ class FormState(dict):
         self._form_action_dependencies = {}
         self._item_map = {}
 
+        self._request = context.request
+
         # Initialize the session.
         self._session = context.request.session
         if not context.data or 'registry_form_id' not in context.data:
@@ -35,6 +37,9 @@ class FormState(dict):
 
         self._metadata = self.session['metadata']
         self._annotations = self.session['annotations']
+
+    def get_request(self):
+        return self._request
 
     def _get_session(self):
         self._session.modified = True
