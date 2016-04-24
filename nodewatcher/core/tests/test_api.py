@@ -124,7 +124,6 @@ class CoreAPITest(test.RegistryAPITestCase):
         # Project an invalid field.
         self.assertResponseWithoutProjections(self.get_node_list({'fields': 'config:core.general__invalidfield'}))
         # Project some invalid expressions.
-        self.assertResponseWithoutProjections(self.get_node_list({'fields': 'core.general__name'}))
         self.assertResponseWithoutProjections(self.get_node_list({'fields': 'config:core.general__'}))
         self.assertResponseWithoutProjections(self.get_node_list({'fields': 'config:core.general[]'}))
         self.assertResponseWithoutProjections(self.get_node_list({'fields': 'config:core.general[foo]'}))

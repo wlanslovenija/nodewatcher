@@ -118,8 +118,15 @@ class RegistryTestCase(django_test.TransactionTestCase):
             self.assertEquals(thing.f1.interesting, 'nope')
             self.assertEquals(thing.f1.pk, None)
 
-        with self.assertRaises(TypeError):
-            models.Thing.objects.regpoint('first').registry_fields(f1=models.FirstSubRegistryItem)
+        # Check that registration point may be specified for each field separately.
+        models.Thing.objects.regpoint('first').registry_fields(f1=models.FirstSubRegistryItem)
+        for thing in models.Thing.objects.registry_fields(f1='first:foo.simple__additional'):
+            self.assertEquals(thing.f1, 42)
+        for thing in models.Thing.objects.regpoint('second').registry_fields(f1='first:foo.simple__another'):
+            self.assertEquals(thing.f1, 69)
+        for thing in models.Thing.objects.registry_fields(f1='first:foo.simple__additional', f2='second:foo.multiple'):
+            self.assertEquals(thing.f1, 42)
+            self.assertEquals(len(thing.f2.all()), 4)
 
         # Test filter queries
         thing = models.Thing.objects.all()[0]

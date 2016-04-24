@@ -13,6 +13,7 @@ from django.utils import tree
 from . import expression, exceptions
 
 
+# TODO: No need to subclass GeoQuerySet once we get rid of Tastypie.
 class RegistryQuerySet(gis_models.query.GeoQuerySet):
     """
     An augmented query set that enables lookups of values from the registry.
@@ -224,8 +225,7 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         Select fields from the registry.
         """
 
-        if getattr(self, '_regpoint', None) is None:
-            raise ValueError("Calling 'registry_fields' first requires a selected registration point!")
+        from . import registration
 
         clone = self._clone()
 
@@ -299,18 +299,10 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
             m2m = False
 
             if inspect.isclass(dst) and issubclass(dst, django_models.Model):
-                if not self._regpoint.is_item(dst):
-                    raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
-
-                dst_registry_id = dst._registry.registry_id
                 dst_model = dst
             elif isinstance(dst, django_models.QuerySet):
                 dst_model = dst.model
-                dst_registry_id = dst_model._registry.registry_id
                 dst_queryset = dst
-
-                if not self._regpoint.is_item(dst_model):
-                    raise TypeError("Specified models must be registry items registered under '%s'!" % self._regpoint.name)
             else:
                 if isinstance(dst, expression.LookupExpression):
                     # We can use an already parsed lookup expression directly.
@@ -318,23 +310,35 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 else:
                     info = parser.parse(dst)
 
-                # TODO: Support inline registration point specification.
-                dst_registry_id = info.registry_id
+                try:
+                    if not info.registration_point:
+                        registration_point = self._regpoint
+                        if not registration_point:
+                            raise ValueError("Registration point not specified.")
+                    else:
+                        registration_point = registration.point('%s.%s' % (clone.model._meta.concrete_model._meta.model_name, info.registration_point))
+                except KeyError, name:
+                    raise ValueError("Invalid registration point: %s" % name)
+
                 if info.field:
                     # Discover, which model provides the destination field.
-                    dst_model, dst_field = self._regpoint.get_model_with_field(info.registry_id, info.field[0])
+                    dst_model, dst_field = registration_point.get_model_with_field(info.registry_id, info.field[0])
                     m2m = dst_field.many_to_many
 
                     # TODO: Support arbitrary chains of relations.
                     if len(info.field) > 1:
                         dst_related = info.field[1]
                 else:
-                    dst_model = self._regpoint.get_top_level_class(info.registry_id)
+                    dst_model = registration_point.get_top_level_class(info.registry_id)
 
                 # If there are constraints, we need to specify a queryset and apply the constraints.
                 if info.constraints:
                     dst_queryset = info.apply_constraints(dst_model.objects.all())
 
+            if not hasattr(dst_model, '_registry'):
+                raise TypeError("Specified model must be a registry item.")
+            if not issubclass(clone.model, dst_model._registry.registration_point.model):
+                raise TypeError("Specified registry item is not part of any registration point for '%s'." % clone.model.__name__)
             if m2m:
                 raise ValueError("Many-to-many fields not supported in registry_fields query!")
 
@@ -343,7 +347,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
                 # provide the proxy model with a descriptor that returns a queryset to the models.
                 if dst_related is not None:
                     raise ValueError("Related fields on registry items with multiple models not supported!")
-
                 if dst_field is not None and not dst_field.concrete:
                     raise ValueError("Cannot project non-concrete field on registry items with multiple models.")
 
@@ -474,30 +477,6 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
         clone = clone.extra(order_by=final_fields)
 
         return clone
-
-    def ip_filter(self, **kwargs):
-        """
-        Performs a lookup on inet fields.
-        """
-
-        connection = django_db.connections[self._db or django_db.DEFAULT_DB_ALIAS]
-        where_opts = []
-        for key, value in kwargs.iteritems():
-            field, op = key.split(constants.LOOKUP_SEP)
-            field_obj = self.model._meta.get_field(field)
-            value = field_obj.get_db_prep_lookup('exact', value, connection=connection)[0]
-            field = '%s.%s' % (self.model._meta.db_table, field)
-
-            if op == 'contains':
-                where_opts.append('%s >>= %s' % (field, value))
-            elif op == 'contained':
-                where_opts.append('%s <<= %s' % (field, value))
-            elif op == 'conflicts':
-                where_opts.append('(%s <<= %s OR %s >>= %s)' % (field, value, field, value))
-            else:
-                raise TypeError("Operation '%s' not supported." % op)
-
-        return self.extra(where=where_opts)
 
 
 class RegistryLookupManager(gis_models.GeoManager):

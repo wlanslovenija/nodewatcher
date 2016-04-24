@@ -67,7 +67,7 @@ def apply_registry_field(field_specifier, queryset):
     info = parser.parse(field_specifier)
     field_name = info.name
 
-    queryset = queryset.regpoint(info.registration_point).registry_fields(**{field_name: info})
+    queryset = queryset.registry_fields(**{field_name: info})
     for field in queryset.model._meta.virtual_fields:
         if field.name != field_name:
             continue
