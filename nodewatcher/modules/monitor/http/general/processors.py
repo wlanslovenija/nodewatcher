@@ -48,16 +48,16 @@ class GeneralInfo(monitor_processors.NodeProcessor):
             status = node.monitoring.system.status(create=monitor_models.SystemStatusMonitor)
 
         if version >= 4:
-            general.uuid = context.http.core.general.uuid
-            general.firmware = context.http.core.general.version
+            general.uuid = context.http.core.general.get('uuid', None)
+            general.firmware = context.http.core.general.get('version', None)
 
             # Process node uptime and local time (v4+).
             status.uptime = int(context.http.core.general.uptime)
             local_time = int(context.http.core.general.local_time)
             status.local_time = datetime.datetime.fromtimestamp(local_time, pytz.utc)
         else:
-            general.uuid = context.http.general.uuid
-            general.firmware = context.http.general.version
+            general.uuid = context.http.general.get('uuid', None)
+            general.firmware = context.http.general.get('version', None)
 
             # Process node uptime and local time (v1+).
             uptime, _ = context.http.general.uptime.split()
