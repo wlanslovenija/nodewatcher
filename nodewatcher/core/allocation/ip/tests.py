@@ -168,5 +168,5 @@ class IpPoolAPITest(api_test.RegistryAPITestCase):
     def test_allocated_to_filter(self):
         # Check that the allocated_to filter can filter by nodes.
         for node_id, node in self.nodes.items():
-            response = self.get_ip_allocation_list({'allocated_to': 'node,%s' % node_id})
+            response = self.get_ip_allocation_list({'allocated_to': 'node:%s' % node_id})
             self.assertEquals(response.data['count'], 1)

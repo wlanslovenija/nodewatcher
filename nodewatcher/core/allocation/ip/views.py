@@ -18,7 +18,7 @@ class IpPoolViewSet(viewsets.ReadOnlyModelViewSet):
         # Support allocated_to queries (list of IP pool allocations for a given object).
         allocated_to = self.request.query_params.get('allocated_to', None)
         if allocated_to:
-            allocated_to = allocated_to.split(',')
+            allocated_to = allocated_to.split(':')
 
             if len(allocated_to) == 2:
                 base_model, root_id = allocated_to

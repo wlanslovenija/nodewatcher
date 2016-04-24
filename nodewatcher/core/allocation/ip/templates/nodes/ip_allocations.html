@@ -11,7 +11,7 @@
 
 {% theme_legend _("IP allocations") %}
 <div class="ip-allocations">
-    <table class="table table-striped ip-allocation-list {% block ip_allocation_list_classes %}{% endblock ip_allocation_list_classes %}" data-source="{% block ip_allocation_list_data_source %}{% url "apiv2:ippool-list" %}?allocated_to=node,{{ node.pk }}{% endblock ip_allocation_list_data_source %}" width="100%">
+    <table class="table table-striped ip-allocation-list {% block ip_allocation_list_classes %}{% endblock ip_allocation_list_classes %}" data-source="{% block ip_allocation_list_data_source %}{% url "apiv2:ippool-list" %}?allocated_to=node:{{ node.pk }}{% endblock ip_allocation_list_data_source %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Pool" %}</th>
