@@ -5,13 +5,13 @@
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
-    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "api/js/base.js" %}
     {% add_data "js_data" "ip_allocations/js/list.js" %}
 {% endcontextblock %}
 
 {% theme_legend _("IP allocations") %}
 <div class="ip-allocations">
-    <table class="table table-striped ip-allocation-list {% block ip_allocation_list_classes %}{% endblock ip_allocation_list_classes %}" data-source="{% block ip_allocation_list_data_source %}{% url "api:api_dispatch_node" "v1" node.pk "ip_allocations" %}{% endblock ip_allocation_list_data_source %}" width="100%">
+    <table class="table table-striped ip-allocation-list {% block ip_allocation_list_classes %}{% endblock ip_allocation_list_classes %}" data-source="{% block ip_allocation_list_data_source %}{% url "apiv2:ippool-list" %}?allocated_to=node:{{ node.pk }}{% endblock ip_allocation_list_data_source %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Pool" %}</th>

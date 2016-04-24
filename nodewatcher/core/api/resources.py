@@ -11,7 +11,7 @@ from django_datastream import resources as datastream_resources, serializers
 
 import jsonfield
 
-from ...registry import fields as registry_fields
+from ..registry import fields as registry_fields
 
 from . import fields, paginator
 

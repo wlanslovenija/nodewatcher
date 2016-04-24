@@ -82,5 +82,6 @@ class PublicKeyAuthenticationConfig(cgm_models.AuthenticationConfig):
 
     class RegistryMeta(cgm_models.AuthenticationConfig.RegistryMeta):
         registry_name = _("Public Key")
+        sensitive_fields = ['public_key']
 
 registration.point('node.config').register_item(PublicKeyAuthenticationConfig)

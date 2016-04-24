@@ -1,6 +1,6 @@
 from nodewatcher.core.frontend import components
 
-from . import models
+from . import models, serializers, views
 
 
 components.partials.get_partial('node_general_partial').add(components.PartialEntry(

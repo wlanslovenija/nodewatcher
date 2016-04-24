@@ -24,7 +24,7 @@ class NodesByDeviceResource(resources.StatisticsResource):
 
     def get_statistics(self):
         return core_models.Node.objects.regpoint('config').registry_fields(
-            device='core.general#router'
+            device='core.general__router'
         ).values(
             'device'
         ).annotate(

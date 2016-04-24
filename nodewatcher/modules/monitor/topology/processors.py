@@ -84,7 +84,7 @@ class Topology(monitor_processors.NetworkProcessor):
         node_attributes = tp_pool.get_attributes(tp_base.NodeAttribute)
 
         qs = core_models.Node.objects.all()
-        qs = qs.regpoint('monitoring').registry_fields(status='core.status#network')
+        qs = qs.regpoint('monitoring').registry_fields(status='core.status__network')
         qs = qs.filter(models.Q(pk__in=vertices.keys()) | models.Q(status='up'))
         qs = qs.regpoint('config')
         for attr in node_attributes:

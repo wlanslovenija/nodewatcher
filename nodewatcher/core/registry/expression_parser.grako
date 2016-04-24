@@ -1,0 +1,45 @@
+######################
+# Filter expression. #
+######################
+filter = filter_expression_prec1 $ ;
+
+filter_expression_prec1 = {lhs:filter_expression_prec2 op:(',' | '|')} rhs:filter_expression_prec2 ;
+filter_expression_prec2 = {op:('!')} expression:filter_expression_prec3 ;
+filter_expression_prec3 = atom ;
+
+atom = equality_lookup | ( '(' @:filter_expression_prec1 ')' ) ;
+
+equality_lookup = field:lookup_filter '=' value:CONSTANT ;
+lookup_filter = registration_point:registration_point registry_id:registry_id field:field_specifier ;
+
+######################
+# Lookup expression. #
+######################
+lookup = [registration_point:registration_point] registry_id:registry_id [constraints:constraint_specifier] [field:field_specifier] $ ;
+
+registration_point = @:FIELD ':' ;
+registry_id = '.'.{ REGISTRY_ID_ATOM } ;
+REGISTRY_ID_ATOM = /[a-zA-Z0-9]+/ ;
+
+field_specifier = '__' @:fields ;
+fields = '__'.{ FIELD } ;
+FIELD = /([a-zA-Z0-9]|_(?!_))+/ ;
+
+constraint_specifier = '[' @:constraints ']' ;
+constraints = ( CONSTRAINT_SEPARATOR ).{ constraint } ;
+constraint = field:fields operator:operator value:CONSTANT ;
+CONSTRAINT_SEPARATOR = ',' ;
+
+operator = '=' ;
+
+CONSTANT = FLOAT | INTEGER | STRING | distance | area | tuple ;
+FLOAT = /[0-9+]\.[0-9+]/ ;
+INTEGER = /[0-9]+/ ;
+STRING = '"' @:{/[^"\n\\]/ | ESC} '"' ;
+ESC = ?/\\["\\]/? ;
+
+tuple = '{' @:tuple_values '}' ;
+tuple_values = ','.{ CONSTANT } ;
+
+distance = 'distance::' @:(FLOAT | INTEGER) ;
+area = 'area::' @:(FLOAT | INTEGER) ;

@@ -6,7 +6,7 @@ from django.db import models as django_models
 
 import jsonfield
 
-from . import access as registry_access, lookup as registry_lookup, models as registry_models, state as registry_state
+from . import access as registry_access, lookup as registry_lookup, state as registry_state
 from . import exceptions
 from ...utils import datastructures as nw_datastructures
 
@@ -606,6 +606,10 @@ def create_point(model, namespace, mixins=None):
         point = RegistrationPoint(model, namespace, point_id)
         registry_state.points[point_id] = point
 
+        # We import it here so that we can import this file
+        # without an AppRegistryNotReady exception.
+        from . import models as registry_models
+
         # Create a new top-level class
         class Meta(registry_models.RegistryItemBase.Meta):
             abstract = True
@@ -683,3 +687,14 @@ def register_form_for_item(item, form_class):
     """
 
     item._registry.set_form_class(form_class)
+
+
+def register_serializer_for_item(item, serializer_class):
+    """
+    Registers a serializer for use with the specified registry item.
+
+    :param item: Registry item class
+    :param serializer_class: Serializer class
+    """
+
+    item._registry.serializer_class = serializer_class

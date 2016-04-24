@@ -1,10 +1,6 @@
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core.frontend import components
 
-from . import resources
-
-
-api.v1_api.register(resources.IpPoolResource())
-api.v1_api.register(resources.NodeIpAllocationResource())
+from . import serializers, views
 
 
 components.partials.get_partial('node_display_partial').add(components.PartialEntry(

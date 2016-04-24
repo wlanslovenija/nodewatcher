@@ -469,7 +469,9 @@ class Command(base.BaseCommand):
                 country=country,
                 timezone='Europe/Ljubljana',
                 altitude=0,
-                geolocation='POINT(%f %f)' % (node['geo_long'], node['geo_lat']) if node['geo_lat'] else None,
+                defaults={
+                    'geolocation': 'POINT(%f %f)' % (node['geo_long'], node['geo_lat']) if node['geo_lat'] else None,
+                }
             )
 
             # Description config

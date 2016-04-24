@@ -49,9 +49,9 @@ registration.register_form_for_item(models.CgmGeneralConfig, CgmGeneralConfigFor
 class AccessPointSelectionField(forms.ModelChoiceField):
     def __init__(self, protocol, **kwargs):
         kwargs['queryset'] = core_models.Node.objects.regpoint('config').registry_fields(
-            name='core.general#name',
+            name='core.general__name',
             wifi_interface='core.interfaces',
-            wifi_mode='core.interfaces#mode',
+            wifi_mode='core.interfaces__mode',
         ).filter(
             # Only show nodes which have access point interfaces configured.
             wifi_mode='ap',

@@ -5,7 +5,7 @@ from django import db as django_db
 from django.contrib.postgres import fields as postgres_fields
 from django.core import exceptions
 from django.db import models
-from django.db.models import constants
+from django.db.models import constants, query as django_query
 from django.db.models.fields import related as related_fields
 from django.forms import fields as widgets
 from django.utils import text, functional
@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from ...utils import ipaddr
 
-from . import registration, models as registry_models
+from . import registration
 from .forms import fields as form_fields
 
 
@@ -449,6 +449,10 @@ class ReferenceChoiceField(models.ForeignKey):
         Performs relation validation after the destination model is fully resolved.
         """
 
+        # We import it here so that we can import this file
+        # without an AppRegistryNotReady exception.
+        from . import models as registry_models
+
         if not issubclass(cls, registry_models.RegistryItemBase):
             raise exceptions.ImproperlyConfigured(
                 'ReferenceChoiceField can only be used in registry item models!'
@@ -576,6 +580,7 @@ class RegistryProxyMultipleDescriptor(object):
         self.related_model = field_with_rel.rel.to
         self.related_field = field_with_rel.related_field
         self.cache_name = field_with_rel.get_cache_name()
+        self.queryset = field_with_rel.queryset
 
         # Generate a chain that can be used to generate the filter query.
         toplevel = self.related_model._registry.get_toplevel_class()
@@ -596,8 +601,14 @@ class RegistryProxyMultipleDescriptor(object):
         rel_model = self.related_model
         rel_field = rel_model._meta.get_field('root')
         rel_subfield = self.related_field
+        rel_queryset = self.queryset
         chain = constants.LOOKUP_SEP.join(self.chain)
         cache_name = self.cache_name
+
+        class RelatedSubfieldIterable(django_query.ModelIterable):
+            def __iter__(self):
+                for row in super(RelatedSubfieldIterable, self).__iter__():
+                    yield getattr(row, rel_subfield)
 
         class RelatedManager(superclass):
             def __init__(self, instance):
@@ -609,15 +620,35 @@ class RegistryProxyMultipleDescriptor(object):
             def __call__(self, **kwargs):
                 raise Exception
 
+            def _get_queryset(self):
+                if rel_queryset is not None:
+                    # If a queryset is available, use it instead of the default queryset as it may have
+                    # some additional constraints applied.
+                    queryset = rel_queryset.all()
+                else:
+                    queryset = super(RelatedManager, self).get_queryset()
+
+                if rel_subfield is not None:
+                    # If the target subfield is known, then we skip polymorphic queries (as the proper model,
+                    # which has the target subfield has already been selected) and we only select a subset
+                    # of columns, as others will not be needed.
+                    queryset = queryset.non_polymorphic().only(rel_field.name, rel_subfield)
+
+                return queryset
+
             def get_queryset(self):
                 try:
                     qs = self.instance._prefetched_objects_cache[cache_name]
+
+                    if rel_subfield is not None and not getattr(qs, '_result_cache_fixed', False):
+                        # Fix the result cache as it is otherwise impossible to change the transformation
+                        # applied by the QuerySet iterator.
+                        qs._result_cache = map(lambda instance: getattr(instance, rel_subfield), qs._result_cache)
+                        qs._result_cache_fixed = True
                 except (AttributeError, KeyError):
                     db = self._db or django_db.router.db_for_read(self.model, instance=self.instance)
                     empty_strings_as_null = django_db.connections[db].features.interprets_empty_strings_as_nulls
-                    qs = super(RelatedManager, self).get_queryset()
-                    # Disable polymorphic queries as they can be very expensive in this case.
-                    qs = qs.non_polymorphic()
+                    qs = self._get_queryset()
 
                     qs._add_hints(instance=self.instance)
                     if self._db:
@@ -630,19 +661,17 @@ class RegistryProxyMultipleDescriptor(object):
                             return qs.none()
                     qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
 
-                if rel_subfield is not None:
-                    return qs.values_list(rel_subfield, flat=True)
+                    if rel_subfield is not None:
+                        qs._iterable_class = RelatedSubfieldIterable
 
                 return qs
 
             def get_prefetch_queryset(self, instances, queryset=None):
                 if queryset is None:
-                    queryset = super(RelatedManager, self).get_queryset().all()
+                    queryset = self._get_queryset()
 
                 queryset._add_hints(instance=instances[0])
                 queryset = queryset.using(queryset._db or self._db)
-                # Disable polymorphic queries as they can be very expensive in this case.
-                queryset = queryset.non_polymorphic()
 
                 rel_obj_attr = operator.attrgetter(rel_field.attname)
                 instance_attr = lambda obj: obj._get_pk_val()
@@ -663,6 +692,7 @@ class RegistryProxyMultipleDescriptor(object):
 class RegistryMultipleRelationField(models.Field):
     def __init__(self, to, *args, **kwargs):
         self.related_field = kwargs.pop('related_field', None)
+        self.queryset = kwargs.pop('queryset', None)
         kwargs['rel'] = related_fields.ForeignObjectRel(self, to)
         super(RegistryMultipleRelationField, self).__init__(*args, **kwargs)
 

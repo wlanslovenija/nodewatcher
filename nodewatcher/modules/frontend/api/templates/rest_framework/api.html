@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "rest_framework/base.html" %}
+{% endblock %}
+
+{% block title_value %}{{ name }}{% endblock %}
+
+{% block title_delimiter %}{% if name %}{{ block.super }}{% endif %}{% endblock title_delimiter %}
+
+{% block head_meta %}
+    {{ block.super }}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="robots" content="NONE,NOARCHIVE" />
+{% endblock %}

@@ -1,9 +1,10 @@
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core.api import urls as api_urls
+from nodewatcher.core.frontend import components
 
-from . import resources
+from . import resources, serializers
 
 
-api.v1_api.register(resources.BabelTopologyLinkResource())
+api_urls.v1_api.register(resources.BabelTopologyLinkResource())
 
 
 components.partials.get_partial('node_display_partial').add(components.PartialEntry(

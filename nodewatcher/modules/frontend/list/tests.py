@@ -108,7 +108,9 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                 country='SI',
                 timezone='Europe/Ljubljana',
                 altitude=0,
-                geolocation='POINT(%f %f)' % (10 + (i / 100.0), 40 + (i / 100.0)),
+                defaults={
+                    'geolocation': 'POINT(%f %f)' % (10 + (i / 100.0), 40 + (i / 100.0)),
+                }
             )
 
             cls.nodes.append(node)
@@ -407,9 +409,9 @@ class NodeResourceTest(test_runner.ResourceTestCase):
                     ({'last_seen__range': '2014-11-05 01:05:10+0000,2014-11-05 01:05:20+0000'}, lambda node: self.initial_time + datetime.timedelta(seconds=10) <= node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=20)),
                     ({'last_seen__range': ['2014-11-05 01:05:10+0000', '2014-11-05 01:05:20+0000']}, lambda node: self.initial_time + datetime.timedelta(seconds=10) <= node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=20)),
                     # Nodes in the space interval match nodes in the time interval, so we can use that to filter the test list.
-                    ({'location__geolocation__contained': json.dumps({'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]})}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
-                    ({'location__geolocation__contained': str({'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]})}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
-                    ({'location__geolocation__contained': {'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]}}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
+                    ({'location__geolocation__bboverlaps': json.dumps({'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]})}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
+                    ({'location__geolocation__bboverlaps': str({'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]})}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
+                    ({'location__geolocation__bboverlaps': {'type': 'Polygon', 'coordinates': [[[10, 40], [10.1, 40], [10.1, 40.1], [10, 40.1], [10, 40]]]}}, lambda node: node.monitoring.core.general().last_seen <= self.initial_time + datetime.timedelta(seconds=10)),
                 ):
                     kwargs = {
                         'offset': offset,

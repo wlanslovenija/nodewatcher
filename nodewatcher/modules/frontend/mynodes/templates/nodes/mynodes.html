@@ -6,15 +6,15 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% url "api:api_dispatch_list" "v1" "node" as api_url %}
+    {% url "apiv2:node-list" as api_url %}
     {% with username=request.user.username|urlencode %}
-    {% with api_url|add:"?maintainer="|add:username as url %}
+    {% with api_url|add:"?has_permissions="|add:username as url %}
     {% include "formats.html" %}
     {% endwith %}
     {% endwith %}
 {% endblock altlinks %}
 
-{% block node_list_data_source %}{{ block.super }}?maintainer={{ request.user.username|urlencode }}{% endblock node_list_data_source %}
+{% block node_list_data_source %}{{ block.super }}?has_permissions={{ request.user.username|urlencode }}{% endblock node_list_data_source %}
 
 {% block node_list_classes %}mynodes-list {{ block.super }}{% endblock node_list_classes %}
 

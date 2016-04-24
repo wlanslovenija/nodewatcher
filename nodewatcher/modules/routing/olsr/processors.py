@@ -45,7 +45,7 @@ class GlobalTopology(monitor_processors.NetworkProcessor):
         registered_routers = set()
         router_id_map = {}
         for node in core_models.Node.objects.regpoint('config').registry_fields(
-            router_id='core.routerid#router_id'
+            router_id='core.routerid__router_id'
         ).registry_filter(
             core_routerid__rid_family='ipv4',
             core_routerid__router_id__in=visible_routers,

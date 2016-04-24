@@ -13,6 +13,9 @@ from ....utils import ipaddr
 # Needed for node.config registration point
 from ... import models as core_models
 
+# Reverse relation name for IP address allocators.
+IP_ALLOCATOR_REVERSE_RELATION = 'allocations_%(app_label)s_%(class)s'
+
 
 class IpPoolStatus(object):
     """
@@ -343,7 +346,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
     subnet_hint = registry_fields.IPAddressField(null=True, blank=True, host_required=True)
     allocation = models.ForeignKey(
         IpPool, editable=False, null=True,
-        on_delete=models.PROTECT, related_name='allocations_%(app_label)s_%(class)s',
+        on_delete=models.PROTECT, related_name=IP_ALLOCATOR_REVERSE_RELATION,
     )
 
     class Meta:
