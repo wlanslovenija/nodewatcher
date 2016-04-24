@@ -48,12 +48,19 @@
     margin-top: 30px;
 }
 
-.btn-row {
+form .btn-row {
     margin: 20px 0;
 }
 
-form .btn-row {
-    text-align: right;
+form .btn-row:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+form .btn-row button {
+    float: right;
+    margin-left: 5px;
 }
 
 textarea.form-control {
