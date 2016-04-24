@@ -333,7 +333,7 @@ class IPAddressField(models.Field):
 
     default_error_messages = {
         'invalid': _("Enter a valid IP address in CIDR notation."),
-        'subnet_required': _("Enter a valid IP address with subnet in CIDR notation."),
+        'subnet_required': _("Enter a valid subnet's IP address with its prefix in CIDR notation."),
         'host_required': _("Enter a valid host IP address."),
     }
 
