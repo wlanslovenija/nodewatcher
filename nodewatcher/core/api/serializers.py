@@ -13,6 +13,7 @@ from . import exceptions
 # Exports.
 __all__ = [
     'JSONLDSerializerMixin',
+    'PolymorphicSerializerMixin',
     'pool'
 ]
 
@@ -43,6 +44,24 @@ class JSONLDSerializerMixin(object):
                 '@base': urlresolvers.reverse(base_view),
                 # TODO: Also include @vocab.
             }
+
+        return data
+
+
+class PolymorphicSerializerMixin(object):
+    """
+    Mixin for properly serializing polymorphic models.
+    """
+
+    def to_representation(self, instance):
+        # Apply the base serializer first, then merge the results with the subclass.
+        data = super(PolymorphicSerializerMixin, self).to_representation(instance)
+
+        # Resolve the subclass serializer (if it exists).
+        try:
+            data.update(pool.get_serializer(instance.__class__)(instance).data)
+        except exceptions.SerializerNotRegistered:
+            pass
 
         return data
 

@@ -1,7 +1,7 @@
 from nodewatcher.core.api import urls
 from nodewatcher.core.frontend import components
 
-from . import resources
+from . import resources, serializers
 
 
 urls.v1_api.register(resources.OlsrTopologyLinkResource())
