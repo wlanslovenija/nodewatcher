@@ -11,6 +11,7 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 _ = lambda s: s
 
 DEBUG = True
+TEMPLATE_DEBUG = False
 TEMPLATE_URL_RESOLVERS_DEBUG = True # Active only when TEMPLATE_DEBUG is True.
 
 # A tuple that lists people who get code error notifications. When
@@ -446,6 +447,7 @@ TELEMETRY_PROCESSOR_PIPELINE = (
     # Telemetry processors should be below this point.
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
+    'nodewatcher.core.monitor.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',

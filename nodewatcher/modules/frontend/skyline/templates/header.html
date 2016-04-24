@@ -1,8 +1,10 @@
 {% extends "header.html" %}
+
 {% contextblock %}
-{% load future staticfiles sekizai_tags %}
-{% add_data "css_data" "frontend/skyline/css/style.css" %}
+    {% load future staticfiles sekizai_tags %}
+    {% add_data "css_data" "frontend/skyline/css/style.css" %}
 {% endcontextblock %}
+
 {% block included_header %}
     {{ block.super }}
     <object id="skyline" data="{% static "frontend/skyline/img/skyline.svg" %}" type="image/svg+xml"></object>

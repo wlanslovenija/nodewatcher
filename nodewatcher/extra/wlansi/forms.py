@@ -51,22 +51,18 @@ class DefaultProject(registry_forms.FormDefaults):
         if not create:
             return
 
-        # Default to project 'Slovenia' in case it exists.
-        try:
-            slovenia_project = project_models.Project.objects.get(name='Slovenija')
-        except project_models.Project.DoesNotExist:
-            return
-
         # Choose a default project.
+        default_project = project_models.project_default(state.get_request())
+
         project_config = state.lookup_item(project_models.ProjectConfig)
         if not project_config:
-            state.append_item(project_models.ProjectConfig, project=slovenia_project)
+            state.append_item(project_models.ProjectConfig, project=default_project)
         else:
             try:
                 if project_config.project:
                     return
             except project_models.Project.DoesNotExist:
-                state.update_item(project_config, project=slovenia_project)
+                state.update_item(project_config, project=default_project)
 
 registration.point('node.config').add_form_defaults(DefaultProject())
 
@@ -123,7 +119,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
     def set_defaults(self, state, create):
         # Get device descriptor.
         general_config = state.lookup_item(cgm_models.CgmGeneralConfig)
-        if not general_config or not general_config.router:
+        if not general_config or not hasattr(general_config, 'router') or not general_config.router:
             # Return if no device is selected.
             return
 
@@ -620,10 +616,12 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
             self.remove_tunneldigger(state)
 
     def get_servers(self, state):
-        # Get the currently configured project.
+        # Get configured project.
+        project_config = state.lookup_item(project_models.ProjectConfig)
         try:
-            project_config = state.filter_items('core.project')[0]
-        except IndexError:
+            if project_config and not project_config.project:
+                project_config = None
+        except project_models.Project.DoesNotExist:
             project_config = None
 
         query = models.Q(PerProjectTunneldiggerServer___project=None)
@@ -693,10 +691,12 @@ class DnsServers(registry_forms.FormDefaults):
                 state.remove_item(server)
 
     def get_servers(self, state):
-        # Get the currently configured project.
+        # Get configured project.
+        project_config = state.lookup_item(project_models.ProjectConfig)
         try:
-            project_config = state.filter_items('core.project')[0]
-        except IndexError:
+            if project_config and not project_config.project:
+                project_config = None
+        except project_models.Project.DoesNotExist:
             project_config = None
 
         query = models.Q(PerProjectDnsServer___project=None)

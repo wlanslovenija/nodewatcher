@@ -35,12 +35,15 @@ class NodeStatus(monitor_processors.NodeProcessor):
                 sm.network = 'up'
                 if context.http.successfully_parsed is True:
                     sm.monitored = True
+                else:
+                    sm.monitored = False
             else:
                 sm.network = 'visible'
                 if context.http.successfully_parsed is False:
                     # HTTP fetch was tried, but failed
                     sm.monitored = False
                 else:
+                    assert context.http.successfully_parsed is not True
                     # HTTP fetch was not tried so we don't know whether the node is monitored
                     sm.monitored = None
         # TODO: Change depending on any warning/error events

@@ -167,9 +167,14 @@
         var forms = $('#registry_forms *').serialize();
         forms += '&ACTIONS=' + encodeURI(JSON.stringify(actions));
 
+        // TODO: Dynamically resolve the URL and do not have it hard-coded.
+        var registryEndpoint = '/registry/evaluate_forms/' + regpoint_id + '/';
+        if (root_id) {
+            registryEndpoint += root_id + '/';
+        }
+
         $.postCsrf(
-            // TODO: Dynamically resolve the URL and do not have it hard-coded.
-            "/registry/evaluate_forms/" + regpoint_id + "/" + root_id + "/",
+            registryEndpoint,
             forms
         ).done(function(data) {
             $('#registry_forms').html(data);

@@ -1,3 +1,4 @@
+from django import dispatch
 from django.db import models
 from django.utils.translation import gettext_noop
 
@@ -63,3 +64,18 @@ class GenericSensorMonitorStreams(ds_models.RegistryItemStreams):
         return tags
 
 ds_pool.register(GenericSensorMonitor, GenericSensorMonitorStreams)
+
+# In case we have the frontend module installed, we also subscribe to its
+# reset signal that gets called when a user requests a node's data to be reset.
+try:
+    from nodewatcher.modules.frontend.editor import signals as editor_signals
+
+    @dispatch.receiver(editor_signals.reset_node)
+    def sensors_node_reset(sender, request, node, **kwargs):
+        """
+        Remove all sensor data when a user requests the node to be reset.
+        """
+
+        node.monitoring.sensors.generic(queryset=True).delete()
+except ImportError:
+    pass

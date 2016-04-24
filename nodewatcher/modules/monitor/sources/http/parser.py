@@ -53,13 +53,14 @@ class HttpTelemetryParser(object):
             return self.data
 
         # Create our own HTTP connection so we can use a successful TCP connection as
-        # a signal that the node is up.
-        connection = httplib.HTTPConnection(self.host, self.port, timeout=15)
+        # a signal that the node is up. We use a short timeout (0.5 s) to see if we
+        # can establish a connection.
+        connection = httplib.HTTPConnection(self.host, self.port, timeout=0.5)
         try:
             try:
                 connection.connect()
                 self.node_responds = True
-            except IOError, error:
+            except IOError as error:
                 # Receiving a TCP RST is also a response.
                 if error.errno in (errno.ECONNREFUSED, errno.ECONNRESET):
                     self.node_responds = True
@@ -67,6 +68,8 @@ class HttpTelemetryParser(object):
                 raise HttpTelemetryParseFailed
 
             try:
+                # A longer timeout to retrieve the data.
+                connection.sock.settimeout(15)
                 connection.request('GET', url)
                 return connection.getresponse().read()
             except (httplib.HTTPException, IOError):

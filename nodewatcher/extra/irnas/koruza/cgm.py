@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core.generator.cgm import base as cgm_base
+from nodewatcher.core.generator.cgm import base as cgm_base, models as cgm_models
 
 from . import models
 
@@ -13,7 +13,7 @@ def koruza_network_measurement(node, pkgcfg, cfg):
 
     try:
         pkgcfg = pkgcfg.get()
-    except models.KoruzaNetworkMeasurementConfig.MultipleObjectsReturned:
+    except cgm_models.PackageConfig.MultipleObjectsReturned:
         raise cgm_base.ValidationError(_("Only one KORUZA network measurement unit may be defined."))
 
     # Ensure that the network measurement unit is a supported one.

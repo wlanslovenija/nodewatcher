@@ -100,6 +100,9 @@ class IpPool(allocation_models.PoolBase):
         if not self.parent:
             self.reclaim_held_down()
 
+        # TODO: Consider relaxing this requirement to allow point-to-point links as specified in RFC 3021.
+        #       /31 subnets are not really reasonable (because you need network and broadcast address, and then
+        #       non are left), but we might allow this in the future fore point-to-point links.
         if prefix_len == 31:
             return None
 
@@ -318,6 +321,9 @@ class IpPool(allocation_models.PoolBase):
         if prefix_len < self.prefix_length_minimum or prefix_len > self.prefix_length_maximum:
             return None
 
+        # TODO: Consider relaxing this requirement to allow point-to-point links as specified in RFC 3021.
+        #       /31 subnets are not really reasonable (because you need network and broadcast address, and then
+        #       non are left), but we might allow this in the future fore point-to-point links.
         if prefix_len == 31:
             return None
 
@@ -433,11 +439,18 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         if self.allocation is not None:
             self.update_if_exists()
         else:
-            raise registry_forms.RegistryValidationError(
-                _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
-                    'prefix': self.prefix_length, 'pool': unicode(self.pool),
-                }
-            )
+            if self.subnet_hint:
+                raise registry_forms.RegistryValidationError(
+                    _(u"Unable to satisfy address allocation request for %(subnet_hint)s/%(prefix)s from '%(pool)s'!") % {
+                        'subnet_hint': str(self.subnet_hint.network), 'prefix': self.prefix_length, 'pool': unicode(self.pool),
+                    }
+                )
+            else:
+                raise registry_forms.RegistryValidationError(
+                    _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
+                        'prefix': self.prefix_length, 'pool': unicode(self.pool),
+                    }
+                )
 
     def free(self):
         """
