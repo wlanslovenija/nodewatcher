@@ -81,6 +81,9 @@ will be wrong. You can do it by prefixing commands with ``docker-compose run web
 Populating the database
 -----------------------
 
+From scratch
+............
+
 If you are installing the nodewatcher from scratch, you should probably now create a Django admin user::
 
     $ docker-compose run web python manage.py createsuperuser
@@ -91,6 +94,9 @@ the nodewatcher's admin interface at http://localhost:8000/admin/.
 .. note::
     Depending on your Docker installation the web interface might not be available at ``localhost``
     but at some other address.
+
+From nodewatcher v2 dump
+........................
 
 If you have a JSON data export from nodewatcher version 2 available and would like to migrate to version 3,
 the procedure is as follows (after you have already performed the database initialization above). Let us assume
