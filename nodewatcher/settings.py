@@ -440,6 +440,7 @@ TELEMETRY_PROCESSOR_PIPELINE = (
     # Telemetry processors should be below this point.
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
+    'nodewatcher.core.monitor.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
