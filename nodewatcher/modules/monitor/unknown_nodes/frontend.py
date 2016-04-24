@@ -22,7 +22,7 @@ api_urls.v1_api.register(resources.UnknownNodeResource())
 
 
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
-    label=components.ugettext_lazy("My Unknown Nodes"),
+    label=components.ugettext_lazy("Unknown Nodes"),
     url=urlresolvers.reverse_lazy('UnknownNodesComponent:list'),
     weight=80,
     visible=lambda menu_entry, request, context: request.user.is_superuser,
