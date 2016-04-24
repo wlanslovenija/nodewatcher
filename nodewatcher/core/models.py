@@ -98,7 +98,13 @@ class StaticIpRouterIdConfig(RouterIdConfig):
     Static router identifier configuration.
     """
 
-    address = registry_fields.IPAddressField(subnet_required=True)
+    address = registry_fields.IPAddressField(
+        help_text=_(
+            "A static IP address is not allocated from an IP pool. " +
+            "A conflict with an IP allocated from an IP pool is possible. " +
+            "Consider allocating it from the IP pool and use \"hint\" to suggest the wanted IP address."
+        ),
+    )
 
     class Meta:
         app_label = 'core'
