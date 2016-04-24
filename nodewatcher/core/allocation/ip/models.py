@@ -430,11 +430,18 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
         if self.allocation is not None:
             self.update_if_exists()
         else:
-            raise registry_forms.RegistryValidationError(
-                _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
-                    'prefix': self.prefix_length, 'pool': unicode(self.pool),
-                }
-            )
+            if self.subnet_hint:
+                raise registry_forms.RegistryValidationError(
+                    _(u"Unable to satisfy address allocation request for %(subnet_hint)s/%(prefix)s from '%(pool)s'!") % {
+                        'subnet_hint': str(self.subnet_hint.network), 'prefix': self.prefix_length, 'pool': unicode(self.pool),
+                    }
+                )
+            else:
+                raise registry_forms.RegistryValidationError(
+                    _(u"Unable to satisfy address allocation request for /%(prefix)s from '%(pool)s'!") % {
+                        'prefix': self.prefix_length, 'pool': unicode(self.pool),
+                    }
+                )
 
     def free(self):
         """
