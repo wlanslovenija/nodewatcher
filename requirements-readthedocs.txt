@@ -13,7 +13,7 @@ git+https://github.com/zestedesavoir/django-cors-middleware.git@1b9f8f5a10cc4251
 django-classy-tags==0.7.1
 ujson==1.35
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
---allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@adfbb91ca4798e8c993f1b5c305ecbedb9e6cfe7#egg=django_datastream-master
+--allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@2491245bff7893fb13de143fa26fb1aa1f4f45c9#egg=django_datastream-master
 git+https://github.com/wlanslovenija/django-guardian.git@fff3e0bb16f079d2d1995e9b8caffda4c5738212#egg=django_guardian-wlanslovenija
 git+https://github.com/wlanslovenija/django-missing.git@cbc730248c62fa8fd433794b8fe4072183aba156#egg=django_missing-wlanslovenija
 django-phonenumber-field==1.0.0
