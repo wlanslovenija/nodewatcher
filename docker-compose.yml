@@ -1,5 +1,5 @@
 db:
-    image: wlanslovenija/postgis
+    image: tozd/postgresql:9.3
     environment:
         PGSQL_ROLE_1_USERNAME: nodewatcher
         PGSQL_ROLE_1_PASSWORD: nodewatcher
