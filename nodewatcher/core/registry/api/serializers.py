@@ -21,10 +21,16 @@ class RegistryRootSerializerMixin(object):
     Mixin for serializing registry roots.
     """
 
+    def get_field_names(self, *args, **kwargs):
+        fields = super(RegistryRootSerializerMixin, self).get_field_names(*args, **kwargs)
+
+        # Exclude internal fields.
+        fields.remove('registry_metadata')
+
+        return fields
+
     def to_representation(self, instance):
         data = super(RegistryRootSerializerMixin, self).to_representation(instance)
-
-        del data['registry_metadata']
 
         for field in instance._meta.virtual_fields:
             if not hasattr(field, 'src_model'):
@@ -92,6 +98,22 @@ class RegistryItemSerializerMixin(object):
     Mixin for serializing registry items.
     """
 
+    def get_field_names(self, *args, **kwargs):
+        model = getattr(self.Meta, 'model')
+        fields = super(RegistryItemSerializerMixin, self).get_field_names(*args, **kwargs)
+
+        # Exclude internal fields.
+        fields.remove('polymorphic_ctype')
+        fields.remove('root')
+        fields.remove('display_order')
+        fields.remove('annotations')
+
+        # Remove all sensitive fields.
+        for field_name in model._registry.sensitive_fields:
+            fields.remove(field_name)
+
+        return fields
+
     def build_relational_field(self, field_name, relation_info):
         if isinstance(relation_info.model_field, model_fields.IntraRegistryForeignKey):
             return (api_fields.IntraRegistryForeignKeyField, {'related_model': relation_info.related_model})
@@ -102,16 +124,6 @@ class RegistryItemSerializerMixin(object):
 
     def to_representation(self, instance):
         data = super(RegistryItemSerializerMixin, self).to_representation(instance)
-
-        # Remove some internal fields.
-        del data['polymorphic_ctype']
-        del data['root']
-        del data['display_order']
-        del data['annotations']
-
-        # Remove all sensitive fields.
-        for field_name in instance._registry.sensitive_fields:
-            del data[field_name]
 
         # Add JSON-LD annotations.
         annotate_instance(instance._registry, data, self)
