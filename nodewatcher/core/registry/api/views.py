@@ -1,3 +1,4 @@
+from django.db import models as django_models
 from django.db.models import constants
 from django.contrib.auth import models as auth_models
 from django.contrib.gis.db import models as geo_models
@@ -9,15 +10,37 @@ from guardian import shortcuts
 
 from .. import expression, exceptions
 
+# Exports.
+__all__ = [
+    'RegistryRootViewSetMixin'
+]
+
 
 class RegistryRootViewSetMixin(object):
     def get_queryset(self):
         queryset = super(RegistryRootViewSetMixin, self).get_queryset()
-        return self.get_registry_queryset(queryset)
 
-    def get_registry_queryset(self, queryset):
+        registry_root_fields = getattr(self, 'registry_root_fields', None)
+        if registry_root_fields is None:
+            return self.get_registry_queryset(queryset)
+        else:
+            for field in registry_root_fields:
+                registry_queryset = queryset.model._meta.get_field(field).related_model.objects.all()
+                return queryset.prefetch_related(
+                    django_models.Prefetch(
+                        field,
+                        queryset=self.get_registry_queryset(registry_queryset, field=field)
+                    )
+                )
+
+    def get_registry_queryset(self, queryset, field=None):
+        if field is None:
+            argument_name = lambda name: name
+        else:
+            argument_name = lambda name: '%s__%s' % (field, name)
+
         # Apply projection.
-        for field in self.request.query_params.getlist('fields'):
+        for field in self.request.query_params.getlist(argument_name('fields')):
             try:
                 field_name, queryset = apply_registry_field(field, queryset)
             except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
@@ -25,7 +48,7 @@ class RegistryRootViewSetMixin(object):
                 pass
 
         # Apply filter expression.
-        filters = self.request.query_params.get('filters', None)
+        filters = self.request.query_params.get(argument_name('filters'), None)
         if filters:
             try:
                 parser = expression.FilterExpressionParser(queryset.model, disallow_sensitive=True)
@@ -35,7 +58,7 @@ class RegistryRootViewSetMixin(object):
                 pass
 
         # Apply ordering.
-        ordering = self.request.query_params.get('ordering', None)
+        ordering = self.request.query_params.get(argument_name('ordering'), None)
         if ordering:
             try:
                 queryset = queryset.order_by(*ordering.split(','), disallow_sensitive=True)
@@ -43,7 +66,7 @@ class RegistryRootViewSetMixin(object):
                 pass
 
         # Apply permission-based filter.
-        has_permissions = self.request.query_params.get('has_permissions', None)
+        has_permissions = self.request.query_params.get(argument_name('has_permissions'), None)
         if has_permissions:
             try:
                 has_permissions_user = auth_models.User.objects.get(username=has_permissions)
