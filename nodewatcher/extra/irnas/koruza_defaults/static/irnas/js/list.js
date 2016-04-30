@@ -41,7 +41,7 @@
         if (!data.length)
             return "<em>unknown</em>"
 
-        return "" + data[0] + " dBu"
+        return "" + data[0].toFixed(2) + " dBu"
     }
 
     $(document).ready(function () {
