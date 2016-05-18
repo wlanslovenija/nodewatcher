@@ -1,5 +1,5 @@
 db:
-    image: wlanslovenija/postgis
+    image: tozd/postgresql:9.3
     environment:
         PGSQL_ROLE_1_USERNAME: nodewatcher
         PGSQL_ROLE_1_PASSWORD: nodewatcher
@@ -7,6 +7,7 @@ db:
         PGSQL_DB_1_NAME: nodewatcher
         PGSQL_DB_1_OWNER: nodewatcher
         PGSQL_DB_1_ENCODING: UNICODE
+        PGSQL_DB_1_POSTGIS: true
     volumes:
         # Use a volume to enable database persistency across restarts
         - /tmp/nodewatcher-db:/var/lib/postgresql/9.3/main
@@ -63,7 +64,7 @@ generator:
     entrypoint: scripts/docker-run
     environment:
         # Allow celery to run under the root user in order for it to have access
-        C_FORCE_ROOT: true
+        C_FORCE_ROOT: "true"
     volumes:
         - .:/code
     links:
@@ -78,7 +79,7 @@ monitorq:
     entrypoint: scripts/docker-run
     environment:
         # Allow celery to run under the root user in order for it to have access
-        C_FORCE_ROOT: true
+        C_FORCE_ROOT: "true"
     volumes:
         - .:/code
     links:

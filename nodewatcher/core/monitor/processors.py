@@ -1,7 +1,11 @@
 import logging
 import traceback
 
+from django.utils import timezone
+
 from nodewatcher.core import models as core_models
+
+from . import models
 
 
 class ProcessorContext(dict):
@@ -192,6 +196,36 @@ class GetAllNodes(NetworkProcessor):
             nodes.add(node)
 
         return context, nodes
+
+
+class GeneralInfo(NodeProcessor):
+    """
+    Stores "first seen" and "last seen" general node info monitor data into the database.
+    """
+
+    def process(self, context, node):
+        """
+        Called for every processed node.
+
+        :param context: Current context
+        :param node: Node that is being processed
+        :return: A (possibly) modified context
+        """
+
+        # Create general model when they don't yet exist.
+        general = node.monitoring.core.general()
+        if general is None:
+            general = node.monitoring.core.general(create=models.GeneralMonitor)
+
+        if context.node_available is True and context.node_responds is True:
+            if not general.first_seen:
+                general.first_seen = timezone.now()
+
+            general.last_seen = timezone.now()
+
+        general.save()
+
+        return context
 
 
 def depends_on_context(key_name, key_type):

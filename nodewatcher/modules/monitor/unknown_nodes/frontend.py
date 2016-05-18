@@ -1,7 +1,8 @@
 from django.conf import urls
 from django.core import urlresolvers
 
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core.api import urls as api_urls
+from nodewatcher.core.frontend import components
 
 from . import resources, views
 
@@ -17,11 +18,11 @@ class UnknownNodesComponent(components.FrontendComponent):
 components.pool.register(UnknownNodesComponent)
 
 
-api.v1_api.register(resources.UnknownNodeResource())
+api_urls.v1_api.register(resources.UnknownNodeResource())
 
 
 components.menus.get_menu('accounts_menu').add(components.MenuEntry(
-    label=components.ugettext_lazy("My Unknown Nodes"),
+    label=components.ugettext_lazy("Unknown Nodes"),
     url=urlresolvers.reverse_lazy('UnknownNodesComponent:list'),
     weight=80,
     visible=lambda menu_entry, request, context: request.user.is_superuser,

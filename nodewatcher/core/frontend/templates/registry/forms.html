@@ -33,8 +33,8 @@
         {{ registry_forms }}
 
         <p class="btn-row">
-            <button class="btn btn-default btn-lg" type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>&nbsp;
             <button class="btn btn-primary btn-lg" type="submit">{% if registry_forms.root %}{% trans "Update" %}{% else %}{% trans "Register" %}{% endif %}</button>
+            <button class="btn btn-default btn-lg" type="submit" name="cancel" value="cancel">{% trans "Cancel" %}</button>&nbsp;
         </p>
     </div>
 

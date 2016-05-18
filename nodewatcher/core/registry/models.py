@@ -1,6 +1,7 @@
 from django.db import models
 
 import jsonfield
+
 from polymorphic import base as polymorphic_base, models as polymorphic_models
 from . import polymorphic_deletion_fix, options
 

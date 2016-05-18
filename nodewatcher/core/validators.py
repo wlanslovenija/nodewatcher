@@ -9,7 +9,7 @@ class NodeNameValidator(validators.RegexValidator):
     """
 
     regex = r'^[a-z](?:-?[a-z0-9]+)*$'
-    message = _('Node name contains invalid characters.')
+    message = _('Node name contains invalid characters. Only a-z, 0-9, and - characters are allowed.')
 
 
 @deconstruct.deconstructible

@@ -88,17 +88,17 @@ class Project(models.Model):
 
 
 def project_default(request=None):
-    if request and hasattr(request.user, 'profile'):
+    if request and hasattr(request.user, 'profile') and request.user.profile.default_project is not None:
         return request.user.profile.default_project
-    else:
-        try:
-            return Project.objects.get(is_default=True)
-        except Project.DoesNotExist:
-            projects = Project.objects.all()
-            if projects.exists():
-                return projects[0]
-            else:
-                return None
+
+    try:
+        return Project.objects.get(is_default=True)
+    except Project.DoesNotExist:
+        projects = Project.objects.all()
+        if projects.exists():
+            return projects[0]
+        else:
+            return None
 
 
 class ProjectConfig(registration.bases.NodeConfigRegistryItem):

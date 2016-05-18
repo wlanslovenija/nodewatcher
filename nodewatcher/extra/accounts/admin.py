@@ -89,7 +89,7 @@ class UserAdmin(auth_admin.UserAdmin):
         return super(UserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 
-# TODO: Needed until this ticket is resolved; https://code.djangoproject.com/ticket/897
+# TODO: Needed until this ticket is resolved: https://code.djangoproject.com/ticket/897
 class GroupAdminForm(django_forms.ModelForm):
     users = django_forms.ModelMultipleChoiceField(
         queryset=auth_admin.User.objects.all(),

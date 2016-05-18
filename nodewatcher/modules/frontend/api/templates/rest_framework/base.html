@@ -1,0 +1,32 @@
+{% extends "rest_framework/base.html" %}
+
+{% load sekizai_tags %}
+
+{% block prehead %}{% endblock %}
+
+{% block head %}
+    {% add_data "css_data" "rest_framework/css/prettify.css" %}
+    {% add_data "css_data" "rest_framework/css/default.css" %}
+{% endblock %}
+
+{% block posthead %}{% endblock %}
+{% block navbar %}{% endblock %}
+{% block bodystart %}{% endblock %}
+{% block bodyend %}{% endblock %}
+{% block postbody %}{% endblock %}
+
+{% block script %}
+    {% prepend_data "js_data" "jquery/js/jquery.js" %}
+    {% add_data "js_data" "bootstrap/js/bootstrap.js" %}
+    {% add_data "js_data" "rest_framework/js/ajax-form.js" %}
+    {% add_data "js_data" "rest_framework/js/csrf.js" %}
+    {% add_data "js_data" "rest_framework/js/prettify-min.js" %}
+
+    {% add_data "js_data_end" "rest_framework/js/default.js" %}
+
+    <script>
+        $(document).ready(function() {
+            $('form').ajaxForm();
+        });
+    </script>
+{% endblock %}

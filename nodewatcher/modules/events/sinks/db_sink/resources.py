@@ -3,8 +3,8 @@ from django.db import models as django_models
 from tastypie import fields as tastypie_fields
 from tastypie import authorization as api_authorization
 
-from nodewatcher.core.frontend import api
-from nodewatcher.core.frontend.api import fields as api_fields
+from nodewatcher.core import api
+from nodewatcher.core.api import fields as api_fields
 from nodewatcher.modules.frontend.list import resources
 
 from . import models
@@ -28,7 +28,7 @@ class RelatedNodes(str):
     def __call__(self, bundle):
         # Add name to related nodes
         return bundle.obj.related_nodes.regpoint('config').registry_fields(
-            name='core.general#name',
+            name='core.general__name',
         )
 
 

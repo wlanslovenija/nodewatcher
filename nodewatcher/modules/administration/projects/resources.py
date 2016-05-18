@@ -11,7 +11,7 @@ class NodesByProjectResource(resources.StatisticsResource):
 
     def get_statistics(self):
         return core_models.Node.objects.regpoint('config').registry_fields(
-            project='core.project#project.name'
+            project='core.project__project__name'
         ).values(
             'project'
         ).annotate(

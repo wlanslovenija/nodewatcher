@@ -11,6 +11,7 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 _ = lambda s: s
 
 DEBUG = True
+TEMPLATE_DEBUG = False
 TEMPLATE_URL_RESOLVERS_DEBUG = True # Active only when TEMPLATE_DEBUG is True.
 
 # A tuple that lists people who get code error notifications. When
@@ -174,6 +175,7 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -238,6 +240,7 @@ INSTALLED_APPS = (
     'nodewatcher.core',
     'nodewatcher.core.allocation',
     'nodewatcher.core.allocation.ip',
+    'nodewatcher.core.api',
     'nodewatcher.core.events',
     'nodewatcher.core.frontend',
     'nodewatcher.core.generator.cgm',
@@ -277,6 +280,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.authentication.public_key',
     'nodewatcher.modules.vpn.tunneldigger',
     'nodewatcher.modules.events.sinks.db_sink',
+    'nodewatcher.modules.frontend.api',
     'nodewatcher.modules.frontend.display',
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
@@ -330,6 +334,9 @@ INSTALLED_APPS = (
     'django_countries',
     'timedelta',
     'registration',
+    'rest_framework',
+    'rest_framework_gis',
+    'corsheaders',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -363,7 +370,7 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
-        }
+        },
     },
     'loggers': {
         'django': {
@@ -440,6 +447,7 @@ TELEMETRY_PROCESSOR_PIPELINE = (
     # Telemetry processors should be below this point.
     'nodewatcher.modules.monitor.sources.http.processors.HTTPTelemetry',
     'nodewatcher.modules.monitor.http.general.processors.GeneralInfo',
+    'nodewatcher.core.monitor.processors.GeneralInfo',
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
@@ -588,9 +596,6 @@ NETWORK = {
     'LOGO_FILE': None,
 }
 
-EVENTS_EMAIL = DEFAULT_FROM_EMAIL
-IMAGE_GENERATOR_EMAIL = DEFAULT_FROM_EMAIL
-
 FRONTEND_MAIN_COMPONENT = 'ListComponent'
 
 MENUS = {
@@ -618,6 +623,11 @@ MENUS = {
         {
             'name': 'Map',
             'weight': 50,
+            'visible': True,
+        },
+        {
+            'name': 'API',
+            'weight': 60,
             'visible': True,
         },
     ],
@@ -653,5 +663,33 @@ REGISTRY_SIMPLE_MODE = {
     },
 }
 
-# Allowed hosts (required for production use)
+# REST framework.
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 50,
+    'DEFAULT_PAGINATION_CLASS': 'nodewatcher.core.api.pagination.LimitOffsetPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        #'rest_framework.renderers.JSONRenderer',
+        'nodewatcher.core.api.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        #'rest_framework.parsers.JSONParser',
+        'nodewatcher.core.api.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ),
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
+# Currently only v2 API needs this. Tastypie API provides headers by itself.
+CORS_URLS_REGEX = r'^/api/v2/'
+# API is read-only for now.
+CORS_ALLOW_METHODS = (
+    'GET',
+    'HEAD',
+    'OPTIONS',
+)
+
+# Allowed hosts (required for production use, when DEBUG is false). Set it
+# to the (virtual HTTP) hostname under which you have nodewatcher installation.
 ALLOWED_HOSTS = []

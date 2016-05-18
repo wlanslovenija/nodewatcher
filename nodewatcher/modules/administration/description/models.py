@@ -21,5 +21,6 @@ class DescriptionConfig(registration.bases.NodeConfigRegistryItem):
         registry_id = 'core.description'
         registry_section = _("Description")
         registry_name = _("Basic Description")
+        sensitive_fields = ['notes']
 
 registration.point('node.config').register_item(DescriptionConfig)

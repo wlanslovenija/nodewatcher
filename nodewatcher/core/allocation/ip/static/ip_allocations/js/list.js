@@ -1,15 +1,18 @@
 (function ($) {
     $(document).ready(function () {
         $('.ip-allocation-list').each(function (i, table) {
-            $.tastypie.newDataTable(table, $(table).data('source'), {
-                'columns': [
-                    {'data': 'pool.description'},
+            $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
+                searching: false,
+                paging: false,
+                info: false,
+                columns: [
+                    {'data': 'top_level.description'},
                     {'data': 'family'},
                     {'data': 'network'},
                     {'data': 'prefix_length'}
                 ],
-                'order': [[2, 'asc']],
-                'language': {
+                order: [[2, 'asc']],
+                language: {
                     // TODO: Make strings translatable
                     'sZeroRecords': "No IP allocations found.",
                     'sEmptyTable ': "There are currently no IP allocations.",

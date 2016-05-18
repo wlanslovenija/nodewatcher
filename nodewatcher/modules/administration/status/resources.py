@@ -20,7 +20,7 @@ class NodesByStatusResource(resources.StatisticsResource):
 
     def get_statistics(self):
         return core_models.Node.objects.regpoint('monitoring').registry_fields(
-            status='core.status#network'
+            status='core.status__network'
         ).values(
             'status'
         ).annotate(

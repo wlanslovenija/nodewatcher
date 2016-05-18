@@ -39,7 +39,7 @@ class IncludeRoutableNodes(monitor_processors.NetworkProcessor):
 
         # Determine which nodes are available.
         for node in core_models.Node.objects.regpoint('config').registry_fields(
-            router_id='core.routerid#router_id'
+            router_id='core.routerid__router_id'
         ).registry_filter(
             core_routerid__rid_family__in=['ipv4', 'ipv6'],
         ):

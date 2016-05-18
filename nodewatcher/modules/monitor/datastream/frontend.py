@@ -4,9 +4,10 @@ from django.utils import timezone
 
 from tastypie import resources
 
-from django_datastream import urls
+from django_datastream import urls as datastream_urls
 
-from nodewatcher.core.frontend import api, components
+from nodewatcher.core.api import urls as api_urls
+from nodewatcher.core.frontend import components
 from nodewatcher.core.registry import exceptions as registry_exceptions
 
 
@@ -15,9 +16,9 @@ def register_resource(resource):
     class Resource(resources.NamespacedModelMixin, resource.__class__):
         pass
 
-    api.v1_api.register(Resource())
+    api_urls.v1_api.register(Resource())
 
-for resource in urls.v1_api._registry.values():
+for resource in datastream_urls.v1_api._registry.values():
     register_resource(resource)
 
 

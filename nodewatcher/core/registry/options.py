@@ -1,7 +1,15 @@
 import collections
+import re
 
 from django import forms
 from django.core import exceptions as django_exceptions
+
+from rest_framework import serializers as drf_serializers
+
+from .api import serializers
+
+# Valid registry identifiers.
+REGISTRY_ID = re.compile('^([a-zA-Z0-9]|\.(?!(\.|$)))+$')
 
 
 class Options(object):
@@ -17,6 +25,13 @@ class Options(object):
         """
 
         meta = model_class.RegistryMeta
+
+        if not model_class._meta.abstract:
+            # Validate that the registry identifier is properly formatted.
+            if not meta.registry_id:
+                raise django_exceptions.ImproperlyConfigured("Non-abstract registry item '%s' is missing a registy identifier." % model_class.__name__)
+            if not REGISTRY_ID.match(meta.registry_id):
+                raise django_exceptions.ImproperlyConfigured("Registry identifier '%s' is not a valid identifier." % meta.registry_id)
 
         self.registration_point = None
         self.model_class = model_class
@@ -34,6 +49,19 @@ class Options(object):
         self.item_children = collections.OrderedDict()
         self.item_parent = None
         self.item_parent_field = None
+        self.sensitive_fields = getattr(meta, 'sensitive_fields', [])
+
+        # Create a default serializer.
+        class meta_cls:
+            model = model_class
+
+        self.serializer_class = type(
+            '%sRegistryItemSerializer' % (model_class.__name__),
+            (serializers.RegistryItemSerializerMixin, drf_serializers.ModelSerializer),
+            {
+                'Meta': meta_cls,
+            }
+        )
 
     def set_form_class(self, form_class):
         """
@@ -140,3 +168,23 @@ class Options(object):
         """
 
         return (self.hidden and self.is_toplevel_class()) or self.hide_requests > 0
+
+    def get_api_id(self, value=''):
+        """
+        Returns this registry item's unique identifier that is used by the API.
+
+        :param value: Value of the instance's primary key
+        """
+
+        return '%s/%s/%s' % (
+            self.registration_point.namespace,
+            self.registry_id,
+            value
+        )
+
+    def get_api_type(self):
+        """
+        Returns this registry item's type name that is used by the API.
+        """
+
+        return self.model_class.__name__.replace(self.registration_point.namespace.capitalize(), '')
