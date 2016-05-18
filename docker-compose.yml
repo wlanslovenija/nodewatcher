@@ -7,7 +7,7 @@ db:
         PGSQL_DB_1_NAME: nodewatcher
         PGSQL_DB_1_OWNER: nodewatcher
         PGSQL_DB_1_ENCODING: UNICODE
-        PGSQL_DB_1_POSTGIS: true
+        PGSQL_DB_1_POSTGIS: "true"
     volumes:
         # Use a volume to enable database persistency across restarts
         - /tmp/nodewatcher-db:/var/lib/postgresql/9.3/main
