@@ -364,15 +364,16 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
 
         return self.allocation == other.allocation
 
+    @transaction.atomic
     def update_if_exists(self):
-        with transaction.atomic():
-            # Check if an object actually exists in the database. It may have already been removed
-            # from the database and in this case, we should not do anything.
-            if not self.__class__.objects.filter(pk=self.pk).exists():
-                return
+        # Check if an object actually exists in the database. It may have already been removed
+        # from the database and in this case, we should not do anything.
+        if not self.__class__.objects.filter(pk=self.pk).exists():
+            return
 
-            self.save()
+        self.save()
 
+    @transaction.atomic
     def satisfy_from(self, other):
         """
         Attempts to satisfy this request by taking resources from an existing one.
@@ -397,7 +398,9 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             return False
 
         self.allocation = other.allocation
+        other.allocation = None
         self.update_if_exists()
+        other.update_if_exists()
 
         return True
 
@@ -423,6 +426,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
 
         return True
 
+    @transaction.atomic
     def satisfy(self, obj):
         """
         Attempts to satisfy this allocation request by obtaining a new allocation
@@ -452,6 +456,7 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
                     }
                 )
 
+    @transaction.atomic
     def free(self):
         """
         Frees this allocation.
