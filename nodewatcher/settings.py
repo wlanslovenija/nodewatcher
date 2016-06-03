@@ -266,6 +266,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.monitor.http.resources',
     'nodewatcher.modules.monitor.http.interfaces',
     'nodewatcher.modules.monitor.http.clients',
+    'nodewatcher.modules.monitor.http.survey',
     'nodewatcher.modules.monitor.topology',
     'nodewatcher.modules.monitor.unknown_nodes',
     'nodewatcher.modules.monitor.validation.reboot',
