@@ -42,7 +42,7 @@ try:
     class SurveyInfoStreamsData(object):
         def __init__(self, node, frequency, channel, snr, neighbors):
             self.node = node
-            self.frequency = frequency #either 2 or 5, corresponding to 2.4GHz and 5GHz
+            self.frequency = frequency  # either 2 or 5, corresponding to 2.4GHz and 5GHz
             self.channel = channel
             self.snr = snr
             self.neighbors = neighbors
@@ -83,7 +83,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         print("incoming clients")
         channel = self.getNodeChannel(context, node)
         snr = self.getNodeSNR(context, node)
-        neighbors = self.getNodeNeighbors(context,node)
+        neighbors = self.getNodeNeighbors(context, node)
         print(neighbors)
         if DATASTREAM_SUPPORTED:
             # Store client count into datastream.
