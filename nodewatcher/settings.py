@@ -452,6 +452,7 @@ TELEMETRY_PROCESSOR_PIPELINE = (
     'nodewatcher.modules.monitor.http.resources.processors.SystemStatus',
     'nodewatcher.modules.monitor.http.interfaces.processors.DatastreamInterfaces',
     'nodewatcher.modules.monitor.http.clients.processors.ClientInfo',
+    'nodewatcher.modules.monitor.http.survey.processors.SurveyInfo',
     'nodewatcher.modules.routing.olsr.processors.NodeTopology',
     'nodewatcher.modules.routing.babel.processors.BabelTopology',
     'nodewatcher.modules.sensors.generic.processors.GenericSensors',
