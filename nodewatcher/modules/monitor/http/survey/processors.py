@@ -80,7 +80,6 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             # Unsupported version or data fetch failed (v0)
             return context
 
-        print("incoming clients")
         channel = self.getNodeChannel(context, node)
         snr = self.getNodeSNR(context, node)
         neighbors = self.getNodeNeighbors(context, node)
