@@ -80,16 +80,16 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             # Unsupported version or data fetch failed (v0)
             return context
 
-        channel = self.getNodeChannel(context, node)
-        snr = self.getNodeSNR(context, node)
-        neighbors = self.getNodeNeighbors(context, node)
+        channel = self.get_node_channel(context, node)
+        snr = self.get_node_snr(context, node)
+        neighbors = self.get_node_neighbors(context, node)
         if DATASTREAM_SUPPORTED:
             # Store client count into datastream.
             context.datastream.monitor_http_clients = SurveyInfoStreamsData(node, "2", channel, snr, neighbors)
 
         return context
 
-    def getNodeChannel(self, context, node, frequency_band="2"):
+    def get_node_channel(self, context, node, frequency_band="2"):
         """
         Extracts the channel number from the context for the specified frequency band.
         :param context: Current context
@@ -104,7 +104,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         except NameError:
             print("Error parsing JSON file for " + node)
 
-    def getNodeSNR(self, context, node, frequency_band="2"):
+    def get_node_snr(self, context, node, frequency_band="2"):
         """
         Extracts the SNR from the context for the specified frequency band.
         :param context: Current context
@@ -128,7 +128,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             print("No SNR available for " + node)
             return 0
 
-    def getNodeNeighbors(self, context, node, frequency_band="2"):
+    def get_node_neighbors(self, context, node, frequency_band="2"):
         """
         returns a dictionary of all access points in the vicinity along with the signal strength of each access point.
         :param: frequency_band: either "2" or "5", corresponding to 2.4GHz and 5GHz.
