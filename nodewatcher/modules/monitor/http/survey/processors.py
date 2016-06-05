@@ -75,7 +75,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         #for client in node.monitoring.network.clients():
         #    existing_clients[client.client_id] = client
 
-        version = context.http.get_module_version("core.clients")
+        version = context.http.get_module_version("core.wireless")
         if version == 0:
             # Unsupported version or data fetch failed (v0)
             return context
@@ -83,7 +83,6 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         channel = self.getNodeChannel(context, node)
         snr = self.getNodeSNR(context, node)
         neighbors = self.getNodeNeighbors(context, node)
-        print(neighbors)
         if DATASTREAM_SUPPORTED:
             # Store client count into datastream.
             context.datastream.monitor_http_clients = SurveyInfoStreamsData(node, "2", channel, snr, neighbors)
