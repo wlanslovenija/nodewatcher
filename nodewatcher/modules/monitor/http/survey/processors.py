@@ -133,7 +133,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
 
     def get_node_neighbors(self, context, node, frequency_band='2'):
         """
-        returns a dictionary of all access points in the vicinity along with the signal strength of each access point.
+        Returns a dictionary of all access points in the vicinity along with the signal strength of each access point.
         :param: frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: a dictionary of neighbors at the specified frequency band
         """
@@ -151,7 +151,8 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         try:
             for radio in context.http.core.wireless.radios:
                 for neighbor in context.http.core.wireless.radios[str(radio)]['survey']:
-                    if neighbor['channel'] <= frequency_band_max_channel and neighbor['channel'] >= frequency_band_min_channel:
+                    if neighbor['channel'] <= frequency_band_max_channel and neighbor['channel'] \
+                            >= frequency_band_min_channel:
                         return context.http.core.wireless.radios[radio]['survey']
         except KeyError:
             pass
