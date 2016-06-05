@@ -75,7 +75,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         #for client in node.monitoring.network.clients():
         #    existing_clients[client.client_id] = client
 
-        version = context.http.get_module_version("core.wireless")
+        version = context.http.get_module_version('core.wireless')
         if version == 0:
             # Unsupported version or data fetch failed (v0)
             return context
@@ -85,16 +85,16 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         neighbors = self.get_node_neighbors(context, node)
         if DATASTREAM_SUPPORTED:
             # Store client count into datastream.
-            context.datastream.monitor_http_clients = SurveyInfoStreamsData(node, "2", channel, snr, neighbors)
+            context.datastream.monitor_http_clients = SurveyInfoStreamsData(node, '2', channel, snr, neighbors)
 
         return context
 
-    def get_node_channel(self, context, node, frequency_band="2"):
+    def get_node_channel(self, context, node, frequency_band='2'):
         """
         Extracts the channel number from the context for the specified frequency band.
         :param context: Current context
         :param node: Node that is being processed
-        :param frequency_band: either "2" or "5", corresponding to 2.4GHz and 5GHz.
+        :param frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: channel currently assigned to the node at the specified frequency band.
         """
         try:
@@ -104,12 +104,12 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         except NameError:
             print("Error parsing JSON file for " + node)
 
-    def get_node_snr(self, context, node, frequency_band="2"):
+    def get_node_snr(self, context, node, frequency_band='2'):
         """
         Extracts the SNR from the context for the specified frequency band.
         :param context: Current context
         :param node: Node that is being processed
-        :param frequency_band: either "2" or "5", corresponding to 2.4GHz and 5GHz.
+        :param frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: SNR of the node at the specified frequency band.
         """
         try:
@@ -128,16 +128,16 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             print("No SNR available for " + node)
             return 0
 
-    def get_node_neighbors(self, context, node, frequency_band="2"):
+    def get_node_neighbors(self, context, node, frequency_band='2'):
         """
         returns a dictionary of all access points in the vicinity along with the signal strength of each access point.
-        :param: frequency_band: either "2" or "5", corresponding to 2.4GHz and 5GHz.
+        :param: frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: a dictionary of neighbors at the specified frequency band
         """
-        if frequency_band == "2":
+        if frequency_band == '2':
             frequency_band_max_channel = 14
             frequency_band_min_channel = 1
-        elif frequency_band == "5":
+        elif frequency_band == '5':
             frequency_band_max_channel = 165
             frequency_band_min_channel = 36
         else:
@@ -146,9 +146,9 @@ class SurveyInfo(monitor_processors.NodeProcessor):
 
         try:
             for radio in context.http.core.wireless.radios:
-                for neighbor in context.http.core.wireless.radios[str(radio)]["survey"]:
-                    if neighbor["channel"] <= frequency_band_max_channel and neighbor["channel"] >= frequency_band_min_channel:
-                        return context.http.core.wireless.radios[radio]["survey"]
+                for neighbor in context.http.core.wireless.radios[str(radio)]['survey']:
+                    if neighbor['channel'] <= frequency_band_max_channel and neighbor['channel'] >= frequency_band_min_channel:
+                        return context.http.core.wireless.radios[radio]['survey']
         except KeyError:
             pass
         except NameError:
