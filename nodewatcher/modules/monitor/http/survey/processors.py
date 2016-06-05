@@ -70,6 +70,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         :param node: Node that is being processed
         :return: A (possibly) modified context
         """
+
         # Should I go through the existing clients as well?
         # existing_clients = {}
         #for client in node.monitoring.network.clients():
@@ -97,6 +98,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         :param frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: channel currently assigned to the node at the specified frequency band.
         """
+
         try:
             for interface in context.http.core.wireless.interfaces:
                 if str(context.http.core.wireless.interfaces[interface].frequency)[:1] == frequency_band:
@@ -112,6 +114,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         :param frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: SNR of the node at the specified frequency band.
         """
+
         try:
             for interface in context.http.core.wireless.interfaces:
                 if str(context.http.core.wireless.interfaces[interface].frequency)[:1] == frequency_band:
@@ -134,6 +137,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         :param: frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: a dictionary of neighbors at the specified frequency band
         """
+
         if frequency_band == '2':
             frequency_band_max_channel = 14
             frequency_band_min_channel = 1
