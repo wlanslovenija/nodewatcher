@@ -104,7 +104,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                 if str(context.http.core.wireless.interfaces[interface].frequency)[:1] == frequency_band:
                     return context.http.core.wireless.interfaces[interface].channel
         except NameError:
-            print("Error parsing JSON file for " + node)
+            self.logger.warning("Error parsing JSON file for " + str(node))
 
     def get_node_snr(self, context, node, frequency_band='2'):
         """
@@ -121,14 +121,14 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                     signal = context.http.core.wireless.interfaces[interface].signal
                     noise = context.http.core.wireless.interfaces[interface].noise
                     if (not signal or not noise):
-                        print("No SNR available for " + node)
+                        self.logger.warning("No SNR available for " + str(node))
                         return 0
                     else:
                         return signal - noise
         except NameError:
-            print("Error parsing JSON file for " + node)
+            self.logger.warning("Error parsing JSON file for " + str(node))
         except KeyError:
-            print("No SNR available for " + node)
+            self.logger.warning("No SNR available for " + str(node))
             return 0
 
     def get_node_neighbors(self, context, node, frequency_band='2'):
@@ -145,7 +145,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             frequency_band_max_channel = 165
             frequency_band_min_channel = 36
         else:
-            print("Frequency band not recognized")
+            self.logger.warning("Frequency band not recognized")
             return
 
         try:
@@ -156,4 +156,4 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         except KeyError:
             pass
         except NameError:
-            print("Error parsing JSON file for " + node)
+            self.logger.warning("Error parsing JSON file for " + str(node))
