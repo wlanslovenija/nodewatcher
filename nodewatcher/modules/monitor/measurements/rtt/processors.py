@@ -40,8 +40,8 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
         try:
             context.rtt.source_node = core_models.Node.objects.get(uuid=source_node_id)
         except core_models.Node.DoesNotExist:
-            self.logger.error("Invalid measurement source UUID specified in MEASUREMENT_SOURCE_NODE!")
-            return context, nodes
+            self.logger.warning("Invalid or no measurement source UUID specified in MEASUREMENT_SOURCE_NODE!")
+            context.rtt.source_node = None
 
         # Prepare a list of node IPv4 addresses
         node_ips = []
