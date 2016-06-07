@@ -71,11 +71,6 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         :return: A (possibly) modified context
         """
 
-        # Should I go through the existing clients as well?
-        # existing_clients = {}
-        #for client in node.monitoring.network.clients():
-        #    existing_clients[client.client_id] = client
-
         version = context.http.get_module_version('core.wireless')
         if version == 0:
             # Unsupported version or data fetch failed (v0)
