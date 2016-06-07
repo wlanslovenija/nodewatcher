@@ -84,15 +84,12 @@ Initial setup
 From scratch
 ............
 
-If you are installing the nodewatcher from scratch, you should probably now create a Django admin user.
+If you are installing the nodewatcher from scratch, you should probably now create a Django admin account.
 You can do this by opening nodewatcher initial setup page at `http://localhost:8000/setup/`_, and
 follow instructions there.
-Alternatively, you can run::
 
-    $ docker-compose run web python manage.py createsuperuser
-
-Now you can login with this user into the nodewatcher at http://localhost:8000/account/login/ or into
-the nodewatcher's admin interface at http://localhost:8000/admin/.
+Afterwards, you can login with this account into the nodewatcher at http://localhost:8000/account/login/
+or into the nodewatcher's admin interface at http://localhost:8000/admin/.
 
 .. note::
     Depending on your Docker installation the web interface might not be available at ``localhost``
