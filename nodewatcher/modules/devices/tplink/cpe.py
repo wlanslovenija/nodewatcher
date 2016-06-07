@@ -75,7 +75,8 @@ class TPLinkCPE210(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'CPE510',
             'files': [
-                'openwrt-ar71xx-generic-cpe210-220-510-520-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-cpe210-220-510-520-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-cpe210-220-510-520-squashfs-sysupgrade.bin'
             ]
         }
     }
