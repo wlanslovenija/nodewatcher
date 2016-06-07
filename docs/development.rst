@@ -1,4 +1,4 @@
-Setting up the development environment
+Setting Up the Development Environment
 ======================================
 
 In order to make nodewatcher development as simple as possible, a Docker_ development environment can be built from the provided Dockerfile. To help with preparing the environment and running common tasks, `Docker Compose`_ configuration is also provided. This section describes how to use both to work on nodewatcher. It is assumed that Docker and `Docker Compose` are already installed, so in order to install them, please follow the guides on their respective pages.
@@ -6,7 +6,7 @@ In order to make nodewatcher development as simple as possible, a Docker_ develo
 .. _Docker: https://www.docker.com
 .. _Docker Compose: https://docs.docker.com/compose/
 
-Running the development instance
+Running the Development Instance
 --------------------------------
 
 In order to ensure that you have the latest versions of all dependent Docker images, you have to first run the following command in the top-level nodewatcher directory::
@@ -38,7 +38,7 @@ The following containers will be created and started when you run the above comm
 
         $ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
-Initializing the database
+Initializing the Database
 -------------------------
 
 .. note:: This and all further sections assume that the development environment has been started via ``docker-compose up`` and is running (in the background or in another terminal). If the environment is not running, some of the following commands will fail.
@@ -59,8 +59,8 @@ This will initialize the database schema.
 
         $ docker-compose run web python manage.py <command...>
 
-Compile stylesheets
--------------------
+Compiling Stylesheets
+---------------------
 
 For default nodewatcher stylesheets we are using `Compass`_, which means that SCSS files have to be
 compiled into CSS files before CSS files can be served to users. Compass is built on top of `Sass`_,
@@ -76,10 +76,10 @@ To compile SCSS files into CSS files run::
 .. _Compass: http://compass-style.org/
 .. _Sass: http://sass-lang.com/
 
-Initial setup
+Initial Setup
 -------------
 
-From scratch
+From Scratch
 ............
 
 If you are installing the nodewatcher from scratch, you should probably now create a Django admin account.
@@ -95,7 +95,7 @@ or into the nodewatcher's admin interface at http://localhost:8000/admin/.
 
 .. _http://localhost:8000/setup/: http://localhost:8000/setup/
 
-From nodewatcher v2 dump
+From nodewatcher v2 Dump
 ........................
 
 If you have a JSON data export from nodewatcher version 2 available and would like to migrate to version 3,
@@ -110,8 +110,8 @@ Now the database is ready for use with nodewatcher 3.
 
 .. _development-run-builder:
 
-Running a builder
------------------
+Running a Firmware Builder
+--------------------------
 
 In order to develop firmware generator related functions, a firmware builder is provided with the development
 installation. In order to use it, you have to configure it via the nodewatcher admin interface. First, you
@@ -167,7 +167,7 @@ The following information should be used when adding a builder:
 
         This will generate a ``builder.key`` (private key) and ``builder.key.pub`` (public key).
 
-Running the monitoring system
+Running the Monitoring System
 -----------------------------
 
 In order to enable data collection from nodes, the monitoring system needs to be running. It is important that the nodewatcher instance is able to connect to the nodes directly by their IP addresses. This can usually be achieved by establishing a VPN tunnel to some server that is connected to the mesh network.
