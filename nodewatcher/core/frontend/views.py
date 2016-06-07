@@ -12,6 +12,8 @@ class NodeNameMixin(object):
 
 
 class CancelableFormMixin(object):
+    cancel_url = None
+
     def post(self, request, *args, **kwargs):
         if request.POST.get('cancel', None):
             return http.HttpResponseRedirect(self.get_cancel_url())
@@ -20,8 +22,8 @@ class CancelableFormMixin(object):
 
     def get_cancel_url(self):
         if self.cancel_url:
-            # Forcing possible reverse_lazy evaluation
-            url = encoding.force_text(self.success_url)
+            # Forcing possible reverse_lazy evaluation.
+            url = encoding.force_text(self.cancel_url)
         else:
             raise exceptions.ImproperlyConfigured("No URL to redirect to. Provide a cancel_url.")
         return url
