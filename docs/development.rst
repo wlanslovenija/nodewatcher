@@ -53,6 +53,12 @@ This will recreate the ``nodewatcher`` database and thus erase ALL data from the
 
 This will initialize the database schema.
 
+.. note::
+    When running any Django management command, do not forget to run it via the container as otherwise the settings
+    will be wrong. You can do it by prefixing commands with ``docker-compose run web`` like this::
+
+        $ docker-compose run web python manage.py <command...>
+
 Compile stylesheets
 -------------------
 
@@ -69,14 +75,6 @@ To compile SCSS files into CSS files run::
 
 .. _Compass: http://compass-style.org/
 .. _Sass: http://sass-lang.com/
-
-Running management commands
----------------------------
-
-When running any Django management command, do not forget to run it via the container as otherwise the settings
-will be wrong. You can do it by prefixing commands with ``docker-compose run web`` like this::
-
-    $ docker-compose run web python manage.py <command...>
 
 Initial setup
 -------------
