@@ -78,13 +78,16 @@ will be wrong. You can do it by prefixing commands with ``docker-compose run web
 
     $ docker-compose run web python manage.py <command...>
 
-Populating the database
------------------------
+Initial setup
+-------------
 
 From scratch
 ............
 
-If you are installing the nodewatcher from scratch, you should probably now create a Django admin user::
+If you are installing the nodewatcher from scratch, you should probably now create a Django admin user.
+You can do this by opening nodewatcher initial setup page at `http://localhost:8000/setup/`_, and
+follow instructions there.
+Alternatively, you can run::
 
     $ docker-compose run web python manage.py createsuperuser
 
@@ -94,6 +97,8 @@ the nodewatcher's admin interface at http://localhost:8000/admin/.
 .. note::
     Depending on your Docker installation the web interface might not be available at ``localhost``
     but at some other address.
+
+.. _http://localhost:8000/setup/: http://localhost:8000/setup/
 
 From nodewatcher v2 dump
 ........................
