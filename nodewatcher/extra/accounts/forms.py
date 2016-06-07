@@ -41,7 +41,6 @@ def alter_user_form_fields(form):
             form.fields[field].required = True
 
 
-
 class ValidateUsernameMixin(object):
     def clean_username(self):
         # Check for username existence in a case-insensitive manner.
