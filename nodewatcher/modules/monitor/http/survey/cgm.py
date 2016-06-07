@@ -7,4 +7,4 @@ def clients(node, cfg):
     Register packages needed for reporting the clients.
     """
 
-    cfg.packages.update(['nodewatcher-agent-mod-clients'])
+    cfg.packages.update(['nodewatcher-agent-mod-wireless'])
