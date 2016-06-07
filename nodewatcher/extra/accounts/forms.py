@@ -1,12 +1,13 @@
 from django.conf import settings
-from django.core import validators as core_validators
 from django.forms import forms, models as forms_models
 from django.contrib.admin import utils as admin_utils
 from django.contrib import auth
-from django.contrib.auth import admin as auth_admin, forms as auth_forms, models as auth_models
+from django.contrib.auth import admin as auth_admin, forms as auth_forms
 from django.utils.translation import ugettext_lazy as _
 
-from . import metaforms, models, validators
+from nodewatcher.modules.frontend.setup import forms as setup_forms
+
+from . import metaforms, models
 
 # Fieldsets of fields we use both in admin and registration for the user object creation.
 user_add_fieldsets = list(auth_admin.UserAdmin.add_fieldsets)
@@ -25,22 +26,7 @@ def alter_user_form_fields(form):
     to fields.
     """
 
-    if 'username' in form.fields:
-        # Minimal length (it is otherwise checked in a form field so we also check it just there).
-        if not filter(lambda v: isinstance(v, core_validators.MinLengthValidator), form.fields['username'].validators):
-            # We do not blindly append as field objects can be reused.
-            form.fields['username'].validators.append(core_validators.MinLengthValidator(4))
-        # We set it every time to be sure.
-        form.fields['username'].min_length = 4
-        form.fields['username'].help_text = _("Letters, digits and @/./+/-/_ only. Will be public.")
-
-    # E-mail domain validation (we check it in a model field).
-    emailfield = filter(lambda x: x.name == 'email', form.Meta.model._meta.fields)[0]
-    # We replace core validator with our own extended version which also checks hostname existence.
-    emailfield.validators = filter(lambda x: not isinstance(x, core_validators.EmailValidator), emailfield.validators)
-    # We do not blindly append as field objects can be reused.
-    if validators.validate_email_with_hostname not in emailfield.validators:
-        emailfield.validators.append(validators.validate_email_with_hostname)
+    setup_forms.alter_creation_form(form)
 
     # We add in a form field as it is too late to add in model field.
     form.fields['email'].help_text = _("Carefully enter your e-mail address as it will be used for account activation. It will be visible to other registered users.")
@@ -54,23 +40,6 @@ def alter_user_form_fields(form):
         if field in form.fields:
             form.fields[field].required = True
 
-
-def check_password_length(form):
-    """
-    This function sets minimal length on the password field in the given form.
-    """
-
-    fieldname1 = 'new_password1' if 'new_password1' in form.fields else 'password1'
-    fieldname2 = 'new_password2' if 'new_password2' in form.fields else 'password2'
-
-    # Minimal length (it can be checked only in a form field).
-    if not filter(lambda v: isinstance(v, core_validators.MinLengthValidator), form.fields[fieldname1].validators):
-        # We do not blindly append as field objects can be reused.
-        form.fields[fieldname1].validators.append(core_validators.MinLengthValidator(6))
-    # We set it every time to be sure.
-    form.fields[fieldname1].min_length = 6
-    form.fields[fieldname1].help_text = _("Minimal password length is 6.")
-    form.fields[fieldname2].help_text = _("Enter the same password as above, for verification.")
 
 
 class ValidateUsernameMixin(object):
@@ -111,7 +80,7 @@ class AdminUserCreationForm(ValidateUsernameMixin, auth_forms.UserCreationForm):
         super(AdminUserCreationForm, self).__init__(*args, **kwargs)
 
         alter_user_form_fields(self)
-        check_password_length(self)
+        setup_forms.check_password_length(self)
 
 
 class UserCreationForm(AdminUserCreationForm):
@@ -237,7 +206,7 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
     def __init__(self, *args, **kwargs):
         super(SetPasswordForm, self).__init__(*args, **kwargs)
 
-        check_password_length(self)
+        setup_forms.check_password_length(self)
 
 
 class PasswordChangeForm(auth_forms.PasswordChangeForm):
@@ -252,7 +221,7 @@ class PasswordChangeForm(auth_forms.PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super(PasswordChangeForm, self).__init__(*args, **kwargs)
 
-        check_password_length(self)
+        setup_forms.check_password_length(self)
 
 # TODO: Probably not needed anymore in Django 1.9.
 #       See: https://github.com/django/django/commit/28986da4ca167ae257abcaf7caea230eca2bcd80

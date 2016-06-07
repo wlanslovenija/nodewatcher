@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% contextblock %}
+    {% load future i18n %}
+
+    {% trans "Setup" as title %}
+{% endcontextblock %}
+
+{% block content %}
+    <h2>{% trans "Migrations" %}</h2>
+    {% if pending_migrations %}
+        <p>{% blocktrans %}You have <strong>unapplied database migration(s)</strong>. nodewatcher may not work properly until you apply the migrations.{% endblocktrans %}</p>
+    {% else %}
+        <p>{% blocktrans %}Database migrations are all applied.{% endblocktrans %}</p>
+    {% endif %}
+    <h2>{% trans "Admin account" %}</h2>
+    {% if create_admin %}
+        <p>{% blocktrans %}Create the first user account. It will have admin permissions.{% endblocktrans %}</p>
+        {% with form_submit=_("Create admin account") %}
+            {% include "form.html" %}
+        {% endwith %}
+    {% else %}
+        {% url 'admin:index' as admin_url %}
+        <p>{% blocktrans %}You can create only the initial admin account using this page. Use the <a href="{{ admin_url }}">admin interface</a> to create further user accounts.{% endblocktrans %}</p>
+    {% endif %}
+{% endblock %}

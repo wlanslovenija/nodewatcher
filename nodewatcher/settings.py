@@ -285,6 +285,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.frontend.editor',
     'nodewatcher.modules.frontend.list',
     'nodewatcher.modules.frontend.mynodes',
+    'nodewatcher.modules.frontend.setup',
     'nodewatcher.modules.frontend.statistics',
     'nodewatcher.modules.frontend.topology',
     'nodewatcher.modules.frontend.generator',

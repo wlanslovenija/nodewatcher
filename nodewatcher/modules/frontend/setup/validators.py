@@ -30,4 +30,4 @@ def validate_email_with_hostname(value):
         except:
             pass
 
-        raise exceptions.ValidationError(_(u'Enter a valid e-mail address.'), code='invalid')
+        raise exceptions.ValidationError(_("Enter a valid e-mail address."), code='invalid')
