@@ -1,4 +1,5 @@
 import datetime
+import traceback
 
 from django.db.models import signals as model_signals
 
@@ -206,6 +207,10 @@ class MaintenanceDownsample(monitor_processors.NetworkProcessor):
             results.append(workers.apply_async(_maintenance_downsample_worker, [worker, num_workers]))
 
         for result in results:
-            result.get()
+            try:
+                result.get()
+            except:
+                self.logger.warning("Downsample worker failed with exception:")
+                self.logger.warning(traceback.format_exc())
 
         return context, nodes
