@@ -94,7 +94,7 @@ class MQMakerWiTiv2(cgm_devices.DeviceBase):
     }
     profiles = {
         'openwrt': {
-            'name': 'witi',
+            'name': 'WITI',
             'files': [
                 'openwrt-ramips-mt7621-witi-squashfs-sysupgrade.bin'
             ]
