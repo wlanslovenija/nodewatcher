@@ -69,7 +69,8 @@ class TPLinkWR740NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR740',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr740n-v1-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr740n-v1-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr740n-v1-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -86,7 +87,8 @@ class TPLinkWR740NDv3(TPLinkWR740NDv1):
         'openwrt': {
             'name': 'TLWR740',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr740n-v3-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr740n-v3-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr740n-v3-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -103,7 +105,8 @@ class TPLinkWR740NDv4(TPLinkWR740NDv1):
         'openwrt': {
             'name': 'TLWR740',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr740n-v4-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr740n-v4-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr740n-v4-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -120,7 +123,8 @@ class TPLinkWR740NDv5(TPLinkWR740NDv1):
         'openwrt': {
             'name': 'TLWR740',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr740n-v5-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr740n-v5-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr740n-v5-squashfs-sysupgrade.bin'
             ]
         }
     }
