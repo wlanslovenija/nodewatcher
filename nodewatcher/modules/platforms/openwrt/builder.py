@@ -103,7 +103,8 @@ def build_image(result, profile):
             'make', 'image',
             'PROFILE=%s' % profile["name"],
             'FILES=%s' % temp_path,
-            'PACKAGES=%s' % " ".join(cfg['_packages'])
+            'PACKAGES=%s' % " ".join(cfg['_packages']),
+            'FORCE=1'
         )
 
         # Determine the location of output files.
