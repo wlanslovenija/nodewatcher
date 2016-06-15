@@ -13,40 +13,23 @@ try:
     from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
     class SurveyInfoStreams(ds_models.RegistryRootStreams):
-        snr = ds_fields.IntegerField(tags={
-            'title': gettext_noop("SNR"),
-            'description': gettext_noop("Node SNR."),
+
+        neighbor_graph = ds_fields.GraphField(tags={
+            'title': gettext_noop("Neighbor topology"),
+            'description': gettext_noop("Neigbhbor topology."),
             'visualization': {
-                'type': 'line',
+                'type': 'graph',
                 'initial_set': True,
-                'time_downsamplers': ['mean'],
-                'value_downsamplers': ['min', 'mean', 'max'],
-                'minimum': 0.0,
-            },
-        })
-        neighbor_count = ds_fields.IntegerField(tags={
-            'title': gettext_noop("Neighbor count"),
-            'description': gettext_noop("Number of detected access points."),
-            'visualization': {
-                'type': 'line',
-                'initial_set': True,
-                'time_downsamplers': ['mean'],
-                'value_downsamplers': ['min', 'mean', 'max'],
-                'minimum': 0.0,
-            },
+            }
         })
 
         def get_module_name(self):
             return 'monitor.http.survey'
 
     class SurveyInfoStreamsData(object):
-        def __init__(self, node, frequency, channel, snr, neighbors):
+        def __init__(self, node, neighbor_graph):
             self.node = node
-            self.frequency = frequency  # either 2 or 5, corresponding to 2.4GHz and 5GHz
-            self.channel = channel
-            self.snr = snr
-            self.neighbors = neighbors
-            self.neighbor_count = len(self.neighbors)
+            self.neighbor_graph = neighbor_graph
 
     ds_pool.register(SurveyInfoStreamsData, SurveyInfoStreams)
 
@@ -76,8 +59,23 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             # Unsupported version or data fetch failed (v0)
             return context
 
-        channel = self.get_node_channel(context, node)
-        snr = self.get_node_snr(context, node)
+        try:
+            for radio in context.http.core.wireless.radios:
+                edge = {}
+                for neighbor in context.http.core.wireless.radios[str(radio)]['survey']:
+                    # add an edge for that neighbor
+                    print(neighbor)
+                    print(type(neighbor))
+                    print(neighbor.keys())
+                    print(neighbor)
+                    #edge['channel'] = neighbor.channel
+        except KeyError:
+            pass
+        except NameError:
+            self.logger.warning("Error parsing JSON file for " + str(node))
+
+        #channel = self.get_node_channel(context, node)
+        #snr = self.get_node_snr(context, node)
         neighbors = self.get_node_neighbors(context, node)
         if DATASTREAM_SUPPORTED:
             # Store client count into datastream.
@@ -111,17 +109,24 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         :param frequency_band: either '2' or '5', corresponding to 2.4GHz and 5GHz.
         :return: SNR of the node at the specified frequency band.
         """
-
+        edges = {}
+        vertices = {}
         try:
             for interface in context.http.core.wireless.interfaces:
-                if str(context.http.core.wireless.interfaces[interface].frequency)[:1] == frequency_band:
-                    signal = context.http.core.wireless.interfaces[interface].signal
-                    noise = context.http.core.wireless.interfaces[interface].noise
-                    if (not signal or not noise):
-                        self.logger.warning("No SNR available for " + str(node))
-                        return 0
-                    else:
-                        return signal - noise
+                # create an edge for every interface
+                edge = {}
+                edge = {'f': str(node), 't': destination_id}
+                signal = 0
+                noise = 0
+                #try:
+                #    signal = context.http.core.wireless.interfaces[interface].signal
+                #    noise = context.http.core.wireless.interfaces[interface].noise
+                #except KeyError:
+                #    self.logger.warning("No SNR available for " + str(node))
+                #    pass
+                #edge['snr'] = signal - noise
+                #edge['channel'] = context.http.core.wireless.interfaces[interface].channel
+
         except NameError:
             self.logger.warning("Error parsing JSON file for " + str(node))
         except KeyError:
@@ -150,10 +155,12 @@ class SurveyInfo(monitor_processors.NodeProcessor):
 
         try:
             for radio in context.http.core.wireless.radios:
+                edge = {}
                 for neighbor in context.http.core.wireless.radios[str(radio)]['survey']:
-                    if neighbor['channel'] <= frequency_band_max_channel \
-                            and neighbor['channel'] >= frequency_band_min_channel:
-                        return context.http.core.wireless.radios[radio]['survey']
+                    #add an edge for that neighbor
+                    print(neighbor)
+                    print(neighbor.keys())
+                    edge['channel']= neighbor.channel
         except KeyError:
             pass
         except NameError:
