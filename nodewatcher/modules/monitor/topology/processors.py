@@ -17,8 +17,7 @@ class TopologyStreams(ds_base.StreamsBase):
         'title': gettext_noop("Network topology"),
         'description': gettext_noop("Network topology."),
         'visualization': {
-            'type': 'graph',
-            'initial_set': True,
+            'type': 'graph'
         }
     })
 
