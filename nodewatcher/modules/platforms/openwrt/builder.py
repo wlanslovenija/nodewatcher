@@ -97,6 +97,8 @@ def build_image(result, profile):
 
         # Clean the build first to prevent accidentally taking build results from a previous build.
         builder.call('make', 'clean')
+        # Ensure the prerequisite check is skipped.
+        builder.call('touch', 'staging_dir/host/.prereq-build')
 
         # Run the build system and wait for its completion.
         result.build_log = builder.call(
