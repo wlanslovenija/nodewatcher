@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_noop as _
 
 from django_datastream import datastream
 
@@ -14,8 +14,8 @@ from .pool import pool as tp_pool
 
 class TopologyStreams(ds_base.StreamsBase):
     topology = ds_fields.GraphField(tags={
-        'title': gettext_noop("Network topology"),
-        'description': gettext_noop("Network topology."),
+        'title': _("Network topology"),
+        'description': _("Network topology."),
         'visualization': {
             'type': 'graph'
         }
