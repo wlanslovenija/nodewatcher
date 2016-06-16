@@ -56,12 +56,16 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             return context
         edges, vertices = [], []
         try:
-            vertices.append(dict(i=str(node)))
-            for radio in context.http.core.wireless.radios:
-                for neighbor in context.http.core.wireless.radios[str(radio)]['survey']:
-                    # add an edge for that neighbor
-                    edge = {'f': str(node), 't': neighbor['bssid']}
+            vertex_bssids = []
+            for interface in context.http.core.wireless.interfaces.values():
+                vertex_bssids.append(interface['bssid'])
+            vertex = dict(i=str(node.uuid), bssids = vertex_bssids)
+            vertices.append(vertex)
+            for radio in context.http.core.wireless.radios.values():
+                for neighbor in radio.survey:
                     vertices.append(dict(i=neighbor['bssid']))
+                    # Add an edge for that neighbor
+                    edge = {'f': str(node.uuid), 't': neighbor['bssid']}
                     edge['channel'] = neighbor['channel']
                     edge['signal'] = neighbor['signal']
                     edges.append(edge)
@@ -72,5 +76,4 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         if DATASTREAM_SUPPORTED:
             # Store survey graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, vertices, edges)
-
         return context
