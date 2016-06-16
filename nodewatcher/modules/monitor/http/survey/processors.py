@@ -14,10 +14,6 @@ try:
         neighbor_graph = ds_fields.GraphField(tags={
             'title': gettext_noop("Neighbor topology"),
             'description': gettext_noop("Neighbor topology."),
-            'visualization': {
-                'type': 'graph',
-                'initial_set': True,
-            }
         })
 
         def get_module_name(self):
