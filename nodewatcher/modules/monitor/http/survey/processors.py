@@ -1,10 +1,6 @@
-import datetime
-import pytz
-
 from django.utils.translation import gettext_noop
 
-from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
-from nodewatcher.utils import ipaddr
+from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
 
 from django_datastream import datastream
