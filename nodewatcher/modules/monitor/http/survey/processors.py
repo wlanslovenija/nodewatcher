@@ -10,7 +10,7 @@ try:
     from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models, base as ds_base
     from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
-    class SurveyInfoStreams(ds_base.StreamsBase):
+    class SurveyInfoStreams(ds_models.RegistryRootStreams):
         neighbor_graph = ds_fields.GraphField(tags={
             'title': gettext_noop("Neighbor topology"),
             'description': gettext_noop("Neighbor topology."),
@@ -19,17 +19,9 @@ try:
         def get_module_name(self):
             return 'monitor.http.survey'
 
-        def get_stream_query_tags(self):
-            return {'module': 'survey'}
-
-        def get_stream_tags(self):
-            return {'module': 'survey'}
-
-        def get_stream_highest_granularity(self):
-            return datastream.Granularity.Minutes
-
     class SurveyInfoStreamsData(object):
-        def __init__(self, vertices, edges):
+        def __init__(self, node, vertices, edges):
+            self.node = node
             self.neighbor_graph = {
                 'v': vertices,
                 'e': edges
@@ -79,6 +71,6 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             self.logger.warning("Error parsing JSON file for " + str(node))
         if DATASTREAM_SUPPORTED:
             # Store survey graph into datastream.
-            context.datastream.survey_topology = SurveyInfoStreamsData(vertices, edges)
+            context.datastream.survey_topology = SurveyInfoStreamsData(node, vertices, edges)
 
         return context
