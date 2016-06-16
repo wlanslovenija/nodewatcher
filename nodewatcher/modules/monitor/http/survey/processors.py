@@ -59,7 +59,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             vertex_bssids = []
             for interface in context.http.core.wireless.interfaces.values():
                 vertex_bssids.append(interface['bssid'])
-            vertex = dict(i=str(node.uuid), bssids = vertex_bssids)
+            vertex = dict(i=str(node.uuid), bssids=vertex_bssids)
             vertices.append(vertex)
             for radio in context.http.core.wireless.radios.values():
                 for neighbor in radio.survey:
