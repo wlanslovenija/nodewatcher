@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_noop as _
+from django_datastream import datastream
 
 from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
@@ -14,6 +15,9 @@ class SurveyInfoStreams(ds_models.RegistryRootStreams):
 
     def get_module_name(self):
         return 'monitor.http.survey'
+
+    def get_stream_highest_granularity(self):
+        return datastream.Granularity.Hours
 
 
 class SurveyInfoStreamsData(object):
