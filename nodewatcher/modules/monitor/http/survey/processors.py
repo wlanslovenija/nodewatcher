@@ -5,33 +5,30 @@ from nodewatcher.modules.monitor.sources.http import processors as http_processo
 
 from django_datastream import datastream
 
-DATASTREAM_SUPPORTED = False
-try:
-    from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
-    from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
+from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
+from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
-    class SurveyInfoStreams(ds_models.RegistryRootStreams):
-        neighbor_graph = ds_fields.GraphField(tags={
-            'title': gettext_noop("Neighbor topology"),
-            'description': gettext_noop("Neighbor topology."),
-        })
 
-        def get_module_name(self):
-            return 'monitor.http.survey'
+class SurveyInfoStreams(ds_models.RegistryRootStreams):
+    neighbor_graph = ds_fields.GraphField(tags={
+        'title': gettext_noop("Neighbor topology"),
+        'description': gettext_noop("Neighbor topology."),
+    })
 
-    class SurveyInfoStreamsData(object):
-        def __init__(self, node, vertices, edges):
-            self.node = node
-            self.neighbor_graph = {
-                'v': vertices,
-                'e': edges
-            }
+    def get_module_name(self):
+        return 'monitor.http.survey'
 
-    ds_pool.register(SurveyInfoStreamsData, SurveyInfoStreams)
 
-    DATASTREAM_SUPPORTED = True
-except ImportError:
-    pass
+class SurveyInfoStreamsData(object):
+    def __init__(self, node, vertices, edges):
+        self.node = node
+        self.neighbor_graph = {
+            'v': vertices,
+            'e': edges
+        }
+
+
+ds_pool.register(SurveyInfoStreamsData, SurveyInfoStreams)
 
 
 class SurveyInfo(monitor_processors.NodeProcessor):
@@ -74,7 +71,6 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             pass
         except NameError:
             self.logger.warning("Error parsing JSON file for " + str(node))
-        if DATASTREAM_SUPPORTED:
-            # Store survey graph into datastream.
-            context.datastream.survey_topology = SurveyInfoStreamsData(node, vertices, edges)
+        # Store survey graph into datastream.
+        context.datastream.survey_topology = SurveyInfoStreamsData(node, vertices, edges)
         return context
