@@ -12,19 +12,7 @@ class MQMakerWiTiv2(cgm_devices.DeviceBase):
     url = 'https://mqmaker.com/product/witi-board/'
     architecture = 'ramips_mt7621'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio (2.4 GHz)", [
-            cgm_protocols.IEEE80211BGN(
-                cgm_protocols.IEEE80211BGN.SHORT_GI_20,
-                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
-                cgm_protocols.IEEE80211BGN.RX_STBC1,
-                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
-            )
-        ], [
-            cgm_devices.AntennaConnector('a1', "Antenna0")
-        ], [
-            cgm_devices.DeviceRadio.MultipleSSID,
-        ]),
-        cgm_devices.IntegratedRadio('wifi1', "Integrated wireless radio (5 GHz)", [
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio (5 GHz)", [
             cgm_protocols.IEEE80211AN(
                 cgm_protocols.IEEE80211AN.SHORT_GI_20,
                 cgm_protocols.IEEE80211AN.SHORT_GI_40,
@@ -32,7 +20,19 @@ class MQMakerWiTiv2(cgm_devices.DeviceBase):
                 cgm_protocols.IEEE80211AN.DSSS_CCK_40,
             )
         ], [
-            cgm_devices.AntennaConnector('a2', "Antenna1")
+            cgm_devices.AntennaConnector('a1', "Antenna1")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
+        ]),
+        cgm_devices.IntegratedRadio('wifi1', "Integrated wireless radio (2.4 GHz)", [
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_20,
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
+            )
+        ], [
+            cgm_devices.AntennaConnector('a2', "Antenna0")
         ], [
             cgm_devices.DeviceRadio.MultipleSSID,
         ])
