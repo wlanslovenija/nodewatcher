@@ -7,7 +7,7 @@ from django_datastream import datastream
 
 DATASTREAM_SUPPORTED = False
 try:
-    from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models, base as ds_base
+    from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
     from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
     class SurveyInfoStreams(ds_models.RegistryRootStreams):
