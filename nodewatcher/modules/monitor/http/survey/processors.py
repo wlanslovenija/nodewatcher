@@ -68,6 +68,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                     edge = {'f': str(node.uuid), 't': neighbor['bssid']}
                     edge['channel'] = neighbor['channel']
                     edge['signal'] = neighbor['signal']
+                    edge['ssid'] = neighbor['ssid']
                     edges.append(edge)
         except KeyError:
             pass
