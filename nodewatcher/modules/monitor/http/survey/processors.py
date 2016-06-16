@@ -2,9 +2,6 @@ from django.utils.translation import gettext_noop
 
 from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
-
-from django_datastream import datastream
-
 from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
 from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
