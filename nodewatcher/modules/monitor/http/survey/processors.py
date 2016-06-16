@@ -1,4 +1,4 @@
-from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_noop as _
 
 from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
@@ -8,8 +8,8 @@ from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
 
 class SurveyInfoStreams(ds_models.RegistryRootStreams):
     neighbor_graph = ds_fields.GraphField(tags={
-        'title': gettext_noop("Neighbor topology"),
-        'description': gettext_noop("Neighbor topology."),
+        'title': _("Neighbor topology"),
+        'description': _("Neighbor topology."),
     })
 
     def get_module_name(self):
