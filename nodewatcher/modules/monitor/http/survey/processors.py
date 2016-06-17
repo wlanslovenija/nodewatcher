@@ -34,8 +34,10 @@ ds_pool.register(SurveyInfoStreamsData, SurveyInfoStreams)
 
 class SurveyInfo(monitor_processors.NodeProcessor):
     """
-    Stores neighbor's reported channel, BSSID and signal strength into the monitoring schema. A star shaped graph
-    is constructed. Will only run if HTTP monitor module has previously fetched data.
+    Stores neighbor's reported channel, BSSID, SSID and signal strength into the datastream. A star shaped graph
+    is constructed. The source vertex contains an array of all BSSIDs of that node. Source vertex is stored according
+    to its UUID, wherease all neighbors are stored according to their BSSIDs. Will only run if HTTP monitor module
+    has previously fetched data.
     """
 
     @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
