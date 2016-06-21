@@ -21,7 +21,8 @@ class SurveyInfoStreams(ds_models.RegistryRootStreams):
         # The nodewatcher-agent performs a survey once every ~240 monitoring intervals according to
         # https://github.com/wlanslovenija/nodewatcher-agent/blob/master/modules/wireless.c#L362
         # and a monitoring run is performed every 30 seconds according to
-        # https://github.com/wlanslovenija/nodewatcher-agent/blob/73f2b25db2c34ae7d70904bac31379a2243bade0/modules/wireless.c#L437.
+        # https://github.com/wlanslovenija/nodewatcher-agent/blob/73f2b25db2c34ae7d70904bac31379a2243bade0/modules/wireless.c#L437
+        # (master branch at https://github.com/wlanslovenija/nodewatcher-agent/blob/master/modules/wireless.c#L437).
         # So a survey is performed once every two hours, meaning that we use hourly granularity.
         return datastream.Granularity.Hours
 
