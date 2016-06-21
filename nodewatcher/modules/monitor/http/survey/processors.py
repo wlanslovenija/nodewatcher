@@ -89,11 +89,11 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         streams = datastream.find_streams({'node': node.uuid, 'module': 'monitor.http.survey'})
         if streams:
             assert len(streams) == 1
-            latest_stream = streams[len(streams) - 1]
             datapoint_iterator = datastream.get_data(
-                stream_id=latest_stream['stream_id'],
-                granularity=latest_stream['highest_granularity'],
-                start=latest_stream['latest_datapoint'])
+                stream_id=streams[0]['stream_id'],
+                granularity=streams[0]['highest_granularity'],
+                start=streams[0]['latest_datapoint'],
+                reverse=True)
             try:
                 latest_stored_graph = datapoint_iterator[0]['v']
             except IndexError:
@@ -108,7 +108,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             # Since a new survey is performed once every two hours, it should be impossible to insert new data more
             # often than once every hour.
             if latest_stored_graph:
-                assert timezone.now() - latest_stream['latest_datapoint'] > datetime.timedelta(hours=1)
+                assert timezone.now() - streams[0]['latest_datapoint'] > datetime.timedelta(hours=1)
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
         return context
