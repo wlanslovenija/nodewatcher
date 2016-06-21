@@ -72,9 +72,9 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                     vertices.append({'i': neighbor['bssid']})
                     # Add an edge for that neighbor.
                     edge = {'f': str(node.uuid), 't': neighbor['bssid']}
-                    edge['channel'] = neighbor['channel']
-                    edge['signal'] = neighbor['signal']
-                    edge['ssid'] = neighbor['ssid']
+                    for field in ('channel', 'signal', 'ssid'):
+                        if field in neighbor:
+                            edge[field] = neighbor[field]
                     edges.append(edge)
         except KeyError:
             pass
@@ -98,7 +98,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             "v": vertices,
             "e": edges
         }
-
+        
         if latest_graph != latest_stored_graph:
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
