@@ -1,5 +1,5 @@
 db:
-    image: tozd/postgresql:9.3
+    image: tozd/postgresql:9.5
     environment:
         PGSQL_ROLE_1_USERNAME: nodewatcher
         PGSQL_ROLE_1_PASSWORD: nodewatcher
@@ -9,14 +9,14 @@ db:
         PGSQL_DB_1_ENCODING: UNICODE
         PGSQL_DB_1_POSTGIS: "true"
     volumes:
-        # Use a volume to enable database persistency across restarts
-        - /tmp/nodewatcher-db:/var/lib/postgresql/9.3/main
+        # Use a volume to enable database persistence across restarts
+        - /tmp/nodewatcher-db:/var/lib/postgresql/9.5/main
 tokumx:
     image: wlanslovenija/tokumx
     # A privileged container is required to disable hugepages for TokuMX
     privileged: true
     volumes:
-        # Use a volume to enable database persistency across restarts
+        # Use a volume to enable database persistence across restarts
         - /tmp/nodewatcher-tokumx:/var/lib/tokumx
 redis:
     image: tozd/redis
