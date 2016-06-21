@@ -87,17 +87,18 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         streams = datastream.find_streams({'node': node.uuid})
         if streams:
             latest_stream = streams[len(streams) - 1]
-            datapoint_iterator = datastream.get_data(stream_id=latest_stream['stream_id'],
-                                                     granularity=latest_stream['highest_granularity'],
-                                                     start=latest_stream['latest_datapoint'])
+            datapoint_iterator = datastream.get_data(
+                stream_id=latest_stream['stream_id'],
+                granularity=latest_stream['highest_granularity'],
+                start=latest_stream['latest_datapoint'])
             try:
                 latest_stored_graph = datapoint_iterator[0]['v']
             except IndexError:
                 pass
 
         latest_graph = {
-            "v": vertices,
-            "e": edges
+            'v': vertices,
+            'e': edges
         }
 
         if latest_graph != latest_stored_graph:
