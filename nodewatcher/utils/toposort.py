@@ -7,6 +7,8 @@ def topological_sort(data, dependency_key='dependencies'):
     """
 
     dep_graph = {item: value[dependency_key] for item, value in data.iteritems()}
+    if not dep_graph:
+        return
 
     # Ignore self dependencies
     for key, value in dep_graph.items():
