@@ -89,7 +89,7 @@ ROUTER_MAP = {
     "tp-wr1043nd": "tp-wr1043ndv1",
     "sm-sx763v2": "sm-sx763v2",
     "tp-wdr4300": "tp-wdr4300v1",
-    "gl-inet": "gl-inetv1",
+    "gl-inet": "gl-inet6416av1",
 }
 
 # Mapping of v2 device identifiers to v3 wireless protocol identifiers
