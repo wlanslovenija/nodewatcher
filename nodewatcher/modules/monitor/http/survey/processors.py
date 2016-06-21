@@ -93,7 +93,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                 stream_id=streams[0]['stream_id'],
                 granularity=streams[0]['highest_granularity'],
                 start=streams[0]['latest_datapoint'],
-                reverse=True
+                reverse=True,
             )
             try:
                 latest_stored_graph = datapoint_iterator[0]['v']
