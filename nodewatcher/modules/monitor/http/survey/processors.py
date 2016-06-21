@@ -2,6 +2,7 @@ import datetime
 
 from django.utils.translation import gettext_noop as _
 from django.utils import timezone
+
 from django_datastream import datastream
 
 from nodewatcher.core.monitor import processors as monitor_processors
