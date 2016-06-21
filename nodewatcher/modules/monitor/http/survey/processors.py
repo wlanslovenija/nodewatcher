@@ -1,5 +1,7 @@
-from django.utils.translation import gettext_noop as _
+import datetime
 
+from django.utils.translation import gettext_noop as _
+from django.utils import timezone
 from django_datastream import datastream
 
 from nodewatcher.core.monitor import processors as monitor_processors
@@ -102,6 +104,10 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         }
 
         if latest_graph != latest_stored_graph:
+            # Since a new survey is performed once every two hours, it should be impossible to insert new data more
+            # often than once every hour.
+            if latest_stored_graph:
+                assert timezone.now() - latest_stream['latest_datapoint'] > datetime.timedelta(hours=1)
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
         return context
