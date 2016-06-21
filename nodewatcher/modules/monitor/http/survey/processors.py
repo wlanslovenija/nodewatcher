@@ -86,8 +86,9 @@ class SurveyInfo(monitor_processors.NodeProcessor):
 
         latest_stored_graph = None
         # Retrieve the latest stored datapoint, if it exists
-        streams = datastream.find_streams({'node': node.uuid})
+        streams = datastream.find_streams({'node': node.uuid, 'module': 'monitor.http.survey'})
         if streams:
+            assert len(streams) == 1
             latest_stream = streams[len(streams) - 1]
             datapoint_iterator = datastream.get_data(
                 stream_id=latest_stream['stream_id'],
