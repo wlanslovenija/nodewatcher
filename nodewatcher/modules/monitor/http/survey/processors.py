@@ -27,12 +27,9 @@ class SurveyInfoStreams(ds_models.RegistryRootStreams):
 
 
 class SurveyInfoStreamsData(object):
-    def __init__(self, node, vertices, edges):
+    def __init__(self, node, neighbor_graph):
         self.node = node
-        self.neighbor_graph = {
-            'v': vertices,
-            'e': edges
-        }
+        self.neighbor_graph = neighbor_graph
 
 
 ds_pool.register(SurveyInfoStreamsData, SurveyInfoStreams)
@@ -84,6 +81,25 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         except NameError:
             self.logger.warning("Could not parse survey data for node: " + str(node))
 
-        # Store survey graph into datastream.
-        context.datastream.survey_topology = SurveyInfoStreamsData(node, vertices, edges)
+        latest_stored_graph = None
+        # Retrieve the latest stored datapoint, if it exists
+        streams = datastream.find_streams({'node': node.uuid})
+        if streams:
+            latest_stream = streams[len(streams) - 1]
+            datapoint_iterator = datastream.get_data(stream_id=latest_stream['stream_id'],
+                                                     granularity=latest_stream['highest_granularity'],
+                                                     start=latest_stream['latest_datapoint'])
+            try:
+                latest_stored_graph = datapoint_iterator[0]['v']
+            except IndexError:
+                pass
+
+        latest_graph = {
+            "v": vertices,
+            "e": edges
+        }
+
+        if latest_graph != latest_stored_graph:
+            # Store the latest graph into datastream.
+            context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
         return context
