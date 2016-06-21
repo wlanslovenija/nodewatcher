@@ -98,7 +98,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             "v": vertices,
             "e": edges
         }
-        
+
         if latest_graph != latest_stored_graph:
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
