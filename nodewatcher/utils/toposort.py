@@ -6,7 +6,7 @@ def topological_sort(data, dependency_key='dependencies'):
     Performs a topological sort.
     """
 
-    dep_graph = {item: value[dependency_key] for item, value in data.iteritems()}
+    dep_graph = {item: set(value[dependency_key]) for item, value in data.iteritems()}
     if not dep_graph:
         return
 
