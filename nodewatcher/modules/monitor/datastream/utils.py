@@ -8,13 +8,16 @@ from nodewatcher.utils import toposort
 COMMIT_BATCH_SIZE = 1000
 
 
-def datastream_copy(source, destination):
+def datastream_copy(source, destination, start=None, end=None, remove_all=False):
     """
     Copies all streams from one datastream backend to another. Source and destination
     MUST differ. All data in destination datastream backend WILL BE LOST.
 
     :param source: Source datastream backend instance
     :param destination: Destination datastream backend instance
+    :param start: Import from the specified timestamp
+    :param end: Import until the specified timestamp
+    :param remove_all: Remove all destination streams
     """
 
     # Do a basic check if source and destination are the same. This cannot determine
@@ -22,6 +25,9 @@ def datastream_copy(source, destination):
     # data will be lost.
     if source == destination:
         raise ValueError('Source and destination must differ!')
+
+    if start is None:
+        start = datetime.datetime.min
 
     ds_source = datastream.Datastream(source)
     ds_destination = datastream.Datastream(destination)
@@ -39,8 +45,9 @@ def datastream_copy(source, destination):
     print "Resolving dependencies with %d streams." % len(streams)
     sorted_streams = toposort.topological_sort(streams)
 
-    print "Dropping destination streams."
-    ds_destination.delete_streams()
+    if remove_all:
+        print "Dropping destination streams."
+        ds_destination.delete_streams()
 
     print "Importing streams."
     stream_no = 1
@@ -81,7 +88,7 @@ def datastream_copy(source, destination):
                 batch = []
 
                 try:
-                    for datapoint in ds_source.get_data(stream.id, stream.highest_granularity, start=datetime.datetime.min):
+                    for datapoint in ds_source.get_data(stream.id, stream.highest_granularity, start=start, end=end):
                         batch.append({'stream_id': stream_id, 'value': datapoint['v'], 'timestamp': datapoint['t']})
                         if len(batch) >= COMMIT_BATCH_SIZE:
                             ds_destination.append_multiple(batch)
