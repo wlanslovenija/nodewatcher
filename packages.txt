@@ -13,3 +13,4 @@ eot-utils
 python-fontforge
 python-apt
 libaprutil1-dev
+liblzma-dev
