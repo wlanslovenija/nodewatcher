@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import datastream
 
@@ -6,6 +7,8 @@ from nodewatcher.utils import toposort
 
 # Number of datapoints to commit in one batch.
 COMMIT_BATCH_SIZE = 1000
+# Number of bytes to commit in one batch.
+COMMIT_BATCH_BYTE_SIZE = 1048576
 
 
 def datastream_copy(source, destination, start=None, end=None, remove_all=False):
@@ -87,10 +90,16 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                 print "Copying data."
                 batch = []
 
+                def size_of_batch():
+                    size = 0
+                    for point in batch:
+                        size += len(json.dumps(point))
+                    return size
+
                 try:
                     for datapoint in ds_source.get_data(stream.id, stream.highest_granularity, start=start, end=end):
                         batch.append({'stream_id': stream_id, 'value': datapoint['v'], 'timestamp': datapoint['t']})
-                        if len(batch) >= COMMIT_BATCH_SIZE:
+                        if len(batch) >= COMMIT_BATCH_SIZE or size_of_batch() >= COMMIT_BATCH_BYTE_SIZE:
                             ds_destination.append_multiple(batch)
                             batch = []
 
