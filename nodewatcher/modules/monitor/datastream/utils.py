@@ -8,7 +8,7 @@ from nodewatcher.utils import toposort
 # Number of datapoints to commit in one batch.
 COMMIT_BATCH_SIZE = 1000
 # Number of bytes to commit in one batch.
-COMMIT_BATCH_BYTE_SIZE = 1048576
+COMMIT_BATCH_BYTE_SIZE = 5242880
 
 
 def datastream_copy(source, destination, start=None, end=None, remove_all=False):
@@ -93,7 +93,10 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                 def size_of_batch():
                     size = 0
                     for point in batch:
-                        size += len(json.dumps(point))
+                        if isinstance(point['value'], (long, int, float)):
+                            size += str(point['value'])
+                        else:
+                            size += len(json.dumps(point['value']))
                     return size
 
                 try:
