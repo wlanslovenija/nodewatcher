@@ -93,10 +93,7 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                 def size_of_batch():
                     size = 0
                     for point in batch:
-                        if isinstance(point['value'], (long, int, float)):
-                            size += str(point['value'])
-                        else:
-                            size += len(json.dumps(point['value']))
+                        size += len(json.dumps(point['value']))
                     return size
 
                 try:
