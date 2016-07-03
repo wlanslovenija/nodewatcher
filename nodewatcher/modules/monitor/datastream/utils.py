@@ -1,5 +1,4 @@
 import datetime
-import json
 
 import datastream
 
@@ -89,19 +88,16 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                 # Copy data.
                 print "Copying data."
                 batch = []
-
-                def size_of_batch():
-                    size = 0
-                    for point in batch:
-                        size += len(json.dumps(point['value']))
-                    return size
+                size_of_batch = 0
 
                 try:
                     for datapoint in ds_source.get_data(stream.id, stream.highest_granularity, start=start, end=end):
                         batch.append({'stream_id': stream_id, 'value': datapoint['v'], 'timestamp': datapoint['t']})
-                        if len(batch) >= COMMIT_BATCH_SIZE or size_of_batch() >= COMMIT_BATCH_BYTE_SIZE:
+                        size_of_batch += len(str(datapoint['v']))
+                        if len(batch) >= COMMIT_BATCH_SIZE or size_of_batch >= COMMIT_BATCH_BYTE_SIZE:
                             ds_destination.append_multiple(batch)
                             batch = []
+                            size_of_batch = 0
 
                     if batch:
                         ds_destination.append_multiple(batch)
