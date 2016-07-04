@@ -102,6 +102,11 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                     if batch:
                         ds_destination.append_multiple(batch)
                         batch = []
+                except datastream.exceptions.StreamNotFound:
+                    # Stream has been removed while import was in progress. Remove the stream from
+                    # destination as well.
+                    print "Skipping removed stream."
+                    ds_destination.delete_streams({'import_id': stream.id})
                 except:
                     print "ERROR: Failed to copy data."
                     print "ERROR: Last batch was:"
