@@ -66,7 +66,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             source_vertex_bssids = [interface.bssid for interface in context.http.core.wireless.interfaces.values()]
             source_vertex = {
                 'i': str(node.uuid),
-                'bssids': source_vertex_bssids,
+                'b': source_vertex_bssids,
             }
             vertices.append(source_vertex)
 
@@ -77,9 +77,11 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                     edge = {
                         'f': str(node.uuid),
                         't': neighbor['bssid'],
+                        'c': neighbor['channel'],
+                        's': neighbor['signal'],
+                        # "n" like "name".
+                        'n': neighbor['ssid'],
                     }
-                    for field in ('channel', 'signal', 'ssid'):
-                        edge[field] = neighbor[field]
                     edges.append(edge)
 
         except (KeyError, NameError):
