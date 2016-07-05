@@ -69,19 +69,22 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                 'bssids': source_vertex_bssids,
             }
             vertices.append(source_vertex)
+
             for radio in context.http.core.wireless.radios.values():
                 for neighbor in radio.survey:
                     vertices.append({'i': neighbor['bssid']})
                     # Add an edge for that neighbor.
-                    edge = {'f': str(node.uuid), 't': neighbor['bssid']}
+                    edge = {
+                        'f': str(node.uuid),
+                        't': neighbor['bssid'],
+                    }
                     for field in ('channel', 'signal', 'ssid'):
-                        if field in neighbor:
-                            edge[field] = neighbor[field]
+                        edge[field] = neighbor[field]
                     edges.append(edge)
-        except KeyError:
-            pass
-        except NameError:
-            self.logger.warning("Could not parse survey data for node: " + str(node))
+
+        except (KeyError, NameError):
+            self.logger.error("Could not parse survey data for node '%s'." % node)
+            return context
 
         latest_stored_graph = None
         # Retrieve the latest stored datapoint, if it exists
@@ -110,4 +113,5 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             assert not latest_stored_graph or timezone.now() - streams[0]['latest_datapoint'] >= datetime.timedelta(hours=1)
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
+
         return context
