@@ -45,15 +45,15 @@ class TrackRegistryModels(monitor_processors.NodeProcessor):
             except KeyError:
                 pass
 
-        model_signals.post_save.connect(registry_track_save, weak=False, dispatch_uid="ds_track_models")
-        model_signals.post_delete.connect(registry_track_delete, weak=False, dispatch_uid="ds_track_models")
+        model_signals.post_save.connect(registry_track_save, weak=False, dispatch_uid='ds_track_models')
+        model_signals.post_delete.connect(registry_track_delete, weak=False, dispatch_uid='ds_track_models')
 
         return context
 
     def cleanup(self, context, node):
 
-        model_signals.post_save.disconnect(dispatch_uid="ds_track_models")
-        model_signals.post_delete.disconnect(dispatch_uid="ds_track_models")
+        model_signals.post_save.disconnect(dispatch_uid='ds_track_models')
+        model_signals.post_delete.disconnect(dispatch_uid='ds_track_models')
 
 
 class DatastreamBase(object):

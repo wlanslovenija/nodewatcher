@@ -46,7 +46,7 @@ class ClientInfo(monitor_processors.NodeProcessor):
     only run if HTTP monitor module has previously fetched data.
     """
 
-    @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
+    @monitor_processors.depends_on_context('http', http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
         Called for every processed node.
@@ -60,7 +60,7 @@ class ClientInfo(monitor_processors.NodeProcessor):
         for client in node.monitoring.network.clients():
             existing_clients[client.client_id] = client
 
-        version = context.http.get_module_version("core.clients")
+        version = context.http.get_module_version('core.clients')
         if version == 0:
             # Unsupported version or data fetch failed (v0)
             return context

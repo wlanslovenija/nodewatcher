@@ -11,7 +11,7 @@ class GeneralInfo(monitor_processors.NodeProcessor):
     monitor module has previously fetched data.
     """
 
-    @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
+    @monitor_processors.depends_on_context('http', http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
         Called for every processed node.
@@ -29,7 +29,7 @@ class GeneralInfo(monitor_processors.NodeProcessor):
         if general is None:
             general = node.monitoring.core.general(create=monitor_models.GeneralMonitor)
 
-        version = context.http.get_module_version("core.general")
+        version = context.http.get_module_version('core.general')
         if not version:
             # Unsupported version or data fetch failed.
             general.save()

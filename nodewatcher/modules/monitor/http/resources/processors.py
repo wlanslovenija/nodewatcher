@@ -8,7 +8,7 @@ class SystemStatus(monitor_processors.NodeProcessor):
     monitor module has previously fetched data.
     """
 
-    @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
+    @monitor_processors.depends_on_context('http', http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
         Called for every processed node.
@@ -40,9 +40,9 @@ class SystemStatus(monitor_processors.NodeProcessor):
         # In the old version, the "core.general" module reports resource usage, where
         # in the new one, this has been moved to its own "core.resources" module
         if context.http.get_version() == 3:
-            version = context.http.get_module_version("core.resources")
+            version = context.http.get_module_version('core.resources')
         else:
-            version = context.http.get_module_version("core.general")
+            version = context.http.get_module_version('core.general')
 
         if version >= 2 and context.http.get_version() == 3:
             # Process general resources (v2+, new version)

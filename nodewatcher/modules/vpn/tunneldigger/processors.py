@@ -11,7 +11,7 @@ try:
 
     class TunneldiggerStreams(ds_models.RegistryRootStreams):
         tx_bytes = ds_fields.CounterField()
-        tx_bytes_rate = ds_fields.RateField("system.status#reboots", "#tx_bytes", tags={
+        tx_bytes_rate = ds_fields.RateField('system.status#reboots', '#tx_bytes', tags={
             'group': 'tunneldigger_bytes_rate',
             'title': gettext_noop("Tunneldigger TX bytes rate"),
             'description': gettext_noop("Combined throughput of transmitted packets via Tunneldigger."),
@@ -26,7 +26,7 @@ try:
             'unit': 'Bps',
         })
         rx_bytes = ds_fields.CounterField()
-        rx_bytes_rate = ds_fields.RateField("system.status#reboots", "#rx_bytes", tags={
+        rx_bytes_rate = ds_fields.RateField('system.status#reboots', '#rx_bytes', tags={
             'group': 'tunneldigger_bytes_rate',
             'title': gettext_noop("Tunneldigger RX bytes rate"),
             'description': gettext_noop("Combined throughput of received packets via Tunneldigger."),

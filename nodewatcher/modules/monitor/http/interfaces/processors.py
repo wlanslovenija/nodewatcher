@@ -15,7 +15,7 @@ class Interfaces(monitor_processors.NodeProcessor):
     Stores interface monitoring data.
     """
 
-    @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
+    @monitor_processors.depends_on_context('http', http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
         Called for every processed node.
@@ -53,8 +53,8 @@ class Interfaces(monitor_processors.NodeProcessor):
 
             existing_interfaces[iface.name] = iface
 
-        version_ifaces = context.http.get_module_version("core.interfaces")
-        version_wifi = context.http.get_module_version("core.wireless")
+        version_ifaces = context.http.get_module_version('core.interfaces')
+        version_wifi = context.http.get_module_version('core.wireless')
         if version_ifaces < 3 or version_wifi < 3 or context.http.get_version() < 3:
             return context
 
@@ -113,12 +113,12 @@ class Interfaces(monitor_processors.NodeProcessor):
             wdata = context.http.core.wireless.interfaces[iface.name]
 
             # Wireless interface has some additional fields
-            if wdata.mode == "Master":
-                iface.mode = "ap"
-            elif wdata.mode == "Ad-Hoc":
-                iface.mode = "mesh"
-            elif wdata.mode == "Client":
-                iface.mode = "sta"
+            if wdata.mode == 'Master':
+                iface.mode = 'ap'
+            elif wdata.mode == 'Ad-Hoc':
+                iface.mode = 'mesh'
+            elif wdata.mode == 'Client':
+                iface.mode = 'sta'
             else:
                 iface.mode = None
                 self.logger.warning("Ignoring unknown wifi mode '%s' on node '%s' interface '%s'!" % (wdata.mode, node.pk, iface.name))
