@@ -34,6 +34,7 @@ class Command(base.BaseCommand):
         """
         Exports the latest survey data graph as a JSON file into the root directory.
         """
+
         number = options['number']
         label = options['label']
 
