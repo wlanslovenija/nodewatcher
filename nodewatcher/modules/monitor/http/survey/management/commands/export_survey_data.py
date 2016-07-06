@@ -1,10 +1,11 @@
+import io
+import json
+import time
+
 from django.core.management import base
 
 from django_datastream import datastream
 
-import json
-
-import io
 
 class Command(base.BaseCommand):
     help = 'Consolidates survey data from all nodes and exports the meta graph as a JSON file.'
@@ -30,10 +31,13 @@ class Command(base.BaseCommand):
         )
 
     def handle(self, *args, **options):
+        """
+        Exports the latest survey data graph as a JSON file into the root directory.
+        """
+        number = options['number']
+        label = options['label']
 
         streams = datastream.find_streams({'module': 'monitor.http.survey'})
-        print("len of streams is ")
-        print(len(streams))
 
         # Create a meta graph
         meta_vertices, meta_edges = [], []
@@ -59,15 +63,18 @@ class Command(base.BaseCommand):
             'v': meta_vertices,
             'e': meta_edges,
         }
-        print(meta_graph)
-        with io.open('data.json', 'w', encoding='utf-8') as f:
-            f.write(json.dumps(meta_graph, ensure_ascii=False))
-        number = options['number']
-        if number:
-            print(number)
-            self.stdout.write(self.style.SUCCESS(number))
-        label = options['label']
-        if label:
-            self.stdout.write(self.style.SUCCESS(label))
+        exported_graph = {
+            'graph': meta_graph,
+            'friendly_nodes': friendly_nodes,
+        }
 
-        self.stdout.write(self.style.SUCCESS("Successfully called export survey data"))
+        timestamp = int(time.time())
+
+        if label:
+            filename = label + str(timestamp) + '.json'
+        else:
+            filename = 'survey_export' + str(timestamp) + '.json'
+
+        with io.open(filename, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(exported_graph, ensure_ascii=False))
+            self.stdout.write(self.style.SUCCESS("Successfully exported survey data."))
