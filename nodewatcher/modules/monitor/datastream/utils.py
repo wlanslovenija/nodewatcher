@@ -116,7 +116,12 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                     # Stream has been removed while import was in progress. Remove the stream from
                     # destination as well.
                     print "Skipping removed stream."
-                    ds_destination.delete_streams({'import_id': stream.id})
+
+                    try:
+                        ds_destination.delete_streams({'import_id': stream.id})
+                    except:
+                        # Do not abort import when a stream cannot be deleted.
+                        pass
                 except:
                     print "ERROR: Failed to copy data for source stream %s (target %s)." % (stream.id, stream_id)
                     print "ERROR: Last batch was (%d items, %d bytes):" % (len(batch), size_of_batch)
