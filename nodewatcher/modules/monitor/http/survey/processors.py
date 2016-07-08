@@ -103,7 +103,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
 
         latest_graph = {
             'v': vertices,
-            'e': edges
+            'e': edges,
         }
 
         if latest_graph != latest_stored_graph:
