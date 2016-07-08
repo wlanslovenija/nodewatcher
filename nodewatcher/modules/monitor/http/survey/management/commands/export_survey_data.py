@@ -72,6 +72,11 @@ class Command(base.BaseCommand):
                     meta_edges.append(edge)
             except IndexError:
                 pass
+
+        if not meta_vertices or not meta_edges:
+            self.stdout.write(self.style.ERROR("Insufficient survey data in the datastream during this time period."))
+            return
+
         meta_graph = {
             'v': meta_vertices,
             'e': meta_edges,
