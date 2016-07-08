@@ -1,6 +1,3 @@
-import datetime
-
-from django.utils import timezone
 from django.utils.translation import gettext_noop as _
 
 from django_datastream import datastream
