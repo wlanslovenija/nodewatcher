@@ -1,6 +1,7 @@
 import io
 import json
 import time
+import datetime
 
 from django.core.management import base
 
@@ -8,18 +9,18 @@ from django_datastream import datastream
 
 
 class Command(base.BaseCommand):
-    help = 'Consolidates survey data from all nodes and exports the meta graph as a JSON file.'
+    help = "Consolidates survey data from all nodes and exports the meta graph as a JSON file."
 
     def add_arguments(self, parser):
 
         # Optional arguments
         parser.add_argument(
-            '--surveys-to-export',
+            '--timestamp',
             type=int,
             action='store',
-            dest='number',
-            default=1,
-            help='Number of surveys to export'
+            dest='timestamp',
+            default=int(time.time()),
+            help="Number of surveys to export"
         )
 
         parser.add_argument(
@@ -27,7 +28,8 @@ class Command(base.BaseCommand):
             type=str,
             action='store',
             dest='label',
-            help='Optional label for the filename',
+            default='survey_export',
+            help="Optional label for the filename",
         )
 
     def handle(self, *args, **options):
@@ -35,7 +37,8 @@ class Command(base.BaseCommand):
         Exports the latest survey data graph as a JSON file into the root directory.
         """
 
-        number = options['number']
+        timestamp = options['timestamp']
+        date_from_timestamp = datetime.datetime.fromtimestamp(timestamp)
         label = options['label']
 
         streams = datastream.find_streams({'module': 'monitor.http.survey'})
@@ -64,6 +67,7 @@ class Command(base.BaseCommand):
             'v': meta_vertices,
             'e': meta_edges,
         }
+
         exported_graph = {
             'graph': meta_graph,
             'friendly_nodes': friendly_nodes,
@@ -78,4 +82,5 @@ class Command(base.BaseCommand):
 
         with io.open(filename, 'w', encoding='utf-8') as f:
             f.write(json.dumps(exported_graph, ensure_ascii=False))
-            self.stdout.write(self.style.SUCCESS("Successfully exported survey data."))
+
+        self.stdout.write(self.style.SUCCESS("Successfully exported survey data."))
