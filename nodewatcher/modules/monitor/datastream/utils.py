@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import datastream
 
@@ -91,27 +92,41 @@ def datastream_copy(source, destination, start=None, end=None, remove_all=False)
                 size_of_batch = 0
 
                 try:
+                    def append_current_batch():
+                        for i in xrange(10):
+                            try:
+                                ds_destination.append_multiple(batch)
+                                break
+                            except datastream.exceptions.StreamAppendFailed:
+                                print "WARNING: Destination stream append failed. Retry #%d after 30 seconds." % (i + 1)
+                                time.sleep(30)
+
                     for datapoint in ds_source.get_data(stream.id, stream.highest_granularity, start=start, end=end):
                         batch.append({'stream_id': stream_id, 'value': datapoint['v'], 'timestamp': datapoint['t']})
                         size_of_batch += len(str(datapoint['v']))
                         if len(batch) >= COMMIT_BATCH_SIZE or size_of_batch >= COMMIT_BATCH_BYTE_SIZE:
-                            ds_destination.append_multiple(batch)
+                            append_current_batch()
                             batch = []
                             size_of_batch = 0
 
                     if batch:
-                        ds_destination.append_multiple(batch)
+                        append_current_batch()
                         batch = []
                 except datastream.exceptions.StreamNotFound:
                     # Stream has been removed while import was in progress. Remove the stream from
                     # destination as well.
                     print "Skipping removed stream."
-                    ds_destination.delete_streams({'import_id': stream.id})
+
+                    try:
+                        ds_destination.delete_streams({'import_id': stream.id})
+                    except:
+                        # Do not abort import when a stream cannot be deleted.
+                        pass
                 except:
-                    print "ERROR: Failed to copy data."
-                    print "ERROR: Last batch was:"
+                    print "ERROR: Failed to copy data for source stream %s (target %s)." % (stream.id, stream_id)
+                    print "ERROR: Last batch was (%d items, %d bytes):" % (len(batch), size_of_batch)
                     for value in batch:
-                        print "  %s" % value['value']
+                        print "  %s" % repr(value['value'])
                     print "ERROR: Aborting due to exception."
                     raise
 
