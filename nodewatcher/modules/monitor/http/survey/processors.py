@@ -21,7 +21,8 @@ class SurveyInfoStreams(ds_models.RegistryRootStreams):
         # The nodewatcher-agent performs a survey once every ~240 monitoring intervals and
         # a monitoring run is performed every 30 seconds according to the wireless module of
         #  nodewatcher-agent. So a survey is performed once every two hours, meaning that we
-        #  use hourly granularity.
+        #  use hourly granularity. Granularity is just an optimization technique for the underlying
+        # databases.
         return datastream.Granularity.Hours
 
 
@@ -109,6 +110,9 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         if latest_graph != latest_stored_graph:
             # Since a new survey is performed once every two hours,
             # new data should only be inserted once in that time period.
+            # Even if data is inserted more frequently than the maximum granularity,
+            # this does not mean any data (either data or metadata such as timestamps)
+            # is lost.
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
 
