@@ -1,6 +1,3 @@
-import datetime
-
-from django.utils import timezone
 from django.utils.translation import gettext_noop as _
 
 from django_datastream import datastream
@@ -24,7 +21,8 @@ class SurveyInfoStreams(ds_models.RegistryRootStreams):
         # The nodewatcher-agent performs a survey once every ~240 monitoring intervals and
         # a monitoring run is performed every 30 seconds according to the wireless module of
         #  nodewatcher-agent. So a survey is performed once every two hours, meaning that we
-        #  use hourly granularity.
+        #  use hourly granularity. Granularity is just an optimization technique for the underlying
+        # databases.
         return datastream.Granularity.Hours
 
 
@@ -106,13 +104,15 @@ class SurveyInfo(monitor_processors.NodeProcessor):
 
         latest_graph = {
             'v': vertices,
-            'e': edges
+            'e': edges,
         }
 
         if latest_graph != latest_stored_graph:
-            # Since a new survey is performed once every two hours, it should be impossible to insert new data more
-            # often than once every hour.
-            assert not latest_stored_graph or timezone.now() - streams[0]['latest_datapoint'] >= datetime.timedelta(hours=1)
+            # Since a new survey is performed once every two hours,
+            # new data should only be inserted once in that time period.
+            # Even if data is inserted more frequently than the maximum granularity,
+            # this does not mean any data (either data or metadata such as timestamps)
+            # is lost.
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
 
