@@ -20,7 +20,7 @@ class Command(base.BaseCommand):
             action='store',
             dest='timestamp',
             default=int(time.time()),
-            help="Number of surveys to export"
+            help="All the data will be collected between this UNIX timestamp and two hours preceding it."
         )
 
         parser.add_argument(
