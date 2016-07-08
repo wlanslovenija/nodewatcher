@@ -32,6 +32,15 @@ class Command(base.BaseCommand):
             help="Optional label for the filename",
         )
 
+        parser.add_argument(
+            '--include-timestamp-in-filename',
+            type=bool,
+            action='store',
+            dest='store_timestamp',
+            default=True,
+            help="Include timestamp in filename?",
+        )
+
     def handle(self, *args, **options):
         """
         Exports the latest survey data graph as a JSON file into the root directory.
@@ -73,12 +82,10 @@ class Command(base.BaseCommand):
             'friendly_nodes': friendly_nodes,
         }
 
-        timestamp = int(time.time())
-
-        if label:
-            filename = label + str(timestamp) + '.json'
+        if options['store_timestamp']:
+            filename = '{0}{1}.json'.format(label, timestamp)
         else:
-            filename = 'survey_export' + str(timestamp) + '.json'
+            filename = '{0}.json'.format(label)
 
         with io.open(filename, 'w', encoding='utf-8') as f:
             f.write(json.dumps(exported_graph, ensure_ascii=False))
