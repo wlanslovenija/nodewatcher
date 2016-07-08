@@ -50,7 +50,7 @@ class Command(base.BaseCommand):
             datapoint_iterator = datastream.get_data(
                 stream_id=stream['stream_id'],
                 granularity=stream['highest_granularity'],
-                start=stream['latest_datapoint'],
+                start=date_from_timestamp - datetime.timedelta(hours=2),
                 reverse=True,
             )
             try:
