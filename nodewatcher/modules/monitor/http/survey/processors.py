@@ -112,7 +112,6 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         if latest_graph != latest_stored_graph:
             # Since a new survey is performed once every two hours, it should be impossible to insert new data more
             # often than once every hour.
-            assert not latest_stored_graph or timezone.now() - streams[0]['latest_datapoint'] >= datetime.timedelta(hours=1)
             # Store the latest graph into datastream.
             context.datastream.survey_topology = SurveyInfoStreamsData(node, latest_graph)
 
