@@ -78,7 +78,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                         'c': neighbor['channel'],
                         's': neighbor['signal'],
                         # "n" like "name".
-                        'n': neighbor['ssid'],
+                        'n': neighbor.get('ssid', None),
                     }
                     edges.append(edge)
 
