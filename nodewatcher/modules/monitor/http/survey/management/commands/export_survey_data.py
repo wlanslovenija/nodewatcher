@@ -19,17 +19,17 @@ class Command(base.BaseCommand):
             type=int,
             action='store',
             dest='timestamp',
-            default=int(time.time()),
             help="All the data will be collected between this UNIX timestamp and two hours preceding it."
         )
 
         parser.add_argument(
-            '--label',
+            '-f',
+            '--filename',
             type=str,
             action='store',
-            dest='label',
+            dest='filename',
             default='survey_export',
-            help="Optional label for the filename",
+            help="Optional filename",
         )
 
         parser.add_argument(
@@ -48,7 +48,7 @@ class Command(base.BaseCommand):
 
         timestamp = options['timestamp']
         date_from_timestamp = datetime.datetime.fromtimestamp(timestamp)
-        label = options['label']
+        filename = options['filename']
 
         streams = datastream.find_streams({'module': 'monitor.http.survey'})
 
@@ -88,9 +88,9 @@ class Command(base.BaseCommand):
         }
 
         if options['store_timestamp']:
-            filename = '{0}{1}.json'.format(label, timestamp)
+            filename = '{0}{1}.json'.format(filename, timestamp)
         else:
-            filename = '{0}.json'.format(label)
+            filename = '{0}.json'.format(filename)
 
         with io.open(filename, 'w', encoding='utf-8') as f:
             f.write(json.dumps(exported_graph, ensure_ascii=False))
