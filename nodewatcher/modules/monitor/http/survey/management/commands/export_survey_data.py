@@ -37,7 +37,7 @@ class Command(base.BaseCommand):
             type=bool,
             action='store',
             dest='store_timestamp',
-            default=True,
+            default=False,
             help="Include timestamp in filename?",
         )
 
