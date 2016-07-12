@@ -59,6 +59,8 @@ class Command(base.BaseCommand):
         # Create a meta graph
         meta_vertices, meta_edges = [], []
         friendly_nodes = []
+        latest_data_timepoint = 0
+
         for stream in streams:
             datapoint_iterator = datastream.get_data(
                 stream_id=stream['stream_id'],
@@ -74,6 +76,8 @@ class Command(base.BaseCommand):
                         friendly_nodes.append(vertex)
                 for edge in stream_graph['e']:
                     meta_edges.append(edge)
+                if not latest_data_timepoint or datapoint_iterator[0]['t'] > latest_data_timepoint:
+                    latest_data_timepoint = datapoint_iterator[0]['t']
             except IndexError:
                 pass
 
@@ -89,6 +93,7 @@ class Command(base.BaseCommand):
         exported_graph = {
             'graph': meta_graph,
             'friendly_nodes': friendly_nodes,
+            'timepoint': str(latest_data_timepoint)
         }
 
         if options['store_timestamp']:
