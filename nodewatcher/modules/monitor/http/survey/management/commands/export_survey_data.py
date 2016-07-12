@@ -47,7 +47,11 @@ class Command(base.BaseCommand):
         """
 
         timestamp = options['timestamp']
-        date_from_timestamp = datetime.datetime.fromtimestamp(timestamp)
+        if timestamp:
+            latest_survey_datetime = datetime.datetime.fromtimestamp(timestamp)
+        else:
+            latest_survey_datetime = datetime.datetime.utcnow()
+
         filename = options['filename']
 
         streams = datastream.find_streams({'module': 'monitor.http.survey'})
@@ -59,7 +63,7 @@ class Command(base.BaseCommand):
             datapoint_iterator = datastream.get_data(
                 stream_id=stream['stream_id'],
                 granularity=stream['highest_granularity'],
-                start=date_from_timestamp - datetime.timedelta(hours=2),
+                start=(latest_survey_datetime - datetime.timedelta(hours=2)),
                 reverse=True,
             )
             try:
