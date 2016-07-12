@@ -35,11 +35,9 @@
     }
 
     function renderRxPower(data, type, row, meta) {
-        if (type !== 'display')
-            return data;
+        if (type !== 'display') return data;
 
-        if (!data.length)
-            return "<em>unknown</em>"
+        if (!data.length || _.isNull(data[0])) return "<em>unknown</em>"
 
         return "" + data[0].toFixed(2) + " dBu"
     }
