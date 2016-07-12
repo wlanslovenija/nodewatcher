@@ -1,6 +1,5 @@
 import io
 import json
-import time
 import datetime
 
 from django.core.management import base
