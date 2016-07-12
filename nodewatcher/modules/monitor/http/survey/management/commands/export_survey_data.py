@@ -72,7 +72,7 @@ class Command(base.BaseCommand):
                 stream_graph = datapoint_iterator[0]['v']
                 for vertex in stream_graph['v']:
                     meta_vertices.append(vertex)
-                    if 'bssids' in vertex:
+                    if 'b' in vertex:
                         friendly_nodes.append(vertex)
                 for edge in stream_graph['e']:
                     meta_edges.append(edge)
