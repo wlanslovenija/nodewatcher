@@ -1,6 +1,6 @@
 import datetime
 
-from django.core.mail import send_mail
+from django.core.mail import mail_admins
 
 from django.conf import settings
 
@@ -34,11 +34,9 @@ def rogue_node_detection(self):
     rogue_node_list = filter(lambda unknown_node: unknown_node['probability_being_rogue'] > 0.9, unknown_node_list)
 
     if rogue_node_list:
-        send_mail(
+        mail_admins(
             subject="Rogue nodes detected",
             message="We detected the following rogue nodes: {0}".format(rogue_node_list),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=["to@example.com"],
             fail_silently=False,
         )
 
