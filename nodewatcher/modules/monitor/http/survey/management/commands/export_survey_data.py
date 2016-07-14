@@ -8,17 +8,20 @@ from django_datastream import datastream
 
 
 class Command(base.BaseCommand):
-    help = "Consolidates survey data from all nodes and exports the meta graph as a JSON file."
+    help = "Consolidates the latest survey data within the specified time interval \
+           from all nodes and exports the meta graph as a JSON file."
 
     def add_arguments(self, parser):
 
         # Optional arguments
         parser.add_argument(
-            '--timestamp',
-            type=int,
+            '--datetime',
+            type=str,
             action='store',
-            dest='timestamp',
-            help="All the data will be collected between this UNIX timestamp and two hours preceding it."
+            dest='datetime',
+            help="All the data will be collected between this UTC datetime \
+                 (format 'yyyy-mm-ddThh:mm:ss' (i.e. '2007-03-04T12:00:00 2007-04-10T12:00:00'), \
+                  and two hours preceding it."
         )
 
         parser.add_argument(
@@ -32,12 +35,12 @@ class Command(base.BaseCommand):
         )
 
         parser.add_argument(
-            '--include-timestamp-in-filename',
+            '--include-datetime-in-filename',
             type=bool,
             action='store',
-            dest='store_timestamp',
+            dest='store_datetime',
             default=False,
-            help="Include timestamp in filename?",
+            help="Include datetime in filename?",
         )
 
     def handle(self, *args, **options):
@@ -45,17 +48,25 @@ class Command(base.BaseCommand):
         Exports the latest survey data graph as a JSON file into the root directory.
         """
 
-        timestamp = options['timestamp']
+        parsed_datetime = None
+        input_datetime = options['datetime']
         filename = options['filename']
 
-        exported_graph = extract_survey_graph(timestamp)
+        if input_datetime:
+            try:
+                parsed_datetime = datetime.datetime.strptime(options['datetime'], "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                self.stdout.write(self.style.ERROR("Unable to parse datetime."))
+                return
+
+        exported_graph = extract_survey_graph(parsed_datetime)
 
         if not exported_graph:
             self.stdout.write(self.style.ERROR("Insufficient survey data in the datastream during this time period."))
             return
 
-        if options['store_timestamp']:
-            filename = '{0}{1}.json'.format(filename, timestamp)
+        if options['store_datetime']:
+            filename = '{0}{1}.json'.format(filename, str(datetime))
         else:
             filename = '{0}.json'.format(filename)
 
@@ -65,17 +76,17 @@ class Command(base.BaseCommand):
         self.stdout.write(self.style.SUCCESS("Successfully exported survey data."))
 
 
-def extract_survey_graph(timestamp=None):
+def extract_survey_graph(parsed_datetime=None):
     """
     Extracts a graph of the survey during a specified time period. Only the latest data
     from specified datetime and two hours preceding the datetime will be used.
 
-    :param timestamp: UNIX timestamp according to the UTC timezone.
+    :param parsed_datetime: Datetime object according to the UTC timezone.
     :return: A dictionary that contains the graph under the 'graph' key.
     """
 
-    if timestamp:
-        latest_survey_datetime = datetime.datetime.fromtimestamp(timestamp)
+    if parsed_datetime:
+        latest_survey_datetime = parsed_datetime
     else:
         latest_survey_datetime = datetime.datetime.utcnow()
 
@@ -91,6 +102,7 @@ def extract_survey_graph(timestamp=None):
             stream_id=stream['stream_id'],
             granularity=stream['highest_granularity'],
             start=(latest_survey_datetime - datetime.timedelta(hours=2)),
+            end=latest_survey_datetime,
             reverse=True,
         )
         try:
