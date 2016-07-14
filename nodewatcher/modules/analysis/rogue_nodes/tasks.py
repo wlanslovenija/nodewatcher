@@ -59,7 +59,8 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
         's': -1 * edge['s'],
         'c': edge['c'],
         'n': edge['n'],
-    }) for edge in graph['e']])
+    }) for edge in graph['e']],
+    )
 
     # Create a MST with Kruskal's
     mst = nx.minimum_spanning_tree(nx_graph, weight='s')
