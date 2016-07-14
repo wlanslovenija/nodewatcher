@@ -2,6 +2,8 @@ import datetime
 
 from django.core.mail import send_mail
 
+from django.conf import settings
+
 from nodewatcher import celery
 
 from nodewatcher.modules.monitor.http.survey.management.commands.export_survey_data import extract_survey_graph
@@ -33,10 +35,10 @@ def rogue_node_detection(self):
 
     if rogue_node_list:
         send_mail(
-            "Rogue nodes detected",
-            "We detected the following rogue nodes: {0}".format(rogue_node_list),
-            "from@example.com",
-            ["to@example.com"],
+            subject="Rogue nodes detected",
+            message="We detected the following rogue nodes: {0}".format(rogue_node_list),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=["to@example.com"],
             fail_silently=False,
         )
 
