@@ -56,3 +56,4 @@ git+https://github.com/wlanslovenija/django-rest-framework-gis.git@d6e9678c1bc10
 git+https://github.com/wlanslovenija/drf-ujson-renderer.git@96cee399260daf469b7e4b004fa245edf9dd253c#egg=drf_ujson-wlanslovenija
 grako==3.8.1
 influxdb==2.12.0
+networkx==1.11
