@@ -14,7 +14,6 @@ class Command(base.BaseCommand):
     """
 
     def add_arguments(self, parser):
-
         # Optional arguments
         parser.add_argument(
             '--datetime',
