@@ -52,14 +52,13 @@ class Command(base.BaseCommand):
         try:
             upper_datetime = datetime.datetime.strptime(string_upper_datetime, '%Y-%m-%dT%H:%M:%S')
         except ValueError:
-            self.stdout.write(self.style.ERROR("Unable to parse the date parameter."))
-            return
+            raise base.CommandError("Unable to parse the date parameter.")
 
         exported_graph = extract_survey_graph(upper_datetime)
 
         if not basename:
             # Redirect to stdout.
-            self.stdout.write(exported_graph,  ending="")
+            self.stdout.write(exported_graph, ending="")
             return
 
         filename = '{0}.json'.format(basename)
