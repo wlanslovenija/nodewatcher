@@ -34,7 +34,6 @@ class Command(base.BaseCommand):
             type=str,
             action='store',
             dest='basename',
-            default='survey_export',
             help="""
             If provided, survey data will be written to (basename).json.
             Otherwise, survey data will be redirected to stdout.
@@ -58,6 +57,11 @@ class Command(base.BaseCommand):
                 return
 
         exported_graph = extract_survey_graph(parsed_datetime)
+
+        if not basename:
+            # Redirect to stdout.
+            self.stdout.write(exported_graph)
+            return
 
         filename = '{0}.json'.format(basename)
 
