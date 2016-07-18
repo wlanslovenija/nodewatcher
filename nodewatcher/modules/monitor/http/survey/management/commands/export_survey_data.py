@@ -59,10 +59,7 @@ class Command(base.BaseCommand):
             self.stdout.write(self.style.ERROR("Insufficient survey data in the datastream during this time period."))
             return
 
-        if options['store_datetime']:
-            filename = '{0}{1}.json'.format(filename, str(datetime))
-        else:
-            filename = '{0}.json'.format(filename)
+        filename = '{0}.json'.format(filename)
 
         with io.open(filename, 'w', encoding='utf-8') as f:
             f.write(json.dumps(exported_graph, ensure_ascii=False))
