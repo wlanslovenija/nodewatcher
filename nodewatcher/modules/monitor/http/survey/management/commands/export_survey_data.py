@@ -21,9 +21,10 @@ class Command(base.BaseCommand):
             action='store',
             dest='datetime',
             help="""
-            All the data will be collected between this UTC date
-            (format 'yyyy-mm-ddThh:mm:ss' (i.e. '2007-04-10T12:00:00')
-            and two hours preceding it.
+            The latest data used would be collected on the date provided
+            and the earliest data used would be collected
+            two hours preceding the date provided. Date format is
+            'yyyy-mm-ddThh:mm:ss' [i.e. '2007-04-10T12:00:00']).
             """,
         )
 
