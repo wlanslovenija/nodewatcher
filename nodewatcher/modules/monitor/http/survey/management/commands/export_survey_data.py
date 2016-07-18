@@ -84,7 +84,7 @@ def extract_survey_graph(upper_datetime):
     # Create a meta graph
     meta_vertices, meta_edges = [], []
     friendly_nodes = []
-    latest_data_timepoint = 0
+    latest_data_timepoint = None
 
     for stream in streams:
         datapoint_iterator = datastream.get_data(
