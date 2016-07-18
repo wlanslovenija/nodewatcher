@@ -20,6 +20,7 @@ class Command(base.BaseCommand):
             type=str,
             action='store',
             dest='string_upper_datetime',
+            default=datetime.datetime.strftime(datetime.datetime.utcnow(), '%Y-%m-%dT%H:%M:%S'),
             help="""
             The latest data used would be collected on the date provided
             and the earliest data used would be collected
@@ -48,12 +49,11 @@ class Command(base.BaseCommand):
         string_upper_datetime = options['string_upper_datetime']
         basename = options['basename']
 
-        if string_upper_datetime:
-            try:
-                upper_datetime = datetime.datetime.strptime(string_upper_datetime, '%Y-%m-%dT%H:%M:%S')
-            except ValueError:
-                self.stdout.write(self.style.ERROR("Unable to parse the date parameter."))
-                return
+        try:
+            upper_datetime = datetime.datetime.strptime(string_upper_datetime, '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            self.stdout.write(self.style.ERROR("Unable to parse the date parameter."))
+            return
 
         exported_graph = extract_survey_graph(upper_datetime)
 
