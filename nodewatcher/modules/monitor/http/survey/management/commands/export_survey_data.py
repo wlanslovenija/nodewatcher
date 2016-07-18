@@ -81,7 +81,7 @@ def extract_survey_graph(upper_datetime):
 
     streams = datastream.find_streams({'module': 'monitor.http.survey'})
 
-    # Create a meta graph
+    # Create a meta graph consolidating date from all streams.
     meta_vertices, meta_edges = [], []
     friendly_nodes = []
     latest_data_timepoint = None
