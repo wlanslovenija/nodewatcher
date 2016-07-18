@@ -59,7 +59,7 @@ class Command(base.BaseCommand):
 
         if not basename:
             # Redirect to stdout.
-            self.stdout.write(exported_graph)
+            self.stdout.write(exported_graph,  ending="")
             return
 
         filename = '{0}.json'.format(basename)
