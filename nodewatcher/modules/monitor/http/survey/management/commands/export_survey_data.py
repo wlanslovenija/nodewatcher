@@ -59,9 +59,6 @@ class Command(base.BaseCommand):
 
         exported_graph = extract_survey_graph(parsed_datetime)
 
-        if not exported_graph:
-            raise base.CommandError("Insufficient survey data in the datastream during this time period.")
-
         filename = '{0}.json'.format(filename)
 
         with io.open(filename, 'w', encoding='utf-8') as f:
@@ -115,7 +112,7 @@ def extract_survey_graph(parsed_datetime=None):
             pass
 
     if not meta_vertices or not meta_edges:
-        return
+        raise LookupError("Insufficient survey data in the datastream during this time period.")
 
     meta_graph = {
         'v': meta_vertices,
