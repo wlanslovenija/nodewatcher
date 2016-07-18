@@ -29,15 +29,15 @@ class Command(base.BaseCommand):
         )
 
         parser.add_argument(
-            '-f',
-            '--filename',
+            '-b',
+            '--basename',
             type=str,
             action='store',
-            dest='filename',
+            dest='basename',
             default='survey_export',
             help="""
-            If provided, survey data will be written to (filename).json.
-            Otherwise, survey data will be written to "survey_export.json".
+            If provided, survey data will be written to (basename).json.
+            Otherwise, survey data will be redirected to stdout.
             """,
         )
 
@@ -48,7 +48,7 @@ class Command(base.BaseCommand):
 
         parsed_datetime = None
         input_datetime = options['datetime']
-        filename = options['filename']
+        basename = options['basename']
 
         if input_datetime:
             try:
@@ -59,7 +59,7 @@ class Command(base.BaseCommand):
 
         exported_graph = extract_survey_graph(parsed_datetime)
 
-        filename = '{0}.json'.format(filename)
+        filename = '{0}.json'.format(basename)
 
         with io.open(filename, 'w', encoding='utf-8') as f:
             f.write(json.dumps(exported_graph, ensure_ascii=False))
