@@ -37,15 +37,6 @@ class Command(base.BaseCommand):
             help="Optional filename",
         )
 
-        parser.add_argument(
-            '--include-datetime-in-filename',
-            type=bool,
-            action='store',
-            dest='store_datetime',
-            default=False,
-            help="Include datetime in filename?",
-        )
-
     def handle(self, *args, **options):
         """
         Exports the latest survey data graph as a JSON file into the root directory.
