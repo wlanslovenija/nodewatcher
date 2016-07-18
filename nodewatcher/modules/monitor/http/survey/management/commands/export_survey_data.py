@@ -35,7 +35,10 @@ class Command(base.BaseCommand):
             action='store',
             dest='filename',
             default='survey_export',
-            help="Optional filename",
+            help="""
+            If provided, survey data will be written to (filename).json.
+            Otherwise, survey data will be written to "survey_export.json".
+            """,
         )
 
     def handle(self, *args, **options):
