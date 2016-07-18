@@ -8,8 +8,10 @@ from django_datastream import datastream
 
 
 class Command(base.BaseCommand):
-    help = "Consolidates the latest survey data within the specified time interval \
-           from all nodes and exports the meta graph as a JSON file."
+    help = """
+    Consolidates the latest survey data within the specified time interval
+    from all nodes and exports the meta graph as a JSON file.
+    """
 
     def add_arguments(self, parser):
 
