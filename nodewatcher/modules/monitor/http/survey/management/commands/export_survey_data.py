@@ -20,9 +20,11 @@ class Command(base.BaseCommand):
             type=str,
             action='store',
             dest='datetime',
-            help="All the data will be collected between this UTC datetime \
-                 (format 'yyyy-mm-ddThh:mm:ss' (i.e. '2007-03-04T12:00:00 2007-04-10T12:00:00'), \
-                  and two hours preceding it."
+            help="""
+            All the data will be collected between this UTC date
+            (format 'yyyy-mm-ddThh:mm:ss' (i.e. '2007-04-10T12:00:00')
+            and two hours preceding it.
+            """,
         )
 
         parser.add_argument(
