@@ -50,7 +50,7 @@ class Command(base.BaseCommand):
 
         if string_upper_datetime:
             try:
-                upper_datetime = datetime.datetime.strptime(string_upper_datetime, "%Y-%m-%dT%H:%M:%S")
+                upper_datetime = datetime.datetime.strptime(string_upper_datetime, '%Y-%m-%dT%H:%M:%S')
             except ValueError:
                 self.stdout.write(self.style.ERROR("Unable to parse the date parameter."))
                 return
