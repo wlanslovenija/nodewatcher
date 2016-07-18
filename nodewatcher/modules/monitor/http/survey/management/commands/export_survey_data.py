@@ -56,8 +56,7 @@ class Command(base.BaseCommand):
         exported_graph = extract_survey_graph(parsed_datetime)
 
         if not exported_graph:
-            self.stdout.write(self.style.ERROR("Insufficient survey data in the datastream during this time period."))
-            return
+            raise base.CommandError("Insufficient survey data in the datastream during this time period.")
 
         filename = '{0}.json'.format(filename)
 
