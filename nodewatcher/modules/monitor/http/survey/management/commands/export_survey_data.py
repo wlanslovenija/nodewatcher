@@ -19,7 +19,7 @@ class Command(base.BaseCommand):
             '--at',
             type=str,
             action='store',
-            dest='datetime',
+            dest='string_upper_datetime',
             help="""
             The latest data used would be collected on the date provided
             and the earliest data used would be collected
@@ -45,18 +45,17 @@ class Command(base.BaseCommand):
         Exports the latest survey data graph as a JSON file into the root directory.
         """
 
-        parsed_datetime = None
-        input_datetime = options['datetime']
+        string_upper_datetime = options['string_upper_datetime']
         basename = options['basename']
 
-        if input_datetime:
+        if string_upper_datetime:
             try:
-                parsed_datetime = datetime.datetime.strptime(options['datetime'], "%Y-%m-%dT%H:%M:%S")
+                upper_datetime = datetime.datetime.strptime(string_upper_datetime, "%Y-%m-%dT%H:%M:%S")
             except ValueError:
-                self.stdout.write(self.style.ERROR("Unable to parse datetime."))
+                self.stdout.write(self.style.ERROR("Unable to parse the date parameter."))
                 return
 
-        exported_graph = extract_survey_graph(parsed_datetime)
+        exported_graph = extract_survey_graph(upper_datetime)
 
         if not basename:
             # Redirect to stdout.
@@ -71,19 +70,14 @@ class Command(base.BaseCommand):
         self.stdout.write(self.style.SUCCESS("Successfully exported survey data."))
 
 
-def extract_survey_graph(parsed_datetime=None):
+def extract_survey_graph(upper_datetime):
     """
     Extracts a graph of the survey during a specified time period. Only the latest data
     from specified datetime and two hours preceding the datetime will be used.
 
-    :param parsed_datetime: Datetime object according to the UTC timezone.
+    :param upper_datetime: Datetime object according to the UTC timezone.
     :return: A dictionary that contains the graph under the 'graph' key.
     """
-
-    if parsed_datetime:
-        latest_survey_datetime = parsed_datetime
-    else:
-        latest_survey_datetime = datetime.datetime.utcnow()
 
     streams = datastream.find_streams({'module': 'monitor.http.survey'})
 
@@ -96,8 +90,8 @@ def extract_survey_graph(parsed_datetime=None):
         datapoint_iterator = datastream.get_data(
             stream_id=stream['stream_id'],
             granularity=stream['highest_granularity'],
-            start=(latest_survey_datetime - datetime.timedelta(hours=2)),
-            end=latest_survey_datetime,
+            start=(upper_datetime - datetime.timedelta(hours=2)),
+            end=upper_datetime,
             reverse=True,
         )
         try:
