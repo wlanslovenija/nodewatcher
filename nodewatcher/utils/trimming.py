@@ -1,5 +1,6 @@
 import sys
 
+
 # Adapted from PEP 257.
 def trim(docstring):
     if not docstring:
