@@ -1,5 +1,3 @@
-import sys
-
 from django.contrib.gis.db import models as gis_models
 from django.db.models import query
 from django.utils import six
@@ -12,6 +10,7 @@ from django_datastream import resources as datastream_resources, serializers
 import jsonfield
 
 from ..registry import fields as registry_fields
+from nodewatcher.utils import trimming
 
 from . import fields, paginator
 
@@ -19,33 +18,6 @@ from . import fields, paginator
 __all__ = [
     'BaseResource',
 ]
-
-
-# Adapted from PEP 257
-def trim(docstring):
-    if not docstring:
-        return ''
-    # Convert tabs to spaces (following the normal Python rules)
-    # and split into a list of lines:
-    lines = docstring.expandtabs().splitlines()
-    # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxint
-    for line in lines[1:]:
-        stripped = line.lstrip()
-        if stripped:
-            indent = min(indent, len(line) - len(stripped))
-    # Remove indentation (first line is special):
-    trimmed = [lines[0].strip()]
-    if indent < sys.maxint:
-        for line in lines[1:]:
-            trimmed.append(line[indent:].rstrip())
-    # Strip off trailing and leading blank lines:
-    while trimmed and not trimmed[-1]:
-        trimmed.pop()
-    while trimmed and not trimmed[0]:
-        trimmed.pop(0)
-    # Return the first paragraph as a single string:
-    return '\n'.join(trimmed).split('\n\n')[0]
 
 
 class AllFiltering(object):
@@ -269,7 +241,7 @@ class BaseResource(six.with_metaclass(BaseMetaclass, resources.NamespacedModelRe
                     data['fields'][field_name]['content']['type'] = field_type
 
                     if field_object.field.__doc__:
-                        data['fields'][field_name]['content']['help_text'] = trim(field_object.field.__doc__)
+                        data['fields'][field_name]['content']['help_text'] = trimming.trim(field_object.field.__doc__)
 
             if hasattr(field_object, 'build_schema'):
                 data['fields'][field_name].update(field_object.build_schema())
