@@ -136,8 +136,8 @@ def all_nodes_survey_graph(at):
 
     exported_graph = {
         'graph': {
-            'vertices': vertices,
-            'edges': edges,
+            'v': vertices,
+            'e': edges,
         },
         'known_nodes': known_nodes,
         'timestamp': latest_datapoint_time
