@@ -65,10 +65,27 @@ class Command(base.BaseCommand):
 
         if output:
             with io.open(output, 'w', encoding='utf-8') as f:
-                json.dump(graph, f, ensure_ascii=False, cls=django_json.DjangoJSONEncoder)
+                f.write(
+                    json.dumps(
+                        graph,
+                        ensure_ascii=False,
+                        cls=django_json.DjangoJSONEncoder,
+                        sort_keys=True,
+                        indent=4,
+                        separators=(',', ': '),
+                    )
+                )
         else:
             self.stdout.ending = None
-            json.dump(graph, self.stdout, ensure_ascii=False, cls=django_json.DjangoJSONEncoder)
+            json.dump(
+                graph,
+                self.stdout,
+                ensure_ascii=False,
+                cls=django_json.DjangoJSONEncoder,
+                sort_keys=True,
+                indent=4,
+                separators=(',', ': '),
+            )
 
         if options['verbosity'] >= 2:
             self.stderr.write(self.style.SUCCESS("Successfully exported survey data."))
