@@ -63,29 +63,22 @@ class Command(base.BaseCommand):
 
         graph = all_nodes_survey_graph(at)
 
+        # TODO: "unicode" does not exist anymore in Python 3.5.
+        #       But json.dumps returns there a normal string, and not once str and once unicode like in Python 2.
+        json_graph = unicode(json.dumps(
+            graph,
+            ensure_ascii=False,
+            cls=django_json.DjangoJSONEncoder,
+            sort_keys=True,
+            indent=4,
+            separators=(',', ': '),
+        ))
+
         if output:
             with io.open(output, 'w', encoding='utf-8') as f:
-                f.write(
-                    json.dumps(
-                        graph,
-                        ensure_ascii=False,
-                        cls=django_json.DjangoJSONEncoder,
-                        sort_keys=True,
-                        indent=4,
-                        separators=(',', ': '),
-                    )
-                )
+                f.write(json_graph)
         else:
-            self.stdout.ending = None
-            json.dump(
-                graph,
-                self.stdout,
-                ensure_ascii=False,
-                cls=django_json.DjangoJSONEncoder,
-                sort_keys=True,
-                indent=4,
-                separators=(',', ': '),
-            )
+            self.stdout.write(json_graph, ending='')
 
         if options['verbosity'] >= 2:
             self.stderr.write(self.style.SUCCESS("Successfully exported survey data."))
