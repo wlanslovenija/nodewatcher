@@ -22,7 +22,7 @@ class RogueDetectionTest(django_test.TestCase):
                         graph=input_graph['graph'],
                         friendly_nodes=input_graph['friendly_nodes'],
                     )
-                    # append -results to the end of the filename
+                    # Appends "-results" to the end of the filename.
                     results_filename = '{0}-results.json'.format(filename[:-5])
                     asserted_results = json.load(io.open(os.path.join(path, results_filename), encoding='utf-8'))
                     assert (output_results == asserted_results)
