@@ -1,10 +1,10 @@
-from django import test as django_test
-
-from nodewatcher.modules.analysis.rogue_nodes.tasks import rogue_node_detection_algorithm
-
 import json
 import io
 import os
+
+from django import test as django_test
+
+from nodewatcher.modules.analysis.rogue_nodes.tasks import rogue_node_detection_algorithm
 
 
 class RogueDetectionTest(django_test.TestCase):
