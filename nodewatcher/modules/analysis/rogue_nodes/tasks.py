@@ -1,13 +1,9 @@
 import datetime
-
 from django.core import mail
-
-from django.conf import settings
 
 from nodewatcher import celery
 
 from nodewatcher.modules.monitor.http.survey.management.commands.export_survey_data import all_nodes_survey_graph
-
 from .algorithm import rogue_node_detection_algorithm
 
 import networkx as nx
