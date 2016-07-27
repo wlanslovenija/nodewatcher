@@ -25,7 +25,7 @@ def rogue_node_detection(self):
     Detects rogues nodes and issues a warning to its neighbors that are monitored by nodewatcher.
     """
 
-    extracted_graph = all_nodes_survey_graph()
+    extracted_graph = all_nodes_survey_graph(datetime.datetime.utcnow())
 
     if not extracted_graph:
         return
