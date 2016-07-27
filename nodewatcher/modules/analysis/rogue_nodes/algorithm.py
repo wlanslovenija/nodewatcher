@@ -14,7 +14,7 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
     """
 
     nx_graph = nx.Graph()
-    nx_graph.add_nodes_from([(node['i'], {'b': node['b']}) if 'b' in node else node['i'] for node in graph["v"]])
+    nx_graph.add_nodes_from([(node['i'], {'b': node['b']}) if 'b' in node else node['i'] for node in graph['v']])
     nx_graph.add_edges_from([(edge['f'], edge['t'], {
         's': -1 * edge['s'],
         'c': edge['c'],
