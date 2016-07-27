@@ -1,0 +1,506 @@
+[
+    {
+        "name": "FE:51:A4:45:9A:09",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "0C:54:A5:D2:36:19",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "06:4E:5A:97:12:4C",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "0C:54:A5:D2:36:18",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "GODDAMNIT-SHEHAN"
+        ]
+    },
+    {
+        "name": "4C:E6:76:AA:2C:E9",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "EECS-TEMP-000"
+        ]
+    },
+    {
+        "name": "A0:63:91:D6:83:35",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "WhyIsHouseSoTilted?"
+        ]
+    },
+    {
+        "name": "74:D0:2B:67:DA:A6",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "domus"
+        ]
+    },
+    {
+        "name": "C0:7C:D1:5D:DB:09",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "6C:CA:08:39:18:B0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "f0rest_wOw"
+        ]
+    },
+    {
+        "name": "84:61:A0:E8:F0:50",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "ATT576"
+        ]
+    },
+    {
+        "name": "24:A4:3C:2A:28:60",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "JSTJEsuits"
+        ]
+    },
+    {
+        "name": "5E:8F:E0:AA:C7:A0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "38:EA:A7:39:09:93",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "HP-Print-93-Photosmart 6520"
+        ]
+    },
+    {
+        "name": "32:86:8C:39:6E:5A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "00:71:C2:F9:9C:6A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "F8:2C:18:02:E3:52",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Sonic-8935"
+        ]
+    },
+    {
+        "name": "A8:86:DD:A8:C8:9B",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Ryan's Mac mini"
+        ]
+    },
+    {
+        "name": "44:D9:E7:FD:75:D4",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Stebbins"
+        ]
+    },
+    {
+        "name": "22:86:8C:39:6E:5A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "5A:23:8C:66:71:8C",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "00:23:6A:6A:82:9F",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "ivan"
+        ]
+    },
+    {
+        "name": "48:F8:B3:8F:BA:66",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "you3dit"
+        ]
+    },
+    {
+        "name": "08:ED:B9:5D:8E:0B",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "HP-Print-0B-LaserJet M1217"
+        ]
+    },
+    {
+        "name": "5C:8F:E0:AA:C7:A0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Ridgeroad"
+        ]
+    },
+    {
+        "name": "5C:5B:35:00:2F:71",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "EECS-Mist"
+        ]
+    },
+    {
+        "name": "00:26:5A:1A:11:81",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "F8:E9:03:BE:84:2C",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "24:A4:3C:04:69:C6",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Stebbins"
+        ]
+    },
+    {
+        "name": "B8:C7:5D:04:C7:33",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "wireless2"
+        ]
+    },
+    {
+        "name": "00:71:C2:BC:3F:32",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "00:71:C2:BC:3F:31",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "48:F8:B3:E5:B1:11",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "doodlebee"
+        ]
+    },
+    {
+        "name": "32:CD:A7:30:E8:4E",
+        "probability_being_rogue": 0.5,
+        "ssids": [
+            "DIRECT-M5M283x Series"
+        ]
+    },
+    {
+        "name": "5A:23:8C:66:71:8B",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "58:23:8C:66:71:8A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "HOME-718A"
+        ]
+    },
+    {
+        "name": "FC:51:A4:45:9A:09",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "OurLifeline"
+        ]
+    },
+    {
+        "name": "10:86:8C:39:6E:5A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Allenoke-2.4"
+        ]
+    },
+    {
+        "name": "84:B5:17:3D:46:D1",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "attwifi"
+        ]
+    },
+    {
+        "name": "18:A6:F7:32:6B:87",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "The tessaract 2.4"
+        ]
+    },
+    {
+        "name": "94:C1:50:B7:1C:9E",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "ATT760"
+        ]
+    },
+    {
+        "name": "F8:ED:A5:C0:5F:B0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "HOME-5FB2"
+        ]
+    },
+    {
+        "name": "38:3B:C8:1A:7E:2A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "ATT326"
+        ]
+    },
+    {
+        "name": "7E:8F:E0:AA:C7:A0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "84:00:2D:70:A4:78",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Burt_Macklin_2.4"
+        ]
+    },
+    {
+        "name": "84:00:2D:70:A4:79",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "C4:6E:1F:C5:76:84",
+        "probability_being_rogue": 1.0,
+        "ssids": [
+            "TP-LINK_C57684"
+        ]
+    },
+    {
+        "name": "5C:50:15:36:92:64",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "eduroam"
+        ]
+    },
+    {
+        "name": "5C:50:15:36:92:62",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "AirBears2"
+        ]
+    },
+    {
+        "name": "26:4E:5A:97:12:4C",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "02:CE:0C:E2:31:D5",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "SETUP"
+        ]
+    },
+    {
+        "name": "AC:CF:23:43:A2:74",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "LEDnetACCF2343A274"
+        ]
+    },
+    {
+        "name": "12:86:8C:39:6E:5A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "6E:8F:E0:AA:C7:A0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "04:21:5A:1A:11:81",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Nyingma Institute"
+        ]
+    },
+    {
+        "name": "0E:51:A4:45:9A:09",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "0C:54:A5:D2:36:1A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "BA:C7:5D:04:C7:34",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "wireless2 guest"
+        ]
+    },
+    {
+        "name": "C0:7C:D1:5D:E5:3A",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "xfinitywifi"
+        ]
+    },
+    {
+        "name": "F2:ED:A5:C0:5F:B0",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "0C:68:03:D6:C3:44",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "eduroam"
+        ]
+    },
+    {
+        "name": "0C:68:03:B8:A9:81",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "attwifi"
+        ]
+    },
+    {
+        "name": "0C:68:03:B8:A9:83",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "CalVisitor"
+        ]
+    },
+    {
+        "name": "00:24:36:AC:C1:FF",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "Gladys Block's Network"
+        ]
+    },
+    {
+        "name": "00:1A:70:53:07:B7",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "SWARMBOX"
+        ]
+    },
+    {
+        "name": "FC:8F:C4:0B:D7:A4",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "ZyXEL-0BD7A5"
+        ]
+    },
+    {
+        "name": "E8:FC:AF:A6:9E:59",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "prime minister"
+        ]
+    },
+    {
+        "name": "C0:7C:D1:5D:E5:39",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    },
+    {
+        "name": "C0:7C:D1:5D:E5:38",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "HOME-6D59-2.4"
+        ]
+    },
+    {
+        "name": "5C:50:15:36:79:31",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "attwifi"
+        ]
+    },
+    {
+        "name": "5C:50:15:36:79:33",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "CalVisitor"
+        ]
+    },
+    {
+        "name": "5C:50:15:36:79:34",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            "eduroam"
+        ]
+    },
+    {
+        "name": "10:FE:ED:AF:53:15",
+        "probability_being_rogue": 0.0,
+        "ssids": [
+            null
+        ]
+    }
+]
