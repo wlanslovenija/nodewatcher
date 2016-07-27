@@ -6,7 +6,7 @@ from django.conf import settings
 
 from nodewatcher import celery
 
-from nodewatcher.modules.monitor.http.survey.management.commands.export_survey_data import extract_survey_graph
+from nodewatcher.modules.monitor.http.survey.management.commands.export_survey_data import all_nodes_survey_graph
 
 import networkx as nx
 
@@ -23,7 +23,7 @@ def rogue_node_detection(self):
     Detects rogues nodes and issues a warning to its neighbors that are monitored by nodewatcher.
     """
 
-    extracted_graph = extract_survey_graph()
+    extracted_graph = all_nodes_survey_graph()
 
     if not extracted_graph:
         return
