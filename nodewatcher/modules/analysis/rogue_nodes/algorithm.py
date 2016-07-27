@@ -16,7 +16,7 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
     nx_graph = nx.Graph()
     nx_graph.add_nodes_from([(node['i'], {'b': node['b']}) if 'b' in node else node['i'] for node in graph["v"]])
     nx_graph.add_edges_from([(edge['f'], edge['t'], {
-        's': -1*edge['s'],
+        's': -1 * edge['s'],
         'c': edge['c'],
         'n': edge['n'],
     }) for edge in graph['e']])
@@ -27,7 +27,7 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
     unknown_nodes = []
     for node_name in mst.node:
         if node_name not in friendly_nodes:
-            node_probability = min((mst.degree(node_name) - 1)/2.0, 1)
+            node_probability = min((mst.degree(node_name) - 1) / 2.0, 1)
             ssid_set = []
             for edge in mst.edges(node_name, data=True):
                 if edge[2]['n'] not in ssid_set:
@@ -36,5 +36,5 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
                 'name': node_name,
                 'probability_being_rogue': node_probability,
                 'ssids': ssid_set,
-                })
+            })
     return unknown_nodes
