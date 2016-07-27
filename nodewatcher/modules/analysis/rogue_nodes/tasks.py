@@ -6,8 +6,6 @@ from nodewatcher import celery
 from nodewatcher.modules.monitor.http.survey.management.commands.export_survey_data import all_nodes_survey_graph
 from .algorithm import rogue_node_detection_algorithm
 
-import networkx as nx
-
 # Register the periodic schedule.
 celery.app.conf.CELERYBEAT_SCHEDULE['nodewatcher.modules.analysis.rogue_nodes.tasks.rogue_node_detection'] = {
     'task': 'nodewatcher.modules.analysis.rogue_nodes.tasks.rogue_node_detection',
