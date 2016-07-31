@@ -4,9 +4,8 @@ import networkx as nx
 def rogue_node_detection_algorithm(graph, friendly_nodes):
     """
     Detects rogue nodes and outputs an array of detected rogue nodes in the graph. The algorithm first creates a
-    minimum spanning tree of the graph and goes through all the nodes with at least two edges in the MST. If at least
-    three edges are present, declare that node to be rogue. If two edges are present, we perform a linear time
-    correction step. The algorithm takes at most O(EV log(V)) time.
+    minimum spanning tree of the graph and then computes the probability of a node being rogue from
+     the number of edges that node has in a MST. The algorithm takes at most O(E log(V)) time.
 
     :param graph: A graph datastructure which contains both friendly and unknown nodes.
     :param friendly_nodes: An array of nodes that are monitored by nodewatcher and are considered friendly.
