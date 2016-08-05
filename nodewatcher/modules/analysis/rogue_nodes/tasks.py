@@ -4,7 +4,7 @@ from django.core import mail
 
 from nodewatcher import celery
 
-from nodewatcher.modules.monitor.http.survey.management.commands.export_survey_data import all_nodes_survey_graph
+from nodewatcher.modules.monitor.http.survey import extract_nodes
 from .algorithm import rogue_node_detection_algorithm
 
 
@@ -21,7 +21,7 @@ def rogue_node_detection(self):
     Detects rogues nodes and issues a warning to its neighbors that are monitored by nodewatcher.
     """
 
-    extracted_graph = all_nodes_survey_graph(datetime.datetime.utcnow())
+    extracted_graph = extract_nodes.all_nodes_survey_graph(datetime.datetime.utcnow())
 
     if not extracted_graph:
         return
