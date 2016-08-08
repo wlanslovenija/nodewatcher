@@ -25,7 +25,7 @@ def allocation(self):
         return
 
     # Run the coloring algorithm on the meta graph.
-    node_channels = allocation_algorithms.coloring_algorithm(extracted_graph['graph'], extracted_graph['known_nodes'])
+    node_channels = allocation_algorithms.meta_algorithm(extracted_graph['graph'])
 
     # Compare the optimal channel with the actual channel of every node.
     for node in node_channels:
