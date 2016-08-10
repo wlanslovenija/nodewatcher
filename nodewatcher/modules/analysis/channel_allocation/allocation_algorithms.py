@@ -107,7 +107,7 @@ def strategy_largest_first(nx_graph):
     return sorted(nx_graph, key=nx_graph.degree, reverse=True)
 
 
-def greedy_color_with_constraints(nx_graph, number_of_colors, colors={}, strategy='largest_first'):
+def greedy_color_with_constraints(nx_graph, number_of_colors, colors={}):
     """
     Custom implementation of the NetworkX function greedy_color that allows existing color constraints.
 
