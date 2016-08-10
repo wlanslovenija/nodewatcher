@@ -1,3 +1,5 @@
+import math
+
 import networkx as nx
 
 
@@ -19,40 +21,48 @@ def meta_algorithm(graph):
     colors_5ghz = {}
 
     for node in graph['v']:
-        if 'b' in node and node['c'] > highest_2ghz_channel:
-            nx_2ghz_graph.add_node([node['i'], {'b': node['b'], 'current_channel': node['c']}])
-        elif 'b' in node and node['c'] <= highest_2ghz_channel:
-            nx_5ghz_graph.add_node([node['i'], {'b': node['b'], 'current_channel': node['c']}])
+        if 'b' in node:
+            nx_2ghz_graph.add_node(node['i'], {'b': node['b']})
+            nx_5ghz_graph.add_node(node['i'], {'b': node['b']})
         else:
             nx_2ghz_graph.add_node(node['i'])
             nx_5ghz_graph.add_node(node['i'])
 
     for edge in graph['e']:
         chosen_graph = None
-        if edge['f'] in nx_2ghz_graph.nodes():
+        if edge['c'] <= highest_2ghz_channel:
             chosen_graph = nx_2ghz_graph
             chosen_colors = colors_2ghz
-
-        elif edge['f'] in nx_5ghz_graph.nodes():
+        else:
             chosen_graph = nx_5ghz_graph
             chosen_colors = colors_5ghz
-
-        if not chosen_graph:
-            raise EnvironmentError("Node {0} belongs neither to the 2GHz nor the 5GHz network.".format(edge['f']))
 
         chosen_graph.add_edge(
             edge['f'],
             edge['t'],
             s=edge['s'],
-            c=edge['c'],
+            c=set_edge_color(edge['c']),
             n=edge['n'],
         )
         chosen_colors[edge['t']] = set_edge_color(edge['c'])
 
-    color_allocations = {
-        '2.4GHz': greedy_color_with_constraints(nx_2ghz_graph, number_of_2ghz_channels, colors_2ghz),
-        '5GHz': greedy_color_with_constraints(nx_5ghz_graph, number_of_5ghz_channels, colors_5ghz),
-    }
+    optimal_2ghz_graph = greedy_color_with_constraints(nx_2ghz_graph, number_of_2ghz_channels, colors_2ghz)
+    optimal_5ghz_graph = greedy_color_with_constraints(nx_5ghz_graph, number_of_5ghz_channels, colors_5ghz)
+
+    color_allocations = {}
+
+    for node in optimal_2ghz_graph:
+        if node in color_allocations:
+            color_allocations[node].append(optimal_2ghz_graph[node])
+        else:
+            color_allocations[node] = [optimal_2ghz_graph[node]]
+
+    for node in optimal_5ghz_graph:
+        if node in color_allocations:
+            color_allocations[node].append(optimal_5ghz_graph[node])
+        else:
+            color_allocations[node] = [optimal_5ghz_graph[node]]
+
     return color_allocations
 
 
@@ -113,7 +123,7 @@ def greedy_color_with_constraints(nx_graph, number_of_colors, colors={}, strateg
 
     nodes = strategy_largest_first(nx_graph)
     for u in nodes:
-        if colors[u]:
+        if u in colors:
             # Color already assigned.
             break
 
@@ -144,10 +154,28 @@ def sort_neighbor_colors(nx_graph, u):
     :param u: Node whose neighbors need to be sorted.
     :return: Sorted list of colors of node's neighbors, sorted according to signal strength.
     """
-    neighbor_colors = []
+    neighbor_colors = {}
     for neighbor in nx_graph[u]:
-        if neighbor['current_channel'] == u['current_channel']:
-            neighbor_colors.append((neighbor['current_channel'], nx_graph[u][neighbor]['s']))
+        if nx_graph[u][neighbor]['c'] not in neighbor_colors:
+            neighbor_colors[nx_graph[u][neighbor]['c']] = nx_graph[u][neighbor]['s']
+        else:
+            neighbor_colors[nx_graph[u][neighbor]['c']] = combine_power(
+                nx_graph[u][neighbor]['c'],
+                nx_graph[u][neighbor]['s']
+            )
 
-    sorted_colors = sorted(neighbor_colors, key=lambda x: x[1])
+    sorted_colors = sorted(neighbor_colors.items(), key=lambda x: x[1])
     return [color[0] for color in sorted_colors]
+
+
+def combine_power(signal1, signal2):
+    """
+    Calculates the combined signal (in db) from two signals. It assumes that the output power equals the sum
+    of powers of signal1 and signal2.
+
+    :param signal1: First signal strength in dB.
+    :param signal2: Second signal strength in dB.
+    :return: signal strength in dB.
+    """
+
+    return 10*math.log(math.pow(10, signal1/10)+math.pow(10, signal2/10), 10)

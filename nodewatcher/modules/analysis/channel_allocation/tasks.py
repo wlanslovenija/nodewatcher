@@ -16,11 +16,10 @@ celery.app.conf.CELERYBEAT_SCHEDULE['nodewatcher.modules.analysis.channel_alloca
 @celery.app.task(queue='monitor', bind=True)
 def allocation(self):
     """
-    Assigns an optiomal channel to each known node in the graph to maximize spectral efficiency.
+    Assigns an optimal channel to each known node in the graph to maximize spectral efficiency.
     """
 
     extracted_graph = extract_nodes.all_nodes_survey_graph(datetime.datetime.utcnow())
-
     if not extracted_graph:
         return
 
@@ -28,7 +27,7 @@ def allocation(self):
     node_channels = allocation_algorithms.meta_algorithm(extracted_graph['graph'])
 
     # Compare the optimal channel with the actual channel of every node.
-    for node in node_channels:
-        if node['optimal_channel'] != node['current_channel']:
-            # Issue a warning for that node.
-            pass
+    # for node in node_channels:
+    #     if node['optimal_channel'] != node['current_channel']:
+    #         # Issue a warning for that node.
+    #         pass
