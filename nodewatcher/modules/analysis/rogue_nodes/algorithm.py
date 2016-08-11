@@ -5,7 +5,7 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
     """
     Detects rogue nodes and outputs an array of detected rogue nodes in the graph. The algorithm first creates a
     minimum spanning tree of the graph and then computes the probability of a node being rogue from
-     the number of edges that node has in a MST. The algorithm takes at most O(E log(V)) time.
+    the number of edges that node has in a MST. The algorithm takes at most O(E log(V)) time.
 
     :param graph: A graph datastructure which contains both friendly and unknown nodes.
     :param friendly_nodes: An array of nodes that are monitored by nodewatcher and are considered friendly.
@@ -27,13 +27,12 @@ def rogue_node_detection_algorithm(graph, friendly_nodes):
     for node_name in mst.node:
         if node_name not in friendly_nodes:
             node_probability = min((mst.degree(node_name) - 1) / 2.0, 1)
-            ssid_set = []
+            ssids = set()
             for edge in mst.edges(node_name, data=True):
-                if edge[2]['n'] not in ssid_set:
-                    ssid_set.append(edge[2]['n'])
+                ssids.add(edge[2]['n'])
             unknown_nodes.append({
                 'name': node_name,
                 'probability_being_rogue': node_probability,
-                'ssids': ssid_set,
+                'ssids': list(ssids),
             })
     return unknown_nodes

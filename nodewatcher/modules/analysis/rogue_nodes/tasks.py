@@ -2,10 +2,9 @@ import datetime
 
 from django.core import mail
 
+from . import algorithm
+from ...monitor.http.survey import extract_nodes
 from nodewatcher import celery
-
-from nodewatcher.modules.monitor.http.survey import extract_nodes
-from .algorithm import rogue_node_detection_algorithm
 
 
 # Register the periodic schedule.
@@ -27,13 +26,13 @@ def rogue_node_detection(self):
         return
 
     # Run the algorithm on the meta graph.
-    unknown_node_list = rogue_node_detection_algorithm(extracted_graph['graph'], extracted_graph['known_nodes'])
+    unknown_node_list = algorithm.rogue_node_detection_algorithm(extracted_graph['graph'], extracted_graph['known_nodes'])
 
     rogue_node_list = filter(lambda unknown_node: unknown_node['probability_being_rogue'] > 0.9, unknown_node_list)
 
     if rogue_node_list:
+        # TODO: Replace sending of e-mails with network-wide notifications/warnings.
         mail.mail_admins(
             subject="Rogue nodes detected",
             message="We detected the following rogue nodes: {0}".format(rogue_node_list),
-            fail_silently=False,
         )
