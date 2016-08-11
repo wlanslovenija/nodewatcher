@@ -1,8 +1,7 @@
-import math
-
 import networkx as nx
 
-from nodewatcher.core.monitor import models
+from nodewatcher.modules.analysis.channel_allocation import signal_processing
+from nodewatcher.modules.analysis.channel_allocation import channel_lookup
 
 
 def meta_algorithm(graph, known_nodes):
@@ -10,6 +9,7 @@ def meta_algorithm(graph, known_nodes):
     Ensures that specific algorithms are called with appropriate data structures and chooses the algorithm.
 
     :param graph: A graph datastructure which contains both friendly and unknown nodes.
+    :param known_nodes: An array of BSSIDs monitored by nodewatcher.
     :return: A dictionary with two k-v pairs, one for each frequency spectrum. Keys are "2.4GHz" and "5GHz".
     """
 
@@ -17,13 +17,13 @@ def meta_algorithm(graph, known_nodes):
 
     nx_2ghz_graph = nx.Graph()
     nx_5ghz_graph = nx.Graph()
-    colors_2ghz = {}
-    colors_5ghz = {}
+    channels_2ghz = {}
+    channels_5ghz = {}
 
     for node in graph['v']:
         if 'b' in node:
             for bssid in node['b']:
-                if is_2ghz_bssid(bssid):
+                if channel_lookup.is_2ghz_bssid(bssid):
                     nx_2ghz_graph.add_node(bssid)
                     # Relabel edges.
                     for edge in graph['e']:
@@ -39,85 +39,36 @@ def meta_algorithm(graph, known_nodes):
                                 edge['f'] = bssid
 
     for edge in graph['e']:
-        chosen_graph = None
-
         if edge['c'] <= highest_2ghz_channel:
             chosen_graph = nx_2ghz_graph
-            chosen_colors = colors_2ghz
+            chosen_channels = channels_2ghz
         else:
-            print('added an edge to 5ghz!')
             chosen_graph = nx_5ghz_graph
-            chosen_colors = colors_5ghz
+            chosen_channels = channels_5ghz
 
         chosen_graph.add_node(edge['t'])
         chosen_graph.add_edge(
             edge['f'],
             edge['t'],
             s=edge['s'],
-            c=set_edge_color(edge['c']),
+            c=edge['c'],
             n=edge['n'],
         )
         if edge['t'] not in known_nodes:
-            chosen_colors[edge['t']] = set_edge_color(edge['c'])
+            chosen_channels[edge['t']] = edge['c']
 
-    optimal_2ghz_graph = greedy_color_with_constraints(nx_2ghz_graph, colors_2ghz)
-    optimal_5ghz_graph = greedy_color_with_constraints(nx_5ghz_graph, colors_5ghz)
+    optimal_2ghz_graph = greedy_color_with_constraints(nx_2ghz_graph, channels_2ghz)
+    optimal_5ghz_graph = greedy_color_with_constraints(nx_5ghz_graph, channels_5ghz)
 
-    color_allocations = {}
+    channel_allocations = {}
 
     for node in optimal_2ghz_graph:
-        if node in color_allocations:
-            color_allocations[node].append(optimal_2ghz_graph[node])
-        else:
-            color_allocations[node] = [optimal_2ghz_graph[node]]
+        channel_allocations[node] = [optimal_2ghz_graph[node]]
 
     for node in optimal_5ghz_graph:
-        if node in color_allocations:
-            color_allocations[node].append(optimal_5ghz_graph[node])
-        else:
-            color_allocations[node] = [optimal_5ghz_graph[node]]
+        channel_allocations[node] = [optimal_5ghz_graph[node]]
 
-    return color_allocations
-
-
-def is_2ghz_bssid(node_bssid):
-    """
-    Is this BSSID associated to 2.4ghz or 5ghz?
-
-    :param node_bssid:
-    :return: Boolean whether the BSSID belongs to the 2.4ghz spectrum or not.
-    """
-
-    return models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel <= 11
-
-
-def set_edge_color(channel):
-    color = None
-    if channel <= 3:
-        color = 1
-    elif channel <= 8:
-        color = 6
-    elif channel <= 11:
-        color = 11
-    elif channel <= 38:
-        color = 36
-    elif channel <= 42:
-        color = 40
-    elif channel <= 46:
-        color = 44
-    elif channel <= 50:
-        color = 48
-    elif channel <= 151:
-        color = 149
-    elif channel <= 155:
-        color = 153
-    elif channel <= 159:
-        color = 157
-    elif channel <= 163:
-        color = 161
-    if color is None:
-        raise EnvironmentError("Invalid channel {0}".format(channel))
-    return color
+    return channel_allocations
 
 
 def strategy_largest_first(nx_graph):
@@ -126,116 +77,93 @@ def strategy_largest_first(nx_graph):
     degree.
 
     :param nx_graph: NX Graph.
-    :return: List of nodes in nx_graph in decreasing order by signal strength.
+    :return: List of nodes in nx_graph in decreasing order by degree.
     """
 
     return sorted(nx_graph, key=nx_graph.degree, reverse=True)
 
 
-def greedy_color_with_constraints(nx_graph, colors={}):
+def greedy_color_with_constraints(nx_graph, channels={}):
     """
-    Custom implementation of the NetworkX function greedy_color that allows existing color constraints.
+    Custom implementation of the NetworkX function greedy_color that allows existing channel constraints.
 
     :param nx_graph: NX graph.
-    :param available_colors: A dictionary of available colors for each node.
-    :param colors:  existing color constraints.
-    :param strategy: Strategy to order nodes for the greedy search.
-    :return: A dictionary of all nodes that were assigned a color.
+    :param channels:  existing channel constraints.
+    :return: A dictionary of all nodes that were assigned a channel.
     """
-    color_dictionary = {}
+    channel_dictionary = {}
     if len(nx_graph) == 0:
         return {}
 
     nodes = strategy_largest_first(nx_graph)
-    for u in nodes:
-        if u not in colors:
-            # Set to keep track of colors of neighbours
-            neighbour_colors = sort_neighbor_colors(nx_graph, u)
+    for node in nodes:
+        if node not in channels:
+            # Set to keep track of channels of neighbours
+            neighbour_channels = sort_neighbor_channels(nx_graph, node)
 
-            # Find the first unused color.
-            available_colors = get_available_channels(u)
-            if len(neighbour_colors) < len(available_colors):
-                # TODO: look into the database for the current channel. If it's unused, use it. Otherwise,
-                # assign optimal channel.
-                current_channel = get_channel(u)
-                if current_channel not in neighbour_colors:
-                    color = current_channel
+            # Find the first unused channel.
+            available_channels = channel_lookup.get_available_channels(node)
+            if len(neighbour_channels) < len(available_channels):
+                current_channel = channel_lookup.get_channel(node)
+                if current_channel not in neighbour_channels:
+                    channel = current_channel
                 else:
-                    for color in available_colors:
-                        if color not in neighbour_colors:
+                    for channel in available_channels:
+                        if channel not in neighbour_channels:
                             break
             else:
-                color = neighbour_colors[-1]
+                channel = neighbour_channels[-1]
 
-            # Add the color to the internal tracking dictionary.
-            colors[u] = color
-            for neighbor in nx_graph[u]:
-                nx_graph[u][neighbor]['c'] = color
-            # Assign the new color to the current node.
-            color_dictionary[u] = color
+            # Add the channel to the internal tracking dictionary.
+            channels[node] = channel
+            for neighbor in nx_graph[node]:
+                nx_graph[node][neighbor]['c'] = channel
+            # Assign the new channel to the current node.
+            channel_dictionary[node] = channel
 
-    return color_dictionary
+    return channel_dictionary
 
 
-def get_available_channels(node_bssid):
+def sort_neighbor_channels(nx_graph, node):
     """
-    Returns an array of available channels for that node.
-
-    :param node_bssid: BSSID of a node
-    :return: Array of available channels.
-    """
-    highest_2ghz_channel = 11
-    channels_2ghz = [1, 6, 11]
-    channels_5ghz = [36, 40, 44, 48, 149, 153, 157, 161]
-
-    if models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel <= highest_2ghz_channel:
-        return channels_2ghz
-    else:
-        return channels_5ghz
-
-
-def sort_neighbor_colors(nx_graph, u):
-    """
-    Sorts neighboring colors in decreasing order of signal strength. If the channels of a neighbor
-    and a node do not match, the signal is set to 0.
+    Sorts neighboring channels in decreasing order of signal strength. Channel spill-over is calculated according to a
+    linear function. 100% of signal spills over to the same channel, 66% spill over to the next channel, 33% spills over
+    two channels and nothing spills further.
 
     :param nx_graph: NX graph.
-    :param u: Node whose neighbors need to be sorted.
-    :return: Sorted list of colors of node's neighbors, sorted according to signal strength.
+    :param node: Node whose neighbors need to be sorted.
+    :return: Sorted list of channels of node's neighbors, sorted according to signal strength.
     """
-    neighbor_colors = {}
-    for neighbor in nx_graph[u]:
-        if nx_graph[u][neighbor]['c'] not in neighbor_colors:
-            neighbor_colors[nx_graph[u][neighbor]['c']] = nx_graph[u][neighbor]['s']
-        else:
-            neighbor_colors[nx_graph[u][neighbor]['c']] = combine_power(
-                nx_graph[u][neighbor]['c'],
-                nx_graph[u][neighbor]['s']
-            )
+    neighbor_channels = {}
+    for neighbor in nx_graph[node]:
+        new_interference = interference(nx_graph[node][neighbor]['c'], nx_graph[node][neighbor]['s'])
+        for channel in new_interference:
+            if channel not in neighbor_channels:
+                neighbor_channels[channel] = new_interference[channel]
+            else:
+                neighbor_channels[channel] = signal_processing.combine_power(
+                    neighbor_channels[channel],
+                    new_interference[channel]
+                )
 
-    sorted_colors = sorted(neighbor_colors.items(), key=lambda x: x[1])
-    return [color[0] for color in sorted_colors]
+    sorted_channels = sorted(neighbor_channels.items(), key=lambda x: x[1])
+    return [channel[0] for channel in sorted_channels]
 
 
-def get_channel(node_bssid):
+def interference(channel, signal):
     """
-    Gets the current channel of the BSSID
+    Calculates interference on neighboring channels.
 
-    :param node_bssid:
-    :return:
+    :param channel: WiFi channel.
+    :param signal: Signal strength in dB.
+    :return: Dictionary of channels with non-zero interference as keys and values representing the interference in dB.
     """
+    ch_2ghz = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    ch_5ghz = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 100, 102, 104, 106, 108, 110, 112, 114, 116,
+               118, 120, 122, 124, 126, 128, 132, 134, 136, 138, 140, 142, 144, 149, 151, 153, 155, 157, 159, 161, 165]
 
-    return models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel
-
-
-def combine_power(signal1, signal2):
-    """
-    Calculates the combined signal (in db) from two signals. It assumes that the output power equals the sum
-    of powers of signal1 and signal2.
-
-    :param signal1: First signal strength in dB.
-    :param signal2: Second signal strength in dB.
-    :return: signal strength in dB.
-    """
-
-    return 10*math.log(math.pow(10, signal1/10)+math.pow(10, signal2/10), 10)
+    total_interference = {}
+    for ch in range(channel-2, channel+3):
+        if ch in ch_2ghz or ch in ch_5ghz:
+            total_interference[ch] = signal_processing.amplify_interference(signal, 1 - abs(ch-channel) * 0.33)
+    return total_interference
