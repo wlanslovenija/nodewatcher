@@ -2,9 +2,10 @@ import datetime
 
 from django.core import mail
 
+from nodewatcher import celery
+
 from . import algorithm
 from ...monitor.http.survey import extract_nodes
-from nodewatcher import celery
 
 
 # Register the periodic schedule.
