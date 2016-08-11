@@ -2,8 +2,10 @@ import math
 
 import networkx as nx
 
+from nodewatcher.core.monitor import models
 
-def meta_algorithm(graph):
+
+def meta_algorithm(graph, known_nodes):
     """
     Ensures that specific algorithms are called with appropriate data structures and chooses the algorithm.
 
@@ -11,8 +13,6 @@ def meta_algorithm(graph):
     :return: A dictionary with two k-v pairs, one for each frequency spectrum. Keys are "2.4GHz" and "5GHz".
     """
 
-    number_of_2ghz_channels = 3
-    number_of_5ghz_channels = 8
     highest_2ghz_channel = 11
 
     nx_2ghz_graph = nx.Graph()
@@ -22,21 +22,34 @@ def meta_algorithm(graph):
 
     for node in graph['v']:
         if 'b' in node:
-            nx_2ghz_graph.add_node(node['i'], {'b': node['b']})
-            nx_5ghz_graph.add_node(node['i'], {'b': node['b']})
-        else:
-            nx_2ghz_graph.add_node(node['i'])
-            nx_5ghz_graph.add_node(node['i'])
+            for bssid in node['b']:
+                if is_2ghz_bssid(bssid):
+                    nx_2ghz_graph.add_node(bssid)
+                    # Relabel edges.
+                    for edge in graph['e']:
+                        if edge['f'] == node['i']:
+                            if edge['c'] <= highest_2ghz_channel:
+                                edge['f'] = bssid
+                else:
+                    nx_5ghz_graph.add_node(bssid)
+                    # Relabel edges.
+                    for edge in graph['e']:
+                        if edge['f'] == node['i']:
+                            if edge['c'] > highest_2ghz_channel:
+                                edge['f'] = bssid
 
     for edge in graph['e']:
         chosen_graph = None
+
         if edge['c'] <= highest_2ghz_channel:
             chosen_graph = nx_2ghz_graph
             chosen_colors = colors_2ghz
         else:
+            print('added an edge to 5ghz!')
             chosen_graph = nx_5ghz_graph
             chosen_colors = colors_5ghz
 
+        chosen_graph.add_node(edge['t'])
         chosen_graph.add_edge(
             edge['f'],
             edge['t'],
@@ -44,10 +57,11 @@ def meta_algorithm(graph):
             c=set_edge_color(edge['c']),
             n=edge['n'],
         )
-        chosen_colors[edge['t']] = set_edge_color(edge['c'])
+        if edge['t'] not in known_nodes:
+            chosen_colors[edge['t']] = set_edge_color(edge['c'])
 
-    optimal_2ghz_graph = greedy_color_with_constraints(nx_2ghz_graph, number_of_2ghz_channels, colors_2ghz)
-    optimal_5ghz_graph = greedy_color_with_constraints(nx_5ghz_graph, number_of_5ghz_channels, colors_5ghz)
+    optimal_2ghz_graph = greedy_color_with_constraints(nx_2ghz_graph, colors_2ghz)
+    optimal_5ghz_graph = greedy_color_with_constraints(nx_5ghz_graph, colors_5ghz)
 
     color_allocations = {}
 
@@ -66,30 +80,41 @@ def meta_algorithm(graph):
     return color_allocations
 
 
+def is_2ghz_bssid(node_bssid):
+    """
+    Is this BSSID associated to 2.4ghz or 5ghz?
+
+    :param node_bssid:
+    :return: Boolean whether the BSSID belongs to the 2.4ghz spectrum or not.
+    """
+
+    return models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel <= 11
+
+
 def set_edge_color(channel):
     color = None
     if channel <= 3:
-        color = 0
+        color = 1
     elif channel <= 8:
-        color = 1
-    elif channel <= 11:
-        color = 2
-    elif channel <= 38:
-        color = 0
-    elif channel <= 42:
-        color = 1
-    elif channel <= 46:
-        color = 2
-    elif channel <= 50:
-        color = 3
-    elif channel <= 151:
-        color = 4
-    elif channel <= 155:
-        color = 5
-    elif channel <= 159:
         color = 6
+    elif channel <= 11:
+        color = 11
+    elif channel <= 38:
+        color = 36
+    elif channel <= 42:
+        color = 40
+    elif channel <= 46:
+        color = 44
+    elif channel <= 50:
+        color = 48
+    elif channel <= 151:
+        color = 149
+    elif channel <= 155:
+        color = 153
+    elif channel <= 159:
+        color = 157
     elif channel <= 163:
-        color = 7
+        color = 161
     if color is None:
         raise EnvironmentError("Invalid channel {0}".format(channel))
     return color
@@ -107,12 +132,12 @@ def strategy_largest_first(nx_graph):
     return sorted(nx_graph, key=nx_graph.degree, reverse=True)
 
 
-def greedy_color_with_constraints(nx_graph, number_of_colors, colors={}):
+def greedy_color_with_constraints(nx_graph, colors={}):
     """
     Custom implementation of the NetworkX function greedy_color that allows existing color constraints.
 
     :param nx_graph: NX graph.
-    :param number_of_colors: Max number of colors we can use.
+    :param available_colors: A dictionary of available colors for each node.
     :param colors:  existing color constraints.
     :param strategy: Strategy to order nodes for the greedy search.
     :return: A dictionary of all nodes that were assigned a color.
@@ -123,26 +148,50 @@ def greedy_color_with_constraints(nx_graph, number_of_colors, colors={}):
 
     nodes = strategy_largest_first(nx_graph)
     for u in nodes:
-        if u in colors:
-            # Color already assigned.
-            break
+        if u not in colors:
+            # Set to keep track of colors of neighbours
+            neighbour_colors = sort_neighbor_colors(nx_graph, u)
 
-        # Set to keep track of colors of neighbours
-        neighbour_colors = sort_neighbor_colors(nx_graph, u)
-        # Find the first unused color.
-        if len(neighbour_colors) < number_of_colors:
-            for color in range(number_of_colors):
-                if color not in neighbour_colors:
-                    break
-        else:
-            color = neighbour_colors[-1]
+            # Find the first unused color.
+            available_colors = get_available_channels(u)
+            if len(neighbour_colors) < len(available_colors):
+                # TODO: look into the database for the current channel. If it's unused, use it. Otherwise,
+                # assign optimal channel.
+                current_channel = get_channel(u)
+                if current_channel not in neighbour_colors:
+                    color = current_channel
+                else:
+                    for color in available_colors:
+                        if color not in neighbour_colors:
+                            break
+            else:
+                color = neighbour_colors[-1]
 
-        # Add the color to the internal tracking dictionary.
-        colors[u] = color
-        # Assign the new color to the current node.
-        color_dictionary[u] = color
+            # Add the color to the internal tracking dictionary.
+            colors[u] = color
+            for neighbor in nx_graph[u]:
+                nx_graph[u][neighbor]['c'] = color
+            # Assign the new color to the current node.
+            color_dictionary[u] = color
 
     return color_dictionary
+
+
+def get_available_channels(node_bssid):
+    """
+    Returns an array of available channels for that node.
+
+    :param node_bssid: BSSID of a node
+    :return: Array of available channels.
+    """
+    highest_2ghz_channel = 11
+    channels_2ghz = [1, 6, 11]
+    channels_5ghz = [36, 40, 44, 48, 149, 153, 157, 161]
+
+    if models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel <= highest_2ghz_channel:
+        return channels_2ghz
+    else:
+        return channels_5ghz
 
 
 def sort_neighbor_colors(nx_graph, u):
@@ -166,6 +215,17 @@ def sort_neighbor_colors(nx_graph, u):
 
     sorted_colors = sorted(neighbor_colors.items(), key=lambda x: x[1])
     return [color[0] for color in sorted_colors]
+
+
+def get_channel(node_bssid):
+    """
+    Gets the current channel of the BSSID
+
+    :param node_bssid:
+    :return:
+    """
+
+    return models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel
 
 
 def combine_power(signal1, signal2):
