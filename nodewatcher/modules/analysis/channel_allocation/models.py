@@ -1,6 +1,13 @@
 from django.db import models
+from nodewatcher.core.monitor import models as monitor_models
 
 
 class NodeChannel(models.Model):
-    node_interface = models.CharField(max_length=20)
-    node_channel = models.IntegerField()
+
+    interface = models.ForeignKey(
+        monitor_models.WifiInterfaceMonitor,
+        on_delete=models.CASCADE,
+    )
+    optimal_channel = models.PositiveIntegerField()
+    channel_width = models.PositiveIntegerField()
+
