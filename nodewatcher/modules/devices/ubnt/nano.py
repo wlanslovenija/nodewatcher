@@ -8,7 +8,7 @@ class UBNTNanoM2(cgm_devices.DeviceBase):
 
     identifier = 'ub-nano-m2'
     name = "Nanostation M2"
-    manufacturer = "Ubiquity"
+    manufacturer = "Ubiquiti"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [

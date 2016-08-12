@@ -8,7 +8,7 @@ class UBNTPicoM2(cgm_devices.DeviceBase):
 
     identifier = 'ub-pico-m2'
     name = "Picostation M2"
-    manufacturer = "Ubiquity"
+    manufacturer = "Ubiquiti"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
