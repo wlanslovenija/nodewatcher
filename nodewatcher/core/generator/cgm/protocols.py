@@ -312,7 +312,7 @@ class IEEE80211A(WirelessProtocol):
         Channel("ch36", 36, 5180),
         Channel("ch38", 38, 5190),
         Channel("ch40", 40, 5200),
-        Channel("ch40", 42, 5210),
+        Channel("ch42", 42, 5210),
         Channel("ch44", 44, 5220),
         Channel("ch46", 46, 5230),
         Channel("ch48", 48, 5240),
