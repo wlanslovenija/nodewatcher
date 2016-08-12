@@ -371,7 +371,7 @@ class DeviceBase(object):
             'core.general#router',
             registration.Choice(
                 cls.identifier,
-                _("%(manufacturer)s - %(name)s") % {'manufacturer': cls.manufacturer, 'name': cls.name},
+                cls.get_display_name(),
                 limited_to=('core.general#platform', platform.name),
                 # Include some more device metadata.
                 manufacturer=cls.manufacturer,
@@ -412,6 +412,14 @@ class DeviceBase(object):
                     function,
                     cls.identifier,
                 )
+
+    @classmethod
+    def get_display_name(cls):
+        """
+        Returns a display name for this device.
+        """
+
+        return _("%(manufacturer)s - %(name)s") % {'manufacturer': cls.manufacturer, 'name': cls.name}
 
     @classmethod
     def remap_port(cls, platform, interface_or_port):
