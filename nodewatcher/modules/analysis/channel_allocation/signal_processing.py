@@ -10,7 +10,7 @@ def amplify_interference(signal, factor):
     :return: dB signal given that the original power was multiplied by the multiplication factor.
     """
 
-    return 10 * math.log(factor * math.pow(10, signal/10), 10)
+    return 10 * math.log(factor * math.pow(10, signal / 10), 10)
 
 
 def combine_power(signal1, signal2):
