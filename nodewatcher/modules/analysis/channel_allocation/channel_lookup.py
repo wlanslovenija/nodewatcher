@@ -30,6 +30,7 @@ def get_available_channels(node_bssid):
     :param node_bssid: BSSID of a node
     :return: Array of available channels.
     """
+    # TODO: Turn hard-coded array into a node-specific (stemming from regulatory practices) property.
     highest_2ghz_channel = 11
     ch_2ghz = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     ch_5ghz = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 100, 102, 104, 106, 108, 110, 112, 114, 116,
