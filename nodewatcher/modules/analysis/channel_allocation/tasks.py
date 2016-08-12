@@ -2,8 +2,8 @@ import datetime
 
 from nodewatcher import celery
 
-from nodewatcher.modules.monitor.http.survey import extract_nodes
-from nodewatcher.modules.analysis.channel_allocation import allocation_algorithms
+from ...monitor.http.survey import extract_nodes
+from . import allocation_algorithms
 from . import models
 
 # Register the periodic schedule.
