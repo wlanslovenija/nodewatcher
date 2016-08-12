@@ -4,12 +4,12 @@ from nodewatcher import celery
 
 from nodewatcher.modules.monitor.http.survey import extract_nodes
 from nodewatcher.modules.analysis.channel_allocation import allocation_algorithms
-
+from . import models
 
 # Register the periodic schedule.
 celery.app.conf.CELERYBEAT_SCHEDULE['nodewatcher.modules.analysis.channel_allocation.tasks.allocation'] = {
     'task': 'nodewatcher.modules.analysis.channel_allocation.tasks.allocation',
-    'schedule': datetime.timedelta(days=1),
+    'schedule': datetime.timedelta(seconds=10),
 }
 
 
@@ -25,8 +25,6 @@ def allocation(self):
 
     # Run the coloring algorithm on the meta graph.
     node_channels = allocation_algorithms.meta_algorithm(extracted_graph['graph'], extracted_graph['known_nodes'])
-    # Compare the optimal channel with the actual channel of every node.
-    # for node in node_channels:
-    #     if node['optimal_channel'] != node['current_channel']:
-    #         # Issue a warning for that node.
-    #         pass
+    for node in node_channels:
+        n = models.NodeChannel(node_interface=node, node_channel=node_channels[node])
+        n.save()
