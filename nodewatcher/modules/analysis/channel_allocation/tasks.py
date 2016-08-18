@@ -31,6 +31,8 @@ def allocation(self):
     for interface in interface_dict:
         n = models.NodeChannel(
             interface=wifi_models.WifiInterfaceMonitor.objects.get(bssid=interface),
-            optimal_channel=interface_dict[interface]
+            optimal_start_frequency=interface_dict[interface]['freq'],
+            optimal_channel_width=interface_dict[interface]['width'],
+            optimal_channel_interference=interface_dict[interface]['interference'],
         )
         n.save()
