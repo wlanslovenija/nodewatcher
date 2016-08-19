@@ -7,34 +7,36 @@ from . import algorithm
 
 
 class RogueNodeTestCase(unittest.TestCase):
-    def __init__(self, method_name, test_directory):
-        self.test_directory = test_directory
+    def __init__(self, method_name, test_filename):
+        self.test_filename = test_filename
         super(RogueNodeTestCase, self).__init__(method_name)
+
+    def __hash__(self):
+        return hash((type(self), self._testMethodName, self.test_filename))
 
     def run_test(self):
         # Run the algorithm on the file and store the results.
-        for path, dirs, files in os.walk(self.test_directory):
-            for filename in files:
-                # Test every JSON file that does not contain "results" in the filename.
-                if os.path.splitext(filename)[1] == '.json' and 'results' not in filename:
+        with io.open(self.test_filename, encoding='utf-8') as input_graph_file:
+            input_graph = json.load(input_graph_file)
 
-                    with io.open(os.path.join(path, filename), encoding='utf-8') as input_graph_file:
-                        input_graph = json.load(input_graph_file)
+        algorithm_output = algorithm.rogue_node_detection_algorithm(
+            graph=input_graph['graph'],
+            friendly_nodes=input_graph['friendly_nodes'],
+        )
 
-                    algorithm_output = algorithm.rogue_node_detection_algorithm(
-                        graph=input_graph['graph'],
-                        friendly_nodes=input_graph['friendly_nodes'],
-                    )
+        # Append "-results" to the end of the filename.
+        results_filename = '{0}-results.json'.format(os.path.splitext(self.test_filename)[0])
+        with io.open(results_filename, encoding='utf-8') as asserted_output_file:
+            asserted_output = json.load(asserted_output_file)
 
-                    # Append "-results" to the end of the filename.
-                    results_filename = '{0}-results.json'.format(os.path.splitext(filename)[0])
-                    with io.open(os.path.join(path, results_filename), encoding='utf-8') as asserted_output_file:
-                        asserted_output = json.load(asserted_output_file)
-
-                    self.assertEqual(algorithm_output, asserted_output)
+        self.assertEqual(algorithm_output, asserted_output)
 
 
 def load_tests(loader, tests, pattern):
     test_cases = unittest.TestSuite()
-    test_cases.addTest(RogueNodeTestCase('run_test', os.path.join(os.path.dirname(__file__), 'test_json_files')))
+    for path, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), 'test_json_files')):
+        for filename in files:
+            # Test every JSON file that does not contain "results" in the filename.
+            if os.path.splitext(filename)[1] == '.json' and 'results' not in filename:
+                test_cases.addTest(RogueNodeTestCase('run_test', os.path.join(path, filename)))
     return test_cases
