@@ -103,7 +103,7 @@ class DeviceRadio(object):
     # Radio features
     MultipleSSID = "multiple_ssid"
 
-    def __init__(self, identifier, description, protocols, connectors, features=None):
+    def __init__(self, identifier, description, protocols, connectors, features=None, index=None):
         """
         Class constructor.
         """
@@ -113,7 +113,7 @@ class DeviceRadio(object):
         self.protocols = protocols
         self.connectors = connectors
         self.features = features or []
-        self.index = None
+        self.index = index
 
     def get_connector_choices(self):
         """
@@ -161,7 +161,7 @@ class USBRadio(DeviceRadio):
     Describes a device's USB radio.
     """
 
-    def __init__(self, identifier, description):
+    def __init__(self, identifier, description, index=None):
         """
         Class constructor.
         """
@@ -192,6 +192,7 @@ class USBRadio(DeviceRadio):
             [
                 DeviceRadio.MultipleSSID,
             ],
+            index=index
         )
 
 
@@ -312,7 +313,8 @@ class DeviceMetaclass(type):
                 if not isinstance(radio, DeviceRadio):
                     raise exceptions.ImproperlyConfigured("List of device radios may only contain DeviceRadio instances!")
 
-                radio.index = idx
+                if radio.index is None:
+                    radio.index = idx
 
             # Validate that list of antennas only contains InternalAntenna instances
             if len([x for x in new_class.antennas if not isinstance(x, InternalAntenna)]):
