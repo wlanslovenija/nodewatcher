@@ -86,5 +86,14 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
             'kmod-rt2x00-usb'
         ])
 
+    @cgm_devices.register_module('openwrt')
+    def openwrt_disable_rtc_pcf8563(node, cfg):
+        """
+        Disable the kmod-rtc-pcf8563 package as it interferes with SFP due
+        to it having the same address on the I2C bus.
+        """
+
+        cfg.packages.add('-kmod-rtc-pcf8563')
+
 # Register the IRNAS KORUZA device.
 cgm_base.register_device('openwrt', IRNASKoruzav2)
