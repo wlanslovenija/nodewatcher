@@ -57,8 +57,8 @@ class TPLinkWR841NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841nd-v1.5-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841nd-v1.5-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v1.5-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v1.5-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -85,8 +85,8 @@ class TPLinkWR841NDv3(TPLinkWR841NDv1):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841nd-v3-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841nd-v3-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v3-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v3-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -103,8 +103,8 @@ class TPLinkWR841NDv5(TPLinkWR841NDv1):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841nd-v5-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841nd-v5-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v5-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v5-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -146,8 +146,8 @@ class TPLinkWR841NDv7(TPLinkWR841NDv1):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841nd-v7-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841nd-v7-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v7-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v7-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -175,8 +175,8 @@ class TPLinkWR841NDv8(TPLinkWR841NDv7):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841n-v8-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841n-v8-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v8-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v8-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -193,8 +193,8 @@ class TPLinkWR841NDv9(TPLinkWR841NDv7):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841n-v9-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841n-v9-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v9-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v9-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -211,8 +211,8 @@ class TPLinkWR841NDv10(TPLinkWR841NDv7):
         'openwrt': {
             'name': 'TLWR841',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr841n-v10-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr841n-v10-squashfs-sysupgrade.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v10-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr841*-v10-squashfs-sysupgrade.bin',
             ]
         }
     }
