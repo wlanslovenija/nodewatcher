@@ -1,4 +1,5 @@
 import base64
+import fnmatch
 import io
 import os
 
@@ -115,15 +116,20 @@ def build_image(result, profile):
         # Collect the output files and return them.
         fw_files = []
         for fw_file in profile['files']:
+            matched = False
             for output_location in output_locations:
-                try:
-                    fw_files.append(
-                        (fw_file, builder.read_result_file(os.path.join('bin', output_location, fw_file)))
-                    )
-                    break
-                except IOError:
-                    continue
-            else:
+                for output_filename in builder.list_dir(os.path.join('bin', output_location)):
+                    if fnmatch.fnmatch(output_filename, fw_file):
+                        try:
+                            fw_files.append((
+                                output_filename,
+                                builder.read_result_file(os.path.join('bin', output_location, output_filename))
+                            ))
+                            matched = True
+                        except IOError:
+                            continue
+
+            if not matched:
                 raise cgm_exceptions.BuildError('Output file \'%s\' not found!' % fw_file)
 
         return fw_files
