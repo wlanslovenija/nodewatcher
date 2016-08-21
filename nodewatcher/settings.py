@@ -249,6 +249,7 @@ INSTALLED_APPS = (
     'nodewatcher.core.registry',
 
     # Modules.
+    #'nodewatcher.modules.analysis.rogue_nodes',
     'nodewatcher.modules.administration.types',
     'nodewatcher.modules.administration.projects',
     'nodewatcher.modules.administration.location',
