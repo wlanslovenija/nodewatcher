@@ -1,0 +1,4423 @@
+[
+  {
+    "model": "core.node",
+    "pk": "df93387a-6180-4cde-a854-7cba043c385f",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "e994747e-7fa3-454b-b734-a98cc6593972",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "bdce5561-230a-409e-8497-d879b0304562",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "core.node",
+    "pk": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+    "fields": {
+      "registry_metadata": {
+        "config": {
+          "using_simple_mode": false
+        }
+      }
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "first_seen": "2016-06-02T18:53:55.892Z",
+      "last_seen": "2016-08-21T00:28:35.600Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "first_seen": "2016-06-02T18:53:55.335Z",
+      "last_seen": "2016-08-16T23:52:16.472Z",
+      "uuid": null,
+      "firmware": null
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "first_seen": "2016-06-22T16:36:45.244Z",
+      "last_seen": "2016-08-21T00:28:37.485Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "first_seen": "2016-06-22T16:39:16.690Z",
+      "last_seen": "2016-08-21T00:28:36.735Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "first_seen": "2016-06-22T16:39:52.472Z",
+      "last_seen": "2016-08-21T00:29:29.648Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "first_seen": "2016-06-22T16:40:28.195Z",
+      "last_seen": "2016-08-21T00:28:35.620Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "first_seen": "2016-07-04T18:50:05.320Z",
+      "last_seen": "2016-08-21T00:28:34.161Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "first_seen": "2016-07-04T18:50:44.765Z",
+      "last_seen": "2016-08-21T00:29:29.732Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "first_seen": "2016-07-04T18:51:23.845Z",
+      "last_seen": "2016-08-21T00:28:34.763Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "first_seen": "2016-07-04T18:52:06.974Z",
+      "last_seen": "2016-08-21T00:28:38.390Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "first_seen": "2016-07-04T18:52:42.778Z",
+      "last_seen": "2016-08-21T00:29:29.809Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "first_seen": "2016-07-04T18:53:24.049Z",
+      "last_seen": "2016-08-21T00:29:29.801Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "first_seen": "2016-07-04T18:53:27.949Z",
+      "last_seen": "2016-08-21T00:28:35.425Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "first_seen": "2016-07-04T18:54:11.009Z",
+      "last_seen": "2016-08-21T00:28:38.253Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.generalmonitor",
+    "pk": 15,
+    "fields": {
+      "polymorphic_ctype": 28,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "first_seen": "2016-07-04T18:54:47.746Z",
+      "last_seen": "2016-08-21T00:29:29.714Z",
+      "uuid": null,
+      "firmware": "git.3f106ae"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "uptime": 1393109,
+      "local_time": "2015-08-24T16:21:14Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "uptime": 8407817,
+      "local_time": "2015-10-25T16:45:16Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "uptime": 10125733,
+      "local_time": "2015-11-27T12:15:52Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "uptime": 10125757,
+      "local_time": "2015-12-03T17:38:46Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "uptime": 4738404,
+      "local_time": "2015-09-14T03:52:45Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "uptime": 7878368,
+      "local_time": "2015-09-29T07:43:20Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "uptime": 6920314,
+      "local_time": "2015-10-02T00:19:08Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "uptime": 10125749,
+      "local_time": "2015-10-30T20:12:54Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "uptime": 10125741,
+      "local_time": "2015-10-19T10:24:43Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "uptime": 10125843,
+      "local_time": "2015-12-04T04:16:07Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "uptime": 796405,
+      "local_time": "2015-07-15T10:11:25Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "uptime": 1782048,
+      "local_time": "2015-08-02T06:31:05Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "uptime": 6984794,
+      "local_time": "2015-10-10T05:05:01Z"
+    }
+  },
+  {
+    "model": "monitor.systemstatusmonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 32,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "uptime": 4752989,
+      "local_time": "2015-08-03T05:45:41Z"
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "loadavg_1min": 0.03,
+      "loadavg_5min": 0.07,
+      "loadavg_15min": 0.05,
+      "memory_free": 101616,
+      "memory_buffers": 2180,
+      "memory_cache": 5884,
+      "memory_total": 126444,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "loadavg_1min": 0.24,
+      "loadavg_5min": 0.13,
+      "loadavg_15min": 0.14,
+      "memory_free": 39128,
+      "memory_buffers": 2196,
+      "memory_cache": 6052,
+      "memory_total": 61468,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "loadavg_1min": 0.12,
+      "loadavg_5min": 0.13,
+      "loadavg_15min": 0.14,
+      "memory_free": 100756,
+      "memory_buffers": 2180,
+      "memory_cache": 5872,
+      "memory_total": 126444,
+      "processes": 35
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "loadavg_1min": 0.14,
+      "loadavg_5min": 0.1,
+      "loadavg_15min": 0.06,
+      "memory_free": 102668,
+      "memory_buffers": 2180,
+      "memory_cache": 5816,
+      "memory_total": 126444,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "loadavg_1min": 0.01,
+      "loadavg_5min": 0.08,
+      "loadavg_15min": 0.12,
+      "memory_free": 38984,
+      "memory_buffers": 2196,
+      "memory_cache": 6104,
+      "memory_total": 61468,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "loadavg_1min": 0.1,
+      "loadavg_5min": 0.09,
+      "loadavg_15min": 0.12,
+      "memory_free": 39552,
+      "memory_buffers": 2196,
+      "memory_cache": 6056,
+      "memory_total": 61468,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "loadavg_1min": 0.13,
+      "loadavg_5min": 0.15,
+      "loadavg_15min": 0.14,
+      "memory_free": 39400,
+      "memory_buffers": 2196,
+      "memory_cache": 6056,
+      "memory_total": 61468,
+      "processes": 35
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "loadavg_1min": 0.1,
+      "loadavg_5min": 0.08,
+      "loadavg_15min": 0.1,
+      "memory_free": 101332,
+      "memory_buffers": 2180,
+      "memory_cache": 5868,
+      "memory_total": 126444,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "loadavg_1min": 0.05,
+      "loadavg_5min": 0.1,
+      "loadavg_15min": 0.06,
+      "memory_free": 102472,
+      "memory_buffers": 2180,
+      "memory_cache": 5868,
+      "memory_total": 126444,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "loadavg_1min": 0.07,
+      "loadavg_5min": 0.1,
+      "loadavg_15min": 0.12,
+      "memory_free": 101568,
+      "memory_buffers": 2180,
+      "memory_cache": 5872,
+      "memory_total": 126444,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "loadavg_1min": 0.0,
+      "loadavg_5min": 0.06,
+      "loadavg_15min": 0.08,
+      "memory_free": 103144,
+      "memory_buffers": 2180,
+      "memory_cache": 5820,
+      "memory_total": 126444,
+      "processes": 35
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "loadavg_1min": 0.08,
+      "loadavg_5min": 0.11,
+      "loadavg_15min": 0.08,
+      "memory_free": 102804,
+      "memory_buffers": 2180,
+      "memory_cache": 5872,
+      "memory_total": 126444,
+      "processes": 34
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "loadavg_1min": 0.0,
+      "loadavg_5min": 0.01,
+      "loadavg_15min": 0.05,
+      "memory_free": 7864,
+      "memory_buffers": 2196,
+      "memory_cache": 6056,
+      "memory_total": 28980,
+      "processes": 32
+    }
+  },
+  {
+    "model": "monitor.generalresourcesmonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 33,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "loadavg_1min": 0.0,
+      "loadavg_5min": 0.02,
+      "loadavg_15min": 0.05,
+      "memory_free": 7964,
+      "memory_buffers": 2196,
+      "memory_cache": 6056,
+      "memory_total": 28980,
+      "processes": 32
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 345,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 343,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 345,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 344,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 353,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 348,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 349,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 353,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 346,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 354,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 345,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 352,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 346,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.networkresourcesmonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 34,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "routes": null,
+      "tcp_connections": 4,
+      "udp_connections": 0,
+      "track_connections": 343,
+      "track_connections_max": 16384
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:60:44",
+      "tx_packets": "134146",
+      "rx_packets": "49756961",
+      "tx_bytes": "12669275",
+      "rx_bytes": "5975306532",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "97",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:60:44",
+      "tx_packets": "123828684",
+      "rx_packets": "38086943",
+      "tx_bytes": "1330558332",
+      "rx_bytes": "3518929625",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:60:44",
+      "tx_packets": "66112808",
+      "rx_packets": "159062912",
+      "tx_bytes": "2488592198",
+      "rx_bytes": "3711053192",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "2258",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "e8:94:f6:68:87:50",
+      "tx_packets": "691916216",
+      "rx_packets": "253644283",
+      "tx_bytes": "1298697280",
+      "rx_bytes": "1606179611",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "e8:94:f6:68:87:51",
+      "tx_packets": "890763",
+      "rx_packets": "288654732",
+      "tx_bytes": "94067344",
+      "rx_bytes": "34935954029",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77041",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "name": "eth1",
+      "up": true,
+      "hw_address": "e8:94:f6:68:87:50",
+      "tx_packets": "254455847",
+      "rx_packets": "689056621",
+      "tx_bytes": "1682828793",
+      "rx_bytes": "974172161",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "66204",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "e8:94:f6:68:87:51",
+      "tx_packets": "289459133",
+      "rx_packets": "0",
+      "tx_bytes": "373423820",
+      "rx_bytes": "0",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:58:df",
+      "tx_packets": "1972024657",
+      "rx_packets": "996006867",
+      "tx_bytes": "441999629",
+      "rx_bytes": "1268750641",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:58:df",
+      "tx_packets": "1892886499",
+      "rx_packets": "839505819",
+      "tx_bytes": "1210346021",
+      "rx_bytes": "1573633562",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:58:df",
+      "tx_packets": "1091574",
+      "rx_packets": "361312552",
+      "tx_bytes": "114858846",
+      "rx_bytes": "43913618260",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77241",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:58:df",
+      "tx_packets": "1835210604",
+      "rx_packets": "3482515003",
+      "tx_bytes": "2469895020",
+      "rx_bytes": "3542181161",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "94392",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:5c:fe",
+      "tx_packets": "1743963828",
+      "rx_packets": "816634392",
+      "tx_bytes": "2092900501",
+      "rx_bytes": "99287793",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:5c:fe",
+      "tx_packets": "2293795425",
+      "rx_packets": "1075071159",
+      "tx_bytes": "3157447279",
+      "rx_bytes": "3828212451",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:5c:fe",
+      "tx_packets": "1109004",
+      "rx_packets": "359422631",
+      "tx_bytes": "116697067",
+      "rx_bytes": "43718035560",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77251",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 15,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:5c:fe",
+      "tx_packets": "1892051693",
+      "rx_packets": "3662176579",
+      "tx_bytes": "3908330817",
+      "rx_bytes": "1035432651",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "94404",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 16,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "c0:4a:00:5d:c3:f2",
+      "tx_packets": "171582923",
+      "rx_packets": "48257536",
+      "tx_bytes": "2239394567",
+      "rx_bytes": "2716866587",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 17,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "c0:4a:00:5d:c3:f3",
+      "tx_packets": "1124503",
+      "rx_packets": "96139861",
+      "tx_bytes": "108875066",
+      "rx_bytes": "12035379469",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "25132",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 18,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "name": "eth1",
+      "up": true,
+      "hw_address": "c0:4a:00:5d:c3:f2",
+      "tx_packets": "49890481",
+      "rx_packets": "257823774",
+      "tx_bytes": "2832021741",
+      "rx_bytes": "612867066",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "7804",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 19,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "c0:4a:00:5d:c3:f3",
+      "tx_packets": "94739163",
+      "rx_packets": "0",
+      "tx_bytes": "388448411",
+      "rx_bytes": "0",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 20,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "c0:4a:00:40:e3:60",
+      "tx_packets": "351498264",
+      "rx_packets": "64653325",
+      "tx_bytes": "217635200",
+      "rx_bytes": "1829026820",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 21,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "c0:4a:00:40:e3:61",
+      "tx_packets": "1388434",
+      "rx_packets": "240367332",
+      "tx_bytes": "132746189",
+      "rx_bytes": "29160899279",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77020",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 22,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "name": "eth1",
+      "up": true,
+      "hw_address": "c0:4a:00:40:e3:60",
+      "tx_packets": "64588043",
+      "rx_packets": "383843623",
+      "tx_bytes": "1559459433",
+      "rx_bytes": "2024372930",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "56970",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 23,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "c0:4a:00:40:e3:61",
+      "tx_packets": "238931528",
+      "rx_packets": "0",
+      "tx_bytes": "2260632218",
+      "rx_bytes": "0",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 24,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "e8:94:f6:68:84:78",
+      "tx_packets": "538562664",
+      "rx_packets": "182451481",
+      "tx_bytes": "2801161062",
+      "rx_bytes": "1213769189",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 25,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "e8:94:f6:68:84:79",
+      "tx_packets": "635758",
+      "rx_packets": "229125087",
+      "tx_bytes": "67450391",
+      "rx_bytes": "27497483915",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "76918",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 26,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "name": "eth1",
+      "up": true,
+      "hw_address": "e8:94:f6:68:84:78",
+      "tx_packets": "229311007",
+      "rx_packets": "99",
+      "tx_bytes": "649846918",
+      "rx_bytes": "11130",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "46",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 27,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "e8:94:f6:68:84:79",
+      "tx_packets": "180722135",
+      "rx_packets": "559278152",
+      "tx_bytes": "2438764419",
+      "rx_bytes": "974836665",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "32640",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 28,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:59:c8",
+      "tx_packets": "609340680",
+      "rx_packets": "170037770",
+      "tx_bytes": "1583345027",
+      "rx_bytes": "831154419",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 29,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:59:c8",
+      "tx_packets": "570848647",
+      "rx_packets": "130209416",
+      "tx_bytes": "4038700378",
+      "rx_bytes": "1630553762",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 30,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:59:c8",
+      "tx_packets": "1096560",
+      "rx_packets": "359108143",
+      "tx_bytes": "107093016",
+      "rx_bytes": "43707839876",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77250",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 31,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:59:c8",
+      "tx_packets": "301015600",
+      "rx_packets": "815146892",
+      "tx_bytes": "2500503471",
+      "rx_bytes": "3405446722",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "94402",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 32,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:5a:1f",
+      "tx_packets": "851320343",
+      "rx_packets": "391782930",
+      "tx_bytes": "1307676487",
+      "rx_bytes": "3075662229",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 33,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:5a:1f",
+      "tx_packets": "910839818",
+      "rx_packets": "414640772",
+      "tx_bytes": "1669696186",
+      "rx_bytes": "3841641682",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 34,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:5a:1f",
+      "tx_packets": "2684109",
+      "rx_packets": "183496669",
+      "tx_bytes": "244354042",
+      "rx_bytes": "24136413752",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77249",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 35,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:5a:1f",
+      "tx_packets": "808864499",
+      "rx_packets": "1682083290",
+      "tx_bytes": "2689888454",
+      "rx_bytes": "3001199309",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "94398",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 36,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:59:c7",
+      "tx_packets": "917470593",
+      "rx_packets": "373442425",
+      "tx_bytes": "567425965",
+      "rx_bytes": "3773530905",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 37,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:59:c7",
+      "tx_packets": "2367651063",
+      "rx_packets": "1435686424",
+      "tx_bytes": "1692609956",
+      "rx_bytes": "4070579816",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 38,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:59:c7",
+      "tx_packets": "3153590",
+      "rx_packets": "184476185",
+      "tx_bytes": "284635132",
+      "rx_bytes": "24203795647",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "77251",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 39,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:59:c7",
+      "tx_packets": "1807035375",
+      "rx_packets": "3166225522",
+      "tx_bytes": "800323794",
+      "rx_bytes": "632698040",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "94404",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 40,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:58:e4",
+      "tx_packets": "126235172",
+      "rx_packets": "63096153",
+      "tx_bytes": "728718772",
+      "rx_bytes": "2693863644",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 41,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:58:e4",
+      "tx_packets": "88463470",
+      "rx_packets": "43212298",
+      "tx_bytes": "449123885",
+      "rx_bytes": "4202364969",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 42,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:58:e4",
+      "tx_packets": "26726",
+      "rx_packets": "12228856",
+      "tx_bytes": "2988810",
+      "rx_bytes": "1487101174",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "48",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 43,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:58:e4",
+      "tx_packets": "105469139",
+      "rx_packets": "203529694",
+      "tx_bytes": "2388382268",
+      "rx_bytes": "2783085995",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "1181",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 44,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "name": "wlan1",
+      "up": true,
+      "hw_address": "04:18:d6:22:5f:e6",
+      "tx_packets": "465402402",
+      "rx_packets": "241971040",
+      "tx_bytes": "3843667796",
+      "rx_bytes": "4035491926",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 45,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:5f:e6",
+      "tx_packets": "409493660",
+      "rx_packets": "236580477",
+      "tx_bytes": "2110447337",
+      "rx_bytes": "3216908676",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 46,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "04:18:d6:20:5f:e6",
+      "tx_packets": "556165",
+      "rx_packets": "34161349",
+      "tx_bytes": "48746965",
+      "rx_bytes": "4259315567",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "214",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 47,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "name": "eth0",
+      "up": true,
+      "hw_address": "04:18:d6:20:5f:e6",
+      "tx_packets": "477991906",
+      "rx_packets": "844556679",
+      "tx_bytes": "2087128521",
+      "rx_bytes": "2643919255",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "2915",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 48,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "name": "eth0.1",
+      "up": true,
+      "hw_address": "90:f6:52:ea:05:ec",
+      "tx_packets": "116505925",
+      "rx_packets": "449250226",
+      "tx_bytes": "18905597751",
+      "rx_bytes": "256941734380",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "34552",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 49,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "90:f6:52:ea:05:ec",
+      "tx_packets": "1168515",
+      "rx_packets": "229402751",
+      "tx_bytes": "112269047",
+      "rx_bytes": "27507582413",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "76993",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 50,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "90:f6:52:ea:05:ec",
+      "tx_packets": "431905950",
+      "rx_packets": "115879741",
+      "tx_bytes": "3731684327",
+      "rx_bytes": "1720902637",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 51,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "name": "eth0.1",
+      "up": true,
+      "hw_address": "90:f6:52:2a:08:54",
+      "tx_packets": "278503018",
+      "rx_packets": "618839124",
+      "tx_bytes": "91641952510",
+      "rx_bytes": "549227904135",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "7843",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 52,
+    "fields": {
+      "polymorphic_ctype": 35,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "name": "br-lan",
+      "up": true,
+      "hw_address": "90:f6:52:2a:08:54",
+      "tx_packets": "723395",
+      "rx_packets": "175480144",
+      "tx_bytes": "74711201",
+      "rx_bytes": "20777688907",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "25611",
+      "mtu": 1500
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 53,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "90:f6:52:2a:08:54",
+      "tx_packets": "610364195",
+      "rx_packets": "278039447",
+      "tx_bytes": "1952032499",
+      "rx_bytes": "1555044686",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.interfacemonitor",
+    "pk": 73,
+    "fields": {
+      "polymorphic_ctype": 36,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "name": "wlan0",
+      "up": true,
+      "hw_address": "04:18:d6:21:60:44",
+      "tx_packets": "86121131",
+      "rx_packets": "27931699",
+      "tx_bytes": "273676587",
+      "rx_bytes": "3258486054",
+      "tx_errors": "0",
+      "rx_errors": "0",
+      "tx_drops": "0",
+      "rx_drops": "0",
+      "mtu": null
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 2,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:60:44",
+      "protocol": "bgn",
+      "channel": 6,
+      "channel_width": null,
+      "bitrate": 54100.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -74,
+      "noise": -95,
+      "snr": 21.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 4,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "E8:94:F6:68:87:50",
+      "protocol": "bgn",
+      "channel": 11,
+      "channel_width": null,
+      "bitrate": 115600.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -69,
+      "noise": -95,
+      "snr": 26.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 8,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:58:DF",
+      "protocol": "bgn",
+      "channel": 6,
+      "channel_width": null,
+      "bitrate": 68600.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -58,
+      "noise": -95,
+      "snr": 37.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 9,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:58:DF",
+      "protocol": "an",
+      "channel": 132,
+      "channel_width": null,
+      "bitrate": 90000.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -77,
+      "noise": -95,
+      "snr": 18.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 12,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:5C:FE",
+      "protocol": "bgn",
+      "channel": 6,
+      "channel_width": null,
+      "bitrate": 44200.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -58,
+      "noise": -95,
+      "snr": 37.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 13,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:5C:FE",
+      "protocol": "an",
+      "channel": 124,
+      "channel_width": null,
+      "bitrate": 135000.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -72,
+      "noise": -95,
+      "snr": 23.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 16,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "C0:4A:00:5D:C3:F2",
+      "protocol": "bgn",
+      "channel": 1,
+      "channel_width": null,
+      "bitrate": null,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": null,
+      "noise": -93,
+      "snr": null
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 20,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "C0:4A:00:40:E3:60",
+      "protocol": "bgn",
+      "channel": 1,
+      "channel_width": null,
+      "bitrate": 104700.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -55,
+      "noise": -95,
+      "snr": 40.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 24,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "E8:94:F6:68:84:78",
+      "protocol": "bgn",
+      "channel": 1,
+      "channel_width": null,
+      "bitrate": 115600.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -43,
+      "noise": -95,
+      "snr": 52.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 28,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:59:C8",
+      "protocol": "bgn",
+      "channel": 1,
+      "channel_width": null,
+      "bitrate": 58500.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -71,
+      "noise": -95,
+      "snr": 24.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 29,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:59:C8",
+      "protocol": "an",
+      "channel": 116,
+      "channel_width": null,
+      "bitrate": 81000.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -77,
+      "noise": -95,
+      "snr": 18.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 32,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:5A:1F",
+      "protocol": "bgn",
+      "channel": 11,
+      "channel_width": null,
+      "bitrate": 72200.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -55,
+      "noise": -95,
+      "snr": 40.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 33,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:5A:1F",
+      "protocol": "an",
+      "channel": 108,
+      "channel_width": null,
+      "bitrate": 108000.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -79,
+      "noise": -95,
+      "snr": 16.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 36,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:59:C7",
+      "protocol": "bgn",
+      "channel": 1,
+      "channel_width": null,
+      "bitrate": 40600.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -67,
+      "noise": -95,
+      "snr": 28.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 37,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:59:C7",
+      "protocol": "an",
+      "channel": 100,
+      "channel_width": null,
+      "bitrate": 120600.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -74,
+      "noise": -95,
+      "snr": 21.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 40,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:58:E4",
+      "protocol": "bgn",
+      "channel": 11,
+      "channel_width": null,
+      "bitrate": 60400.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -69,
+      "noise": -95,
+      "snr": 26.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 41,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:58:E4",
+      "protocol": "an",
+      "channel": 64,
+      "channel_width": null,
+      "bitrate": 53200.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -81,
+      "noise": -95,
+      "snr": 14.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 44,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "04:18:D6:22:5F:E6",
+      "protocol": "bgn",
+      "channel": 1,
+      "channel_width": null,
+      "bitrate": 67100.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -60,
+      "noise": -95,
+      "snr": 35.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 45,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:5F:E6",
+      "protocol": "an",
+      "channel": 56,
+      "channel_width": null,
+      "bitrate": 161200.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -71,
+      "noise": -95,
+      "snr": 24.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 50,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "90:F6:52:EA:05:EC",
+      "protocol": "bgn",
+      "channel": 11,
+      "channel_width": null,
+      "bitrate": 68200.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -51,
+      "noise": -95,
+      "snr": 44.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 53,
+    "fields": {
+      "mode": "ap",
+      "essid": "CloyneSlow",
+      "bssid": "90:F6:52:2A:08:54",
+      "protocol": "bgn",
+      "channel": 6,
+      "channel_width": null,
+      "bitrate": 48700.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -58,
+      "noise": -95,
+      "snr": 37.0
+    }
+  },
+  {
+    "model": "monitor.wifiinterfacemonitor",
+    "pk": 73,
+    "fields": {
+      "mode": "ap",
+      "essid": "Cloyne",
+      "bssid": "04:18:D6:21:60:44",
+      "protocol": "an",
+      "channel": 48,
+      "channel_width": null,
+      "bitrate": 122600.0,
+      "rts_threshold": null,
+      "frag_threshold": null,
+      "signal": -71,
+      "noise": -95,
+      "snr": 24.0
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "interface": 1,
+      "family": "ipv4",
+      "address": "10.20.32.40/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "interface": 5,
+      "family": "ipv4",
+      "address": "10.20.32.41/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "interface": 10,
+      "family": "ipv4",
+      "address": "10.20.32.42/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "interface": 14,
+      "family": "ipv4",
+      "address": "10.20.32.43/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "interface": 17,
+      "family": "ipv4",
+      "address": "10.20.32.44/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "interface": 21,
+      "family": "ipv4",
+      "address": "10.20.32.45/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "interface": 25,
+      "family": "ipv4",
+      "address": "10.20.32.46/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "interface": 30,
+      "family": "ipv4",
+      "address": "10.20.32.47/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "interface": 34,
+      "family": "ipv4",
+      "address": "10.20.32.48/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "interface": 38,
+      "family": "ipv4",
+      "address": "10.20.32.49/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "interface": 42,
+      "family": "ipv4",
+      "address": "10.20.32.50/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "interface": 46,
+      "family": "ipv4",
+      "address": "10.20.32.51/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "interface": 49,
+      "family": "ipv4",
+      "address": "10.20.32.52/22"
+    }
+  },
+  {
+    "model": "monitor.networkaddressmonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 37,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "interface": 52,
+      "family": "ipv4",
+      "address": "10.20.32.53/22"
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 100,
+      "all_packets": 10,
+      "successful_packets": 0,
+      "failed_packets": 10,
+      "rtt_minimum": null,
+      "rtt_average": null,
+      "rtt_maximum": null,
+      "rtt_std": null
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.21,
+      "rtt_average": 3.916,
+      "rtt_maximum": 5.07,
+      "rtt_std": 0.749743659896873
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.54,
+      "rtt_average": 5.514,
+      "rtt_maximum": 8.61,
+      "rtt_std": 1.51605628743351
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 100,
+      "all_packets": 10,
+      "successful_packets": 0,
+      "failed_packets": 10,
+      "rtt_minimum": null,
+      "rtt_average": null,
+      "rtt_maximum": null,
+      "rtt_std": null
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.04,
+      "rtt_average": 4.32,
+      "rtt_maximum": 10.82,
+      "rtt_std": 2.34932614452173
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 100,
+      "all_packets": 10,
+      "successful_packets": 0,
+      "failed_packets": 10,
+      "rtt_minimum": null,
+      "rtt_average": null,
+      "rtt_maximum": null,
+      "rtt_std": null
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 7,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.75,
+      "rtt_average": 5.123,
+      "rtt_maximum": 6.72,
+      "rtt_std": 1.00861896780807
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 8,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 100,
+      "all_packets": 10,
+      "successful_packets": 0,
+      "failed_packets": 10,
+      "rtt_minimum": null,
+      "rtt_average": null,
+      "rtt_maximum": null,
+      "rtt_std": null
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 9,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "df93387a-6180-4cde-a854-7cba043c385f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 5.09,
+      "rtt_average": 8.847,
+      "rtt_maximum": 12.18,
+      "rtt_std": 2.39732281236105
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 10,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 100,
+      "all_packets": 10,
+      "successful_packets": 0,
+      "failed_packets": 10,
+      "rtt_minimum": null,
+      "rtt_average": null,
+      "rtt_maximum": null,
+      "rtt_std": null
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 11,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.82,
+      "rtt_average": 4.813,
+      "rtt_maximum": 14.13,
+      "rtt_std": 3.36534974243226
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 12,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.36,
+      "rtt_average": 5.381,
+      "rtt_maximum": 10.2,
+      "rtt_std": 1.96543153305098
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 13,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.91,
+      "rtt_average": 6.244,
+      "rtt_maximum": 19.81,
+      "rtt_std": 5.54124173809445
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 14,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.38,
+      "rtt_average": 5.919,
+      "rtt_maximum": 11.67,
+      "rtt_std": 2.45558071882532
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 15,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "3e2512e2-06a2-4d11-9138-6377e5db9159",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 6.64,
+      "rtt_average": 8.659,
+      "rtt_maximum": 11.66,
+      "rtt_std": 1.7976246672886
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 16,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.77,
+      "rtt_average": 3.796,
+      "rtt_maximum": 5.48,
+      "rtt_std": 0.990411811094532
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 17,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.37,
+      "rtt_average": 6.474,
+      "rtt_maximum": 16.07,
+      "rtt_std": 4.15058550086611
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 18,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.8,
+      "rtt_average": 3.906,
+      "rtt_maximum": 5.4,
+      "rtt_std": 0.798612685988788
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 19,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.47,
+      "rtt_average": 5.437,
+      "rtt_maximum": 11.63,
+      "rtt_std": 2.40736393408041
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 20,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "5a6c2236-6d21-46b5-887e-8e5aff515874",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 6.14,
+      "rtt_average": 8.672,
+      "rtt_maximum": 10.68,
+      "rtt_std": 1.17303784157962
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 21,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.062Z",
+      "end": "2016-08-21T00:29:29.279Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.85,
+      "rtt_average": 3.677,
+      "rtt_maximum": 5.27,
+      "rtt_std": 0.87811730423674
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 22,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.093Z",
+      "end": "2016-08-21T00:29:29.310Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.55,
+      "rtt_average": 4.264,
+      "rtt_maximum": 5.68,
+      "rtt_std": 0.695065144828567
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 23,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.074Z",
+      "end": "2016-08-21T00:29:29.291Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.95,
+      "rtt_average": 4.292,
+      "rtt_maximum": 8.85,
+      "rtt_std": 1.808085543699
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 24,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.107Z",
+      "end": "2016-08-21T00:29:29.330Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.49,
+      "rtt_average": 4.598,
+      "rtt_maximum": 8.27,
+      "rtt_std": 1.50558072959683
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 25,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e994747e-7fa3-454b-b734-a98cc6593972",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.120Z",
+      "end": "2016-08-21T00:29:29.343Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 4.12,
+      "rtt_average": 7.426,
+      "rtt_maximum": 10.56,
+      "rtt_std": 1.90286450735026
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 26,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.8,
+      "rtt_average": 3.982,
+      "rtt_maximum": 7.41,
+      "rtt_std": 1.53879317793017
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 27,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.62,
+      "rtt_average": 5.176,
+      "rtt_maximum": 7.52,
+      "rtt_std": 1.42454047171555
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 28,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.95,
+      "rtt_average": 4.568,
+      "rtt_maximum": 8.14,
+      "rtt_std": 1.78969146937553
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 29,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.66,
+      "rtt_average": 5.107,
+      "rtt_maximum": 7.45,
+      "rtt_std": 1.14923211077851
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 30,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "aa6691bf-e04d-41bf-920f-45ae742f456f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 6.08,
+      "rtt_average": 10.02,
+      "rtt_maximum": 16.92,
+      "rtt_std": 3.75994089788065
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 31,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.53,
+      "rtt_average": 3.727,
+      "rtt_maximum": 4.8,
+      "rtt_std": 0.887481455205307
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 32,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.6,
+      "rtt_average": 6.42,
+      "rtt_maximum": 17.02,
+      "rtt_std": 3.86108217415216
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 33,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.73,
+      "rtt_average": 4.286,
+      "rtt_maximum": 6.15,
+      "rtt_std": 1.09628868866229
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 34,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.65,
+      "rtt_average": 5.797,
+      "rtt_maximum": 8.47,
+      "rtt_std": 1.57355965886267
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 35,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "25d05a2e-6cbc-4da5-83ff-20d9adef56eb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 5.5,
+      "rtt_average": 7.781,
+      "rtt_maximum": 10.34,
+      "rtt_std": 1.83219631408137
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 36,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.062Z",
+      "end": "2016-08-21T00:29:29.279Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.75,
+      "rtt_average": 3.433,
+      "rtt_maximum": 5.44,
+      "rtt_std": 0.85083031341286
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 37,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.093Z",
+      "end": "2016-08-21T00:29:29.310Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.1,
+      "rtt_average": 4.437,
+      "rtt_maximum": 11.03,
+      "rtt_std": 2.47027686257589
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 38,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.074Z",
+      "end": "2016-08-21T00:29:29.291Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.98,
+      "rtt_average": 4.205,
+      "rtt_maximum": 10.21,
+      "rtt_std": 2.14110693074608
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 39,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.107Z",
+      "end": "2016-08-21T00:29:29.330Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.66,
+      "rtt_average": 4.379,
+      "rtt_maximum": 5.45,
+      "rtt_std": 0.693260412832001
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 40,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "bdce5561-230a-409e-8497-d879b0304562",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.120Z",
+      "end": "2016-08-21T00:29:29.343Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 4.75,
+      "rtt_average": 7.658,
+      "rtt_maximum": 11.92,
+      "rtt_std": 2.63626334884139
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 41,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.99,
+      "rtt_average": 4.378,
+      "rtt_maximum": 8.29,
+      "rtt_std": 1.56757278760651
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 42,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.62,
+      "rtt_average": 5.284,
+      "rtt_maximum": 9.34,
+      "rtt_std": 1.74391131272972
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 43,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.23,
+      "rtt_average": 5.083,
+      "rtt_maximum": 8.4,
+      "rtt_std": 1.94664412087401
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 44,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.81,
+      "rtt_average": 4.59,
+      "rtt_maximum": 6.02,
+      "rtt_std": 0.643514654931114
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 45,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "48f45ac9-e326-4417-8e78-a6a041984a7e",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 10,
+      "all_packets": 10,
+      "successful_packets": 9,
+      "failed_packets": 1,
+      "rtt_minimum": 6.78,
+      "rtt_average": 9.11222222222222,
+      "rtt_maximum": 12.28,
+      "rtt_std": 2.21003833551467
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 46,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.66,
+      "rtt_average": 3.955,
+      "rtt_maximum": 5.37,
+      "rtt_std": 0.727022084335211
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 47,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.22,
+      "rtt_average": 5.105,
+      "rtt_maximum": 8.46,
+      "rtt_std": 1.67832754053949
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 48,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.71,
+      "rtt_average": 3.758,
+      "rtt_maximum": 5.6,
+      "rtt_std": 0.902069226217634
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 49,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.56,
+      "rtt_average": 4.81,
+      "rtt_maximum": 6.25,
+      "rtt_std": 0.914901330441949
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 50,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "e6eb00ea-6582-4aef-b012-12319c21cafb",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 5.36,
+      "rtt_average": 9.205,
+      "rtt_maximum": 12.17,
+      "rtt_std": 2.25495134217028
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 51,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.062Z",
+      "end": "2016-08-21T00:29:29.279Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.67,
+      "rtt_average": 3.25,
+      "rtt_maximum": 3.98,
+      "rtt_std": 0.473239427304562
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 52,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.093Z",
+      "end": "2016-08-21T00:29:29.310Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.31,
+      "rtt_average": 3.752,
+      "rtt_maximum": 5.42,
+      "rtt_std": 0.647435968519925
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 53,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.074Z",
+      "end": "2016-08-21T00:29:29.291Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.02,
+      "rtt_average": 4.151,
+      "rtt_maximum": 6.89,
+      "rtt_std": 1.38002777749822
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 54,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.107Z",
+      "end": "2016-08-21T00:29:29.330Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.69,
+      "rtt_average": 4.922,
+      "rtt_maximum": 8.83,
+      "rtt_std": 1.54930665496251
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 55,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "51c9b0a5-a0a9-4a39-97c5-5942d5d8164c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.120Z",
+      "end": "2016-08-21T00:29:29.343Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 7.2,
+      "rtt_average": 9.834,
+      "rtt_maximum": 15.39,
+      "rtt_std": 2.51191029563822
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 56,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.062Z",
+      "end": "2016-08-21T00:29:29.279Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.76,
+      "rtt_average": 3.576,
+      "rtt_maximum": 4.72,
+      "rtt_std": 0.594926699499846
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 57,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.093Z",
+      "end": "2016-08-21T00:29:29.310Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.33,
+      "rtt_average": 5.031,
+      "rtt_maximum": 14.21,
+      "rtt_std": 3.2743394584082
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 58,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.074Z",
+      "end": "2016-08-21T00:29:29.291Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.0,
+      "rtt_average": 4.049,
+      "rtt_maximum": 6.43,
+      "rtt_std": 1.21622777471985
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 59,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.107Z",
+      "end": "2016-08-21T00:29:29.330Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.8,
+      "rtt_average": 4.277,
+      "rtt_maximum": 5.85,
+      "rtt_std": 0.596956168128505
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 60,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "0efadf86-99db-4915-86eb-541ad1a2cf0c",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.120Z",
+      "end": "2016-08-21T00:29:29.343Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 4.84,
+      "rtt_average": 8.071,
+      "rtt_maximum": 11.17,
+      "rtt_std": 2.1674534468921
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 61,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.88,
+      "rtt_average": 4.642,
+      "rtt_maximum": 10.29,
+      "rtt_std": 2.47365586396599
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 62,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.41,
+      "rtt_average": 4.819,
+      "rtt_maximum": 10.56,
+      "rtt_std": 2.05749821115084
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 63,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.02,
+      "rtt_average": 4.541,
+      "rtt_maximum": 7.43,
+      "rtt_std": 1.51903075822856
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 64,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.93,
+      "rtt_average": 5.628,
+      "rtt_maximum": 8.4,
+      "rtt_std": 1.48341048488497
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 65,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "d6b1f709-e6a9-4d5d-a6c9-c796b2de2c1f",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 5.93,
+      "rtt_average": 10.366,
+      "rtt_maximum": 14.52,
+      "rtt_std": 2.61515752659163
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 66,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.016Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.89,
+      "rtt_average": 3.693,
+      "rtt_maximum": 5.34,
+      "rtt_std": 0.752684824109303
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 67,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.059Z",
+      "end": "2016-08-21T00:28:29.306Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.32,
+      "rtt_average": 6.018,
+      "rtt_maximum": 13.98,
+      "rtt_std": 3.56086381529975
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 68,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.041Z",
+      "end": "2016-08-21T00:28:29.269Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.86,
+      "rtt_average": 4.519,
+      "rtt_maximum": 7.9,
+      "rtt_std": 1.50218692430588
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 69,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.079Z",
+      "end": "2016-08-21T00:28:29.334Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.82,
+      "rtt_average": 5.695,
+      "rtt_maximum": 7.21,
+      "rtt_std": 1.01457434972067
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 70,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "264f092c-4ee5-4663-b0a0-61f99db55fd2",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:28:25.091Z",
+      "end": "2016-08-21T00:28:29.322Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 5.29,
+      "rtt_average": 8.918,
+      "rtt_maximum": 14.43,
+      "rtt_std": 2.72095898127439
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 71,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.062Z",
+      "end": "2016-08-21T00:29:29.279Z",
+      "packet_size": 56,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.79,
+      "rtt_average": 3.308,
+      "rtt_maximum": 4.75,
+      "rtt_std": 0.540366131021881
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 72,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.093Z",
+      "end": "2016-08-21T00:29:29.310Z",
+      "packet_size": 500,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.22,
+      "rtt_average": 4.596,
+      "rtt_maximum": 6.77,
+      "rtt_std": 1.13594013926791
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 73,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.074Z",
+      "end": "2016-08-21T00:29:29.291Z",
+      "packet_size": 100,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 2.81,
+      "rtt_average": 3.982,
+      "rtt_maximum": 7.14,
+      "rtt_std": 1.23557274168703
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 74,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.107Z",
+      "end": "2016-08-21T00:29:29.330Z",
+      "packet_size": 1000,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 3.69,
+      "rtt_average": 4.289,
+      "rtt_maximum": 6.18,
+      "rtt_std": 0.759684876189535
+    }
+  },
+  {
+    "model": "monitor.rttmeasurementmonitor",
+    "pk": 75,
+    "fields": {
+      "polymorphic_ctype": 38,
+      "display_order": null,
+      "annotations": {},
+      "root": "62e3b05f-e0b9-4c4d-9961-ceba4a3df787",
+      "source": "1ac1e408-6ba5-417d-8b3f-74dc2e768130",
+      "start": "2016-08-21T00:29:25.120Z",
+      "end": "2016-08-21T00:29:29.343Z",
+      "packet_size": 1480,
+      "packet_loss": 0,
+      "all_packets": 10,
+      "successful_packets": 10,
+      "failed_packets": 0,
+      "rtt_minimum": 5.57,
+      "rtt_average": 8.047,
+      "rtt_maximum": 13.45,
+      "rtt_std": 2.7186477439263
+    }
+  }
+]
