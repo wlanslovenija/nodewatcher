@@ -1,15 +1,11 @@
 import io
 import json
 import os
-
-from django import test as django_test
 import unittest
 
-from django.core import management
+from django import test as django_test
 
 from . import allocation_algorithms
-
-from nodewatcher.core.monitor import models as wifi_models
 
 
 class ChannelAllocationTestCase(django_test.TestCase):
