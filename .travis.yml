@@ -1,3 +1,4 @@
+dist: trusty
 language: python
 python:
  - 2.7
@@ -6,19 +7,11 @@ services:
  - mongodb
  - postgresql
 addons:
-  postgresql: "9.3"
+  postgresql: "9.5"
 before_install:
  - sudo add-apt-repository --yes ppa:fontforge/fontforge
  - sudo apt-get update
- - cat packages.txt | sudo DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
- - cat /etc/apt/sources.list.d/pgdg-source.list || true
- - cat /etc/apt/sources.list.d/ubuntugis-stable-source.list || true
- - sudo rm -f /etc/apt/sources.list.d/pgdg-source.list /etc/apt/sources.list.d/ubuntugis-stable-source.list
- - sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ trusty main restricted universe" >> /etc/apt/sources.list.d/pgdg-source.list'
- - sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg-source.list'
- - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
- - sudo apt-get update
- - sudo DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -y --force-yes install postgresql-9.3-postgis-2.1 libgeos-c1
+ - cat packages.txt | grep -v postgresql- | grep -v libgeos-c1 | sudo DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
  - sudo rm -rf /dev/shm
  - sudo ln -s /run/shm /dev/shm
  - cp /usr/lib/python2.7/dist-packages/fontforge.* /home/travis/virtualenv/python2.7/lib/python2.7/site-packages
