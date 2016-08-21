@@ -218,22 +218,22 @@ def greedy_color_with_constraints(nx_graph, channels={}):
 def optimal_channel(nx_graph, node, channel_width=20):
     """
     Returns the optimal frequency range for a node with the specified channel width to minimize interference
-     from neighboring nodes. 
+    from neighboring nodes.
      
-     The algorithm first checks if the currently assigned channel is completely noiseless. If so, the currently assigned
-     channel is kept. Otherwise, we perform a linear sweep, keeping track of the smallest interference we encountered 
-     thus far along with the frequency range which has minimized interference. We return the optimal frequency along 
-     with its interference.
+    The algorithm first checks if the currently assigned channel is completely noiseless. If so, the currently assigned
+    channel is kept. Otherwise, we perform a linear sweep, keeping track of the smallest interference we encountered
+    thus far along with the frequency range which has minimized interference. We return the optimal frequency along
+    with its interference.
 
-     In case no frequencies are available, the algorithm will return an interference value of 0, which is too high
-     to ever be used.
+    In case no frequencies are available, the algorithm will return an interference value of 0, which is too high
+    to ever be used.
 
     :param nx_graph: NX graph.
     :param node: Node in a graph for which we're optimizing the frequency selection
     :param channel_width: Channel width in MHz.
     :return: The optimal frequency and its interference in dB.
     """
-    
+
     # TODO: Tweak the noise floor constant.
     noise_floor = -95
 
@@ -247,7 +247,7 @@ def optimal_channel(nx_graph, node, channel_width=20):
     frequency_range_empty = True
     best_frequency_so_far = None
     smallest_interference_so_far = 0
-    for frequency_iterator in range(current_frequency, current_frequency+channel_width+1):
+    for frequency_iterator in range(current_frequency, current_frequency + channel_width + 1):
         if frequency_iterator in frequency_list:
             frequency_range_empty = False
     if frequency_range_empty:
@@ -257,7 +257,7 @@ def optimal_channel(nx_graph, node, channel_width=20):
         # Current channel cannot be used. Perform a linear sweep to minimize interference.
         for frequency in available_frequencies:
             current_interference = noise_floor
-            for freq in range(frequency, frequency+channel_width+1):
+            for freq in range(frequency, frequency + channel_width + 1):
                 if freq in frequency_list:
                     current_interference = signal_processing.combine_power(
                         frequency_list[freq],
