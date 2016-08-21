@@ -11,6 +11,7 @@ class MQMakerWiTiv2(cgm_devices.DeviceBase):
     manufacturer = "MQMaker"
     url = 'https://mqmaker.com/product/witi-board/'
     architecture = 'ramips_mt7621'
+    usb = True
     radios = [
         cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio (5 GHz)", [
             cgm_protocols.IEEE80211AN(

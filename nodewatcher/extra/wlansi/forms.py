@@ -444,6 +444,9 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         )
 
         def get_project_ssid(purpose, default=None, attribute='essid'):
+            if attribute == 'essid' and 'hostname-essid' in network_profiles:
+                return general_config.name
+
             try:
                 ssid = getattr(project_config.project.ssids.get(purpose=purpose), attribute)
             except project_models.SSID.DoesNotExist:
