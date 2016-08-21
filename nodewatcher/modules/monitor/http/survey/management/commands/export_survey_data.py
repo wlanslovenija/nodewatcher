@@ -6,8 +6,7 @@ from django.core.management import base
 from django.core.serializers import json as django_json
 
 from nodewatcher.utils import trimming
-
-from django_datastream import datastream
+from nodewatcher.modules.monitor.http.survey import extract_nodes
 
 
 class Command(base.BaseCommand):
@@ -61,7 +60,7 @@ class Command(base.BaseCommand):
             except ValueError:
                 raise base.CommandError("Unable to parse the 'at' argument.")
 
-        graph = all_nodes_survey_graph(at)
+        graph = extract_nodes.all_nodes_survey_graph(at)
 
         # TODO: "unicode" does not exist anymore in Python 3.5.
         #       But json.dumps returns there a normal string, and not once str and once unicode like in Python 2.
@@ -82,58 +81,3 @@ class Command(base.BaseCommand):
 
         if options['verbosity'] >= 2:
             self.stderr.write(self.style.SUCCESS("Successfully exported survey data."))
-
-
-def all_nodes_survey_graph(at):
-    """
-    Returns a graph of the site survey data for a specified time. Only the latest datapoint for
-    each node between the specified time and two hours preceding the time will be used.
-
-    :param at: A datetime object.
-    :return: A dictionary that contains the graph under the "graph" key.
-    """
-
-    streams = datastream.find_streams({'module': 'monitor.http.survey'})
-
-    vertices = []
-    edges = []
-    # List of BSSIDs of known nodes.
-    known_nodes = []
-    latest_datapoint_time = None
-
-    for stream in streams:
-        datapoints = datastream.get_data(
-            stream_id=stream['stream_id'],
-            granularity=stream['highest_granularity'],
-            start=(at - datetime.timedelta(hours=2)),
-            end=at,
-            reverse=True,
-        )
-        try:
-            stream_graph = datapoints[0]['v']
-            for vertex in stream_graph['v']:
-                vertices.append(vertex)
-                if 'b' in vertex:
-                    known_nodes.append(vertex['i'])
-                    for bssid in vertex['b']:
-                        known_nodes.append(bssid)
-            for edge in stream_graph['e']:
-                edges.append(edge)
-            if not latest_datapoint_time or datapoints[0]['t'] > latest_datapoint_time:
-                latest_datapoint_time = datapoints[0]['t']
-        except IndexError:
-            pass
-
-    if not vertices or not edges:
-        raise base.CommandError("Insufficient survey data in the datastream for the specified time.")
-
-    exported_graph = {
-        'graph': {
-            'v': vertices,
-            'e': edges,
-        },
-        'known_nodes': known_nodes,
-        'timestamp': latest_datapoint_time
-    }
-
-    return exported_graph
