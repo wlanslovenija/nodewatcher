@@ -219,7 +219,7 @@ def optimal_channel(nx_graph, node, channel_width=20):
     """
     Returns the optimal frequency range for a node with the specified channel width to minimize interference
     from neighboring nodes.
-     
+
     The algorithm first checks if the currently assigned channel is completely noiseless. If so, the currently assigned
     channel is kept. Otherwise, we perform a linear sweep, keeping track of the smallest interference we encountered
     thus far along with the frequency range which has minimized interference. We return the optimal frequency along
