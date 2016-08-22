@@ -29,10 +29,12 @@ def allocation(self):
     interface_dict = allocation_algorithms.meta_algorithm(extracted_graph['graph'], extracted_graph['known_nodes'])
 
     for interface in interface_dict:
-        n = models.NodeChannel(
+        n, created = models.NodeChannel.objects.get_or_create(
             interface=wifi_models.WifiInterfaceMonitor.objects.get(bssid=interface),
-            optimal_start_frequency=interface_dict[interface]['freq'],
-            optimal_channel_width=interface_dict[interface]['width'],
-            optimal_channel_interference=interface_dict[interface]['interference'],
+            defaults={
+                'optimal_start_frequency': interface_dict[interface]['freq'],
+                'optimal_channel_width': interface_dict[interface]['width'],
+                'optimal_channel_interference': interface_dict[interface]['interference'],
+            }
         )
         n.save()
