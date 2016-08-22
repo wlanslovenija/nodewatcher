@@ -9,7 +9,7 @@ from . import allocation_algorithms
 
 
 class ChannelAllocationTestCase(django_test.TestCase):
-    fixtures = ['/nodewatcher/modules/analysis/channel_allocation/fixtures/cloyne_wifi_monitor_fixtures']
+    fixtures = ['cloyne_wifi_monitor_fixtures']
 
     def __init__(self, method_name, test_filename):
         self.test_filename = test_filename
