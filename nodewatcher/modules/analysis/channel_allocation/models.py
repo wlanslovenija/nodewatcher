@@ -8,7 +8,6 @@ class NodeChannel(models.Model):
         monitor_models.WifiInterfaceMonitor,
         on_delete=models.CASCADE,
     )
-    channel_width = models.PositiveIntegerField()
     optimal_start_frequency = models.PositiveIntegerField()
     optimal_channel_width = models.PositiveIntegerField()
-    optimal_channel_interference = models.PositiveIntegerField()
+    optimal_channel_interference = models.FloatField()
