@@ -250,7 +250,7 @@ INSTALLED_APPS = (
 
     # Modules.
     #'nodewatcher.modules.analysis.rogue_nodes',
-    #'nodewatcher.modules.analysis.channel_allocation',
+    'nodewatcher.modules.analysis.channel_allocation',
     'nodewatcher.modules.administration.types',
     'nodewatcher.modules.administration.projects',
     'nodewatcher.modules.administration.location',
