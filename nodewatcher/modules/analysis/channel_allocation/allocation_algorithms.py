@@ -282,7 +282,7 @@ def optimal_channel(nx_graph, node, channel_width=20):
 
 def list_neighbor_channels(nx_graph, node):
     """
-    Goes through all neighbors and adds their signal strength to the interference it experiences..
+    Goes through all neighbors and adds their signal strength to the interference it experiences.
 
     :param nx_graph: NX graph.
     :param node: Node whose neighbors need to be sorted.
