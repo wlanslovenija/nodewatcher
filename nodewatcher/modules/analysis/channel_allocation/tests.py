@@ -4,6 +4,7 @@ import os
 import unittest
 
 from django import test as django_test
+from django.conf import settings
 
 from . import allocation_algorithms
 
@@ -18,6 +19,10 @@ class ChannelAllocationTestCase(django_test.TestCase):
     def __hash__(self):
         return hash((type(self), self._testMethodName, self.test_filename))
 
+    @unittest.skipIf(
+        condition='nodewatcher.modules.analysis.channel_allocation' not in settings.INSTALLED_APPS,
+        reason="Skipping channel_allocation tests since the app is not used."
+    )
     def run_test(self):
         # Run the algorithm on the file and store the results.
         with io.open(self.test_filename, encoding='utf-8') as input_graph_file:
