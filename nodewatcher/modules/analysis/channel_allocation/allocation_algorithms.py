@@ -301,8 +301,8 @@ def list_neighbor_channels(nx_graph, node):
                 neighbor_channels[frequency] = new_interference[frequency]
             else:
                 neighbor_channels[frequency] = signal_processing.combine_power(
-                    neighbor_channels[frequency],
-                    new_interference[frequency]
+                    signal1=neighbor_channels[frequency],
+                    signal2=new_interference[frequency],
                 )
 
     return neighbor_channels
