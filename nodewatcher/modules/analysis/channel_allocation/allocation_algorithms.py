@@ -91,6 +91,13 @@ def meta_algorithm(graph, known_nodes):
 
 
 def channel_to_frequency(channel):
+    """
+    Returns a start frequency associated to a particular channel.
+
+    :param channel: Number representing the channel of a node.
+    :return: Number denoting the start frequency.
+    """
+
     ch_to_freq = {
         '1': 2412,
         '2': 2417,
@@ -149,6 +156,7 @@ def channel_to_frequency(channel):
         '161': 5805,
         '165': 5825
     }
+
     return ch_to_freq[str(channel)]
 
 
