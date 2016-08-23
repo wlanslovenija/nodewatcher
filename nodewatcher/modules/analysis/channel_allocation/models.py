@@ -1,4 +1,5 @@
 from django.db import models
+
 from nodewatcher.core.monitor import models as monitor_models
 
 
