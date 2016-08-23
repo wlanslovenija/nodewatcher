@@ -12,7 +12,9 @@ def meta_algorithm(graph, known_nodes):
     :return: A dictionary with two k-v pairs, one for each frequency spectrum. Keys are "2.4GHz" and "5GHz".
     """
 
-    highest_2ghz_channel = 11
+    # TODO: Remove hard-coded channel list.
+    ch_2ghz = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    highest_2ghz_channel = max(ch_2ghz)
 
     nx_2ghz_graph = nx.Graph()
     nx_5ghz_graph = nx.Graph()
