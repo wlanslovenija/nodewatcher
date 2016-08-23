@@ -35,6 +35,6 @@ def allocation(self):
                 'optimal_start_frequency': interface_dict[interface]['freq'],
                 'optimal_channel_width': interface_dict[interface]['width'],
                 'optimal_channel_interference': interface_dict[interface]['interference'],
-            }
+            },
         )
         n.save()
