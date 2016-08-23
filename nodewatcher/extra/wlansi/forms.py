@@ -291,7 +291,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                                 'description': "AP-LAN Client Access",
                                 'routing_announces': ['olsr', 'babel'],
                                 'family': 'ipv4',
-                                'pool': clients_network_defaults.pool,
+                                'pool': getattr(clients_network_defaults, 'pool', None),
                                 'prefix_length': clients_network_defaults.prefix_length,
                                 'lease_type': 'dhcp',
                                 'lease_duration': clients_network_defaults.lease_duration,
