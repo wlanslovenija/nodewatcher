@@ -84,7 +84,6 @@ def meta_algorithm(graph, known_nodes):
             'width': optimal_5ghz_graph[node]['width'],
             'interference': optimal_5ghz_graph[node]['interference'],
             'current_interference': optimal_5ghz_graph[node]['current_interference'],
-
         }
 
     return channel_allocations
