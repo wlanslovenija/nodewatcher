@@ -1,7 +1,6 @@
 import networkx as nx
 
-from nodewatcher.modules.analysis.channel_allocation import channel_lookup
-from nodewatcher.modules.analysis.channel_allocation import signal_processing
+from . import channel_lookup, signal_processing
 
 
 def meta_algorithm(graph, known_nodes):
