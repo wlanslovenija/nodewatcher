@@ -4,7 +4,6 @@ from nodewatcher.core.monitor import models as monitor_models
 
 
 class NodeChannel(models.Model):
-
     interface = models.ForeignKey(
         monitor_models.WifiInterfaceMonitor,
         on_delete=models.CASCADE,
