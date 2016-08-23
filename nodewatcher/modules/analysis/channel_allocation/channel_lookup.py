@@ -17,6 +17,17 @@ freq_list_5ghz_40mhz = [5170, 5210, 5250, 5290, 5490, 5530, 5570, 5610, 5650, 56
 freq_list_5ghz_80mhz = [5170, 5250, 5490, 5570, 5650, 5735]
 
 
+def get_interface_from_bssid(node_bssid):
+    """
+    Returns the WifiInterfaceMonitor objects associated to the bssid.
+
+    :param node_bssid: BSSID address on which we're performing the lookup.
+    :return: WifiInterfaceMonitor object associated to the bssid.
+    """
+
+    return models.WifiInterfaceMonitor.objects.get(bssid=node_bssid)
+
+
 def get_channel(node_bssid):
     """
     Returns the current channel of the BSSID.
@@ -25,7 +36,8 @@ def get_channel(node_bssid):
     :return: Channel currently assigned to that network interface.
     """
 
-    return models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel
+    node = get_interface_from_bssid(node_bssid)
+    return node.channel
 
 
 def is_2ghz_bssid(node_bssid):
@@ -36,7 +48,8 @@ def is_2ghz_bssid(node_bssid):
     :return: Boolean whether the BSSID belongs to the 2.4ghz spectrum or not.
     """
 
-    return models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel <= highest_2ghz_channel
+    node = get_interface_from_bssid(node_bssid)
+    return node.channel <= highest_2ghz_channel
 
 
 def get_available_frequencies(node_bssid, channel_width):
@@ -47,7 +60,8 @@ def get_available_frequencies(node_bssid, channel_width):
     :return: Array of available channels.
     """
 
-    if models.WifiInterfaceMonitor.objects.filter(bssid=node_bssid)[0].channel <= highest_2ghz_channel:
+    node = get_interface_from_bssid(node_bssid)
+    if node.channel <= highest_2ghz_channel:
         if channel_width == 20:
             return freq_list_2ghz_20mhz
         elif channel_width == 40:
