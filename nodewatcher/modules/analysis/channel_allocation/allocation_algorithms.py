@@ -186,7 +186,7 @@ def greedy_color_with_constraints(nx_graph, channels={}):
     :return: A dictionary of all nodes that were assigned a frequency band, along with its interference.
     """
 
-    # Constant that needs to be tweaked.
+    # TODO: Constant that needs to be tweaked.
     cutoff_factor = 1.2
 
     channel_dictionary = {}
