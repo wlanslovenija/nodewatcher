@@ -1,0 +1,134 @@
+{
+    "04:18:D6:21:58:DF": {
+        "current_interference": -95,
+        "freq": 5660,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:58:E4": {
+        "current_interference": -95,
+        "freq": 5320,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:59:C7": {
+        "current_interference": -95,
+        "freq": 5500,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:59:C8": {
+        "current_interference": -95,
+        "freq": 5490,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:5A:1F": {
+        "current_interference": -95,
+        "freq": 5170,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:5C:FE": {
+        "current_interference": -95,
+        "freq": 5620,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:5F:E6": {
+        "current_interference": -95,
+        "freq": 5170,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:21:60:44": {
+        "current_interference": -95,
+        "freq": 5240,
+        "interference": -95,
+        "width": 80
+    },
+    "04:18:D6:22:58:DF": {
+        "current_interference": -37.941350199395934,
+        "freq": 2462,
+        "interference": -81.932592183799,
+        "width": 20
+    },
+    "04:18:D6:22:58:E4": {
+        "current_interference": -71.96561808060775,
+        "freq": 2462,
+        "interference": -71.96561808060775,
+        "width": 20
+    },
+    "04:18:D6:22:59:C7": {
+        "current_interference": -32.007419386211566,
+        "freq": 2462,
+        "interference": -40.99941590825991,
+        "width": 20
+    },
+    "04:18:D6:22:59:C8": {
+        "current_interference": -44.76245049016096,
+        "freq": 2442,
+        "interference": -77.72983151837133,
+        "width": 40
+    },
+    "04:18:D6:22:5A:1F": {
+        "current_interference": -44.99883248827644,
+        "freq": 2437,
+        "interference": -62.93207764300989,
+        "width": 20
+    },
+    "04:18:D6:22:5C:FE": {
+        "current_interference": -39.70775510993414,
+        "freq": 2412,
+        "interference": -70.59718011020571,
+        "width": 20
+    },
+    "04:18:D6:22:5F:E6": {
+        "current_interference": -72.31541737737798,
+        "freq": 2412,
+        "interference": -72.31541737737798,
+        "width": 20
+    },
+    "04:18:D6:22:60:44": {
+        "current_interference": -36.98514250178979,
+        "freq": 2462,
+        "interference": -70.55896507876007,
+        "width": 20
+    },
+    "90:F6:52:2A:08:54": {
+        "current_interference": -64.85330267499133,
+        "freq": 2437,
+        "interference": -64.85330267499133,
+        "width": 20
+    },
+    "90:F6:52:EA:05:EC": {
+        "current_interference": -38.82838873893347,
+        "freq": 2437,
+        "interference": -66.74306689023183,
+        "width": 20
+    },
+    "C0:4A:00:40:E3:60": {
+        "current_interference": -42.89669044513549,
+        "freq": 2462,
+        "interference": -77.12980926100292,
+        "width": 20
+    },
+    "C0:4A:00:5D:C3:F2": {
+        "current_interference": -52.010081782436764,
+        "freq": 2437,
+        "interference": -73.97585774285037,
+        "width": 20
+    },
+    "E8:94:F6:68:84:78": {
+        "current_interference": -64.59203283103182,
+        "freq": 2437,
+        "interference": -67.24680270545817,
+        "width": 20
+    },
+    "E8:94:F6:68:87:50": {
+        "current_interference": -95,
+        "freq": 2442,
+        "interference": -54.87633952051331,
+        "width": 40
+    }
+}
