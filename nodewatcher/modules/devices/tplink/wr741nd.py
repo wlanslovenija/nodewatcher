@@ -69,7 +69,8 @@ class TPLinkWR741NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR741',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -86,7 +87,8 @@ class TPLinkWR741NDv2(TPLinkWR741NDv1):
         'openwrt': {
             'name': 'TLWR741',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -103,12 +105,13 @@ class TPLinkWR741NDv4(TPLinkWR741NDv1):
         'openwrt': {
             'name': 'TLWR741',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin'
+                'openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin',
+                'openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-sysupgrade.bin'
             ]
         }
     }
 
-# Register the TP-Link WR741ND device
+# Register the TP-Link WR741ND devices.
 cgm_base.register_device('openwrt', TPLinkWR741NDv1)
 cgm_base.register_device('openwrt', TPLinkWR741NDv2)
 cgm_base.register_device('openwrt', TPLinkWR741NDv4)
