@@ -22,17 +22,12 @@ class Koruza(monitor_processors.NodeProcessor):
 
         version = context.http.get_module_version('irnas.koruza')
 
-        koruza = node.monitoring.irnas.koruza(create=models.KoruzaMonitor)
-        koruza.mcu_connected = None
-        koruza.motor_x = None
-        koruza.motor_y = None
-
         if version >= 1:
+            koruza = node.monitoring.irnas.koruza(create=models.KoruzaMonitor)
             status = context.http.irnas.koruza.status
             koruza.mcu_connected = bool(status.connected)
             koruza.motor_x = int(status.motors.x)
             koruza.motor_y = int(status.motors.y)
-
-        koruza.save()
+            koruza.save()
 
         return context
