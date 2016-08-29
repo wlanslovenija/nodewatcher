@@ -59,7 +59,7 @@ class SurveyInfo(monitor_processors.NodeProcessor):
             # Unsupported version or data fetch failed
             return context
 
-        edges, vertices = [], []
+        edges, vertices, vertex_ids = [], [], set()
         try:
             source_vertex_bssids = [interface.bssid for interface in context.http.core.wireless.interfaces.values()]
             source_vertex = {
@@ -67,10 +67,14 @@ class SurveyInfo(monitor_processors.NodeProcessor):
                 'b': source_vertex_bssids,
             }
             vertices.append(source_vertex)
+            vertex_ids.add(str(node.uuid))
 
             for radio in context.http.core.wireless.radios.values():
                 for neighbor in radio.survey:
-                    vertices.append({'i': neighbor['bssid']})
+                    if neighbor['bssid'] not in vertex_ids:
+                        vertices.append({'i': neighbor['bssid']})
+                        vertex_ids.add(neighbor['bssid'])
+
                     # Add an edge for that neighbor.
                     edge = {
                         'f': str(node.uuid),
@@ -91,15 +95,17 @@ class SurveyInfo(monitor_processors.NodeProcessor):
         streams = datastream.find_streams({'node': node.uuid, 'module': 'monitor.http.survey'})
         if streams:
             assert len(streams) == 1
-            datapoint_iterator = datastream.get_data(
-                stream_id=streams[0]['stream_id'],
-                granularity=streams[0]['highest_granularity'],
-                start=streams[0]['latest_datapoint'],
-                reverse=True,
-            )
+
             try:
+                datapoint_iterator = datastream.get_data(
+                    stream_id=streams[0]['stream_id'],
+                    granularity=streams[0]['highest_granularity'],
+                    start=streams[0]['latest_datapoint'],
+                    reverse=True,
+                )
+
                 latest_stored_graph = datapoint_iterator[0]['v']
-            except IndexError:
+            except (IndexError, AttributeError):
                 pass
 
         latest_graph = {
