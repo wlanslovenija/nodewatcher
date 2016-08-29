@@ -306,6 +306,8 @@ INSTALLED_APPS = (
 
     # IRNAS extra modules.
     'nodewatcher.extra.irnas.koruza',
+    'nodewatcher.extra.irnas.koruzav2',
+    'nodewatcher.extra.irnas.sfp',
 
     # Importers for external data.
     'nodewatcher.modules.importer.nw2',
@@ -460,6 +462,8 @@ TELEMETRY_PROCESSOR_PIPELINE = (
     'nodewatcher.modules.routing.olsr.processors.NodeTopology',
     'nodewatcher.modules.routing.babel.processors.BabelTopology',
     'nodewatcher.modules.sensors.generic.processors.GenericSensors',
+    'nodewatcher.extra.irnas.koruzav2.processors.Koruza',
+    'nodewatcher.extra.irnas.sfp.processors.SFP',
     'nodewatcher.modules.vpn.tunneldigger.processors.DatastreamTunneldigger',
     'nodewatcher.modules.administration.status.processors.NodeStatus',
     'nodewatcher.modules.monitor.datastream.processors.NodeDatastream',
