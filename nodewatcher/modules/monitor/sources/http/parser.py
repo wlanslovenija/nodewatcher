@@ -2,6 +2,8 @@ import errno
 import json
 import httplib
 
+from django.conf import settings
+
 
 class HttpTelemetryParseFailed(Exception):
     error = None
@@ -65,9 +67,13 @@ class HttpTelemetryParser(object):
             return self.data
 
         # Create our own HTTP connection so we can use a successful TCP connection as
-        # a signal that the node is up. We use a short timeout (2 s) to see if we
-        # can establish a connection.
-        connection = httplib.HTTPConnection(self.host, self.port, timeout=2)
+        # a signal that the node is up. We use a short timeout to see if we can establish
+        # a connection.
+        connection = httplib.HTTPConnection(
+            self.host,
+            self.port,
+            timeout=getattr(settings, 'MONITOR_HTTP_POLL_CONNECT_TIMEOUT', 2)
+        )
         try:
             try:
                 connection.connect()
@@ -81,7 +87,7 @@ class HttpTelemetryParser(object):
 
             try:
                 # A longer timeout to retrieve the data.
-                connection.sock.settimeout(15)
+                connection.sock.settimeout(getattr(settings, 'MONITOR_HTTP_POLL_READ_TIMEOUT', 15))
                 connection.request('GET', url)
                 return connection.getresponse().read()
             except (httplib.HTTPException, IOError):

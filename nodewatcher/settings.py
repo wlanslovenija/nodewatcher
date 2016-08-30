@@ -537,6 +537,10 @@ MONITOR_RUNS = {
 MONITOR_HTTP_PUSH_RUN = 'telemetry-push'
 # Base host that should be used for HTTP push. Must be reachable from nodes.
 MONITOR_HTTP_PUSH_HOST = '127.0.0.1'
+# Timeout when establishing a connection during HTTP polling.
+MONITOR_HTTP_POLL_CONNECT_TIMEOUT = 2
+# Timeout when reading data over an established connection during HTTP polling.
+MONITOR_HTTP_POLL_READ_TIMEOUT = 15
 
 # Backend for the monitoring data archive.
 DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
