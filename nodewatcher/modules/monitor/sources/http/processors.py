@@ -115,14 +115,14 @@ class HTTPTelemetry(monitor_processors.NodeProcessor):
             # Remove the warning if it is present.
             if hasattr(node.config.core.general(), 'router'):
                 monitor_events.TelemetryProcessingFailed(node, method='http').absent()
-        except telemetry_parser.HttpTelemetryParseFailed:
+        except telemetry_parser.HttpTelemetryParseFailed, failure:
             # If the node responded in some way, set the appropriate flag.
             if parser.node_responds:
                 context.node_responds = True
 
             # Create a warning in case the router has an associated firmware configuration.
             if hasattr(node.config.core.general(), 'router') and context.node_responds:
-                monitor_events.TelemetryProcessingFailed(node, method='http').post()
+                monitor_events.TelemetryProcessingFailed(node, method='http', error=failure.error).post()
 
         return context
 

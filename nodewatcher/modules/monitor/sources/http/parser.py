@@ -4,7 +4,19 @@ import httplib
 
 
 class HttpTelemetryParseFailed(Exception):
-    pass
+    error = None
+
+
+class FailedToConnect(HttpTelemetryParseFailed):
+    error = 'connect'
+
+
+class FailedToFetchData(HttpTelemetryParseFailed):
+    error = 'fetch'
+
+
+class FailedToParseData(HttpTelemetryParseFailed):
+    error = 'parse'
 
 
 class HttpTelemetryParser(object):
@@ -65,7 +77,7 @@ class HttpTelemetryParser(object):
                 if error.errno in (errno.ECONNREFUSED, errno.ECONNRESET):
                     self.node_responds = True
 
-                raise HttpTelemetryParseFailed
+                raise FailedToConnect
 
             try:
                 # A longer timeout to retrieve the data.
@@ -73,7 +85,7 @@ class HttpTelemetryParser(object):
                 connection.request('GET', url)
                 return connection.getresponse().read()
             except (httplib.HTTPException, IOError):
-                raise HttpTelemetryParseFailed
+                raise FailedToFetchData
         finally:
             connection.close()
 
@@ -90,7 +102,7 @@ class HttpTelemetryParser(object):
         try:
             data = json.loads(data)
         except ValueError:
-            raise HttpTelemetryParseFailed
+            raise FailedToParseData
 
         if tree is None:
             tree = {}
@@ -146,7 +158,7 @@ class HttpTelemetryParser(object):
                 key = key.strip().split('.')
                 value = value.strip()
             except ValueError:
-                raise HttpTelemetryParseFailed
+                raise FailedToParseData
 
             reduce(lambda x, y: x.setdefault(y, x.__class__()), key[:-1], tree)[key[-1]] = value
 

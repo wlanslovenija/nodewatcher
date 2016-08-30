@@ -51,8 +51,9 @@ class TelemetryProcessingFailed(events.NodeWarningRecord):
     description = _("Telemetry processing has failed.")
     # TODO: Should this be changed into a choice attribute?
     method = events.CharAttribute(primary_key=True)
+    error = events.CharAttribute()
 
-    def __init__(self, node, method):
+    def __init__(self, node, method, error=None):
         """
         Class constructor.
 
@@ -64,6 +65,7 @@ class TelemetryProcessingFailed(events.NodeWarningRecord):
             [node],
             events.NodeWarningRecord.SEVERITY_ERROR,
             method=method,
+            error=error,
         )
 
 pool.register_record(TelemetryProcessingFailed)
