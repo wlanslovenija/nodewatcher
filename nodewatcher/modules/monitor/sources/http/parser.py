@@ -65,9 +65,9 @@ class HttpTelemetryParser(object):
             return self.data
 
         # Create our own HTTP connection so we can use a successful TCP connection as
-        # a signal that the node is up. We use a short timeout (0.5 s) to see if we
+        # a signal that the node is up. We use a short timeout (2 s) to see if we
         # can establish a connection.
-        connection = httplib.HTTPConnection(self.host, self.port, timeout=0.5)
+        connection = httplib.HTTPConnection(self.host, self.port, timeout=2)
         try:
             try:
                 connection.connect()
