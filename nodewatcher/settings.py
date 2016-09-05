@@ -485,7 +485,7 @@ MONITOR_RUNS = {
     },
 
     'telemetry': {
-        'workers': 30,
+        'workers': 15,
         'interval': 300,
         'max_tasks_per_child': 50,
         'processors': (
@@ -543,13 +543,21 @@ MONITOR_HTTP_POLL_CONNECT_TIMEOUT = 2
 MONITOR_HTTP_POLL_READ_TIMEOUT = 15
 
 # Backend for the monitoring data archive.
-DATASTREAM_BACKEND = 'datastream.backends.mongodb.Backend'
+DATASTREAM_BACKEND = 'datastream.backends.influxdb.Backend'
 # Each backend can have backend-specific settings that can be specified here.
 DATASTREAM_BACKEND_SETTINGS = {
-    'database_name': 'nodewatcher',
-    'host': os.environ.get('TOKUMX_1_PORT_27017_TCP_ADDR', '127.0.0.1'),
-    'port': int(os.environ.get('TOKUMX_1_PORT_27017_TCP_PORT', '27017')),
-    'tz_aware': USE_TZ,
+    'connection_influxdb': {
+        'host': os.environ.get('INFLUXDB_1_PORT_8086_TCP_ADDR', '127.0.0.1'),
+        'port': int(os.environ.get('INFLUXDB_1_PORT_8086_TCP_PORT', '8086')),
+        'database': 'nodewatcher'
+    },
+    'connection_metadata': {
+        'host': DATABASES['default']['HOST'],
+        'port': DATABASES['default']['PORT'],
+        'database': DATABASES['default']['NAME'],
+        'user': DATABASES['default']['USER'],
+        'password': DATABASES['default']['PASSWORD'],
+    },
 }
 
 OLSRD_MONITOR_HOST = '127.0.0.1'

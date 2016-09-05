@@ -11,13 +11,10 @@ db:
     volumes:
         # Use a volume to enable database persistence across restarts
         - /tmp/nodewatcher-db:/var/lib/postgresql/9.5/main
-tokumx:
-    image: wlanslovenija/tokumx
-    # A privileged container is required to disable hugepages for TokuMX
-    privileged: true
+influxdb:
+    image: tozd/influxdb
     volumes:
-        # Use a volume to enable database persistence across restarts
-        - /tmp/nodewatcher-tokumx:/var/lib/tokumx
+        - /tmp/nodewatcher-influxdb:/data
 redis:
     image: tozd/redis
 builderar71xx:
@@ -69,7 +66,7 @@ generator:
         - .:/code
     links:
         - db
-        - tokumx
+        - influxdb
         - redis
         - builderar71xx
         - builderlantiq
@@ -84,7 +81,7 @@ monitorq:
         - .:/code
     links:
         - db
-        - tokumx
+        - influxdb
         - redis
 web:
     build: .
@@ -98,7 +95,7 @@ web:
         - "8000:8000"
     links:
         - db
-        - tokumx
+        - influxdb
         - redis
         - builderar71xx
         - builderlantiq
