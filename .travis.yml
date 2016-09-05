@@ -4,11 +4,12 @@ python:
  - 2.7
 env: PYTHONPATH=. DB_1_ENV_PGSQL_ROLE_1_USERNAME=postgres
 services:
- - mongodb
+ - docker
  - postgresql
 addons:
   postgresql: "9.5"
 before_install:
+ - docker run -d -p 8086:8086 -v /var/lib/influxdb influxdb
  - sudo add-apt-repository --yes ppa:fontforge/fontforge
  - sudo apt-get update
  - cat packages.txt | grep -v postgresql- | grep -v libgeos-c1 | sudo DEBIAN_FRONTEND=noninteractive xargs apt-get --no-install-recommends -y --force-yes install
