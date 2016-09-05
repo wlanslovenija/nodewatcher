@@ -56,7 +56,13 @@ class TestStreams(TestBaseStreams):
 class RegistryTestCase(django_test.TestCase):
     def setUp(self):
         DATASTREAM_BACKEND_SETTINGS = settings.DATASTREAM_BACKEND_SETTINGS.copy()
-        DATASTREAM_BACKEND_SETTINGS['database_name'] = 'test_nodewatcher_datastream'
+        if settings.DATASTREAM_BACKEND == 'datastream.backends.mongodb.Backend':
+            DATASTREAM_BACKEND_SETTINGS['database_name'] = 'test_nodewatcher_datastream'
+        elif settings.DATASTREAM_BACKEND == 'datastream.backends.influxdb.Backend':
+            DATASTREAM_BACKEND_SETTINGS['connection_influxdb']['database'] = 'test_nodewatcher_datastream'
+            DATASTREAM_BACKEND_SETTINGS['connection_metadata']['database'] = 'test_nodewatcher'
+        else:
+            raise ValueError('Unsupported datastream backend')
 
         self.datastream = django_datastream.init_datastream(
             settings.DATASTREAM_BACKEND,

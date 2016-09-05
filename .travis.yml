@@ -27,4 +27,4 @@ before_script:
  - pep8 nodewatcher
  - pylint nodewatcher || true
 script:
- - python manage.py test
+ - python manage.py test --keepdb
