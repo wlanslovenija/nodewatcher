@@ -1,4 +1,4 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, devices as cgm_devices
+from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
 class IRNASKoruzav2(cgm_devices.DeviceBase):
@@ -13,8 +13,31 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
     architecture = 'ramips_mt7621'
     usb = True
     radios = [
-        # TODO: Change index for production KORUZA version.
-        cgm_devices.USBRadio('wifi-usb0', "USB wireless radio", index=2)
+        # TODO: Change this for production KORUZA version.
+        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio (5 GHz)", [
+            cgm_protocols.IEEE80211AN(
+                cgm_protocols.IEEE80211AN.SHORT_GI_20,
+                cgm_protocols.IEEE80211AN.SHORT_GI_40,
+                cgm_protocols.IEEE80211AN.RX_STBC1,
+                cgm_protocols.IEEE80211AN.DSSS_CCK_40,
+            )
+        ], [
+            cgm_devices.AntennaConnector('a1', "Antenna1")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
+        ]),
+        cgm_devices.IntegratedRadio('wifi1', "Integrated wireless radio (2.4 GHz)", [
+            cgm_protocols.IEEE80211BGN(
+                cgm_protocols.IEEE80211BGN.SHORT_GI_20,
+                cgm_protocols.IEEE80211BGN.SHORT_GI_40,
+                cgm_protocols.IEEE80211BGN.RX_STBC1,
+                cgm_protocols.IEEE80211BGN.DSSS_CCK_40,
+            )
+        ], [
+            cgm_devices.AntennaConnector('a2', "Antenna0")
+        ], [
+            cgm_devices.DeviceRadio.MultipleSSID,
+        ])
     ]
     switches = [
         cgm_devices.Switch(
@@ -58,9 +81,17 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
     ]
     port_map = {
         'openwrt': {
+            'wifi0': 'radio0',
+            'wifi1': 'radio1',
             'sw0': 'switch0',
             'lan0': 'eth0.1',
             'wan0': 'eth0.2',
+        }
+    }
+    drivers = {
+        'openwrt': {
+            'wifi0': 'mac80211',
+            'wifi1': 'mac80211'
         }
     }
     profiles = {
