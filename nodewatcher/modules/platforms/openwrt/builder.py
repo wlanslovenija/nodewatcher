@@ -98,6 +98,9 @@ def build_image(result, profile):
 
         # Clean the build first to prevent accidentally taking build results from a previous build.
         builder.call('make', 'clean')
+        # Ensure build dir paths are cleaned. This is required because for some architectures, there
+        # are leftovers even after a 'make clean'.
+        builder.call('rm', '-rf', 'build_dir/target-*/linux-*/{tmp,root.squashfs}')
         # Ensure the prerequisite check is skipped.
         builder.call('touch', 'staging_dir/host/.prereq-build')
 
