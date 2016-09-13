@@ -847,6 +847,10 @@ def configure_switch(cfg, device, port):
 
     switch = device.get_switch(port.switch)
     switch_iface = device.remap_port('openwrt', port.switch)
+    if switch_iface is None:
+        raise cgm_base.ValidationError(
+            _("No mapping for OpenWrt when configuring switch '%(switch)s'.") % {'switch': port.switch}
+        )
 
     # Enable switch if not yet enabled
     try:

@@ -253,6 +253,34 @@ class Switch(object):
         self.vlans = vlans
         self.cpu_tagged = cpu_tagged
 
+
+class SwitchPortMap(object):
+    """
+    Describes a port mapping for a given switch. Port mappings are defined for
+    each supported platform.
+    """
+
+    def __init__(self, switch, vlans):
+        """
+        Class constructor.
+
+        :param switch: Switch name mapping
+        :param vlans: VLAN port mapping pattern
+        """
+
+        self.switch = switch
+        self.vlans = vlans
+
+    def get_port(self, switched_port):
+        """
+        Returns a mapping for the given switched port.
+
+        :param switched_port: An instance of SwitchedEthernetPort
+        :return: Mapping
+        """
+
+        return self.vlans.format(vlan=switched_port.vlan)
+
 # A list of attributes that are required to be defined
 REQUIRED_DEVICE_ATTRIBUTES = (
     'identifier',
@@ -439,7 +467,22 @@ class DeviceBase(object):
         elif isinstance(interface_or_port, cgm_models.WifiRadioDeviceConfig):
             interface_or_port = interface_or_port.wifi_radio
 
-        return cls.port_map.get(platform, {}).get(interface_or_port, None)
+        # If a direct mapping exists, use it. Otherwise, check if this is a switched
+        # port and if a special switch-wide mapping is available.
+        mapping = cls.port_map.get(platform, {}).get(interface_or_port, None)
+        if mapping is not None:
+            if isinstance(mapping, SwitchPortMap):
+                return mapping.switch
+
+            return mapping
+
+        # Handle ethernet ports.
+        port = cls.get_port(interface_or_port)
+        if isinstance(port, SwitchedEthernetPort):
+            switch = cls.get_switch(port.switch)
+            switch_map = cls.port_map.get(platform, {}).get(switch.identifier, None)
+            if isinstance(switch_map, SwitchPortMap):
+                return switch_map.get_port(port)
 
     @classmethod
     def get_vif_mapping(cls, platform, radio, vif):
