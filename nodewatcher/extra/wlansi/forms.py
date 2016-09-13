@@ -193,14 +193,18 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
             # The firt non-WAN port is for routing/clients.
             lan_port = None
+            lan_extra_ports = []
             for port in device.ports:
                 if port.identifier != wan_port:
-                    lan_port = port.identifier
-                    break
+                    if lan_port is None:
+                        lan_port = port.identifier
+                    else:
+                        lan_extra_ports.append(port.identifier)
         else:
             # Do not configure any ethernet ports.
             wan_port = None
             lan_port = None
+            lan_extra_ports = []
 
         if node_type != 'backbone':
             # Setup uplink interface.
@@ -373,6 +377,17 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                                     'routing_protocols': ['olsr', 'babel'],
                                 },
                             )
+
+        # Setup additional routing interfaces on all extra ports.
+        for extra_port in lan_extra_ports:
+            self.setup_interface(
+                state,
+                cgm_models.EthernetInterfaceConfig,
+                eth_port=extra_port,
+                configuration={
+                    'routing_protocols': ['olsr', 'babel'],
+                },
+            )
 
         # Mobile uplink.
 
