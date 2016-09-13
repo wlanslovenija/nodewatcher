@@ -59,8 +59,14 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
             'lan0', "Lan0",
             switch='sw0',
             vlan=1,
-            ports=[0, 1, 2, 3, 6],
-        )
+            ports=[0, 1, 3, 6],
+        ),
+        cgm_devices.SwitchedEthernetPort(
+            'lan1', "Lan1",
+            switch='sw0',
+            vlan=3,
+            ports=[2, 6],
+        ),
     ]
     antennas = [
         # TODO: This information is probably not correct
@@ -83,9 +89,7 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
         'openwrt': {
             'wifi0': 'radio0',
             'wifi1': 'radio1',
-            'sw0': 'switch0',
-            'lan0': 'eth0.1',
-            'wan0': 'eth0.2',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
         }
     }
     drivers = {
