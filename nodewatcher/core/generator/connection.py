@@ -122,15 +122,20 @@ class BuilderConnection(object):
         except IOError:
             raise cgm_exceptions.BuildError('Failed to chmod file: %s' % path)
 
-    def call(self, *args):
+    def call(self, *args, **kwargs):
         """
         Executes a builder command.
+
+        :param quote: Should the arguments be quoted
         """
+
+        if kwargs.get('quote', True):
+            args = [pipes.quote(arg) for arg in args]
 
         try:
             cmd = [
                 'cd %s;' % BUILDER_PATH,
-                " ".join([pipes.quote(arg) for arg in args]),
+                " ".join(args),
                 "2>&1",
             ]
 
