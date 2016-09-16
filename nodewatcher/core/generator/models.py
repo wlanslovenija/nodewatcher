@@ -189,7 +189,10 @@ class Builder(models.Model):
         was registered.
         """
 
-        metadata = self._get_metadata()
+        try:
+            metadata = self._get_metadata()
+        except (requests.ConnectionError, ValueError):
+            return False
 
         if self.platform != str(metadata['platform']):
             return False
