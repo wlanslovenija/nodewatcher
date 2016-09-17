@@ -126,13 +126,63 @@ class PackageConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_item(PackageConfig)
 
 
+class SwitchConfig(registration.bases.NodeConfigRegistryItem):
+    """
+    Switch configuration.
+    """
+
+    switch = registry_fields.RegistryChoiceField('node.config', 'core.switch#switch')
+    # Valid VLAN presets are defined by the device descriptor based for a specific switch.
+    vlan_preset = models.CharField(max_length=50)
+
+    class RegistryMeta:
+        form_weight = 40
+        registry_id = 'core.switch'
+        registry_section = _("Switch")
+        registry_name = _("Switch Configuration")
+        multiple = True
+
+registration.point('node.config').register_item(SwitchConfig)
+
+
+class VLANConfig(registration.bases.NodeConfigRegistryItem):
+    """
+    VLAN configuration for a specific switch.
+    """
+
+    switch = registry_fields.IntraRegistryForeignKey(SwitchConfig, editable=False, null=False, related_name='vlans')
+    name = models.CharField(max_length=30)
+    # Valid VLANs are defined by the device descriptor for a specific switch.
+    vlan = models.IntegerField()
+    # Valid ports are defined by the device descriptor for a specific switch.
+    ports = postgres_fields.ArrayField(models.IntegerField(), default=list)
+
+    class RegistryMeta:
+        registry_id = 'core.switch.vlan'
+        registry_section = _("VLAN")
+        registry_name = _("VLAN Configuration")
+        multiple = True
+
+    def __unicode__(self):
+        if not self.name:
+            return ugettext("VLAN %(switch)s.vlan%(vlan)s") % {'switch': self.switch.switch, 'vlan': self.vlan}
+
+        return ugettext("VLAN %(switch)s.vlan%(vlan)s (%(name)s)") % {
+            'switch': self.switch.switch,
+            'vlan': self.vlan,
+            'name': self.name
+        }
+
+registration.point('node.config').register_subitem(SwitchConfig, VLANConfig)
+
+
 class RoutableInterface(models.Model):
     class Meta:
         abstract = True
 
     routing_protocols = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'core.interfaces#routing_protocol',
-        blank=True, null=True, default=[],
+        blank=True, null=True, default=list,
     )
 
 
@@ -206,7 +256,7 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
     An ethernet interface.
     """
 
-    eth_port = registry_fields.RegistryChoiceField('node.config', 'core.interfaces#eth_port')
+    eth_port = models.CharField(max_length=50)
     uplink = models.BooleanField(default=False)
     mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
 
@@ -217,7 +267,7 @@ class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
         if not self.eth_port:
             return ugettext("Ethernet interface (unbound)")
 
-        return ugettext("Ethernet interface (%(eth_port)s)") % {'eth_port': self.get_eth_port_display()}
+        return ugettext("Ethernet interface (%(eth_port)s)") % {'eth_port': self.eth_port}
 
 registration.point('node.config').register_item(EthernetInterfaceConfig)
 
@@ -271,7 +321,7 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         models.CharField(max_length=50),
         blank=True,
         null=True,
-        default=[],
+        default=list,
     )
     isolate_clients = models.BooleanField(
         default=True,
@@ -386,7 +436,7 @@ class AnnouncableNetwork(models.Model):
 
     routing_announces = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'core.interfaces.network#routing_announce',
-        blank=True, null=True, verbose_name=_("Announce Via"), default=[],
+        blank=True, null=True, verbose_name=_("Announce Via"), default=list,
     )
 
 

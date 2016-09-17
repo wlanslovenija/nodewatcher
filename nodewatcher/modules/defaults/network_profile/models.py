@@ -10,7 +10,7 @@ class NetworkProfileConfig(registration.bases.NodeConfigRegistryItem):
 
     profiles = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'network.profile#profiles',
-        blank=True, null=True, default=[],
+        blank=True, null=True, default=list,
         help_text=_("Selected network profiles affect how the node is configured when automatic defaults are enabled. In case defaults are disabled, selecting network profiles will have no effect."),
     )
 

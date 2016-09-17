@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
@@ -20,6 +22,25 @@ class MikrotikRB2011UiAS_IN(cgm_devices.DeviceBase):
             cpu_port=0,
             cpu_tagged=True,
             vlans=16,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'wan0', "Wan0",
+                        vlan=1,
+                        ports=[0, 1],
+                    ),
+                    cgm_devices.SwitchVLANPreset(
+                        'lan0', "Lan0",
+                        vlan=2,
+                        ports=[0, 2, 3, 4, 5],
+                    ),
+                    cgm_devices.SwitchVLANPreset(
+                        'sfp0', "SFP",
+                        vlan=3,
+                        ports=[0, 6],
+                    ),
+                ])
+            ]
         ),
         cgm_devices.Switch(
             'sw1', "Fast Ethernet Switch",
@@ -27,34 +48,18 @@ class MikrotikRB2011UiAS_IN(cgm_devices.DeviceBase):
             cpu_port=0,
             cpu_tagged=True,
             vlans=16,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'lan1', "Lan1",
+                        vlan=1,
+                        ports=[0, 1, 2, 3, 4],
+                    ),
+                ])
+            ]
         ),
     ]
-    ports = [
-        cgm_devices.SwitchedEthernetPort(
-            'wan0', "Wan0",
-            switch='sw0',
-            vlan=1,
-            ports=[0, 1],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=2,
-            ports=[0, 2, 3, 4, 5],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'lan1', "Lan1",
-            switch='sw1',
-            vlan=1,
-            ports=[0, 1, 2, 3, 4],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'sfp0', "SFP",
-            switch='sw0',
-            vlan=3,
-            ports=[0, 6],
-        ),
-    ]
+    ports = []
     antennas = []
     port_map = {
         'openwrt': {
@@ -83,7 +88,7 @@ class MikrotikRB2011UiAS_2HnD_IN(MikrotikRB2011UiAS_IN):
     name = "RB2011UiAS-2HnD-IN"
     url = 'http://routerboard.com/RB2011UiAS-2HnD-IN'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,

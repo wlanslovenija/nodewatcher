@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
@@ -13,7 +15,7 @@ class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
     architecture = 'ar71xx'
     usb = True
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,
@@ -33,22 +35,23 @@ class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
             cpu_port=5,
             vlans=16,
             cpu_tagged=True,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'wan0', "Wan0",
+                        vlan=2,
+                        ports=[0, 5],
+                    ),
+                    cgm_devices.SwitchVLANPreset(
+                        'lan0', "Lan0",
+                        vlan=1,
+                        ports=[1, 2, 3, 4, 5],
+                    )
+                ])
+            ]
         )
     ]
-    ports = [
-        cgm_devices.SwitchedEthernetPort(
-            'wan0', "Wan0",
-            switch='sw0',
-            vlan=2,
-            ports=[0, 5],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=1,
-            ports=[1, 2, 3, 4, 5],
-        )
-    ]
+    ports = []
     antennas = [
         # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(
@@ -91,25 +94,26 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
         cgm_devices.Switch(
             'sw0', "Switch0",
             ports=[0, 1, 2, 3, 4, 5, 6],
+            tagged_ports=[0],
             cpu_port=[0, 6],
             vlans=16,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'wan0', "Wan0",
+                        vlan=2,
+                        ports=[5, 6],
+                    ),
+                    cgm_devices.SwitchVLANPreset(
+                        'lan0', "Lan0",
+                        vlan=1,
+                        ports=[0, 1, 2, 3, 4],
+                    )
+                ])
+            ]
         )
     ]
-    ports = [
-        cgm_devices.SwitchedEthernetPort(
-            'wan0', "Wan0",
-            switch='sw0',
-            vlan=2,
-            ports=[5, 6],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=1,
-            ports=[0, 1, 2, 3, 4],
-            tagged_ports=[0],
-        )
-    ]
+    ports = []
     profiles = {
         'openwrt': {
             'name': 'TLWR1043',

@@ -28,6 +28,7 @@ except ImportError:
 
 # Allowed characters for UCI identifiers.
 UCI_IDENTIFIER = re.compile(r'^[a-zA-Z0-9_]+$')
+UCI_IDENTIFIER_REPLACE = re.compile(r'[^a-zA-Z0-9_]')
 UCI_PACKAGE_IDENTIFIER = re.compile(r'^[a-zA-Z0-9_-]+$')
 
 
@@ -467,6 +468,18 @@ class UCIConfiguration(cgm_base.PlatformConfiguration):
         self.sysctl = self.sysctl_manager_class()
         self._packages = {}
 
+    def sanitize_identifier(self, identifier):
+        """
+        Sanitizes an identifier so that it is appropriate for use as an
+        UCI identifier. This should be used for any external strings, which
+        are used as UCI identifiers (option or section names).
+
+        :param identifier: Potentially "dirty" identifier
+        :return: An identifier suitable for use in UCI
+        """
+
+        return UCI_IDENTIFIER_REPLACE.sub('_', identifier)
+
     def package_version_compare(self, version_a, version_b):
         """
         Platform-specific version check. Should return an integer, which is
@@ -836,46 +849,46 @@ def configure_interface(cfg, node, interface, section, iface_name):
         firewall.network.append(iface_name)
 
 
-def configure_switch(cfg, device, port):
+def configure_switch(cfg, device, switch, vlan):
     """
     Configures a switch port.
 
     :param cfg: Platform configuration
     :param device: Device descriptor
-    :param port: Port descriptor
+    :param switch: Switch descriptor
+    :param vlan: VLAN configuration
     """
 
-    switch = device.get_switch(port.switch)
-    switch_iface = device.remap_port('openwrt', port.switch)
+    switch_iface = device.remap_port('openwrt', switch.identifier)
     if switch_iface is None:
         raise cgm_base.ValidationError(
-            _("No mapping for OpenWrt when configuring switch '%(switch)s'.") % {'switch': port.switch}
+            _("No mapping for OpenWrt when configuring switch '%(switch)s'.") % {'switch': switch.identifier}
         )
 
-    # Enable switch if not yet enabled
+    # Enable switch if not yet enabled.
     try:
         sw = cfg.network.add(switch=switch_iface)
         sw.enable_vlan = True
     except ValueError:
-        # Switch is already enabled
+        # Switch is already enabled.
         pass
 
-    # Check if wanted VLAN is already configured
+    # Check if wanted VLAN is already configured.
     if 'switch_vlan' in cfg.network:
-        for vlan in cfg.network.switch_vlan:
-            if vlan.vlan == port.vlan:
+        for existing_vlan in cfg.network.switch_vlan:
+            if existing_vlan.device == switch_iface and existing_vlan.vlan == vlan.vlan:
                 raise cgm_base.ValidationError(_("VLAN assignment conflict while trying to configure switch!"))
 
-    # Configure VLAN
-    vlan = cfg.network.add('switch_vlan')
-    vlan.device = switch_iface
-    vlan.vlan = port.vlan
+    # Configure VLAN.
+    vlan_cfg = cfg.network.add('switch_vlan')
+    vlan_cfg.device = switch_iface
+    vlan_cfg.vlan = vlan.vlan
     ports = []
-    for p in port.ports:
-        if port.is_tagged(p) or (p in switch.cpu_ports and switch.cpu_tagged):
+    for p in vlan.ports:
+        if switch.is_tagged(p):
             p = '%st' % p
         ports.append(str(p))
-    vlan.ports = ' '.join(ports)
+    vlan_cfg.ports = ' '.join(ports)
 
 
 def set_dhcp_ignore(cfg, iface_name):
@@ -986,15 +999,25 @@ def network(node, cfg):
     cfg.sysctl.set_variable('net.ipv6.conf.default.accept_dad', 0)
     cfg.sysctl.set_variable('net.ipv6.conf.all.accept_dad', 0)
 
-    # Obtain the device descriptor for this device and generate physical port resource so
-    # we can track binding of ports to different interface and prevent multiple definitions.
+    # Obtain the device descriptor for this device.
     device = node.config.core.general().get_device()
     if not device:
         return
 
+    # Configure switches.
+    vlan_ports = []
+    for switch in node.config.core.switch():
+        switch_descriptor = device.get_switch(switch.switch)
+
+        for vlan in switch.vlans.all():
+            vlan_ports.append(switch_descriptor.get_port_identifier(vlan.vlan))
+            configure_switch(cfg, device, switch_descriptor, vlan)
+
+    # Generate physical port resource so we can track binding of ports to different
+    # interface and prevent multiple definitions.
     cfg.resources.add(cgm_resources.PhysicalPortResource(
         'ethernet',
-        [port.identifier for port in device.ports],
+        [port.identifier for port in device.ports] + vlan_ports,
     ))
     cfg.resources.add(cgm_resources.PhysicalPortResource(
         'radio',
@@ -1010,7 +1033,7 @@ def network(node, cfg):
             continue
 
         if isinstance(interface, cgm_models.BridgeInterfaceConfig):
-            iface_name = device.get_bridge_mapping('openwrt', interface)
+            iface_name = cfg.sanitize_identifier(device.get_bridge_mapping('openwrt', interface))
             iface = cfg.network.add(interface=iface_name, managed_by=interface)
             iface.type = 'bridge'
 
@@ -1020,7 +1043,14 @@ def network(node, cfg):
                 port = port.interface
                 if isinstance(port, cgm_models.EthernetInterfaceConfig):
                     raw_port = device.remap_port('openwrt', port.eth_port)
-                    if isinstance(raw_port, (list, tuple)):
+                    if raw_port is None:
+                        raise cgm_base.ValidationError(
+                            _("No port remapping for port '%(port)s' of device '%(device_name)s' is available!") % {
+                                'port': port.eth_port,
+                                'device_name': device.name
+                            }
+                        )
+                    elif isinstance(raw_port, (list, tuple)):
                         iface.ifname += raw_port
                     else:
                         iface.ifname.append(raw_port)
@@ -1060,7 +1090,7 @@ def network(node, cfg):
                     _("The target device does not support USB, so mobile interface cannot be configured!")
                 )
 
-            iface_name = interface.device.replace('-', '')
+            iface_name = cfg.sanitize_identifier(interface.device)
             iface = cfg.network.add(interface=iface_name, managed_by=interface)
 
             if interface.uplink:
@@ -1180,16 +1210,13 @@ def network(node, cfg):
                     }
                 )
 
-            # Check if we need to configure the switch.
-            port = device.get_port(interface.eth_port)
-            if isinstance(port, cgm_devices.SwitchedEthernetPort):
-                configure_switch(cfg, device, port)
-
             if check_interface_bridged(interface) is not None:
                 continue
 
+            iface_name = cfg.sanitize_identifier(interface.eth_port)
+
             try:
-                iface = cfg.network.add(interface=interface.eth_port, managed_by=interface)
+                iface = cfg.network.add(interface=iface_name, managed_by=interface)
             except ValueError:
                 raise cgm_base.ValidationError(
                     _("Duplicate interface definition for port '%s'!") % interface.eth_port
@@ -1198,7 +1225,10 @@ def network(node, cfg):
             iface.ifname = device.remap_port('openwrt', interface.eth_port)
             if iface.ifname is None:
                 raise cgm_base.ValidationError(
-                    _("No port remapping for port '%(port)s' of device '%s(device_name)' is available!") % {'port': interface.eth_port, 'device_name': device.name}
+                    _("No port remapping for port '%(port)s' of device '%(device_name)s' is available!") % {
+                        'port': interface.eth_port,
+                        'device_name': device.name
+                    }
                 )
 
             if isinstance(iface.ifname, (list, tuple)):
@@ -1206,12 +1236,12 @@ def network(node, cfg):
 
             if interface.uplink:
                 iface._uplink = True
-                set_dhcp_ignore(cfg, interface.eth_port)
+                set_dhcp_ignore(cfg, iface_name)
 
             if interface.mac_address:
                 iface.macaddr = interface.mac_address
 
-            configure_interface(cfg, node, interface, iface, interface.eth_port)
+            configure_interface(cfg, node, interface, iface, iface_name)
         elif isinstance(interface, cgm_models.WifiRadioDeviceConfig):
             # Allocate the port to ensure it is only bound to this bridge.
             try:

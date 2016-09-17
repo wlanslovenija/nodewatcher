@@ -29,7 +29,7 @@ class RegistryItemBase(polymorphic_models.PolymorphicModel):
     # order that they were shown on any edit forms.
     display_order = models.IntegerField(null=True, editable=False)
     # Custom item annotations.
-    annotations = jsonfield.JSONField(default={}, editable=False)
+    annotations = jsonfield.JSONField(default=dict, editable=False)
 
     class RegistryMeta:
         registry_id = None

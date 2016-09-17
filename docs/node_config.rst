@@ -265,6 +265,43 @@ The following roles are provided by default:
   * ``vpn-server`` (the node provides a VPN server for other nodes),
   * ``redundancy-required`` (the node requires multiple redundant links).
 
+core.switch
+-----------
+
+When a device supports switch configurations, the switch may be configured using this registry
+item. A concrete implementation is provided with the core module.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.SwitchConfig()
+
+    :param switch: Identifier of the switch that is being configured.
+    :type switch: registered choice
+
+    :param vlan_preset: Switch VLAN configuration preset identifier that should be used.
+    :type vlan_preset: string
+
+All switches must define a default preset under the identifier ``default`` in their device
+descriptor.
+
+core.switch.vlan
+----------------
+
+Each switch can contain multiple VLAN configurations, which define how individual switch
+ports are grouped into VLANs.
+
+.. autoclass:: nodewatcher.core.generator.cgm.models.VLANConfig()
+
+    :param switch: Parent switch this VLAN configuration belongs to.
+    :type switch: foreign key to :class:`~nodewatcher.core.generator.cgm.models.SwitchConfig`
+
+    :param name: Name of the VLAN for easier identification.
+    :type name: string
+
+    :param vlan: VLAN identifier that is being configured.
+    :type vlan: integer
+
+    :param ports: Ports that should be grouped under the configured VLAN.
+    :type ports: list of integers
+
 core.interfaces
 ---------------
 
@@ -301,7 +338,7 @@ The following interface types are currently implemented by :mod:`nodewatcher.cor
    :show-inheritance:
 
    :param eth_port: Ethernet port that this interface is connected to. Available ethernet ports
-     depend on the selected device.
+     depend on the selected device and configured switch VLANs.
    :type eth_port: registered choice
 
    :param uplink: Should this interface be considered as a WAN uplink.

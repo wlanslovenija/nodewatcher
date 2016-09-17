@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
@@ -12,7 +14,7 @@ class GenericRamipsA5V11(cgm_devices.DeviceBase):
     url = 'https://wiki.openwrt.org/toh/unbranded/a5-v11'
     architecture = 'ramips_rt305x'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,
@@ -32,16 +34,18 @@ class GenericRamipsA5V11(cgm_devices.DeviceBase):
             cpu_port=6,
             cpu_tagged=True,
             vlans=16,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'lan0', "Lan0",
+                        vlan=1,
+                        ports=[0, 6],
+                    )
+                ])
+            ]
         )
     ]
-    ports = [
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=1,
-            ports=[0, 6],
-        )
-    ]
+    ports = []
     antennas = [
         # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(

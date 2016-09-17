@@ -183,23 +183,38 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         # Ethernet.
 
-        if len(device.ports) >= 1:
+        vlan_ports = {}
+        for switch in state.filter_items('core.switch', klass=cgm_models.SwitchConfig):
+            switch_descriptor = device.get_switch(switch.switch)
+            for vlan in state.filter_items('core.switch.vlan', klass=cgm_models.VLANConfig, parent=switch):
+                vlan_ports[switch_descriptor.get_port_identifier(vlan.vlan)] = vlan
+
+        # Compute the list of available ports.
+        available_ports = [port.identifier for port in device.ports] + vlan_ports.keys()
+
+        if len(available_ports) >= 1:
             # If there are multiple ethernet ports, use Wan0 for uplink.
             wan_port = device.get_port('wan0')
             if not wan_port:
-                wan_port = device.ports[0]
-
-            wan_port = wan_port.identifier
+                # Also check if there is a defined VLAN, containing "wan" in its name.
+                for vlan_port in vlan_ports:
+                    if 'wan' in vlan_ports[vlan_port].name.lower():
+                        wan_port = vlan_port
+                        break
+                else:
+                    wan_port = device.ports[0].identifier
+            else:
+                wan_port = wan_port.identifier
 
             # The firt non-WAN port is for routing/clients.
             lan_port = None
             lan_extra_ports = []
-            for port in device.ports:
-                if port.identifier != wan_port:
+            for port in available_ports:
+                if port != wan_port:
                     if lan_port is None:
-                        lan_port = port.identifier
+                        lan_port = port
                     else:
-                        lan_extra_ports.append(port.identifier)
+                        lan_extra_ports.append(port)
         else:
             # Do not configure any ethernet ports.
             wan_port = None
@@ -427,9 +442,6 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             return
 
         radio_defaults = radio_defaults.get(radio.identifier, None)
-
-        if not radio:
-            return
 
         protocol = radio.protocols[0]
         channel = protocol.channels[7].identifier

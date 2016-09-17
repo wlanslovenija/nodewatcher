@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
@@ -12,7 +14,7 @@ class UBNTNanoM2(cgm_devices.DeviceBase):
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,
                 cgm_protocols.IEEE80211BGN.TX_STBC1,
@@ -71,7 +73,7 @@ class UBNTNanoM5(UBNTNanoM2):
     identifier = 'ub-nano-m5'
     name = "Nanostation M5"
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211AN(
                 cgm_protocols.IEEE80211AN.SHORT_GI_40,
                 cgm_protocols.IEEE80211AN.TX_STBC1,

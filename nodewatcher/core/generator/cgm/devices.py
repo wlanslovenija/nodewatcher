@@ -1,10 +1,14 @@
+import copy
 import inspect
 
 from django.core import exceptions
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from ...registry import registration
 from . import protocols as cgm_protocols
+
+# Separator between VLAN atoms in switch port identifiers.
+SWITCH_ATOM_SEPARATOR = '.'
 
 
 class DevicePort(object):
@@ -16,6 +20,7 @@ class DevicePort(object):
         """
         Class constructor.
         """
+
         self.identifier = identifier
         self.description = description
 
@@ -26,60 +31,6 @@ class EthernetPort(DevicePort):
     """
 
     pass
-
-
-class SwitchedEthernetPort(EthernetPort):
-    """
-    Describes a device's ethernet port attached to a configurable
-    switch.
-    """
-
-    def __init__(self, identifier, description, switch, vlan, ports, tagged_ports=None):
-        """
-        Class constructor.
-        """
-
-        super(SwitchedEthernetPort, self).__init__(identifier, description)
-        self.switch = switch
-        self.vlan = vlan
-        self.ports = ports
-        self.tagged_ports = tagged_ports or []
-
-    def is_tagged(self, port):
-        """
-        Returns true if a port is marked as tagged.
-
-        :param port: Switch port identifier
-        """
-
-        return port in self.tagged_ports
-
-    def validate(self, device):
-        """
-        Ensure that the switch that the port refers to actually exists.
-        """
-
-        switch = device.get_switch(self.switch)
-        if switch is None:
-            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' refers to an invalid switch '%s'!" % (
-                self.identifier, self.switch
-            ))
-
-        if not (0 <= self.vlan < switch.vlans):
-            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' VLAN (%s) out of range!" % (
-                self.identifier, self.vlan
-            ))
-
-        if not switch.cpu_ports.intersection(self.ports):
-            raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' does not connect to CPU!" % (
-                self.identifier
-            ))
-
-        for port in self.ports:
-            if port not in switch.ports:
-                raise exceptions.ImproperlyConfigured("Switched ethernet port '%s' contains invalid port '%d'!" % (
-                    self.identifier, port
-                ))
 
 
 class AntennaConnector(object):
@@ -221,12 +172,81 @@ class InternalAntenna(object):
         self.gain = gain
 
 
+class SwitchVLANPreset(object):
+    """
+    Describes a device's ethernet port attached to a configurable
+    switch.
+    """
+
+    def __init__(self, identifier, description, vlan, ports):
+        """
+        Class constructor.
+        """
+
+        self.identifier = identifier
+        self.description = description
+        self.switch = None
+        self.vlan = vlan
+        self.ports = ports
+
+    def attach(self, switch):
+        """
+        Attaches this VLAN preset to a specific switch. It is an error to attempt
+        to attach an already attached port to a differnet switch.
+
+        :param switch: Switch instance to attach to
+        """
+
+        if self.switch is not None and self.switch != switch:
+            raise ValueError('Cannot reattach already attached SwitchVLANPreset')
+
+        # Validate configuration.
+        if not (0 <= self.vlan < switch.vlans):
+            raise exceptions.ImproperlyConfigured("Switch VLAN preset '%s' VLAN (%s) out of range!" % (
+                self.identifier, self.vlan
+            ))
+
+        if not switch.cpu_ports.intersection(self.ports):
+            raise exceptions.ImproperlyConfigured("Switch VLAN preset '%s' does not connect to CPU!" % (
+                self.identifier
+            ))
+
+        for port in self.ports:
+            if port not in switch.ports:
+                raise exceptions.ImproperlyConfigured("Switch VLAN preset '%s' contains invalid port '%d'!" % (
+                    self.identifier, port
+                ))
+
+        self.switch = switch
+
+
+class SwitchPreset(object):
+    """
+    Describes a switch VLAN preset.
+    """
+
+    def __init__(self, identifier, description, vlans=None, custom=False):
+        self.identifier = identifier
+        self.description = description
+        self.vlans = vlans or []
+        self.custom = custom
+
+    def attach(self, switch):
+        """
+        Attaches this switch preset to a switch.
+        """
+
+        for vlan in self.vlans:
+            vlan.attach(switch)
+
+
 class Switch(object):
     """
     Describes an ethernet switch that a device has.
     """
 
-    def __init__(self, identifier, description, ports, cpu_port, vlans, cpu_tagged=False):
+    def __init__(self, identifier, description, ports, cpu_port, vlans, cpu_tagged=False,
+                 configurable=True, presets=None, tagged_ports=None):
         """
         Class constructor.
         """
@@ -252,6 +272,113 @@ class Switch(object):
         self.cpu_ports = cpu_ports
         self.vlans = vlans
         self.cpu_tagged = cpu_tagged
+        self.configurable = configurable
+        self.tagged_ports = tagged_ports or []
+        if cpu_tagged:
+            self.tagged_ports.extend(cpu_ports)
+
+        # Validate presets.
+        self.presets = []
+        has_default_preset = False
+        if presets is not None:
+            if not isinstance(presets, (list, tuple)):
+                raise exceptions.ImproperlyConfigured("Presets for switch '%s' must be a list or tuple!" % self.identifier)
+
+            names = set()
+            for preset in presets:
+                if preset.identifier in names:
+                    raise exceptions.ImproperlyConfigured("Preset identifier '%s' is duplicated in switch '%s'!" % (
+                        preset.identifier, self.identifier
+                    ))
+
+                if preset.custom:
+                    raise exceptions.ImproperlyConfigured(
+                        "Preset '%s' cannot be marked as custom. Set configurable=True for the switch instead." % (
+                            preset.identifier
+                        )
+                    )
+
+                names.add(preset.identifier)
+
+                # Attach VLAN preset to this switch.
+                preset.attach(self)
+
+            has_default_preset = 'default' in names
+            self.presets.extend(presets)
+
+        if not has_default_preset:
+            raise exceptions.ImproperlyConfigured("Switch '%s' does not have a default preset defined!" % (
+                self.identifier
+            ))
+
+        # Configurable switches support custom configuration.
+        if configurable:
+            self.presets.append(SwitchPreset('custom', _("Custom VLAN configuration"), custom=True))
+
+    def is_tagged(self, port):
+        """
+        Returns true if the given port must be tagged.
+
+        :param port: Port identifier
+        """
+
+        return port in self.tagged_ports
+
+    def get_preset(self, identifier):
+        """
+        Returns the preset with the given identifier.
+        """
+
+        for preset in self.presets:
+            if preset.identifier == identifier:
+                return preset
+
+    def get_preset_choices(self):
+        """
+        Returns a list of VLAN presets for this switch.
+        """
+
+        return ((p.identifier, p.description) for p in self.presets)
+
+    def get_vlan_choices(self):
+        """
+        Returns a list of available VLANs for this switch.
+        """
+
+        return ((vlan, _("VLAN %s") % vlan) for vlan in xrange(1, self.vlans + 1))
+
+    def get_port_choices(self):
+        """
+        Returns a list of available ports for this switch.
+        """
+
+        # TODO: Should we support better port names, similar to ethernet interfaces?
+        def port_name(port):
+            if port in self.cpu_ports:
+                return _("Port %s (CPU)") % port
+
+            return _("Port %s") % port
+
+        return ((port, port_name(port)) for port in self.ports)
+
+    def get_port_identifier(self, vlan):
+        """
+        Returns a unique port identifier for a specific switch port.
+        """
+
+        return '{switch}{separator}vlan{vlan}'.format(
+            separator=SWITCH_ATOM_SEPARATOR,
+            switch=self.identifier,
+            vlan=vlan,
+        )
+
+    def get_vlan_from_identifier(self, atom):
+        """
+        Returns the VLAN identifier given the last atom from an identifier previously
+        returned by `get_port_identifier`.
+        """
+
+        return int(atom[len('vlan'):])
 
 
 class SwitchPortMap(object):
@@ -271,15 +398,15 @@ class SwitchPortMap(object):
         self.switch = switch
         self.vlans = vlans
 
-    def get_port(self, switched_port):
+    def get_port(self, vlan):
         """
-        Returns a mapping for the given switched port.
+        Returns a mapping for the given VLAN.
 
-        :param switched_port: An instance of SwitchedEthernetPort
+        :param vlan: VLAN number
         :return: Mapping
         """
 
-        return self.vlans.format(vlan=switched_port.vlan)
+        return self.vlans.format(vlan=vlan)
 
 # A list of attributes that are required to be defined
 REQUIRED_DEVICE_ATTRIBUTES = (
@@ -322,9 +449,11 @@ class DeviceMetaclass(type):
             if len([x for x in new_class.switches if not isinstance(x, Switch)]):
                 raise exceptions.ImproperlyConfigured("List of device switches may only contain Switch instances!")
 
+            new_class.switches = copy.deepcopy(new_class.switches)
+
             # Router ports and radios cannot both be empty
-            if not len(new_class.radios) and not len(new_class.ports):
-                raise exceptions.ImproperlyConfigured("A device cannot be without radios and ports!")
+            if not new_class.radios and not new_class.ports and not new_class.switches:
+                raise exceptions.ImproperlyConfigured("A device cannot be without radios, ports and switches!")
 
             # Validate that list of ports only contains DevicePort instances and validate
             # that switched ports refer to valid switches
@@ -334,6 +463,8 @@ class DeviceMetaclass(type):
 
                 if hasattr(port, 'validate'):
                     port.validate(new_class)
+
+            new_class.ports = copy.deepcopy(new_class.ports)
 
             # Validate that list of radios only contains DeviceRadio instances and assign
             # radio indices
@@ -411,11 +542,26 @@ class DeviceBase(object):
 
         # Register a new choice for available device ports
         for port in cls.ports:
+            if isinstance(port, SwitchVLANPreset):
+                continue
+
             registration.point('node.config').register_choice(
                 'core.interfaces#eth_port',
                 registration.Choice(
                     port.identifier,
                     port.description,
+                    limited_to=('core.general#router', cls.identifier),
+                )
+            )
+
+        # Register switches.
+        for switch in cls.switches:
+            # Register the switch.
+            registration.point('node.config').register_choice(
+                'core.switch#switch',
+                registration.Choice(
+                    switch.identifier,
+                    '{} - {}'.format(switch.identifier, switch.description),
                     limited_to=('core.general#router', cls.identifier),
                 )
             )
@@ -478,11 +624,11 @@ class DeviceBase(object):
 
         # Handle ethernet ports.
         port = cls.get_port(interface_or_port)
-        if isinstance(port, SwitchedEthernetPort):
-            switch = cls.get_switch(port.switch)
+        if isinstance(port, tuple):
+            switch, vlan = port
             switch_map = cls.port_map.get(platform, {}).get(switch.identifier, None)
             if isinstance(switch_map, SwitchPortMap):
-                return switch_map.get_port(port)
+                return switch_map.get_port(vlan)
 
     @classmethod
     def get_vif_mapping(cls, platform, radio, vif):
@@ -553,9 +699,23 @@ class DeviceBase(object):
         :param identifier: Port identifier
         """
 
-        for port in cls.ports:
-            if port.identifier == identifier:
-                return port
+        atoms = identifier.split(SWITCH_ATOM_SEPARATOR)
+
+        if len(atoms) == 1:
+            # Simple port name.
+            for port in cls.ports:
+                if port.identifier == atoms[0]:
+                    return port
+        elif len(atoms) == 2:
+            # A configured switch VLAN, we return the correct switch and parsed VLAN.
+            switch, vlan = atoms
+            switch = cls.get_switch(switch)
+            if not switch:
+                return
+
+            return switch, switch.get_vlan_from_identifier(vlan)
+        else:
+            raise ValueError('Unsupported number of atoms in port identifier')
 
 
 def register_module(platform=None, weight=50):

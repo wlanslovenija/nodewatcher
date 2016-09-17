@@ -1,4 +1,6 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
+from django.utils.translation import ugettext_lazy as _
+
+from nodewatcher.core.generator.cgm import base as cgm_base, devices as cgm_devices
 
 
 class MikrotikRB450G(cgm_devices.DeviceBase):
@@ -19,22 +21,23 @@ class MikrotikRB450G(cgm_devices.DeviceBase):
             cpu_port=0,
             cpu_tagged=True,
             vlans=16,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'wan0', "Wan0",
+                        vlan=1,
+                        ports=[0, 1],
+                    ),
+                    cgm_devices.SwitchVLANPreset(
+                        'lan0', "Lan0",
+                        vlan=2,
+                        ports=[0, 2, 3, 4, 5],
+                    ),
+                ])
+            ]
         ),
     ]
-    ports = [
-        cgm_devices.SwitchedEthernetPort(
-            'wan0', "Wan0",
-            switch='sw0',
-            vlan=1,
-            ports=[0, 1],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=2,
-            ports=[0, 2, 3, 4, 5],
-        ),
-    ]
+    ports = []
     antennas = []
     port_map = {
         'openwrt': {

@@ -119,7 +119,7 @@ class Builder(models.Model):
         editable=False,
     )
     metadata = jsonfield.JSONField(
-        default={},
+        default=dict,
         blank=True,
         editable=False,
     )
@@ -263,7 +263,7 @@ class BuildResult(models.Model):
         help_text=_('Node this firmware build is for.'),
     )
     config = jsonfield.JSONField(
-        default={},
+        default=dict,
         blank=True,
         help_text=_('Configuration used to build this firmware.'),
     )

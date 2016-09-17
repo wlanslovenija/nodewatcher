@@ -663,12 +663,50 @@ class Command(base.BaseCommand):
                 except antenna_models.Antenna.DoesNotExist:
                     pass
 
-                # WAN uplink
+                # Switch configuration.
+                wan_port = None
+                lan_port = None
+                for switch in device.switches:
+                    switch_cfg = node_mdl.config.core.switch(
+                        create=cgm_models.SwitchConfig,
+                        switch=switch.identifier,
+                        vlan_preset='default',
+                    )
+                    switch_cfg.save()
+
+                    preset = switch.get_preset('default')
+                    for vlan in preset.vlans:
+                        # Create all VLAN configurations.
+                        node_mdl.config.core.switch.vlan(
+                            create=cgm_models.VLANConfig,
+                            switch=switch_cfg,
+                            vlan=vlan.vlan,
+                            name=vlan.description,
+                            ports=vlan.ports,
+                        ).save()
+
+                        if vlan.identifier == 'wan0' and not wan_port:
+                            wan_port = switch.get_port_identifier(vlan.vlan)
+                        if vlan.identifier == 'lan0' and not lan_port:
+                            lan_port = switch.get_port_identifier(vlan.vlan)
+
+                # Determine WAN and LAN ports.
+                if not wan_port:
+                    wan_port = device.get_port('wan0')
+                    if wan_port:
+                        wan_port = wan_port.identifier
+
+                if not lan_port:
+                    lan_port = device.get_port('lan0')
+                    if lan_port:
+                        lan_port = lan_port.identifier
+
+                # WAN uplink.
                 uplink_configured = False
-                if device.get_port('wan0'):
+                if wan_port:
                     iface_wan = node_mdl.config.core.interfaces(
                         create=cgm_models.EthernetInterfaceConfig,
-                        eth_port='wan0',
+                        eth_port=wan_port,
                         uplink=True,
                     )
                     iface_wan.save()
@@ -690,11 +728,11 @@ class Command(base.BaseCommand):
                             gateway=node['profile']['wan_gw']
                         ).save()
 
-                # LAN subnets
-                if device.get_port('lan0'):
+                # LAN subnets.
+                if lan_port:
                     iface_lan = node_mdl.config.core.interfaces(
                         create=cgm_models.EthernetInterfaceConfig,
-                        eth_port='lan0',
+                        eth_port=lan_port,
                     )
                     iface_lan.save()
 

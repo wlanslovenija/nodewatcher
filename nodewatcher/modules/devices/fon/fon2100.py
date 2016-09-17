@@ -36,13 +36,5 @@ class Fonera(cgm_devices.DeviceBase):
         }
     }
 
-    @cgm_devices.register_module()
-    def network(node, cfg):
-        """
-        Network configuration CGM for FON-2100.
-        """
-
-        pass
-
 # Register the FON-2100 device
 cgm_base.register_device('openwrt', Fonera)

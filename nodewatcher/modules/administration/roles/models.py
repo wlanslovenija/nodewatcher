@@ -10,7 +10,7 @@ class RoleConfig(registration.bases.NodeConfigRegistryItem):
 
     roles = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'core.roles#roles',
-        blank=True, null=True, default=[],
+        blank=True, null=True, default=list,
     )
 
     class RegistryMeta:

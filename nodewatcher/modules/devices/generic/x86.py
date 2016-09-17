@@ -1,4 +1,4 @@
-from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
+from nodewatcher.core.generator.cgm import base as cgm_base, devices as cgm_devices
 
 
 class GenericX86NoWifi(cgm_devices.DeviceBase):

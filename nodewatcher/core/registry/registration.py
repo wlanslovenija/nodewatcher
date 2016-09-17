@@ -647,7 +647,7 @@ def create_point(model, namespace, mixins=None):
             try:
                 model._meta.get_field('registry_metadata')
             except django_exceptions.FieldDoesNotExist:
-                model.add_to_class('registry_metadata', jsonfield.JSONField(default={}, editable=False))
+                model.add_to_class('registry_metadata', jsonfield.JSONField(default=dict, editable=False))
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation

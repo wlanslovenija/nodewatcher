@@ -63,22 +63,25 @@ The following things need to be determined for a device descriptor:
   by its logical identifier, which is platform-independent (eg. ``wifi0``).
 
 * ``switches`` contains a list of switch descriptors, which describe ethernet switches present on the device.
-  Each switch is identified by its logical identifier, which is platform-independent (eg. ``switch0``).
+  Each switch is identified by its logical identifier, which is platform-independent (eg. ``switch0``). Each
+  switch can also define multiple VLAN presets that can be used when configuring the switch. If the switch supports
+  custom configuration, it should have the ``configurable`` attribute set to ``True``.
 
-* ``ports`` contains a list of ethernet ports, which describe either physical ethernet ports or a configuration of
-  switched ethernet ports present on the device. Each port is identified by its logical identifier, which is
-  platform-independent (eg. ``wan0``, ``lan0``, etc.).
+* ``ports`` contains a list of ethernet ports, which describe physical ethernet ports. Each port is identified by
+  its logical identifier, which is platform-independent (eg. ``wan0``, ``lan0``, etc.).
 
 * ``port_map`` contains the mapping of logical port names to platform-specific identifiers (one mapping per platform,
   eg. OpenWrt). It maps all platform-independent identifiers (eg. ``wifi0``, ``switch0``, ``wan0``, ``lan0``) to
-  identifiers used on a specific platform (eg. ``radio0``, ``switch0``, ``eth1``, ``eth0``).
+  identifiers used on a specific platform (eg. ``radio0``, ``switch0``, ``eth1``, ``eth0``). For switch configurations
+  a special ``SwitchPortMap`` instance may be used to define VLAN interface naming.
 
 * ``drivers`` defines the drivers used by the radios on each platform. For example, on OpenWrt this may be ``mac80211``.
 
 * ``profiles`` define the platform-specific device profiles that should be used when building an image and paths to the
   resulting firmware files. Note that a single profile may be used for multiple devices. For example, on OpenWrt a
   profile ``TLWR741`` generates a firmware file ``openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin`` for
-  the TP-Link WR741NDv1 device and this must be configured here.
+  the TP-Link WR741NDv1 device and this must be configured here. The firmware filenames can also contain filename
+  patterns containing ``?`` and ``*`` to match different filenames at once.
 
 The best way to determine the values for ``radios``, ``switches``, ``ports``, ``port_map`` and ``drivers`` is
 to boot a stock version of OpenWrt on the device and check the default configuration inside ``/etc/config/network``

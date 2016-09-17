@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
@@ -13,7 +15,7 @@ class LigoWaveLigoDLB5(cgm_devices.DeviceBase):
     architecture = 'ar71xx'
     usb = True
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211AN(
                 cgm_protocols.IEEE80211AN.SHORT_GI_20,
                 cgm_protocols.IEEE80211AN.SHORT_GI_40,
@@ -104,7 +106,7 @@ class LigoWaveLigoDLB2(LigoWaveLigoDLB5):
     identifier = 'lw-ligodlb-2'
     name = 'LigoDLB 2'
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,

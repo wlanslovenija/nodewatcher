@@ -525,8 +525,6 @@ class FormState(dict):
         :param create: True if the root is just being created
         """
 
-        if not self.is_using_defaults():
-            return
-
         for form_default in registration_point.get_form_defaults():
-            form_default.set_defaults(self, create)
+            if form_default.always_apply or self.is_using_defaults():
+                form_default.set_defaults(self, create)

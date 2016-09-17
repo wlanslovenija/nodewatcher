@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
@@ -13,7 +15,7 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
     architecture = 'lantiq'
     usb = True
     radios = [
-        cgm_devices.IntegratedRadio('wifi0', "Integrated wireless radio", [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BG()
         ], [
             cgm_devices.AntennaConnector('a1', "Antenna0")
@@ -28,22 +30,23 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
             cpu_port=5,
             vlans=16,
             cpu_tagged=True,
+            presets=[
+                cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
+                    cgm_devices.SwitchVLANPreset(
+                        'wan0', "Wan0",
+                        vlan=1,
+                        ports=[1, 5],
+                    ),
+                    cgm_devices.SwitchVLANPreset(
+                        'lan0', "Lan0",
+                        vlan=2,
+                        ports=[2, 3, 4, 5],
+                    )
+                ])
+            ]
         )
     ]
-    ports = [
-        cgm_devices.SwitchedEthernetPort(
-            'wan0', "Wan0",
-            switch='sw0',
-            vlan=1,
-            ports=[1, 5],
-        ),
-        cgm_devices.SwitchedEthernetPort(
-            'lan0', "Lan0",
-            switch='sw0',
-            vlan=2,
-            ports=[2, 3, 4, 5],
-        )
-    ]
+    ports = []
     antennas = [
         # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(
