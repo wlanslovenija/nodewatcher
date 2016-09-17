@@ -55,8 +55,7 @@ class GenericRamipsA5V11(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'switch0',
-            'lan0': 'eth0.1',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
         }
     }
     drivers = {

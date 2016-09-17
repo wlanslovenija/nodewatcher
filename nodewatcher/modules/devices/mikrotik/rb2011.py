@@ -58,12 +58,8 @@ class MikrotikRB2011UiAS_IN(cgm_devices.DeviceBase):
     antennas = []
     port_map = {
         'openwrt': {
-            'sw0': 'switch0',
-            'sw1': 'switch1',
-            'wan0': 'eth0.1',
-            'lan0': 'eth0.2',
-            'lan1': 'eth1.1',
-            'sfp0': 'eth0.3',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
+            'sw1': cgm_devices.SwitchPortMap('switch1', vlans='eth1.{vlan}'),
         }
     }
     profiles = {

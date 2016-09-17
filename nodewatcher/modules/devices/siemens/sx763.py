@@ -57,9 +57,7 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'eth0',
-            'wan0': 'eth0.1',
-            'lan0': 'eth0.2',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
         }
     }
     drivers = {

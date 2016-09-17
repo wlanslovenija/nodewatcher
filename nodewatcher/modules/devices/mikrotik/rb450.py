@@ -38,9 +38,7 @@ class MikrotikRB450G(cgm_devices.DeviceBase):
     antennas = []
     port_map = {
         'openwrt': {
-            'sw0': 'switch0',
-            'wan0': 'eth0.1',
-            'lan0': 'eth0.2',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
         }
     }
     profiles = {

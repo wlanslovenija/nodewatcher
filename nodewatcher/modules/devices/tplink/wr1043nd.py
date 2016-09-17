@@ -62,9 +62,7 @@ class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'sw0': 'switch0',
-            'wan0': 'eth0.2',
-            'lan0': 'eth0.1',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
         }
     }
     drivers = {
@@ -112,14 +110,6 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
             tagged_ports=[0],
         )
     ]
-    port_map = {
-        'openwrt': {
-            'wifi0': 'radio0',
-            'sw0': 'switch0',
-            'wan0': 'eth0',
-            'lan0': 'eth1.1',
-        }
-    }
     profiles = {
         'openwrt': {
             'name': 'TLWR1043',

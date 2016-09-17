@@ -82,9 +82,7 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
         'openwrt': {
             'wifi0': 'radio0',
             'wifi1': 'radio1',
-            'sw0': 'switch0',
-            'wan0': 'eth0.2',
-            'lan0': 'eth0.1',
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth0.{vlan}'),
         }
     }
     drivers = {
