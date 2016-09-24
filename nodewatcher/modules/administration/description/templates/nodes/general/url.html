@@ -1,0 +1,7 @@
+{% load i18n %}
+{% if description.url %}
+<div class="row snippet node-name">
+    <div class="col-md-2 key">{% trans "Node URL" %}</div>
+    <div class="col-md-10 value"><a href="{{ description.url }}">{{ description.url }}</a></div>
+</div>
+{% endif %}
