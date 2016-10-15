@@ -171,16 +171,6 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             mobile_defaults = mobile_interface
             break
 
-        def filter_remove_item(item):
-            # Do not remove tunneldigger interfaces as they are already handled by other
-            # defaults handlers.
-            if isinstance(item, td_models.TunneldiggerInterfaceConfig):
-                return False
-
-            # Remove everything else.
-            return True
-        state.remove_items('core.interfaces', filter=filter_remove_item)
-
         # Ethernet.
 
         vlan_ports = {}
@@ -191,6 +181,23 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         # Compute the list of available ports.
         available_ports = [port.identifier for port in device.ports] + vlan_ports.keys()
+
+        # Check if we can reuse the LAN port, so when there are multiple choices, the user
+        # can force a specific port to be used as LAN.
+        lan_port = None
+        for interface in state.filter_items('core.interfaces', klass=cgm_models.EthernetInterfaceConfig):
+            if interface.annotations.get('wlansi.lan', False) and interface.eth_port in available_ports:
+                lan_port = interface.eth_port
+
+        def filter_remove_item(item):
+            # Do not remove tunneldigger interfaces as they are already handled by other
+            # defaults handlers.
+            if isinstance(item, td_models.TunneldiggerInterfaceConfig):
+                return False
+
+            # Remove everything else.
+            return True
+        state.remove_items('core.interfaces', filter=filter_remove_item)
 
         if len(available_ports) >= 1:
             # If there are multiple ethernet ports, use Wan0 for uplink.
@@ -207,13 +214,12 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 wan_port = wan_port.identifier
 
             # The firt non-WAN port is for routing/clients.
-            lan_port = None
             lan_extra_ports = []
             for port in available_ports:
                 if port != wan_port:
                     if lan_port is None:
                         lan_port = port
-                    else:
+                    elif port != lan_port:
                         lan_extra_ports.append(port)
         else:
             # Do not configure any ethernet ports.
@@ -343,6 +349,9 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             configuration={
                                 'routing_protocols': ['olsr', 'babel'],
                             },
+                            annotations={
+                                'wlansi.lan': True,
+                            }
                         )
                     else:
                         # Bridge LAN port to clients.
@@ -350,6 +359,9 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             state,
                             cgm_models.EthernetInterfaceConfig,
                             eth_port=lan_port,
+                            annotations={
+                                'wlansi.lan': True,
+                            }
                         )
 
                         self.setup_network(
