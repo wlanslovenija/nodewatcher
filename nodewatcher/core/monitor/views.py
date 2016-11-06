@@ -15,4 +15,15 @@ class TopologyLinkViewSet(registry_api.RegistryRootViewSetMixin,
     serializer_class = serializers.TopologyLinkSerializer
     registry_root_fields = ['peer']
 
+    def get_queryset(self):
+        """
+        Augments the queryset to allow filtering by node.
+        """
+
+        queryset = super(TopologyLinkViewSet, self).get_queryset()
+        node = self.request.query_params.get('node', None)
+        if node is not None:
+            queryset = queryset.filter(monitor__root__pk=node)
+        return queryset
+
 api_urls.v2_api.register('link', TopologyLinkViewSet)
