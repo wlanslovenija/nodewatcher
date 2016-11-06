@@ -7,7 +7,7 @@ amqp==1.4.9
 anyjson==0.3.3
 billiard==3.3.0.22
 celery==3.1.20
-datastream==0.5.12
+datastream[influxdb]==0.5.14
 defusedxml==0.4.1
 git+https://github.com/zestedesavoir/django-cors-middleware.git@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
 django-classy-tags==0.7.1
@@ -26,11 +26,9 @@ lxml==3.5.0
 kombu==3.0.33
 mimeparse==0.1.3
 mock==1.3.0
-mongoengine==0.8.1
 phonenumbers==7.2.4
 psycopg2==2.6.1
 git+https://github.com/wlanslovenija/pyScss.git@026664cf390ffb6883994cbc54c5b3d3f507a48d#egg=pyScss-wlanslovenija
-pymongo==2.7.1
 python-dateutil==2.4.2
 python-memcached==1.53
 pytz==2015.7
@@ -55,5 +53,5 @@ git+https://github.com/wlanslovenija/django-rest-framework.git@4ce5ae7e3fdaac262
 git+https://github.com/wlanslovenija/django-rest-framework-gis.git@d6e9678c1bc109fd9db886aacd5d0925147c61d5#egg=djangorestframework_gis-wlanslovenija
 git+https://github.com/wlanslovenija/drf-ujson-renderer.git@96cee399260daf469b7e4b004fa245edf9dd253c#egg=drf_ujson-wlanslovenija
 grako==3.8.1
-influxdb==2.12.0
+influxdb==3.0.0
 networkx==1.11
