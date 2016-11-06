@@ -26,12 +26,14 @@ class RegistryRootViewSetMixin(object):
         else:
             for field in registry_root_fields:
                 registry_queryset = queryset.model._meta.get_field(field).related_model.objects.all()
-                return queryset.prefetch_related(
+                queryset = queryset.prefetch_related(
                     django_models.Prefetch(
                         field,
                         queryset=self.get_registry_queryset(registry_queryset, field=field)
                     )
                 )
+
+            return queryset
 
     def get_registry_queryset(self, queryset, field=None):
         if field is None:
