@@ -1,5 +1,5 @@
 -r requirements-readthedocs.txt
 gdal==1.10.0
-cryptography==1.4
+cryptography==1.5.3
 scour==0.27
 git+https://github.com/herzbube/python-aprmd5.git@ddbdab1e36291677984f26756fd9856e05994a61#egg=aprmd5-master
