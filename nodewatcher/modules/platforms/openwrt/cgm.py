@@ -1102,6 +1102,8 @@ def network(node, cfg):
                 # the existing device port map to see which interfaces are already there by default.
                 used_ports = set()
                 for port in device.port_map['openwrt'].values():
+                    if isinstance(port, cgm_devices.SwitchPortMap):
+                        port = port.get_port(vlan=0)
                     if not port.startswith('eth'):
                         continue
 
