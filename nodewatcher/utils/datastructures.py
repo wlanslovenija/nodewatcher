@@ -58,3 +58,24 @@ class OrderedSet(collections.MutableSet):
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
+
+
+def merge_dict(a, b):
+    """
+    Merges two dictionaries recursively.
+
+    :param a: Target dictionary to merge into
+    :param b: Dictionary to merge from
+    :return: Reference to the target dictionary
+    """
+
+    for k, v in b.items():
+        if k in a:
+            if isinstance(a[k], dict):
+                a[k] = merge_dict(a[k], v)
+            else:
+                a[k] = v
+        else:
+            a[k] = v
+
+    return a

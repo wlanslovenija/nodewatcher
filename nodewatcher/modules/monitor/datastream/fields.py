@@ -5,6 +5,7 @@ from django.core import exceptions
 
 from datastream import exceptions as ds_exceptions
 
+from nodewatcher.utils import datastructures
 from .pool import pool
 
 
@@ -166,7 +167,7 @@ class Field(object):
         query_tags = descriptor.get_stream_query_tags()
         query_tags.update(self.prepare_query_tags())
         tags = descriptor.get_stream_tags()
-        tags.update(self._process_tag_references(self.prepare_tags(), descriptor))
+        datastructures.merge_dict(tags, self._process_tag_references(self.prepare_tags(), descriptor))
         return query_tags, tags
 
     def ensure_stream(self, descriptor, stream):

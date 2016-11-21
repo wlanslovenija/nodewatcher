@@ -37,6 +37,7 @@ class GenericSensors(monitor_processors.NodeProcessor):
                         'name': str(data.name or ''),
                         'unit': str(data.unit or ''),
                         'value': float(data.value),
+                        'group': str(data.group or ''),
                     }
                 )
 

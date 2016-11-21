@@ -5,6 +5,7 @@ from django.utils.translation import gettext_noop
 from nodewatcher.core.registry import registration
 from nodewatcher.modules.monitor.datastream import fields as ds_fields, models as ds_models
 from nodewatcher.modules.monitor.datastream.pool import pool as ds_pool
+from nodewatcher.utils import datastructures
 
 
 class GenericSensorMonitor(registration.bases.NodeMonitoringRegistryItem):
@@ -17,6 +18,7 @@ class GenericSensorMonitor(registration.bases.NodeMonitoringRegistryItem):
     name = models.CharField(max_length=200)
     unit = models.CharField(max_length=50)
     value = models.FloatField(null=True)
+    group = models.CharField(max_length=200, null=True)
 
     class RegistryMeta:
         registry_id = 'sensors.generic'
@@ -61,6 +63,19 @@ class GenericSensorMonitorStreams(ds_models.RegistryItemStreams):
             'name': self._model.name,
             'unit': self._model.unit,
         })
+
+        if self._model.group:
+            group = 'generic-sensor-{}'.format(self._model.group)
+            datastructures.merge_dict(tags, {
+                'group': group,
+                'visualization': {
+                    'with': {
+                        'group': group,
+                        'node': ds_fields.TagReference('node'),
+                    }
+                }
+            })
+
         return tags
 
 ds_pool.register(GenericSensorMonitor, GenericSensorMonitorStreams)
