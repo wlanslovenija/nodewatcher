@@ -145,6 +145,8 @@ class DefaultSwitchConfiguration(registry_forms.FormDefaults):
             return
 
         device = general_config.get_device()
+        if not device:
+            return
 
         for switch in device.switches:
             switch_config = state.filter_items('core.switch', klass=models.SwitchConfig, switch=switch.identifier)
