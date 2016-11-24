@@ -167,7 +167,8 @@ class Field(object):
         query_tags = descriptor.get_stream_query_tags()
         query_tags.update(self.prepare_query_tags())
         tags = descriptor.get_stream_tags()
-        datastructures.merge_dict(tags, self._process_tag_references(self.prepare_tags(), descriptor))
+        datastructures.merge_dict(tags, self.prepare_tags())
+        tags = self._process_tag_references(tags, descriptor)
         return query_tags, tags
 
     def ensure_stream(self, descriptor, stream):
