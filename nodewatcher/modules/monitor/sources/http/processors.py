@@ -150,6 +150,7 @@ class HTTPGetPushedNode(monitor_processors.NetworkProcessor):
                 telemetry_source = node.config.core.telemetry.http()
                 if telemetry_source.source != 'push':
                     # If the node is not configured to push, we ignore it.
+                    self.logger.error("Node '%s' not configured to push." % context.push.source)
                     return context, nodes
 
                 nodes.add(node)

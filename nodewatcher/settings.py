@@ -262,6 +262,7 @@ INSTALLED_APPS = (
     'nodewatcher.modules.devices',
     'nodewatcher.modules.identity.base',
     'nodewatcher.modules.identity.public_key',
+    'nodewatcher.modules.identity.hmac',
     'nodewatcher.modules.qos.base',
     'nodewatcher.modules.monitor.sources.http',
     'nodewatcher.modules.monitor.datastream',
@@ -506,7 +507,7 @@ MONITOR_RUNS = {
         'processors': (
             'nodewatcher.modules.monitor.unknown_nodes.processors.DiscoverUnknownNodes',
             'nodewatcher.modules.monitor.sources.http.processors.HTTPGetPushedNode',
-            'nodewatcher.modules.identity.public_key.processors.VerifyNodePublicKey',
+            'nodewatcher.modules.identity.base.processors.VerifyNodeIdentity',
             'nodewatcher.modules.monitor.datastream.processors.TrackRegistryModels',
             TELEMETRY_PROCESSOR_PIPELINE,
         ),
