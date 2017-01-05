@@ -201,7 +201,7 @@ class SwitchVLANPreset(object):
             raise ValueError('Cannot reattach already attached SwitchVLANPreset')
 
         # Validate configuration.
-        if not (0 <= self.vlan < switch.vlans):
+        if self.vlan not in switch.vlans:
             raise exceptions.ImproperlyConfigured("Switch VLAN preset '%s' VLAN (%s) out of range!" % (
                 self.identifier, self.vlan
             ))
@@ -270,7 +270,14 @@ class Switch(object):
                 ))
 
         self.cpu_ports = cpu_ports
-        self.vlans = vlans
+        if isinstance(vlans, int):
+            self.vlans = range(1, vlans + 1)
+        elif isinstance(vlans, dict):
+            self.vlans = range(vlans['start'], vlans['end'] + 1)
+        else:
+            raise exceptions.ImproperlyConfigured("Switch descriptor '%s' has invalid VLANs specification." % (
+                self.identifier
+            ))
         self.cpu_tagged = cpu_tagged
         self.configurable = configurable
         self.tagged_ports = tagged_ports or []
@@ -345,7 +352,7 @@ class Switch(object):
         Returns a list of available VLANs for this switch.
         """
 
-        return ((vlan, _("VLAN %s") % vlan) for vlan in xrange(1, self.vlans + 1))
+        return ((vlan, _("VLAN %s") % vlan) for vlan in self.vlans)
 
     def get_port_choices(self):
         """

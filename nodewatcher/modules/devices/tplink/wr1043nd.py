@@ -93,20 +93,21 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
     switches = [
         cgm_devices.Switch(
             'sw0', "Switch0",
-            ports=[0, 1, 2, 3, 4, 5, 6],
+            ports=[0, 1, 2, 3, 4, 5],
             tagged_ports=[0],
-            cpu_port=[0, 6],
-            vlans=16,
+            cpu_port=[0],
+            vlans={'start': 3, 'end': 9},
+            # VLANs 1 and 2 should not be used as they have hardcoded special roles.
             presets=[
                 cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
                     cgm_devices.SwitchVLANPreset(
                         'wan0', "Wan0",
-                        vlan=2,
-                        ports=[5, 6],
+                        vlan=4,
+                        ports=[0, 5],
                     ),
                     cgm_devices.SwitchVLANPreset(
                         'lan0', "Lan0",
-                        vlan=1,
+                        vlan=3,
                         ports=[0, 1, 2, 3, 4],
                     )
                 ])
@@ -114,6 +115,11 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
         )
     ]
     ports = []
+    port_map = {
+        'openwrt': {
+            'sw0': cgm_devices.SwitchPortMap('switch0', vlans='eth1.{vlan}'),
+        }
+    }
     profiles = {
         'openwrt': {
             'name': 'TLWR1043',
