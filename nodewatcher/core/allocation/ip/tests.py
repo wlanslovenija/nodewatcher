@@ -41,12 +41,12 @@ class IpPoolTest(unittest.TestCase):
             prefix_length=26,
         )
 
-        # Override hold-down period for tests
+        # Override hold-down period for tests.
         self._hold_down_period = models.IpPool.HOLD_DOWN_PERIOD
         models.IpPool.HOLD_DOWN_PERIOD = datetime.timedelta(seconds=0)
 
     def tearDown(self):
-        # Restore hold-down period
+        # Restore hold-down period.
         models.IpPool.HOLD_DOWN_PERIOD = self._hold_down_period
 
     def test_basic_allocation(self):
@@ -105,15 +105,34 @@ class IpPoolTest(unittest.TestCase):
             self.pool.free(hold_down=False)
 
     def test_hold_down(self):
-        # Test that hold-down works as expected
+        # Test that hold-down works as expected.
         a = self.pool.allocate_subnet(prefix_len=27)
         a.free()
         a = models.IpPool.objects.get(pk=a.pk)
         self.assertEqual(a.status, models.IpPoolStatus.HeldDown)
-        # Test that hold-down expiry works as expected
+
+        # Test that hold-down expiry works as expected.
         self.pool.reclaim_held_down()
         with self.assertRaises(models.IpPool.DoesNotExist):
             a = models.IpPool.objects.get(pk=a.pk)
+
+    def test_hold_down_full(self):
+        # An absurdly long hold down period that can never be reached in tests.
+        models.IpPool.HOLD_DOWN_PERIOD = datetime.timedelta(days=1)
+
+        subnet = self.small_pool.allocate_subnet(prefix_len=28)
+        subnet.free()
+        subnet = models.IpPool.objects.get(pk=subnet.pk)
+        self.assertEqual(subnet.status, models.IpPoolStatus.HeldDown)
+
+        # Fill the pool and ensure that the held down subnet will not be suballocated,
+        # before its time expires.
+        self.assertNotEqual(self.small_pool.allocate_subnet(prefix_len=28), None)
+        self.assertNotEqual(self.small_pool.allocate_subnet(prefix_len=27), None)
+
+        self.assertEqual(self.small_pool.allocate_subnet(prefix_len=27), None)
+        self.assertEqual(self.small_pool.allocate_subnet(prefix_len=28), None)
+        self.assertEqual(self.small_pool.allocate_subnet(prefix_len=29), None)
 
     def test_concurrent_allocation(self):
         # Close the connection to avoid sharing it with child processes

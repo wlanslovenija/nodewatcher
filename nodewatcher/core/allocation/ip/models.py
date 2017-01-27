@@ -69,17 +69,27 @@ class IpPool(allocation_models.PoolBase):
         """
         Splits this pool into two subpools.
 
-        WARNING: This method must be called on an object that is locked for
-        updates using `select_for_update`. Otherwise this will cause corruptions.
+        .. warning:: This method must be called on an object that is locked for
+           updates using `select_for_update`. Otherwise this will cause corruptions.
         """
 
         net = ipaddr.IPNetwork('%s/%d' % (self.network, self.prefix_length))
         net0, net1 = net.subnet()
 
-        left = IpPool(parent=self, family=self.family, network=str(net0.network), prefix_length=net0.prefixlen, top_level=self.top_level)
-        right = IpPool(parent=self, family=self.family, network=str(net1.network), prefix_length=net1.prefixlen, top_level=self.top_level)
-        left.save()
-        right.save()
+        left = IpPool.objects.create(
+            parent=self,
+            family=self.family,
+            network=str(net0.network),
+            prefix_length=net0.prefixlen,
+            top_level=self.top_level
+        )
+        right = IpPool.objects.create(
+            parent=self,
+            family=self.family,
+            network=str(net1.network),
+            prefix_length=net1.prefixlen,
+            top_level=self.top_level
+        )
 
         self.status = IpPoolStatus.Partial
         self.save()
@@ -125,7 +135,7 @@ class IpPool(allocation_models.PoolBase):
         # Find the proper network between our children
         alloc = None
         if self.children.count() > 0:
-            for child in self.children.exclude(status=IpPoolStatus.Full).select_for_update():
+            for child in self.available_children().select_for_update():
                 alloc = child.reserve_subnet(network, prefix_len, check_only)
                 if alloc:
                     break
@@ -169,6 +179,13 @@ class IpPool(allocation_models.PoolBase):
             pool.save()
             pool.reclaim_pools()
 
+    def available_children(self):
+        """
+        Returns child pools which can potentially still be allocated.
+        """
+
+        return self.children.filter(status__in=[IpPoolStatus.Free, IpPoolStatus.Partial])
+
     def _allocate_buddy(self, prefix_len):
         """
         Allocate IP addresses from the pool in a buddy-like allocation scheme. This
@@ -195,7 +212,7 @@ class IpPool(allocation_models.PoolBase):
         # and traverse the left one
         alloc = None
         if self.children.count() > 0:
-            for child in self.children.exclude(status=IpPoolStatus.Full).order_by("ip_subnet").select_for_update():
+            for child in self.available_children().order_by("ip_subnet").select_for_update():
                 alloc = child._allocate_buddy(prefix_len)
                 if alloc:
                     break
@@ -210,6 +227,13 @@ class IpPool(allocation_models.PoolBase):
             # Split ourselves into two halves and traverse the left half
             left, right = self._split_buddy()
             alloc = left._allocate_buddy(prefix_len)
+
+            if not alloc:
+                # Nothing has been allocated, this means that the given subnet
+                # was invalid. Remove all children and become free again.
+                self.children.all().delete()
+                self.status = IpPoolStatus.Free
+                self.save()
 
         return alloc
 
