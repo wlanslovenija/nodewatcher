@@ -209,7 +209,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         wan_port = vlan_port
                         break
                 else:
-                    wan_port = device.ports[0].identifier
+                    wan_port = available_ports[0]
             else:
                 wan_port = wan_port.identifier
 
