@@ -282,7 +282,8 @@ DEPENDENCY_APPS = [
 ]
 
 # Compose installed applications into a default configuration.
-INSTALLED_APPS = COMMON_FRONTEND_APPS
+INSTALLED_APPS = []
+INSTALLED_APPS += COMMON_FRONTEND_APPS
 INSTALLED_APPS += ['nodewatcher.modules.frontend.skyline']
 INSTALLED_APPS += CORE_APPS
 INSTALLED_APPS += [
