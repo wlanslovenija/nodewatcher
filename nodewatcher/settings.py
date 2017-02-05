@@ -227,16 +227,16 @@ TEST_RUNNER_FILTER = (
     'django_datastream.',
 )
 
-INSTALLED_APPS = (
+# Common frontend apps should be loaded first.
+COMMON_FRONTEND_APPS = [
     # Common frontend libraries before nodewatcher.core.frontend.
     # Uses "prepend_data" to assure libraries are loaded first.
     'nodewatcher.extra.jquery',
     'nodewatcher.extra.normalize',
+]
 
-    # Extend the default frontend with skyline banner
-    'nodewatcher.modules.frontend.skyline',
-
-    # Ours are at the beginning so that we can override default templates in 3rd party Django apps.
+# Core apps should be listed second, followed by modules.
+CORE_APPS = [
     'nodewatcher.core',
     'nodewatcher.core.allocation',
     'nodewatcher.core.allocation.ip',
@@ -247,7 +247,45 @@ INSTALLED_APPS = (
     'nodewatcher.core.generator',
     'nodewatcher.core.monitor',
     'nodewatcher.core.registry',
+]
 
+# External dependency apps should be listed last.
+DEPENDENCY_APPS = [
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.sitemaps',
+    'django.contrib.admin',
+    'django.contrib.gis',
+
+    # We override staticfiles runserver with default Django runserver in
+    # nodewatcher.core.frontend, which is loaded before for this to work.
+    'django.contrib.staticfiles',
+
+    'polymorphic',
+    'tastypie',
+    'django_datastream',
+    'guardian',
+    'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
+    'missing',
+    'timezone_field',
+    'jsonfield',
+    'leaflet',
+    'django_countries',
+    'timedelta',
+    'registration',
+    'rest_framework',
+    'rest_framework_gis',
+    'corsheaders',
+]
+
+# Compose installed applications into a default configuration.
+INSTALLED_APPS = COMMON_FRONTEND_APPS
+INSTALLED_APPS += ['nodewatcher.modules.frontend.skyline']
+INSTALLED_APPS += CORE_APPS
+INSTALLED_APPS += [
     # Modules.
     #'nodewatcher.modules.analysis.rogue_nodes',
     #'nodewatcher.modules.analysis.channel_allocation',
@@ -315,36 +353,8 @@ INSTALLED_APPS = (
 
     # Accounts support.
     'nodewatcher.extra.accounts',
-
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.sitemaps',
-    'django.contrib.admin',
-    'django.contrib.gis',
-
-    # We override staticfiles runserver with default Django runserver in
-    # nodewatcher.core.frontend, which is loaded before for this to work.
-    'django.contrib.staticfiles',
-
-    'polymorphic',
-    'tastypie',
-    'django_datastream',
-    'guardian',
-    'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
-    'missing',
-    'timezone_field',
-    'jsonfield',
-    'leaflet',
-    'django_countries',
-    'timedelta',
-    'registration',
-    'rest_framework',
-    'rest_framework_gis',
-    'corsheaders',
-)
+]
+INSTALLED_APPS += DEPENDENCY_APPS
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
