@@ -11,7 +11,7 @@ from nodewatcher.core.registry import registration, exceptions
 
 CUSTOM_SETTINGS = {
     'DEBUG': True,
-    'INSTALLED_APPS': settings.INSTALLED_APPS + ('nodewatcher.core.registry.tests.registry_tests',),
+    'INSTALLED_APPS': settings.INSTALLED_APPS + ['nodewatcher.core.registry.tests.registry_tests'],
 }
 
 
