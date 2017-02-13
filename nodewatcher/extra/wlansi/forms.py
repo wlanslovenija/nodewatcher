@@ -124,6 +124,8 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             return
 
         device = general_config.get_device()
+        if not device:
+            return
 
         # Get configured project.
         project_config = state.lookup_item(project_models.ProjectConfig)
