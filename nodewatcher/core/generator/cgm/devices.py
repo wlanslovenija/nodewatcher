@@ -492,6 +492,7 @@ class DeviceMetaclass(type):
 
             new_class.port_map = {}
             new_class.drivers = {}
+            new_class.profiles = {}
 
             for base in bases:
                 if not issubclass(base, DeviceBase):
@@ -501,9 +502,12 @@ class DeviceMetaclass(type):
                 merge_platform_dict(base.port_map, new_class.port_map)
                 # Merge drivers from base classes.
                 merge_platform_dict(base.drivers, new_class.drivers)
+                # Merge profiles from base classes.
+                merge_platform_dict(base.profiles, new_class.profiles)
 
             merge_platform_dict(attrs.get('port_map', {}), new_class.port_map)
             merge_platform_dict(attrs.get('drivers', {}), new_class.drivers)
+            merge_platform_dict(attrs.get('profiles', {}), new_class.profiles)
 
         return new_class
 
@@ -534,7 +538,7 @@ class DeviceBase(object):
         :param platform: Platform instance
         """
 
-        # Register a new choice in the configuration registry
+        # Register a new choice in the configuration registry.
         registration.point('node.config').register_choice(
             'core.general#router',
             registration.Choice(
@@ -547,7 +551,7 @@ class DeviceBase(object):
             )
         )
 
-        # Register a new choice for available device ports
+        # Register a new choice for available device ports.
         for port in cls.ports:
             if isinstance(port, SwitchVLANPreset):
                 continue
@@ -573,7 +577,7 @@ class DeviceBase(object):
                 )
             )
 
-        # Register a new choice for available device radios
+        # Register a new choice for available device radios.
         for radio in cls.radios:
             registration.point('node.config').register_choice(
                 'core.interfaces#wifi_radio',
@@ -584,7 +588,7 @@ class DeviceBase(object):
                 )
             )
 
-        # Register CGM methods
+        # Register CGM methods.
         for name, function in inspect.getmembers(cls, inspect.isfunction):
             if not getattr(function, 'cgm_module', False):
                 continue
@@ -605,11 +609,48 @@ class DeviceBase(object):
         return _("%(manufacturer)s - %(name)s") % {'manufacturer': cls.manufacturer, 'name': cls.name}
 
     @classmethod
+    def resolve_platform_dict(cls, platform, dictionary, default=None):
+        """
+        Resolve platform-keyed dictionary.
+
+        :param platform: Platform instance
+        :param dictionary: Source dictionary
+        :param default: Optional default value
+        """
+
+        for name in [platform.name] + platform.includes:
+            if name in dictionary:
+                return dictionary[name]
+
+        return default
+
+    @classmethod
+    def get_port_map(cls, platform):
+        """
+        Return platform-specific port map.
+
+        :param platform: Platform instance
+        """
+
+        return cls.resolve_platform_dict(platform, cls.port_map, {})
+
+    @classmethod
+    def get_driver(cls, platform, interface):
+        """
+        Return platform-specific driver for the given interface.
+
+        :param platform: Platform instance
+        :param interface: Interface name
+        """
+
+        return cls.resolve_platform_dict(platform, cls.drivers, {})[interface]
+
+    @classmethod
     def remap_port(cls, platform, interface_or_port):
         """
         Remaps a port according to the port mapping.
 
-        :param platform: Platform identifier
+        :param platform: Platform instance
         :param interface_or_port: Interface model or port identifier
         """
 
@@ -622,7 +663,7 @@ class DeviceBase(object):
 
         # If a direct mapping exists, use it. Otherwise, check if this is a switched
         # port and if a special switch-wide mapping is available.
-        mapping = cls.port_map.get(platform, {}).get(interface_or_port, None)
+        mapping = cls.resolve_platform_dict(platform, cls.port_map, {}).get(interface_or_port, None)
         if mapping is not None:
             if isinstance(mapping, SwitchPortMap):
                 return mapping.switch
@@ -633,7 +674,7 @@ class DeviceBase(object):
         port = cls.get_port(interface_or_port)
         if isinstance(port, tuple):
             switch, vlan = port
-            switch_map = cls.port_map.get(platform, {}).get(switch.identifier, None)
+            switch_map = cls.resolve_platform_dict(platform, cls.port_map, {}).get(switch.identifier, None)
             if isinstance(switch_map, SwitchPortMap):
                 return switch_map.get_port(vlan)
 

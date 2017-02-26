@@ -3,8 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.registry import registration
+from nodewatcher.core.generator.cgm import base as cgm_base
 from nodewatcher.modules.frontend.statistics import resources
-from nodewatcher.utils import loader
 
 
 class NodesByDeviceResource(resources.StatisticsResource):
@@ -13,7 +13,7 @@ class NodesByDeviceResource(resources.StatisticsResource):
 
     def get_header(self):
         # Ensure all CGMs are loaded so that we get all the device metadata.
-        loader.load_modules('cgm')
+        cgm_base.registry.discover()
 
         return {
             'device': {

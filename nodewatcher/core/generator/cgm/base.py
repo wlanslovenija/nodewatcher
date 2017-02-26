@@ -1,5 +1,3 @@
-import copy
-
 from django.template import loader as template_loader
 
 from ....utils import loader
@@ -8,9 +6,6 @@ from ...registry import registration
 
 from . import devices as cgm_devices, resources as cgm_resources, exceptions
 from .. import models as generator_models
-
-# Registered platform modules
-PLATFORM_REGISTRY = {}
 
 
 class ValidationError(Exception):
@@ -358,9 +353,28 @@ class PlatformBase(object):
         """
 
         self.name = None
+        self._includes = []
+        self._included = []
         self._modules = []
         self._packages = []
         self._devices = {}
+
+    def add_include(self, platform_name):
+        """
+        Add platform include.
+        """
+
+        platform = get_platform(platform_name)
+        platform._included.append(self.name)
+        self._includes.append(platform_name)
+
+    @property
+    def includes(self):
+        """
+        Included platforms.
+        """
+
+        return self._includes
 
     def generate(self, node):
         """
@@ -374,10 +388,21 @@ class PlatformBase(object):
         except exceptions.BuilderConfigurationError:
             cfg.builder = None
 
-        modules = copy.copy(self._modules)
+        modules = []
+        packages = []
+
+        # Process module and package includes.
+        for platform_name in self._includes:
+            platform = get_platform(platform_name)
+            modules += platform._modules
+            packages += platform._packages
+
+        # Include local modules and packages.
+        modules += self._modules
+        packages += self._packages
 
         # Process user-configured packages.
-        for name, cfgclass, package, weight in self._packages:
+        for name, cfgclass, package, weight in packages:
             pkgcfg = node.config.core.packages(onlyclass=cfgclass)
             if [x for x in pkgcfg if x.enabled]:
                 # Copy the variables to avoid them being overwritten in the for loop.
@@ -551,6 +576,10 @@ class PlatformBase(object):
         self._devices[device.identifier] = device
         device.register(self)
 
+        # Also register the device in all platforms that include this one.
+        for platform in self._included:
+            get_platform(platform).register_device(device)
+
     def get_device(self, device):
         """
         Returns a device descriptor.
@@ -561,104 +590,143 @@ class PlatformBase(object):
         return self._devices[device]
 
 
-def register_platform(enum, text, platform):
+class PlatformRegistry(object):
     """
-    Registers a new platform with the Configuration Generation Modules
-    system.
-    """
-
-    if not isinstance(platform, PlatformBase):
-        raise TypeError("Platform formatter/builder implementation must be a PlatformBase instance!")
-
-    if enum in PLATFORM_REGISTRY:
-        raise ValueError("Platform '{0}' is already registered!".format(enum))
-
-    PLATFORM_REGISTRY[enum] = platform
-    platform.name = enum
-
-    # Register the choice in configuration registry
-    registration.point("node.config").register_choice("core.general#platform", registration.Choice(enum, text))
-
-
-def get_platform(platform):
-    """
-    Returns the given platform implementation.
+    Platform registry.
     """
 
-    # Ensure that all CGMs are registred
-    loader.load_modules('cgm')
+    def __init__(self):
+        self._platforms = {}
+        self._loading = False
+        self._loaded = False
 
-    try:
-        return PLATFORM_REGISTRY[platform]
-    except KeyError:
-        raise KeyError("Platform '{0}' does not exist!".format(platform))
+    def discover(self):
+        """
+        Discover platforms.
+        """
 
+        if not self._loaded and not self._loading:
+            self._loading = True
 
-def register_platform_module(platform, weight=999, device=None):
-    """
-    Registers a new platform module.
-    """
+            try:
+                # Ensure that all CGMs are registered.
+                loader.load_modules('cgm')
+            finally:
+                self._loading = False
 
-    def wrapper(f):
-        get_platform(platform).register_module(weight, f, device=device)
-        return f
+            self._loaded = True
 
-    return wrapper
+    def register_platform(self, enum, text, platform=None, include=None):
+        """
+        Registers a new platform with the Configuration Generation Modules
+        system.
+        """
 
+        if not isinstance(platform, PlatformBase):
+            raise TypeError("Platform formatter/builder implementation must be a PlatformBase instance!")
 
-def register_platform_package(platform, name, cfgclass):
-    """
-    Registers a new platform package.
-    """
+        if enum in self._platforms:
+            raise ValueError("Platform '{0}' is already registered!".format(enum))
 
-    def wrapper(f):
-        get_platform(platform).register_package(name, cfgclass, f)
-        return f
+        self._platforms[enum] = platform
+        platform.name = enum
 
-    return wrapper
+        # Setup any includes.
+        if include is not None:
+            for platform_name in include:
+                platform.add_include(platform_name)
 
+        # Register the choice in configuration registry.
+        registration.point("node.config").register_choice("core.general#platform", registration.Choice(enum, text))
 
-def register_device(platform, device):
-    """
-    Registers a new device.
-    """
+    def get_platform(self, platform):
+        """
+        Returns the given platform implementation.
+        """
 
-    get_platform(platform).register_device(device)
+        self.discover()
 
+        try:
+            return self._platforms[platform]
+        except KeyError:
+            raise KeyError("Platform '{0}' does not exist!".format(platform))
 
-def iterate_devices():
-    """
-    Iterates over all registered devices.
-    """
+    def register_platform_module(self, platform, weight=999, device=None):
+        """
+        Registers a new platform module.
+        """
 
-    for platform in PLATFORM_REGISTRY.values():
-        for device in platform._devices.values():
-            yield device
+        def wrapper(f):
+            self.get_platform(platform).register_module(weight, f, device=device)
+            return f
 
+        return wrapper
 
-def generate_firmware(node, user=None, only_validate=False):
-    """
-    Generates configuration and/or firmware for the specified node.
+    def register_platform_package(self, platform, name, cfgclass):
+        """
+        Registers a new platform package.
+        """
 
-    :param node: Node instance
-    :param user: User that will own the firmware image
-    :param only_validate: True if only validation should be performed
-    """
+        def wrapper(f):
+            self.get_platform(platform).register_package(name, cfgclass, f)
+            return f
 
-    # Determine the destination platform
-    try:
-        platform = get_platform(node.config.core.general().platform)
-    except (AttributeError, KeyError):
-        return None
+        return wrapper
 
-    cfg = platform.generate(node)
-    if not only_validate:
-        if user is None:
-            raise ValueError('To build firmware images, the \'user\' argument must be specified!')
+    def register_device(self, platform, device):
+        """
+        Registers a new device.
+        """
 
-        return platform.defer_build(user, node, cfg)
-    else:
-        # Ensure that the proper builders are available for building this firmware
-        platform.validate_build(node, cfg)
+        self.get_platform(platform).register_device(device)
 
-    return cfg
+    def iterate_devices(self):
+        """
+        Iterates over all registered devices.
+        """
+
+        self.discover()
+
+        existing = set()
+        for platform in self._platforms.values():
+            for device in platform._devices.values():
+                if device not in existing:
+                    existing.add(device)
+                    yield device
+
+    def generate_firmware(self, node, user=None, only_validate=False):
+        """
+        Generates configuration and/or firmware for the specified node.
+
+        :param node: Node instance
+        :param user: User that will own the firmware image
+        :param only_validate: True if only validation should be performed
+        """
+
+        # Determine the destination platform.
+        try:
+            platform = self.get_platform(node.config.core.general().platform)
+        except (AttributeError, KeyError):
+            return None
+
+        cfg = platform.generate(node)
+        if not only_validate:
+            if user is None:
+                raise ValueError('To build firmware images, the \'user\' argument must be specified!')
+
+            return platform.defer_build(user, node, cfg)
+        else:
+            # Ensure that the proper builders are available for building this firmware.
+            platform.validate_build(node, cfg)
+
+        return cfg
+
+# Global platform registry.
+registry = PlatformRegistry()
+register_platform = registry.register_platform
+register_platform_module = registry.register_platform_module
+register_platform_package = registry.register_platform_package
+register_device = registry.register_device
+iterate_devices = registry.iterate_devices
+generate_firmware = registry.generate_firmware
+get_platform = registry.get_platform

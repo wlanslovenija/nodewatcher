@@ -56,8 +56,15 @@ class UBNTRocketM2(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-rocket-m-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-rocket-m-squashfs-sysupgrade.bin',
+                '*-ar71xx-generic-ubnt-rocket-m-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-rocket-m-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'ubnt-rocket-m',
+            'files': [
+                '*-ar71xx-generic-ubnt-rocket-m-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-rocket-m-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -97,8 +104,15 @@ class UBNTRocketM5XW(UBNTRocketM5):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-rocket-m-xw-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-rocket-m-xw-squashfs-sysupgrade.bin',
+                '*-ar71xx-generic-ubnt-rocket-m-xw-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-rocket-m-xw-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'ubnt-rocket-m-xw',
+            'files': [
+                '*-ar71xx-generic-ubnt-rocket-m-xw-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-rocket-m-xw-squashfs-sysupgrade.bin',
             ]
         }
     }

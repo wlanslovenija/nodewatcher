@@ -32,8 +32,8 @@ class GenericX86NoWifi(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'Generic',
             'files': [
-                'openwrt-x86-generic-rootfs-ext4.img.gz',
-                'openwrt-x86-generic-vmlinuz'
+                '*-x86-generic-rootfs-ext4.img.gz',
+                '*-x86-generic-vmlinuz'
             ]
         }
     }
@@ -51,7 +51,7 @@ class GenericX86HyperVNoWifi(GenericX86NoWifi):
         'openwrt': {
             'name': 'Generic',
             'files': [
-                'openwrt-x86-generic-combined-ext4.img.gz'
+                '*-x86-generic-combined-ext4.img.gz'
             ]
         }
     }
@@ -69,7 +69,7 @@ class GenericX86KVMNoWifi(GenericX86NoWifi):
         'openwrt': {
             'name': 'Generic',
             'files': [
-                'openwrt-x86-kvm_guest-combined-ext4.img.gz'
+                '*-x86-kvm_guest-combined-ext4.img.gz'
             ]
         }
     }
@@ -87,7 +87,7 @@ class GenericX86VMWareNoWifi(GenericX86NoWifi):
         'openwrt': {
             'name': 'Generic',
             'files': [
-                'openwrt-x86-generic-combined-ext4.vmdk'
+                '*-x86-generic-combined-ext4.vmdk'
             ]
         }
     }
@@ -105,7 +105,7 @@ class GenericX86VirtualBoxNoWifi(GenericX86NoWifi):
         'openwrt': {
             'name': 'Generic',
             'files': [
-                'openwrt-x86-generic-combined-ext4.vdi'
+                '*-x86-generic-combined-ext4.vdi'
             ]
         }
     }

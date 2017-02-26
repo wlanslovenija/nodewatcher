@@ -4,6 +4,10 @@ from ...registry.forms import formprocessors
 from . import base as cgm_base, exceptions
 
 
+# Ensure all CGMs have been loaded.
+cgm_base.registry.discover()
+
+
 class NodeCgmValidator(formprocessors.RegistryFormProcessor):
     """
     A form processor that validates a node's firmware configuration via the

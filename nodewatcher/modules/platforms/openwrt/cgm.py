@@ -549,6 +549,14 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
     """
 
     config_class = UCIConfiguration
+    builder_class = openwrt_builder.Builder
+
+    def get_profile(self, device):
+        """
+        Returns the device profile.
+        """
+
+        return device.profiles['openwrt']
 
     def build(self, result):
         """
@@ -559,11 +567,12 @@ class PlatformOpenWRT(cgm_base.PlatformBase):
         :return: A list of generated firmware files
         """
 
-        # Extract the device descriptor to get the profile
+        # Extract the device descriptor to get the profile.
         device = result.node.config.core.general().get_device()
-        profile = device.profiles['openwrt']
+        profile = self.get_profile(device)
 
-        return openwrt_builder.build_image(result, profile)
+        builder = self.builder_class(result, profile)
+        return builder.build()
 
 cgm_base.register_platform('openwrt', _("OpenWRT"), PlatformOpenWRT())
 
@@ -859,11 +868,11 @@ def configure_switch(cfg, device, switch, vlan):
     :param vlan: VLAN configuration
     """
 
-    switch_iface = device.remap_port('openwrt', switch.identifier)
+    switch_iface = device.remap_port(cfg.platform, switch.identifier)
     if switch_iface is None:
         raise cgm_base.ValidationError(
             _("No mapping for OpenWrt when configuring switch '%(switch)s'.") % {'switch': switch.identifier}
-        )
+         )
 
     # Enable switch if not yet enabled.
     try:
@@ -1033,7 +1042,7 @@ def network(node, cfg):
             continue
 
         if isinstance(interface, cgm_models.BridgeInterfaceConfig):
-            iface_name = cfg.sanitize_identifier(device.get_bridge_mapping('openwrt', interface))
+            iface_name = cfg.sanitize_identifier(device.get_bridge_mapping(cfg.platform.name, interface))
             iface = cfg.network.add(interface=iface_name, managed_by=interface)
             iface.type = 'bridge'
 
@@ -1042,7 +1051,7 @@ def network(node, cfg):
             for port in interface.bridge_ports.all():
                 port = port.interface
                 if isinstance(port, cgm_models.EthernetInterfaceConfig):
-                    raw_port = device.remap_port('openwrt', port.eth_port)
+                    raw_port = device.remap_port(cfg.platform, port.eth_port)
                     if raw_port is None:
                         raise cgm_base.ValidationError(
                             _("No port remapping for port '%(port)s' of device '%(device_name)s' is available!") % {
@@ -1101,7 +1110,7 @@ def network(node, cfg):
                 # Mobile modem presents itself as a USB ethernet device. Determine the port based on
                 # the existing device port map to see which interfaces are already there by default.
                 used_ports = set()
-                for port in device.port_map['openwrt'].values():
+                for port in device.get_port_map(cfg.platform).values():
                     if isinstance(port, cgm_devices.SwitchPortMap):
                         port = port.get_port(vlan=0)
                     if not port.startswith('eth'):
@@ -1224,7 +1233,7 @@ def network(node, cfg):
                     _("Duplicate interface definition for port '%s'!") % interface.eth_port
                 )
 
-            iface.ifname = device.remap_port('openwrt', interface.eth_port)
+            iface.ifname = device.remap_port(cfg.platform, interface.eth_port)
             if iface.ifname is None:
                 raise cgm_base.ValidationError(
                     _("No port remapping for port '%(port)s' of device '%(device_name)s' is available!") % {
@@ -1263,14 +1272,14 @@ def network(node, cfg):
 
             if isinstance(dsc_radio, cgm_devices.IntegratedRadio):
                 # Integrated radios have specified names and drivers.
-                wifi_radio = device.remap_port('openwrt', interface.wifi_radio)
+                wifi_radio = device.remap_port(cfg.platform, interface.wifi_radio)
                 if not wifi_radio:
                     raise cgm_base.ValidationError(
                         _("Radio '%s' not defined on OpenWRT!") % interface.wifi_radio
                     )
 
                 try:
-                    radio_type = device.drivers['openwrt'][interface.wifi_radio]
+                    radio_type = device.get_driver(cfg.platform, interface.wifi_radio)
                 except KeyError:
                     raise cgm_base.ValidationError(
                         _("Radio driver for '%s' not defined on OpenWRT!") % interface.wifi_radio
@@ -1415,7 +1424,7 @@ def network(node, cfg):
                         raise cgm_base.ValidationError(_("Unsupported OpenWrt bitrate set '%s'!") % bitrate.rate_set)
 
                 # Configure network interface for each vif, first being the primary network
-                vif_name = device.get_vif_mapping('openwrt', interface.wifi_radio, vif)
+                vif_name = device.get_vif_mapping(cfg.platform.name, interface.wifi_radio, vif)
                 wif.ifname = vif_name
 
                 bridge = check_interface_bridged(vif)

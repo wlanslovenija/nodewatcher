@@ -99,7 +99,15 @@ class TPLinkWDR3600v1(cgm_devices.DeviceBase):
             # The TLWDR4300 profile is also used for WDR 3600.
             'name': 'TLWDR4300',
             'files': [
-                'openwrt-ar71xx-generic-tl-wdr3600-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wdr3600-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wdr3600-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wdr3600-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wdr3600-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wdr3600-v1-squashfs-sysupgrade.bin'
             ]
         }
     }

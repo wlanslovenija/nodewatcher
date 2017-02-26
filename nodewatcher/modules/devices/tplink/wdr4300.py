@@ -98,7 +98,15 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWDR4300',
             'files': [
-                'openwrt-ar71xx-generic-tl-wdr4300-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wdr4300-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wdr4300-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'openwrt': {
+            'name': 'tl-wdr4300-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wdr4300-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wdr4300-v1-squashfs-sysupgrade.bin'
             ]
         }
     }

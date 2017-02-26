@@ -60,8 +60,15 @@ class GLiNet6408Av1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'GLINET',
             'files': [
-                'openwrt-ar71xx-generic-gl-inet-6408A-v1-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-gl-inet-6408A-v1-squashfs-sysupgrade.bin'
+                '*-ar71xx-generic-gl-inet-6408A-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-gl-inet-6408A-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'gl-inet-6408A-v1',
+            'files': [
+                '*-ar71xx-generic-gl-inet-6408A-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-gl-inet-6408A-v1-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -78,8 +85,15 @@ class GLiNet6416Av1(GLiNet6408Av1):
         'openwrt': {
             'name': 'GLINET',
             'files': [
-                'openwrt-ar71xx-generic-gl-inet-6416A-v1-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-gl-inet-6416A-v1-squashfs-sysupgrade.bin'
+                '*-ar71xx-generic-gl-inet-6416A-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-gl-inet-6416A-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'gl-inet-6416A-v1',
+            'files': [
+                '*-ar71xx-generic-gl-inet-6416A-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-gl-inet-6416A-v1-squashfs-sysupgrade.bin'
             ]
         }
     }

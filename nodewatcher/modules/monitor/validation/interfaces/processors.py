@@ -1,6 +1,5 @@
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.monitor import models as monitor_models, processors as monitor_processors
-from nodewatcher.utils import loader
 
 from . import events
 
@@ -21,8 +20,6 @@ class InterfaceValidator(monitor_processors.NodeProcessor):
         # Check if any configured interfaces are missing from the report or if there are some
         # things misconfigured
         try:
-            loader.load_modules('cgm')
-
             platform = node.config.core.general().platform
             device = node.config.core.general().get_device()
             if not platform or not device:

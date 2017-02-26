@@ -76,8 +76,15 @@ class TPLinkCPE210(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'CPE510',
             'files': [
-                'openwrt-ar71xx-generic-cpe210-220-510-520-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-cpe210-220-510-520-squashfs-sysupgrade.bin'
+                '*-ar71xx-generic-cpe210-220-510-520-squashfs-factory.bin',
+                '*-ar71xx-generic-cpe210-220-510-520-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'cpe210-220',
+            'files': [
+                '*-ar71xx-generic-cpe210-220-squashfs-factory.bin',
+                '*-ar71xx-generic-cpe210-220-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -113,6 +120,15 @@ class TPLinkCPE510(TPLinkCPE210):
             cgm_devices.DeviceRadio.MultipleSSID,
         ])
     ]
+    profiles = {
+        'lede': {
+            'name': 'cpe510-520',
+            'files': [
+                '*-ar71xx-generic-cpe510-520-squashfs-factory.bin',
+                '*-ar71xx-generic-cpe510-520-squashfs-sysupgrade.bin'
+            ]
+        }
+    }
 
 
 class TPLinkCPE520(TPLinkCPE510):

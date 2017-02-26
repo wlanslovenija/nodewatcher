@@ -77,7 +77,15 @@ class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR1043',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr1043nd-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr1043nd-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wr1043nd-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -124,7 +132,15 @@ class TPLinkWR1043NDv2(TPLinkWR1043NDv1):
         'openwrt': {
             'name': 'TLWR1043',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr1043nd-v2-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr1043nd-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1043nd-v2-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr1043nd-v2',
+            'files': [
+                '*-ar71xx-generic-tl-wr1043nd-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1043nd-v2-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -141,7 +157,15 @@ class TPLinkWR1043NDv3(TPLinkWR1043NDv2):
         'openwrt': {
             'name': 'TLWR1043',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr1043nd-v3-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr1043nd-v3-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1043nd-v3-squashfs-sysupgrade.bin'
+            ]
+        },
+        'openwrt': {
+            'name': 'tl-wr1043nd-v3',
+            'files': [
+                '*-ar71xx-generic-tl-wr1043nd-v3-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1043nd-v3-squashfs-sysupgrade.bin'
             ]
         }
     }

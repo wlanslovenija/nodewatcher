@@ -58,9 +58,17 @@ class TPLinkMR3020v1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLMR3020',
             'files': [
-                'openwrt-ar71xx-generic-tl-mr3020-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-mr3020-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-mr3020-v1-squashfs-sysupgrade.bin'
             ]
-        }
+        },
+        'lede': {
+            'name': 'tl-mr3020-v1',
+            'files': [
+                '*-ar71xx-generic-tl-mr3020-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-mr3020-v1-squashfs-sysupgrade.bin'
+            ]
+        },
     }
 
 # Register the TP-Link MR3020 device

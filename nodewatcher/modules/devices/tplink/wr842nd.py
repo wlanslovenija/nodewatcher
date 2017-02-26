@@ -75,7 +75,15 @@ class TPLinkWR842NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR842',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr842n-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr842n-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr842n-v1-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr842n-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wr842n-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr842n-v1-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -99,11 +107,19 @@ class TPLinkWR842NDv2(TPLinkWR842NDv1):
         'openwrt': {
             'name': 'TLWR842',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr842n-v2-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr842n-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr842n-v2-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr842n-v2',
+            'files': [
+                '*-ar71xx-generic-tl-wr842n-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr842n-v2-squashfs-sysupgrade.bin',
             ]
         }
     }
 
-# Register the TP-Link WR842ND device
+# Register the TP-Link WR842ND devices.
 cgm_base.register_device('openwrt', TPLinkWR842NDv1)
 cgm_base.register_device('openwrt', TPLinkWR842NDv2)

@@ -288,6 +288,9 @@ INSTALLED_APPS += ['nodewatcher.modules.frontend.skyline']
 INSTALLED_APPS += CORE_APPS
 INSTALLED_APPS += [
     # Modules.
+    'nodewatcher.modules.platforms.openwrt',
+    'nodewatcher.modules.platforms.lede',
+    'nodewatcher.modules.devices',
     #'nodewatcher.modules.analysis.rogue_nodes',
     #'nodewatcher.modules.analysis.channel_allocation',
     'nodewatcher.modules.administration.types',
@@ -297,8 +300,6 @@ INSTALLED_APPS += [
     'nodewatcher.modules.administration.roles',
     'nodewatcher.modules.administration.status',
     'nodewatcher.modules.equipment.antennas',
-    'nodewatcher.modules.platforms.openwrt',
-    'nodewatcher.modules.devices',
     'nodewatcher.modules.identity.base',
     'nodewatcher.modules.identity.public_key',
     'nodewatcher.modules.identity.hmac',

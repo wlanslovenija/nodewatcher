@@ -105,7 +105,7 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'WITI',
             'files': [
-                'openwrt-ramips-mt7621-witi-squashfs-sysupgrade.bin'
+                '*-ramips-mt7621-witi-squashfs-sysupgrade.bin'
             ]
         }
     }

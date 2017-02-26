@@ -12,8 +12,6 @@ from django.core.files import uploadedfile
 from django import db
 from django.db import transaction
 
-from ....utils import loader
-
 from . import signals, base as cgm_base, exceptions
 from .. import models as generator_models
 from .. import events as generator_events
@@ -42,8 +40,6 @@ def background_build(self, result_uuid):
     result.status = generator_models.BuildResult.BUILDING
     result.save()
 
-    # Ensure that all CGMs are loaded before doing processing
-    loader.load_modules('cgm')
     platform = cgm_base.get_platform(result.builder.platform)
 
     # Dispatch pre-build signal

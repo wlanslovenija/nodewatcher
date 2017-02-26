@@ -20,7 +20,8 @@ def public_key_identity(node, cfg):
             uhttpd.cert = IDENTITY_CERTIFICATE_LOCATION
             uhttpd.key = IDENTITY_KEY_LOCATION
 
-            cfg.packages.add('uhttpd-mod-tls')
+            if cfg.has_package('uhttpd-mod-tls'):
+                cfg.packages.add('uhttpd-mod-tls')
         except IndexError:
             pass
 

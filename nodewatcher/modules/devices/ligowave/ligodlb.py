@@ -57,7 +57,7 @@ class LigoWaveLigoDLB5(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'DELIBERANT',
             'files': [
-                'openwrt-ar71xx-generic-deliberant-squashfs-sysupgrade.bin',
+                '*-ar71xx-generic-deliberant-squashfs-sysupgrade.bin',
             ],
         }
     }

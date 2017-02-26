@@ -27,7 +27,7 @@ class RaspberryPi1B(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'RaspberryPi',
             'files': [
-                'openwrt-brcm2708-bcm2708-sdcard-vfat-ext4.img',
+                '*-brcm2708-bcm2708-sdcard-vfat-ext4.img',
             ]
         }
     }

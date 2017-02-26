@@ -75,9 +75,17 @@ class TPLinkWR1041NDv2(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR1041',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr1041n-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1041n-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1041n-v2-squashfs-sysupgrade.bin',
             ],
-        }
+        },
+        'lede': {
+            'name': 'tl-wr1041n-v2',
+            'files': [
+                '*-ar71xx-generic-tl-wr1041n-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr1041n-v2-squashfs-sysupgrade.bin',
+            ],
+        },
     }
 
 # Register the TP-Link WR1041ND device

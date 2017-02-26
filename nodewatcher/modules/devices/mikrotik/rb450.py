@@ -48,9 +48,9 @@ class MikrotikRB450G(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'DefaultNoWifi',
             'files': [
-                'openwrt-ar71xx-mikrotik-DefaultNoWifi-rootfs.tar.gz',
-                'openwrt-ar71xx-mikrotik-vmlinux-lzma.elf',
-                'openwrt-ar71xx-mikrotik-vmlinux-initramfs-lzma.elf',
+                '*-ar71xx-mikrotik-DefaultNoWifi-rootfs.tar.gz',
+                '*-ar71xx-mikrotik-vmlinux-lzma.elf',
+                '*-ar71xx-mikrotik-vmlinux-initramfs-lzma.elf',
             ]
         }
     }

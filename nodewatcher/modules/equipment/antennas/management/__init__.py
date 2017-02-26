@@ -4,7 +4,6 @@ from django.apps import apps
 from django.db.models import signals as django_signals
 
 from nodewatcher.core.generator.cgm import base as cgm_base
-from nodewatcher.utils import loader
 
 from .. import models as antennas_models
 
@@ -28,9 +27,6 @@ def install_antenna_fixtures(sender, **kwargs):
         apps.get_model('antennas', 'Antenna')
     except LookupError:
         return
-
-    # Ensure that all CGMs are registred
-    loader.load_modules('cgm')
 
     for device in cgm_base.iterate_devices():
         for antenna in device.antennas:

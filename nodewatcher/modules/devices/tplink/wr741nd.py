@@ -74,8 +74,15 @@ class TPLinkWR741NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR741',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr741nd-v1-squashfs-sysupgrade.bin'
+                '*-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr741nd-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr741nd-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wr741nd-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr741nd-v1-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -92,8 +99,15 @@ class TPLinkWR741NDv2(TPLinkWR741NDv1):
         'openwrt': {
             'name': 'TLWR741',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr741nd-v2-squashfs-sysupgrade.bin'
+                '*-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr741nd-v2-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr741nd-v2',
+            'files': [
+                '*-ar71xx-generic-tl-wr741nd-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr741nd-v2-squashfs-sysupgrade.bin'
             ]
         }
     }
@@ -110,8 +124,15 @@ class TPLinkWR741NDv4(TPLinkWR741NDv1):
         'openwrt': {
             'name': 'TLWR741',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-tl-wr741nd-v4-squashfs-sysupgrade.bin'
+                '*-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr741nd-v4-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr741nd-v4',
+            'files': [
+                '*-ar71xx-generic-tl-wr741nd-v4-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr741nd-v4-squashfs-sysupgrade.bin'
             ]
         }
     }

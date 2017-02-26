@@ -58,8 +58,15 @@ class UBNTNanoM2(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
+                '*-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'ubnt-nano-m',
+            'files': [
+                '*-ar71xx-generic-ubnt-nano-m-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-nano-m-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -99,8 +106,15 @@ class UBNTNanoM5XW(UBNTNanoM5):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-nano-m-xw-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-nano-m-xw-squashfs-sysupgrade.bin',
+                '*-ar71xx-generic-ubnt-nano-m-xw-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-nano-m-xw-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'ubnt-nano-m-xw',
+            'files': [
+                '*-ar71xx-generic-ubnt-nano-m-xw-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-nano-m-xw-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -153,8 +167,15 @@ class UBNTLocoM5XW(UBNTLocoM5):
         'openwrt': {
             'name': 'UBNT',
             'files': [
-                'openwrt-ar71xx-generic-ubnt-loco-m-xw-squashfs-factory.bin',
-                'openwrt-ar71xx-generic-ubnt-loco-m-xw-squashfs-sysupgrade.bin',
+                '*-ar71xx-generic-ubnt-loco-m-xw-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-loco-m-xw-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'ubnt-loco-m-xw',
+            'files': [
+                '*-ar71xx-generic-ubnt-loco-m-xw-squashfs-factory.bin',
+                '*-ar71xx-generic-ubnt-loco-m-xw-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -177,7 +198,7 @@ class UBNTNanobridgeM2(UBNTLocoM2):
     identifier = 'ub-nanobridge-m2'
     name = "Nanobridge M2"
 
-# Register the UBNT Nano device.
+# Register the UBNT Nano devices.
 cgm_base.register_device('openwrt', UBNTNanoM2)
 cgm_base.register_device('openwrt', UBNTNanoM5)
 cgm_base.register_device('openwrt', UBNTNanoM5XW)

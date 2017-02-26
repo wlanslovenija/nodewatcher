@@ -71,7 +71,7 @@ class GenericRamipsA5V11(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'A5-V11',
             'files': [
-                'openwrt-ramips-rt305x-a5-v11-squashfs-factory.bin'
+                '*-ramips-rt305x-a5-v11-squashfs-factory.bin'
             ]
         }
     }

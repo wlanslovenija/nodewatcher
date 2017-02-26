@@ -58,7 +58,15 @@ class TPLinkWR703Nv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR703',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr703n-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr703n-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr703n-v1-squashfs-sysupgrade.bin'
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr703n-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wr703n-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr703n-v1-squashfs-sysupgrade.bin'
             ]
         }
     }

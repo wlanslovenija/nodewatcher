@@ -787,8 +787,8 @@ def prepare_root_forms(regpoint, request, root=None, data=None, save=False, form
     :param save: Are we performing a save or rendering an initial form
     """
 
-    # Ensure that all registry forms, form processors and CGMs are registered.
-    loader.load_modules('forms', 'formprocessors', 'cgm')
+    # Ensure that all registry forms and form processors are registered.
+    loader.load_modules('forms', 'formprocessors')
 
     if save and flags & FORM_ONLY_DEFAULTS:
         raise ValueError("You cannot use save and FORM_ONLY_DEFAULTS at the same time!")

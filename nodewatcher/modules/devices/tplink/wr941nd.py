@@ -17,7 +17,15 @@ class TPLinkWR941NDv2(wr841nd.TPLinkWR841NDv1):
         'openwrt': {
             'name': 'TLWR941',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr941nd-v2-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr941nd-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr941nd-v2-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr941nd-v2',
+            'files': [
+                '*-ar71xx-generic-tl-wr941nd-v2-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr941nd-v2-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -34,7 +42,15 @@ class TPLinkWR941NDv3(TPLinkWR941NDv2):
         'openwrt': {
             'name': 'TLWR941',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr941nd-v3-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr941nd-v3-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr941nd-v3-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr941nd-v3',
+            'files': [
+                '*-ar71xx-generic-tl-wr941nd-v3-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr941nd-v3-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -51,12 +67,20 @@ class TPLinkWR941NDv4(TPLinkWR941NDv2):
         'openwrt': {
             'name': 'TLWR941',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr941nd-v4-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr941nd-v4-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr941nd-v4-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr941nd-v4',
+            'files': [
+                '*-ar71xx-generic-tl-wr941nd-v4-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr941nd-v4-squashfs-sysupgrade.bin',
             ]
         }
     }
 
-# Register the TP-Link WR941ND device
+# Register the TP-Link WR941ND devices.
 cgm_base.register_device('openwrt', TPLinkWR941NDv2)
 cgm_base.register_device('openwrt', TPLinkWR941NDv3)
 cgm_base.register_device('openwrt', TPLinkWR941NDv4)

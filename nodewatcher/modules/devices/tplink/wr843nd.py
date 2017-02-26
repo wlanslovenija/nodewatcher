@@ -74,10 +74,18 @@ class TPLinkWR843NDv1(cgm_devices.DeviceBase):
         'openwrt': {
             'name': 'TLWR843',
             'files': [
-                'openwrt-ar71xx-generic-tl-wr843nd-v1-squashfs-factory.bin'
+                '*-ar71xx-generic-tl-wr843nd-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr843nd-v1-squashfs-sysupgrade.bin',
+            ]
+        },
+        'lede': {
+            'name': 'tl-wr843nd-v1',
+            'files': [
+                '*-ar71xx-generic-tl-wr843nd-v1-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr843nd-v1-squashfs-sysupgrade.bin',
             ]
         }
     }
 
-# Register the TP-Link WR843ND device
+# Register the TP-Link WR843ND device.
 cgm_base.register_device('openwrt', TPLinkWR843NDv1)
