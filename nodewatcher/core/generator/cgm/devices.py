@@ -683,7 +683,7 @@ class DeviceBase(object):
         """
         Returns a name for the wireless virtual interface.
 
-        :param platform: Platform identifier
+        :param platform: Platform instance
         :param radio: Radio identifier
         :param vif: Wireless virtual interface model
         """
@@ -695,7 +695,7 @@ class DeviceBase(object):
         """
         Returns a bridge name.
 
-        :param platform: Platform identifier
+        :param platform: Platform instance
         :param bridge: Bridge interface model
         """
 

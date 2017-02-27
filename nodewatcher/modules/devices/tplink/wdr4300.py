@@ -102,7 +102,7 @@ class TPLinkWDR4300v1(cgm_devices.DeviceBase):
                 '*-ar71xx-generic-tl-wdr4300-v1-squashfs-sysupgrade.bin'
             ]
         },
-        'openwrt': {
+        'lede': {
             'name': 'tl-wdr4300-v1',
             'files': [
                 '*-ar71xx-generic-tl-wdr4300-v1-squashfs-factory.bin',

@@ -161,7 +161,7 @@ class TPLinkWR1043NDv3(TPLinkWR1043NDv2):
                 '*-ar71xx-generic-tl-wr1043nd-v3-squashfs-sysupgrade.bin'
             ]
         },
-        'openwrt': {
+        'lede': {
             'name': 'tl-wr1043nd-v3',
             'files': [
                 '*-ar71xx-generic-tl-wr1043nd-v3-squashfs-factory.bin',

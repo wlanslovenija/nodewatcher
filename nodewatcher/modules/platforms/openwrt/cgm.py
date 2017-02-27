@@ -1042,7 +1042,7 @@ def network(node, cfg):
             continue
 
         if isinstance(interface, cgm_models.BridgeInterfaceConfig):
-            iface_name = cfg.sanitize_identifier(device.get_bridge_mapping(cfg.platform.name, interface))
+            iface_name = cfg.sanitize_identifier(device.get_bridge_mapping(cfg.platform, interface))
             iface = cfg.network.add(interface=iface_name, managed_by=interface)
             iface.type = 'bridge'
 
@@ -1424,7 +1424,7 @@ def network(node, cfg):
                         raise cgm_base.ValidationError(_("Unsupported OpenWrt bitrate set '%s'!") % bitrate.rate_set)
 
                 # Configure network interface for each vif, first being the primary network
-                vif_name = device.get_vif_mapping(cfg.platform.name, interface.wifi_radio, vif)
+                vif_name = device.get_vif_mapping(cfg.platform, interface.wifi_radio, vif)
                 wif.ifname = vif_name
 
                 bridge = check_interface_bridged(vif)
