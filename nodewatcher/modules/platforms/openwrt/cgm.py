@@ -872,7 +872,7 @@ def configure_switch(cfg, device, switch, vlan):
     if switch_iface is None:
         raise cgm_base.ValidationError(
             _("No mapping for OpenWrt when configuring switch '%(switch)s'.") % {'switch': switch.identifier}
-         )
+        )
 
     # Enable switch if not yet enabled.
     try:
