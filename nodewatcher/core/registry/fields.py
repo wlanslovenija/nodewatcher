@@ -329,8 +329,6 @@ class IPAddressField(models.Field):
     netmask in CIDR notation.
     """
 
-    __metaclass__ = models.SubfieldBase
-
     default_error_messages = {
         'invalid': _("Enter a valid IP address in CIDR notation."),
         'subnet_required': _("Enter a valid subnet's IP address with its prefix in CIDR notation."),
@@ -383,6 +381,13 @@ class IPAddressField(models.Field):
             return ipaddr.IPNetwork(value.encode('latin-1'))
         except ValueError:
             raise exceptions.ValidationError(error_messages['invalid'])
+
+    def from_db_value(self, value, expression, connection, context):
+        """
+        Converts a database value into a Python one.
+        """
+
+        return self.ip_to_python(value, self.error_messages)
 
     def to_python(self, value):
         """
