@@ -114,6 +114,8 @@ class StaticIpRouterIdConfig(RouterIdConfig):
         hidden = False
 
     def save(self, *args, **kwargs):
+        self.full_clean()
+
         if self.address.version == 4:
             self.rid_family = 'ipv4'
         elif self.address.version == 6:
