@@ -1,1 +1,1 @@
-from . import x86, ramips
+from . import x86, x86_64, ramips
