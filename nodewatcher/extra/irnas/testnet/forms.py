@@ -234,6 +234,10 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     state,
                     uplink_interface,
                     cgm_models.DHCPNetworkConfig,
+                    configuration={
+                        'dns': False,
+                        'default_route': True,
+                    },
                 )
 
             # TODO: Announce default route.

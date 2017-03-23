@@ -793,6 +793,8 @@ def configure_network(cfg, node, interface, network, section, iface_name):
     elif isinstance(network, cgm_models.DHCPNetworkConfig):
         section.proto = 'dhcp'
         section.hostname = cfg.system.system[0].hostname
+        section.peerdns = network.dns
+        section.defaultroute = network.default_route
     elif isinstance(network, cgm_models.PPPoENetworkConfig):
         section.proto = 'pppoe'
         section.username = network.username

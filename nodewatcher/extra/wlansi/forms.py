@@ -257,6 +257,10 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         state,
                         uplink_interface,
                         cgm_models.DHCPNetworkConfig,
+                        configuration={
+                            'dns': False,
+                            'default_route': True,
+                        },
                     )
 
             clients_interface = None
@@ -393,6 +397,10 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         state,
                         uplink_interface,
                         cgm_models.DHCPNetworkConfig,
+                        configuration={
+                            'dns': False,
+                            'default_route': True,
+                        },
                     )
                 else:
                     # Setup routing interface on all defined ports.
@@ -604,6 +612,10 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 state,
                 wifi_uplink_interface,
                 cgm_models.DHCPNetworkConfig,
+                configuration={
+                    'dns': False,
+                    'default_route': True,
+                },
             )
 
     def setup_item(self, state, registry_id, klass, configuration=None, annotations=None, **filter):

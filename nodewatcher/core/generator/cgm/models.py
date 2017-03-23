@@ -551,7 +551,9 @@ class DHCPNetworkConfig(NetworkConfig):
     DHCP IP configuration.
     """
 
-    # No additional fields
+    dns = models.BooleanField(default=False, verbose_name=_("Use received DNS server"))
+    default_route = models.BooleanField(default=True, verbose_name=_("Create default route via received gateway"))
+
     class RegistryMeta(NetworkConfig.RegistryMeta):
         registry_name = _("DHCP")
 
