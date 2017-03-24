@@ -177,12 +177,31 @@ registration.point('node.config').register_subitem(SwitchConfig, VLANConfig)
 
 
 class RoutableInterface(models.Model):
+    """
+    Abstract interface, which may be used in a routing protocol.
+    """
+
     class Meta:
         abstract = True
 
     routing_protocols = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'core.interfaces#routing_protocol',
         blank=True, null=True, default=list,
+    )
+
+
+class UplinkableInterface(models.Model):
+    """
+    Abstract interface, which may be used as an uplink.
+    """
+
+    class Meta:
+        abstract = True
+
+    uplink = models.BooleanField(default=False)
+    routing_default_announces = registry_fields.RegistryMultipleChoiceField(
+        'node.config', 'core.interfaces.network#routing_announce',
+        blank=True, null=True, verbose_name=_("Announce Default Route Via"), default=list,
     )
 
 
@@ -251,13 +270,12 @@ class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
 registration.point('node.config').register_item(BridgeInterfaceConfig)
 
 
-class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface):
+class EthernetInterfaceConfig(InterfaceConfig, RoutableInterface, UplinkableInterface):
     """
     An ethernet interface.
     """
 
     eth_port = models.CharField(max_length=50)
-    uplink = models.BooleanField(default=False)
     mac_address = registry_fields.MACAddressField(verbose_name=_("Override MAC Address"), null=True, blank=True)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
@@ -297,7 +315,7 @@ class WifiRadioDeviceConfig(InterfaceConfig):
 registration.point('node.config').register_item(WifiRadioDeviceConfig)
 
 
-class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
+class WifiInterfaceConfig(InterfaceConfig, RoutableInterface, UplinkableInterface):
     """
     Wifi interface configuration.
     """
@@ -327,7 +345,6 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface):
         default=True,
         help_text=_("Enable to isolate clients connected to the same AP from each other."),
     )
-    uplink = models.BooleanField(default=False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         form_weight = 51
@@ -391,7 +408,7 @@ registration.point('node.config').register_choice('core.interfaces#wifi_bitrates
 registration.point('node.config').register_subitem(WifiRadioDeviceConfig, WifiInterfaceConfig)
 
 
-class MobileInterfaceConfig(InterfaceConfig):
+class MobileInterfaceConfig(InterfaceConfig, UplinkableInterface):
     """
     A mobile (3G/UMTS/GPRS) interface.
     """
@@ -402,7 +419,6 @@ class MobileInterfaceConfig(InterfaceConfig):
     pin = models.CharField(max_length=4, blank=True, verbose_name=_("PIN"))
     username = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=50, blank=True)
-    uplink = models.BooleanField(default=False)
 
     class RegistryMeta(InterfaceConfig.RegistryMeta):
         registry_name = _("Mobile Interface")

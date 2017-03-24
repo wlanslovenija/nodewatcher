@@ -859,6 +859,12 @@ def configure_interface(cfg, node, interface, section, iface_name):
 
         firewall.network.append(iface_name)
 
+        # Configure masquerade if a default route is announced via this interface
+        # for any routing protocol.
+        if getattr(interface, 'routing_default_announces', []):
+            firewall.masq = True
+            firewall.mtu_fix = True
+
 
 def configure_switch(cfg, device, switch, vlan):
     """

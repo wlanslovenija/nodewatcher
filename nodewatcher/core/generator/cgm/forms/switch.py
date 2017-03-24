@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 
 from nodewatcher.core.registry import forms as registry_forms, registration
 
+from . import uplink
 from .. import models
 
 
@@ -90,7 +91,7 @@ class VLANConfigForm(forms.ModelForm):
 registration.register_form_for_item(models.VLANConfig, VLANConfigForm)
 
 
-class EthernetInterfaceConfigForm(forms.ModelForm):
+class EthernetInterfaceConfigForm(uplink.UplinkableFormMixin, forms.ModelForm):
     """
     Ethernet interface configuration form.
     """
@@ -103,6 +104,8 @@ class EthernetInterfaceConfigForm(forms.ModelForm):
         """
         Dynamically configures the ethernet interface configuration form.
         """
+
+        super(EthernetInterfaceConfigForm, self).modify_to_context(item, cfg, request)
 
         ethernet_ports = []
 

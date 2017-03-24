@@ -8,6 +8,7 @@ from nodewatcher.core import models as core_models
 from nodewatcher.core.allocation.ip import forms as ip_forms
 from nodewatcher.core.registry import forms as registry_forms, registration
 
+from . import uplink
 from .. import models, base as cgm_base
 
 
@@ -35,7 +36,7 @@ class AccessPointSelectionField(forms.ModelChoiceField):
         return encoding.smart_text(obj.name)
 
 
-class WifiInterfaceConfigForm(forms.ModelForm):
+class WifiInterfaceConfigForm(uplink.UplinkableFormMixin, forms.ModelForm):
     """
     Wifi interface configuration form.
     """
@@ -48,6 +49,8 @@ class WifiInterfaceConfigForm(forms.ModelForm):
         """
         Dynamically configures the wireless interface configuration form.
         """
+
+        super(WifiInterfaceConfigForm, self).modify_to_context(item, cfg, request)
 
         # Handle "connect to existing access point" functionality for STA VIFs.
         if item.mode == 'sta':

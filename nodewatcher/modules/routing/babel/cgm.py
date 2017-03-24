@@ -17,6 +17,20 @@ class BabelProtocolManager(object):
     routing_protocol = babel_models.BABEL_PROTOCOL_NAME
 
 
+def has_routing_protocol(manager, attribute):
+    """
+    Helper for determining whether a given manager has this routing
+    protocol in a specific attribute. The value of this attribute
+    may either be None or a list of protocol identifiers.
+    """
+
+    protocols = getattr(manager, attribute, None)
+    if not protocols:
+        return False
+
+    return babel_models.BABEL_PROTOCOL_NAME in protocols
+
+
 @cgm_base.register_platform_module('openwrt', 900)
 def babel(node, cfg):
     babel_configured = False
@@ -25,6 +39,7 @@ def babel(node, cfg):
     # on the presence of BABEL_PROTOCOL_NAME in the interface manager's "routing_protocols".
     routable_ifaces = []
     announced_ifaces = []
+    announced_uplink_ifaces = []
     announced_networks = []
     for name, iface in list(cfg.network):
         if iface.get_type() != 'interface':
@@ -34,7 +49,7 @@ def babel(node, cfg):
         network_manager = iface.get_manager(cgm_models.NetworkConfig)
 
         # All interfaces that are marked for this routing protocol should be redistributed.
-        if babel_models.BABEL_PROTOCOL_NAME in getattr(network_manager, 'routing_announces', []):
+        if has_routing_protocol(network_manager, 'routing_announces'):
             net = ipaddr.IPNetwork('%s/%s' % (iface.ipaddr, iface.netmask))
             announced_networks.append(net)
 
@@ -49,7 +64,23 @@ def babel(node, cfg):
             announced_ifaces.append(iface)
             babel_configured = True
 
-        if babel_models.BABEL_PROTOCOL_NAME not in getattr(manager, 'routing_protocols', []):
+        if has_routing_protocol(manager, 'routing_default_announces') and getattr(manager, 'uplink', False):
+            # Add default route announce.
+            net = ipaddr.IPNetwork('0.0.0.0/0')
+            announced_networks.append(net)
+
+            # For each announced interface add a static route to the Babel routing table.
+            hna_route = cfg.network.add(route='babel_rt_%s' % iface.get_key())
+            hna_route.interface = iface.get_key()
+            hna_route.target = net.network
+            hna_route.netmask = '0.0.0.0'
+            hna_route.gateway = '0.0.0.0'
+            hna_route.table = ROUTING_TABLE_ID
+
+            announced_uplink_ifaces.append(iface)
+            babel_configured = True
+
+        if not has_routing_protocol(manager, 'routing_protocols'):
             continue
 
         if iface.proto == 'none':
@@ -143,6 +174,12 @@ def babel(node, cfg):
     firewall.input = 'ACCEPT'
     firewall.output = 'ACCEPT'
     firewall.forward = 'ACCEPT'
+
+    # Ensure that forwarding between routable interfaces and any uplink interfaces.
+    if announced_uplink_ifaces:
+        fwd_uplink = cfg.firewall.add('forwarding')
+        fwd_uplink.src = firewall.name
+        fwd_uplink.dest = 'uplink'
 
     # Ensure that Babel packages are installed.
     cfg.packages.update([
