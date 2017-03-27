@@ -1,3 +1,4 @@
+from .bridge import *
 from .general import *
 from .mobile import *
 from .wireless import *

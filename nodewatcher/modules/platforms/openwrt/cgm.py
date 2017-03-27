@@ -834,7 +834,11 @@ def configure_interface(cfg, node, interface, section, iface_name):
     else:
         section.proto = 'none'
 
-    if section._uplink:
+    # Configure uplink interface.
+    if getattr(interface, 'uplink', None):
+        section._uplink = True
+        set_dhcp_ignore(cfg, iface_name)
+
         # An uplink interface cannot be used for routing.
         if getattr(interface, 'routing_protocols', []):
             raise cgm_base.ValidationError(_("An uplink interface cannot also be used for routing!"))
@@ -1054,7 +1058,7 @@ def network(node, cfg):
             iface = cfg.network.add(interface=iface_name, managed_by=interface)
             iface.type = 'bridge'
 
-            # Configure bridge interfaces
+            # Configure bridge interfaces.
             iface.ifname = []
             for port in interface.bridge_ports.all():
                 port = port.interface
@@ -1071,10 +1075,6 @@ def network(node, cfg):
                         iface.ifname += raw_port
                     else:
                         iface.ifname.append(raw_port)
-
-                    if port.uplink:
-                        iface._uplink = True
-                        set_dhcp_ignore(cfg, iface_name)
 
                     if port.routing_protocols:
                         raise cgm_base.ValidationError(
@@ -1109,10 +1109,6 @@ def network(node, cfg):
 
             iface_name = cfg.sanitize_identifier(interface.device)
             iface = cfg.network.add(interface=iface_name, managed_by=interface)
-
-            if interface.uplink:
-                iface._uplink = True
-                set_dhcp_ignore(cfg, iface_name)
 
             if interface.device.startswith('eth'):
                 # Mobile modem presents itself as a USB ethernet device. Determine the port based on
@@ -1252,10 +1248,6 @@ def network(node, cfg):
 
             if isinstance(iface.ifname, (list, tuple)):
                 iface.type = 'bridge'
-
-            if interface.uplink:
-                iface._uplink = True
-                set_dhcp_ignore(cfg, iface_name)
 
             if interface.mac_address:
                 iface.macaddr = interface.mac_address
@@ -1443,12 +1435,8 @@ def network(node, cfg):
                     iface = cfg.network.add(interface=vif_name, managed_by=vif)
                     wif.network = vif_name
 
-                    if vif.uplink:
-                        if vif.mode != 'sta':
+                    if vif.uplink and vif.mode != 'sta':
                             raise cgm_base.ValidationError(_("Wireless interface may only be an uplink when in station mode!"))
-
-                        iface._uplink = True
-                        set_dhcp_ignore(cfg, vif_name)
 
                     configure_interface(cfg, node, vif, iface, vif_name)
 

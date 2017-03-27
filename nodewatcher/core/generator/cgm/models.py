@@ -239,7 +239,7 @@ class InterfaceConfig(registration.bases.NodeConfigRegistryItem):
 registration.point('node.config').register_item(InterfaceConfig)
 
 
-class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface):
+class BridgeInterfaceConfig(InterfaceConfig, RoutableInterface, UplinkableInterface):
     """
     Bridge interface configuration.
     """
