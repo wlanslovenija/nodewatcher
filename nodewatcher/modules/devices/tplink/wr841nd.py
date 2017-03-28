@@ -144,8 +144,7 @@ class TPLinkWR841NDv7(TPLinkWR841NDv1):
             'sw0', "Switch0",
             ports=5,
             cpu_port=0,
-            vlans=16,
-            configurable=False,
+            vlans=1,
             presets=[
                 cgm_devices.SwitchPreset('default', _("Default VLAN configuration"), vlans=[
                     cgm_devices.SwitchVLANPreset(
