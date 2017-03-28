@@ -4,7 +4,6 @@ from django.core import urlresolvers
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from nodewatcher.core import models as core_models
 from nodewatcher.core.generator.cgm import base as cgm_base
 
 
@@ -23,7 +22,7 @@ def general(node, cfg):
         # Configure the uhttpd server.
         uhttpd = cfg.uhttpd.add(uhttpd='main')
         uhttpd.listen_http = []
-        uhttpd.listen_http.append('%s:80' % router_id)
+        uhttpd.listen_http.append('{}:80'.format(router_id))
         uhttpd.home = '/www'
         uhttpd.cgi_prefix = '/cgi-bin'
 
