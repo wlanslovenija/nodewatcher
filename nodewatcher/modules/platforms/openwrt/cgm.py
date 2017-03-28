@@ -991,6 +991,18 @@ def network(node, cfg):
     lo.ipaddr = '127.0.0.1'
     lo.netmask = '255.0.0.0'
 
+    # Ensure the IPv4 address for the router ID is assigned to loopback.
+    try:
+        router_id = node.config.core.routerid(queryset=True).filter(rid_family='ipv4')[0].router_id
+
+        lo_rid = cfg.network.add(alias='routerid')
+        lo_rid.interface = 'loopback'
+        lo_rid.proto = 'static'
+        lo_rid.ipaddr = router_id
+        lo_rid.netmask = '255.255.255.255'
+    except IndexError:
+        pass
+
     # Configure default routing table names.
     cfg.routing_tables.set_table('local', 255)
     cfg.routing_tables.set_table('main', 254)
