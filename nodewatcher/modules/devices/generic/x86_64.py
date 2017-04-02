@@ -7,7 +7,7 @@ class GenericX86_64NoWifi(cgm_devices.DeviceBase):
     """
 
     identifier = 'generic-x86_64-nowifi'
-    name = "x86-64 (no wireless)"
+    name = "x86_64 (no wireless)"
     manufacturer = "Generic"
     url = 'http://www.intel.com/'
     architecture = 'x86_64'
@@ -67,6 +67,8 @@ class GenericX86_64VMWareNoWifi(GenericX86_64NoWifi):
         'lede': {
             'name': 'Generic',
             'files': [
+                # Provide img.gz for sysupgrade support.
+                '*-x86-64-combined-ext4.img.gz',
                 '*-x86-64-combined-ext4.vmdk',
             ]
         }
@@ -84,6 +86,8 @@ class GenericX86_64VirtualBoxNoWifi(GenericX86_64NoWifi):
         'lede': {
             'name': 'Generic',
             'files': [
+                # Provide img.gz for sysupgrade support.
+                '*-x86-64-combined-ext4.img.gz',
                 '*-x86-64-combined-ext4.vdi',
             ]
         }
