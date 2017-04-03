@@ -74,7 +74,6 @@ def babel(node, cfg):
             hna_route.interface = iface.get_key()
             hna_route.target = net.network
             hna_route.netmask = '0.0.0.0'
-            hna_route.gateway = '0.0.0.0'
             hna_route.table = ROUTING_TABLE_ID
 
             announced_uplink_ifaces.append(iface)
