@@ -1,12 +1,12 @@
 from django.utils.translation import ugettext as _
 
 from nodewatcher.core.generator.cgm import base as cgm_base
-from nodewatcher.modules.platforms.openwrt import cgm as openwrt_cgm
+from nodewatcher.modules.platforms.openwrt.cgm import platform as openwrt_platform
 
 from . import builder as lede_builder
 
 
-class PlatformLEDE(openwrt_cgm.PlatformOpenWRT):
+class PlatformLEDE(openwrt_platform.PlatformOpenWRT):
     """
     LEDE platform descriptor.
     """
