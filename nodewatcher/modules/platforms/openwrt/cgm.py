@@ -848,9 +848,17 @@ def configure_interface(cfg, node, interface, section, iface_name):
         if not firewall:
             firewall = cfg.firewall.add('zone')
             firewall.name = 'uplink'
-            firewall.input = 'ACCEPT'
+            firewall.input = 'DROP'
             firewall.output = 'ACCEPT'
             firewall.forward = 'REJECT'
+
+            # Ensure DHCP client is allowed on the uplink interface.
+            dhcp_rule = cfg.firewall.add('rule')
+            dhcp_rule.src = 'uplink'
+            dhcp_rule.proto = 'udp'
+            dhcp_rule.src_port = 67
+            dhcp_rule.dest_port = 68
+            dhcp_rule.target = 'ACCEPT'
 
         if not firewall.network:
             firewall.network = []
