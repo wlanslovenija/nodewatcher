@@ -680,11 +680,21 @@ class TunneldiggerServersOnUplink(registry_forms.FormDefaults):
         except project_models.Project.DoesNotExist:
             project_config = None
 
-        query = models.Q(PerProjectTunneldiggerServer___project=None)
         if project_config:
-            query |= models.Q(PerProjectTunneldiggerServer___project=project_config.project)
+            # Check if there are any project-specific servers configured. In this
+            # case, we only use those, otherwise we use the default ones.
+            qs = td_models.TunneldiggerServer.objects.filter(
+                PerProjectTunneldiggerServer___project=project_config.project,
+                enabled=True,
+            )
 
-        return td_models.TunneldiggerServer.objects.filter(query)
+            if qs.exists():
+                return qs
+
+        return td_models.TunneldiggerServer.objects.filter(
+            PerProjectTunneldiggerServer___project=None,
+            enabled=True,
+        )
 
     def remove_tunneldigger(self, state):
         # Remove any tunneldigger interfaces.
