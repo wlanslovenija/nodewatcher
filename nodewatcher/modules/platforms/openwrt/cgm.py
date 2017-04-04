@@ -843,12 +843,6 @@ def configure_interface(cfg, node, interface, section, iface_name):
         if getattr(interface, 'routing_protocols', []):
             raise cgm_base.ValidationError(_("An uplink interface cannot also be used for routing!"))
 
-        # Ensure that uplink traffic is routed via the main table.
-        policy = cfg.network.add('rule')
-        policy['in'] = iface_name
-        policy.lookup = 'main'
-        policy.priority = 500
-
         # Configure firewall policy for the uplink interface.
         firewall = cfg.firewall.find_ordered_section('zone', name='uplink')
         if not firewall:
@@ -863,11 +857,17 @@ def configure_interface(cfg, node, interface, section, iface_name):
 
         firewall.network.append(iface_name)
 
-        # Configure masquerade if a default route is announced via this interface
-        # for any routing protocol.
         if getattr(interface, 'routing_default_announces', []):
+            # Configure masquerade if a default route is announced via this interface
+            # for any routing protocol.
             firewall.masq = True
             firewall.mtu_fix = True
+        else:
+            # Ensure that uplink traffic is routed via the main table.
+            policy = cfg.network.add('rule')
+            policy['in'] = iface_name
+            policy.lookup = 'main'
+            policy.priority = 500
 
 
 def configure_switch(cfg, device, switch, vlan):
