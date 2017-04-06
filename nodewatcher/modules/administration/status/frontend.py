@@ -1,13 +1,9 @@
 from nodewatcher.core.frontend import components
+from nodewatcher.core.api import urls as api_urls
 
-# TODO: Should we make this conditional, so only in case the statistics module is loaded?
-from nodewatcher.modules.frontend.statistics.pool import pool as statistics_pool
+from . import models, views
 
-from . import models, resources
-
-
-statistics_pool.register(resources.NodesByStatusResource())
-
+api_urls.v2_api.register('statistics/status', views.StatusStatisticsViewSet, base_name='statistics-status')
 
 components.partials.get_partial('node_general_partial').add(components.PartialEntry(
     name='status',
@@ -16,7 +12,6 @@ components.partials.get_partial('node_general_partial').add(components.PartialEn
         'node_status': context['node'].monitoring.core.status(default=models.StatusMonitor),
     },
 ))
-
 
 components.partials.get_partial('network_statistics_partial').add(components.PartialEntry(
     name='status',

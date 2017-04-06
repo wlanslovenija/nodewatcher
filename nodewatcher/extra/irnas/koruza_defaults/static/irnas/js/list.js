@@ -45,28 +45,32 @@
     $(document).ready(function () {
         $('.koruza-node-list').each(function (i, table) {
             $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
-                registryFields: {
-                    'config': [
-                        ['core.general', 'name'],
-                        ['core.type', 'type'],
-                        ['core.project', 'project__name']
-                    ],
-                    'monitoring': [
-                        'core.general',
-                        'core.status',
-                        'network.routing.topology',
-                        ['sensors.generic[sensor_id="sfp-rx_power_dbu"]', 'value']
-                    ]
+                registryRoots: {
+                    '*': {
+                        fields: {
+                            'config': [
+                                ['core.general', 'name'],
+                                ['core.type', 'type'],
+                                ['core.project', 'project__name']
+                            ],
+                            'monitoring': [
+                                'core.general',
+                                'core.status',
+                                'network.routing.topology',
+                                ['sensors.generic[sensor_id="sfp-rx_power_dbu"]', 'value']
+                            ]
+                        },
+                        searchFilters: 'config:core.general__name__icontains="%s"',
+                    },
                 },
-                registrySearchFilters: 'config:core.general__name__icontains="%s"',
                 columns: [
-                    {data: 'config.core__type.type', width: 0, render: $.nodewatcher.renderNodeType(table)},
-                    {data: 'config.core__general.name', render: $.nodewatcher.api.renderNodeName(table)},
-                    {data: 'monitoring.core__general.last_seen', render: renderTimeAgo},
-                    {data: 'monitoring.core__status.network', render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
-                    {data: 'monitoring.sensors__generic[].value', render: renderRxPower},
-                    {data: 'monitoring.network__routing__topology[].', render: renderRoutingTopology},
-                    {data: 'config.core__project.project.name'},
+                    {data: 'config.core__type.type', registry: true, width: 0, render: $.nodewatcher.renderNodeType(table)},
+                    {data: 'config.core__general.name', registry: true, render: $.nodewatcher.api.renderNodeName(table)},
+                    {data: 'monitoring.core__general.last_seen', registry: true, render: renderTimeAgo},
+                    {data: 'monitoring.core__status.network', registry: true, render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
+                    {data: 'monitoring.sensors__generic[].value', registry: true, render: renderRxPower},
+                    {data: 'monitoring.network__routing__topology[].', registry: true, render: renderRoutingTopology},
+                    {data: 'config.core__project.project.name', registry: true},
                     {data: '@id', 'visible': false}
                 ],
                 // And make default sorting by type and name columns.

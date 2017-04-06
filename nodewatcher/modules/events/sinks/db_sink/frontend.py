@@ -1,9 +1,9 @@
 from django.core import urlresolvers
 
-from nodewatcher.core.api import urls
+from nodewatcher.core.api import urls as api_urls
 from nodewatcher.core.frontend import components
 
-from . import resources, views
+from . import views
 
 
 class EventsComponent(components.FrontendComponent):
@@ -17,9 +17,8 @@ class EventsComponent(components.FrontendComponent):
 
 components.pool.register(EventsComponent)
 
-
-urls.v1_api.register(resources.EventResource())
-
+api_urls.v2_api.register('event', views.EventViewSet)
+api_urls.v2_api.register('warning', views.WarningViewSet)
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Events"),

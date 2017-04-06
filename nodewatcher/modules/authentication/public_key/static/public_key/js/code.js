@@ -16,25 +16,24 @@
 
     $(document).ready(function () {
         $('.key-list').each(function (i, table) {
-            $.tastypie.newDataTable(table, $(table).data('source'), {
-                'columns': [
-                    {'data': 'name'},
-                    {'data': 'fingerprint'},
-                    {'data': 'created'},
-                    {'data': null, 'render': renderActions(table), 'orderable': false, 'searchable': false},
-                    {'data': 'id', 'visible': false}
+            $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
+                columns: [
+                    {data: 'name'},
+                    {data: 'fingerprint'},
+                    {data: 'created'},
+                    {data: null, render: renderActions(table), orderable: false, searchable: false},
+                    {data: 'id', visible: false},
                 ],
-                // And make default sorting by name column
-                'order': [[0, 'asc']],
-                'language': {
+                order: [[0, 'asc']],
+                language: {
                     // TODO: Make strings translatable
-                    'sZeroRecords': "No matching public keys found.",
-                    'sEmptyTable ': "There are currently no public keys.",
-                    'sInfo': "_START_ to _END_ of _TOTAL_ public keys shown",
-                    'sInfoEmpty': "0 public keys shown",
-                    'sInfoFiltered': "(from _MAX_ all public keys)",
-                    'sInfoPostFix': "",
-                    'sSearch': "Filter:"
+                    zeroRecords: "No public keys found.",
+                    emptyTable: "There are currently no public keys.",
+                    info: "_START_ to _END_ of _TOTAL_ public keys shown",
+                    infoEmpty: "0 public keys shown",
+                    infoFiltered: "(from _MAX_ all public keys)",
+                    infoPostFix: "",
+                    search: "Filter:"
                 }
             });
         });

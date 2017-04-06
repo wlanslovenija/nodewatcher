@@ -1,10 +1,12 @@
 from django.core import urlresolvers
 from django.views import generic
 
+from rest_framework import filters, viewsets
+
 from nodewatcher.core.frontend import views
 from nodewatcher.extra.accounts import mixins
 
-from . import models
+from . import permissions, models, serializers
 
 
 class AddPublicKey(mixins.AuthenticatedRequiredMixin, views.CancelableFormMixin, generic.CreateView):
@@ -39,3 +41,28 @@ class RemovePublicKey(mixins.AuthenticatedRequiredMixin, views.CancelableFormMix
 
 class ListPublicKeys(mixins.AuthenticatedRequiredMixin, generic.TemplateView):
     template_name = 'public_key/list_public_keys.html'
+
+
+class UserAuthenticationKeyViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint for user authentication keys.
+    """
+
+    queryset = models.UserAuthenticationKey.objects.all()
+    serializer_class = serializers.UserAuthenticationKeySerializer
+    permission_classes = (permissions.UserAuthenticationKeyPermission,)
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ['id', 'name', 'fingerprint', 'created']
+
+    def get_queryset(self):
+        """
+        Filter user authentication keys for the currently authenticated user.
+        """
+
+        qs = super(UserAuthenticationKeyViewSet, self).get_queryset()
+        user = self.request.user
+        if not user.is_authenticated():
+            return qs.none()
+
+        qs = qs.filter(user=user)
+        return qs

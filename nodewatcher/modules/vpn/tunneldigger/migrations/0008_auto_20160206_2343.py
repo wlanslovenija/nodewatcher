@@ -3,8 +3,7 @@
 from __future__ import unicode_literals
 
 import datetime
-from django.db import migrations
-import timedelta.fields
+from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
@@ -17,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tunneldiggerbrokerconfig',
             name='tunnel_timeout',
-            field=timedelta.fields.TimedeltaField(choices=[(datetime.timedelta(0, 60), '1 minute'), (datetime.timedelta(0, 120), '2 minutes'), (datetime.timedelta(0, 300), '5 minutes')], default=b'1min', verbose_name='Tunnel Timeout'),
+            field=models.DurationField(choices=[(datetime.timedelta(0, 60), '1 minute'), (datetime.timedelta(0, 120), '2 minutes'), (datetime.timedelta(0, 300), '5 minutes')], default=datetime.timedelta(0, 60), verbose_name='Tunnel Timeout'),
         ),
     ]

@@ -48,5 +48,6 @@ class LocationConfigSerializer(api.RegistryItemSerializerMixin, serializers.Mode
 
     class Meta:
         model = LocationConfig
+        fields = '__all__'
 
 registration.register_serializer_for_item(LocationConfig, LocationConfigSerializer)

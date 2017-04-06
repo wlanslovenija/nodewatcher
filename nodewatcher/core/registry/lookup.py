@@ -1,42 +1,23 @@
 import copy
 import inspect
-import re
 
-from django.contrib.gis.db import models as gis_models
 from django import db as django_db
 from django.apps import apps
+from django.core import exceptions as django_exceptions
 from django.db import models as django_models
 from django.db.models import constants
-from django.db.models.sql import query
 from django.utils import tree
 
 from . import expression, exceptions
 
 
-# TODO: No need to subclass GeoQuerySet once we get rid of Tastypie.
-class RegistryQuerySet(gis_models.query.GeoQuerySet):
+class RegistryQuerySet(django_models.QuerySet):
     """
     An augmented query set that enables lookups of values from the registry.
     """
 
     def __init__(self, *args, **kwargs):
         super(RegistryQuerySet, self).__init__(*args, **kwargs)
-
-        # Override query_terms as it breaks Tastypie on Django 1.8 for GIS fields as they are no
-        # longer hardcoded terms, but use the new lookup API which Tastypie does not know about.
-        # TODO: Remove this hack once we get rid of Tastypie.
-        from django.db.models.sql.constants import QUERY_TERMS
-        GIS_LOOKUPS = {
-            'bbcontains', 'bboverlaps', 'contained', 'contains',
-            'contains_properly', 'coveredby', 'covers', 'crosses', 'disjoint',
-            'distance_gt', 'distance_gte', 'distance_lt', 'distance_lte',
-            'dwithin', 'equals', 'exact',
-            'intersects', 'overlaps', 'relate', 'same_as', 'touches', 'within',
-            'left', 'right', 'overlaps_left', 'overlaps_right',
-            'overlaps_above', 'overlaps_below',
-            'strictly_above', 'strictly_below'
-        }
-        self.query.query_terms = GIS_LOOKUPS | QUERY_TERMS
 
         # Quote name. We import it here so that we can import this file
         # without an AppRegistryNotReady exception.
@@ -410,76 +391,23 @@ class RegistryQuerySet(gis_models.query.GeoQuerySet):
 
         return clone
 
+    def raw_order_by(self, *args, **kwargs):
+        return super(RegistryQuerySet, self).order_by(*args, **kwargs)
+
     def order_by(self, *fields, **kwargs):
         """
-        Order by with special handling for RegistryChoiceFields.
+        Order by registry fields.
         """
 
-        disallow_sensitive = kwargs.pop('disallow_sensitive', False)
-
-        assert self.query.can_filter(), "Cannot reorder a query once a slice has been taken."
-
-        from . import fields as registry_fields
-        clone = self._clone()
-        clone.query.clear_ordering(force_empty=False)
-
-        parser = expression.LookupExpressionParser()
-        final_fields = []
-        for raw_field_name in fields:
-            field_name, field_order = query.get_order_dir(raw_field_name)
-            field_order = '-' if field_order == 'DESC' else ''
-
-            # Support for direct specification of registry fields. In this case, the
-            # field is first fetched into an internal field and then used for sorting.
-            try:
-                info = parser.parse(field_name)
-                if info.registration_point:
-                    # Switch to proper registration point when requested.
-                    clone = clone.regpoint(info.registration_point)
-
-                if info.field:
-                    # Check if the field is sensitive and if ordering by sensitive fields is disallowed.
-                    dst_model, dst_field = clone._regpoint.get_model_with_field(info.registry_id, info.field[0])
-                    if dst_field.name in dst_model._registry.sensitive_fields and disallow_sensitive:
-                        continue
-
-                    # If a field has been specified, use it to order by the field.
-                    internal_field_name = '_order_field_%s' % info.name
-                    clone = clone.registry_fields(**{internal_field_name: info})
-                    field_name = internal_field_name
-            except (ValueError, exceptions.RegistryItemNotRegistered):
-                pass
-
-            field_names = clone.registry_expand_proxy_field(field_name).split(constants.LOOKUP_SEP)
-            field = clone.query.setup_joins(field_names, clone.model._meta, clone.query.get_initial_alias())[0]
-
-            if isinstance(field, (registry_fields.RegistryChoiceField, registry_fields.NullBooleanChoiceField)):
-                # Ordering by RegistryChoiceField should generate a specific query that will
-                # sort by the order that the choices were registered.
-                order_query = ['CASE', '%s.%s' % (self._quote_name(field.model()._meta.db_table), self._quote_name(field.column))]
-                order_params = []
-                for order, choice in enumerate(field.get_registered_choices()):
-                    order_query.append('WHEN %%s THEN %d' % order)
-                    order_params.append(choice.name)
-
-                order_query.append('ELSE %d END' % (order + 1))
-
-                clone = clone.extra(
-                    select={'%s_choice_order' % field_name: ' '.join(order_query)},
-                    select_params=order_params,
-                )
-                final_fields.append('%s%s_choice_order' % (field_order, field_name))
-            else:
-                final_fields.append('%s%s' % (field_order, constants.LOOKUP_SEP.join(field_names)))
-
-        # Order by all the specified fields. We must not call the super order_by method
-        # as it will reset all ordering.
-        clone = clone.extra(order_by=final_fields)
-
-        return clone
+        return order_by(
+            self,
+            fields,
+            self.model,
+            disallow_sensitive=kwargs.pop('disallow_sensitive', False),
+        )
 
 
-class RegistryLookupManager(gis_models.GeoManager):
+class RegistryLookupManager(django_models.Manager):
     """
     A manager for doing lookups over the registry models.
     """
@@ -514,22 +442,109 @@ def selector_for_lookup(root_cls, lookup, disallow_sensitive=False):
     :param root_cls: Registry root model class
     :param lookup: A LookupExpression for the destination field
     :param disallow_sensitive: Should sensitive fields be disallowed
-    :return A tuple (selector, ensure_distinct) or None in case a field is disallowed
+    :return A tuple (selector, field, ensure_distinct) or None in case a field is disallowed
     """
 
     from . import registration
 
-    registration_point = registration.point('%s.%s' % (root_cls._meta.concrete_model._meta.model_name, lookup.registration_point))
-    dst_model, dst_field = registration_point.get_model_with_field(lookup.registry_id, lookup.field[0])
-    dst_field = dst_field.name
+    registration_point = registration.point('{}.{}'.format(
+        root_cls._meta.concrete_model._meta.model_name,
+        lookup.registration_point
+    ))
+    dst_model, dst_field = registration_point.get_model_with_field(
+        lookup.registry_id,
+        lookup.field[0]
+    )
 
     # Disallow filter by sensitive fields if requested.
-    if dst_field in dst_model._registry.sensitive_fields and disallow_sensitive:
+    if dst_field.name in dst_model._registry.sensitive_fields and disallow_sensitive:
         return None
 
-    selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field
+    selector = dst_model._registry.get_lookup_chain() + constants.LOOKUP_SEP + dst_field.name
     if len(lookup.field) > 1:
         selector += constants.LOOKUP_SEP + constants.LOOKUP_SEP.join(lookup.field[1:])
 
     ensure_distinct = dst_model._registry.multiple
-    return (selector, ensure_distinct)
+    return (selector, dst_field, ensure_distinct)
+
+
+def order_by(queryset, ordering, root_cls, field=None, disallow_sensitive=False):
+    """
+    Orders a queryset using registry field specifiers.
+    """
+
+    from . import fields as registry_fields
+
+    ordering_specifiers = []
+    parser = expression.LookupExpressionParser()
+    for field_specifier in ordering:
+        if field_specifier[0] == '-':
+            order = '-'
+            field_specifier = field_specifier[1:]
+        else:
+            order = ''
+
+        try:
+            info = parser.parse(field_specifier)
+
+            # Use default registration point for registry querysets.
+            if not info.registration_point and hasattr(queryset, '_regpoint'):
+                info.registration_point = queryset._regpoint.namespace
+        except (exceptions.RegistryItemNotRegistered, django_exceptions.FieldError, ValueError):
+            continue
+
+        # Pass-through field by default.
+        selector = None
+
+        if info.field:
+            # Valid registry field.
+            try:
+                selector, dst_field, _ = selector_for_lookup(root_cls, info, disallow_sensitive=disallow_sensitive)
+            except TypeError:
+                # Disallowed field.
+                continue
+            except exceptions.RegistryItemNotRegistered:
+                pass
+
+        if selector is None:
+            if hasattr(queryset, 'registry_expand_proxy_field'):
+                # Non-registry field or an alias.
+                selector = queryset.registry_expand_proxy_field(field_specifier)
+            else:
+                # Pass-through field.
+                selector = field_specifier
+
+        # Add subfield prefix if required.
+        if field is not None:
+            selector = field.name + constants.LOOKUP_SEP + selector
+
+        dst_field = queryset.query.names_to_path(
+            selector.split(constants.LOOKUP_SEP),
+            queryset.model._meta,
+            fail_on_missing=True
+        )[1]
+
+        # Ordering by registry choice fields should generate a specific query that will sort by the
+        # order that the choices were registered, instead of by their value.
+        if isinstance(dst_field, (registry_fields.RegistryChoiceField, registry_fields.NullBooleanChoiceField)):
+            cases = []
+            for order, choice in enumerate(dst_field.get_registered_choices()):
+                cases.append(django_models.When(
+                    then=django_models.Value(order),
+                    **{selector: choice.name}
+                ))
+
+            order_field = django_models.Case(*cases, output_field=django_models.IntegerField())
+            if order == '-':
+                order_field = order_field.desc()
+            else:
+                order_field = order_field.asc()
+        else:
+            order_field = '{}{}'.format(order, selector)
+
+        ordering_specifiers.append(order_field)
+
+    if hasattr(queryset, 'raw_order_by'):
+        return queryset.raw_order_by(*ordering_specifiers)
+    else:
+        return queryset.order_by(*ordering_specifiers)

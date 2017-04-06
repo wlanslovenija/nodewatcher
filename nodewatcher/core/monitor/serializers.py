@@ -14,10 +14,11 @@ class TopologyLinkSerializer(api_serializers.PolymorphicSerializerMixin,
         fields = ('id', 'last_seen')
         base_view = 'apiv2:topologylink-list'
 
-    def __init__(self, *args, **kwargs):
-        super(TopologyLinkSerializer, self).__init__(*args, **kwargs)
+    def get_fields(self):
+        """
+        Add serializer for peer field.
+        """
 
-        # Add serializer for peer field.
-        self.fields['peer'] = api_serializers.pool.get_serializer(core_models.Node)(context=self.context)
-
-api_serializers.pool.register(TopologyLinkSerializer)
+        fields = super(TopologyLinkSerializer, self).get_fields()
+        fields['peer'] = api_serializers.pool.get_serializer(core_models.Node)(context=self.context)
+        return fields

@@ -6,7 +6,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from polymorphic import models as polymorphic_models
-from timedelta import fields as timedelta_fields
 
 from nodewatcher.core import validators as core_validators
 from nodewatcher.core.registry import fields as registry_fields, registration
@@ -106,8 +105,8 @@ class TunneldiggerBrokerConfig(cgm_models.PackageConfig, cgm_models.RoutableInte
     )
     max_cookies = models.PositiveIntegerField(default=1024)
     max_tunnels = models.PositiveIntegerField(default=1024)
-    tunnel_timeout = timedelta_fields.TimedeltaField(
-        default='1min',
+    tunnel_timeout = models.DurationField(
+        default=datetime.timedelta(minutes=1),
         verbose_name=_("Tunnel Timeout"),
         choices=(
             (datetime.timedelta(minutes=1), _("1 minute")),

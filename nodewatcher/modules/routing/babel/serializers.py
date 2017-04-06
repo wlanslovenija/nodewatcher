@@ -9,5 +9,3 @@ class BabelTopologyLinkSerializer(api_serializers.JSONLDSerializerMixin, seriali
     class Meta:
         model = models.BabelTopologyLink
         fields = ('id', 'interface', 'rxcost', 'txcost', 'rtt', 'rttcost', 'cost', 'reachability')
-
-api_serializers.pool.register(BabelTopologyLinkSerializer)

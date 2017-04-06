@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import nodewatcher.core.registry.fields
-import postgres.fields
+import django.contrib.postgres.fields
 import django.db.models.deletion
 import nodewatcher.core.validators
 
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100)),
                 ('address', nodewatcher.core.registry.fields.IPAddressField(host_required=True)),
-                ('ports', postgres.fields.ArrayField(models.IntegerField(validators=[nodewatcher.core.validators.PortNumberValidator()]), size=None)),
+                ('ports', django.contrib.postgres.fields.ArrayField(models.IntegerField(validators=[nodewatcher.core.validators.PortNumberValidator()]), size=None)),
                 ('enabled', models.BooleanField(default=True)),
             ],
             options={

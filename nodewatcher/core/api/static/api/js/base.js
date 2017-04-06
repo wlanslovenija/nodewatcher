@@ -87,7 +87,8 @@
                     data.recordsFiltered = data.count;
                 }
 
-                data = $.nodewatcher.api.transformApiResponse(data);
+                var settings = $(table).dataTable().api().init();
+                data = $.nodewatcher.api.transformApiResponse(settings, data);
             };
         },
 
@@ -111,10 +112,11 @@
          * Transforms the given API response. Modules can hook into this transformation by
          * providing a `transformApiResponse` method.
          *
+         * @param {Object} settings Table configuration
          * @param {Object} response Response received from the server
          */
-        transformApiResponse: function (response) {
-            this.callModules('transformApiResponse', response, function (result) {
+        transformApiResponse: function (settings, response) {
+            this.callModules('transformApiResponse', settings, response, function (result) {
                 $.extend(response, result || {});
             });
             return response;
@@ -180,13 +182,18 @@
                 }
                 if (type === 'display') {
                     return $.map(data, function (node, i) {
+                        if ($.isArray(node)) {
+                            // TODO: Support rendering multiple nodes.
+                            node = node[0];
+                        }
+
                         var name = $('<a/>').attr(
                             'href', $(table).data('node-url-template').replace('{pk}', node['@id'])
                         // TODO: Make "unknown" string translatable.
                         // A bit of jQuery mingling to get outer HTML ($.html() returns inner HTML).
-                        ).text(node.name || "unknown").wrap('<span/>').parent().html();
-                        if (routerId && node.router_id) {
-                            var router_ids = $.map(node.router_id, function (item) { return item.router_id; });
+                        ).text(node.config.core__general.name || "unknown").wrap('<span/>').parent().html();
+                        if (routerId && node.config.core__routerid) {
+                            var router_ids = $.map(node.config.core__routerid, function (item) { return item.router_id; });
                             if (router_ids.length > 0) {
                                 name += ' <span class="small">(' + router_ids.join(', ') + ')</a>';
                             }

@@ -3,8 +3,7 @@
 from __future__ import unicode_literals
 
 import datetime
-from django.db import migrations
-import timedelta.fields
+from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
@@ -17,11 +16,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='allocatednetworkconfig',
             name='lease_duration',
-            field=timedelta.fields.TimedeltaField(choices=[(datetime.timedelta(0, 900), '15 minutes'), (datetime.timedelta(0, 1800), '30 minutes'), (datetime.timedelta(0, 3600), '1 hour'), (datetime.timedelta(0, 7200), '2 hours'), (datetime.timedelta(0, 14400), '4 hours'), (datetime.timedelta(0, 43200), '12 hours'), (datetime.timedelta(1), '24 hours')], default=b'15min', verbose_name='Lease Duration'),
+            field=models.DurationField(choices=[(datetime.timedelta(0, 900), '15 minutes'), (datetime.timedelta(0, 1800), '30 minutes'), (datetime.timedelta(0, 3600), '1 hour'), (datetime.timedelta(0, 7200), '2 hours'), (datetime.timedelta(0, 14400), '4 hours'), (datetime.timedelta(0, 43200), '12 hours'), (datetime.timedelta(1), '24 hours')], default=datetime.timedelta(0, 900), verbose_name='Lease Duration'),
         ),
         migrations.AlterField(
             model_name='staticnetworkconfig',
             name='lease_duration',
-            field=timedelta.fields.TimedeltaField(choices=[(datetime.timedelta(0, 900), '15 minutes'), (datetime.timedelta(0, 1800), '30 minutes'), (datetime.timedelta(0, 3600), '1 hour'), (datetime.timedelta(0, 7200), '2 hours'), (datetime.timedelta(0, 14400), '4 hours'), (datetime.timedelta(0, 43200), '12 hours'), (datetime.timedelta(1), '24 hours')], default=b'15min', verbose_name='Lease Duration'),
+            field=models.DurationField(choices=[(datetime.timedelta(0, 900), '15 minutes'), (datetime.timedelta(0, 1800), '30 minutes'), (datetime.timedelta(0, 3600), '1 hour'), (datetime.timedelta(0, 7200), '2 hours'), (datetime.timedelta(0, 14400), '4 hours'), (datetime.timedelta(0, 43200), '12 hours'), (datetime.timedelta(1), '24 hours')], default=datetime.timedelta(0, 900), verbose_name='Lease Duration'),
         ),
     ]

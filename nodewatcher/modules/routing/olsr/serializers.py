@@ -9,5 +9,3 @@ class OlsrTopologyLinkSerializer(api_serializers.JSONLDSerializerMixin, serializ
     class Meta:
         model = models.OlsrTopologyLink
         fields = ('id', 'lq', 'ilq', 'etx')
-
-api_serializers.pool.register(OlsrTopologyLinkSerializer)

@@ -70,7 +70,8 @@ class RegistryTestCase(django_test.TestCase):
         )
 
     def tearDown(self):
-        pass
+        # Ensure all datastream connections get closed.
+        del self.datastream
 
     def test_basic(self):
         # Register stream.

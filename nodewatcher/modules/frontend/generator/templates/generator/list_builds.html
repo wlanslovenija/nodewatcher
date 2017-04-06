@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n sekizai_tags html_tags url_tags %}
+    {% load i18n sekizai_tags html_tags url_tags %}
 
     {% add_data "css_data" "datatables/css/style.css" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
     {% add_data "js_data" "datastream/moment/moment.js" %}
-    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "api/js/base.js" %}
+    {% add_data "js_data" "api/js/registry.js" %}
     {% add_data "js_data" "generator/js/generator.js" %}
     {% add_data "js_data" "generator/list_builds/js/code.js" %}
 
@@ -16,14 +17,14 @@
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% url "api:api_dispatch_list" "v1" "build_result" as api_url %}
+    {% url "apiv2:buildresult-list" as api_url %}
     {% with api_url as url %}
     {% include "formats.html" %}
     {% endwith %}
 {% endblock altlinks %}
 
 {% block content %}
-    <table class="table table-striped build-list {% block build_list_classes %}{% endblock build_list_classes %}" data-source="{% block build_list_data_source %}{% url "api:api_dispatch_list" "v1" "build_result" %}{% endblock build_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" data-build-url-template="{% urltemplate "GeneratorComponent:view_build" %}" width="100%">
+    <table class="table table-striped build-list {% block build_list_classes %}{% endblock build_list_classes %}" data-source="{% block build_list_data_source %}{% url "apiv2:buildresult-list" %}{% endblock build_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" data-build-url-template="{% urltemplate "GeneratorComponent:view_build" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Build ID" %}</th>

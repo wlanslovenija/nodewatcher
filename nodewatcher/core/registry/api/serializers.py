@@ -1,19 +1,56 @@
 from django.db import models
 from django.db.models import constants
-from django.core import urlresolvers
 
 from rest_framework import serializers
 
 from nodewatcher.core.api import serializers as api_serializers, exceptions as api_exceptions
+from nodewatcher.core.registry import registration
 
 from . import fields as api_fields
 from .. import fields as model_fields
 
 # Exports.
 __all__ = [
+    'RegisteredChoiceSerializer',
     'RegistryRootSerializerMixin',
     'RegistryItemSerializerMixin',
 ]
+
+
+class RegisteredChoiceSerializer(serializers.Serializer):
+    """
+    Serializer for registered choices.
+    """
+
+    name = serializers.CharField()
+    verbose_name = serializers.CharField()
+    help_text = serializers.CharField()
+    icon = serializers.CharField()
+
+    def __init__(self, *args, **kwargs):
+        """
+        Construct registered choice serializer.
+        """
+
+        regpoint = kwargs.pop('regpoint', None)
+        choices = kwargs.pop('choices', None)
+        if not choices or not regpoint:
+            raise ValueError("Registered choice serializer must specify 'regpoint' and 'choices' parameters!")
+
+        self._choices = registration.point(regpoint).get_registered_choices(choices)
+
+        super(RegisteredChoiceSerializer, self).__init__(*args, **kwargs)
+
+    def get_attribute(self, instance):
+        """
+        Resolve plain value into the correct registred choice instance.
+        """
+
+        value = super(RegisteredChoiceSerializer, self).get_attribute(instance)
+        try:
+            return self._choices.resolve(value).get_json()
+        except KeyError:
+            return None
 
 
 class RegistryRootSerializerMixin(object):

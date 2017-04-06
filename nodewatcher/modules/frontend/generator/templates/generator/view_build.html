@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n registry path_tags %}
+    {% load i18n registry path_tags %}
 
     {% setcontext as title %}{% blocktrans with build_id=build.pk%}Build {{ build_id }}{% endblocktrans %}{% endsetcontext %}
     {% setcontext as heading %}{% spaceless %}

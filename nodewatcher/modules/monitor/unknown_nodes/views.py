@@ -2,6 +2,8 @@ from django import http, shortcuts
 from django.core import urlresolvers, exceptions
 from django.views import generic
 
+from rest_framework import filters, viewsets, permissions
+
 from nodewatcher.core.frontend import views
 from nodewatcher.core.registry import forms as registry_forms
 from nodewatcher.extra.accounts import mixins
@@ -10,7 +12,7 @@ from nodewatcher.modules.identity.base import models as identity_models
 from nodewatcher.modules.identity.public_key import models as public_key_models
 from nodewatcher.modules.monitor.sources.http import models as http_models
 
-from . import models
+from . import models, serializers
 
 
 class SuperuserRequiredMixin(object):
@@ -91,3 +93,15 @@ class RegisterUnknownNode(mixins.PermissionRequiredMixin,
     def get_success_url(self):
         # TODO: Where should we redirect here? What if display component is not enabled?
         return urlresolvers.reverse('DisplayComponent:node', kwargs={'pk': self.object.pk})
+
+
+class UnknownNodeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint for unknown nodes.
+    """
+
+    queryset = models.UnknownNode.objects.all()
+    serializer_class = serializers.UnknownNodeSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ['uuid', 'first_seen', 'last_seen', 'ip_address']

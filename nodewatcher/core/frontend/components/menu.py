@@ -99,8 +99,9 @@ class MenuEntry(object):
     def render(self, context=None):
         if context is None:
             context = self._context
-        extra_context = self.get_extra_context(context)
-        return loader.render_to_string(self._template, extra_context, context)
+        context = context.flatten()
+        context.update(self.get_extra_context(context))
+        return loader.render_to_string(self._template, context)
 
 
 class DeferredMenu(object):

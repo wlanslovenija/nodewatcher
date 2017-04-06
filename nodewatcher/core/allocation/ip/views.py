@@ -1,14 +1,17 @@
 from django.db.models import query
 
-from rest_framework import viewsets, decorators
+from rest_framework import viewsets
 
-from nodewatcher.core.api import urls as api_urls
 from nodewatcher.core.registry import registration
 
 from . import models, serializers
 
 
 class IpPoolViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint for IP pools.
+    """
+
     queryset = models.IpPool.objects.all()
     serializer_class = serializers.IpPoolSerializer
 
@@ -47,5 +50,3 @@ class IpPoolViewSet(viewsets.ReadOnlyModelViewSet):
                     queryset = queryset.filter(q_filter)
 
         return queryset
-
-api_urls.v2_api.register('pool/ip', IpPoolViewSet)

@@ -1,9 +1,6 @@
 import collections
 import copy
-import re
 
-from django import shortcuts
-from django.conf import settings, urls
 from django.core import urlresolvers
 
 from nodewatcher.utils import loader

@@ -3,14 +3,14 @@ from django.contrib.auth import models as auth_models
 from django.db import transaction
 
 
-class Command(management_base.NoArgsCommand):
+class Command(management_base.BaseCommand):
     """
     This class defines an action for manage.py which assigns default permissions to all users missing them.
     """
 
     help = "Assign default permissions to all users missing them."
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         """
         Assigns default permissions to all users missing them.
         """

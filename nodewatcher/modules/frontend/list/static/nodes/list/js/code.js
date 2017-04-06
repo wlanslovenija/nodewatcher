@@ -38,31 +38,35 @@
     $(document).ready(function () {
         $('.node-list').each(function (i, table) {
             $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
-                registryFields: {
-                    'config': [
-                        ['core.general', 'name'],
-                        ['core.type', 'type'],
-                        ['core.routerid', 'router_id'],
-                        ['core.project', 'project__name']
-                    ],
-                    'monitoring': [
-                        'core.general',
-                        'core.status',
-                        'network.routing.topology'
-                    ]
+                registryRoots: {
+                    '*': {
+                        fields: {
+                            'config': [
+                                ['core.general', 'name'],
+                                ['core.type', 'type'],
+                                ['core.routerid', 'router_id'],
+                                ['core.project', 'project__name']
+                            ],
+                            'monitoring': [
+                                'core.general',
+                                'core.status',
+                                'network.routing.topology'
+                            ],
+                        },
+                        searchFilters: 'config:core.general__name__icontains="%s"',
+                    },
                 },
-                registrySearchFilters: 'config:core.general__name__icontains="%s"',
                 columns: [
-                    {data: 'config.core__type.type', width: 0, render: $.nodewatcher.renderNodeType(table)},
-                    {data: 'config.core__general.name', render: $.nodewatcher.api.renderNodeName(table)},
-                    {data: 'config.core__routerid[].router_id'},
-                    {data: 'monitoring.core__general.last_seen', render: renderTimeAgo},
-                    {data: 'monitoring.core__status.network', render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
-                    {data: 'monitoring.core__status.monitored', render: $.nodewatcher.renderStatus(table, 'Monitored'), class: 'center', width: '20px'},
-                    {data: 'monitoring.core__status.health', render: $.nodewatcher.renderStatus(table, 'Health'), class: 'center', width: '20px'},
-                    {data: 'monitoring.network__routing__topology[].', render: renderRoutingTopology},
-                    {data: 'config.core__project.project.name'},
-                    {data: '@id', 'visible': false}
+                    {data: 'config.core__type.type', registry: true, width: 0, render: $.nodewatcher.renderNodeType(table)},
+                    {data: 'config.core__general.name', registry: true, render: $.nodewatcher.api.renderNodeName(table)},
+                    {data: 'config.core__routerid[].router_id', registry: true},
+                    {data: 'monitoring.core__general.last_seen', registry: true, render: renderTimeAgo},
+                    {data: 'monitoring.core__status.network', registry: true, render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
+                    {data: 'monitoring.core__status.monitored', registry: true, render: $.nodewatcher.renderStatus(table, 'Monitored'), class: 'center', width: '20px'},
+                    {data: 'monitoring.core__status.health', registry: true, render: $.nodewatcher.renderStatus(table, 'Health'), class: 'center', width: '20px'},
+                    {data: 'monitoring.network__routing__topology[].', registry: true, render: renderRoutingTopology},
+                    {data: 'config.core__project.project.name', registry: true},
+                    {data: '@id', visible: false}
                 ],
                 // And make default sorting by type and name columns.
                 order: [[0, 'asc'],[1, 'asc']],

@@ -2,12 +2,15 @@ from django import http
 from django.core import urlresolvers
 from django.views import generic
 
+from rest_framework import viewsets, filters
+
 from nodewatcher.core import models as core_models
 from nodewatcher.core.frontend import views
 from nodewatcher.core.generator import models as generator_models
+from nodewatcher.core.registry import api as registry_api
 from nodewatcher.extra.accounts import mixins
 
-from . import forms
+from . import forms, serializers, permissions
 
 
 class GenerateFirmwareMixin(object):
@@ -71,3 +74,36 @@ class ViewBuild(mixins.PermissionRequiredMixin,
 class ListBuilds(mixins.AuthenticatedRequiredMixin,
                  generic.TemplateView):
     template_name = 'generator/list_builds.html'
+
+
+class BuildResultViewSet(registry_api.RegistryRootViewSetMixin,
+                         viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint for build results.
+    """
+
+    queryset = generator_models.BuildResult.objects.all()
+    serializer_class = serializers.BuildResultSerializer
+    permission_classes = (permissions.BuildResultPermission,)
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ['uuid', 'status', 'created']
+    registry_root_fields = ['node']
+
+    def get_queryset(self):
+        """
+        Filter build results for the currently authenticated user.
+        """
+
+        qs = super(BuildResultViewSet, self).get_queryset()
+        user = self.request.user
+        if not user.is_authenticated():
+            return qs.none()
+
+        qs = qs.filter(
+            user=user
+        ).prefetch_related(
+            'build_channel',
+            'builder',
+            'builder__version',
+        ).order_by('uuid')
+        return qs

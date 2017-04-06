@@ -1,9 +1,8 @@
 from django.core import urlresolvers
 
-from nodewatcher.core.api import urls
 from nodewatcher.core.frontend import components
 
-from . import resources, views
+from . import views
 
 
 class ListComponent(components.FrontendComponent):
@@ -16,9 +15,6 @@ class ListComponent(components.FrontendComponent):
         }
 
 components.pool.register(ListComponent)
-
-
-urls.v1_api.register(resources.NodeResource())
 
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(

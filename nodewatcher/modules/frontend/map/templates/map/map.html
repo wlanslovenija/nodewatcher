@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n sekizai_tags html_tags url_tags partial_tags leaflet_tags %}
+    {% load i18n sekizai_tags html_tags url_tags partial_tags leaflet_tags %}
 
     {% addtoblock "css" %}{% leaflet_css %}{% endaddtoblock %}
     {% addtoblock "js" %}{% leaflet_js %}{% endaddtoblock %}

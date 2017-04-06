@@ -62,8 +62,8 @@ def evaluate_forms(request, regpoint_id, root_id):
             pass
 
     # Render forms and return them.
-    return shortcuts.render_to_response(
+    return shortcuts.render(
+        request,
         'registry/forms.html',
         {'registry_forms': forms},
-        context_instance=template.RequestContext(request),
     )

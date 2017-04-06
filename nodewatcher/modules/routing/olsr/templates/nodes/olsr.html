@@ -5,13 +5,14 @@
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
-    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "api/js/base.js" %}
+    {% add_data "js_data" "api/js/registry.js" %}
     {% add_data "js_data" "olsr/js/peer_list.js" %}
 {% endcontextblock %}
 
 {% theme_legend _("OLSR peers") %}
 <div class="olsr-peers">
-    <table class="table table-striped olsr-peer-list {% block olsr_peer_list_classes %}{% endblock olsr_peer_list_classes %}" data-source="{% block olsr_peer_list_data_source %}{% url "api:api_dispatch_node" "v1" node.pk "olsr_topology_link" %}{% endblock olsr_peer_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
+    <table class="table table-striped olsr-peer-list {% block olsr_peer_list_classes %}{% endblock olsr_peer_list_classes %}" data-source="{% block olsr_peer_list_data_source %}{% url "apiv2:topologylink-list" %}?protocol=olsr&node={{ node.pk }}{% endblock olsr_peer_list_data_source %}" data-node-url-template="{% urltemplate "DisplayComponent:node" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Peer node" %}</th>

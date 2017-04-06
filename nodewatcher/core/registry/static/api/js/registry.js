@@ -18,13 +18,23 @@
 
         getApiRequestParameters: function (settings, data) {
             var self = this;
-            var params = {
-                fields: []
-            };
+            var params = {};
 
-            // Setup field projections.
-            if (settings.registryFields) {
-                $.each(settings.registryFields, function (registrationPoint, fields) {
+            if (!settings.registryRoots) return {};
+
+            $.each(settings.registryRoots, function (rootField, rootSettings) {
+                var fieldsAttribute = 'fields';
+                var filtersAttribute = 'filters';
+                var orderingAttribute = 'ordering';
+                if (rootField !== '*') {
+                    fieldsAttribute = rootField + '__' + fieldsAttribute;
+                    filtersAttribute = rootField + '__' + filtersAttribute;
+                    orderingAttribute = rootField + '__' + orderingAttribute;
+                }
+
+                // Setup field projections.
+                params[fieldsAttribute] = [];
+                $.each(rootSettings.fields, function (registrationPoint, fields) {
                     $.each(fields, function (index, field) {
                         var fieldSpecification = [];
                         if ($.isArray(field)) {
@@ -35,41 +45,61 @@
                             fieldSpecification.push(field);
                         }
 
-                        params.fields.push(registrationPoint + ':' + fieldSpecification.join('__'));
+                        params[fieldsAttribute].push(registrationPoint + ':' + fieldSpecification.join('__'));
                     });
                 });
-            }
 
-            // Setup filters.
-            if (settings.registrySearchFilters && data.search && data.search.value && data.search.value.length) {
-                params.filters = settings.registrySearchFilters.replace(/%s/g, data.search.value);
-            }
+                // Setup filters.
+                if (rootSettings.searchFilters && data.search && data.search.value && data.search.value.length) {
+                    params[filtersAttribute] = rootSettings.searchFilters.replace(/%s/g, data.search.value);
+                }
 
-            // Setup ordering.
-            var order = data.order || [];
-            var ordering = [];
-            $.each(order, function (index, orderSpecification) {
-                var column = data.columns[orderSpecification.column];
-                var lookup = self._pathToLookup(column.data);
-                var direction = orderSpecification.dir == 'asc' ? '' : '-';
-                // Skip sort by items, which do not specify fields.
-                if (!lookup[2].length) return;
+                // Setup ordering.
+                var order = data.order || [];
+                var ordering = [];
+                var nonRegistryOrdering = [];
+                $.each(order, function (index, orderSpecification) {
+                    var column = settings.columns[orderSpecification.column];
+                    var direction = orderSpecification.dir == 'asc' ? '' : '-';
 
-                ordering.push(direction + lookup[0] + ':' + lookup[1] + '__' + lookup[2]);
+                    if (column.registry) {
+                        var lookup = self._pathToLookup(column.data);
+                        // Skip sort by items, which do not specify fields.
+                        if (!lookup[2].length) return;
+
+                        ordering.push(direction + lookup[0] + ':' + lookup[1] + '__' + lookup[2]);
+                    } else {
+                        // Non-registry order.
+                        nonRegistryOrdering.push(direction + column.data.replace(/\./g, '__'));
+                    }
+                });
+                if (ordering.length) {
+                    params[orderingAttribute] = ordering.join(',');
+                }
+                if (nonRegistryOrdering.length) {
+                    if (orderingAttribute === 'ordering') {
+                        params['ordering'] += ',';
+                    } else {
+                        params['ordering'] = '';
+                    }
+
+                    params['ordering'] += nonRegistryOrdering.join(',');
+                }
             });
-            if (ordering.length) {
-                params.ordering = ordering.join(',');
-            }
 
             return params;
         },
 
-        transformApiResponse: function (response) {
-            // Transform all dots in registry identifiers to double underscores.
-            var results = [];
-            $.each(response.results, function (index, result) {
+        transformApiResponse: function (settings, response) {
+            if (!settings.registryRoots) return response;
+
+            function transformRootField(rootField) {
+                if ($.isArray(rootField)) {
+                    return $.map(rootField, transformRootField);
+                }
+
                 var transformedResult = {};
-                $.each(result, function (registrationPoint, registryItems) {
+                $.each(rootField, function (registrationPoint, registryItems) {
                     if (registrationPoint[0] == '@' || !$.isPlainObject(registryItems)) {
                         transformedResult[registrationPoint] = registryItems;
                     } else {
@@ -80,7 +110,29 @@
                     }
                 });
 
-                results.push(transformedResult);
+                return transformedResult;
+            }
+
+            var results = [];
+            $.each(settings.registryRoots, function (rootField, rootSettings) {
+                // Transform all dots in registry identifiers to double underscores.
+                $.each(response.results, function (index, result) {
+                    var transformedResult = {};
+                    if (rootField === '*') {
+                        transformedResult = transformRootField(result);
+                    } else {
+                        $.each(result, function (key, value) {
+                            if (key === rootField) {
+                                transformedResult[key] = transformRootField(value);
+                            } else {
+                                // Copy all other fields.
+                                transformedResult[key] = value;
+                            }
+                        });
+                    }
+
+                    results.push(transformedResult);
+                });
             });
 
             response.results = results;

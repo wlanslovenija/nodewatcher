@@ -1,9 +1,11 @@
-from django.apps import apps
-
 from nodewatcher.core.frontend import components
+from nodewatcher.core.api import serializers as api_serializers, urls as api_urls
 
-# Register API serializers and views.
 from . import serializers, views
+
+api_serializers.pool.register(serializers.ProjectSerializer)
+api_urls.v2_api.register('project', views.ProjectViewSet)
+api_urls.v2_api.register('statistics/project', views.ProjectStatisticsViewSet, base_name='statistics-project')
 
 components.partials.get_partial('node_general_partial').add(components.PartialEntry(
     name='project',
@@ -13,16 +15,8 @@ components.partials.get_partial('node_general_partial').add(components.PartialEn
     }
 ))
 
-
-# Provide statistics only in case the nodewatcher.modules.frontend.statistics app is installed.
-if apps.is_installed('nodewatcher.modules.frontend.statistics'):
-    from nodewatcher.modules.frontend.statistics.pool import pool as statistics_pool
-    from . import resources
-
-    statistics_pool.register(resources.NodesByProjectResource())
-
-    components.partials.get_partial('network_statistics_partial').add(components.PartialEntry(
-        name='project',
-        template='network/statistics/project.html',
-        weight=50,
-    ))
+components.partials.get_partial('network_statistics_partial').add(components.PartialEntry(
+    name='project',
+    template='network/statistics/project.html',
+    weight=50,
+))

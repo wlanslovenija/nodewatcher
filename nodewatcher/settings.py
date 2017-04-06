@@ -32,9 +32,9 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'nodewatcher', # Use: createdb nodewatcher
         'USER': os.environ.get('DB_1_ENV_PGSQL_ROLE_1_USERNAME', 'nodewatcher'), # Set to empty string to connect as current user.
-        'PASSWORD': os.environ.get('DB_1_ENV_PGSQL_ROLE_1_PASSWORD', ''),
-        'HOST': os.environ.get('DB_1_PORT_5432_TCP_ADDR', 'localhost'), # Set to empty string for socket.
-        'PORT': os.environ.get('DB_1_PORT_5432_TCP_PORT', ''), # Set to empty string for default.
+        'PASSWORD': os.environ.get('DB_1_ENV_PGSQL_ROLE_1_PASSWORD', 'nodewatcher'),
+        'HOST': os.environ.get('DB_1_PORT_5432_TCP_ADDR', 'db'), # Set to empty string for socket.
+        'PORT': os.environ.get('DB_1_PORT_5432_TCP_PORT', '5432'), # Set to empty string for default.
     },
 }
 
@@ -158,11 +158,11 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
-                'django.core.context_processors.debug',
-                'django.core.context_processors.i18n',
-                'django.core.context_processors.media',
-                'django.core.context_processors.static',
-                'django.core.context_processors.request',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'sekizai.context_processors.sekizai',
                 'nodewatcher.core.frontend.context_processors.global_vars',
@@ -274,7 +274,6 @@ DEPENDENCY_APPS = [
     'jsonfield',
     'leaflet',
     'django_countries',
-    'timedelta',
     'registration',
     'rest_framework',
     'rest_framework_gis',
@@ -412,7 +411,7 @@ LOGGING = {
 }
 
 BROKER_URL = 'redis://%(host)s:%(port)s/0' % {
-    'host': os.environ.get('REDIS_1_PORT_6379_TCP_ADDR', '127.0.0.1'),
+    'host': os.environ.get('REDIS_1_PORT_6379_TCP_ADDR', 'redis'),
     'port': os.environ.get('REDIS_1_PORT_6379_TCP_PORT', '6379'),
 }
 CELERY_RESULT_BACKEND = BROKER_URL
@@ -560,7 +559,7 @@ DATASTREAM_BACKEND = 'datastream.backends.influxdb.Backend'
 # Each backend can have backend-specific settings that can be specified here.
 DATASTREAM_BACKEND_SETTINGS = {
     'connection_influxdb': {
-        'host': os.environ.get('INFLUXDB_1_PORT_8086_TCP_ADDR', '127.0.0.1'),
+        'host': os.environ.get('INFLUXDB_1_PORT_8086_TCP_ADDR', 'influxdb'),
         'port': int(os.environ.get('INFLUXDB_1_PORT_8086_TCP_PORT', '8086')),
         'database': 'nodewatcher'
     },

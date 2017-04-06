@@ -9,16 +9,11 @@
         }).done(function (data) {
             var series = [];
 
-            _.each(data.statistics, function(point) {
-                _.each(data.header.status.choices, function (choice) {
-                    if (point.status == choice.name)
-                        point.status = choice;
-                });
-
+            _.each(data.results, function(point) {
                 series.push({
                     name: point.status.verbose_name,
                     icon: point.status.icon,
-                    y: point.count
+                    y: point.nodes
                 });
             });
 

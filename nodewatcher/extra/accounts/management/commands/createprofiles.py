@@ -5,14 +5,14 @@ from django.db import transaction
 from ... import models
 
 
-class Command(management_base.NoArgsCommand):
+class Command(management_base.BaseCommand):
     """
     This class defines an action for manage.py which populates database with user profiles for all users missing them.
     """
 
     help = "Populate database with user profiles for all users missing them."
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         """
         Populates database with user profiles for all users missing them.
         """

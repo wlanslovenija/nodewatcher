@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n sekizai_tags html_tags url_tags %}
+    {% load i18n sekizai_tags html_tags url_tags %}
 
     {% add_data "css_data" "datatables/css/style.css" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.bootstrap.js" %}
     {% add_data "js_data" "datatables/js/jquery.dataTables.fixedHeader.js" %}
-    {% add_data "js_data" "tastypie/js/code.js" %}
+    {% add_data "js_data" "api/js/base.js" %}
     {% add_data "js_data" "public_key/js/code.js" %}
 
     {% trans "List of My Public Keys" as title %}
 {% endcontextblock %}
 
 {% block altlinks %}
-    {% url "api:api_dispatch_list" "v1" "user_authentication_key" as api_url %}
+    {% url "apiv2:userauthenticationkey-list" as api_url %}
     {% with api_url as url %}
     {% include "formats.html" %}
     {% endwith %}
@@ -32,7 +32,7 @@
 {% endblock content_before %}
 
 {% block content %}
-    <table class="table table-striped key-list {% block key_list_classes %}{% endblock key_list_classes %}" data-source="{% block key_list_data_source %}{% url "api:api_dispatch_list" "v1" "user_authentication_key" %}{% endblock key_list_data_source %}" data-remove-url-template="{% urltemplate "PublicKeyComponent:remove" %}" width="100%">
+    <table class="table table-striped key-list {% block key_list_classes %}{% endblock key_list_classes %}" data-source="{% block key_list_data_source %}{% url "apiv2:userauthenticationkey-list" %}{% endblock key_list_data_source %}" data-remove-url-template="{% urltemplate "PublicKeyComponent:remove" %}" width="100%">
         <thead>
             <tr>
                 <th>{% trans "Name" %}</th>

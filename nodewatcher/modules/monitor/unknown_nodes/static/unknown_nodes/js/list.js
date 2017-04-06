@@ -49,25 +49,24 @@
 
     $(document).ready(function () {
         $('.unknown-node-list').each(function (i, table) {
-            $.tastypie.newDataTable(table, $(table).data('source'), {
-                'columns': [
-                    {'data': 'uuid', 'render': renderUnknownNodeUuid(table)},
-                    {'data': 'first_seen', 'render': renderTimeAgo},
-                    {'data': 'last_seen', 'render': renderTimeAgo},
-                    {'data': 'ip_address'},
-                    {'data': 'certificate.subject.', 'sortable': false, 'render': renderCertificateSubject},
+            $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
+                columns: [
+                    {data: 'uuid', render: renderUnknownNodeUuid(table)},
+                    {data: 'first_seen', render: renderTimeAgo},
+                    {data: 'last_seen', render: renderTimeAgo},
+                    {data: 'ip_address'},
+                    {data: 'certificate.subject.', sortable: false, render: renderCertificateSubject},
                 ],
-                // And make default sorting by last seen column
-                'order': [[2, 'desc']],
-                'language': {
+                order: [[0, 'asc']],
+                language: {
                     // TODO: Make strings translatable
-                    'zeroRecords': "No matching unknown nodes found.",
-                    'emptyTable ': "There are currently no unknown nodes.",
-                    'info': "_START_ to _END_ of _TOTAL_ unknown nodes shown",
-                    'infoEmpty': "0 unknown nodes shown",
-                    'infoFiltered': "(from _MAX_ all unknown nodes)",
-                    'infoPostFix': "",
-                    'search': "Filter:"
+                    zeroRecords: "No unknown nodes found.",
+                    emptyTable: "There are currently no unknown nodes.",
+                    info: "_START_ to _END_ of _TOTAL_ unknown nodes shown",
+                    infoEmpty: "0 unknown nodes shown",
+                    infoFiltered: "(from _MAX_ all unknown nodes)",
+                    infoPostFix: "",
+                    search: "Filter:"
                 }
             });
         });

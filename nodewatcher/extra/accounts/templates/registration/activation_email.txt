@@ -1,4 +1,4 @@
-{% load future i18n %}{% blocktrans with username=user.username %}Hello {{ username }}!{% endblocktrans %}
+{% load i18n %}{% blocktrans with username=user.username %}Hello {{ username }}!{% endblocktrans %}
 {% filter wordwrap:68 %}
 {% if email_change %}{% blocktrans with username=user.username %}You have changed your e-mail address and your {{ site_name }} account has been inactivated. This message was sent to you to confirm this e-mail address ({{ email }}) as yours and reactivate the account with username "{{ username }}". If you have already done so or the account does not belong to you, you can safely ignore this e-mail.{% endblocktrans %}{% else %}{% blocktrans with username=user.username %}Thank you for registering your {{ site_name }} account. This message was sent to you to confirm this e-mail address ({{ email }}) as yours and activate the account with username "{{ username }}". If you have already done so or the account does not belong to you, you can safely ignore this e-mail.{% endblocktrans %}{% endif %}
 

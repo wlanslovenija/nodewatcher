@@ -9,7 +9,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from guardian import shortcuts
-from timedelta import fields as timedelta_fields
 
 from .. import models as generator_models
 from ... import models as core_models
@@ -18,8 +17,8 @@ from ...registry import fields as registry_fields, registration, permissions
 
 from . import base as cgm_base
 
-# Register a new firmware-generating permission
-permissions.register(core_models.Node, 'generate_firmware', _("Can generate firmware"))
+# Register a new firmware-generating permission.
+permissions.register(core_models.Node, 'generate_firmware', "Can generate firmware")
 
 # In case we have the frontend module installed, we also subscribe to its
 # node created signal that gets called when a node is created via the editor
@@ -465,8 +464,8 @@ class LeasableNetwork(models.Model):
         'node.config', 'core.interfaces.network#lease_type',
         blank=True, null=True, verbose_name=_("Lease Type"),
     )
-    lease_duration = timedelta_fields.TimedeltaField(
-        default='15min',
+    lease_duration = models.DurationField(
+        default=datetime.timedelta(minutes=15),
         verbose_name=_("Lease Duration"),
         choices=(
             (datetime.timedelta(minutes=15), _("15 minutes")),

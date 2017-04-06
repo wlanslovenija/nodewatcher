@@ -14,7 +14,11 @@ class MenuEntries(list):
 @register.assignment_tag(takes_context=True)
 def get_menu(context, menu_name):
     try:
-        menu = MenuEntries([entry.add_context(context) for entry in components.menus.get_menu(menu_name).entries if entry.is_visible(context['request'], context)])
+        menu = MenuEntries([
+            entry.add_context(context)
+            for entry in components.menus.get_menu(menu_name).entries
+            if entry.is_visible(context['request'], context)
+        ])
         menu.name = menu_name
         return menu
     except:

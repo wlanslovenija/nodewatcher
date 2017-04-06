@@ -21,5 +21,3 @@ class IpPoolSerializer(api_serializers.JSONLDSerializerMixin, serializers.ModelS
                   'prefix_length_default', 'prefix_length_minimum', 'prefix_length_maximum',
                   'held_from', 'top_level')
         base_view = 'apiv2:ippool-list'
-
-api_serializers.pool.register(IpPoolSerializer)

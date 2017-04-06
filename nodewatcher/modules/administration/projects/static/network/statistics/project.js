@@ -9,10 +9,10 @@
         }).done(function (data) {
             var series = [];
 
-            _.each(data.statistics, function(point) {
+            _.each(data.results, function(point) {
                 series.push({
                     name: point.project,
-                    y: point.count
+                    y: point.nodes
                 });
             });
 

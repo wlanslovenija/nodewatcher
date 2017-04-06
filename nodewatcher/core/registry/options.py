@@ -54,6 +54,7 @@ class Options(object):
         # Create a default serializer.
         class meta_cls:
             model = model_class
+            fields = '__all__'
 
         self.serializer_class = type(
             '%sRegistryItemSerializer' % (model_class.__name__),

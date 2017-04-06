@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% contextblock %}
-    {% load future i18n html_tags %}
+    {% load i18n html_tags %}
 
     {% setcontext as title %}{% blocktrans %}Node {{ node_name }}{% endblocktrans %}{% endsetcontext %}
     {% url "DisplayComponent:node" node.pk as permalink %}

@@ -640,9 +640,9 @@ def create_point(model, namespace, mixins=None):
             # Augment the model with a custom manager and a custom accessor.
             model.add_to_class(namespace, registry_access.RegistryAccessor(point))
             if not isinstance(model.objects, registry_lookup.RegistryLookupManager):
+                model._meta.local_managers.remove(model.objects)
                 del model.objects
                 model.add_to_class('objects', registry_lookup.RegistryLookupManager(point))
-                model._default_manager = model.objects
 
             # Update the model attribute in regpoint instance.
             point.model = model
@@ -654,7 +654,7 @@ def create_point(model, namespace, mixins=None):
                 model.add_to_class('registry_metadata', jsonfield.JSONField(default=dict, editable=False))
 
         # Try to load the model; if it is already loaded this will work, but if
-        # not, we will need to defer part of object creation
+        # not, we will need to defer part of object creation.
         try:
             augment_root_model(django_apps.apps.get_registered_model(app_label, model_name))
         except LookupError:

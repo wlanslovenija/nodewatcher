@@ -493,7 +493,7 @@ among its bases.
   :type lease_type: registered choice
 
   :param lease_duration: Duration of each lease.
-  :type lease_duration: :class:`timedelta.fields.TimedeltaFields`
+  :type lease_duration: duration
 
 The simplest is a static IP network configuration.
 

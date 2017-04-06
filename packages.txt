@@ -1,12 +1,12 @@
-postgresql-client-9.3
-postgresql-server-dev-9.3
+postgresql-client-9.5
+postgresql-server-dev-9.5
 libxml2-dev
 libxslt-dev
 libpcre3-dev
 libgeoip1
-libgeos-c1
+libgeos-c1v5
 libgdal-dev
-libgdal1h
+libgdal1i
 fping
 libffi-dev
 eot-utils

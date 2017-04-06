@@ -140,7 +140,12 @@ class FilterExpression(object):
         :return Queryset with filter expression applied
         """
 
-        queryset = queryset.raw_filter(self.filter_q)
+        if hasattr(queryset, 'raw_filter'):
+            # Use raw filter for registry querysets.
+            queryset = queryset.raw_filter(self.filter_q)
+        else:
+            queryset = queryset.filter(self.filter_q)
+
         if self.ensure_distinct:
             queryset = queryset.distinct()
         return queryset
@@ -150,8 +155,9 @@ class FilterExpression(object):
 
 
 class FilterExpressionSemantics(LookupExpressionSemantics):
-    def __init__(self, root, disallow_sensitive=False):
+    def __init__(self, root, field=None, disallow_sensitive=False):
         self.root = root
+        self.field = field
         self.disallow_sensitive = disallow_sensitive
 
     def filter_expression_prec1(self, ast):
@@ -199,7 +205,14 @@ class FilterExpressionSemantics(LookupExpressionSemantics):
 
         lookup_expression = LookupExpression.from_ast(ast['field'])
         try:
-            selector, ensure_distinct = lookup.selector_for_lookup(self.root, lookup_expression, self.disallow_sensitive)
+            selector, _, ensure_distinct = lookup.selector_for_lookup(
+                self.root,
+                lookup_expression,
+                disallow_sensitive=self.disallow_sensitive
+            )
+
+            if self.field is not None:
+                selector = self.field.name + constants.LOOKUP_SEP + selector
         except TypeError:
             # Disallowed field.
             return FilterExpression(query.Q())
@@ -212,9 +225,13 @@ class FilterExpressionParser(object):
     A parser for registry filter expressions.
     """
 
-    def __init__(self, root, disallow_sensitive=False):
+    def __init__(self, root, field=None, disallow_sensitive=False):
         self._parser = expression_parser.ExpressionParser()
-        self._semantics = FilterExpressionSemantics(root, disallow_sensitive=disallow_sensitive)
+        self._semantics = FilterExpressionSemantics(
+            root,
+            field=field,
+            disallow_sensitive=disallow_sensitive
+        )
 
     def parse(self, expression):
         try:

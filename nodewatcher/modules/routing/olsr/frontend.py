@@ -1,11 +1,9 @@
-from nodewatcher.core.api import urls
+from nodewatcher.core.api import serializers as api_serializers
 from nodewatcher.core.frontend import components
 
-from . import resources, serializers
+from . import serializers
 
-
-urls.v1_api.register(resources.OlsrTopologyLinkResource())
-
+api_serializers.pool.register(serializers.OlsrTopologyLinkSerializer)
 
 components.partials.get_partial('network_topology_partial').add(components.PartialEntry(
     name='olsr',

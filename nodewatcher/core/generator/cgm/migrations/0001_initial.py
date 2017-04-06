@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import nodewatcher.core.registry.fields
 import django.db.models.deletion
-import timedelta.fields
 
 
 class Migration(migrations.Migration):
@@ -97,7 +96,7 @@ class Migration(migrations.Migration):
                 ('subnet_hint', nodewatcher.core.registry.fields.IPAddressField(host_required=True, null=True, blank=True)),
                 ('routing_announces', nodewatcher.core.registry.fields.RegistryMultipleChoiceField(blank=True, default=[], regpoint=b'node.config', null=True, verbose_name='Announce Via', enum_id=b'core.interfaces.network#routing_announce', size=None)),
                 ('lease_type', nodewatcher.core.registry.fields.RegistryChoiceField(b'node.config', b'core.interfaces.network#lease_type', blank=True, max_length=50, null=True, verbose_name='Lease Type', choices=[(b'dhcp', 'DHCP')])),
-                (b'lease_duration', timedelta.fields.TimedeltaField(max_value=None, min_value=None)),
+                (b'lease_duration', models.DurationField()),
                 ('nat_type', nodewatcher.core.registry.fields.RegistryChoiceField(b'node.config', b'core.interfaces.network#nat_type', blank=True, max_length=50, null=True, verbose_name='NAT Type', choices=[(b'snat-routed-networks', 'SNAT (towards routed networks)')])),
                 ('allocation', models.ForeignKey(related_name='allocations_cgm_allocatednetworkconfig', on_delete=django.db.models.deletion.PROTECT, editable=False, to='core.IpPool', null=True)),
                 ('pool', nodewatcher.core.registry.fields.ModelRegistryChoiceField(to='core.IpPool', on_delete=django.db.models.deletion.PROTECT)),
@@ -208,7 +207,7 @@ class Migration(migrations.Migration):
                 ('networkconfig_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='cgm.NetworkConfig')),
                 ('routing_announces', nodewatcher.core.registry.fields.RegistryMultipleChoiceField(blank=True, default=[], regpoint=b'node.config', null=True, verbose_name='Announce Via', enum_id=b'core.interfaces.network#routing_announce', size=None)),
                 ('lease_type', nodewatcher.core.registry.fields.RegistryChoiceField(b'node.config', b'core.interfaces.network#lease_type', blank=True, max_length=50, null=True, verbose_name='Lease Type', choices=[(b'dhcp', 'DHCP')])),
-                (b'lease_duration', timedelta.fields.TimedeltaField(max_value=None, min_value=None)),
+                (b'lease_duration', models.DurationField()),
                 ('nat_type', nodewatcher.core.registry.fields.RegistryChoiceField(b'node.config', b'core.interfaces.network#nat_type', blank=True, max_length=50, null=True, verbose_name='NAT Type', choices=[(b'snat-routed-networks', 'SNAT (towards routed networks)')])),
                 ('family', nodewatcher.core.registry.fields.RegistryChoiceField(b'node.config', b'core.interfaces.network#ip_family', max_length=50, choices=[(b'ipv4', 'IPv4'), (b'ipv6', 'IPv6')])),
                 ('address', nodewatcher.core.registry.fields.IPAddressField(subnet_required=True)),

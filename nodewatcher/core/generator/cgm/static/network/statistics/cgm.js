@@ -11,12 +11,7 @@
             var colors = Highcharts.getOptions().colors;
             var colorIndex = 0;
 
-            _.each(data.statistics, function (point) {
-                _.each(data.header.device.choices, function (choice) {
-                    if (point.device == choice.name)
-                        point.device = choice;
-                });
-
+            _.each(data.results, function (point) {
                 if (!point.device) {
                     point.device = {
                         // TODO: Translate.
@@ -34,8 +29,8 @@
                 }
 
                 var manufacturer = manufacturers[point.device.manufacturer];
-                manufacturer.count += point.count;
-                manufacturer.models.push(_.extend({count: point.count}, point.device));
+                manufacturer.count += point.nodes;
+                manufacturer.models.push(_.extend({count: point.nodes}, point.device));
             });
 
             var manufacturersSeries = [];

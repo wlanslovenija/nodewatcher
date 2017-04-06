@@ -12,42 +12,36 @@
 
     $(document).ready(function() {
         $('.events-list').each(function(i, table) {
-            $.tastypie.newDataTable(table, $(table).data('source'), {
-                'pageLength': 50,
-                'dom': 'ifprtifp',
-                'columns': [{
-                        'data': 'timestamp',
-                        'render': renderDate
+            $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
+                registryRoots: {
+                    'related_nodes': {
+                        fields: {
+                            'config': [
+                                ['core.general', 'name'],
+                                ['core.routerid', 'router_id'],
+                            ],
+                        },
                     },
-                    // TODO: Correctly render names and links
+                },
+                columns: [
+                    {data: 'timestamp', render: renderDate},
                     {
-                        'data': 'related_nodes',
-                        'render': $.tastypie.nodeSubdocumentName(table)
-                    }, {
-                        'data': 'description',
-                        'orderable': false
+                        data: 'related_nodes.config.core__general.name',
+                        render: $.nodewatcher.api.renderNodeNameSubdocument(table, 'related_nodes', true),
+                        registry: true,
                     },
-                    // We need extra data to render the related nodes column
-                    {
-                        'data': 'related_nodes[].name',
-                        'visible': false
-                    }, {
-                        'data': 'related_nodes[].uuid',
-                        'visible': false
-                    }
+                    {data: 'description', orderable: false},
                 ],
-                'aaSorting': [
-                    [0, 'desc']
-                ],
-                'language': {
+                order: [[0, 'desc']],
+                language: {
                     // TODO: Make strings translatable
-                    'zeroRecords': "No matching events found.",
-                    'emptyTable ': "There are currently no events.",
-                    'info': "_START_ to _END_ of _TOTAL_ events shown",
-                    'infoEmpty': "0 events shown",
-                    'infoFiltered': "(from _MAX_ all events)",
-                    'infoPostFix': "",
-                    'search': "Filter:"
+                    zeroRecords: "No events found.",
+                    emptyTable: "There are currently no events.",
+                    info: "_START_ to _END_ of _TOTAL_ events shown",
+                    infoEmpty: "0 events shown",
+                    infoFiltered: "(from _MAX_ all events)",
+                    infoPostFix: "",
+                    search: "Filter:"
                 }
             });
         });

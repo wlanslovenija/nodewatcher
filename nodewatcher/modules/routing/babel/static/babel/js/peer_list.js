@@ -16,29 +16,42 @@
 
     $(document).ready(function () {
         $('.babel-peer-list').each(function (i, table) {
-            $.tastypie.newDataTable(table, $(table).data('source'), {
-                'columns': [
-                    // TODO: How can we generate string from registry, without hardcoding registry relations?
-                    {'data': 'peer.name', 'render': $.tastypie.nodeSubdocumentName(table, 'peer', true), 'orderByField': 'peer__config_core_generalconfig__name'},
-                    {'data': 'last_seen', 'render': renderTimeAgo},
-                    {'data': 'reachability'},
-                    {'data': 'rxcost'},
-                    {'data': 'txcost'},
-                    {'data': 'cost'},
-                    // We need extra data to render the node column.
-                    {'data': 'peer.uuid', 'visible': false},
-                    {'data': 'peer.router_id[].', 'visible': false},
+            $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
+                registryRoots: {
+                    'peer': {
+                        fields: {
+                            'config': [
+                                ['core.general', 'name'],
+                                ['core.routerid', 'router_id'],
+                            ],
+                        },
+                    },
+                },
+                columns: [
+                    {
+                        data: 'peer.config.core__general.name',
+                        render: $.nodewatcher.api.renderNodeNameSubdocument(table, 'peer', true),
+                        registry: true,
+                    },
+                    {data: 'last_seen', render: renderTimeAgo},
+                    {data: 'reachability'},
+                    {data: 'rxcost'},
+                    {data: 'txcost'},
+                    {data: 'cost'},
+                    {data: 'peer.@id', visible: false},
+                    {data: 'peer.config.core__routerid[].router_id', visible: false},
                 ],
-                'order': [[0, 'asc']],
-                'language': {
+                order: [[0, 'asc']],
+                paging: false,
+                language: {
                     // TODO: Make strings translatable
-                    'sZeroRecords': "No Babel peer links found.",
-                    'sEmptyTable ': "There are currently no Babel peer links.",
-                    'sInfo': "_START_ to _END_ of _TOTAL_ Babel peer links shown",
-                    'sInfoEmpty': "0 Babel peer links shown",
-                    'sInfoFiltered': "(from _MAX_ all Babel peer links)",
-                    'sInfoPostFix': "",
-                    'sSearch': "Filter:"
+                    zeroRecords: "No Babel peer links found.",
+                    emptyTable: "There are currently no Babel peer links.",
+                    info: "_START_ to _END_ of _TOTAL_ Babel peer links shown",
+                    infoEmpty: "0 Babel peer links shown",
+                    infoFiltered: "(from _MAX_ all Babel peer links)",
+                    infoPostFix: "",
+                    search: "Filter:"
                 }
             });
         });

@@ -4,7 +4,7 @@ from django.core import urlresolvers
 from nodewatcher.core.api import urls as api_urls
 from nodewatcher.core.frontend import components
 
-from . import resources, views
+from . import views
 
 
 class GeneratorComponent(components.FrontendComponent):
@@ -19,13 +19,7 @@ class GeneratorComponent(components.FrontendComponent):
 
 components.pool.register(GeneratorComponent)
 
-
-api_urls.v1_api.register(resources.BuildResultResource())
-api_urls.v1_api.register(resources.BuildResultFileResource())
-api_urls.v1_api.register(resources.BuilderResource())
-api_urls.v1_api.register(resources.BuildChannelResource())
-api_urls.v1_api.register(resources.BuildVersionResource())
-
+api_urls.v2_api.register('build_result', views.BuildResultViewSet)
 
 components.menus.get_menu('node_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Generate Firmware"),

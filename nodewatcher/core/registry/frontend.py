@@ -16,6 +16,7 @@ for model in top_level_models:
     class meta_cls:
         model = model
         base_view = 'apiv2:%s-list' % model._meta.object_name.lower()
+        fields = '__all__'
 
     serializer = type(
         '%sRegistryRootSerializer' % (model.__name__),
