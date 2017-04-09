@@ -68,6 +68,13 @@ def tunneldigger(node, cfg):
             policy.lookup = 'main'
             policy.priority = 500
 
+            # In case the main table doesn't have a default route, make sure the
+            # lookup stops, so VPN traffic is never routed over the internal network.
+            policy = cfg.network.add('rule')
+            policy.dest = "%s/32" % broker.ip
+            policy.action = 'unreachable'
+            policy.priority = 510
+
     if tunneldigger_enabled:
         # Raise validation error when no uplink interface has been configured.
         uplink_interface = cfg.network.find_named_section('interface', _uplink=True)
