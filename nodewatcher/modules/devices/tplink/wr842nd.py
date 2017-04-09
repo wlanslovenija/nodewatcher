@@ -120,6 +120,25 @@ class TPLinkWR842NDv2(TPLinkWR842NDv1):
         }
     }
 
+
+class TPLinkWR842NDv3(TPLinkWR842NDv1):
+    """
+    TP-Link WR842NDv3 device descriptor.
+    """
+
+    identifier = 'tp-wr842ndv3'
+    name = "WR842ND (v3)"
+    profiles = {
+        'lede': {
+            'name': 'tl-wr842n-v3',
+            'files': [
+                '*-ar71xx-generic-tl-wr842n-v3-squashfs-factory.bin',
+                '*-ar71xx-generic-tl-wr842n-v3-squashfs-sysupgrade.bin',
+            ]
+        }
+    }
+
 # Register the TP-Link WR842ND devices.
 cgm_base.register_device('openwrt', TPLinkWR842NDv1)
 cgm_base.register_device('openwrt', TPLinkWR842NDv2)
+cgm_base.register_device('lede', TPLinkWR842NDv3)
