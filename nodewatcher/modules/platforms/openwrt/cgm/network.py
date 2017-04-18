@@ -243,6 +243,12 @@ def configure_interface(cfg, node, interface, section, iface_name):
             dhcp_rule.dest_port = 68
             dhcp_rule.target = 'ACCEPT'
 
+            # Ensure ICMP traffic is allowed on the uplink interface.
+            icmp_rule = cfg.firewall.add('rule')
+            icmp_rule.src = 'uplink'
+            icmp_rule.proto = 'icmp'
+            icmp_rule.target = 'ACCEPT'
+
         if not firewall.network:
             firewall.network = []
 
