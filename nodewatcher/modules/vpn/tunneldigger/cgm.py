@@ -75,6 +75,13 @@ def tunneldigger(node, cfg):
             policy.action = 'unreachable'
             policy.priority = 510
 
+            # Add firewall policy to allow communication with the VPN broker.
+            firewall = cfg.firewall.add('rule')
+            firewall.src = 'uplink'
+            firewall.proto = 'udp'
+            firewall.src_ip = broker.ip
+            firewall.target = 'ACCEPT'
+
     if tunneldigger_enabled:
         # Raise validation error when no uplink interface has been configured.
         uplink_interface = cfg.network.find_named_section('interface', _uplink=True)
