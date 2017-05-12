@@ -63,7 +63,7 @@ class UBNTUapACLite(cgm_devices.DeviceBase):
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
-            'wifi1': 'radio1',       
+            'wifi1': 'radio1',
             'lan0': 'eth0',
         }
     }
@@ -80,7 +80,6 @@ class UBNTUapACLite(cgm_devices.DeviceBase):
                 '*-ar71xx-generic-ub-uap-ac-lite-squashfs-sysupgrade.bin',
             ]
         }
-    }  
+    }
 # Register Unifi UAP AC Lite device.
 cgm_base.register_device('lede', UBNTUapACLite)
-    
