@@ -81,6 +81,8 @@ class UBNTUapACLite(cgm_devices.DeviceBase):
             ]
         }
     }
+
+
 class UBNTUap(cgm_devices.DeviceBase):
     """
     UBNT Unifi UAP device descriptor.
@@ -138,7 +140,6 @@ class UBNTUap(cgm_devices.DeviceBase):
             ]
         }
     }
-    
 # Register Unifi UAP AC Lite device.
 cgm_base.register_device('lede', UBNTUapACLite)
 cgm_base.register_device('lede', UBNTUap)
