@@ -397,3 +397,45 @@ class IEEE80211AN(IEEE80211A):
         Bitrate('ht-mcs-%d' % index, _("HT MCS %d") % index, index, rate_set='802.11n')
         for index in xrange(0, 32)
     ])
+
+
+class IEEE80211AC(IEEE80211A):
+    """
+    IEEE 802.11a + c protocol.
+    """
+
+    identifier = "ieee-80211ac"
+    description = _("IEEE 802.11AC")
+    capabilities = (
+        Capability("LDPC"),
+        Capability("GF"),
+        Capability("SHORT-GI-20"),
+        Capability("SHORT-GI-40"),
+        Capability("TX-STBC"),
+        Capability("TX-STBC1"),
+        Capability("RX-STBC1"),
+        Capability("RX-STBC12"),
+        Capability("RX-STBC123"),
+        Capability("DSSS_CCK-40"),
+    )
+    widths = (
+        ChannelWidth(
+            "ht40",
+            _("40 MHz"),
+            40,
+        ),
+        ChannelWidth(
+            "ht80",
+            _("80 MHz"),
+            80,
+        ),
+        ChannelWidth(
+            "ht160",
+            _("160 MHz"),
+            160,
+        )
+    )
+    bitrates = tuple([
+        Bitrate('ht-mcs-%d' % index, _("HT MCS %d") % index, index, rate_set='802.11n')
+        for index in xrange(0, 32)
+    ])

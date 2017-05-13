@@ -703,7 +703,7 @@ def network(node, cfg):
             # Select proper hardware mode
             if dsc_protocol.identifier in ('ieee-80211bg', 'ieee-80211bgn'):
                 radio.hwmode = '11g'
-            elif dsc_protocol.identifier in ('ieee-80211a', 'ieee-80211an'):
+            elif dsc_protocol.identifier in ('ieee-80211a', 'ieee-80211an', 'ieee-80211ac'):
                 radio.hwmode = '11a'
             else:
                 raise cgm_base.ValidationError(_("Unsupported OpenWRT wireless protocol '%s'!") % dsc_protocol.identifier)
@@ -731,6 +731,27 @@ def network(node, cfg):
                     radio.htmode = 'HT40-'
                 elif dsc_channel_width.identifier == 'ht40u':
                     radio.htmode = 'HT40+'
+                else:
+                    raise cgm_base.ValidationError(_("Unsupported OpenWRT channel width '%s'!") % dsc_channel_width.identifier)
+                radio.ht_capab = []
+
+                for capability in dsc_protocol.available_capabilities:
+                    radio.ht_capab.append(capability.identifier)
+            elif dsc_protocol.identifier in ('ieee-80211ac',):
+                if dsc_channel_width.identifier == 'nw5':
+                    radio.htmode = 'VHT20'
+                    radio.chanbw = 5
+                elif dsc_channel_width.identifier == 'nw10':
+                    radio.htmode = 'VHT20'
+                    radio.chanbw = 10
+                elif dsc_channel_width.identifier == 'ht20':
+                    radio.htmode = 'VHT20'
+                elif dsc_channel_width.identifier == 'ht40':
+                    radio.htmode = 'VHT40'
+                elif dsc_channel_width.identifier == 'ht80':
+                    radio.htmode = 'VHT80'
+                elif dsc_channel_width.identifier == 'ht160':
+                    radio.htmode = 'VHT160'
                 else:
                     raise cgm_base.ValidationError(_("Unsupported OpenWRT channel width '%s'!") % dsc_channel_width.identifier)
                 radio.ht_capab = []
