@@ -517,13 +517,17 @@ class RegistrationPoint(object):
         """
         Adds a new form defaults setter.
 
-        :param defaults: Form defaults instance
+        :param defaults: Form defaults instance or a list of instances
         """
 
-        if not hasattr(defaults, 'set_defaults'):
-            raise TypeError("Form defaults instance should implement method 'set_defaults'.")
+        if not isinstance(defaults, list):
+            defaults = [defaults]
 
-        self._form_defaults.append(defaults)
+        for default in defaults:
+            if not hasattr(default, 'set_defaults'):
+                raise TypeError("Form defaults instance should implement method 'set_defaults'.")
+
+            self._form_defaults.append(default)
 
     def get_form_defaults(self):
         """
