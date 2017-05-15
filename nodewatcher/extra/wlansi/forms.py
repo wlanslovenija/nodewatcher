@@ -11,13 +11,13 @@ from .network import NetworkConfiguration
 
 # Defaults for wlan slovenija network.
 registration.point('node.config').add_form_defaults([
-    DefaultPlatform(platform='openwrt'),
+    DefaultPlatform(platform='lede'),
     DefaultType(type='wireless'),
     DefaultProject(),
     DefaultRandomPassword(),
     DefaultProjectRouterID(),
-    NetworkConfiguration(routing_protocols=['olsr', 'babel']),
+    NetworkConfiguration(routing_protocols=['babel']),
     STAChannelAutoselect(),
-    TunneldiggerServersOnUplink(routing_protocols=['olsr', 'babel']),
+    TunneldiggerServersOnUplink(routing_protocols=['babel']),
     DnsServers(),
 ])
