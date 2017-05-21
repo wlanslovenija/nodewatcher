@@ -94,7 +94,7 @@ class UBNTUap(cgm_devices.DeviceBase):
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
     radios = [
-        cgm_devices.IntegratedRadio('wifi1', _("Integrated wireless radio (2.4 GHz)"), [
+        cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio (2.4 GHz)"), [
             cgm_protocols.IEEE80211BGN(
                 cgm_protocols.IEEE80211BGN.SHORT_GI_20,
                 cgm_protocols.IEEE80211BGN.SHORT_GI_40,
