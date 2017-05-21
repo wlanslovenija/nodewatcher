@@ -49,8 +49,7 @@ class UBNTEdgerouterX(cgm_devices.DeviceBase):
         'lede': {
             'name': 'ubnt-erx',
             'files': [
-                '*-mt7621-generic-ubnt-erx-squashfs-factory.bin',
-                '*-mt7621-generic-ubnt-erx-squashfs-sysupgrade.bin',
+                '*-ramips-mt7621-ubnt-erx-squashfs-sysupgrade.tar',
             ]
         }
     }
