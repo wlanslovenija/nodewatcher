@@ -98,7 +98,7 @@ class XiaomiMiMini(cgm_devices.DeviceBase):
         'lede': {
             'name': 'miwifi-mini',
             'files': [
-                '*-mt7620-generic-miwifi-mini-squashfs-sysupgrade.bin',
+                '*-ramips-mt7620-miwifi-mini-squashfs-sysupgrade.bin',
             ]
         }
     }
@@ -188,7 +188,7 @@ class XiaomiMiNano(cgm_devices.DeviceBase):
         'lede': {
             'name': 'miwifi-nano',
             'files': [
-                '*-mt7628-generic-miwifi-nano-squashfs-sysupgrade.bin',
+                '*-ramips-mt7628-miwifi-nano-squashfs-sysupgrade.bin',
             ]
         }
     }
