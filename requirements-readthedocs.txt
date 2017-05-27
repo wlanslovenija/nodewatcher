@@ -42,7 +42,6 @@ django-leaflet==0.18.0
 django-countries==3.4.1
 django-timedeltafield==0.7.10
 git+https://github.com/wlanslovenija/django-postgres.git@2c9760da48caaf9656c8b1e3f81e70671b7e7c5e#egg=django_postgres-master
-pyinotify==0.9.5
 requests==2.5.1
 unidecode==0.04.19
 ijson==2.3
