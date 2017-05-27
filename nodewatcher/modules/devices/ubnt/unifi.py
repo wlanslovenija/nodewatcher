@@ -3,13 +3,13 @@ from django.utils.translation import ugettext_lazy as _
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class UBNTAPACLite(cgm_devices.DeviceBase):
+class UBNTUniFiAPACLite(cgm_devices.DeviceBase):
     """
-    Ubiquiti AP AC Lite device descriptor.
+    Ubiquiti UniFi AP AC Lite device descriptor.
     """
 
     identifier = 'ub-uap-ac-lite'
-    name = "Unifi AP AC Lite"
+    name = "UniFi AP AC Lite"
     manufacturer = "Ubiquiti"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
@@ -47,17 +47,18 @@ class UBNTAPACLite(cgm_devices.DeviceBase):
         # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(
             identifier='a1',
-            polarization='dual',
+            polarization='horizontal',
             angle_horizontal=360,
-            angle_vertical=120,
-            gain=3,
+            angle_vertical=75,
+            gain=2,
         ),
+        # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(
             identifier='a2',
-            polarization='dual',
+            polarization='horizontal',
             angle_horizontal=360,
-            angle_vertical=120,
-            gain=3,
+            angle_vertical=75,
+            gain=2,
         )
     ]
     port_map = {
@@ -83,13 +84,13 @@ class UBNTAPACLite(cgm_devices.DeviceBase):
     }
 
 
-class UBNTAPACPro(cgm_devices.DeviceBase):
+class UBNTUniFiAPACPro(cgm_devices.DeviceBase):
     """
-    Ubiquiti AP AC Pro device descriptor.
+    Ubiquiti UniFi AP AC Pro device descriptor.
     """
 
     identifier = 'ub-uap-ac-pro'
-    name = "Unifi AP AC Pro"
+    name = "UniFi AP AC Pro"
     manufacturer = "Ubiquiti"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
@@ -149,24 +150,18 @@ class UBNTAPACPro(cgm_devices.DeviceBase):
         # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(
             identifier='a1',
-            polarization='dual',
+            polarization='horizontal',
             angle_horizontal=360,
-            angle_vertical=120,
-            gain=3,
+            angle_vertical=75,
+            gain=2,
         ),
+        # TODO: This information is probably not correct
         cgm_devices.InternalAntenna(
             identifier='a2',
-            polarization='dual',
+            polarization='horizontal',
             angle_horizontal=360,
-            angle_vertical=120,
-            gain=3,
-        ),
-        cgm_devices.InternalAntenna(
-            identifier='a3',
-            polarization='dual',
-            angle_horizontal=360,
-            angle_vertical=120,
-            gain=3,
+            angle_vertical=75,
+            gain=2,
         )
     ]
     port_map = {
@@ -192,13 +187,13 @@ class UBNTAPACPro(cgm_devices.DeviceBase):
     }
 
 
-class UBNTUap(cgm_devices.DeviceBase):
+class UBNTUniFiAP(cgm_devices.DeviceBase):
     """
-    UBNT Unifi UAP device descriptor.
+    UBNT UniFi AP device descriptor.
     """
 
     identifier = 'ub-uap'
-    name = "Unifi UAP"
+    name = "UniFi AP"
     manufacturer = "Ubiquiti"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
@@ -251,17 +246,17 @@ class UBNTUap(cgm_devices.DeviceBase):
     }
 
 
-class UBNTUapLR(UBNTUap):
+class UBNTUniFiAPLR(UBNTUniFiAP):
     """
-    UBNT Unifi UAP-LR device descriptor.
+    UBNT UniFi AP LR device descriptor.
     """
 
     identifier = 'ub-uap-lr'
-    name = "Unifi UAP-LR"
+    name = "UniFi AP LR"
 
 
 # Register Unifi AP devices.
-cgm_base.register_device('lede', UBNTAPACLite)
-cgm_base.register_device('lede', UBNTAPACPro)
-cgm_base.register_device('lede', UBNTUap)
-cgm_base.register_device('lede', UBNTUapLR)
+cgm_base.register_device('lede', UBNTUniFiAPACLite)
+cgm_base.register_device('lede', UBNTUniFiAPACPro)
+cgm_base.register_device('lede', UBNTUniFiAP)
+cgm_base.register_device('lede', UBNTUniFiAPLR)
