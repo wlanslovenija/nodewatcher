@@ -1,9 +1,9 @@
-/.git
-/.idea
-/.gitignore
-/.gitmodules
-/.dockerignore
-/docker-compose.yml
+.git
+.idea
+.gitignore
+.gitmodules
+.dockerignore
+docker-compose.yml
 **/*.pyc
 **/__pycache__
 **/*.swp
