@@ -29,3 +29,11 @@ components.partials.get_partial('generator_view_build_partial').add(components.P
     visible=filter_platform('openwrt'),
     template='nodeupgrade/build_result_openwrt.html',
 ))
+
+# LEDE nodeupgrade instructions.
+components.partials.get_partial('generator_view_build_partial').add(components.PartialEntry(
+    name='nodeupgrade_lede',
+    weight=100,
+    visible=filter_platform('lede'),
+    template='nodeupgrade/build_result_openwrt.html',
+))
