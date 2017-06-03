@@ -7,7 +7,7 @@ from django.core import management, exceptions as django_exceptions
 from django.db.models import query
 from django.test import utils
 
-from nodewatcher.core.registry import registration, exceptions
+from nodewatcher.core.registry import registration, exceptions, expression
 
 CUSTOM_SETTINGS = {
     'DEBUG': True,
@@ -310,3 +310,25 @@ class RegistryTestCase(django_test.TransactionTestCase):
             self.assertEqual(thing.f1.interesting, 'nope')
             self.assertEqual(thing.f1.level, None)
             self.assertEqual(thing.f1.test, None)
+
+    def test_filter_expression_parser(self):
+        from .registry_tests import models
+
+        parser = expression.FilterExpressionParser(models.Thing, disallow_sensitive=False)
+
+        conditions = [
+            'first:foo.another__interesting="nope"',
+            'first:foo.simple__level="level-x"',
+            'first:foo.simple__interesting="yes"',
+            'first:foo.another__interesting="nope"',
+            'first:foo.simple__level="level-x"',
+            'first:foo.simple__interesting="yes"',
+            'first:foo.another__interesting="nope"',
+            'first:foo.simple__level="level-x"',
+            'first:foo.simple__interesting="yes"',
+        ]
+
+        for operator in (',', '|'):
+            for length in range(1, len(conditions) + 1):
+                filters = operator.join(conditions[:length])
+                parser.parse(filters)

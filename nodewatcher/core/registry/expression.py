@@ -1,5 +1,3 @@
-import re
-
 from grako import exceptions
 
 from django.db.models import constants, query
@@ -161,18 +159,30 @@ class FilterExpressionSemantics(LookupExpressionSemantics):
 
         if op is None:
             return rhs
-        elif op == ',':
-            return FilterExpression(
-                lhs.filter_q & rhs.filter_q,
-                ensure_distinct=lhs.ensure_distinct or rhs.ensure_distinct
+        if not isinstance(lhs, list):
+            lhs = [lhs]
+        if not isinstance(op, list):
+            op = [op]
+
+        expressions = lhs + [rhs]
+        active = expressions[0]
+        for expression, operator in zip(expressions[1:], op):
+            q = active.filter_q
+            ensure_distinct = active.ensure_distinct or expression.ensure_distinct
+
+            if operator == ',':
+                q = q & expression.filter_q
+            elif operator == '|':
+                q = q | expression.filter_q
+            else:
+                raise ValueError('Unsupported operator: %s' % op)
+
+            active = FilterExpression(
+                q,
+                ensure_distinct=ensure_distinct
             )
-        elif op == '|':
-            return FilterExpression(
-                lhs.filter_q | rhs.filter_q,
-                ensure_distinct=lhs.ensure_distinct or rhs.ensure_distinct
-            )
-        else:
-            raise ValueError('Unsupported operator: %s' % op)
+
+        return active
 
     def filter_expression_prec2(self, ast):
         expression, op = ast['expression'], ast['op']
