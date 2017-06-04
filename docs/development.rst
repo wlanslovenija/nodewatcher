@@ -117,6 +117,7 @@ The following information should be used when adding a builder:
 * **Host:**
     * builderar71xx
     * builderlantiq
+    * builderar71xx_lede
 * **Private key:**
 
     ::
