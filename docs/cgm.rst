@@ -12,41 +12,55 @@ TODO.
 
 .. _cgm-build-channel:
 
-Build Channel
--------------
+Builders
+--------
 
-Build channels enable having multiple builders with different versions of source code.
-That way testing of newer source code can be done without changes to default build channel.
-Build channel can be selected in Node settings.
+Builders_ generate firmware images. They are packaged as Docker images, which you run, and then you can connect
+to them over SSH and issue commands to build a new firmware image.
+Builders are platform and architecture specific.
+Their main purpose is to bundle the whole toolchain needed to generate firmware images into isolated,
+shareable, and reproducible containers.
 
-.. _cgm-build-version:
+Nodewatcher uses builders to generate images automatically.
+You have to register builders you want to use through nodewatcher's admin interface.
+
+.. _Builders: https://github.com/wlanslovenija/firmware-core
+
+.. _cgm-platforms:
 
 Build Version
 -------------
 
-Firmware image build version is equal to source code version included in builders.
-Version can only be bumped with generating new builders with never source code.
+Each builder version corresponds to the the source code version which was used to create the builder.
+The version of a particular builder is automatically fetched from its Docker container when
+the builder is registered with nodewatcher.
 
 .. _cgm-builders:
 
-Builders
---------
+Build Channel
+-------------
 
-Builders are docker images used for firmware image generation.
-Builders are platform and architecture specific.
-Builders can be custom generated or periodicly released docker builder images for supported platforms can be used.
-In order to be used in Nodewatcher builders need to be linked either by passing --link argument or by editing docker-compose.yml. 
-Instructions for custom generating builders can be found here: https://github.com/wlanslovenija/firmware-core
+Build channels allow you to group multiple builders together. For example, you could have
+two groups ``stable`` and ``experimental``. You would put builders for stable release of
+the source code for your firmware into ``stable``. You can put builders with new experimental
+features or builders with unstable code still being developed into ``experimental`` channel.
 
-.. _cgm-platforms:
+Then, for each node maintainers can choose which build channel to use for generation of its firmware
+image.
+This allows for example for some nodes to always use stable firmware versions, while maintainers
+who like to help testing development versions can use experimental channel for their nodes.
+
+.. _cgm-build-version:
+
 
 Platforms
 ---------
 
 Nodewatcher platform descriptors are defined in ``nodewatcher/modules/platforms`` and are Python modules.
 Platform descriptors define way that firmware images are generated.
-Currently supported platforms are OpenWRT and LEDE.
-Suport for new platforms can be done by extending existing descriptors if your platform is based on OpenWRT or make a new one that suits your platform.
+Currently supported platforms are OpenWrt and LEDE.
+Suport for new platforms can be done by extending existing descriptors if your platform is based
+on existing platforms or make a new one that suits your platform.
 
 .. _cgm-devices:
 
@@ -105,5 +119,8 @@ to boot a stock version of OpenWrt on the device and check the default configura
 and ``/etc/config/wireless``.
 
 OpenWrt profiles may be listed by running ``make info`` on the `generated image builder`_.
-LEDE profiles can be made by mostly replacing OpenWRT with LEDE.
+
+Because LEDE platform is very similar to OpenWrt, if OpenWrt profile, for a device you are interested in, already exists,
+you can often base the LEDE device profile on OpenWrt's device profile for that particular device.
+
 .. _generated image builder: https://github.com/wlanslovenija/firmware-core#building-images
