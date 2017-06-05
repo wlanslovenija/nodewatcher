@@ -10,7 +10,7 @@ Configuration Generating Modules
 
 TODO.
 
-.. _cgm-build-channel:
+.. _cgm-builders:
 
 Builders
 --------
@@ -26,7 +26,7 @@ You have to register builders you want to use through nodewatcher's admin interf
 
 .. _Builders: https://github.com/wlanslovenija/firmware-core
 
-.. _cgm-platforms:
+.. _cgm-build-version:
 
 Build Version
 -------------
@@ -35,7 +35,7 @@ Each builder version corresponds to the the source code version which was used t
 The version of a particular builder is automatically fetched from its Docker container when
 the builder is registered with nodewatcher.
 
-.. _cgm-builders:
+.. _cgm-build-channel:
 
 Build Channel
 -------------
@@ -50,8 +50,7 @@ image.
 This allows for example for some nodes to always use stable firmware versions, while maintainers
 who like to help testing development versions can use experimental channel for their nodes.
 
-.. _cgm-build-version:
-
+.. _cgm-platforms:
 
 Platforms
 ---------
