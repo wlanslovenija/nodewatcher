@@ -13,6 +13,7 @@ class XiaomiMiMini(cgm_devices.DeviceBase):
     manufacturer = "Xiaomi"
     url = 'http://miwifi.com/'
     architecture = 'ramips_mt7620'
+    usb = True
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio (5 GHz)"), [
             cgm_protocols.IEEE80211AC(
@@ -114,6 +115,7 @@ class XiaomiMiNano(cgm_devices.DeviceBase):
     manufacturer = "Xiaomi"
     url = 'http://miwifi.com/'
     architecture = 'ramips_mt7628'
+    usb = True
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(
