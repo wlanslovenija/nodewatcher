@@ -47,6 +47,7 @@ py-radix==0.9.3
 django-oauth-toolkit==0.10.0
 redis==2.10.5
 djangorestframework==3.5.4
+django-filter==1.0.4
 git+https://github.com/wlanslovenija/django-rest-framework-gis.git@d2f8adab93be1cab75696485e9b0c56d41248328#egg=djangorestframework_gis-wlanslovenija
 git+https://github.com/wlanslovenija/drf-ujson-renderer.git@96cee399260daf469b7e4b004fa245edf9dd253c#egg=drf_ujson-wlanslovenija
 grako==3.8.1

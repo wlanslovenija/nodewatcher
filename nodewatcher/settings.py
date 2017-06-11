@@ -277,6 +277,7 @@ DEPENDENCY_APPS = [
     'registration',
     'rest_framework',
     'rest_framework_gis',
+    'django_filters',
     'corsheaders',
 ]
 

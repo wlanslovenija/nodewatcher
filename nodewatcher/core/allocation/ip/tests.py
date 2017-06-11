@@ -184,6 +184,19 @@ class IpPoolAPITest(api_test.RegistryAPITestCase):
             self.assertDataKeysEqual(item['top_level'], ['description'])
             self.assertEquals(item['top_level']['description'], "Top level pool")
 
+    def test_filters(self):
+        response = self.get_ip_allocation_list({'family': 'ipv6'})
+        self.assertEquals(response.data['count'], 0)
+
+        response = self.get_ip_allocation_list({'prefix_length': '16'})
+        self.assertEquals(response.data['count'], 1)
+
+        response = self.get_ip_allocation_list({'prefix_length': '27'})
+        self.assertEquals(response.data['count'], 46)
+
+        response = self.get_ip_allocation_list({'prefix_length': '26'})
+        self.assertEquals(response.data['count'], 24)
+
     def test_allocated_to_filter(self):
         # Check that the allocated_to filter can filter by nodes.
         for node_id, node in self.nodes.items():

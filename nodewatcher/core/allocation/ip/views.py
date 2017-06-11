@@ -1,6 +1,7 @@
 from django.db.models import query
 
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
+from django_filters import rest_framework as django_filters
 
 from nodewatcher.core.registry import registration
 
@@ -14,6 +15,9 @@ class IpPoolViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.IpPool.objects.all()
     serializer_class = serializers.IpPoolSerializer
+    filter_backends = (filters.OrderingFilter, django_filters.DjangoFilterBackend)
+    filter_fields = ('id', 'family', 'network', 'prefix_length', 'status')
+    ordering_fields = ('id', 'family', 'network', 'prefix_length', 'status')
 
     def get_queryset(self):
         queryset = super(IpPoolViewSet, self).get_queryset()
