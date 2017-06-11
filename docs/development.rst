@@ -38,11 +38,9 @@ Initializing the Database
 
 .. note:: This and all further sections assume that the development environment has been started via ``docker-compose up`` and is running (in the background or in another terminal). If the environment is not running, some of the following commands will fail.
 
-In order to prepare the database, after running the development server execute::
+Starting the ``db`` container as above will create the database for you. If you need to reinitalize the database at any later time, you need to stop the application (by running ``docker-compose stop``) and then remove the database directory, which is ``/tmp/nodewatcher-db`` by default. Restarting the application will then re-create the database.
 
-    $ docker-compose run web scripts/docker-init-database
-
-This will recreate the ``nodewatcher`` database and thus erase ALL data from the database. If you wish to reinitialize the database at any later time, simply re-running the above command should work. Then, to populate the database with nodewatcher schema call ``migrate``::
+Then, to populate the database with nodewatcher schema call ``migrate``::
 
     $ docker-compose run web python manage.py migrate
 
