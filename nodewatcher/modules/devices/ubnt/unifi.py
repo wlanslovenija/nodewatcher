@@ -84,13 +84,13 @@ class UBNTUniFiAPACLite(cgm_devices.DeviceBase):
     }
 
 
-class UBNTUniFiACMesh(UBNTUniFiAPACLite):
+class UBNTUniFiAPACMesh(UBNTUniFiAPACLite):
     """
-    UBNT UniFi AC Mesh device descriptor.
+    Ubiquiti UniFi AP AC Mesh device descriptor.
     """
 
-    identifier = 'ub-umesh-ac'
-    name = "UniFi AC Mesh"
+    identifier = 'ub-uap-ac-mesh'
+    name = "UniFi AP AC Mesh"
 
 
 class UBNTUniFiAPACPro(cgm_devices.DeviceBase):
@@ -198,7 +198,7 @@ class UBNTUniFiAPACPro(cgm_devices.DeviceBase):
 
 class UBNTUniFiAP(cgm_devices.DeviceBase):
     """
-    UBNT UniFi AP device descriptor.
+    Ubiquiti UniFi AP device descriptor.
     """
 
     identifier = 'ub-uap'
@@ -257,7 +257,7 @@ class UBNTUniFiAP(cgm_devices.DeviceBase):
 
 class UBNTUniFiAPLR(UBNTUniFiAP):
     """
-    UBNT UniFi AP LR device descriptor.
+    Ubiquiti UniFi AP LR device descriptor.
     """
 
     identifier = 'ub-uap-lr'
@@ -267,6 +267,6 @@ class UBNTUniFiAPLR(UBNTUniFiAP):
 # Register Unifi AP devices.
 cgm_base.register_device('lede', UBNTUniFiAPACLite)
 cgm_base.register_device('lede', UBNTUniFiAPACPro)
-cgm_base.register_device('lede', UBNTUniFiACMesh)
+cgm_base.register_device('lede', UBNTUniFiAPACMesh)
 cgm_base.register_device('lede', UBNTUniFiAP)
 cgm_base.register_device('lede', UBNTUniFiAPLR)
