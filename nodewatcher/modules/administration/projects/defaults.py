@@ -58,3 +58,26 @@ class DefaultProjectRouterID(registry_forms.FormDefaults):
             pool=project_config.project.default_ip_pool,
             prefix_length=29,
         )
+
+
+class Project(registry_forms.FormDefaultsModule):
+    """
+    Form defaults module that stores node's project into the module context.
+
+    Exported context properties:
+    - ``project`` contains the ``Project`` instance
+    """
+
+    def pre_configure(self, context, state, create):
+        """
+        Get project for the node that is being edited.
+        """
+
+        project_config = state.lookup_item(models.ProjectConfig)
+        try:
+            if not project_config or not project_config.project:
+                raise registry_forms.StopDefaults
+        except models.Project.DoesNotExist:
+            raise registry_forms.StopDefaults
+
+        context['project'] = project_config.project

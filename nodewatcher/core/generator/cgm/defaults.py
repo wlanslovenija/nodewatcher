@@ -65,3 +65,52 @@ class STAChannelAutoselect(registry_forms.FormDefaults):
             if all_vifs_sta:
                 # Ensure that the parent radio has the channel set to auto.
                 state.update_item(radio, channel='')
+
+
+class Device(registry_forms.FormDefaultsModule):
+    """
+    Form defaults module that stores node's device descriptor into the
+    module context. If no device is configured, defaults processing of
+    the parent module is aborted.
+
+    Exported context properties:
+    - ``device`` contains the device descriptor
+    """
+
+    def pre_configure(self, context, state, create):
+        """
+        Get device descriptor for the node in question.
+        """
+
+        general_config = state.lookup_item(models.CgmGeneralConfig)
+        if not general_config or not hasattr(general_config, 'router') or not general_config.router:
+            # Abort configuration if no device is selected.
+            raise registry_forms.StopDefaults
+
+        device = general_config.get_device()
+        if not device:
+            raise registry_forms.StopDefaults
+
+        context.update({
+            'device': device,
+        })
+
+
+class NetworkModuleMixin(object):
+    """
+    Mixin for form defaults module with useful network-related methods.
+    """
+
+    def setup_item(self, state, registry_id, klass, configuration=None, annotations=None, **filter):
+        # Create a new item.
+        if configuration is None:
+            configuration = {}
+
+        filter.update(configuration)
+        return state.append_item(klass, annotations=annotations, **filter)
+
+    def setup_interface(self, state, klass, configuration=None, annotations=None, **filter):
+        return self.setup_item(state, 'core.interfaces', klass, configuration, annotations, **filter)
+
+    def setup_network(self, state, interface, klass, configuration=None, annotations=None, **filter):
+        return self.setup_item(state, 'core.interfaces.network', klass, configuration, annotations, parent=interface, **filter)

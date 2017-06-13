@@ -1,80 +1,52 @@
-from django.db import models
-from django.utils import crypto
-
-from nodewatcher.core.allocation.ip import models as ip_models
+from nodewatcher.core.defaults import Name
+from nodewatcher.core.generator.cgm.defaults import Device, NetworkModuleMixin
 from nodewatcher.core.generator.cgm import models as cgm_models
 from nodewatcher.core.generator.cgm import devices as cgm_devices
-from nodewatcher.core.registry import forms as registry_forms, registration
+from nodewatcher.core.registry import forms as registry_forms
 
-from nodewatcher.modules.administration.types import models as type_models
 from nodewatcher.modules.administration.projects import models as project_models
+from nodewatcher.modules.administration.projects.defaults import Project
+from nodewatcher.modules.administration.types.defaults import NodeType
+from nodewatcher.modules.defaults.network_profile.defaults import NetworkProfile
 from nodewatcher.modules.vpn.tunneldigger import models as td_models
-from nodewatcher.modules.services.dns import models as dns_models
-from nodewatcher.modules.defaults.network_profile import models as network_profile_models
 
 
-class NetworkConfiguration(registry_forms.FormDefaults):
-    def __init__(self, routing_protocols):
-        self.routing_protocols = routing_protocols
+# TODO: Make more general and move out of extra.wlansi.
+class ClearInterfaces(registry_forms.FormDefaultsModule):
+    """
+    Form defaults module that removes all interfaces during the configuration
+    stage.
+    """
 
-    def set_defaults(self, state, create):
-        # Get device descriptor.
-        general_config = state.lookup_item(cgm_models.CgmGeneralConfig)
-        if not general_config or not hasattr(general_config, 'router') or not general_config.router:
-            # Return if no device is selected.
-            return
+    def configure(self, context, state, create):
+        def filter_remove_item(item):
+            # Do not remove tunneldigger interfaces as they are already handled by other
+            # defaults handlers.
+            if isinstance(item, td_models.TunneldiggerInterfaceConfig):
+                return False
 
-        device = general_config.get_device()
-        if not device:
-            return
+            # Remove everything else.
+            return True
+        state.remove_items('core.interfaces', filter=filter_remove_item)
 
-        # Get configured project.
-        project_config = state.lookup_item(project_models.ProjectConfig)
-        try:
-            if not project_config or not project_config.project:
-                return
-        except project_models.Project.DoesNotExist:
-            return
 
-        # Get configured node type.
-        type_config = state.lookup_item(type_models.TypeConfig)
-        if not type_config or not type_config.type:
-            node_type = 'wireless'
-        else:
-            node_type = type_config.type
+# TODO: Make more general and move out of extra.wlansi.
+class EthernetModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
+    """
+    Form defaults module for configuring switches and ethernet ports.
+    """
 
-        # Get network profile configuration.
-        network_profile_config = state.lookup_item(network_profile_models.NetworkProfileConfig)
-        if not network_profile_config or not network_profile_config.profiles:
-            network_profiles = []
-        else:
-            network_profiles = network_profile_config.profiles
+    requires = [
+        Device(),
+        Project(),
+        NodeType(),
+        NetworkProfile(),
+        ClearInterfaces()
+    ]
+    requires_context = ['routing_protocols']
 
-        # Preserve certain network settings in order to enable a small amount of customization.
-        radio_defaults = {}
-        wifi_uplink_defaults = None
-        wifi_backbone_defaults = None
-        for radio in state.filter_items('core.interfaces', klass=cgm_models.WifiRadioDeviceConfig):
-            radio_defaults[radio.wifi_radio] = radio
-
-            for wifi_interface in state.filter_items('core.interfaces', klass=cgm_models.WifiInterfaceConfig, parent=radio):
-                if wifi_interface.uplink:
-                    wifi_uplink_defaults = wifi_interface
-                elif node_type == 'backbone' and wifi_interface.annotations.get('wlansi.backbone', False):
-                    # Copy over configuration from existing automatically generated backbone configuration.
-                    wifi_backbone_defaults = wifi_interface
-
-        clients_network_defaults = None
-        for bridge in state.filter_items('core.interfaces', klass=cgm_models.BridgeInterfaceConfig, name='clients0'):
-            for network in state.filter_items('core.interfaces.network', klass=cgm_models.AllocatedNetworkConfig, parent=bridge):
-                clients_network_defaults = network
-
-        mobile_defaults = None
-        for mobile_interface in state.filter_items('core.interfaces', klass=cgm_models.MobileInterfaceConfig):
-            mobile_defaults = mobile_interface
-            break
-
-        # Ethernet.
+    def pre_configure(self, context, state, create):
+        device = context['device']
 
         vlan_ports = {}
         for switch in state.filter_items('core.switch', klass=cgm_models.SwitchConfig):
@@ -91,16 +63,6 @@ class NetworkConfiguration(registry_forms.FormDefaults):
         for interface in state.filter_items('core.interfaces', klass=cgm_models.EthernetInterfaceConfig):
             if interface.annotations.get('wlansi.lan', False) and interface.eth_port in available_ports:
                 lan_port = interface.eth_port
-
-        def filter_remove_item(item):
-            # Do not remove tunneldigger interfaces as they are already handled by other
-            # defaults handlers.
-            if isinstance(item, td_models.TunneldiggerInterfaceConfig):
-                return False
-
-            # Remove everything else.
-            return True
-        state.remove_items('core.interfaces', filter=filter_remove_item)
 
         if len(available_ports) >= 1:
             # If there are multiple ethernet ports, use Wan0 for uplink.
@@ -130,6 +92,35 @@ class NetworkConfiguration(registry_forms.FormDefaults):
             lan_port = None
             lan_extra_ports = []
 
+        # Store bridge network defaults.
+        clients_network_defaults = None
+        for bridge in state.filter_items('core.interfaces',
+                                         klass=cgm_models.BridgeInterfaceConfig,
+                                         name='clients0'):
+            for network in state.filter_items('core.interfaces.network',
+                                              klass=cgm_models.AllocatedNetworkConfig,
+                                              parent=bridge):
+                clients_network_defaults = network
+
+        context['ethernet'] = {
+            'vlan_ports': vlan_ports,
+            'available_ports': available_ports,
+            'lan_port': lan_port,
+            'wan_port': wan_port,
+            'lan_extra_ports': lan_extra_ports,
+            'clients_network_defaults': clients_network_defaults,
+        }
+
+    def configure(self, context, state, create):
+        routing_protocols = context['routing_protocols']
+        node_type = context['type']
+        network_profiles = context['network_profiles']
+        project = context['project']
+        lan_port = context['ethernet']['lan_port']
+        wan_port = context['ethernet']['wan_port']
+        lan_extra_ports = context['ethernet']['lan_extra_ports']
+        clients_network_defaults = context['ethernet']['clients_network_defaults']
+
         if node_type != 'backbone':
             # Setup uplink interface.
             if wan_port:
@@ -140,7 +131,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         cgm_models.EthernetInterfaceConfig,
                         eth_port=wan_port,
                         configuration={
-                            'routing_protocols': self.routing_protocols,
+                            'routing_protocols': routing_protocols,
                         },
                     )
                 else:
@@ -180,7 +171,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         'family': 'ipv4',
                         'address': '172.21.42.1/24',
                         'lease_type': 'dhcp',
-                        'lease_duration': '15min',
+                        'lease_duration': '0:15:00',
                         'nat_type': 'snat-routed-networks',
                     }
 
@@ -209,7 +200,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             cgm_models.BridgeInterfaceConfig,
                             name='clients0',
                             configuration={
-                                'routing_protocols': self.routing_protocols,
+                                'routing_protocols': routing_protocols,
                             },
                         )
 
@@ -221,7 +212,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             cgm_models.AllocatedNetworkConfig,
                             configuration={
                                 'description': "AP-LAN Client Access",
-                                'routing_announces': self.routing_protocols,
+                                'routing_announces': routing_protocols,
                                 'family': 'ipv4',
                                 'pool': getattr(clients_network_defaults, 'pool', None),
                                 'prefix_length': clients_network_defaults.prefix_length,
@@ -236,12 +227,12 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             cgm_models.AllocatedNetworkConfig,
                             configuration={
                                 'description': "AP-LAN Client Access",
-                                'routing_announces': self.routing_protocols,
+                                'routing_announces': routing_protocols,
                                 'family': 'ipv4',
-                                'pool': project_config.project.default_ip_pool,
+                                'pool': project.default_ip_pool,
                                 'prefix_length': 28,
                                 'lease_type': 'dhcp',
-                                'lease_duration': '15min',
+                                'lease_duration': '0:15:00',
                             }
                         )
 
@@ -254,7 +245,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                             cgm_models.EthernetInterfaceConfig,
                             eth_port=lan_port,
                             configuration={
-                                'routing_protocols': self.routing_protocols,
+                                'routing_protocols': routing_protocols,
                             },
                             annotations={
                                 'wlansi.lan': True,
@@ -312,7 +303,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                                 cgm_models.EthernetInterfaceConfig,
                                 eth_port=eth_port,
                                 configuration={
-                                    'routing_protocols': self.routing_protocols,
+                                    'routing_protocols': routing_protocols,
                                 },
                             )
 
@@ -323,16 +314,42 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 cgm_models.EthernetInterfaceConfig,
                 eth_port=extra_port,
                 configuration={
-                    'routing_protocols': self.routing_protocols,
+                    'routing_protocols': routing_protocols,
                 },
             )
 
-        # Mobile uplink.
+        context.update({
+            'clients_interface': clients_interface,
+        })
+
+
+# TODO: Make more general and move out of extra.wlansi.
+class MobileUplinkModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
+    """
+    Form defaults module for configuring mobile uplinks.
+    """
+
+    requires = [
+        NetworkProfile(),
+        ClearInterfaces()
+    ]
+
+    def pre_configure(self, context, state, create):
+        mobile_defaults = None
+        for mobile_interface in state.filter_items('core.interfaces', klass=cgm_models.MobileInterfaceConfig):
+            mobile_defaults = mobile_interface
+            break
+
+        context['mobile_defaults'] = mobile_defaults
+
+    def configure(self, context, state, create):
+        network_profiles = context['network_profiles']
+        mobile_defaults = context['mobile_defaults']
 
         if 'mobile-uplink' in network_profiles:
             if mobile_defaults is not None:
                 # Reuse some configuration form the previous mobile interface.
-                mobile_interface = self.setup_interface(
+                self.setup_interface(
                     state,
                     cgm_models.MobileInterfaceConfig,
                     configuration={
@@ -347,7 +364,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 )
             else:
                 # Create a new mobile interface.
-                mobile_interface = self.setup_interface(
+                self.setup_interface(
                     state,
                     cgm_models.MobileInterfaceConfig,
                     configuration={
@@ -357,7 +374,59 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                     }
                 )
 
-        # Wireless.
+
+# TODO: Make more general and move out of extra.wlansi.
+class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
+    """
+    Form defaults module for configuring wireless radios.
+    """
+
+    requires = [
+        Name(),
+        Device(),
+        Project(),
+        NodeType(),
+        NetworkProfile(),
+        EthernetModule(),
+        ClearInterfaces(),
+    ]
+    requires_context = ['routing_protocols']
+
+    def pre_configure(self, context, state, create):
+        node_type = context['type']
+
+        radio_defaults = {}
+        wifi_uplink_defaults = None
+        wifi_backbone_defaults = None
+        for radio in state.filter_items('core.interfaces',
+                                        klass=cgm_models.WifiRadioDeviceConfig):
+            radio_defaults[radio.wifi_radio] = radio
+
+            for wifi_interface in state.filter_items('core.interfaces',
+                                                     klass=cgm_models.WifiInterfaceConfig,
+                                                     parent=radio):
+                if wifi_interface.uplink:
+                    wifi_uplink_defaults = wifi_interface
+                elif node_type == 'backbone' and wifi_interface.annotations.get('wlansi.backbone', False):
+                    # Copy over configuration from existing automatically generated backbone configuration.
+                    wifi_backbone_defaults = wifi_interface
+
+        context.update({
+            'radio_defaults': radio_defaults,
+            'wifi_uplink_defaults': wifi_uplink_defaults,
+            'wifi_backbone_defaults': wifi_backbone_defaults,
+        })
+
+    def configure(self, context, state, create):
+        routing_protocols = context['routing_protocols']
+        network_profiles = context['network_profiles']
+        device = context['device']
+        project = context['project']
+        node_type = context['type']
+        radio_defaults = context['radio_defaults']
+        clients_interface = context['clients_interface']
+        wifi_backbone_defaults = context['wifi_backbone_defaults']
+        wifi_uplink_defaults = context['wifi_uplink_defaults']
 
         try:
             radio = device.radios[0]
@@ -395,13 +464,13 @@ class NetworkConfiguration(registry_forms.FormDefaults):
 
         def get_project_ssid(purpose, default=None, attribute='essid'):
             if attribute == 'essid' and 'hostname-essid' in network_profiles:
-                return general_config.name
+                return context['name']
 
             try:
-                ssid = getattr(project_config.project.ssids.get(purpose=purpose), attribute)
+                ssid = getattr(project.ssids.get(purpose=purpose), attribute)
             except project_models.SSID.DoesNotExist:
                 try:
-                    ssid = getattr(project_config.project.ssids.get(default=True), attribute)
+                    ssid = getattr(project.ssids.get(default=True), attribute)
                 except project_models.SSID.DoesNotExist:
                     ssid = default
 
@@ -441,7 +510,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         'mode': 'mesh',
                         'essid': get_project_ssid('mesh', 'mesh.wlan-si.net'),
                         'bssid': get_project_ssid('mesh', '02:CA:FF:EE:BA:BE', attribute='bssid'),
-                        'routing_protocols': self.routing_protocols,
+                        'routing_protocols': routing_protocols,
                     },
                 )
         elif node_type == 'backbone':
@@ -451,7 +520,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 if mode not in ('ap', 'sta'):
                     mode = 'ap'
 
-                backbone_wifi = self.setup_interface(
+                self.setup_interface(
                     state,
                     cgm_models.WifiInterfaceConfig,
                     parent=wifi_radio,
@@ -461,11 +530,11 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         'essid': wifi_backbone_defaults.essid,
                         'bssid': wifi_backbone_defaults.bssid,
                         'isolate_clients': wifi_backbone_defaults.isolate_clients,
-                        'routing_protocols': self.routing_protocols,
+                        'routing_protocols': routing_protocols,
                     },
                 )
             else:
-                backbone_wifi = self.setup_interface(
+                self.setup_interface(
                     state,
                     cgm_models.WifiInterfaceConfig,
                     parent=wifi_radio,
@@ -473,7 +542,7 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                         'mode': 'ap',
                         'essid': get_project_ssid('backbone', 'backbone.wlan-si.net'),
                         'isolate_clients': True,
-                        'routing_protocols': self.routing_protocols,
+                        'routing_protocols': routing_protocols,
                     },
                     annotations={
                         'wlansi.backbone': True,
@@ -519,16 +588,16 @@ class NetworkConfiguration(registry_forms.FormDefaults):
                 },
             )
 
-    def setup_item(self, state, registry_id, klass, configuration=None, annotations=None, **filter):
-        # Create a new item.
-        if configuration is None:
-            configuration = {}
 
-        filter.update(configuration)
-        return state.append_item(klass, annotations=annotations, **filter)
+# TODO: Make more general and move out of extra.wlansi.
+class NetworkConfiguration(registry_forms.ComplexFormDefaults):
+    modules = [
+        EthernetModule(),
+        MobileUplinkModule(),
+        WirelessModule(),
+    ]
 
-    def setup_interface(self, state, klass, configuration=None, annotations=None, **filter):
-        return self.setup_item(state, 'core.interfaces', klass, configuration, annotations, **filter)
-
-    def setup_network(self, state, interface, klass, configuration=None, annotations=None, **filter):
-        return self.setup_item(state, 'core.interfaces.network', klass, configuration, annotations, parent=interface, **filter)
+    def __init__(self, routing_protocols):
+        super(NetworkConfiguration, self).__init__(
+            routing_protocols=routing_protocols
+        )
