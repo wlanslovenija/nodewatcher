@@ -39,9 +39,7 @@ def user(request, username):
 
     user = shortcuts.get_object_or_404(auth_models.User, username=username)
 
-    return shortcuts.render_to_response("users/user.html", {
-        'profileuser': user,
-    }, context_instance=template.RequestContext(request))
+    return shortcuts.render(request, 'users/user.html', {'profileuser': user})
 
 
 def get_user_copy(user):
@@ -104,9 +102,7 @@ def account(request):
     else:
         form = forms.AccountChangeForm(instance=[request.user, request.user.profile])
 
-    return shortcuts.render_to_response("users/account.html", {
-        'form': form,
-    }, context_instance=template.RequestContext(request))
+    return shortcuts.render(request, 'users/account.html', {'form': form})
 
 
 def logout_redirect(request, *args, **kwargs):
