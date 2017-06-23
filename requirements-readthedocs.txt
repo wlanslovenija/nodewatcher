@@ -7,7 +7,7 @@ amqp==1.4.9
 anyjson==0.3.3
 billiard==3.3.0.22
 celery==3.1.20
-datastream[influxdb]==0.5.14
+datastream[influxdb]==0.5.15
 defusedxml==0.4.1
 git+https://github.com/zestedesavoir/django-cors-middleware.git@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
 django-classy-tags==0.7.1
