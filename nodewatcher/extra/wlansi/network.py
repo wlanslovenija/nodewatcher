@@ -396,8 +396,8 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
         node_type = context['type']
 
         radio_defaults = {}
-        wifi_uplink_defaults = None
-        wifi_backbone_defaults = None
+        wifi_uplink_defaults = {}
+        wifi_backbone_defaults = {}
         for radio in state.filter_items('core.interfaces',
                                         klass=cgm_models.WifiRadioDeviceConfig):
             radio_defaults[radio.wifi_radio] = radio
@@ -406,10 +406,10 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                                                      klass=cgm_models.WifiInterfaceConfig,
                                                      parent=radio):
                 if wifi_interface.uplink:
-                    wifi_uplink_defaults = wifi_interface
+                    wifi_uplink_defaults[radio.wifi_radio] = wifi_interface
                 elif node_type == 'backbone' and wifi_interface.annotations.get('wlansi.backbone', False):
                     # Copy over configuration from existing automatically generated backbone configuration.
-                    wifi_backbone_defaults = wifi_interface
+                    wifi_backbone_defaults[radio.wifi_radio] = wifi_interface
 
         context.update({
             'radio_defaults': radio_defaults,
@@ -417,31 +417,40 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
             'wifi_backbone_defaults': wifi_backbone_defaults,
         })
 
-    def configure(self, context, state, create):
+    def configure_radio(self, context, state, create, radio):
+        """
+        Configure a single radio device.
+        """
+
         routing_protocols = context['routing_protocols']
         network_profiles = context['network_profiles']
-        device = context['device']
         project = context['project']
         node_type = context['type']
         radio_defaults = context['radio_defaults']
         clients_interface = context['clients_interface']
-        wifi_backbone_defaults = context['wifi_backbone_defaults']
-        wifi_uplink_defaults = context['wifi_uplink_defaults']
 
-        try:
-            radio = device.radios[0]
-        except IndexError:
-            return
-
+        # Per-radio defaults.
         radio_defaults = radio_defaults.get(radio.identifier, None)
+        wifi_backbone_defaults = context['wifi_backbone_defaults'].get(radio.identifier, None)
+        wifi_uplink_defaults = context['wifi_uplink_defaults'].get(radio.identifier, None)
 
         protocol = radio.protocols[0]
-        channel = protocol.channels[7].identifier
+        if protocol.channels[0].frequency > 5000:
+            # 5 GHz channels, default to channel 36.
+            channel = protocol.get_channel_number(36).identifier
+        else:
+            # 2.4 GHz channels, default to channel 8.
+            channel = protocol.get_channel_number(8).identifier
+
         tx_power = None
         ack_distance = None
 
         if radio_defaults:
             # Transfer over some settings.
+            protocol = radio.get_protocol(radio_defaults.protocol)
+            if not protocol:
+                protocol = radio.protocols[0]
+
             if protocol.has_channel(radio_defaults.channel):
                 channel = radio_defaults.channel
 
@@ -462,7 +471,7 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
             },
         )
 
-        def get_project_ssid(purpose, default=None, attribute='essid'):
+        def get_project_ssid(purpose, attribute='essid'):
             if attribute == 'essid' and 'hostname-essid' in network_profiles:
                 return context['name']
 
@@ -472,7 +481,12 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                 try:
                     ssid = getattr(project.ssids.get(default=True), attribute)
                 except project_models.SSID.DoesNotExist:
-                    ssid = default
+                    raise registry_forms.RegistryValidationError(
+                        "Project '{}' does not have a default {} configured. "
+                        "Please configure it using the administration interface.".format(
+                            project.name, attribute.upper()
+                        )
+                    )
 
             return ssid
 
@@ -485,7 +499,7 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                     parent=wifi_radio,
                     configuration={
                         'mode': 'ap',
-                        'essid': get_project_ssid('ap', 'open.wlan-si.net'),
+                        'essid': get_project_ssid('ap'),
                         'isolate_clients': False,
                     },
                 )
@@ -508,8 +522,8 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                     parent=wifi_radio,
                     configuration={
                         'mode': 'mesh',
-                        'essid': get_project_ssid('mesh', 'mesh.wlan-si.net'),
-                        'bssid': get_project_ssid('mesh', '02:CA:FF:EE:BA:BE', attribute='bssid'),
+                        'essid': get_project_ssid('mesh'),
+                        'bssid': get_project_ssid('mesh', attribute='bssid'),
                         'routing_protocols': routing_protocols,
                     },
                 )
@@ -540,7 +554,7 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                     parent=wifi_radio,
                     configuration={
                         'mode': 'ap',
-                        'essid': get_project_ssid('backbone', 'backbone.wlan-si.net'),
+                        'essid': get_project_ssid('backbone'),
                         'isolate_clients': True,
                         'routing_protocols': routing_protocols,
                     },
@@ -551,7 +565,8 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
 
         # Wireless uplink.
 
-        if 'wifi-uplink' in network_profiles:
+        if 'wifi-uplink' in network_profiles and radio.index == 0:
+            # TODO: Currently we only configure uplink for the first radio. Give the user a choice.
             if wifi_uplink_defaults is not None:
                 # Reuse some configuration form the previous wifi uplink interface.
                 wifi_uplink_interface = self.setup_interface(
@@ -588,6 +603,16 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                 },
             )
 
+    def configure(self, context, state, create):
+        """
+        Configure all available radio devices.
+        """
+
+        device = context['device']
+
+        for radio in device.radios:
+            self.configure_radio(context, state, create, radio)
+
 
 # TODO: Make more general and move out of extra.wlansi.
 class NetworkConfiguration(registry_forms.ComplexFormDefaults):
@@ -599,5 +624,5 @@ class NetworkConfiguration(registry_forms.ComplexFormDefaults):
 
     def __init__(self, routing_protocols):
         super(NetworkConfiguration, self).__init__(
-            routing_protocols=routing_protocols
+            routing_protocols=routing_protocols,
         )

@@ -51,8 +51,8 @@ class DeviceRadio(object):
     An abstract descriptor of a device's radio.
     """
 
-    # Radio features
-    MultipleSSID = "multiple_ssid"
+    # Radio features.
+    MultipleSSID = 'multiple-ssid'
 
     def __init__(self, identifier, description, protocols, connectors, features=None, index=None):
         """
