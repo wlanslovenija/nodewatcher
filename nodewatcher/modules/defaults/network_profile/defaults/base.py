@@ -1,6 +1,8 @@
 from nodewatcher.core.registry import forms as registry_forms
 
-from . import models
+from nodewatcher.modules.vpn.tunneldigger import models as td_models
+
+from .. import models
 
 
 class NetworkProfile(registry_forms.FormDefaultsModule):
@@ -24,3 +26,21 @@ class NetworkProfile(registry_forms.FormDefaultsModule):
             network_profiles = network_profile_config.profiles
 
         context['network_profiles'] = network_profiles
+
+
+class ClearInterfaces(registry_forms.FormDefaultsModule):
+    """
+    Form defaults module that removes all interfaces during the configuration
+    stage.
+    """
+
+    def configure(self, context, state, create):
+        def filter_remove_item(item):
+            # Do not remove tunneldigger interfaces as they are already handled by other
+            # defaults handlers.
+            if isinstance(item, td_models.TunneldiggerInterfaceConfig):
+                return False
+
+            # Remove everything else.
+            return True
+        state.remove_items('core.interfaces', filter=filter_remove_item)

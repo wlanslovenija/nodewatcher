@@ -5,8 +5,7 @@ from nodewatcher.modules.administration.types.defaults import DefaultType
 from nodewatcher.modules.administration.projects.defaults import DefaultProject, DefaultProjectRouterID
 from nodewatcher.modules.vpn.tunneldigger.defaults import TunneldiggerServersOnUplink
 from nodewatcher.modules.services.dns.defaults import DnsServers
-
-from .network import NetworkConfiguration
+from nodewatcher.modules.defaults.network_profile.defaults import NetworkConfiguration
 
 
 # Defaults for wlan slovenija network.
