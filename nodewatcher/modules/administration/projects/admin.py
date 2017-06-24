@@ -9,7 +9,8 @@ from . import models
 
 
 class SSIDAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('project', 'purpose', 'bssid', 'essid', 'default')
+    list_filter = ('project', 'purpose')
 
 
 class ProjectAdmin(leaflet_admin.LeafletGeoAdmin):
