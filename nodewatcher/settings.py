@@ -334,6 +334,7 @@ INSTALLED_APPS += [
     'nodewatcher.modules.frontend.topology',
     'nodewatcher.modules.frontend.generator',
     'nodewatcher.modules.frontend.map',
+    'nodewatcher.modules.frontend.cidr',
     'nodewatcher.modules.administration.banner',
     'nodewatcher.modules.sensors.generic',
     'nodewatcher.modules.defaults.network_profile',
