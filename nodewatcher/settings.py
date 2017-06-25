@@ -666,6 +666,11 @@ MENUS = {
             'weight': 60,
             'visible': True,
         },
+	{
+	    'name': 'Cidr map',
+	    'weight': 70,
+	    'visible': True,
+	}
     ],
     #'accounts_menu': [
     #    ...
