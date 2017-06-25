@@ -247,4 +247,8 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
         device = context['device']
 
         for radio in device.radios:
+            # Do not configure USB radios automatically as they may not even be there.
+            if isinstance(radio, cgm_devices.USBRadio):
+                continue
+
             self.configure_radio(context, state, create, radio)
