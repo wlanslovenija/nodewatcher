@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% contextblock %}
+    {% load i18n %}
+    {% trans "Cidr map" as title %}
+{% endcontextblock %}
+{% block content %}
+<div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Zoom to subnet<span class="caret"></span></button>
+    <ul class="dropdown-menu" id="topnodes">
+
+    </ul>
+</div>
+{% endblock %}
