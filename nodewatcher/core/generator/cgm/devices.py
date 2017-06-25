@@ -544,12 +544,19 @@ class DeviceBase(object):
             registration.Choice(
                 cls.identifier,
                 cls.get_display_name(),
-                limited_to=('core.general#platform', platform.name),
+                limited_to=lambda resolve: resolve('core.general#platform') == platform.name,
                 # Include some more device metadata.
                 manufacturer=cls.manufacturer,
                 model=cls.name,
             )
         )
+
+        # Resolver for this specific device on this specific platform.
+        def limited_to_device(resolve):
+            if resolve('core.general#platform') != platform.name:
+                return False
+
+            return resolve('core.general#router') == cls.identifier
 
         # Register a new choice for available device ports.
         for port in cls.ports:
@@ -561,7 +568,7 @@ class DeviceBase(object):
                 registration.Choice(
                     port.identifier,
                     port.description,
-                    limited_to=('core.general#router', cls.identifier),
+                    limited_to=limited_to_device,
                 )
             )
 
@@ -573,7 +580,7 @@ class DeviceBase(object):
                 registration.Choice(
                     switch.identifier,
                     '{} - {}'.format(switch.identifier, switch.description),
-                    limited_to=('core.general#router', cls.identifier),
+                    limited_to=limited_to_device,
                 )
             )
 
@@ -584,7 +591,7 @@ class DeviceBase(object):
                 registration.Choice(
                     radio.identifier,
                     radio.description,
-                    limited_to=('core.general#router', cls.identifier),
+                    limited_to=limited_to_device,
                 )
             )
 

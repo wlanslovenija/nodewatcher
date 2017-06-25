@@ -96,11 +96,11 @@ class LazyChoiceList(collections.Sequence):
     def __nonzero__(self):
         return True
 
-    def subset_choices(self, condition):
+    def subset_choices(self, resolver):
         return [
             (choice if not self._returns_field_tuples else choice.get_field_tuple())
             for limited_to, choice in self._dependent_choices
-            if limited_to is None or condition(*limited_to)
+            if limited_to is None or limited_to(resolver)
         ]
 
     def add_choice(self, choice):

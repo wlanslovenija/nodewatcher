@@ -31,7 +31,7 @@ class RegistryChoiceFormFieldMixin(object):
             except (KeyError, IndexError, AttributeError):
                 return None
 
-        current_choices = self._rp_choices.subset_choices(lambda registry_id, value: resolve_registry_id(registry_id) == value)
+        current_choices = self._rp_choices.subset_choices(resolve_registry_id)
         prepend_choices = []
         if not self.accepts_multiple_choices and self.empty_value not in [choice[0] for choice in current_choices]:
             prepend_choices = fields.BLANK_CHOICE_DASH

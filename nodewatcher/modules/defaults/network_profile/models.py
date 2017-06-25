@@ -27,7 +27,7 @@ registration.point('node.config').register_choice(
     registration.Choice(
         'backbone-with-uplink',
         _("Backbone node with uplink"),
-        limited_to=('core.type#type', 'backbone'),
+        limited_to=lambda resolve: resolve('core.type#type') == 'backbone',
     )
 )
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('nat-clients', _("Clients behind NAT")))
