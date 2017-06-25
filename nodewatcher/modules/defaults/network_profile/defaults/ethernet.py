@@ -98,6 +98,7 @@ class EthernetModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
         lan_extra_ports = context['ethernet']['lan_extra_ports']
         clients_network_defaults = context['ethernet']['clients_network_defaults']
 
+        clients_interface = None
         if node_type != 'backbone':
             # Setup uplink interface.
             if wan_port:
@@ -132,7 +133,6 @@ class EthernetModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                         },
                     )
 
-            clients_interface = None
             if node_type != 'server':
                 # Create a clients bridge.
                 if 'nat-clients' in network_profiles:
