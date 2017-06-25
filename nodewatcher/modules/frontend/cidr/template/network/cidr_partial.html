@@ -1,0 +1,11 @@
+{% contextblock %}{# Has to be first to be rendered first #}{% endcontextblock %}
+
+{% load partial_tags %}
+
+{% get_partial "network_cidr_partial" as network_cidr_partial %}
+
+{% block included_network_cidr_partial %}
+    {% with partial=network_cidr_partial %}
+        {% include "base/partial.html" %}
+    {% endwith %}
+{% endblock included_network_cidr_partial %}
