@@ -906,6 +906,7 @@ def time_synchronization(node, cfg):
     """
 
     ntp = cfg.system.add(timeserver='ntp')
+    ntp.enabled = True
     ntp.enable_server = False
     ntp.server = [
         '0.openwrt.pool.ntp.org',
