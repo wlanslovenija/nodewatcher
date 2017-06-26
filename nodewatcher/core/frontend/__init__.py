@@ -12,7 +12,7 @@ try:
 except ImportError:
     from django.utils.importlib import import_module
 
-from django.forms.widgets import flatatt
+from django.forms.utils import flatatt
 
 
 THEME_DEFAULTS = {
