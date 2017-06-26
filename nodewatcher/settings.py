@@ -11,8 +11,7 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 _ = lambda s: s
 
 DEBUG = True
-TEMPLATE_DEBUG = False
-TEMPLATE_URL_RESOLVERS_DEBUG = True # Active only when TEMPLATE_DEBUG is True.
+URL_RESOLVERS_DEBUG = True # Active only when DEBUG is True.
 
 # A tuple that lists people who get code error notifications. When
 # DEBUG=False and a view raises an exception, Django will e-mail these

@@ -15,7 +15,7 @@ ujson==1.35
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
 --allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@a54a2e735950c5c31ec71613750bdf1ce194389f#egg=django_datastream-master
 django-guardian==1.4.8
-git+https://github.com/wlanslovenija/django-missing.git@01d4cda3f6e9a247039b32a8f71b01f1d0fd9c69#egg=django_missing-wlanslovenija
+django-missing==0.2.0
 django-phonenumber-field==1.0.0
 django_polymorphic==1.1
 django-registration==2.0.4
