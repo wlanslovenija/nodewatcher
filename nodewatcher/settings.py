@@ -667,7 +667,7 @@ MENUS = {
             'visible': True,
         },
         {
-            'name': 'Cidr map',
+            'name': 'Ip space',
             'weight': 70,
             'visible': True,
         },

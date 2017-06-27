@@ -12,7 +12,7 @@ class IpSpaceCompontent(components.FrontendComponent):
         return {
             'regex': r'^network/ip_space/$',
             'view': views.IpSpace.as_view(),
-            'name': 'ip_space',
+            'name': 'IpSpace',
         }
 
 components.pool.register(IpSpaceCompontent)
@@ -20,7 +20,7 @@ components.pool.register(IpSpaceCompontent)
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("Ip space"),
-    url=urlresolvers.reverse_lazy('IpSpaceCompontent:ip_space'),
+    url=urlresolvers.reverse_lazy('IpSpaceCompontent:IpSpace'),
 ))
 
 
