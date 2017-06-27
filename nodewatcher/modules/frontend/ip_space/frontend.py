@@ -19,7 +19,7 @@ components.pool.register(IpSpaceCompontent)
 
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(
-    label=components.ugettext_lazy("Ip space"),
+    label=components.ugettext_lazy("IP space"),
     url=urlresolvers.reverse_lazy('IpSpaceCompontent:IpSpace'),
 ))
 
@@ -29,6 +29,6 @@ components.partials.register(components.Partial('ip_space_partial'))
 
 components.partials.get_partial('ip_space_partial').add(components.PartialEntry(
     name='general',
-    template='network/ip_space/general.html',
+    template='ip_space.html',
     weight=-1
 ))

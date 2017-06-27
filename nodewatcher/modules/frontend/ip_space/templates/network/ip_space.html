@@ -1,13 +1,19 @@
 {% extends "base.html" %}
+
 {% contextblock %}
-    {% load i18n %}
+    {% load i18n sekizai_tags html_tags url_tags partial_tags leaflet_tags %}
+
+    {% add_data "css_data" "css/ipspace.css" %}
+    {% add_data "js_data" "js/d3.v4.min.js" %}
+    {% add_data "js_data" "js/point.js" %}
+    {% add_data "js_data" "js/hilbert2d.js" %}
+    {% add_data "js_data_end" "js/jquery.tipsy.js" %}
+    {% add_data "js_data_end" "js/DrawCidrs.js" %}
+
+
     {% trans "Ip space" as title %}
 {% endcontextblock %}
-{% block content %}
-<div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Zoom to subnet<span class="caret"></span></button>
-    <ul class="dropdown-menu" id="topnodes">
 
-    </ul>
-</div>
+{% block content %}
+    <p>Ip space svg</p>
 {% endblock %}

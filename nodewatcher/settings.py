@@ -667,7 +667,7 @@ MENUS = {
             'visible': True,
         },
         {
-            'name': 'Ip space',
+            'name': 'IP space',
             'weight': 70,
             'visible': True,
         },

@@ -1,85 +1,140 @@
-var Point = exports.Point = function(x, y, z) {
-  if (x instanceof Array) {
-    y = x[1];
-    z = x[2];
-    x = x[0];
+var Hilbert2d = window.Hilbert2d = function(options, axisOrderOpt) {
+  options = options || {};
+  if (typeof options == 'number') {
+    this.size = options;
+    this.anchorAxisOrder = axisOrderOpt || 'xy';
+  } else if (typeof options == 'string') {
+    this.anchorAxisOrder = options;
+  } else {
+    // should be empty if we're prioritizing bottom level.
+    this.size = options.top;
+    this.anchorAxisOrder = options.axisOrder || 'xy';
   }
 
-  this.x = Math.round(x) || 0;
-  this.y = Math.round(y) || 0;
-  this.z = Math.round(z) || 0;
+  if (!(this.anchorAxisOrder in {xy:1,yx:1})) {
+    throw new Error("Invalid axis order: " + anchorAxisOrder);
+  }
 
-  this.arr = [this.x, this.y, this.z];
-
-  this.n = 4*this.z + 2*this.y + this.x;
-
-  this.map = function(fn) {
-    return new Point([x,y,z].map(fn));
-  };
-
-  this.mult = function(n) {
-    return new Point(this.x*n, this.y*n, this.z*n);
-  };
-
-  this.add = function(n) {
-    if (n instanceof Number) return new Point(this.x+n, this.y+n, this.z+n);
-    return new Point(this.x + n.x, this.y + n.y, this.z + n.z);
-  };
-
-  this.mod = function(n) {
-    return new Point(this.x % n, this.y % n, this.z % n);
-  };
-
-  this.rotate = function(regs, n) {
-    if (regs.n == 0) {
-      return new Point(this.z, this.x, this.y);
-    } else if (regs.n == 1 || regs.n == 3) {
-      return new Point(this.y, this.z, this.x);
-    } else if (regs.n == 2 || regs.n == 6) {
-      return new Point(n-this.x, n-this.y, this.z);
-    } else if (regs.n == 5 || regs.n == 7) {
-      return new Point(this.y, n-this.z, n-this.x);
-    } else {  // regs.n == 4
-      return new Point(n-this.z, this.x, n-this.y);
+  if (this.size) {
+    this.log2size = 0;
+    var pow2 = 1;
+    for (; pow2 < this.size; pow2 *= 2, this.log2size++) {}
+    if (pow2 != this.size) {
+      throw new Error("Invalid size: " + this.size + ". Must be a power of 2.");
     }
+    this.log2parity = (this.log2size % 2);
+  }
+
+  function invert(point) {
+    return {
+      x: point.y,
+      y: point.x
+    };
   };
 
-  this.unrotate = function(regs, n) {
-    if (regs.n == 0) {
-      return new Point(this.y, this.z, this.x);
-    } else if (regs.n == 1 || regs.n == 3) {
-      return new Point(this.z, this.x, this.y);
-    } else if (regs.n == 2 || regs.n == 6) {
-      return new Point(n-this.x, n-this.y, this.z);
-    } else if (regs.n == 5 || regs.n == 7) {
-      return new Point(n-this.z, this.x, n-this.y);
-    } else {  // regs.n == 4
-      return new Point(this.y, n-this.z, n-this.x);
+  function maybeRotate(point, iter) {
+    if (this.size) {
+      if (this.anchorAxisOrder == 'xy') {
+        if (iter ^ this.log2parity) {
+          return invert(point);
+        }
+      }
+      if (this.anchorAxisOrder == 'yx') {
+        if (!(iter ^ this.log2parity)) {
+          return invert(point);
+        }
+      }
+    } else {
+      if (this.anchorAxisOrder == 'xy') {
+        if (iter == 0) {
+          return invert(point);
+        }
+      } else {
+        if (iter == 1) {
+          return invert(point);
+        }
+      }
     }
+    return point;
   };
 
-  this.rotateLeft = function(n) {
-    if (n%3 == 0) return this;
-    if (n%3 == 1) return new Point(this.y, this.z, this.x);
-    return new Point(this.z, this.x, this.y);
+  this.d2xy = this.xy = function (d) {
+    d = Math.floor(d);
+    var curPos = {
+      x: 0,
+      y: 0
+    };
+    var s = 1;
+    var iter = 0;
+    var size = this.size || 0;
+    while (d > 0 || s < size) {
+      var ry = 1 & (d / 2);
+      var rx = 1 & (ry ^ d);
+
+      // Rotate, if need be
+      if (rx == 0) {
+        if (ry == 1) {
+          curPos = {
+            x: s - 1 - curPos.x,
+            y: s - 1 - curPos.y
+          };
+        }
+        curPos = invert(curPos);
+      }
+
+      curPos = {
+        x: curPos.x + s * rx,
+        y: curPos.y + s * ry
+      };
+
+      s *= 2;
+      d = Math.floor(d / 4);
+      iter = (iter + 1) % 2;
+    }
+    return maybeRotate(curPos, iter);
   };
 
-  this.rotateRight = function(n) {
-    if (n%3 == 0) return this;
-    if (n%3 == 1) return new Point(this.z, this.x, this.y);
-    return new Point(this.y, this.z, this.x);
-  };
+  var horseshoe2d = [0, 1, 3, 2];
 
-  this.shuffle = function(template) {
-    if (!template) return this;
-    return new Point(this[template[0]], this[template[1]], this[template[2]]);
-  };
+  this.xy2d = this.d = function (x, y) {
+    var curPos = {
+      x: Math.floor(x),
+      y: Math.floor(y)
+    };
+    var s = 1;
+    var level = 1;
+    var max = Math.max(curPos.x, curPos.y);
+    for (; 2 * s <= max; s *= 2) {
+      level = (level + 1) % 2;
+    }
+    curPos = maybeRotate(curPos, level);
 
-  this.pp = function() {
-    return [this.x,this.y,this.z].join(',');
-  };
-
-  this.manhattanDistance = function(other) {
-    return Math.abs(other.x - this.x) + Math.abs(other.y - this.y) + Math.abs(other.z - this.z);
+    var d = 0;
+    while (s > 0) {
+      var rx = curPos.x & s && 1;
+      var ry = curPos.y & s && 1;
+      d *= 4;
+      d += horseshoe2d[2 * ry + rx];
+      if (rx == 0) {
+        if (ry == 1) {
+          curPos = {
+            x: s - 1 - curPos.x,
+            y: s - 1 - curPos.y
+          }
+        }
+        curPos = invert(curPos);
+      }
+      curPos = {
+        x: curPos.x % s,
+        y: curPos.y % s
+      };
+      s = Math.floor(s / 2);
+    }
+    return d;
   };
 };
+var h2 = new Hilbert2d();
+window.d2xy = h2.d2xy;
+window.xy = h2.xy;
+window.xy2d = h2.xy2d;
+window.d2 = h2.d;
