@@ -277,7 +277,7 @@ class Command(base.BaseCommand):
             pool_mdl = pool_models.IpPool(
                 family='ipv4',
                 network=pool['network'],
-                prefix_length=pool['ip_space'],
+                prefix_length=pool['cidr'],
                 description=pool['description'],
                 prefix_length_default=pool['default_prefix_len'],
                 prefix_length_minimum=pool['min_prefix_len'],
