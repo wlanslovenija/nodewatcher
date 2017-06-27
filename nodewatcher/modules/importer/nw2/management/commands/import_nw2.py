@@ -277,7 +277,7 @@ class Command(base.BaseCommand):
             pool_mdl = pool_models.IpPool(
                 family='ipv4',
                 network=pool['network'],
-                prefix_length=pool['cidr'],
+                prefix_length=pool['ip_space'],
                 description=pool['description'],
                 prefix_length_default=pool['default_prefix_len'],
                 prefix_length_minimum=pool['min_prefix_len'],
@@ -386,12 +386,12 @@ class Command(base.BaseCommand):
                 continue
 
             try:
-                translated_subnets = SUBNET_SIZE_TRANSLATION[subnet_mesh['cidr']]
+                translated_subnets = SUBNET_SIZE_TRANSLATION[subnet_mesh['ip_space']]
             except KeyError:
                 raise base.CommandError('Unable to translate subnet for node %s.' % node['uuid'])
 
             # Allocate Router-ID based on subnet translation
-            subnet_mesh['cidr'] = translated_subnets['rid']
+            subnet_mesh['ip_space'] = translated_subnets['rid']
             subnet_mesh = ipaddr.IPNetwork('%(subnet)s/%(cidr)s' % subnet_mesh)
             try:
                 pool_mesh = [x['_model'] for x in data['pools'].values() if subnet_mesh in x['_model']][0]

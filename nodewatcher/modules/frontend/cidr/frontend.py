@@ -6,32 +6,29 @@ from nodewatcher.core.frontend import components
 from . import views
 
 
-class CidrCompontent(components.FrontendComponent):
+class IpSpaceCompontent(components.FrontendComponent):
     @classmethod
     def get_main_url(cls):
         return {
-            'regex': r'^network/cidr/$',
-            'view': views.Cidr.as_view(),
-            'name': 'cidr',
+            'regex': r'^network/ip_space/$',
+            'view': views.IpSpace.as_view(),
+            'name': 'ip_space',
         }
 
-components.pool.register(CidrCompontent)
+components.pool.register(IpSpaceCompontent)
 
 
 components.menus.get_menu('main_menu').add(components.MenuEntry(
-    label=components.ugettext_lazy("Cidr map"),
-    url=urlresolvers.reverse_lazy('CidrCompontent:cidr'),
+    label=components.ugettext_lazy("Ip space"),
+    url=urlresolvers.reverse_lazy('IpSpaceCompontent:ip_space'),
 ))
 
 
-components.partials.register(components.Partial('cidr_partial'))
+components.partials.register(components.Partial('ip_space_partial'))
 
 
-components.partials.get_partial('cidr_partial').add(components.PartialEntry(
+components.partials.get_partial('ip_space_partial').add(components.PartialEntry(
     name='general',
-    template='network/statistics/general.html',
-    weight=-1,
-    extra_context=lambda context: {
-        'count': core_models.Node.objects.count(),
-    },
+    template='network/ip_space/general.html',
+    weight=-1
 ))
