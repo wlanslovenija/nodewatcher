@@ -1,3 +1,4 @@
+//Author: https://github.com/ryan-williams
 var Point = window.Point = function(x, y, z) {
   if (x instanceof Array) {
     y = x[1];

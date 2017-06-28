@@ -1,3 +1,4 @@
+//Author: https://github.com/jaz303
 (function($) {
 
     function maybeCall(thing, ctx) {
