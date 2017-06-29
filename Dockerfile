@@ -8,7 +8,8 @@ RUN apt-get update -q -q && \
 
 # Install code dependencies
 ADD ./packages.txt /code/packages.txt
-RUN cat /code/packages.txt | xargs apt-get --no-install-recommends -y install
+RUN cat /code/packages.txt | xargs apt-get --no-install-recommends -y install && \
+    chmod 4755 /usr/bin/{fping,fping6}
 
 # Install Python package dependencies (do not use pip install -r here!)
 ADD ./requirements.txt /code/requirements.txt
