@@ -1,7 +1,10 @@
 window.DrawCidr = class DrawCidr{
 	constructor(svg, size, subnet){
 		this.svg = svg;
-		this.size = size;
+		this.size = this.closestPower(size);
+
+		this.svg.style("width", this.size+"px").style("height", this.size+"px");
+
 		this.subnet = String(subnet);
 		this.n_ips = Math.pow(2,32-parseInt(this.subnet.split("/")[1]));
 		this.ips_side = Math.sqrt(this.n_ips);
@@ -9,6 +12,9 @@ window.DrawCidr = class DrawCidr{
 		this.offset = this.ip2num(this.subnet.split("/")[0]);
 		this.draw(subnet);
 		this.data = new Array();
+	}
+	closestPower(number){
+       return 2**Math.floor(Math.log2(number));
 	}
 	ip2num(ip){
                 var d = ip.split('.');
