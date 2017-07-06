@@ -1,6 +1,11 @@
 window.DrawCidr = class DrawCidr{
 	constructor(svg, size, subnet){
 		this.svg = svg;
+
+		svg.call(d3.zoom().on("zoom", function () {
+              svg.attr("transform", d3.event.transform)
+        })).append("g")
+
 		this.size = this.closestPower(size);
 
 		this.svg.style("width", this.size+"px").style("height", this.size+"px");
