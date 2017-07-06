@@ -5,13 +5,17 @@ window.DrawCidr = class DrawCidr{
 		svg.call(d3.zoom().on("zoom", function () {
               svg.attr("transform", d3.event.transform)
         })).append("g")
+		this.n_ips = Math.pow(2,32-parseInt(subnet.split("/")[1]));
+        this.size = Math.sqrt(this.n_ips);
+		this.displaySize = this.closestPower(size);
 
-		this.size = this.closestPower(size);
+        $("#ipspace").css("transform", "scale(" + this.displaySize/this.size + ")");
+        $("#wraper").width($("#ipspace").width()+"px");
+        $("#wraper").height($("#ipspace").height()+"px");
 
 		this.svg.style("width", this.size+"px").style("height", this.size+"px");
 
 		this.subnet = String(subnet);
-		this.n_ips = Math.pow(2,32-parseInt(this.subnet.split("/")[1]));
 		this.ips_side = Math.sqrt(this.n_ips);
 		this.ips_pixel = this.ips_side/this.size;
 		this.offset = this.ip2num(this.subnet.split("/")[0]);

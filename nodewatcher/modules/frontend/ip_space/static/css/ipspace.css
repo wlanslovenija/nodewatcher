@@ -8,10 +8,11 @@
                       supported by Chrome and Opera */
 }
 .silky-smooth{
-        border-color: rgb(12,70,156);
-        border-width: 1px;
-        border-style: solid;
-        width: 100%;
+    border-color: rgb(12,70,156);
+    border-width: 1px;
+    border-style: solid;
+    width: 100%;
+    transform-origin: top left;
 }
 /*Author of tipsy: https://github.com/jaz303 */
 .tipsy { font-size: 10px; position: absolute; padding: 5px; z-index: 100000; }
