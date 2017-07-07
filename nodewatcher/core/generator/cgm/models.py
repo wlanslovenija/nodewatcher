@@ -397,7 +397,8 @@ class WifiInterfaceConfig(InterfaceConfig, RoutableInterface, UplinkableInterfac
 
         return list(vifs).index(self.pk)
 
-registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh")))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh', _("Mesh (ad-hoc)")))
+registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('mesh11s', _("Mesh (802.11s)")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('ap', _("AP")))
 registration.point('node.config').register_choice('core.interfaces#wifi_mode', registration.Choice('sta', _("STA")))
 registration.point('node.config').register_choice('core.interfaces#wifi_bitrates_preset', registration.Choice(None, _("Allow all supported bitrates")))

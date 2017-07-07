@@ -157,12 +157,14 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                     cgm_models.WifiInterfaceConfig,
                     parent=wifi_radio,
                     configuration={
-                        'mode': 'mesh',
+                        # Use 802.11s if checked, otherwise use ad-hoc.
+                        'mode': 'mesh11s' if 'wifi-mesh-80211s' in network_profiles else 'mesh'
                         'essid': get_project_ssid('mesh'),
                         'bssid': get_project_ssid('mesh', attribute='bssid'),
                         'routing_protocols': routing_protocols,
                     },
                 )
+
         elif node_type == 'backbone':
             # If the device is of type "Backbone", create one AP/STA.
             if wifi_backbone_defaults is not None:

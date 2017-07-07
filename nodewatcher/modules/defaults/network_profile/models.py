@@ -36,5 +36,6 @@ registration.point('node.config').register_choice('network.profile#profiles', re
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('wifi-uplink', _("Use a wireless interface for uplink")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('no-wifi-ap', _("Disable wireless AP")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('no-wifi-mesh', _("Disable wireless mesh")))
+registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('wifi-mesh-80211s', _("Use 802.11s for meshing")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('hostname-essid', _("Use hostname as ESSID")))
 registration.point('node.config').register_item(NetworkProfileConfig)
