@@ -8,7 +8,7 @@ import nodewatcher.core.registry.fields
 
 def add_wifi_mesh_type(apps, schema_editor):
     """
-    Populates the top_level field for existing IpPool instances.
+    Covert previous network profiles to new wireless mesh type field.
     """
 
     NetworkProfileConfig = apps.get_model('defaults_network_profile', 'NetworkProfileConfig')
