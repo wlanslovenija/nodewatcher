@@ -915,8 +915,8 @@ def time_synchronization(node, cfg):
     ntp.enabled = True
     ntp.enable_server = False
     ntp.server = [
-        '0.openwrt.pool.ntp.org',
-        '1.openwrt.pool.ntp.org',
-        '2.openwrt.pool.ntp.org',
-        '3.openwrt.pool.ntp.org',
+        '0.nodewatcher.pool.ntp.org',
+        '1.nodewatcher.pool.ntp.org',
+        '2.nodewatcher.pool.ntp.org',
+        '3.nodewatcher.pool.ntp.org',
     ]
