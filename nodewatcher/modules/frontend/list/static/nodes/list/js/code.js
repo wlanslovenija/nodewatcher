@@ -35,6 +35,11 @@
         return output.html();
     }
 
+    function renderRouterId(data, type, row, meta) {
+        data = _.sortBy(data);
+        return data.join('<br/>');
+    }
+
     $(document).ready(function () {
         $('.node-list').each(function (i, table) {
             $.nodewatcher.api.newDataTable(table, $(table).data('source'), {
@@ -59,7 +64,7 @@
                 columns: [
                     {data: 'config.core__type.type', registry: true, width: 0, render: $.nodewatcher.renderNodeType(table)},
                     {data: 'config.core__general.name', registry: true, render: $.nodewatcher.api.renderNodeName(table)},
-                    {data: 'config.core__routerid[].router_id', registry: true},
+                    {data: 'config.core__routerid[].router_id', registry: true, render: renderRouterId},
                     {data: 'monitoring.core__general.last_seen', registry: true, render: renderTimeAgo},
                     {data: 'monitoring.core__status.network', registry: true, render: $.nodewatcher.renderStatus(table, 'Network'), class: 'center', width: '20px'},
                     {data: 'monitoring.core__status.monitored', registry: true, render: $.nodewatcher.renderStatus(table, 'Monitored'), class: 'center', width: '20px'},
