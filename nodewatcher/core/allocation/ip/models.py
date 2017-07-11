@@ -514,11 +514,14 @@ class IpAddressAllocator(allocation_models.AddressAllocator):
             return str(subnet.iterhosts().next())
 
 
-@dispatch.receiver(django_signals.post_delete, sender=IpAddressAllocator)
+@dispatch.receiver(django_signals.post_delete)
 def allocator_removed(sender, instance, **kwargs):
     """
     Ensure that allocations are automatically freed.
     """
+
+    if not isinstance(sender, IpAddressAllocator):
+        return
 
     if instance.allocation is not None:
         instance.allocation.free()
