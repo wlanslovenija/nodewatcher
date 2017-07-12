@@ -35,5 +35,5 @@ components.partials.get_partial('generator_view_build_partial').add(components.P
     name='nodeupgrade_lede',
     weight=100,
     visible=filter_platform('lede'),
-    template='nodeupgrade/build_result_openwrt.html',
+    template='nodeupgrade/build_result_lede.html',
 ))
