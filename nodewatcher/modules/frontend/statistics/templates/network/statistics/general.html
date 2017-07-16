@@ -8,5 +8,10 @@
         {% plural %}
             There are {{ count }} registered/visible nodes.
         {% endblocktrans %}
+        {% blocktrans count active=active %}
+            One of those has been active in the last 180 days.
+        {% plural %}
+            Of those, {{ active }} have been active in the last 180 days.
+        {% endblocktrans %}
     </div>
 </div>
