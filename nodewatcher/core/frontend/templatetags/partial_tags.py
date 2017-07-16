@@ -18,7 +18,7 @@ def get_partial(context, partial_name):
         partial.name = partial_name
         return partial
     except:
-        if settings.TEMPLATE_DEBUG:
+        if settings.DEBUG:
             raise
         return []
 
@@ -30,6 +30,6 @@ def render_partial_entry(context, partial_entry):
         # but the following is performance-wise better
         return partial_entry.render(context)
     except:
-        if settings.TEMPLATE_DEBUG:
+        if settings.DEBUG:
             raise
         return u''

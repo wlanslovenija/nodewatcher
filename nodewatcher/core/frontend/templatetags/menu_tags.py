@@ -22,7 +22,7 @@ def get_menu(context, menu_name):
         menu.name = menu_name
         return menu
     except:
-        if settings.TEMPLATE_DEBUG:
+        if settings.DEBUG:
             raise
         return []
 
@@ -34,6 +34,6 @@ def render_menu_entry(context, menu_entry):
         # but the following is performance-wise better
         return menu_entry.render(context)
     except:
-        if settings.TEMPLATE_DEBUG:
+        if settings.DEBUG:
             raise
         return u''
