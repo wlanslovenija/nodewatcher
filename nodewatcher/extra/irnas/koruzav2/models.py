@@ -10,6 +10,8 @@ class KoruzaMonitor(registration.bases.NodeMonitoringRegistryItem):
     KORUZA reported data.
     """
 
+    # Unit serial number.
+    serial_number = models.CharField(max_length=50, null=True)
     # MCU connected state.
     mcu_connected = models.NullBooleanField()
     # Current motor coordinates.
