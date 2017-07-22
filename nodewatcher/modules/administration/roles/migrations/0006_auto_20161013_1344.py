@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import jsonfield.fields
 import nodewatcher.core.registry.fields
 
 
@@ -17,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='roleconfig',
             name='annotations',
-            field=jsonfield.fields.JSONField(default=dict, editable=False),
+            field=models.TextField(default='{}', editable=False),
         ),
         migrations.AlterField(
             model_name='roleconfig',

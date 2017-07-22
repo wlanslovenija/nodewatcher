@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import nodewatcher.core.registry.fields
 import django.db.models.deletion
-import jsonfield
 import nodewatcher.core.validators
 
 
@@ -47,7 +46,7 @@ class Migration(migrations.Migration):
             name='Node',
             fields=[
                 ('uuid', models.CharField(max_length=40, serialize=False, primary_key=True)),
-                ('registry_metadata', jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False)),
+                ('registry_metadata', models.TextField(default='{}', help_text='Enter a valid JSON object', editable=False)),
             ],
         ),
         migrations.CreateModel(

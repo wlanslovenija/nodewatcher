@@ -270,7 +270,6 @@ DEPENDENCY_APPS = [
     'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
     'missing',
     'timezone_field',
-    'jsonfield',
     'leaflet',
     'django_countries',
     'registration',
