@@ -657,20 +657,21 @@ MENUS = {
             'visible': True,
         },
         {
-            'name': 'Map',
+            'name': 'IP space',
             'weight': 50,
             'visible': True,
         },
         {
-            'name': 'API',
+            'name': 'Map',
             'weight': 60,
             'visible': True,
         },
         {
-            'name': 'IP space',
+            'name': 'API',
             'weight': 70,
             'visible': True,
         },
+
     ],
     #'accounts_menu': [
     #    ...
