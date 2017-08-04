@@ -27,6 +27,7 @@ class SFPMonitor(registration.bases.NodeMonitoringRegistryItem):
     tx_bias = models.FloatField(null=True)
     tx_power = models.FloatField(null=True)
     rx_power = models.FloatField(null=True)
+    rx_power_dbm = models.FloatField(null=True)
 
     class RegistryMeta:
         registry_id = 'irnas.sfp'
@@ -79,6 +80,16 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     rx_power = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power (%(serial_number)s)")),
         'unit': 'mW',
+        'visualization': {
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_dbm = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power (%(serial_number)s)")),
+        'unit': 'dBm',
         'visualization': {
             'type': 'line',
             'initial_set': True,

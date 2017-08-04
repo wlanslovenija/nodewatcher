@@ -1,3 +1,5 @@
+import math
+
 from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
 
@@ -27,11 +29,20 @@ class SFP(monitor_processors.NodeProcessor):
             sfp.tx_bias = None
             sfp.tx_power = None
             sfp.rx_power = None
+            sfp.rx_power_dbm = None
             existing_sfps[sfp.serial_number] = sfp
 
         if version >= 1:
             for serial_number, data in context.http.irnas.sfp.modules.items():
                 diagnostics = context.http.irnas.sfp.diagnostics[serial_number].value
+
+                rx_power = float(diagnostics.rx_power) if diagnostics else None
+                if rx_power is not None:
+                    rx_power_dbm = 10 * math.log10(diagnostics.rx_power)
+                    if rx_power_dbm < -40:
+                        rx_power_dbm = -40
+                else:
+                    rx_power_dbm = None
 
                 node.monitoring.irnas.sfp(queryset=True).update_or_create(
                     root=node,
@@ -49,7 +60,8 @@ class SFP(monitor_processors.NodeProcessor):
                         'vcc': float(diagnostics.vcc) if diagnostics else None,
                         'tx_bias': float(diagnostics.tx_bias) if diagnostics else None,
                         'tx_power': float(diagnostics.tx_power) if diagnostics else None,
-                        'rx_power': float(diagnostics.rx_power) if diagnostics else None,
+                        'rx_power': rx_power,
+                        'rx_power_dbm': rx_power_dbm,
                     }
                 )
 
