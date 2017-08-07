@@ -43,7 +43,6 @@ class SFPMonitor(registration.bases.NodeMonitoringRegistryItem):
     rx_power_minimum = models.FloatField(null=True)
     rx_power_maximum = models.FloatField(null=True)
     rx_power_dbm = models.FloatField(null=True)
-    rx_power_dbm_variance = models.FloatField(null=True)
     rx_power_dbm_minimum = models.FloatField(null=True)
     rx_power_dbm_maximum = models.FloatField(null=True)
 
@@ -330,13 +329,7 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     rx_power_variance = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Variance (%(serial_number)s)")),
         'unit': 'mW',
-        'group': 'sfp_rx_power',
         'visualization': {
-            'with': {
-                'group': 'sfp_rx_power',
-                'node': ds_fields.TagReference('node'),
-                'serial_number': ds_fields.TagReference('serial_number'),
-            },
             'type': 'line',
             'initial_set': True,
             'time_downsamplers': ['mean'],
@@ -377,22 +370,6 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     })
     rx_power_dbm = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power (%(serial_number)s)")),
-        'unit': 'dBm',
-        'group': 'sfp_rx_power_dbm',
-        'visualization': {
-            'with': {
-                'group': 'sfp_rx_power_dbm',
-                'node': ds_fields.TagReference('node'),
-                'serial_number': ds_fields.TagReference('serial_number'),
-            },
-            'type': 'line',
-            'initial_set': True,
-            'time_downsamplers': ['mean'],
-            'value_downsamplers': ['min', 'mean', 'max'],
-        }
-    })
-    rx_power_dbm_variance = ds_fields.FloatField(tags={
-        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Variance (%(serial_number)s)")),
         'unit': 'dBm',
         'group': 'sfp_rx_power_dbm',
         'visualization': {

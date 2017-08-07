@@ -1,5 +1,7 @@
 import math
 
+from django.core import exceptions
+
 from nodewatcher.core.monitor import processors as monitor_processors
 from nodewatcher.modules.monitor.sources.http import processors as http_processors
 
@@ -53,6 +55,7 @@ class SFP(monitor_processors.NodeProcessor):
 
         if version >= 1:
             for serial_number, data in context.http.irnas.sfp.modules.items():
+                qs = node.monitoring.irnas.sfp(queryset=True)
                 statistics = context.http.irnas.sfp.statistics[serial_number]
 
                 defaults = {
@@ -75,9 +78,15 @@ class SFP(monitor_processors.NodeProcessor):
                     defaults[measurement] = get_value(statistics, 'average')
 
                     for statistic in self.STATISTICS:
-                        defaults['{}_{}'.format(measurement, statistic)] = get_value(statistics, statistic)
+                        field = '{}_{}'.format(measurement, statistic)
+                        try:
+                            qs.model._meta.get_field(field)
+                        except exceptions.FieldDoesNotExist:
+                            continue
 
-                node.monitoring.irnas.sfp(queryset=True).update_or_create(
+                        defaults[field] = get_value(statistics, statistic)
+
+                qs.update_or_create(
                     root=node,
                     serial_number=serial_number,
                     defaults=defaults,

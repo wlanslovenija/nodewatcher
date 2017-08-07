@@ -162,6 +162,5 @@ class SfpProcessorTestCase(test.ProcessorTestCase):
         self.assertEqual(module.rx_power_maximum, 0.0)
 
         self.assertEqual(module.rx_power_dbm, -40)
-        self.assertEqual(module.rx_power_dbm_variance, -40)
         self.assertEqual(module.rx_power_dbm_minimum, -40)
         self.assertEqual(module.rx_power_dbm_maximum, -40)
