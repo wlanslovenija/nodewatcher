@@ -10,6 +10,27 @@ class SFP(monitor_processors.NodeProcessor):
     monitor module has previously fetched data.
     """
 
+    MEASUREMENTS = ('temperature', 'vcc', 'tx_bias', 'tx_power', 'rx_power', 'rx_power_dbm')
+    STATISTICS = ('variance', 'minimum', 'maximum')
+
+    def get_rx_power_dbm_value(self, data, statistic):
+        """
+        Convert RX power to dBm.
+        """
+
+        if not data:
+            return None
+
+        try:
+            rx_power = float(data.rx_power[statistic])
+            rx_power_dbm = 10 * math.log10(rx_power)
+            if rx_power_dbm < -40:
+                rx_power_dbm = -40
+        except ValueError:
+            rx_power_dbm = -40
+
+        return rx_power_dbm
+
     @monitor_processors.depends_on_context("http", http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
@@ -24,45 +45,42 @@ class SFP(monitor_processors.NodeProcessor):
 
         existing_sfps = {}
         for sfp in node.monitoring.irnas.sfp():
-            sfp.temperature = None
-            sfp.vcc = None
-            sfp.tx_bias = None
-            sfp.tx_power = None
-            sfp.rx_power = None
-            sfp.rx_power_dbm = None
+            # Clear measurements.
+            for measurement in self.MEASUREMENTS:
+                setattr(sfp, measurement, None)
+
             existing_sfps[sfp.serial_number] = sfp
 
         if version >= 1:
             for serial_number, data in context.http.irnas.sfp.modules.items():
-                diagnostics = context.http.irnas.sfp.diagnostics[serial_number].value
+                statistics = context.http.irnas.sfp.statistics[serial_number]
 
-                rx_power = float(diagnostics.rx_power) if diagnostics else None
-                if rx_power is not None:
-                    rx_power_dbm = 10 * math.log10(diagnostics.rx_power)
-                    if rx_power_dbm < -40:
-                        rx_power_dbm = -40
-                else:
-                    rx_power_dbm = None
+                defaults = {
+                    'bus': str(data.bus),
+                    'manufacturer': str(data.manufacturer),
+                    'revision': str(data.revision),
+                    'type': int(data.type),
+                    'connector': int(data.connector),
+                    'bitrate': int(data.bitrate),
+                    'wavelength': int(data.wavelength),
+                }
+
+                for measurement in self.MEASUREMENTS:
+                    get_value = getattr(
+                        self,
+                        'get_{}_value'.format(measurement),
+                        lambda data, statistic: float(data[measurement][statistic]) if data else None
+                    )
+
+                    defaults[measurement] = get_value(statistics, 'average')
+
+                    for statistic in self.STATISTICS:
+                        defaults['{}_{}'.format(measurement, statistic)] = get_value(statistics, statistic)
 
                 node.monitoring.irnas.sfp(queryset=True).update_or_create(
                     root=node,
                     serial_number=serial_number,
-                    defaults={
-                        'bus': str(data.bus),
-                        'manufacturer': str(data.manufacturer),
-                        'revision': str(data.revision),
-                        'type': int(data.type),
-                        'connector': int(data.connector),
-                        'bitrate': int(data.bitrate),
-                        'wavelength': int(data.wavelength),
-                        # Diagnostics.
-                        'temperature': float(diagnostics.temperature) if diagnostics else None,
-                        'vcc': float(diagnostics.vcc) if diagnostics else None,
-                        'tx_bias': float(diagnostics.tx_bias) if diagnostics else None,
-                        'tx_power': float(diagnostics.tx_power) if diagnostics else None,
-                        'rx_power': rx_power,
-                        'rx_power_dbm': rx_power_dbm,
-                    }
+                    defaults=defaults,
                 )
 
                 if serial_number in existing_sfps:
