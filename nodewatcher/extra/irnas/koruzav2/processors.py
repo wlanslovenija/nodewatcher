@@ -11,6 +11,9 @@ class Koruza(monitor_processors.NodeProcessor):
     monitor module has previously fetched data.
     """
 
+    ACCELEROMETER_COORDINATES = ('x', 'y', 'z')
+    ACCELEROMETER_RANGES = 4
+
     @monitor_processors.depends_on_context('http', http_processors.HTTPTelemetryContext)
     def process(self, context, node):
         """
@@ -31,6 +34,20 @@ class Koruza(monitor_processors.NodeProcessor):
             koruza.mcu_connected = bool(status.connected)
             koruza.motor_x = int(status.motors.x)
             koruza.motor_y = int(status.motors.y)
+
+            for coordinate in self.ACCELEROMETER_COORDINATES:
+                for f_range in range(self.ACCELEROMETER_RANGES):
+                    if status.accelerometer and status.accelerometer.connected:
+                        values = status.accelerometer[coordinate]
+                        average = values[f_range]['average']
+                        maximum = values[f_range]['maximum']
+                    else:
+                        average = None
+                        maximum = None
+
+                    setattr(koruza, 'accel_{}_range{}'.format(coordinate, f_range + 1), average)
+                    setattr(koruza, 'accel_{}_range{}_maximum'.format(coordinate, f_range + 1), maximum)
+
             koruza.save()
 
             # Automatically configure reported static Router ID.
