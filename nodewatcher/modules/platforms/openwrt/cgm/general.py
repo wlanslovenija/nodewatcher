@@ -66,7 +66,16 @@ def usb(node, cfg):
         # Include base USB packages for devices supporting USB.
         # TODO: Perhaps this should be made device-specific so only the needed packages are installed.
         cfg.packages.update([
-            'kmod-usb2',
             'kmod-usb-ohci',
             'kmod-usb-uhci',
         ])
+        # Include packages to support USB3.0 if device support it.
+        if device.usb3:
+            cfg.packages.update([
+                'kmod-usb3',
+            ])
+        # Include packages to support USB2.0 if device does not support USB3.0.
+        else:
+            cfg.packages.update([
+                'kmod-usb2',
+            ])
