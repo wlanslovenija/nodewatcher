@@ -16,11 +16,7 @@ class IpSpaceCompontent(components.FrontendComponent):
         }
 
 components.pool.register(IpSpaceCompontent)
-
-
 components.menus.get_menu('main_menu').add(components.MenuEntry(
     label=components.ugettext_lazy("IP space"),
     url=urlresolvers.reverse_lazy('IpSpaceCompontent:IpSpace'),
 ))
-
-
