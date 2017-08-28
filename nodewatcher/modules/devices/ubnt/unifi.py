@@ -103,7 +103,7 @@ class UBNTUniFiAPACPro(cgm_devices.DeviceBase):
     manufacturer = "Ubiquiti"
     url = 'http://www.ubnt.com/'
     architecture = 'ar71xx'
-    usb = True
+    usb = USB_2
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio (5 GHz)"), [
             cgm_protocols.IEEE80211AC(

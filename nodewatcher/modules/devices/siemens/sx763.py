@@ -13,7 +13,7 @@ class SiemensSX763v2(cgm_devices.DeviceBase):
     manufacturer = "Siemens"
     url = 'http://www.siemens.com/'
     architecture = 'lantiq'
-    usb = True
+    usb = USB_2
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BG()

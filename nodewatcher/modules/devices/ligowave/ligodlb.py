@@ -13,7 +13,7 @@ class LigoWaveLigoDLB5(cgm_devices.DeviceBase):
     manufacturer = "LigoWave"
     url = 'https://www.ligowave.com/'
     architecture = 'ar71xx'
-    usb = True
+    usb = USB_2
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211AN(

@@ -13,7 +13,7 @@ class MikrotikRB2011UiAS_IN(cgm_devices.DeviceBase):
     manufacturer = "MikroTik"
     url = 'http://routerboard.com/RB2011UiAS-IN'
     architecture = 'ar71xx_mikrotik'
-    usb = True
+    usb = USB_2
     radios = []
     switches = [
         cgm_devices.Switch(

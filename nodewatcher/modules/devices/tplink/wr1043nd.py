@@ -13,7 +13,7 @@ class TPLinkWR1043NDv1(cgm_devices.DeviceBase):
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
-    usb = True
+    usb = USB_2
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211BGN(

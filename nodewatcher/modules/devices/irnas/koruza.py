@@ -13,7 +13,7 @@ class IRNASKoruzav2(cgm_devices.DeviceBase):
     manufacturer = "IRNAS"
     url = 'http://koruza.net'
     architecture = 'ramips_mt7621'
-    usb = True
+    usb = USB_2
     radios = [
         # TODO: Change this for production KORUZA version.
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio (5 GHz)"), [

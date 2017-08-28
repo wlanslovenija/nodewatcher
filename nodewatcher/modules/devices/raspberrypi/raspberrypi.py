@@ -13,7 +13,7 @@ class RaspberryPi1B(cgm_devices.DeviceBase):
     architecture = 'brcm2708'
     radios = []
     switches = []
-    usb = True
+    usb = USB_2
     ports = [
         cgm_devices.EthernetPort('eth0', "Eth0"),
     ]
