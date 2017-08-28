@@ -529,6 +529,8 @@ class DeviceBase(object):
     radios = None
     switches = None
     usb = False
+    USB_2 = 'usb-2'
+    USB_3 = 'usb-3'
 
     @classmethod
     def register(cls, platform):
