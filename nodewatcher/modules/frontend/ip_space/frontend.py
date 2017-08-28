@@ -24,11 +24,3 @@ components.menus.get_menu('main_menu').add(components.MenuEntry(
 ))
 
 
-components.partials.register(components.Partial('ip_space_partial'))
-
-
-components.partials.get_partial('ip_space_partial').add(components.PartialEntry(
-    name='general',
-    template='ip_space.html',
-    weight=-1
-))
