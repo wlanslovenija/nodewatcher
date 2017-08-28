@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import jsonfield.fields
 
 
 class Migration(migrations.Migration):
@@ -15,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='builder',
             name='metadata',
-            field=jsonfield.fields.JSONField(editable=False, blank=True),
+            field=models.TextField(editable=False, blank=True),
         ),
         migrations.AlterField(
             model_name='buildresult',
             name='config',
-            field=jsonfield.fields.JSONField(help_text='Configuration used to build this firmware.', blank=True),
+            field=models.TextField(help_text='Configuration used to build this firmware.', blank=True),
         ),
     ]

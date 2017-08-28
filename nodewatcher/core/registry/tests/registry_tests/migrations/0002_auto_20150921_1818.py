@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import jsonfield
 
 
 class Migration(migrations.Migration):
@@ -15,16 +14,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='anotherregistryitem',
             name='annotations',
-            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=models.TextField(default='{}', help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='multipleregistryitem',
             name='annotations',
-            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=models.TextField(default='{}', help_text='Enter a valid JSON object', editable=False),
         ),
         migrations.AddField(
             model_name='simpleregistryitem',
             name='annotations',
-            field=jsonfield.JSONField(default={}, help_text='Enter a valid JSON object', editable=False),
+            field=models.TextField(default='{}', help_text='Enter a valid JSON object', editable=False),
         ),
     ]

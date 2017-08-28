@@ -789,6 +789,12 @@ def network(node, cfg):
                     # Override default mcast_rate to avoid broadcast traffic from
                     # stealing too much air time
                     wif.mcast_rate = 6000
+                elif vif.mode == 'mesh11s':
+                    wif.mode = 'mesh'
+                    # Use BSSID from Mesh as Mesh ID.
+                    wif.mesh_id = vif.bssid
+                    # Use full wpad instead of wpad-mini because of 802.11s Mesh.
+                    cfg.packages.update(['-wpad-mini', 'wpad'])
                 elif vif.mode == 'sta':
                     wif.mode = 'sta'
 
@@ -909,8 +915,8 @@ def time_synchronization(node, cfg):
     ntp.enabled = True
     ntp.enable_server = False
     ntp.server = [
-        '0.openwrt.pool.ntp.org',
-        '1.openwrt.pool.ntp.org',
-        '2.openwrt.pool.ntp.org',
-        '3.openwrt.pool.ntp.org',
+        '0.nodewatcher.pool.ntp.org',
+        '1.nodewatcher.pool.ntp.org',
+        '2.nodewatcher.pool.ntp.org',
+        '3.nodewatcher.pool.ntp.org',
     ]

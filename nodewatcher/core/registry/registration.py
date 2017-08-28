@@ -1,10 +1,9 @@
 import collections
 
 from django import apps as django_apps
+from django.contrib.postgres.fields import JSONField
 from django.core import exceptions as django_exceptions
 from django.db import models as django_models
-
-import jsonfield
 
 from . import access as registry_access, lookup as registry_lookup, state as registry_state
 from . import exceptions
@@ -651,7 +650,7 @@ def create_point(model, namespace, mixins=None):
             try:
                 model._meta.get_field('registry_metadata')
             except django_exceptions.FieldDoesNotExist:
-                model.add_to_class('registry_metadata', jsonfield.JSONField(default=dict, editable=False))
+                model.add_to_class('registry_metadata', JSONField(default=dict, editable=False))
 
         # Try to load the model; if it is already loaded this will work, but if
         # not, we will need to defer part of object creation.

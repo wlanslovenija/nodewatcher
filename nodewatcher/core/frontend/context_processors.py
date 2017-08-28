@@ -17,13 +17,4 @@ def global_vars(request):
         'request_get_next': request.GET.get(auth.REDIRECT_FIELD_NAME, ''),
     }
 
-    if django.VERSION < (1, 5):
-        # In Django versions before 1.5, you could not use True, False or None
-        # values directly in the template
-        vars.update({
-            'True': True,
-            'False': False,
-            'None': None,
-        })
-
     return vars

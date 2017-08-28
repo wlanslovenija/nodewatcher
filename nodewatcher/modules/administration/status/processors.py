@@ -30,27 +30,31 @@ class NodeStatus(monitor_processors.NodeProcessor):
             sm.monitored = None
         else:
             # At least one of the processors must signal node reachability; these signals
-            # can be produced by OLSR/HTTP telemetry/RTT processors
+            # can be produced by OLSR/HTTP telemetry/RTT processors.
             if context.node_responds is True or context.http.successfully_parsed is True:
                 sm.network = 'up'
                 if context.http.successfully_parsed is True:
                     sm.monitored = True
-                else:
+                elif context.http.successfully_parsed is False:
                     sm.monitored = False
+                else:
+                    # Not enough information to toggle monitored status.
+                    pass
             else:
                 sm.network = 'visible'
                 if context.http.successfully_parsed is False:
-                    # HTTP fetch was tried, but failed
+                    # HTTP fetch was tried, but failed.
                     sm.monitored = False
                 else:
                     assert context.http.successfully_parsed is not True
-                    # HTTP fetch was not tried so we don't know whether the node is monitored
+                    # HTTP fetch was not tried so we don't know whether the node is monitored.
                     sm.monitored = None
-        # TODO: Change depending on any warning/error events
+
+        # TODO: Change health depending on any warning/error events.
         sm.health = None
         sm.save()
 
-        # Emit event on node state transitions
+        # Emit event on node state transitions.
         if prev_network != sm.network:
             events.NodeStatusChange(node, prev_network, sm.network).post()
 

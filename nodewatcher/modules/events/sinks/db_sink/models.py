@@ -1,7 +1,6 @@
-from django.db import models
 from django.contrib.auth import models as auth_models
-
-import jsonfield
+from django.contrib.postgres.fields import JSONField
+from django.db import models
 
 from nodewatcher.core import models as core_models
 from nodewatcher.core.events import pool
@@ -15,7 +14,7 @@ class SerializedEvent(models.Model):
     severity = models.IntegerField()
     source_name = models.CharField(max_length=200)
     source_type = models.CharField(max_length=200)
-    record = jsonfield.JSONField(null=True)
+    record = JSONField(null=True)
 
     class Meta:
         abstract = True

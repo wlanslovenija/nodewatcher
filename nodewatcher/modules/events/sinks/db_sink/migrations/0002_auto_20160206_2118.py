@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import jsonfield.fields
 
 
 class Migration(migrations.Migration):
@@ -15,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='serializednodeevent',
             name='record',
-            field=jsonfield.fields.JSONField(null=True),
+            field=models.TextField(null=True),
         ),
         migrations.AlterField(
             model_name='serializednodewarning',
             name='record',
-            field=jsonfield.fields.JSONField(null=True),
+            field=models.TextField(null=True),
         ),
     ]

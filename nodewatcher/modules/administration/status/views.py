@@ -1,4 +1,7 @@
+import datetime
+
 from django.db import models as django_models
+from django.utils import timezone
 
 from rest_framework import mixins, viewsets
 
@@ -14,6 +17,9 @@ class StatusStatisticsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     queryset = core_models.Node.objects.regpoint('monitoring').registry_fields(
         status='core.status__network'
+    ).regpoint('monitoring').registry_filter(
+        # Ignore nodes, which haven't been seen for more than 180 days.
+        core_general__last_seen__gt=timezone.now() - datetime.timedelta(days=180),
     ).values(
         'status'
     ).annotate(

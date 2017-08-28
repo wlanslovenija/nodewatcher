@@ -50,7 +50,8 @@ class GlobalTopology(monitor_processors.NetworkProcessor):
             core_routerid__rid_family='ipv4',
             core_routerid__router_id__in=visible_routers,
         ):
-            first_router_id = node.router_id.all()[0]
+            # In case there are multiple router IDs, select the one which is advertised by OLSR.
+            first_router_id = node.router_id.filter(router_id__in=visible_routers)[0]
             router_id_map[first_router_id] = node.pk
             registered_routers.add(first_router_id)
             nodes.add(node)

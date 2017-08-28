@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
-import jsonfield.fields
 
 
 class Migration(migrations.Migration):
@@ -22,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('display_order', models.IntegerField(editable=False, null=True)),
-                ('annotations', jsonfield.fields.JSONField(default={}, editable=False)),
+                ('annotations', models.TextField(default='{}', editable=False)),
                 ('serial_number', models.CharField(max_length=100)),
                 ('last_updated', models.DateTimeField(auto_now=True)),
                 ('bus', models.CharField(max_length=50)),

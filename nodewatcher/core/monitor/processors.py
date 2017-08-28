@@ -13,6 +13,20 @@ class ProcessorContext(dict):
     A simple dictionary wrapper to support attribute access.
     """
 
+    def __init__(self, mapping=None):
+        """
+        Create a new processor context.
+
+        :param mapping: Optionally initialize from an existing mapping
+        """
+
+        if mapping is not None:
+            if not isinstance(mapping, dict):
+                raise TypeError('A dictionary is required')
+
+            # Perform recursive merge.
+            self.merge_with(mapping)
+
     def __getitem__(self, key):
         """
         Get that automatically creates ProcessorContexts when key doesn't exist.
@@ -46,7 +60,7 @@ class ProcessorContext(dict):
 
     def merge_with(self, other):
         """
-        Merges this dictionary with another (recursively).
+        Merge this dictionary with another (recursively).
         """
 
         for k, v in other.iteritems():
@@ -56,7 +70,7 @@ class ProcessorContext(dict):
                 except AttributeError:
                     self[k] = v
             else:
-                if isinstance(v, dict):
+                if isinstance(v, dict) and not isinstance(v, ProcessorContext):
                     # Convert dictionaries to context instances.
                     context = ProcessorContext()
                     v = context.merge_with(v)
@@ -67,7 +81,7 @@ class ProcessorContext(dict):
 
     def create(self, namespace, ctx_class=None):
         """
-        Creates a new sub-context.
+        Create a new sub-context.
 
         :param namespace: Namespace
         :param ctx_class: Optional context class to use for this namespace root (should

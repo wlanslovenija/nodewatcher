@@ -1,6 +1,5 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
-
-import jsonfield
 
 from polymorphic import base as polymorphic_base, models as polymorphic_models
 from . import polymorphic_deletion_fix, options
@@ -29,7 +28,7 @@ class RegistryItemBase(polymorphic_models.PolymorphicModel):
     # order that they were shown on any edit forms.
     display_order = models.IntegerField(null=True, editable=False)
     # Custom item annotations.
-    annotations = jsonfield.JSONField(default=dict, editable=False)
+    annotations = JSONField(default=dict, editable=False)
 
     class RegistryMeta:
         registry_id = None

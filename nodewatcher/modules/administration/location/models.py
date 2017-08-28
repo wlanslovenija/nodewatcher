@@ -23,9 +23,6 @@ class LocationConfig(registration.bases.NodeConfigRegistryItem):
     geolocation = gis_models.PointField(geography=True, null=True, blank=True)
     altitude = models.FloatField(default=0, help_text=_("In meters."))
 
-    # TODO: This manager should be removed when we drop support for Tastypie-based API.
-    geo_objects = gis_models.GeoManager()
-
     class RegistryMeta:
         form_weight = 3
         registry_id = 'core.location'

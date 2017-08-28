@@ -145,6 +145,9 @@ class RttMeasurement(monitor_processors.NetworkProcessor):
                     'rtt_std': std,
                 }
 
+        if not context.rtt.results:
+            self.logger.warning("No measurements in results, fping may have failed.")
+
         return context, nodes
 
 

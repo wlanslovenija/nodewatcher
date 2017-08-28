@@ -7,7 +7,7 @@ amqp==1.4.9
 anyjson==0.3.3
 billiard==3.3.0.22
 celery==3.1.20
-datastream[influxdb]==0.5.16
+datastream[influxdb]==0.5.19
 defusedxml==0.4.1
 git+https://github.com/zestedesavoir/django-cors-middleware.git@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
 django-classy-tags==0.7.1
@@ -15,7 +15,7 @@ ujson==1.35
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
 --allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@a54a2e735950c5c31ec71613750bdf1ce194389f#egg=django_datastream-master
 django-guardian==1.4.8
-git+https://github.com/wlanslovenija/django-missing.git@01d4cda3f6e9a247039b32a8f71b01f1d0fd9c69#egg=django_missing-wlanslovenija
+django-missing==0.2.1
 django-phonenumber-field==1.0.0
 django_polymorphic==1.1
 django-registration==2.0.4
@@ -36,7 +36,6 @@ six==1.10.0
 sphinx-me==0.3
 wsgiref==0.1.2
 django-timezone-field==2.0
-django-jsonfield==1.0.1
 paramiko==2.0.2
 django-leaflet==0.21.0
 django-countries==4.3
@@ -53,3 +52,4 @@ git+https://github.com/wlanslovenija/drf-ujson-renderer.git@96cee399260daf469b7e
 grako==3.8.1
 influxdb==3.0.0
 networkx==1.11
+django-queryinspect==0.1.0

@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import django.contrib.postgres.fields
 from django.db import migrations, models
 import django.db.models.deletion
-import jsonfield.fields
 import nodewatcher.core.registry.fields
 
 
@@ -23,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('display_order', models.IntegerField(editable=False, null=True)),
-                ('annotations', jsonfield.fields.JSONField(default=dict, editable=False)),
+                ('annotations', models.TextField(default='{}', editable=False)),
                 ('switch', nodewatcher.core.registry.fields.RegistryChoiceField(b'node.config', b'core.switch#switch', max_length=50)),
                 ('vlan_preset', models.CharField(max_length=50)),
                 ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_cgm.switchconfig_set+', to='contenttypes.ContentType')),
@@ -39,7 +38,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('display_order', models.IntegerField(editable=False, null=True)),
-                ('annotations', jsonfield.fields.JSONField(default=dict, editable=False)),
+                ('annotations', models.TextField(default='{}', editable=False)),
                 ('name', models.CharField(max_length=30)),
                 ('vlan', models.IntegerField()),
                 ('ports', django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), default=list, size=None)),
@@ -60,7 +59,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='authenticationconfig',
             name='annotations',
-            field=jsonfield.fields.JSONField(default=dict, editable=False),
+            field=models.TextField(default='{}', editable=False),
         ),
         migrations.AlterField(
             model_name='bridgeinterfaceconfig',
@@ -80,17 +79,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='interfaceconfig',
             name='annotations',
-            field=jsonfield.fields.JSONField(default=dict, editable=False),
+            field=models.TextField(default='{}', editable=False),
         ),
         migrations.AlterField(
             model_name='networkconfig',
             name='annotations',
-            field=jsonfield.fields.JSONField(default=dict, editable=False),
+            field=models.TextField(default='{}', editable=False),
         ),
         migrations.AlterField(
             model_name='packageconfig',
             name='annotations',
-            field=jsonfield.fields.JSONField(default=dict, editable=False),
+            field=models.TextField(default='{}', editable=False),
         ),
         migrations.AlterField(
             model_name='staticnetworkconfig',

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 from django.conf import settings
-import jsonfield
 
 
 class Migration(migrations.Migration):
@@ -21,7 +20,7 @@ class Migration(migrations.Migration):
                 ('severity', models.IntegerField()),
                 ('source_name', models.CharField(max_length=200)),
                 ('source_type', models.CharField(max_length=200)),
-                ('record', jsonfield.JSONField(default='null', help_text='Enter a valid JSON object', null=True)),
+                ('record', models.TextField(default='null', help_text='Enter a valid JSON object', null=True)),
                 ('timestamp', models.DateTimeField()),
                 ('related_nodes', models.ManyToManyField(related_name='events', to='core.Node')),
                 ('related_users', models.ManyToManyField(related_name='events', to=settings.AUTH_USER_MODEL)),
@@ -36,7 +35,7 @@ class Migration(migrations.Migration):
                 ('severity', models.IntegerField()),
                 ('source_name', models.CharField(max_length=200)),
                 ('source_type', models.CharField(max_length=200)),
-                ('record', jsonfield.JSONField(default='null', help_text='Enter a valid JSON object', null=True)),
+                ('record', models.TextField(default='null', help_text='Enter a valid JSON object', null=True)),
                 ('uuid', models.UUIDField(serialize=False, primary_key=True)),
                 ('first_seen', models.DateTimeField(auto_now_add=True)),
                 ('last_seen', models.DateTimeField(auto_now=True)),
