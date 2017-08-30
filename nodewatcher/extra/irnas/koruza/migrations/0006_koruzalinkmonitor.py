@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
-import jsonfield.fields
 
 
 class Migration(migrations.Migration):
@@ -21,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('display_order', models.IntegerField(editable=False, null=True)),
-                ('annotations', jsonfield.fields.JSONField(default={}, editable=False)),
+                ('annotations', models.TextField(default='{}', editable=False)),
                 ('neighbour', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='core.Node')),
                 ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_irnas_koruza.koruzalinkmonitor_set+', to='contenttypes.ContentType')),
                 ('root', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='monitoring_irnas_koruza_koruzalinkmonitor', to='core.Node')),

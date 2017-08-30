@@ -10,13 +10,22 @@
 {% block content %}
     <div class="error">
         <p>{% trans "You don't have permission to access the page you requested." %}</p>
-        {% if no_referer %}
+        {% if exception %}
+            {% if DEBUG %}
+                <p>Exception:</p>
+                <pre>{{ exception }}</pre>
+            {% endif %}
+        {% elif no_referer %}
             <p>{% blocktrans %}You are seeing this message because this HTTPS site requires a 'Referer header' to be sent by your Web browser, but none was sent. This header is required for security reasons, to ensure that your browser is not being hijacked by third parties.{% endblocktrans %}</p>
             <p>{% blocktrans %}If you have configured your browser to disable 'Referer' headers, please re-enable them, at least for this site, or for HTTPS connections, or for 'same-origin' requests.{% endblocktrans %}</p>
-        {% else %}
-            <p>{% trans "For accessing this site and using all features cookies in your browser must be enabled." %}</p>
+        {% elif no_cookie %}
+            <p>{% blocktrans %}You are seeing this message because this site requires a CSRF cookie when submitting forms. This cookie is required for security reasons, to ensure that your browser is not being hijacked by third parties.{% endblocktrans %}</p>
+            <p>{% blocktrans %}If you have configured your browser to disable cookies, please re-enable them, at least for this site, or for 'same-origin' requests.{% endblocktrans %}</p>
         {% endif %}
     </div>
 
-    {% if DEBUG and reason %}<p>Reason: {{ reason }}</p>{% endif %}
+    {% if DEBUG and reason %}
+        <p>Reason:</p>
+        <pre>{{ reason }}</pre>
+    {% endif %}
 {% endblock %}

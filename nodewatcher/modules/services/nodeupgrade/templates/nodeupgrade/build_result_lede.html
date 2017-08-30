@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<dt>{% trans "LEDE upgrade instructions" %}</dt>
+<dd>
+    {% blocktrans %}
+        If your node is already running a recent enough version of nodewatcher firmware, you may
+        perform the upgrade by running the following commands via SSH.
+    {% endblocktrans %}
+
+    <div class="code">$ nodeupgrade {{ build.pk }}</div>
+</dd>

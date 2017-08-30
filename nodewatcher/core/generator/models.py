@@ -3,12 +3,11 @@ import uuid
 
 from django import dispatch
 from django.contrib.auth import models as auth_models
+from django.contrib.postgres.fields import JSONField
 from django.core import exceptions as django_exceptions
 from django.db.models import signals as django_signals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-import jsonfield
 
 from .. import models as core_models
 from . import connection, exceptions
@@ -118,7 +117,7 @@ class Builder(models.Model):
         blank=True,
         editable=False,
     )
-    metadata = jsonfield.JSONField(
+    metadata = JSONField(
         default=dict,
         blank=True,
         editable=False,
@@ -262,7 +261,7 @@ class BuildResult(models.Model):
         core_models.Node,
         help_text=_('Node this firmware build is for.'),
     )
-    config = jsonfield.JSONField(
+    config = JSONField(
         default=dict,
         blank=True,
         help_text=_('Configuration used to build this firmware.'),

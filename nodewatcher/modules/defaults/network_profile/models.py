@@ -11,7 +11,16 @@ class NetworkProfileConfig(registration.bases.NodeConfigRegistryItem):
     profiles = registry_fields.RegistryMultipleChoiceField(
         'node.config', 'network.profile#profiles',
         blank=True, null=True, default=list,
-        help_text=_("Selected network profiles affect how the node is configured when automatic defaults are enabled. In case defaults are disabled, selecting network profiles will have no effect."),
+        help_text=_(
+            "Selected network profiles affect how the node is configured when "
+            "automatic defaults are enabled. In case defaults are disabled, "
+            "selecting network profiles will have no effect."
+        ),
+    )
+    wireless_mesh_type = registry_fields.RegistryChoiceField(
+        'node.config', 'network.profile#wireless_mesh_type',
+        blank=True, null=True, default='ad-hoc',
+        help_text=_("Type of interface that should be used for wireless meshihng.")
     )
 
     class RegistryMeta:
@@ -35,6 +44,19 @@ registration.point('node.config').register_choice('network.profile#profiles', re
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('mobile-uplink', _("Use a mobile interface for uplink")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('wifi-uplink', _("Use a wireless interface for uplink")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('no-wifi-ap', _("Disable wireless AP")))
-registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('no-wifi-mesh', _("Disable wireless mesh")))
 registration.point('node.config').register_choice('network.profile#profiles', registration.Choice('hostname-essid', _("Use hostname as ESSID")))
 registration.point('node.config').register_item(NetworkProfileConfig)
+
+# Register possible mesh network types.
+registration.point('node.config').register_choice(
+    'network.profile#wireless_mesh_type',
+    registration.Choice(None, _("Disable wireless meshing"))
+)
+registration.point('node.config').register_choice(
+    'network.profile#wireless_mesh_type',
+    registration.Choice('ad-hoc', _("Ad-hoc"))
+)
+registration.point('node.config').register_choice(
+    'network.profile#wireless_mesh_type',
+    registration.Choice('80211s', _("802.11s"))
+)

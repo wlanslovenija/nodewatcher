@@ -60,6 +60,7 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
 
         routing_protocols = context['routing_protocols']
         network_profiles = context['network_profiles']
+        wireless_mesh_type = context['wireless_mesh_type']
         project = context['project']
         node_type = context['type']
         radio_defaults = context['radio_defaults']
@@ -151,18 +152,20 @@ class WirelessModule(NetworkModuleMixin, registry_forms.FormDefaultsModule):
                 )
 
             # Create mesh interface.
-            if 'no-wifi-mesh' not in network_profiles:
+            if wireless_mesh_type is not None:
                 self.setup_interface(
                     state,
                     cgm_models.WifiInterfaceConfig,
                     parent=wifi_radio,
                     configuration={
-                        'mode': 'mesh',
+                        # Use 802.11s if checked, otherwise use ad-hoc.
+                        'mode': 'mesh11s' if wireless_mesh_type == '80211s' else 'mesh',
                         'essid': get_project_ssid('mesh'),
                         'bssid': get_project_ssid('mesh', attribute='bssid'),
                         'routing_protocols': routing_protocols,
                     },
                 )
+
         elif node_type == 'backbone':
             # If the device is of type "Backbone", create one AP/STA.
             if wifi_backbone_defaults is not None:

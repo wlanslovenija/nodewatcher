@@ -12,6 +12,7 @@ class NetworkProfile(registry_forms.FormDefaultsModule):
 
     Exported context properties:
     - ``network_profiles`` contains a list of network profile strings
+    - ``wireless_mesh_type`` contains the type of wireless mesh
     """
 
     def pre_configure(self, context, state, create):
@@ -20,12 +21,17 @@ class NetworkProfile(registry_forms.FormDefaultsModule):
         """
 
         network_profile_config = state.lookup_item(models.NetworkProfileConfig)
-        if not network_profile_config or not network_profile_config.profiles:
+        if not network_profile_config:
             network_profiles = []
+            wireless_mesh_type = 'ad-hoc'
         else:
-            network_profiles = network_profile_config.profiles
+            network_profiles = network_profile_config.profiles or []
+            wireless_mesh_type = network_profile_config.wireless_mesh_type
 
-        context['network_profiles'] = network_profiles
+        context.update({
+            'network_profiles': network_profiles,
+            'wireless_mesh_type': wireless_mesh_type,
+        })
 
 
 class ClearInterfaces(registry_forms.FormDefaultsModule):

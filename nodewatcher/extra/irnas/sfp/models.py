@@ -23,10 +23,28 @@ class SFPMonitor(registration.bases.NodeMonitoringRegistryItem):
     wavelength = models.IntegerField()
     # SFP module diagnostics.
     temperature = models.FloatField(null=True)
+    temperature_variance = models.FloatField(null=True)
+    temperature_minimum = models.FloatField(null=True)
+    temperature_maximum = models.FloatField(null=True)
     vcc = models.FloatField(null=True)
+    vcc_variance = models.FloatField(null=True)
+    vcc_minimum = models.FloatField(null=True)
+    vcc_maximum = models.FloatField(null=True)
     tx_bias = models.FloatField(null=True)
+    tx_bias_variance = models.FloatField(null=True)
+    tx_bias_minimum = models.FloatField(null=True)
+    tx_bias_maximum = models.FloatField(null=True)
     tx_power = models.FloatField(null=True)
+    tx_power_variance = models.FloatField(null=True)
+    tx_power_minimum = models.FloatField(null=True)
+    tx_power_maximum = models.FloatField(null=True)
     rx_power = models.FloatField(null=True)
+    rx_power_variance = models.FloatField(null=True)
+    rx_power_minimum = models.FloatField(null=True)
+    rx_power_maximum = models.FloatField(null=True)
+    rx_power_dbm = models.FloatField(null=True)
+    rx_power_dbm_minimum = models.FloatField(null=True)
+    rx_power_dbm_maximum = models.FloatField(null=True)
 
     class RegistryMeta:
         registry_id = 'irnas.sfp'
@@ -39,7 +57,61 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     temperature = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP Temperature (%(serial_number)s)")),
         'unit': 'C',
+        'group': 'sfp_temperature',
         'visualization': {
+            'with': {
+                'group': 'sfp_temperature',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    temperature_variance = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP Temperature Variance (%(serial_number)s)")),
+        'unit': 'C',
+        'group': 'sfp_temperature',
+        'visualization': {
+            'with': {
+                'group': 'sfp_temperature',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    temperature_minimum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP Temperature Minimum (%(serial_number)s)")),
+        'unit': 'C',
+        'group': 'sfp_temperature',
+        'visualization': {
+            'with': {
+                'group': 'sfp_temperature',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    temperature_maximum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP Temperature Maximum (%(serial_number)s)")),
+        'unit': 'C',
+        'group': 'sfp_temperature',
+        'visualization': {
+            'with': {
+                'group': 'sfp_temperature',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
             'type': 'line',
             'initial_set': True,
             'time_downsamplers': ['mean'],
@@ -49,7 +121,61 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     vcc = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP VCC (%(serial_number)s)")),
         'unit': 'V',
+        'group': 'sfp_vcc',
         'visualization': {
+            'with': {
+                'group': 'sfp_vcc',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    vcc_variance = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP VCC Variance (%(serial_number)s)")),
+        'unit': 'V',
+        'group': 'sfp_vcc',
+        'visualization': {
+            'with': {
+                'group': 'sfp_vcc',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    vcc_minimum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP VCC Minimum (%(serial_number)s)")),
+        'unit': 'V',
+        'group': 'sfp_vcc',
+        'visualization': {
+            'with': {
+                'group': 'sfp_vcc',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    vcc_maximum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP VCC Maximum (%(serial_number)s)")),
+        'unit': 'V',
+        'group': 'sfp_vcc',
+        'visualization': {
+            'with': {
+                'group': 'sfp_vcc',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
             'type': 'line',
             'initial_set': True,
             'time_downsamplers': ['mean'],
@@ -59,7 +185,61 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     tx_bias = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Bias (%(serial_number)s)")),
         'unit': 'mW',
+        'group': 'sfp_tx_bias',
         'visualization': {
+            'with': {
+                'group': 'sfp_tx_bias',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    tx_bias_variance = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Bias Variance (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_tx_bias',
+        'visualization': {
+            'with': {
+                'group': 'sfp_tx_bias',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    tx_bias_minimum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Bias Minimum (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_tx_bias',
+        'visualization': {
+            'with': {
+                'group': 'sfp_tx_bias',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    tx_bias_maximum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Bias Maximum (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_tx_bias',
+        'visualization': {
+            'with': {
+                'group': 'sfp_tx_bias',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
             'type': 'line',
             'initial_set': True,
             'time_downsamplers': ['mean'],
@@ -69,7 +249,61 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     tx_power = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Power (%(serial_number)s)")),
         'unit': 'mW',
+        'group': 'sfp_tx_power',
         'visualization': {
+            'with': {
+                'group': 'sfp_tx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    tx_power_variance = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Power Variance (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_tx_power',
+        'visualization': {
+            'with': {
+                'group': 'sfp_tx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    tx_power_minimum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Power Minimum (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_tx_power',
+        'visualization': {
+            'with': {
+                'group': 'sfp_tx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    tx_power_maximum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP TX Power Maximum (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_tx_power',
+        'visualization': {
+            'with': {
+                'group': 'sfp_tx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
             'type': 'line',
             'initial_set': True,
             'time_downsamplers': ['mean'],
@@ -79,7 +313,103 @@ class SFPMonitorStreams(ds_models.RegistryItemStreams):
     rx_power = ds_fields.FloatField(tags={
         'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power (%(serial_number)s)")),
         'unit': 'mW',
+        'group': 'sfp_rx_power',
         'visualization': {
+            'with': {
+                'group': 'sfp_rx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_variance = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Variance (%(serial_number)s)")),
+        'unit': 'mW',
+        'visualization': {
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_minimum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Minimum (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_rx_power',
+        'visualization': {
+            'with': {
+                'group': 'sfp_rx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_maximum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Maximum (%(serial_number)s)")),
+        'unit': 'mW',
+        'group': 'sfp_rx_power',
+        'visualization': {
+            'with': {
+                'group': 'sfp_rx_power',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_dbm = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power (%(serial_number)s)")),
+        'unit': 'dBm',
+        'group': 'sfp_rx_power_dbm',
+        'visualization': {
+            'with': {
+                'group': 'sfp_rx_power_dbm',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_dbm_minimum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Minimum (%(serial_number)s)")),
+        'unit': 'dBm',
+        'group': 'sfp_rx_power_dbm',
+        'visualization': {
+            'with': {
+                'group': 'sfp_rx_power_dbm',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
+            'type': 'line',
+            'initial_set': True,
+            'time_downsamplers': ['mean'],
+            'value_downsamplers': ['min', 'mean', 'max'],
+        }
+    })
+    rx_power_dbm_maximum = ds_fields.FloatField(tags={
+        'title': ds_fields.TagReference('serial_number', gettext_noop("SFP RX Power Maximum (%(serial_number)s)")),
+        'unit': 'dBm',
+        'group': 'sfp_rx_power_dbm',
+        'visualization': {
+            'with': {
+                'group': 'sfp_rx_power_dbm',
+                'node': ds_fields.TagReference('node'),
+                'serial_number': ds_fields.TagReference('serial_number'),
+            },
             'type': 'line',
             'initial_set': True,
             'time_downsamplers': ['mean'],

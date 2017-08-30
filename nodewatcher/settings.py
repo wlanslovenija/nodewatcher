@@ -11,8 +11,7 @@ settings_dir = os.path.abspath(os.path.dirname(__file__))
 _ = lambda s: s
 
 DEBUG = True
-TEMPLATE_DEBUG = False
-TEMPLATE_URL_RESOLVERS_DEBUG = True # Active only when TEMPLATE_DEBUG is True.
+URL_RESOLVERS_DEBUG = True # Active only when DEBUG is True.
 
 # A tuple that lists people who get code error notifications. When
 # DEBUG=False and a view raises an exception, Django will e-mail these
@@ -271,7 +270,6 @@ DEPENDENCY_APPS = [
     'sekizai', # In fact overridden by "nodewatcher.core.frontend" sekizai_tags which adds "prepend_data" and "prependtoblock"
     'missing',
     'timezone_field',
-    'jsonfield',
     'leaflet',
     'django_countries',
     'registration',
@@ -720,6 +718,9 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser'
     ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    )
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
