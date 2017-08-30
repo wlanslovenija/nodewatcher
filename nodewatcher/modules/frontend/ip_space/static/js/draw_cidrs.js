@@ -159,9 +159,9 @@ window.DrawCidr = class DrawCidr {
 
     setTopNodes(data) {
         var self = this;
-        $('#topnodes').html('<li id="cidr"><a href="#" value="10.0.0.0/8">10.0.0.0/8 (Zoom out)</a></li>');
+        $('#topnodes').html('<li id="cidr" cidr="10.0.0.0/8"><a>10.0.0.0/8 (Zoom out)</a></li>');
         data.forEach(function(node) {
-            $('#topnodes').append('<li id="cidr"><a href="#" cidr="' + node.network + '/' + node.prefix_length + '">' + node.network + '/' + node.prefix_length + ' (' + node.description + ')' + '</option>');
+            $('#topnodes').append('<li id="cidr" cidr="' + node.network + '/' + node.prefix_length + '"><a>' + node.network + '/' + node.prefix_length + ' (' + node.description + ')' + '</a></li>');
         });
 
         $('#topnodes').on('click', function(event) {

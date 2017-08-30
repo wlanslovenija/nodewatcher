@@ -8,10 +8,8 @@ $(document).ready(function() {
   cidr.load();
 
   $('#cidr').click(function() {
-    alert(this.value);
     var scale = size / cidr.subnetSize(this.value);
     var start = cidr.subnetXY(this.value);
-    console.log(start);
     svgContainer.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
   });
 });
