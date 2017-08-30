@@ -1,4 +1,4 @@
-//Author: https://github.com/ryan-williams
+//Author: https://github.com/ryan-williams, from: https://github.com/ryan-williams/hilbert-js
 var Hilbert2d = window.Hilbert2d = function(options, axisOrderOpt) {
     options = options || {};
     if (typeof options == 'number') {
