@@ -125,7 +125,7 @@ window.DrawCidr = class DrawCidr {
     load() {
         var self = this;
         for (var i = 0; i < 33; i++) {
-            $.getJSON('http://0.0.0.0:8000/api/v2/pool/ip/?format=json&prefix_length=' + i, function(data) {
+            $.getJSON('/api/v2/pool/ip/?format=json&prefix_length=' + i, function(data) {
                 for (var j = 0; j < data.results.length; j++) {
                     self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
                 }
