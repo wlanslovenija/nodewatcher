@@ -107,6 +107,51 @@ window.DrawCidr = class DrawCidr {
         return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
     }
 
+    UpdateQueryString(key, value, url) {
+        if (!url) url = window.location.href;
+        var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+            hash;
+
+        if (re.test(url)) {
+            if (typeof value !== 'undefined' && value !== null)
+                return url.replace(re, '$1' + key + "=" + value + '$2$3');
+            else {
+                hash = url.split('#');
+                url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+                if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                    url += '#' + hash[1];
+                return url;
+            }
+        }
+        else {
+            if (typeof value !== 'undefined' && value !== null) {
+                var separator = url.indexOf('?') !== -1 ? '&' : '?';
+                hash = url.split('#');
+                url = hash[0] + separator + key + '=' + value;
+                if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                    url += '#' + hash[1];
+                return url;
+            }
+            else
+                return url;
+        }
+    }
+
+    getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
     draw(subnet, description) {
         var times = 32 - parseInt(subnet.split('/')[1]);
         var subnet_ips = Math.pow(2, times);
@@ -163,10 +208,16 @@ window.DrawCidr = class DrawCidr {
         data.forEach(function(node) {
             $('#topnodes').append('<li id="cidr" cidr="' + node.network + '/' + node.prefix_length + '"><a>' + node.network + '/' + node.prefix_length + ' (' + node.description + ')' + '</a></li>');
         });
-
-        $('#topnodes').on('click', function(event) {
-            var scale = self.size / self.subnetSize($(event.target).attr("cidr"));
-            var start = self.subnetXY($(event.target).attr("cidr"));
+        var scale= self.getUrlParameter('scale');
+        var start = self.getUrlParameter('start').split(',');
+        if(scale != undefined && start != undefined){
+            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
+        }
+        $('#topnodes').on('click', '#cidr', function(event) {
+            var scale = self.size / self.subnetSize($(event.target).parent().attr('cidr'));
+            var start = self.subnetXY($(event.target).parent().attr('cidr'));
+            history.replaceState({}, document.title, self.UpdateQueryString('scale', scale, window.url));
+            history.replaceState({}, document.title, self.UpdateQueryString('start', start, window.url));
             self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
         });
     }
