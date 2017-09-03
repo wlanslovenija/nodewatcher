@@ -107,6 +107,22 @@ window.DrawCidr = class DrawCidr {
         return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
     }
 
+    get_url_param(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+        return false;
+    }
+
     UpdateQueryString(key, value, url) {
         if (!url) url = window.location.href;
         var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
@@ -136,21 +152,6 @@ window.DrawCidr = class DrawCidr {
                 return url;
         }
     }
-
-    getUrlParameter(sParam) {
-        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
-
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : sParameterName[1];
-            }
-        }
-    };
 
     draw(subnet, description) {
         var times = 32 - parseInt(subnet.split('/')[1]);
@@ -255,11 +256,6 @@ window.DrawCidr = class DrawCidr {
             $('#topnodes').append('<li id="cidr" cidr="' + node.network + '/' + node.prefix_length + '"><a>' + node.network + '/' + node.prefix_length + ' (' + node.description + ')' + '</a></li>');
         });
 
-        var scale= self.getUrlParameter('scale');
-        var start = self.getUrlParameter('start').split(',');
-        if(scale != undefined && start != undefined) {
-            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
-        }
         $('#topnodes').on('click', '#cidr', function(event) {
             var scale = self.size / self.subnetSize($(event.target).parent().attr('cidr'));
             var start = self.subnetXY($(event.target).parent().attr('cidr'));
@@ -267,5 +263,13 @@ window.DrawCidr = class DrawCidr {
             history.replaceState({}, document.title, self.UpdateQueryString('start', start, window.url));
             self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
         });
+
+        var scale = this.get_url_param('scale');
+        var start = String(this.get_url_param('start')).split(',');
+        if(scale && start) {
+            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
+        }else{
+            $('#topnodes > a').eq(2).trigger();
+        }
     }
 }
