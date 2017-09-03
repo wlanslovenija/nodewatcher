@@ -29,7 +29,7 @@ window.DrawCidr = class DrawCidr {
     }
 
     ip2num(ip) {
-        var d = ip.split('.');
+        var d = String(ip).split('.');
         return ((((((+d[0]) * 256) + (+d[1])) * 256) + (+d[2])) * 256) + (+d[3]);
     }
 
@@ -170,7 +170,7 @@ window.DrawCidr = class DrawCidr {
     load() {
         var self = this;
         for (var i = 0; i < 33; i++) {
-            $.getJSON('/api/v2/pool/ip/?format=json&prefix_length=' + i, function(data) {
+            $.getJSON('api/v2/pool/ip/?format=json&prefix_length=' + i, function(data) {
                 for (var j = 0; j < data.results.length; j++) {
                     self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
                 }
@@ -189,6 +189,16 @@ window.DrawCidr = class DrawCidr {
         }
     }
 
+    cidrToRange(cidr) {
+       var range = [2];
+       cidr = cidr.split('/');
+       var cidr_1 = parseInt(cidr[1])
+       range[0] = (this.ip2num(cidr[0])) & ((-1 << (32 - cidr_1)));
+       var start = this.ip2num(range[0])
+       range[1] = range[0] + Math.pow(2, (32 - cidr_1)) - 1;
+       return [range[0]-this.offset, range[1]-this.offset];
+    }
+
     calcTopNodes(data) {
         var res = new Array();
         for (var i = 0; i < data.length; i++) {
@@ -202,15 +212,52 @@ window.DrawCidr = class DrawCidr {
         return res;
     }
 
+    getMaxOfArray(numArray) {
+      return Math.max.apply(null, numArray);
+    }
+
+    getMinOfArray(numArray) {
+      return Math.min.apply(null, numArray);
+    }
+
     setTopNodes(data) {
         var self = this;
+        var xs = [];
+        var ys = [];
+        data.forEach(function(node) {
+            xs.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[0]).x);
+            ys.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[0]).y);
+            xs.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[1]).x);
+            ys.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[1]).y);
+        });
+
+        var min_x = self.getMinOfArray(xs);
+        var min_y = self.getMinOfArray(ys);
+
+        var max_x = self.getMaxOfArray(xs);
+        var max_y = self.getMaxOfArray(ys);
+
+
+        var start_num = xy2d(min_x, min_y);
+        var stop_num = xy2d(max_x, max_y);
+
+        var ips_needed = stop_num - start_num;
+        var mask = 0;
+        while(Math.pow(2, mask) < ips_needed){
+            mask++;
+        }
+        mask = 32-mask;
+        var start_ip = this.num2ip(this.offset + start_num);
+
         $('#topnodes').html('<li id="cidr" cidr="10.0.0.0/8"><a>10.0.0.0/8 (Zoom out)</a></li>');
+        $('#topnodes').append('<li id="cidr" cidr="'+start_ip+'/'+mask+'"><a>'+start_ip+'/'+mask+'(Zoom to fit)</a></li>');
         data.forEach(function(node) {
             $('#topnodes').append('<li id="cidr" cidr="' + node.network + '/' + node.prefix_length + '"><a>' + node.network + '/' + node.prefix_length + ' (' + node.description + ')' + '</a></li>');
         });
+
         var scale= self.getUrlParameter('scale');
         var start = self.getUrlParameter('start').split(',');
-        if(scale != undefined && start != undefined){
+        if(scale != undefined && start != undefined) {
             self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
         }
         $('#topnodes').on('click', '#cidr', function(event) {
