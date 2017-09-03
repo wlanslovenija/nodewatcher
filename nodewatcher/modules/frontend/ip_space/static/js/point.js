@@ -1,4 +1,7 @@
-//Author: https://github.com/ryan-williams, from: https://github.com/ryan-williams/hilbert-js
+/*  Author: https://github.com/ryan-williams
+    from: https://github.com/ryan-williams/hilbert-js
+    changes: This module was made for nodejs, I adapted it to browser
+*/
 var Point = window.Point = function(x, y, z) {
     if (x instanceof Array) {
         y = x[1];

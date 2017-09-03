@@ -1,4 +1,7 @@
-//Author: https://github.com/ryan-williams, from: https://github.com/ryan-williams/hilbert-js
+/* Author: https://github.com/ryan-williams
+   from: https://github.com/ryan-williams/hilbert-js
+   changes: This used to be a require/node module, I adapted it for in browser module, removed 3d hilbert curve, removed unneeded hilbert.js which was used for init, as I only need one module and not two.
+*/
 var Hilbert2d = window.Hilbert2d = function(options, axisOrderOpt) {
     options = options || {};
     if (typeof options == 'number') {

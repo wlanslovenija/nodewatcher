@@ -1,4 +1,8 @@
-//Author: https://github.com/jaz303
+/* Author of tipsy: https://github.com/jaz303
+   tipsy repository: https://github.com/jaz303/tipsy
+   modified by: https://bl.ocks.org/ilyabo
+   copied from: http://bl.ocks.org/ilyabo/1373263
+*/
 (function($) {
 
     function maybeCall(thing, ctx) {
