@@ -168,42 +168,44 @@ window.DrawCidr = class DrawCidr {
         this.svg.append('rect').attr('x', x).attr('y', y).attr('height', shape_size).attr('width', shape_size).style('fill', this.rgbToHex(times * 8, times * 8, times * 8)).style('opacity', 0.3).attr('id', subnet).attr('n', subnet_ips).attr('d', description);
     }
 
-    loadPrefix(i, url){
-            var self = this;
-            $.getJSON(url, function(data) {
-                if(data.next != null){
-                    self.loadPrefix(i, data.next);
-                    if(self.data[i] == undefined){
-                        self.data[i] = data.results;
-                    }else{
-                        self.data[i].concat(data.results);
-                    }
-                    for (var j = 0; j < data.results.length; j++) {
-                        self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
-                    }
-                }else{
-                    self.loadedPrefixes++;
-                    if(self.data[i] == undefined){
-                        self.data[i] = data.results;
-                    }else{
-                        self.data[i].concat(data.results);
-                    }
-                    for (var j = 0; j < data.results.length; j++) {
-                        self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
-                    }
-                    if (self.loadedPrefixes == 32) {
-                        jQuery('rect').tipsy({
-                            gravity: 'w',
-                            html: true,
-                            title: function() {
-                                return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
-                            }
-                        });
-                        self.setTopNodes(self.calcTopNodes(self.data));
-                    }
+    loadPrefix(i, url) {
+        var self = this;
+        $.getJSON(url, function(data) {
+            if(data.next != null){
+                self.loadPrefix(i, data.next);
+                if(self.data[i] == undefined){
+                    self.data[i] = data.results;
                 }
+                else{
+                    self.data[i].concat(data.results);
+                }
+                for (var j = 0; j < data.results.length; j++) {
+                    self.draw(data.results[j].network + '/' + data.results[j].prefix_length, data.results[j].description);
+                }
+            }
+            else{
+                self.loadedPrefixes++;
+                if(self.data[i] == undefined){
+                    self.data[i] = data.results;
+                }else{
+                    self.data[i].concat(data.results);
+                }
+                for (var j = 0; j < data.results.length; j++) {
+                    self.draw(data.results[j].network + '/' + data.results[j].prefix_length, data.results[j].description);
+                }
+                if (self.loadedPrefixes == 32) {
+                    jQuery('rect').tipsy({
+                        gravity: 'w',
+                        html: true,
+                        title: function() {
+                            return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
+                        }
+                    });
+                    self.setTopNodes(self.calcTopNodes(self.data));
+                }
+            }
 
-            });
+        });
     }
 
     load() {
@@ -260,13 +262,12 @@ window.DrawCidr = class DrawCidr {
         var max_x = self.getMaxOfArray(xs);
         var max_y = self.getMaxOfArray(ys);
 
-
         var start_num = xy2d(min_x, min_y);
         var stop_num = xy2d(max_x, max_y);
 
         var ips_needed = stop_num - start_num;
         var mask = 0;
-        while(Math.pow(2, mask) < ips_needed){
+        while( Math.pow(2, mask) < ips_needed){
             mask++;
         }
         mask = 32-mask;
