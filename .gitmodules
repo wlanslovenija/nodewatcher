@@ -5,4 +5,4 @@
 [submodule "libs/hilbert-js"]
 	path = libs/hilbert-js
 	url = https://github.com/wlanslovenija/hilbert-js
-    branch = wlanslovenija
+	branch = wlanslovenija
