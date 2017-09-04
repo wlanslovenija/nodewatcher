@@ -1,7 +1,7 @@
 window.DrawCidr = class DrawCidr {
     constructor(svg, size, subnet) {
         this.svg = svg;
-
+        this.loadedPrefixes = 0;
         svg.call(d3.zoom().on('zoom', function() {
             svg.attr('transform', d3.event.transform)
         })).append('g');
@@ -21,7 +21,7 @@ window.DrawCidr = class DrawCidr {
         this.ips_pixel = this.ips_side / this.size;
         this.offset = this.ip2num(this.subnet.split("/")[0]);
         this.draw(subnet);
-        this.data = new Array();
+        this.data = new Array(33);
     }
 
     closestPower(number) {
@@ -168,25 +168,48 @@ window.DrawCidr = class DrawCidr {
         this.svg.append('rect').attr('x', x).attr('y', y).attr('height', shape_size).attr('width', shape_size).style('fill', this.rgbToHex(times * 8, times * 8, times * 8)).style('opacity', 0.3).attr('id', subnet).attr('n', subnet_ips).attr('d', description);
     }
 
-    load() {
-        var self = this;
-        for (var i = 0; i < 33; i++) {
-            $.getJSON('api/v2/pool/ip/?format=json&prefix_length=' + i, function(data) {
-                for (var j = 0; j < data.results.length; j++) {
-                    self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
+    loadPrefix(i, url){
+            var self = this;
+            $.getJSON(url, function(data) {
+                if(data.next != null){
+                    self.loadPrefix(i, data.next);
+                    if(self.data[i] == undefined){
+                        self.data[i] = data.results;
+                    }else{
+                        self.data[i].concat(data.results);
+                    }
+                    for (var j = 0; j < data.results.length; j++) {
+                        self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
+                    }
+                }else{
+                    self.loadedPrefixes++;
+                    console.log(self.loadedPrefixes);
+                    if(self.data[i] == undefined){
+                        self.data[i] = data.results;
+                    }else{
+                        self.data[i].concat(data.results);
+                    }
+                    for (var j = 0; j < data.results.length; j++) {
+                        self.draw(data.results[j].network + "/" + data.results[j].prefix_length, data.results[j].description);
+                    }
+                    if (self.loadedPrefixes == 32) {
+                        jQuery('rect').tipsy({
+                            gravity: 'w',
+                            html: true,
+                            title: function() {
+                                return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
+                            }
+                        });
+                        self.setTopNodes(self.calcTopNodes(self.data));
+                    }
                 }
-                self.data.push(data);
-                if (self.data.length == 33) {
-                    jQuery('rect').tipsy({
-                        gravity: 'w',
-                        html: true,
-                        title: function() {
-                            return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
-                        }
-                    });
-                    self.setTopNodes(self.calcTopNodes(self.data));
-                }
+
             });
+    }
+
+    load() {
+        for (var i = 0; i < 33; i++) {
+            this.loadPrefix(i, 'api/v2/pool/ip/?format=json&prefix_length=' + i);
         }
     }
 
@@ -200,11 +223,11 @@ window.DrawCidr = class DrawCidr {
        return [range[0]-this.offset, range[1]-this.offset];
     }
 
-    calcTopNodes(data) {
+    calcTopNodes() {
         var res = new Array();
-        for (var i = 0; i < data.length; i++) {
-            for (var j = 0; j < data[i].results.length; j++) {
-                var node = data[i].results[j];
+        for (var i = 0; i < this.data.length; i++) {
+            for (var j = 0; j < this.data[i].length; j++) {
+                var node = this.data[i][j];
                 if (node['@id'] == node.top_level['@id']) {
                     res.push(node);
                 }
