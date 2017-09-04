@@ -208,7 +208,7 @@ window.DrawCidr = class DrawCidr {
 
     load() {
         for (var i = 0; i < 33; i++) {
-            this.loadPrefix(i, 'http://nodes.wlan-si.net/api/v2/pool/ip/?format=json&prefix_length=' + i);
+            this.loadPrefix(i, 'api/v2/pool/ip/?format=json&prefix_length=' + i);
         }
     }
 
