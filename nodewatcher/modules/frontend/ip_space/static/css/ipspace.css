@@ -25,3 +25,7 @@
     width: 100%;
     transform-origin: top left;
 }
+
+body{
+    overflow: hidden;
+}
