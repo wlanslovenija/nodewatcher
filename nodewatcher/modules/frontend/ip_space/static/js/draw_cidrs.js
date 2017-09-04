@@ -183,7 +183,6 @@ window.DrawCidr = class DrawCidr {
                     }
                 }else{
                     self.loadedPrefixes++;
-                    console.log(self.loadedPrefixes);
                     if(self.data[i] == undefined){
                         self.data[i] = data.results;
                     }else{
@@ -209,7 +208,7 @@ window.DrawCidr = class DrawCidr {
 
     load() {
         for (var i = 0; i < 33; i++) {
-            this.loadPrefix(i, 'api/v2/pool/ip/?format=json&prefix_length=' + i);
+            this.loadPrefix(i, 'http://nodes.wlan-si.net/api/v2/pool/ip/?format=json&prefix_length=' + i);
         }
     }
 
