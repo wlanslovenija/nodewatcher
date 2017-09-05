@@ -1,5 +1,5 @@
 window.DrawCidr = class DrawCidr {
-    constructor(svg, size, subnet) {
+    constructor(svg, size, subnet, url) {
         this.svg = svg;
         this.loadedPrefixes = 0;
 
@@ -19,7 +19,7 @@ window.DrawCidr = class DrawCidr {
         this.offset = 0;
         this.draw(subnet, "Smallest possible network to fit all the ip pools");
         this.data = new Array(33);
-
+        this.base_url = url;
         self = this;
         $('#topnodes').on('click', '#cidr', function(event) {
             var scale = self.size / self.subnetSize($(event.target).parent().attr('cidr'));
@@ -228,7 +228,7 @@ window.DrawCidr = class DrawCidr {
 
     load() {
         for (var i = 0; i < 33; i++) {
-            this.loadPrefix(i, '/api/v2/pool/ip/?prefix_length=' + i);
+            this.loadPrefix(i, this.base_url + '?prefix_length=' + i);
         }
     }
 
