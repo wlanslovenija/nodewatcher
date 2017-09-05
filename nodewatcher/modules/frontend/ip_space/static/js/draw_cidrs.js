@@ -173,8 +173,6 @@ window.DrawCidr = class DrawCidr {
         var x = start_xy.x / this.ips_pixel;
         var y = start_xy.y / this.ips_pixel;
 
-        console.log(subnet, start_xy, x, y);
-
         this.svg.append('rect').attr('x', x).attr('y', y).attr('height', shape_size).attr('width', shape_size).style('fill', this.rgbToHex(times * 8, times * 8, times * 8)).style('opacity', 0.3).attr('id', subnet).attr('n', subnet_ips).attr('d', description);
     }
 
