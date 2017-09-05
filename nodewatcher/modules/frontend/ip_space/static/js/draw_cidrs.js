@@ -2,9 +2,6 @@ window.DrawCidr = class DrawCidr {
     constructor(svg, size, subnet) {
         this.svg = svg;
         this.loadedPrefixes = 0;
-        svg.call(d3.zoom().on('zoom', function() {
-            svg.attr('transform', d3.event.transform)
-        })).append('g');
 
         this.n_ips = Math.pow(2, 32 - parseInt(subnet.split("/")[1]));
         this.size = Math.sqrt(this.n_ips);
@@ -18,10 +15,19 @@ window.DrawCidr = class DrawCidr {
 
         this.subnet = String(subnet);
         this.ips_side = Math.sqrt(this.n_ips);
-        this.ips_pixel = this.ips_side / this.size;
-        this.offset = this.ip2num(this.subnet.split("/")[0]);
-        this.draw(subnet);
+        this.ips_pixel = this.ips_side / (this.size * 1.0);
+        this.offset = 0;
+        this.draw(subnet, "Smallest possible network to fit all the ip pools");
         this.data = new Array(33);
+
+        self = this;
+        $('#topnodes').on('click', '#cidr', function(event) {
+            var scale = self.size / self.subnetSize($(event.target).parent().attr('cidr'));
+            var start = self.subnetXY($(event.target).parent().attr('cidr'));
+            history.replaceState({}, document.title, self.UpdateQueryString('scale', scale, window.url));
+            history.replaceState({}, document.title, self.UpdateQueryString('start', start, window.url));
+            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
+        });
     }
 
     closestPower(number) {
@@ -52,9 +58,8 @@ window.DrawCidr = class DrawCidr {
 
     subnetXY(subnet) {
         var subnet_str = String(subnet);
-        var start_num = this.ip2num(subnet_str.split("/")[0]) - this.offset;
+        var start_num = this.ip2num(subnet_str.split("/")[0]);
         var start_xy = d2xy(start_num);
-
         var x = start_xy.x / this.ips_pixel;
         var y = start_xy.y / this.ips_pixel;
         return [x, y];
@@ -124,13 +129,16 @@ window.DrawCidr = class DrawCidr {
     }
 
     UpdateQueryString(key, value, url) {
-        if (!url) url = window.location.href;
-        var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+        if (!url){
+            url = window.location.href;
+        }
+        var re = new RegExp('([?&])' + key + '=.*?(&|#|$)(.*)', 'gi'),
             hash;
 
         if (re.test(url)) {
-            if (typeof value !== 'undefined' && value !== null)
-                return url.replace(re, '$1' + key + "=" + value + '$2$3');
+            if (typeof value !== 'undefined' && value !== null){
+                return url.replace(re, '$1' + key + '=' + value + '$2$3');
+            }
             else {
                 hash = url.split('#');
                 url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
@@ -158,12 +166,14 @@ window.DrawCidr = class DrawCidr {
         var subnet_ips = Math.pow(2, times);
         var shape_size = Math.sqrt(subnet_ips) / this.ips_pixel;
 
-        var start_num = this.ip2num(subnet.split('/')[0]) - this.offset;
+        var start_num = this.ip2num(subnet.split('/')[0]);
 
         var start_xy = d2xy(start_num);
 
         var x = start_xy.x / this.ips_pixel;
         var y = start_xy.y / this.ips_pixel;
+
+        console.log(subnet, start_xy, x, y);
 
         this.svg.append('rect').attr('x', x).attr('y', y).attr('height', shape_size).attr('width', shape_size).style('fill', this.rgbToHex(times * 8, times * 8, times * 8)).style('opacity', 0.3).attr('id', subnet).attr('n', subnet_ips).attr('d', description);
     }
@@ -173,21 +183,22 @@ window.DrawCidr = class DrawCidr {
         $.getJSON(url, function(data) {
             if(data.next != null){
                 self.loadPrefix(i, data.next);
-                if(self.data[i] == undefined){
+                if (self.data[i] == undefined) {
                     self.data[i] = data.results;
                 }
-                else{
+                else {
                     self.data[i].concat(data.results);
                 }
                 for (var j = 0; j < data.results.length; j++) {
                     self.draw(data.results[j].network + '/' + data.results[j].prefix_length, data.results[j].description);
                 }
             }
-            else{
+            else {
                 self.loadedPrefixes++;
-                if(self.data[i] == undefined){
+                if (self.data[i] == undefined) {
                     self.data[i] = data.results;
-                }else{
+                }
+                else {
                     self.data[i].concat(data.results);
                 }
                 for (var j = 0; j < data.results.length; j++) {
@@ -197,11 +208,20 @@ window.DrawCidr = class DrawCidr {
                     jQuery('rect').tipsy({
                         gravity: 'w',
                         html: true,
-                        title: function() {
+                        title: function () {
                             return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
                         }
                     });
-                    self.setTopNodes(self.calcTopNodes(self.data));
+                    var scale = self.get_url_param('scale');
+                    var start = String(self.get_url_param('start')).split(',');
+                    if (scale && start) {
+                        self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
+                    }
+                    else {
+                        var scale = self.size / self.subnetSize(self.subnet);
+                        var start = self.subnetXY(self.subnet);
+                        self.svg.selectAll('rect').attr('transform', 'translate(' + (start[0] * -1 * scale - scale/2) + ',' + (start[1] * -1 * scale - scale/2) + ') scale(' + scale + ')');
+                    }
                 }
             }
 
@@ -210,7 +230,7 @@ window.DrawCidr = class DrawCidr {
 
     load() {
         for (var i = 0; i < 33; i++) {
-            this.loadPrefix(i, 'api/v2/pool/ip/?format=json&prefix_length=' + i);
+            this.loadPrefix(i, '/api/v2/pool/ip/?prefix_length=' + i);
         }
     }
 
@@ -243,56 +263,5 @@ window.DrawCidr = class DrawCidr {
 
     getMinOfArray(numArray) {
       return Math.min.apply(null, numArray);
-    }
-
-    setTopNodes(data) {
-        var self = this;
-        var xs = [];
-        var ys = [];
-        data.forEach(function(node) {
-            xs.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[0]).x);
-            ys.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[0]).y);
-            xs.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[1]).x);
-            ys.push(d2xy(self.cidrToRange(node.network + '/' + node.prefix_length)[1]).y);
-        });
-
-        var min_x = self.getMinOfArray(xs);
-        var min_y = self.getMinOfArray(ys);
-
-        var max_x = self.getMaxOfArray(xs);
-        var max_y = self.getMaxOfArray(ys);
-
-        var start_num = xy2d(min_x, min_y);
-        var stop_num = xy2d(max_x, max_y);
-
-        var ips_needed = stop_num - start_num;
-        var mask = 0;
-        while( Math.pow(2, mask) < ips_needed){
-            mask++;
-        }
-        mask = 32-mask;
-        var start_ip = this.num2ip(this.offset + start_num);
-
-        $('#topnodes').html('<li id="cidr" cidr="10.0.0.0/8"><a>10.0.0.0/8 (Zoom out)</a></li>');
-        $('#topnodes').append('<li id="cidr" cidr="'+start_ip+'/'+mask+'"><a>'+start_ip+'/'+mask+'(Zoom to fit)</a></li>');
-        data.forEach(function(node) {
-            $('#topnodes').append('<li id="cidr" cidr="' + node.network + '/' + node.prefix_length + '"><a>' + node.network + '/' + node.prefix_length + ' (' + node.description + ')' + '</a></li>');
-        });
-
-        $('#topnodes').on('click', '#cidr', function(event) {
-            var scale = self.size / self.subnetSize($(event.target).parent().attr('cidr'));
-            var start = self.subnetXY($(event.target).parent().attr('cidr'));
-            history.replaceState({}, document.title, self.UpdateQueryString('scale', scale, window.url));
-            history.replaceState({}, document.title, self.UpdateQueryString('start', start, window.url));
-            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
-        });
-
-        var scale = this.get_url_param('scale');
-        var start = String(this.get_url_param('start')).split(',');
-        if(scale && start) {
-            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
-        }else{
-            $('#topnodes > a').eq(2).trigger();
-        }
     }
 }

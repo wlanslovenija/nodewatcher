@@ -19,9 +19,13 @@
     <div class="row">
         <div class="col-md-2">
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{% trans "Zoom to subnet" %}<span class="caret"></span></button>
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{% trans "Zoom to top-level" %}<span class="caret"></span></button>
                 <ul class="dropdown-menu" id="topnodes">
-                    <li id="cidr" value="10.0.0.0/8">{% trans "Loading data" %}</li>
+                    {% for pool in pools %}
+                        {% if pool.id == pool.top_level.id %}
+                            <li id="cidr" cidr="{{ pool.network }}/{{ pool.prefix_length }}"><a>{{ pool.network }}/{{ pool.prefix_length }} ({{ pool.description }})</a></li>
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
         </div>
