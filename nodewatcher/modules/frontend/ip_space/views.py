@@ -1,6 +1,7 @@
 from django.views import generic
 from nodewatcher.core.allocation.ip.models import IpPool
 
+
 class IpSpace(generic.TemplateView):
     template_name = 'network/ip_space/ip_space.html'
 
