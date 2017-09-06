@@ -83,7 +83,6 @@ $(document).ready(function() {
     var min_subnet = start_ip + '/' + mask;
     $('#topnodes').prepend('<li id="cidr" cidr="' + min_subnet + '"><a>' + min_subnet + ' (Zoom to fit)</a></li>');
     var api_url = $('#api_url').data('url');
-    console.log(api_url);
     var cidr = new DrawCidr(svgContainer, size, min_subnet, api_url);
     cidr.load();
 });
