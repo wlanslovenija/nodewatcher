@@ -529,8 +529,8 @@ class DeviceBase(object):
     radios = None
     switches = None
     usb = False
-    usb = 'USB_2'
-    usb = 'USB_3'
+    usb = USB_2
+    usb = USB_3
     USB_2 = 'usb-2'
     USB_3 = 'usb-3'
 
