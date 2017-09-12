@@ -21,14 +21,6 @@ function num2ip(num) {
     return d;
 }
 
-function getMaxOfArray(numArray) {
-      return Math.max.apply(null, numArray);
-}
-
-function getMinOfArray(numArray) {
-      return Math.min.apply(null, numArray);
-}
-
 function subnetSize(subnet) {
     var subnet_str = String(subnet);
     var times = 32 - parseInt(subnet_str.split("/")[1]);
@@ -39,7 +31,7 @@ function subnetSize(subnet) {
     return shape_size;
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     var svgContainer = d3.select('#ipspace');
     var size = svgContainer.node().getBoundingClientRect().width;
     svgContainer.style('height', size + 'px');
@@ -50,7 +42,7 @@ $(document).ready(function() {
     var min_y = 65536;
     var last_size = 0;
 
-    $('#topnodes > li').each(function(data) {
+    $('#topnodes > li').each(function (data) {
         if (d2xy(ip2num(cidrToRange($(this).attr('cidr'))[0])).x > max_x) {
             max_x = d2xy(ip2num(cidrToRange($(this).attr('cidr'))[0])).x;
             last_size = subnetSize($(this).attr('cidr'));

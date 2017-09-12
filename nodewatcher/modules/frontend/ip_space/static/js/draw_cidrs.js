@@ -112,11 +112,11 @@ window.DrawCidr = class DrawCidr {
         return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
     }
 
-    get_url_param(sParam) {
-        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
+    getUrlParam(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1));
+        var sURLVariables = sPageURL.split('&');
+        var sParameterName;
+        var i;
 
         for (i = 0; i < sURLVariables.length; i++) {
             sParameterName = sURLVariables[i].split('=');
@@ -129,21 +129,22 @@ window.DrawCidr = class DrawCidr {
     }
 
     UpdateQueryString(key, value, url) {
-        if (!url){
+        if (!url) {
             url = window.location.href;
         }
         var re = new RegExp('([?&])' + key + '=.*?(&|#|$)(.*)', 'gi'),
             hash;
 
         if (re.test(url)) {
-            if (typeof value !== 'undefined' && value !== null){
+            if (typeof value !== 'undefined' && value !== null) {
                 return url.replace(re, '$1' + key + '=' + value + '$2$3');
             }
             else {
                 hash = url.split('#');
                 url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
-                if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
                     url += '#' + hash[1];
+                }
                 return url;
             }
         }
@@ -152,12 +153,14 @@ window.DrawCidr = class DrawCidr {
                 var separator = url.indexOf('?') !== -1 ? '&' : '?';
                 hash = url.split('#');
                 url = hash[0] + separator + key + '=' + value;
-                if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
                     url += '#' + hash[1];
+                }
                 return url;
             }
-            else
+            else {
                 return url;
+            }
         }
     }
 
@@ -178,10 +181,10 @@ window.DrawCidr = class DrawCidr {
 
     loadPrefix(i, url) {
         var self = this;
-        $.getJSON(url, function(data) {
-            if(data.next != null){
+        $.getJSON( url, function(data) {
+            if (data.next !== null) {
                 self.loadPrefix(i, data.next);
-                if (self.data[i] == undefined) {
+                if (self.data[i] === undefined) {
                     self.data[i] = data.results;
                 }
                 else {
@@ -210,8 +213,8 @@ window.DrawCidr = class DrawCidr {
                             return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
                         }
                     });
-                    var scale = self.get_url_param('scale');
-                    var start = String(self.get_url_param('start')).split(',');
+                    var scale = self.getUrlParam('scale');
+                    var start = String(self.getUrlParam('start')).split(',');
                     if (scale && start) {
                         self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
                     }
