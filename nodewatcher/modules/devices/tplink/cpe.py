@@ -3,13 +3,13 @@ from django.utils.translation import ugettext_lazy as _
 from nodewatcher.core.generator.cgm import base as cgm_base, protocols as cgm_protocols, devices as cgm_devices
 
 
-class TPLinkCPE210(cgm_devices.DeviceBase):
+class TPLinkCPE210v1(cgm_devices.DeviceBase):
     """
-    TP-Link CPE210 device descriptor.
+    TP-Link CPE210 v1 device descriptor.
     """
 
-    identifier = 'tp-cpe210'
-    name = "CPE210"
+    identifier = 'tp-cpe210-v1'
+    name = "CPE210 (v1)"
     manufacturer = "TP-Link"
     url = 'http://www.tp-link.com/'
     architecture = 'ar71xx'
@@ -90,22 +90,22 @@ class TPLinkCPE210(cgm_devices.DeviceBase):
     }
 
 
-class TPLinkCPE220(TPLinkCPE210):
+class TPLinkCPE220v1(TPLinkCPE210v1):
     """
-    TP-Link CPE210 device descriptor.
-    """
-
-    identifier = 'tp-cpe220'
-    name = "CPE220"
-
-
-class TPLinkCPE510(TPLinkCPE210):
-    """
-    TP-Link CPE510 device descriptor.
+    TP-Link CPE220 v1 device descriptor.
     """
 
-    identifier = 'tp-cpe510'
-    name = "CPE510"
+    identifier = 'tp-cpe220-v1'
+    name = "CPE220 (v1)"
+
+
+class TPLinkCPE510v1(TPLinkCPE210v1):
+    """
+    TP-Link CPE510 v1 device descriptor.
+    """
+
+    identifier = 'tp-cpe510-v1'
+    name = "CPE510 (v1)"
     radios = [
         cgm_devices.IntegratedRadio('wifi0', _("Integrated wireless radio"), [
             cgm_protocols.IEEE80211AN(
@@ -131,16 +131,16 @@ class TPLinkCPE510(TPLinkCPE210):
     }
 
 
-class TPLinkCPE520(TPLinkCPE510):
+class TPLinkCPE520v1(TPLinkCPE510v1):
     """
-    TP-Link CPE520 device descriptor.
+    TP-Link CPE520 v1 device descriptor.
     """
 
-    identifier = 'tp-cpe520'
-    name = "CPE520"
+    identifier = 'tp-cpe520-v1'
+    name = "CPE520 (v1)"
 
 # Register the TP-Link CPE devices.
-cgm_base.register_device('openwrt', TPLinkCPE210)
-cgm_base.register_device('openwrt', TPLinkCPE220)
-cgm_base.register_device('openwrt', TPLinkCPE510)
-cgm_base.register_device('openwrt', TPLinkCPE520)
+cgm_base.register_device('openwrt', TPLinkCPE210v1)
+cgm_base.register_device('openwrt', TPLinkCPE220v1)
+cgm_base.register_device('openwrt', TPLinkCPE510v1)
+cgm_base.register_device('openwrt', TPLinkCPE520v1)
