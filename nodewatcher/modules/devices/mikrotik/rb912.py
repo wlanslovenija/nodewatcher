@@ -32,6 +32,16 @@ class MikrotikRB912UAG_2HPnD(cgm_devices.DeviceBase):
     ports = [
         cgm_devices.EthernetPort('lan0', "Lan0")
     ]
+    antennas = [
+        # TODO: This information is probably not correct
+        cgm_devices.InternalAntenna(
+            identifier='a1',
+            polarization='horizontal',
+            angle_horizontal=360,
+            angle_vertical=75,
+            gain=2,
+        )
+    ]
     port_map = {
         'openwrt': {
             'wifi0': 'radio0',
