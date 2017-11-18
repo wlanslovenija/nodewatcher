@@ -79,7 +79,6 @@ class MikrotikRBmAP2nD(cgm_devices.DeviceBase):
             'name': 'rb-nor-flash-16M',
             'files': [
                 '*-ar71xx-mikrotik-rb-nor-flash-16M-squashfs-sysupgrade.bin',
-                '*-ar71xx-mikrotik-vmlinux-initramfs.elf',
             ]
         }
     }

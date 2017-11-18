@@ -58,7 +58,6 @@ class MikrotikRB912UAG_2HPnD(cgm_devices.DeviceBase):
             'name': 'nand-large',
             'files': [
                 '*-ar71xx-mikrotik-nand-large-squashfs-sysupgrade.bin',
-                '*-ar71xx-mikrotik-vmlinux-initramfs.elf',
             ]
         }
     }

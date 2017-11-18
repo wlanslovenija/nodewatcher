@@ -56,7 +56,6 @@ class MikrotikRBSXT5nDr2(cgm_devices.DeviceBase):
         'lede': {
             'name': 'nand-large',
             'files': [
-                '*-ar71xx-mikrotik-vmlinux-initramfs.elf',
                 '*-ar71xx-mikrotik-nand-large-squashfs-sysupgrade.bin'
             ],
         }
