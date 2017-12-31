@@ -1,8 +1,0 @@
-[submodule "libs/tipsy"]
-	path = libs/tipsy
-	url = https://github.com/wlanslovenija/tipsy
-	branch = wlanslovenija
-[submodule "libs/hilbert-js"]
-	path = libs/hilbert-js
-	url = https://github.com/wlanslovenija/hilbert-js
-	branch = wlanslovenija

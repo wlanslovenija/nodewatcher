@@ -3,36 +3,30 @@
 {% contextblock %}
     {% load i18n sekizai_tags html_tags url_tags partial_tags leaflet_tags %}
 
-    {% add_data "css_data" "css/ipspace.css" %}
-    {% add_data "css_data" "css/tipsy.css" %}
-    {% add_data "js_data" "js/d3.v4.js" %}
-    {% add_data "js_data" "js/point.js" %}
-    {% add_data "js_data" "js/hilbert2d.js" %}
-    {% add_data "js_data_end" "js/jquery.tipsy.js" %}
-    {% add_data "js_data_end" "js/draw_cidrs.js" %}
-    {% add_data "js_data_end" "js/Support.js" %}
-    {% add_data "js_data_end" "js/main.js" %}
-
+    {% add_data "css_data" "ip_space/css/ip_space.css" %}
+    {% add_data "js_data" "ip_space/js/d3.v4.js" %}
+    {% add_data "js_data" "ip_space/js/draw_pools.js" %}
+    {% add_data "js_data_end" "ip_space/js/main.js" %}
     {% trans "IP space" as title %}
 {% endcontextblock %}
 
 {% block content %}
-    <div class="row">
+    <div class="django import apirow">
         <div class="col-md-2">
             <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{% trans "Zoom to top-level" %}<span class="caret"></span></button>
                 <ul class="dropdown-menu" id="topnodes">
                     {% for pool in pools %}
                         {% if pool.id == pool.top_level.id %}
-                            <li id="cidr" cidr="{{ pool.network }}/{{ pool.prefix_length }}"><a>{{ pool.network }}/{{ pool.prefix_length }} ({{ pool.description }})</a></li>
+                            <li id="pool" pool="{{ pool.network }}/{{ pool.prefix_length }}"><a>{{ pool.network }}/{{ pool.prefix_length }} ({{ pool.description }})</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </div>
         </div>
         <div id="api_url" data-url="{% url "apiv2:ippool-list" %}"></div>
-        <div class="col-md-8" id="wraper">
-            <svg id="ipspace" class="ipspace"></svg>
+        <div class="col-md-8" id="wrapper">
+            <svg id="ip_space" class="ip_space"></svg>
         </div>
     </div>
 {% endblock %}
