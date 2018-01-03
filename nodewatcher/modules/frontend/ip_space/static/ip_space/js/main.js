@@ -1,47 +1,45 @@
-$(document).ready(function () {
-    //Create d3 object on #ipspace
-    var svgContainer = d3.select('#ipspace');
+var pools_url = $('#api_url').attr('data-url') + '?limit=1000';
+pools_url = 'https://nodes.wlan-si.net/api/v2/pool/ip/?limit=1000';
+var pools_array = [];
+window.topLevelPools = [];
+window.pools = {};
 
-    //Get bootstrap width and match it in height
-    var size = svgContainer.node().getBoundingClientRect().width;
-    svgContainer.style('height', size + 'px');
-
-    //Init vars
-    var max_x = 0;
-    var max_y = 0;
-    var min_x = 65536;
-    var min_y = 65536;
-    var last_size = 0;
-
-    //For each top level node check what is the min and the max and save it
-    $('#topnodes > li').each(function (data) {
-        var start_xy = d2xy(Support.ip2num(Support.cidrToRange($(this).attr('cidr'))[0]));
-        var size = Support.subnetSize($(this).attr('cidr'));
-        console.log(start_xy, size);
-
+/**
+ * Loads the results into an array until we get to the end of next url
+ * @param a array into which the data gets loaded
+ * @param url which to load
+*/
+function loadData(a, url) {
+    $.getJSON( url, function( data ) {
+        a = a.concat(data['results']);
+        if (data['next'] !== null) {
+            loadData(a, data['next']);
+        }
+        else{
+            buildTree(a);
+        }
     });
+}
 
-    //Convert min and max cords to number
-    var start_num = xy2d(min_x, min_y);
-    var stop_num = xy2d(max_x + last_size, max_y + last_size);
+/**
+ * Arranges the pools in the array into a tree
+ * @param a Array of pools
+ */
+function buildTree(a) {
+    //Map each pool to id
+    a.forEach(function (pool) {
+        pools[pool['@id']] = new Pool(pool['@id'], pool['network'], pool['prefix_length'], null, pool['description']);
+    });
+    //Add each pool to a parent pool
+    a.forEach(function (pool) {
+        if (pool['@id'] === pool['top_level']['@id']) {
+            pools[pool['@id']].isTopLevel = true;
+            topLevelPools.push(pools[pool['@id']]);
+        }else{
+            pools[pool['top_level']['@id']].addSubnet(pools[pool['@id']]);
+            pools[pool['@id']].parent = pools[pool['top_level']['@id']];
+        }
+    });
+}
 
-    //Calculate the smallest number to fit both min and max
-    var ips_needed = stop_num - start_num;
-    var mask = 0;
-    while (ips_needed > Math.pow(2, mask)) {
-        mask++;
-    }
-    mask = 32 - mask;
-
-    //Convert starting number to ip
-    var start_ip = Support.num2ip(start_num);
-    var min_subnet = start_ip + '/' + mask;
-
-    //Add zoom to fit to list of subnets
-    $('#topnodes').prepend('<li id="cidr" cidr="' + min_subnet + '"><a>' + min_subnet + ' (Zoom to fit)</a></li>');
-    var api_url = $('#api_url').data('url');
-
-    //Init drawing object and load all the ip pools
-    var cidr = new DrawCidr(svgContainer, size, min_subnet, api_url);
-    cidr.load();
-});
+loadData(pools_array, pools_url);

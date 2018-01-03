@@ -1,268 +1,120 @@
-window.DrawCidr = class DrawCidr {
-    constructor(svg, size, subnet, url) {
-        this.svg = svg;
-        this.loadedPrefixes = 0;
+utilization
+functutilization, y) {
+    this.x = x;
+    this.y = y;
+}
 
-        this.n_ips = Math.pow(2, 32 - parseInt(subnet.split("/")[1]));
-        this.size = Math.sqrt(this.n_ips);
-        this.displaySize = this.closestPower(size);
+Point.prototype = {
+  rotate: function (n, x, y) {
+      if (y === 0) {
+          if (x === 1) {
+              this.x = n-1 - this.x;
+              this.y = n-1 - this.y;
+          }
 
-        $('#ipspace').css('transform', 'scale(' + this.displaySize / this.size + ')');
-        $('#wraper').width($('#ipspace').width() + 'px');
-        $('#wraper').height($('#ipspace').height() + 'px');
+          this.x = [this.x, this.y = this.x][0];
+      }
+  }
+};
 
-        this.svg.style('width', this.size + 'px').style('height', this.size + 'px');
+/**
+ * Maps a number to a x,y and returns the point
+ * @param d The number to be mapped
+ * @param n The maximum number of d (by default 2**32)
+ * @returns {Point} A point to which d was mapped
+ */
+function d2xy(d, n=2**32) {
+    var p = new Point(0, 0);
+    var rx = 0;
+    var ry = 0;
+    var t=d;
 
-        this.subnet = String(subnet);
-        this.ips_side = Math.sqrt(this.n_ips);
-        this.ips_pixel = this.ips_side / (this.size * 1.0);
-        this.offset = 0;
-        this.draw(subnet, "Smallest possible network to fit all the ip pools");
-        this.data = new Array(33);
-        this.base_url = url;
-        self = this;
-        $('#topnodes').on('click', '#cidr', function(event) {
-            var scale = self.size / self.subnetSize($(event.target).parent().attr('cidr'));
-            var start = self.subnetXY($(event.target).parent().attr('cidr'));
-            history.replaceState({}, document.title, self.UpdateQueryString('scale', scale, window.url));
-            history.replaceState({}, document.title, self.UpdateQueryString('start', start, window.url));
-            self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
-        });
+    for (var s=1; s<n; s*=2) {
+        rx = 1 & (t/2);
+        ry = 1 & (t ^ rx);
+        p.rotate(s, rx, ry);
+        p.x += s * rx;
+        p.y += s * ry;
+        t /= 4;
     }
+    return p;
+}
 
-    closestPower(number) {
-        return 2 ** Math.floor(Math.log2(number));
-    }
-
-    ip2num(ip) {
-        var d = String(ip).split('.');
-        return ((((((+d[0]) * 256) + (+d[1])) * 256) + (+d[2])) * 256) + (+d[3]);
-    }
-
-    num2ip(num) {
-        var d = num % 256;
-        for (var i = 3; i > 0; i--) {
-            num = Math.floor(num / 256);
-            d = num % 256 + '.' + d;
+/**
+ * Maps a 2D point to a matching 1D number
+ * @param p Point to be mapped
+ * @param n Maximum value of 1D (by default 2**32)
+ * @returns {number} The 1D mapped from a 2D point
+ */
+function xy2d(p, n=2**32){
+        var rx;
+        var ry;
+        var d=0;
+        for (var s=n/2; s>0; s/=2) {
+            rx = (p.x & s) > 0;
+            ry = (p.y & s) > 0;
+            d += s * s * ((3 * rx) ^ ry);
+            p.rotate(s, rx, ry);
         }
         return d;
-    }
-
-    subnetSize(subnet) {
-        var subnet_str = String(subnet);
-        var times = 32 - parseInt(subnet_str.split("/")[1]);
-        var subnet_ips = Math.pow(2, times);
-        var shape_size = Math.sqrt(subnet_ips) / this.ips_pixel;
-        return shape_size;
-    }
-
-    subnetXY(subnet) {
-        var subnet_str = String(subnet);
-        var start_num = this.ip2num(subnet_str.split("/")[0]);
-        var start_xy = d2xy(start_num);
-        var x = start_xy.x / this.ips_pixel;
-        var y = start_xy.y / this.ips_pixel;
-        return [x, y];
-    }
-
-    HSVtoRGB(h, s, v) {
-        var r, g, b, i, f, p, q, t;
-        if (arguments.length === 1) {
-            s = h.s, v = h.v, h = h.h;
-        }
-        i = Math.floor(h * 6);
-        f = h * 6 - i;
-        p = v * (1 - s);
-        q = v * (1 - f * s);
-        t = v * (1 - (1 - f) * s);
-        switch (i % 6) {
-            case 0:
-                r = v, g = t, b = p;
-                break;
-            case 1:
-                r = q, g = v, b = p;
-                break;
-            case 2:
-                r = p, g = v, b = t;
-                break;
-            case 3:
-                r = p, g = q, b = v;
-                break;
-            case 4:
-                r = t, g = p, b = v;
-                break;
-            case 5:
-                r = v, g = p, b = q;
-                break;
-        }
-
-        return {
-            r: Math.round(r * 255),
-            g: Math.round(g * 255),
-            b: Math.round(b * 255)
-        };
-    }
-
-    componentToHex(c) {
-        var hex = c.toString(16);
-        return hex.length == 1 ? '0' + hex : hex;
-    }
-
-    rgbToHex(r, g, b) {
-        return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
-    }
-
-    getUrlParam(sParam) {
-        var sPageURL = decodeURIComponent(window.location.search.substring(1));
-        var sURLVariables = sPageURL.split('&');
-        var sParameterName;
-        var i;
-
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : sParameterName[1];
-            }
-        }
-        return false;
-    }
-
-    UpdateQueryString(key, value, url) {
-        if (!url) {
-            url = window.location.href;
-        }
-        var re = new RegExp('([?&])' + key + '=.*?(&|#|$)(.*)', 'gi'),
-            hash;
-
-        if (re.test(url)) {
-            if (typeof value !== 'undefined' && value !== null) {
-                return url.replace(re, '$1' + key + '=' + value + '$2$3');
-            }
-            else {
-                hash = url.split('#');
-                url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
-                if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
-                    url += '#' + hash[1];
-                }
-                return url;
-            }
-        }
-        else {
-            if (typeof value !== 'undefined' && value !== null) {
-                var separator = url.indexOf('?') !== -1 ? '&' : '?';
-                hash = url.split('#');
-                url = hash[0] + separator + key + '=' + value;
-                if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
-                    url += '#' + hash[1];
-                }
-                return url;
-            }
-            else {
-                return url;
-            }
-        }
-    }
-
-    draw(subnet, description) {
-        var times = 32 - parseInt(subnet.split('/')[1]);
-        var subnet_ips = Math.pow(2, times);
-        var shape_size = Math.sqrt(subnet_ips) / this.ips_pixel;
-
-        var start_num = this.ip2num(subnet.split('/')[0]);
-
-        var start_xy = d2xy(start_num);
-
-        var x = start_xy.x / this.ips_pixel;
-        var y = start_xy.y / this.ips_pixel;
-
-        this.svg.append('rect').attr('x', x).attr('y', y).attr('height', shape_size).attr('width', shape_size).style('fill', this.rgbToHex(times * 8, times * 8, times * 8)).style('opacity', 0.3).attr('id', subnet).attr('n', subnet_ips).attr('d', description);
-    }
-
-    loadPrefix(i, url) {
-        var self = this;
-        $.getJSON( url, function(data) {
-            if (data.next !== null) {
-                self.loadPrefix(i, data.next);
-                if (self.data[i] === undefined) {
-                    self.data[i] = data.results;
-                }
-                else {
-                    self.data[i].concat(data.results);
-                }
-                for (var j = 0; j < data.results.length; j++) {
-                    self.draw(data.results[j].network + '/' + data.results[j].prefix_length, data.results[j].description);
-                }
-            }
-            else {
-                self.loadedPrefixes++;
-                if (self.data[i] == undefined) {
-                    self.data[i] = data.results;
-                }
-                else {
-                    self.data[i].concat(data.results);
-                }
-                for (var j = 0; j < data.results.length; j++) {
-                    self.draw(data.results[j].network + '/' + data.results[j].prefix_length, data.results[j].description);
-                }
-                if (self.loadedPrefixes == 32) {
-                    jQuery('rect').tipsy({
-                        gravity: 'w',
-                        html: true,
-                        title: function () {
-                            return this.id + '<br>Number of hosts: ' + $(this).attr('n') + '<br>Network name: ' + $(this).attr('d');
-                        }
-                    });
-                    var scale = self.getUrlParam('scale');
-                    var start = String(self.getUrlParam('start')).split(',');
-                    if (scale && start) {
-                        self.svg.selectAll('rect').attr('transform', 'translate(' + start[0] * -1 * scale + ',' + start[1] * -1 * scale + ') scale(' + scale + ')');
-                    }
-                    else {
-                        var scale = self.size / self.subnetSize(self.subnet);
-                        var start = self.subnetXY(self.subnet);
-                        self.svg.selectAll('rect').attr('transform', 'translate(' + (start[0] * -1 * scale - scale/2) + ',' + (start[1] * -1 * scale - scale/2) + ') scale(' + scale + ')');
-                    }
-                }
-            }
-
-        });
-    }
-
-    load() {
-        for (var i = 0; i < 33; i++) {
-            this.loadPrefix(i, this.base_url + '?prefix_length=' + i);
-        }
-    }
-
-    cidrToRange(cidr) {
-       var range = [2];
-       cidr = cidr.split('/');
-       var cidr_1 = parseInt(cidr[1])
-       range[0] = (this.ip2num(cidr[0])) & ((-1 << (32 - cidr_1)));
-       var start = this.ip2num(range[0])
-       range[1] = range[0] + Math.pow(2, (32 - cidr_1)) - 1;
-       return [range[0]-this.offset, range[1]-this.offset];
-    }
-
-    calcTopNodes() {
-        var res = new Array();
-        for (var i = 0; i < this.data.length; i++) {
-            for (var j = 0; j < this.data[i].length; j++) {
-                var node = this.data[i][j];
-                if (node['@id'] == node.top_level['@id']) {
-                    res.push(node);
-                }
-            }
-        }
-        return res;
-    }
-
-    getMaxOfArray(numArray) {
-      return Math.max.apply(null, numArray);
-    }
-
-    getMinOfArray(numArray) {
-      return Math.min.apply(null, numArray);
-    }
 }
+
+/**
+ * Maps a dot notation of IP to a number
+ * @param ip Ip dotted notation
+ * @returns {number} The number that matches the notation
+ */
+function ip2num(ip){
+    ip = ip.split(".");
+    return parseInt(ip[0])*256**3 + parseInt(ip[1])*256**2 + parseInt(ip[2])*256 + parseInt(ip[3]);
+}
+
+/**
+ * Holds information about a pool
+ * @param id Of a pool
+ * @param ip Of network
+ * @param prefix Of a pool
+ * @param parent Parent object
+ * @param description Description of a pool
+ * @constructor
+ */
+function Pool(id, ip, prefix, parent, description){
+    this.id = id;
+    this.ip = ip;
+    this.prefix = prefix;
+    this.parent = parent;
+    this.description = description;
+    this.subnets = [];
+    this.isTopLevel = false;
+    this.utalization = 100;
+    this.numberOfIps =  2 ** (32-prefix);
+}
+
+Pool.prototype = {
+    /**
+     * Adds a pool to the pools array of subnets
+     * @param child
+     */
+    addSubnet: function (child) {
+        this.subnets.push(child);
+    },
+    /**
+     * Returns the percentage of pool utilization, if a pool has no subnets its utilization is 100 if not its calculated according to the utilization of subnets
+     * @returns {number}
+     */
+    getUtilization(){
+        if(this.subnets.length === 0){
+            this.utalization = 100;
+            console.log("this is leaf", this.ip+'/'+this.prefix, this.utalization, this.numberOfIps);
+            return this.utalization;
+        }
+        this.utalization = 0;
+        for(var i=0; i<this.subnets.length; i++){
+            var item = this.subnets[i];
+            this.utalization += (item.numberOfIps/this.numberOfIps) * item.getUtilization();
+            console.log('current utalization', this.utalization);
+        }
+        console.log("this is not leaf", this.ip+'/'+this.prefix, this.utalization, this.numberOfIps);
+        return this.utalization;
+    }
+};
