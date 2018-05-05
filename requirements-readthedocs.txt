@@ -1,3 +1,4 @@
+pip==9.0.3
 Django==1.10.8
 Jinja2==2.7.3
 MarkupSafe==0.23
