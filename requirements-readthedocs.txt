@@ -10,15 +10,15 @@ billiard==3.5.0.3
 celery==3.1.25
 datastream[influxdb]==0.5.19
 defusedxml==0.5.0
-git+https://github.com/zestedesavoir/django-cors-middleware.git@1b9f8f5a10cc4251ac9a9c255bbb34a4962ed3f3#egg=cors_middleware-zestedesavoir
-django-classy-tags==0.7.1
+git+https://github.com/zestedesavoir/django-cors-middleware.git@863a523385055ad043a64ac6c0d78c0184eb97d9#egg=cors_middleware-zestedesavoir
+django-classy-tags==0.8.0
 ujson==1.35
 git+https://github.com/wlanslovenija/django-tastypie.git@d8c51ef2ef55efa49409f7ac1f1c44b1258be8b9#egg=django_tastypie-wlanslovenija
 --allow-all-external git+https://github.com/wlanslovenija/django-datastream.git@a54a2e735950c5c31ec71613750bdf1ce194389f#egg=django_datastream-master
-django-guardian==1.4.8
+django-guardian==1.4.9
 django-missing==0.2.1
-django-phonenumber-field==1.0.0
-django_polymorphic==1.1
+django-phonenumber-field==1.3.0
+django_polymorphic==1.3.1
 django-registration==2.0.4
 django-sekizai==0.9.0
 dnspython==1.12.0
