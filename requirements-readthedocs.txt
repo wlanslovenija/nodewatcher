@@ -50,7 +50,7 @@ djangorestframework==3.8.2
 django-filter==1.1.0
 git+https://github.com/wlanslovenija/django-rest-framework-gis.git@d2f8adab93be1cab75696485e9b0c56d41248328#egg=djangorestframework_gis-wlanslovenija
 git+https://github.com/wlanslovenija/drf-ujson-renderer.git@96cee399260daf469b7e4b004fa245edf9dd253c#egg=drf_ujson-wlanslovenija
-grako==3.12.1
+grako==3.11
 influxdb==5.0.0
 networkx==1.11
 django-queryinspect==1.0.0
