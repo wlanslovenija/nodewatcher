@@ -272,7 +272,7 @@ DEPENDENCY_APPS = [
     'timezone_field',
     'leaflet',
     'django_countries',
-    'registration',
+    'django_registration',
     'rest_framework',
     'rest_framework_gis',
     'django_filters',
