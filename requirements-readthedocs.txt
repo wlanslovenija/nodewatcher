@@ -2,7 +2,7 @@ Django==1.10.8
 Jinja2==2.10
 MarkupSafe==1.0
 Pygments==2.2.0
-Sphinx==1.8.2
+Sphinx==1.8.1
 amqp==2.3.2
 anyjson==0.3.3
 billiard==3.5.0.3
