@@ -341,6 +341,9 @@ INSTALLED_APPS += [
     'nodewatcher.modules.authentication.oauth.apps.OAuthAuthenticationConfig',
     'nodewatcher.modules.authentication.oauth.apps.OAuth2ProviderConfig',
 
+    # SNMP Daemon.
+    'nodewatcher.modules.monitor.sources.snmp',
+
     # Defaults for wlan slovenia network.
     'nodewatcher.extra.wlansi',
 
@@ -729,4 +732,4 @@ CORS_ALLOW_METHODS = (
 
 # Allowed hosts (required for production use, when DEBUG is false). Set it
 # to the (virtual HTTP) hostname under which you have nodewatcher installation.
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['212.237.52.226']
