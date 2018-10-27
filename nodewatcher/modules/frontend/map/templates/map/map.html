@@ -9,20 +9,95 @@
     {% add_data "js_data_end" "leaflet/js/leaflet.markercluster.js" %}
     {% add_data "css_data" "leaflet/css/leaflet.markercluster.css" %}
 
+	{% add_data "js_data_end" "leaflet/js/leaflet.fullscreen.js" %}
+	{% add_data "css_data" "leaflet/css/leaflet.fullscreen.css" %}
+
+	{% add_data "js_data_end" "leaflet/js/leaflet-sidebar.js" %}
+	{% addtoblock "css" %}<link href="/static/leaflet/css/leaflet-sidebar.css" media="all" rel="stylesheet" type="text/css" />{% endaddtoblock %}
+
+	{% addtoblock "css" %}<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">{% endaddtoblock %}
+
     {% add_data "js_data" "datastream/moment/moment.js" %}
     {% add_data "js_data" "map/js/api.js" %}
     {% add_data "js_data" "map/js/code.js" %}
     {% add_data "css_data" "map/css/style.css" %}
+
+	{% add_data "js_data" "map/js/sidebar.js" %}
 
     {% trans "Map" as title %}
 {% endcontextblock %}
 
 {% block content %}
     {% leaflet_map "map" %}
-
+	
     {% get_partial "map_partial" as map_partial %}
 
     {% with partial=map_partial %}
         {% include "base/partial.html" %}
     {% endwith %}
+
+	<div id="sidebar" class="leaflet-sidebar collapsed leaflet-control leaflet-sidebar-right leaflet-touch">
+		<!-- Nav tabs -->
+		<div class="leaflet-sidebar-tabs" role="tablist">
+			<ul class="">
+				<li class="" title="Node list">
+					<a class="" href="#node-list" role="tab">
+						<i class="fa fa-bars"></i>
+					</a>
+				</li>
+				<li class="" title="Recently offline">
+					<a class="" href="#recently-offline" role="tab">
+						<i class="fas fa-eye-slash"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+
+		<!-- Tab panes -->
+		<div class="leaflet-sidebar-content">
+			<div class="leaflet-sidebar-pane" id="node-list">
+				<h1 class="leaflet-sidebar-header">Node list</h1>
+				<input id="node-list-search" class="sidebar-search" placeholder="Search for nodes..." title="Type in a name" oninput="sidebarSearch('node-list-search','node-list-table')" type="text">
+				<br>
+				<div class="sidebar-table-container">
+					<table id="node-list-table" class="sidebar-table">
+						<tbody>
+							<tr class="sidebar-table-row-header">
+								<th class="sidebar-table-name">
+									<h2 class="sidebar-table-name">Name</h2>
+								</th>
+								<th>
+									<h2 class="sidebar-table-type">Type</h2>
+								</th>
+								<th class="sidebar-table-locate">
+								</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="leaflet-sidebar-pane" id="recently-offline">
+				<h1 class="leaflet-sidebar-header">Recently offline</h1>
+				<input id="recently-offline-search" class="sidebar-search" placeholder="Search for nodes..." title="Type in a name" oninput="sidebarSearch('recently-offline-search','recently-offline-table')" type="text">
+				<br>
+				<div class="sidebar-table-container">
+					<table id="recently-offline-table" class="sidebar-table">
+						<tbody>
+							<tr class="sidebar-table-row-header">
+								<th class="sidebar-table-name">
+									<h2 class="sidebar-table-name">Name</h2>
+								</th>
+								<th>
+									<h2 class="sidebar-table-type">Type</h2>
+								</th>
+								<th class="sidebar-table-locate">
+								</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
 {% endblock %}
