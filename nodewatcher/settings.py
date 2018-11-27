@@ -332,6 +332,7 @@ INSTALLED_APPS += [
     'nodewatcher.modules.frontend.topology',
     'nodewatcher.modules.frontend.generator',
     'nodewatcher.modules.frontend.map',
+    'nodewatcher.modules.frontend.ip_space',
     'nodewatcher.modules.administration.banner',
     'nodewatcher.modules.sensors.generic',
     'nodewatcher.modules.defaults.network_profile',
@@ -654,15 +655,21 @@ MENUS = {
             'visible': True,
         },
         {
-            'name': 'Map',
+            'name': 'IP space',
             'weight': 50,
             'visible': True,
         },
         {
-            'name': 'API',
+            'name': 'Map',
             'weight': 60,
             'visible': True,
         },
+        {
+            'name': 'API',
+            'weight': 70,
+            'visible': True,
+        },
+
     ],
     #'accounts_menu': [
     #    ...
